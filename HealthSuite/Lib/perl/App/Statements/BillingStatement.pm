@@ -29,8 +29,9 @@ my $SELECT_OUTSTANDING_CLAIMS = qq{
 		) as patient_receipts,
 		p.complete_name AS patient_name,
 		p.name_last AS patient_name_last,
-		'claim' as statement_type
-	FROM Transaction t, Invoice_Billing ib, Invoice i, Person p
+		'claim' as statement_type,
+		o.org_id as billing_org_id
+	FROM Org o, Transaction t, Invoice_Billing ib, Invoice i, Person p
 	WHERE
 		p.person_id = i.client_id
 		AND i.owner_id = :1
@@ -48,6 +49,7 @@ my $SELECT_OUTSTANDING_CLAIMS = qq{
 		AND not exists(select 'x' from Payment_Plan_Inv_Ids ppii
 			where ppii.member_name = i.invoice_id
 		)
+		AND o.org_internal_id = t.billing_facility_id
 	UNION
 	SELECT plan_id * (-1) as invoice_id, pp.person_id as bill_to_id, pp.billing_org_id as
 		billing_facility_id, 'Payment Plan' as provider_id, NULL as care_provider_id,
@@ -57,8 +59,9 @@ my $SELECT_OUTSTANDING_CLAIMS = qq{
 		(select nvl(sum(value_float), 0) from Payment_History where parent_id = pp.plan_id)
 		as patient_receipts,
 		p.complete_name as patient_name, p.name_last as patient_name_last,
-		'payplan' as statement_type
-	FROM Person p, Payment_Plan pp
+		'payplan' as statement_type,
+		o.org_id as billing_org_id
+	FROM Org o, Person p, Payment_Plan pp
 	WHERE pp.next_due > sysdate
 		and pp.owner_org_id = :1
 		and pp.balance > 0
@@ -66,6 +69,7 @@ my $SELECT_OUTSTANDING_CLAIMS = qq{
 		and (pp.laststmt_date is NULL or
 			(pp.laststmt_date is NOT NULL and pp.laststmt_date < trunc(sysdate) -14)
 		)
+		and o.org_internal_id = pp.billing_org_id
 };
 
 $STMTMGR_STATEMENTS = new App::Statements::BillingStatement(
@@ -149,14 +153,16 @@ $STMTMGR_STATEMENTS = new App::Statements::BillingStatement(
 	},
 
 	'sel_orgAddress' => qq{
-		SELECT name_primary, line1, line2, city, state, replace(zip, '-', null) as zip
+		SELECT initcap(name_primary) as name_primary, line1, line2, city, state, 
+			replace(zip, '-', null) as zip
 		FROM Org_Address, Org
 		WHERE org_internal_id = :1
 			and Org_Address.parent_id = Org.org_internal_id
 	},
 
 	'sel_orgAddressByName' => qq{
-		SELECT name_primary, line1, line2, city, state, replace(zip, '-', null) as zip
+		SELECT initcap(name_primary) as name_primary, line1, line2, city, state, 
+			replace(zip, '-', null) as zip
 		FROM org_address, org
 		WHERE org_internal_id = :1
 			AND org_address.parent_id = org.org_internal_id
@@ -164,8 +170,8 @@ $STMTMGR_STATEMENTS = new App::Statements::BillingStatement(
 	},
 
 	'sel_personAddress' => qq{
-		SELECT complete_name, line1, line2, city, State, replace(zip, '-', null) as zip,
-			simple_name
+		SELECT initcap(complete_name) as complete_name, line1, line2, city, State, 
+			replace(zip, '-', null) as zip, initcap(simple_name) as simple_name
 		FROM Person_Address, Person
 		WHERE person_id = ?
 			and Person_Address.parent_id = Person.person_id
@@ -295,6 +301,19 @@ $STMTMGR_STATEMENTS = new App::Statements::BillingStatement(
 				order by statement_id desc
 			)
 			where rownum < 5
+		},
+
+		publishDefn => {
+			columnDefn => [
+				{ head => 'Patient ID', },
+				{ head => 'Transmission Date', hAlign => 'left',},
+				{ head => 'Status', hAlign => 'left', },
+				{ head => 'Ack Date', hAlign => 'left', },
+				{ head => 'Int Stmt ID', hAlign => 'left',},
+				{ head => 'Ext Stmt ID', hAlign => 'left',},
+				{ head => 'Amount Due', hAlign => 'right', dformat => 'currency',},
+				{ head => 'Claim IDs', },
+			],
 		},
 	},
 

@@ -62,6 +62,7 @@ sub populateStatementsHash
 		$statements{$key}->{billPartyType} = $_->{bill_party_type};
 		$statements{$key}->{patientName} = $_->{patient_name};
 		$statements{$key}->{patientLastName} = $_->{patient_name_last};
+		$statements{$key}->{billingOrgId} = $_->{billing_org_id};
 
 		my $balance = defined $_->{balance} ? $_->{balance} : 0;
 		$statements{$key}->{balance} += $balance;
@@ -96,7 +97,8 @@ sub populateStatementsHash
 
 		push(@{$statements{$key}->{invoices}}, $invObject);
 		
-		changeInvoiceStatus($page, $_->{invoice_id}, App::Universal::INVOICESTATUS_AWAITCLIENTPAYMENT);
+		changeInvoiceStatus($page, $_->{invoice_id}, App::Universal::INVOICESTATUS_AWAITCLIENTPAYMENT)
+			unless ($statements{$key}->{paymentPlan} || $ENV{HTTP_USER_AGENT});
 	}
 
 	my @keys = sort keys %statements;
