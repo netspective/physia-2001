@@ -95,5 +95,8 @@ detail report.
 		<deliverable id="1238">
 			Activity log for checkout hardcoded to 'Add'.
 		</deliverable>
+		<deliverable id="360">
+			Added the coverage begin and end date to show up in the 'Personal Coverage' component
+		</deliverable>		
 	</deliverables>
 </release-notes>
