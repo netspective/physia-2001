@@ -56,7 +56,7 @@ sub archiveFiles
 
     for my $orgKey (keys %orgList)
     {
-      my $billingId = $orgList{$orgKey}->{billingId};
+      my $billingId = lc($orgList{$orgKey}->{billingId});
       my $msgFile = $billingId . '.msg';
       my $dlmFile = $billingId . '.dlm';
 
