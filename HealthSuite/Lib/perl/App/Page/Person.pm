@@ -292,24 +292,49 @@ sub prepare_view_appointment
 
 sub prepare_view_refill_request
 {
-	my $self = shift;
-	my $personId = $self->param('person_id');
-	
-	my $dialogCmd = 'add';
-	my $cancelUrl = "/person/$personId/profile";
-	my $dialog = new App::Dialog::Attribute::RefillRequest(schema => $self->getSchema(), cancelUrl => $cancelUrl);
-	$dialog->handle_page($self, $dialogCmd);
+#	my $self = shift;
+#	my $personId = $self->param('person_id');
+#	
+#	my $dialogCmd = 'add';
+#	my $cancelUrl = "/person/$personId/profile";
+#	my $dialog = new App::Dialog::Attribute::RefillRequest(schema => $self->getSchema(), cancelUrl => $cancelUrl);
+#	$dialog->handle_page($self, $dialogCmd);
+
+
+        my ($self) = @_;
+        $self->addContent(qq{
+                <TABLE BORDER=0 CELLSPACING=0 CELLPADDING=0>
+                        <TR VALIGN=TOP> 
+                                <TD>
+                                        #component.stp-person.refillRequest#<BR>
+                                </TD>
+                        </TR>
+                </TABLE>
+        });
+
 }
 
 sub prepare_view_phone_message
 {
-	my $self = shift;
-	my $personId = $self->param('person_id');
+	#my $self = shift;
+	#my $personId = $self->param('person_id');
 	
-	my $dialogCmd = 'add';
-	my $cancelUrl = "/person/$personId/profile";
-	my $dialog = new App::Dialog::Attribute::PhoneMessage(schema => $self->getSchema(), cancelUrl => $cancelUrl);
-	$dialog->handle_page($self, $dialogCmd);
+	#my $dialogCmd = 'add';
+	#my $cancelUrl = "/person/$personId/profile";
+	#my $dialog = new App::Dialog::Attribute::PhoneMessage(schema => $self->getSchema(), cancelUrl => $cancelUrl);
+	#$dialog->handle_page($self, $dialogCmd);
+
+        my ($self) = @_;
+        $self->addContent(qq{
+                <TABLE BORDER=0 CELLSPACING=0 CELLPADDING=0>
+                        <TR VALIGN=TOP>
+                                <TD>
+                                        #component.stp-person.phoneMessage#<BR>
+                                </TD>
+                        </TR>
+                </TABLE>
+        });
+
 }
 
 sub prepare_view_update
