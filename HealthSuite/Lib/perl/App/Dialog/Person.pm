@@ -614,7 +614,10 @@ sub handleAttrs
 			parent_id => $personId || undef,
 			parent_org_id => $orgIntId ||undef,
 			item_name => 'Misc Notes' ,
+			value_type => 0,
 			value_text => $page->field('misc_notes') || undef,
+			value_date => $page->getDate() || undef,
+			value_textB => $page->session('user_id') || undef,
 			_debug => 0
 			) if $page->field('misc_notes') ne '';
 
