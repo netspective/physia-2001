@@ -239,16 +239,20 @@ sub createTextRowsFromData {
 
 	my $mtbDebug = lc($publDefn->{mtbDebug}) || "";
 	$mtbDebug = 'full';
-	my ($maxCols, $maxRows) = ($publDefn->{maxCols} || 132, $publDefn->{maxRows} || 66);
+	my ($maxCols, $maxRows) = ($publDefn->{maxCols} || 132, $publDefn->{maxRows} || 60);
 	my @header = (defined $publDefn->{header}) ? @{$publDefn->{header}} : ();
 	my @footer = @header;
 
 	my ($rowIndex, $colIndex) = (0, 0);
 	my $tempDir = $CONFDATA_SERVER->path_temp();
-	my $theFilename .= "/" . $page->session ('org_id') . $page->session ('user_id') . time() . (rand time() + 1) . ".txt";
+	my $theFilename = "/" . $page->session ('org_id') . (rand time()) . $page->session ('user_id') . (rand time() + 1) . ".txt";
+	while (-e $tempDir.$theFilename) {
+		$theFilename = "/" . $page->session ('org_id') . (rand time()) . $page->session ('user_id') . (rand time() + 1) . ".txt";
+	}
 
 	# Reformat incoming arguments for optimized processing...
 	my @fieldDefn =  @{$publDefn->{columnDefn}};
+	my $reportTitle = (defined $publDefn->{reportTitle} ? $publDefn->{reportTitle} : undef);
 
 	# Initialize report variables...
 	@columnTotals = ();
@@ -263,11 +267,11 @@ sub createTextRowsFromData {
 	# Massage the public definition to appear the way we want it to.
 	my ($newFieldDefn, $origFieldOrder) = massageFieldDefn (\@fieldDefn);
 	my ($rowFormat, $headingOrder, $fieldOrder) = generateFormat ($newFieldDefn, $origFieldOrder, $maxCols);
-	my ($groupCols, $sumCols) = getReportOrganization ($newFieldDefn);
-	my $detailCallback = generateDetailCallback ($rowFormat, $fieldOrder, $newFieldDefn, $groupCols, $sumCols);
-	my $breaksCallback = generateBreaksCallback ($rowFormat, $fieldOrder, $newFieldDefn, $groupCols, $sumCols);
-	my $finalCallback = generateFinalCallback ($rowFormat, $fieldOrder, $newFieldDefn, $groupCols, $sumCols);
-	my $headerCallback = generateHeaderCallback (\@header, $rowFormat, $headingOrder);
+	my ($groupCols, $sumCols) = getReportOrganization ($newFieldDefn, $origFieldOrder);
+	my $detailCallback = generateDetailCallback ($rowFormat, $origFieldOrder, $newFieldDefn, $groupCols, $sumCols);
+	my $breaksCallback = generateBreaksCallback ($rowFormat, $origFieldOrder, $newFieldDefn, $groupCols, $sumCols);
+	my $finalCallback = generateFinalCallback ($rowFormat, $origFieldOrder, $newFieldDefn, $groupCols, $sumCols);
+	my $headerCallback = generateHeaderCallback (\@header, $rowFormat, $headingOrder, $reportTitle);
 	my $footerCallback = generateFooterCallback (\@footer, $rowFormat, $headingOrder);
 	my $titleCallback = generateTitleCallback ();
 
@@ -307,15 +311,14 @@ sub massageFieldDefn {
 	my $logPrepend = (scalar localtime)." " x $logSpaces;
 
 	# Go ahead and massage the data to appear the way we want it to
-	my $tempColIdx = 1;
-	my $currFieldIdx = 0;
+	my $colCount = 0;
 	foreach my $thisFieldDefn (@{$fieldDefn}) {
 		$logSpaces += 2;
 		$logPrepend = (scalar localtime)." " x $logSpaces;
 		# If this field doesnt have a column field, set it to a sane value
 		# Obtained by adding the widths of all the fields before this one.
-		my $tempCol = $thisFieldDefn->{col} || $currFieldIdx;
-		print LOGFILE $logPrepend."tempCol: $tempCol\n";
+#		my $tempCol = $thisFieldDefn->{col} || $colCount;
+#		print LOGFILE $logPrepend."tempCol: $tempCol\n";
 
 		my $thisHashOutput = "{";
 		while (my ($key, $value) = each %{$thisFieldDefn}) {
@@ -326,9 +329,25 @@ sub massageFieldDefn {
 		
 		print LOGFILE $logPrepend."thisHash => ".$thisHashOutput;
 
+		# Set other sane default values...
+		my $tempDataType = ($thisFieldDefn->{dformat} ? lc($thisFieldDefn->{dformat}) : 'raw' );
+		my $tempSummarize = ($thisFieldDefn->{summarize} ? lc($thisFieldDefn->{summarize}) : 'none' );
+		my $tempGroupBy = ($thisFieldDefn->{groupBy} ? lc($thisFieldDefn->{groupBy}) : 'none' );
+		my $tempAlign = uc($thisFieldDefn->{dAlign}) || 'LEFT';
+		$tempAlign = 'RIGHT' if ((defined $thisFieldDefn->{summarize}) or ($tempDataType ne 'raw'));
+		my $tempType = lc($thisFieldDefn->{type}) || 'simple';
+		my $tempData = $thisFieldDefn->{data} || "";
+		my $tempDataFmt = (defined $thisFieldDefn->{dataFmt}) ? $thisFieldDefn->{dataFmt} : '#'.((defined $thisFieldDefn->{colIdx}) ? $thisFieldDefn->{colIdx} : $colCount).'#';
+		
+		unless ($tempDataType eq 'raw' and $tempSummarize eq 'none') {
+			$tempDataFmt = '#'.((defined $thisFieldDefn->{colIdx}) ? $thisFieldDefn->{colIdx} : $colCount).'#';
+		}
+		
+		if ($tempDataFmt =~ /<a\s+href\s*=.*?>(.*?)<\s*\/a>/i) {
+			$tempDataFmt = $1;
+		}
+
 		# Calculate the number of fields in the dataFmt
-#		my $tempDataFmt = ($thisFieldDefn->{dataFmt} ? $thisFieldDefn->{dataFmt} : '#'.((defined $thisFieldDefn->{colIdx}) ? $thisFieldDefn->{colIdx} : $currFieldIdx).'#');
-		my $tempDataFmt = '#'.((defined $thisFieldDefn->{colIdx}) ? $thisFieldDefn->{colIdx} : $currFieldIdx).'#';
 		my $dataFmt = $tempDataFmt;
 		my $numFields = 0;
 		while ($dataFmt =~ /#[0-9]+?#/) {
@@ -338,15 +357,8 @@ sub massageFieldDefn {
 
 		# Default width = 10.  *shrug*
 		my $tempWidth = $thisFieldDefn->{width} || (10 * $numFields);
-		# Update the calculated column index.
-		$tempColIdx += $tempWidth + 1;
-		
-		# Set other sane default values...
-		my $tempAlign = uc($thisFieldDefn->{dAlign}) || 'LEFT';
-		$tempAlign = 'RIGHT' if (defined $thisFieldDefn->{summarize});
-		my $tempType = lc($thisFieldDefn->{type}) || 'simple';
-		my $tempData = $thisFieldDefn->{data} || "";
 		my $tempHead = $thisFieldDefn->{head} || " " x $tempWidth;
+		my $tempCol = (defined $thisFieldDefn->{colIdx}) ? $thisFieldDefn->{colIdx} : $colCount;
 		
 		$newFieldDefn{$tempCol} = {
 			width => $tempWidth,
@@ -356,10 +368,9 @@ sub massageFieldDefn {
 			type => $tempType,
 			data => $tempData,
 			head => $tempHead,
-			groupBy => (defined $thisFieldDefn->{groupBy} ? $thisFieldDefn->{groupBy} : undef ),
-			summarize => (defined $thisFieldDefn->{summarize} ? $thisFieldDefn->{summarize} : undef ),
-			dataType => (defined $thisFieldDefn->{dformat} ? $thisFieldDefn->{dformat} : undef ),
-#			startIdx => 0,
+			groupBy => $tempGroupBy,
+			summarize => $tempSummarize,
+			dataType => $tempDataType,
 		};
 		push @originalFieldOrder, $tempCol;
 
@@ -372,7 +383,7 @@ sub massageFieldDefn {
 		
 		print LOGFILE $logPrepend."$tempCol => ".$massagedHashOutput;
 		
-		$currFieldIdx ++;
+		$colCount ++;
 		$logSpaces -= 2;
 	}
 	
@@ -394,7 +405,7 @@ sub generateFormat {
 		# i.e. either the first field in the row does NOT start at 1 or
 		# there is a >1 space gap between two fields,
 		# then go ahead and add the appropriate number of spaces...
-		$rowFormat .= (' ' x ($field - $fmtColIndex)) if ($fmtColIndex < $field);
+#		$rowFormat .= (' ' x ($field - $fmtColIndex)) if ($fmtColIndex < $field);
 		$rowFormat .= '@';
 		$fmtColIndex += $field - $fmtColIndex + 1;
 		
@@ -421,6 +432,51 @@ sub generateFormat {
 	return ($rowFormat, \@headingOrder, \@fieldOrder);
 }
 
+sub getReportOrganization {
+	my ($newFieldDefn, $fieldOrder) = @_;
+	
+	my @groupCols = ();
+	my @sumCols = ();
+	
+	my $tempDir = $CONFDATA_SERVER->path_temp();
+	my $theFilename .= "/publish.debug.log";
+	
+	open (LOGFILE, ">>$tempDir$theFilename");
+	print LOGFILE "sub getReportOrganization\n";
+	$logSpaces += 2;
+	my $logPrepend = (scalar localtime)." " x $logSpaces;
+
+#	foreach my $field (sort {$a <=> $b} keys %{$newFieldDefn}) {
+	foreach my $field (@{$fieldOrder}) {
+		my $theField = \%{$newFieldDefn->{$field}};
+		if (defined $theField->{groupBy}) {
+			if ($theField->{groupBy} =~ /#([0-9]+)#/) {
+				my $groupByCol = $1;
+				push @groupCols, $groupByCol;
+				print LOGFILE $logPrepend."groupBy: $groupByCol [".$theField->{groupBy}."]\n";
+			}
+		}
+		
+		if (defined $theField->{summarize}) {
+			if (lc($theField->{summarize}) eq "sum") {
+				my $sumCol = $theField->{dataFmt};
+				if ($sumCol =~ /#([0-9]+)#/) {
+					$sumCol = $1;
+				}
+				push @sumCols, $sumCol;
+				print LOGFILE $logPrepend."summarize: $sumCol [".$theField->{summarize}."]\n";
+			}
+		}
+	}
+	
+	print LOGFILE $logPrepend."groupCols: (".(join '|', @groupCols).")\n";
+	print LOGFILE $logPrepend."sumCols: (".(join '|', @sumCols).")\n";
+	
+	close LOGFILE;
+	$logSpaces -= 2;
+	return (\@groupCols, \@sumCols);
+}
+
 sub generateBreaksCallback {
 	my ($rowFormat, $fieldOrder, $newFieldDefn, $groupCols, $sumCols) = @_;
 	
@@ -436,26 +492,33 @@ sub generateBreaksCallback {
 			my @thisRowFields;
 			
 			foreach my $field (@{$fieldOrder}) {
-				my $tempField = $field;
+				my $tempField = $newFieldDefn->{$field}->{dataFmt};
 				while ($tempField =~ /#([0-9]+)#/) {
 					my $fieldNum = $1;
-					if (grep $fieldNum, @_sumCols) {
+					my $tempFieldValue;
+					
+					if (lc($newFieldDefn->{$field}->{summarize}) ne 'none') {
 						# A column that needed to be subtotalled...
-						$tempField =~ s/#$fieldNum#/$columnSubTotals[$fieldNum]/e;
-					} elsif (grep $fieldNum, @_groupCols) {
+						$tempFieldValue = $columnSubTotals[$fieldNum];
+						if (lc ($newFieldDefn->{$fieldNum}->{dataType}) eq 'currency') {
+							$tempFieldValue = FORMATTER->format_price($tempFieldValue, 2);
+						}
+					} elsif (lc($newFieldDefn->{$field}->{groupBy}) ne 'none') {
 						# A column that was grouped on
-#						$tempField =~ s/#$fieldNum#/$rep_actline->[$fieldNum]/e;
-						$tempField =~ s/#$fieldNum#/$groupColumnValues[$fieldNum]/e;
+						$tempFieldValue = $newFieldDefn->{$field}->{groupBy};
+						$tempFieldValue = $rep_actline->[$fieldNum] if ($newFieldDefn->{$field}->{groupBy} =~ /#([0-9]+)#/);
 					} else {
 						# A column that wasnt subtotalled or grouped upon...
-						$tempField =~ s/#$fieldNum#/ /;
+						$tempFieldValue = " ";
 					}
+
+					$tempField =~ s/#$fieldNum#/$tempFieldValue/;
 				}
 				push @thisRowFields, $tempField;
 			}
 
 			foreach my $summedCol (@_sumCols) {
-			    $columnSubTotals [$summedCol] = 0;
+			    $columnSubTotals [$summedCol] = 0.0;
 			}
 			
 			foreach my $groupedCol (@_groupCols) {
@@ -495,30 +558,35 @@ sub generateFinalCallback {
 		my @totalRowFields;
 		
 		foreach my $field (@{$fieldOrder}) {
-			my $tempField = $field;
+			my $tempField = $newFieldDefn->{$field}->{dataFmt};
 			my $totalField = $field;
 			while ($tempField =~ /#([0-9]+)#/) {
 				my $fieldNum = $1;
-					if (grep $fieldNum, @_sumCols) {
+				my $tempFieldValue;
+
+				if (lc($newFieldDefn->{$field}->{summarize}) ne 'none') {
 					# A column that needed to be subtotalled...
-				       	my $tempFieldValue = FORMATTER->format_price($columnSubTotals[$fieldNum], 2);
-					$tempField =~ s/#$fieldNum#/$tempFieldValue/e;
-				       	$tempFieldValue = FORMATTER->format_price($columnSubTotals[$fieldNum], 2);
-					$totalField =~ s/#$fieldNum#/$tempFieldValue/e;
-				} elsif (grep $fieldNum, @_groupCols) {
+				       	$tempFieldValue = $columnTotals[$fieldNum];
+				} elsif (lc($newFieldDefn->{$field}->{groupBy}) ne 'none') {
 					# A column that was grouped on
-				       	my $tempFieldValue = FORMATTER->format_price($rep_actline->[$fieldNum], 2) if ($rep_actline->[$fieldNum] =~ /^[0-9\.\-]+$/);
-#					$tempField =~ s/#$fieldNum#/$rep_actline->[$fieldNum]/e;
-					$tempField =~ s/#$fieldNum#/$groupColumnValues[$fieldNum]/e;
-					$totalField =~ s/#$fieldNum#/ /e;
+					$tempFieldValue = " ";
+#					if (lc($newFieldDefn->{$field}->{groupBy}) !~ /#([0-9]+)#/) {
+#						$tempFieldValue = $rep_actline->[$fieldNum];
+#					} else {
+#						$tempFieldValue = $newFieldDefn->{$field}->{groupBy};
+#					}
 				} else {
 					# A column that wasnt subtotalled or grouped upon...
-					$tempField =~ s/#$fieldNum#/ /;
-					$totalField =~ s/#$fieldNum#/ /;
+					$tempFieldValue = " ";
 				}
+
+				if (lc ($newFieldDefn->{$fieldNum}->{dataType}) eq 'currency') {
+					$tempFieldValue = FORMATTER->format_price($tempFieldValue, 2);
+				}
+				
+				$tempField =~ s/#$fieldNum#/$tempFieldValue/e;
 			}
-			push @thisRowFields, $tempField;
-			push @totalRowFields, $totalField;
+			push @totalRowFields, $tempField;
 		}
 
 		foreach my $summedCol (@_sumCols) {
@@ -530,73 +598,21 @@ sub generateFinalCallback {
 			$groupColumnValues [$groupedCol] = "";
 		}
 			
-		formline $rowFormat, @thisRowFields;
-		my $tempData = $^A;
-		$^A = "";
 		formline $rowFormat, @totalRowFields;
 		my $totalData = $^A;
 		$^A = "";
 	
 		my $line = $rowFormat;
-		$line =~ s/[@<>|]/\-/g;
-#		$sheet->MVPrint (0, 0, $line);
-#		$sheet->MVPrint (0, 1, $tempData);
-		$line =~ s/\-/=/g;
+		$line =~ s/[@<>|]/=/g;
 		$sheet->MVPrint (0, 0, $line);
 		$sheet->MVPrint (0, 1, $totalData);
 	};
 }
 
-sub getReportOrganization {
-	my ($newFieldDefn) = @_;
-	
-	my @groupCols = ();
-	my @sumCols = ();
-	
-	my $tempDir = $CONFDATA_SERVER->path_temp();
-	my $theFilename .= "/publish.debug.log";
-	
-	open (LOGFILE, ">>$tempDir$theFilename");
-	print LOGFILE "sub getReportOrganization\n";
-	$logSpaces += 2;
-	my $logPrepend = (scalar localtime)." " x $logSpaces;
-
-	foreach my $field (sort {$a <=> $b} keys %{$newFieldDefn}) {
-		my $theField = \%{$newFieldDefn->{$field}};
-		if (defined $theField->{groupBy}) {
-			if ($theField->{groupBy} =~ /#([0-9]+)#/) {
-				my $groupByCol = $1;
-				push @groupCols, $groupByCol;
-				print LOGFILE $logPrepend."groupBy: $groupByCol [".$theField->{groupBy}."]\n";
-			}
-		}
-		
-		if (defined $theField->{summarize}) {
-			if (lc($theField->{summarize}) eq "sum") {
-				my $sumCol = $theField->{dataFmt};
-				if ($sumCol =~ /#([0-9]+)#/) {
-					$sumCol = $1;
-				}
-				push @sumCols, $sumCol;
-				print LOGFILE $logPrepend."summarize: $sumCol [".$theField->{summarize}."]\n";
-			}
-		}
-	}
-	
-	print LOGFILE $logPrepend."groupCols: (".(join '|', @groupCols).")\n";
-	print LOGFILE $logPrepend."sumCols: (".(join '|', @sumCols).")\n";
-	
-	close LOGFILE;
-	$logSpaces -= 2;
-	return (\@groupCols, \@sumCols);
-}
-
-
 sub generateHeaderCallback {
 	my ($header, $rowFormat, $headingOrder, $reportTitle) = @_;
 
 	my @tempHeader;
-	$reportTitle = "Insert Report Title Here";
 
 	# Create the header automagically from headings...
 	formline $rowFormat, @{$headingOrder};
@@ -621,17 +637,24 @@ sub generateHeaderCallback {
 		$logSpaces += 2;
 		my $logPrepend = (scalar localtime)." " x $logSpaces;
 	
-		my $titleFormat = "@".("|" x ($report->width() - 1));
-		formline $titleFormat, $reportTitle;
-		my $formattedReportTitle = $^A;
-		$^A = "";
+		if (defined $reportTitle) {
+			my $titleFormat = "@".("|" x ($report->width() - 1));
+			formline $titleFormat, $reportTitle;
+			my $formattedReportTitle = $^A;
+			$^A = "";
 	
-		$sheet->MVPrint (0, 0, $formattedReportTitle);
-		$sheet->MVPrint (0, 1, $report->date(2));
-		$sheet->MVPrint ($report->width() - 10, 1, "Page ".$report->page());
-		$sheet->MVPrint (0, 2, " ");
+			$sheet->MVPrint (0, $row, $formattedReportTitle);
+			
+			$row ++;
+		}
+
+		$sheet->MVPrint (0, $row, $report->date(2));
+		$sheet->MVPrint ($report->width() - 10, $row, "Page ".$report->page());
+		$row ++;
+		$sheet->MVPrint (0, $row, " ");
 
 		$row = 3;
+
 		foreach my $headerLine (@theHeader) {
 			$sheet->MVPrint (0, $row, $headerLine);
 			$headerLength = length ($headerLine) if ((length ($headerLine)) > $headerLength);
@@ -700,12 +723,12 @@ sub generateDetailCallback {
 			$logPrepend = (scalar localtime)." " x $logSpaces;
 			print LOGFILE $logPrepend."field: $field\n";
 
-			my $tempField = $field;
+			my $tempField = $newFieldDefn->{$field}->{dataFmt};
 			my $tempFieldValue;
 			while ($tempField =~ /#([0-9]+)#/) {
 				my $fieldNum = $1;
 #				my %thisFieldDefn = $fieldDefn{$fieldNum};
-				my %thisFieldDefn = $newFieldDefn->{$fieldNum};
+#				my %thisFieldDefn = $newFieldDefn->{$fieldNum};
 				$tempFieldValue = $rep_actline->[$fieldNum];
 
 				my $fieldDefnHashOutput = "{";
@@ -731,20 +754,22 @@ sub generateDetailCallback {
 						$columnSubTotals [$fieldNum] += $rep_actline->[$fieldNum];
 						$columnTotals [$fieldNum] += $rep_actline->[$fieldNum];
 						$summedFields [$fieldNum] = 1;
-						print LOGFILE $logPrepend."$columnSubTotals[$fieldNum]\n";
+						print LOGFILE "$columnSubTotals[$fieldNum]\n";
 					}
 					$logSpaces -= 2;
 			       	}
 				my $attribHashOutput = "{";
-				while (my ($key, $value) = each %thisFieldDefn) {
+				while (my ($key, $value) = each %{$newFieldDefn->{$fieldNum}}) {
 					$attribHashOutput .= "$key=$value|";
 				}
+				chop $attribHashOutput;
 				$attribHashOutput .= "}\n";
 				
 				print LOGFILE $logPrepend."$field attribs: $attribHashOutput\n";
-#			       	$tempFieldValue = FORMATTER->format_price($rep_actline->[$fieldNum], 2) if (defined $thisFieldDefn{dataType});
-			       	$tempFieldValue = FORMATTER->format_price($rep_actline->[$fieldNum], 2) if ($rep_actline->[$fieldNum] =~ /^[0-9\.\-]+$/);
-#			       	$tempField =~ s/#$fieldNum#/$rep_actline->[$fieldNum]/e;
+				if (lc ($newFieldDefn->{$fieldNum}->{dataType}) eq 'currency') {
+					$tempFieldValue = FORMATTER->format_price($rep_actline->[$fieldNum], 2);
+				}
+				
 			       	$tempField =~ s/#$fieldNum#/$tempFieldValue/e;
 				$logSpaces -= 2;
 			}
