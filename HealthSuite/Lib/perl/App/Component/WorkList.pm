@@ -105,7 +105,7 @@ sub initialize
 			
 			my $defaultVar = $itemType. 'Default';
 			$page->session($name, $preference->{resource_id} || eval "\$$defaultVar");
-			$page->addDebugStmt("Read Preference for $name", $page->session($name));
+			#$page->addDebugStmt("Read Preference for $name", $page->session($name));
 		}
 	}
 }
