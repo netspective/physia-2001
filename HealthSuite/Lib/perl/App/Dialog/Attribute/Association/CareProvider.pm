@@ -31,23 +31,22 @@ sub new
 
 	$self->addContent(
 		#new CGI::Dialog::Subhead(heading => 'Attach to Existing Record', name => 'exists_heading'),
-		new App::Dialog::Field::Person::ID(caption =>'Physician/Provider ID', name => 'rel_id', hints => 'Please provide an existing Person ID.', options => FLDFLAG_REQUIRED),
+		new App::Dialog::Field::Person::ID(caption =>'Physician/Provider ID', name => 'value_text', hints => 'Please provide an existing Person ID.', options => FLDFLAG_REQUIRED),
 		#new CGI::Dialog::Subhead(heading => 'Define New Record', name => 'notexists_heading'),
 		#new CGI::Dialog::Field(caption =>'Full Name', name => 'rel_name', hints => 'Please provide the full name of the contact if a record does not exist for him/her. A link will not be created between the patient and contact.'),
 		#new CGI::Dialog::Subhead(heading => 'Contact Information', name => 'contact_heading'),
 		new CGI::Dialog::Field(caption => 'Specialty',
 								#type => 'foreignKey',
-								name => 'rel_type',
+								name => 'value_textb',
 								fKeyStmtMgr => $STMTMGR_PERSON,
 								fKeyStmt => 'selMedicalSpeciality',
 								fKeyDisplayCol => 0,
-								fKeyValueCol => 1,
-						invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE),
-						
+								fKeyValueCol => 1),
+
 		#new CGI::Dialog::Field(type => 'phone', caption => 'Phone Number', name => 'phone_number', options => FLDFLAG_REQUIRED),
 		#new CGI::Dialog::Field(type => 'date', caption => 'Begin Date', name => 'begin_date', defaultValue => ''),
 	);
-	
+
 	$self->{activityLog} =
 	{
 		level => 1,
@@ -64,7 +63,7 @@ sub customValidate
 {
 	my ($self, $page) = @_;
 
-	my $pId = $self->getField('rel_id');
+	my $pId = $self->getField('value_text');
 	#my $pName = $self->getField('rel_name');
 	my $itemId = $page->param('item_id');
 
@@ -91,19 +90,19 @@ sub populateData
 
 	my $itemId = $page->param('item_id');
 
-	my $data = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_NONE, 'selAttributeById', $itemId);
-	$page->field('rel_type', $data->{item_name});
-	$page->field('phone_number', $data->{value_textb});
-	$page->field('begin_date', $data->{value_date});
+	my $data = $STMTMGR_PERSON->createFieldsFromSingleRow($page, STMTMGRFLAG_NONE, 'selAttributeById', $itemId);
+	#$page->field('rel_type', $data->{item_name});
+	#$page->field('phone_number', $data->{value_textb});
+	#$page->field('begin_date', $data->{value_date});
 
-	my $valueInt =  $data->{value_int};
+	#my $valueInt =  $data->{value_int};
 	#if($valueInt == 0)
 	#{
 	#	$page->field('rel_name', $data->{value_text});
 	#}
 	#else
 	#{
-		$page->field('rel_id', $data->{value_text});
+		#$page->field('rel_id', $data->{value_text});
 	#}
 }
 
@@ -111,12 +110,12 @@ sub execute
 {
 	my ($self, $page, $command, $flags) = @_;
 
-	my $relId = $page->field('rel_id');
+	my $relId = $page->field('value_text');
 	#my $relName = $page->field('rel_name');
 
 	#my $valueText = $relId eq '' ? $relName : $relId;
 	my $constrained = $relId eq '' ? 0 : 1;
-	my $medSpecCode = $page->field('rel_type');
+	my $medSpecCode = $page->field('value_textb');
 	my $medSpecCaption = $STMTMGR_PERSON->getSingleValue($page, STMTMGRFLAG_CACHE, 'selMedicalSpecialtyCaption', $medSpecCode);
 	$page->schemaAction(
 		'Person_Attribute',	$command,
@@ -126,13 +125,13 @@ sub execute
 		value_type => App::Universal::ATTRTYPE_PROVIDER || undef,
 		#value_text => $valueText || undef,
 		value_text => $relId || undef,
-		#value_textB => $page->field('phone_number') || undef,
+		value_textB => $page->field('value_textb') || undef,
 		#value_date => $page->field('begin_date') || undef,
 		value_int => defined $constrained ? $constrained : undef,
 		_debug => 0
 	);
-	
-	
+
+
 	$self->handlePostExecute($page, $command, $flags | CGI::Dialog::DLGFLAG_IGNOREREDIRECT);
 	return "\u$command completed.";
 }
