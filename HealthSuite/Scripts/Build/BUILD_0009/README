@@ -13,3 +13,23 @@ If a collection item does not have a reck date and the balance on the invoice is
 zero the invoice is removed from the collection worklist.  
 NOTE : If the user's  min balance values is not > 0 then zero balance invoices WILL stay
 on the worklist.  
+
+
+B734 - User can now reverse incorrectly entered payments by using negative amounts.
+
+B646 - Can now use misc procedure codes to identify products for generic invoices.
+
+B445 - Transfer dialog calculations have been fixed.
+
+B888 - Prosys bug. HCFA fields populating correctly.
+
+B728 - Submission to secondary/tertiary payers is now functioning. Please test claims submission as well as reports thoroughly. Thanks.
+
+B898 - Ability to "Submit for Billing" for self-pay and third party payers implemented.
+	Result of this function depends on completion of patient statements.
+
+B22  - User can now refile to same carrier.
+
+B794 - The org id is now showing correctly on the adjustment summary popup window.
+
+B636 - Third party payer now showing up on the invoice summary.
