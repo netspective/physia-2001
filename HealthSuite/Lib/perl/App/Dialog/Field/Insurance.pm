@@ -49,10 +49,10 @@ sub isValid
 	{
 		my $value = $page->field($self->{name});
 		my $ownerId = $page->param('person_id');
-		#my $recordType = App::Universal::RECORDTYPE_PERSONALCOVERAGE;
+		my $recordType = App::Universal::RECORDTYPE_PERSONALCOVERAGE;
 		my $orgId = $page->field('ins_org_id');
 		my $planName = $page->field('plan_name');
-		#my $personPlanExists = $STMTMGR_INSURANCE->getSingleValue($page,STMTMGRFLAG_NONE,'selPersonPlanExists',$value, $planName, $recordType, $ownerId);
+		my $personPlanExists = $STMTMGR_INSURANCE->getSingleValue($page,STMTMGRFLAG_NONE,'selPersonPlanExists',$value, $planName, $recordType, $ownerId);
 		my $newProductExists = $STMTMGR_INSURANCE->getSingleValue($page,STMTMGRFLAG_NONE,'selNewProductExists',$value, $orgId);
 
 
@@ -144,7 +144,8 @@ sub isValid
 	my $productName = $page->field('product_name');
 	my $preFilledOrg = $page->field('ins_comp');
 	my $preFilledProduct = $page->field('product');
-	my $preFilled =  $self->getField('product_name');
+	#my $preFilled =  $self->getField('product_name');
+	my $preFilledPlan =  $self->getField('plan');
 	my $doesProductExist = $STMTMGR_INSURANCE->getSingleValue($page,STMTMGRFLAG_NONE,'selDoesProductExists',$productName, $orgId) if $productName ne '';
 	my $doesPreFilledProductExist = $STMTMGR_INSURANCE->getSingleValue($page,STMTMGRFLAG_NONE,'selDoesProductExists',$preFilledProduct, $preFilledOrg) if $preFilledProduct ne '';
 
@@ -157,6 +158,21 @@ sub isValid
 	$self->invalidate($page, qq{$self->{caption} '$preFilledProduct' does not exist in '$preFilledOrg'.<br><img src="/resources/icons/arrow_right_red.gif">
 			<a href="$createInsProductPreHref">Create Product '$preFilledProduct' now</a>
 		}) if $doesPreFilledProductExist eq '' &&  $preFilledProduct ne '';
+
+	my $recordType = App::Universal::RECORDTYPE_PERSONALCOVERAGE;
+	my $insInternalId = $page->param('ins_internal_id') || undef;
+
+	my $personalCoverageData = $STMTMGR_INSURANCE->getRowAsHash($page,STMTMGRFLAG_NONE,'selInsuranceData',$insInternalId);
+	my $dataOrgId = $personalCoverageData->{'ins_org_id'};
+	my $dataProductName = $personalCoverageData->{'product_name'};
+	my $dataPlanName = $personalCoverageData->{'plan_name'};
+
+	my $personPlanExists = $STMTMGR_INSURANCE->getSingleValue($page,STMTMGRFLAG_NONE,'selPersonPlanExists',$productName, $planName, $recordType, $personId, $orgId) if !($productName eq $dataProductName && $dataPlanName eq $planName && $orgId eq $dataOrgId);
+	my $preFilledpersonPlanExists = $STMTMGR_INSURANCE->getSingleValue($page,STMTMGRFLAG_NONE,'selPersonPlanExists',$preFilledProduct, $preFilledPlan, $recordType, $personId, $preFilledOrg);
+
+	$self->invalidate($page, "This Personal Coverage already exists for '$personId'.") if  ($personPlanExists ne '' || $preFilledpersonPlanExists ne '');
+
+	#my $preFilledpersonPlanExists = $STMTMGR_INSURANCE->getSingleValue($page,STMTMGRFLAG_NONE,'selPersonPlanExists',$preFilledProduct, $preFilledPlan, $recordType, $personId, $preFilledOrg);
 
 
 	# return TRUE if there were no errors, FALSE (0) if there were errors
