@@ -245,6 +245,13 @@
 				<col name="remarks">The patient's employment is unknown. Stored in value_text in 'person_attribute' table</col>
 			</row>
 			<row>
+				<col name="id">227</col>
+				<col name="caption">Unemployed</col>
+				<col name="group_name">Association</col>
+				<col name="dialog_params">type="text"</col>
+				<col name="remarks">The patient's employment is unemployed. Stored in value_text in 'person_attribute' table</col>
+			</row>
+			<row>
 				<col name="id">250</col>
 				<col name="caption">Resource (Person)</col>
 				<col name="group_name">Association</col>
