@@ -34,7 +34,6 @@ sub new
 	$self->{medicareId} = undef;
 	$self->{bcbsId} = undef;
 	$self->{workersComp} = undef;
-	$self->{uPin} = undef;
 	$self->{taxId} = undef;
 	$self->{taxTypeId} = undef;
 	$self->{insType} = undef;
@@ -89,18 +88,6 @@ sub setTaxId
 {
 	my ($self,$value) = @_;
 	$self->{taxId} = $value;
-}
-
-sub getUPin
-{
-	my ($self) = @_;
-	return $self->{uPin};
-}
-
-sub setUPin
-{
-	my ($self,$value) = @_;
-	$self->{uPin} = $value;
 }
 
 sub getCLIA
@@ -212,7 +199,8 @@ sub getGRP
 	my @ids;
 	$ids[MEDICARE]= $self->getMedicareId();
 	$ids[MEDICAID]= $self->getMedicaidId();
-	my @payerCodes =(MEDICARE, MEDICAID);
+	$ids[BCBS]= $self->getBCBSId();
+	my @payerCodes =(MEDICARE, MEDICAID, BCBS);
 	my $tempInsType = $self->{insType};
 	my $temp = ((grep{$_ eq $tempInsType} @payerCodes) ? $ids[$self->{insType}] : $self->{grp});
 	return $temp;
@@ -264,16 +252,6 @@ sub getId
 {
 	my $self = shift;
 	return $self->{id};
-}
-
-sub printVal
-{
-	my ($self) = @_;
-	foreach my $key (keys(%$self))
-	{
-		print " patient $key = " . $self->{$key} . " \n";
-	}
-
 }
 
 1;

@@ -28,6 +28,7 @@ sub new
 	$self->{pin} = undef;
 	$self->{taxId} = undef;
 	$self->{insType} = undef;
+	$self->{uPIN} = undef;
 	$self->{providerId} = undef;
 	$self->{assignIndicator} = undef;
 	$self->{signatureIndicator} = undef;
@@ -66,6 +67,18 @@ sub setWorkersComp
 	$self->{workersComp} = $value;
 }
 
+sub getUPIN
+{
+	my ($self) = @_;
+	return $self->{uPIN};
+}
+
+sub setUPIN
+{
+	my ($self,$value) = @_;
+	$self->{uPIN} = $value;
+}
+
 sub getEPSDT
 {
 	my ($self) = @_;
@@ -78,13 +91,13 @@ sub setEPSDT
 	$self->{epsdtId} = $value;
 }
 
-sub getRailroadID
+sub getRailroadId
 {
 	my ($self) = @_;
 	return $self->{railroadId};
 }
 
-sub setRailroadID
+sub setRailroadId
 {
 	my ($self,$value) = @_;
 	$self->{railroadId} = $value;
@@ -108,8 +121,11 @@ sub getProviderId
 	my @ids;
 	$ids[MEDICARE]= $self->getMedicareId();
 	$ids[MEDICAID]= $self->getMedicaidId();
-	$ids[WORKERSCOMP]= $self->getWorkersComp();
-	my @payerCodes =(MEDICARE, MEDICAID, WORKERSCOMP);
+	$ids[BCBS]= $self->getBlueShieldId();
+	$ids[CHAMPUS]= $self->getChampusId();
+	$ids[RAILROAD]= $self->getRailroadId();
+	$ids[EPSDT]= $self->getEPSDT();
+	my @payerCodes =(MEDICARE, MEDICAID, BCBS, CHAMPUS, RAILROAD, EPSDT);
 	my $tempInsType = $self->{insType};
 	my $temp = ((grep{$_ eq $tempInsType} @payerCodes) ? $ids[$self->{insType}] : $self->{pin});
 	return $temp;
@@ -314,11 +330,6 @@ sub setPIN
 #	$self->{name} = $value;
 #}
 
-sub setGRP
-{
-	my ($self,$value) = @_;
-	$self->{grp} = $value;
-}
 
 sub setContact_old
 {
@@ -338,8 +349,11 @@ sub getPIN
 	my @ids;
 	$ids[MEDICARE]= $self->getMedicareId();
 	$ids[MEDICAID]= $self->getMedicaidId();
-	$ids[WORKERSCOMP]= $self->getWorkersComp();
-	my @payerCodes =(MEDICARE, MEDICAID, WORKERSCOMP);
+	$ids[BCBS]= $self->getBlueShieldId();
+	$ids[CHAMPUS]= $self->getChampusId();
+	$ids[RAILROAD]= $self->getRailroadId();
+	$ids[EPSDT]= $self->getEPSDT();
+	my @payerCodes =(MEDICARE, MEDICAID, BCBS, CHAMPUS, RAILROAD, EPSDT);
 	my $tempInsType = $self->{insType};
 	my $temp = ((grep{$_ eq $tempInsType} @payerCodes) ? $ids[$self->{insType}] : $self->{pin});
 	return $temp;
@@ -351,11 +365,6 @@ sub getPIN
 #	return $self->{name};
 #}
 
-sub getGRP
-{
-	my ($self) = @_;
-	return $self->{grp};
-}
 
 sub getContact_old
 {
