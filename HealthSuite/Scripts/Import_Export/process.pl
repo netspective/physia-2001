@@ -12,9 +12,9 @@ use Dumpvalue;
 use Date::Manip;
 use File::DosGlob 'glob';
 use Input::Promed;
-use Input::Semnet;
 use Output::PhysiaDB;
 use App::DataModel::Base;
+use Input::Semnet;
 
 use constant DEFAULT_MAIN_ORG => 'PHYSIA_ADMIN'; # use this main org if no matching main org is found
 
@@ -35,7 +35,8 @@ sub main
 	-test					The data being processed should be done in test mode
 
 	-userid <id:s>				Force the user id to this person (person_id)
-	-orgid <id:i>				Force the organization id to this organization (org_internal_id)
+	-orgid <id:i>				Force the organization id to this organization (org_internal_id).  
+						
 	
 	-createid <id:s>			Set cr_user_id to this value.  If not provided default to  IMPORT_PHYSIA
 
@@ -45,7 +46,7 @@ sub main
 						produce report for deletes
 						3: Produce delta report do not alter DB
 						
-	-loadFile <id:s>			Run process and create load file [default is to load database]				
+	-loadFile <id:s>			Run process and creates a load file [default is to load database]				
 	
 	-connectkey <key:s>			Use <key> as connect string instead of what's specified in App::Configuration
 	-schema <file>				Use <file> as schema definition file instead of what's specified in 
@@ -148,6 +149,7 @@ sub process_promed
 	my $input = new Input::Promed(@params);
 	$input->init();
 	$input->open();
+
 	$input->populateDataModel();
 	$input->close();
 
@@ -158,6 +160,9 @@ sub process_promed
 	$output->close();
 }
 
+#
+# Semnet processing function
+#
 sub process_semnet
 {
 	my ($args, %params) = @_;
