@@ -25,6 +25,7 @@ use App::Statements::Component;
 use App::Statements::Component::Person;
 use App::Statements::Component::Org;
 use App::Statements::Component::Scheduling;
+use App::Statements::Component::SDE;
 use App::Statements::Catalog;
 use App::Statements::Insurance;
 use App::Statements::IntelliCode;
@@ -62,6 +63,7 @@ use App::Statements::Transaction;
 # stpe-* are the statement panelEdit components
 @COMPONENT_CATALOG = (
 		$STMTMGR_COMPONENT_PERSON,
+		$STMTMGR_COMPONENT_SDE,
 		$STMTMGR_COMPONENT_ORG,
 		$STMTMGR_PAGE,
 	);
@@ -105,6 +107,7 @@ sub handlePage
 	$page->param('arl_asPopup', $arlAsPopup);
 	$page->param('arl_resource', $resourceId);
 	$page->param('arl_pathItems', @$pathItems) if $pathItems;
+	$page->param('_isPopup', 1) if $flags & PAGEFLAG_ISPOPUP;
 	$page->setFlag($flags);
 	
 	# CGI.pm doesn't auto parse the URL Query String if we're in POST mode
