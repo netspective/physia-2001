@@ -42,7 +42,6 @@ $STMTFMT_SEL_INVOICETYPE = qq{
 	AND ib.bill_id (+) = i.billing_id
 	AND ist.id = i.invoice_status
 	AND to_char(o.org_internal_id (+)) = ib.bill_to_id
-	AND NOT (i.invoice_status = 15 AND i.parent_invoice_id is not NULL)
 	GROUP BY
 		i.invoice_id,
 		i.total_items,
@@ -89,8 +88,10 @@ $STMTRPTDEFN_DEFAULT_ORG =
 										'12' => '#3#',
 										'13' => '#3#',
 										'14' => '#3#',
-										'15' => '#3#',
-										'16' => 'Void #13#'
+										'15' => 'Closed #13#',
+										'16' => 'Void #13#',
+										'17' => '#3#',
+										'18' => '#3#',
 									},
 				},
 				{ head => 'Client', colIdx => 8},
@@ -124,8 +125,10 @@ $STMTRPTDEFN_DEFAULT_PERSON =
 										'12' => '#3#',
 										'13' => '#3#',
 										'14' => '#3#',
-										'15' => '#3#',
-										'16' => 'Void #13#'
+										'15' => 'Closed #13#',
+										'16' => 'Void #13#',
+										'17' => '#3#',
+										'18' => '#3#',
 									},
 				},
 				{ head => 'Provider of Service', dAlign => 'CENTER', dataFmt => '#15#' },
