@@ -188,15 +188,15 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 				from  Person_Attribute
 			where  	parent_id = ?
 			and item_name = 'Misc Notes'
-					
+
 		},
 		sqlStmtBindParamDescr => ['Person ID for Attribute Table'],
-		
+
 	publishDefn =>
 	{
-		columnDefn => [		
+		columnDefn => [
 			{ dataFmt => 'Misc Notes (#5#): #4#' },
-		],	
+		],
 		bullets => 'stpe-#my.stmtId#/dlg-update-attr-#0#/#1#?home=/#param.arl#',
 		frame => { addUrl => 'stpe-#my.stmtId#/dlg-add-misc-notes?home=/#param.arl#' },
 	},
@@ -227,7 +227,7 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 			updUrlFmt => '#param.home#/../stpe-#my.stmtId#/dlg-update-attr-#0#/#1#?home=#param.home#', delUrlFmt => '#param.home#/../stpe-#my.stmtId#/dlg-remove-attr-#0#/#1#?home=#param.home#',
 		},
 	},
-	
+
 	publishComp_st => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.miscNotes', [$personId]); },
 	publishComp_stp => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.miscNotes', [$personId], 'panel'); },
 	publishComp_stpe => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.miscNotes', [$personId], 'panelEdit'); },
@@ -640,7 +640,7 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 'person.insurance' => {
 	sqlStmt => qq{
 			select ins_internal_id, parent_ins_id, product_name,  decode(record_type, 3, 'coverage') as record_type,
-					plan_name, decode(bill_sequence,0,'Inactive',1,'Primary',2,'Secondary',3,'Tertiary','','W. Comp'),
+					plan_name, decode(bill_sequence,1,'Primary',2,'Secondary',3,'Tertiary',4,'W. Comp', 99, 'InActive'),
 					owner_person_id, ins_org_id, indiv_deductible_amt, family_deductible_amt, percentage_pay,
 					copay_amt
 			from insurance
@@ -731,7 +731,7 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 #----------------------------------------------------------------------------------------------------------------------
 'person.extendedHealthCoverage' => {
 	sqlStmt => qq{
-			select 	decode(bill_sequence,0,'Inactive',1,'Primary',2,'Secondary',3,'Tertiary','','W. Comp'),
+			select 	decode(bill_sequence,0,'Inactive',1,'Primary',2,'Secondary',3,'Tertiary',4,'W. Comp'),
 				decode(ins_type,0,'Self-Pay',1,'Insurance',2,'HMO',3,'PPO',4,'Medicare',5,'Medicaid',6,'W.Comp',7,'Client Billing',8,'Champus',9,'ChampVA',10,
 					'FECA Blk Lung',11,'BCBS'), member_number, ins_internal_id, record_type, plan_name, policy_number, copay_amt, coverage_end_date, ins_org_id, product_name
 			from 	insurance
