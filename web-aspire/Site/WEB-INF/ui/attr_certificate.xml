@@ -2,7 +2,7 @@
 
 <xaf>
 	<dialogs package="attr_certificate">
-		<dialog name="certificate_specialty" heading="$Command Specialty">
+		<dialog name="certificate_specialty" heading="create-data-cmd-heading:Specialty">
 			<field.select caption="Specialty"  name="value_text" choices="query:person.selMedicalSpeciality"/>
 			<!--  -->
 			<field.select caption="Specialty Sequence"  name="value_int" choices="Unknown=5;Primary=1;Secondary=2;Tertiary=3;Quaternary=4"/>
@@ -10,14 +10,14 @@
 
 		</dialog>
 
-		<dialog name="certificate_accreditation" heading="$Command Accreditation">
-			<field.attribute.name name="value_text" caption="Accreditation"/>
+		<dialog name="certificate_accreditation" heading="create-data-cmd-heading:Accreditation">
+			<field.attribute.name name="value_text" caption="Accreditation" required="yes"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => 
 				attrNameFmt => #field.value_text#
 				caption => Accreditation
-				fKeyStmtMgr => App::Statements::Person=HASH(0x89bd520)
+				fKeyStmtMgr => App::Statements::Person=HASH(0x89bd518)
 				findPopup => 
 				findPopupAppendValue => 
 				flags => 528
@@ -29,7 +29,7 @@
 				name => value_text
 				onKeyPressJS => return processKeypress_default(event)
 				options => 16
-				popup => HASH(0xba2c050)
+				popup => HASH(0xba3f778)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -46,14 +46,14 @@
 
 		</dialog>
 
-		<dialog name="certificate_board" heading="$Command Board Certification">
-			<field.attribute.name name="value_text" caption="Board Certification Name"/>
+		<dialog name="certificate_board" heading="create-data-cmd-heading:Board Certification">
+			<field.attribute.name name="value_text" caption="Board Certification Name" required="yes"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => 
 				attrNameFmt => #field.value_text#
 				caption => Board Certification Name
-				fKeyStmtMgr => App::Statements::Person=HASH(0x89bd520)
+				fKeyStmtMgr => App::Statements::Person=HASH(0x89bd518)
 				findPopup => 
 				findPopupAppendValue => 
 				flags => 528
@@ -65,7 +65,7 @@
 				name => value_text
 				onKeyPressJS => return processKeypress_default(event)
 				options => 16
-				popup => HASH(0xba36904)
+				popup => HASH(0xba19674)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -82,14 +82,14 @@
 
 		</dialog>
 
-		<dialog name="affiliation" heading="$Command Affiliation">
-			<field.attribute.name name="value_text" caption="Affiliation"/>
+		<dialog name="affiliation" heading="create-data-cmd-heading:Affiliation">
+			<field.attribute.name name="value_text" caption="Affiliation" required="yes"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => 
 				attrNameFmt => #field.value_text#
 				caption => Affiliation
-				fKeyStmtMgr => App::Statements::Person=HASH(0x89bd520)
+				fKeyStmtMgr => App::Statements::Person=HASH(0x89bd518)
 				findPopup => 
 				findPopupAppendValue => 
 				flags => 536
@@ -101,7 +101,7 @@
 				name => value_text
 				onKeyPressJS => return processKeypress_default(event)
 				options => 16
-				popup => HASH(0xb9d37fc)
+				popup => HASH(0xb9d7c7c)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -118,7 +118,7 @@
 
 		</dialog>
 
-		<dialog name="certificate_license" heading="$Command License">
+		<dialog name="certificate_license" heading="create-data-cmd-heading:License">
 			<field.select caption="License" required="yes" name="value_textb" choices="DEA;DPS;IRS"/>
 			<!--  -->
 			<field.text caption="Number" required="yes" name="value_text"/>
@@ -130,7 +130,7 @@
 
 		</dialog>
 
-		<dialog name="certificate_provider_number" heading="$Command Provider Number">
+		<dialog name="certificate_provider_number" heading="create-data-cmd-heading:Provider Number">
 			<field.select caption="Name" required="yes" name="value_textb" choices="BCBS;Memorial Sisters Charity;EPSDT;Medicaid;Medicare;UPIN;Tax ID;Railroad Medicare;Champus;WC#;National Provider Identification"/>
 			<!--  -->
 			<field.text caption="Number" required="yes" name="value_text"/>
@@ -142,14 +142,14 @@
 
 		</dialog>
 
-		<dialog name="certificate_state" heading="$Command State License">
-			<field.attribute.name name="value_textb" caption="State"/>
+		<dialog name="certificate_state" heading="create-data-cmd-heading:State License">
+			<field.attribute.name name="value_textb" caption="State" required="yes"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => 
 				attrNameFmt => #field.value_textb#
 				caption => State
-				fKeyStmtMgr => App::Statements::Person=HASH(0x89bd520)
+				fKeyStmtMgr => App::Statements::Person=HASH(0x89bd518)
 				findPopup => 
 				findPopupAppendValue => 
 				flags => 528
@@ -161,7 +161,7 @@
 				name => value_textb
 				onKeyPressJS => return processKeypress_default(event)
 				options => 16
-				popup => HASH(0xba29764)
+				popup => HASH(0xba56ae8)
 				postHtml => 
 				preHtml => 
 				priKey => 0

@@ -2,11 +2,11 @@
 
 <xaf>
 	<dialogs package="association">
-		<dialog name="feeschedule_person" heading="$Command Assoicated Fee Schedule">
+		<dialog name="feeschedule_person" heading="create-data-cmd-heading:Assoicated Fee Schedule">
 			<field.text hidden="yes" name="item_id" caption="item_id"/>
 			<field.text caption="Organization ID" read-only="yes" name="parent_id"/>
 			<field.text hidden="yes" name="value_int" caption="value_int"/>
-			<field.catalog.id name="catalog_id" caption="Fee Schedule ID"/>
+			<field.catalog.id name="catalog_id" caption="Fee Schedule ID" required="yes"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => /org/#session.org_id#/dlg-add-catalog
@@ -23,7 +23,7 @@
 				name => catalog_id
 				onKeyPressJS => return processKeypress_identifier(event)
 				options => 48
-				popup => HASH(0xba53904)
+				popup => HASH(0xba51a28)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -36,11 +36,11 @@
 
 		</dialog>
 
-		<dialog name="feeschedule_org" heading="$Command Assoicated Fee Schedule">
+		<dialog name="feeschedule_org" heading="create-data-cmd-heading:Assoicated Fee Schedule">
 			<field.text hidden="yes" name="item_id" caption="item_id"/>
 			<field.text caption="Organization ID" read-only="yes" name="parent_id"/>
 			<field.text hidden="yes" name="value_int" caption="value_int"/>
-			<field.catalog.id name="catalog_id" caption="Fee Schedule ID"/>
+			<field.catalog.id name="catalog_id" caption="Fee Schedule ID" required="yes"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => /org/#session.org_id#/dlg-add-catalog
@@ -57,7 +57,7 @@
 				name => catalog_id
 				onKeyPressJS => return processKeypress_identifier(event)
 				options => 48
-				popup => HASH(0xba407b8)
+				popup => HASH(0xb9d6e24)
 				postHtml => 
 				preHtml => 
 				priKey => 0

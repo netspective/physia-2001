@@ -3,7 +3,7 @@
 <xaf>
 	<dialogs package="invoice_worklist_collection">
 		<dialog name="close_collection" heading="Close Invoice Collection">
-			<field.person.id name="person_id" caption="Person ID"/>
+			<field.person.id name="person_id" caption="Person ID" read-only="yes" style="text" types="Patient"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => /org/#session.org_id#/dlg-add-Patient
@@ -22,7 +22,7 @@
 				name => person_id
 				onKeyPressJS => return processKeypress_identifier(event)
 				options => 36
-				popup => HASH(0xba4083c)
+				popup => HASH(0xba496bc)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -31,7 +31,7 @@
 				requiredInvalidMsg => Person ID is required (can not be blank).
 				size => 16
 				type => text
-				types => ARRAY(0xb9f49a0)
+				types => ARRAY(0xba289f0)
 			-->
 			<field.text caption="Invoice" read-only="yes" name="invoice_id"/>
 			<field.select caption="notes"  name="notes" choices="Retain Notes=0;Delete Notes=1" style="radio"/>
@@ -40,7 +40,7 @@
 		</dialog>
 
 		<dialog name="collection_reck_date" heading="Collection Reck Date">
-			<field.person.id name="person_id" caption="Person ID"/>
+			<field.person.id name="person_id" caption="Person ID" read-only="yes" style="text" types="Patient"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => /org/#session.org_id#/dlg-add-Patient
@@ -59,7 +59,7 @@
 				name => person_id
 				onKeyPressJS => return processKeypress_identifier(event)
 				options => 36
-				popup => HASH(0xba46d2c)
+				popup => HASH(0xba4aef8)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -68,7 +68,7 @@
 				requiredInvalidMsg => Person ID is required (can not be blank).
 				size => 16
 				type => text
-				types => ARRAY(0xba6fcd4)
+				types => ARRAY(0xc026048)
 			-->
 			<field.text caption="Invoice ID" read-only="yes" name="invoice_id"/>
 			<field.date caption="Reck Date" name="reckdate" size="12"/>

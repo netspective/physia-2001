@@ -39,12 +39,12 @@
 			<field.text hidden="yes" name="work_ffs" caption="work_ffs"/>
 			<field.text hidden="yes" name="org_ffs" caption="org_ffs"/>
 			<field.text hidden="yes" name="prov_ffs" caption="prov_ffs"/>
-			<field.batchdateid name="batch_fields" caption="Batch ID Date"/>
+			<field.batchdateid name="batch_fields" caption="Batch ID Date" required="yes"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => 
 				caption => Batch ID Date
-				fields => ARRAY(0xba4ee1c)
+				fields => ARRAY(0xba4f374)
 				findPopup => 
 				findPopupAppendValue => 
 				flags => 536
@@ -57,7 +57,7 @@
 				onKeyPressJS => return processKeypress_default(event)
 				options => 16
 				orgInternalIdFieldName => service_facility_id
-				popup => HASH(0xba4fe1c)
+				popup => HASH(0xba4f1dc)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -67,7 +67,7 @@
 				size => 24
 				type => text
 			-->
-			<field.person.id name="attendee_id" caption="Patient ID"/>
+			<field.person.id name="attendee_id" caption="Patient ID" required="yes" style="text" types="Patient"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => /org/#session.org_id#/dlg-add-Patient
@@ -86,7 +86,7 @@
 				name => attendee_id
 				onKeyPressJS => return processKeypress_identifier(event)
 				options => 48
-				popup => HASH(0xba58ca4)
+				popup => HASH(0xba5422c)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -95,7 +95,7 @@
 				requiredInvalidMsg => Patient ID is required (can not be blank).
 				size => 16
 				type => text
-				types => ARRAY(0xba2c0e0)
+				types => ARRAY(0xba28a08)
 			-->
 			<field.datetime caption="Appointment Time" name="start_time" size="20"/>
 			<field.datetime caption="Check-in Time" name="checkin_stamp" size="20"/>
@@ -137,7 +137,7 @@
 			</field.composite>
 			<field.text caption="Billing Contact"  name="billing_contact"/>
 			<field.phone caption="Billing Phone"  max-length="1024" name="billing_phone"/>
-			<field.person.id name="ref_id" caption="Referring Physician ID"/>
+			<field.person.id name="ref_id" caption="Referring Physician ID"  style="text" types="Referring-Doctor"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => /org/#session.org_id#/dlg-add-Referring-Doctor
@@ -156,7 +156,7 @@
 				name => ref_id
 				onKeyPressJS => return processKeypress_identifier(event)
 				options => 32
-				popup => HASH(0xc0001a4)
+				popup => HASH(0xba7c89c)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -165,7 +165,7 @@
 				requiredInvalidMsg => Referring Physician ID is required (can not be blank).
 				size => 16
 				type => text
-				types => ARRAY(0xba7753c)
+				types => ARRAY(0xba7b6a4)
 			-->
 			<field.composite caption="Current/Similar Illness Dates"  name="illness_dates">
 				<field.date caption="illness_end_date" name="illness_end_date" size="12"/>
@@ -187,7 +187,7 @@
 			<field.boolean caption="Have you confirmed Personal Information/Insurance Coverage?" required="yes" name="confirmed_info"/>
 			<field.memo caption="Place Claim(s) On Hold" name="on_hold" size="24"/>
 			<field.separator heading="Procedure Entry" name="procedures_heading"/>
-			<field.procedures name="procedures_list" caption="*"/>
+			<field.procedures name="procedures_list" caption="*" />
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => 
@@ -205,7 +205,7 @@
 				message => 
 				name => procedures_list
 				onKeyPressJS => return processKeypress_default(event)
-				popup => HASH(0xba26fb0)
+				popup => HASH(0xba411ac)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -255,12 +255,12 @@
 			<field.text hidden="yes" name="work_ffs" caption="work_ffs"/>
 			<field.text hidden="yes" name="org_ffs" caption="org_ffs"/>
 			<field.text hidden="yes" name="prov_ffs" caption="prov_ffs"/>
-			<field.batchdateid name="batch_fields" caption="Batch ID Date"/>
+			<field.batchdateid name="batch_fields" caption="Batch ID Date" required="yes"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => 
 				caption => Batch ID Date
-				fields => ARRAY(0xba606ac)
+				fields => ARRAY(0xba662cc)
 				findPopup => 
 				findPopupAppendValue => 
 				flags => 536
@@ -273,7 +273,7 @@
 				onKeyPressJS => return processKeypress_default(event)
 				options => 16
 				orgInternalIdFieldName => service_facility_id
-				popup => HASH(0xba604cc)
+				popup => HASH(0xba676cc)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -283,7 +283,7 @@
 				size => 24
 				type => text
 			-->
-			<field.person.id name="attendee_id" caption="Patient ID"/>
+			<field.person.id name="attendee_id" caption="Patient ID" required="yes" style="text" types="Patient"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => /org/#session.org_id#/dlg-add-Patient
@@ -302,7 +302,7 @@
 				name => attendee_id
 				onKeyPressJS => return processKeypress_identifier(event)
 				options => 48
-				popup => HASH(0xba65b6c)
+				popup => HASH(0xba68d30)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -311,7 +311,7 @@
 				requiredInvalidMsg => Patient ID is required (can not be blank).
 				size => 16
 				type => text
-				types => ARRAY(0xb9f19ec)
+				types => ARRAY(0xba1a7f0)
 			-->
 			<field.datetime caption="Appointment Time" name="start_time" size="20"/>
 			<field.datetime caption="Check-in Time" name="checkin_stamp" size="20"/>
@@ -353,7 +353,7 @@
 			</field.composite>
 			<field.text caption="Billing Contact"  name="billing_contact"/>
 			<field.phone caption="Billing Phone"  max-length="1024" name="billing_phone"/>
-			<field.person.id name="ref_id" caption="Referring Physician ID"/>
+			<field.person.id name="ref_id" caption="Referring Physician ID"  style="text" types="Referring-Doctor"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => /org/#session.org_id#/dlg-add-Referring-Doctor
@@ -372,7 +372,7 @@
 				name => ref_id
 				onKeyPressJS => return processKeypress_identifier(event)
 				options => 32
-				popup => HASH(0xba58d10)
+				popup => HASH(0xba59838)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -381,7 +381,7 @@
 				requiredInvalidMsg => Referring Physician ID is required (can not be blank).
 				size => 16
 				type => text
-				types => ARRAY(0xba0fde0)
+				types => ARRAY(0xba5c1f8)
 			-->
 			<field.composite caption="Current/Similar Illness Dates"  name="illness_dates">
 				<field.date caption="illness_end_date" name="illness_end_date" size="12"/>
@@ -403,7 +403,7 @@
 			<field.boolean caption="Have you confirmed Personal Information/Insurance Coverage?" required="yes" name="confirmed_info"/>
 			<field.memo caption="Place Claim(s) On Hold" name="on_hold" size="24"/>
 			<field.separator heading="Procedure Entry" name="procedures_heading"/>
-			<field.procedures name="procedures_list" caption="*"/>
+			<field.procedures name="procedures_list" caption="*" />
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => 
@@ -421,7 +421,7 @@
 				message => 
 				name => procedures_list
 				onKeyPressJS => return processKeypress_default(event)
-				popup => HASH(0xba37438)
+				popup => HASH(0xc00ecec)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -471,12 +471,12 @@
 			<field.text hidden="yes" name="work_ffs" caption="work_ffs"/>
 			<field.text hidden="yes" name="org_ffs" caption="org_ffs"/>
 			<field.text hidden="yes" name="prov_ffs" caption="prov_ffs"/>
-			<field.batchdateid name="batch_fields" caption="Batch ID Date"/>
+			<field.batchdateid name="batch_fields" caption="Batch ID Date" required="yes"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => 
 				caption => Batch ID Date
-				fields => ARRAY(0xba75a9c)
+				fields => ARRAY(0xba78e98)
 				findPopup => 
 				findPopupAppendValue => 
 				flags => 536
@@ -489,7 +489,7 @@
 				onKeyPressJS => return processKeypress_default(event)
 				options => 16
 				orgInternalIdFieldName => service_facility_id
-				popup => HASH(0xba78124)
+				popup => HASH(0xba7b620)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -499,7 +499,7 @@
 				size => 24
 				type => text
 			-->
-			<field.person.id name="attendee_id" caption="Patient ID"/>
+			<field.person.id name="attendee_id" caption="Patient ID" required="yes" style="text" types="Patient"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => /org/#session.org_id#/dlg-add-Patient
@@ -518,7 +518,7 @@
 				name => attendee_id
 				onKeyPressJS => return processKeypress_identifier(event)
 				options => 48
-				popup => HASH(0xc000384)
+				popup => HASH(0xba7de64)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -527,7 +527,7 @@
 				requiredInvalidMsg => Patient ID is required (can not be blank).
 				size => 16
 				type => text
-				types => ARRAY(0xba1ca74)
+				types => ARRAY(0xba10c38)
 			-->
 			<field.datetime caption="Appointment Time" name="start_time" size="20"/>
 			<field.datetime caption="Check-in Time" name="checkin_stamp" size="20"/>
@@ -569,7 +569,7 @@
 			</field.composite>
 			<field.text caption="Billing Contact"  name="billing_contact"/>
 			<field.phone caption="Billing Phone"  max-length="1024" name="billing_phone"/>
-			<field.person.id name="ref_id" caption="Referring Physician ID"/>
+			<field.person.id name="ref_id" caption="Referring Physician ID"  style="text" types="Referring-Doctor"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => /org/#session.org_id#/dlg-add-Referring-Doctor
@@ -588,7 +588,7 @@
 				name => ref_id
 				onKeyPressJS => return processKeypress_identifier(event)
 				options => 32
-				popup => HASH(0xba66bf4)
+				popup => HASH(0xba69d9c)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -597,7 +597,7 @@
 				requiredInvalidMsg => Referring Physician ID is required (can not be blank).
 				size => 16
 				type => text
-				types => ARRAY(0xba36b68)
+				types => ARRAY(0xba45eac)
 			-->
 			<field.composite caption="Current/Similar Illness Dates"  name="illness_dates">
 				<field.date caption="illness_end_date" name="illness_end_date" size="12"/>
@@ -619,7 +619,7 @@
 			<field.boolean caption="Have you confirmed Personal Information/Insurance Coverage?" required="yes" name="confirmed_info"/>
 			<field.memo caption="Place Claim(s) On Hold" name="on_hold" size="24"/>
 			<field.separator heading="Procedure Entry" name="procedures_heading"/>
-			<field.procedures name="procedures_list" caption="*"/>
+			<field.procedures name="procedures_list" caption="*" />
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => 
@@ -637,7 +637,7 @@
 				message => 
 				name => procedures_list
 				onKeyPressJS => return processKeypress_default(event)
-				popup => HASH(0xba6ac94)
+				popup => HASH(0xba718d0)
 				postHtml => 
 				preHtml => 
 				priKey => 0

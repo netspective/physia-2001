@@ -9,7 +9,7 @@
 				<field.text caption="From"  name="from"/>
 				<field.text caption="send_on"  name="send_on"/>
 			</field.composite>
-			<field.person.id name="to" caption="To"/>
+			<field.person.id name="to" caption="To" required="yes" style="text"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => NONE
@@ -28,7 +28,7 @@
 				name => to
 				onKeyPressJS => return processKeypress_identifier(event)
 				options => 48
-				popup => HASH(0xba4ed38)
+				popup => HASH(0xba4f194)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -38,7 +38,7 @@
 				size => 40
 				type => not_an_identifier
 			-->
-			<field.person.id name="cc" caption="CC"/>
+			<field.person.id name="cc" caption="CC"  style="text"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => NONE
@@ -57,7 +57,7 @@
 				name => cc
 				onKeyPressJS => return processKeypress_identifier(event)
 				options => 32
-				popup => HASH(0xba3ed14)
+				popup => HASH(0xba621e4)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -67,7 +67,7 @@
 				size => 40
 				type => not_an_identifier
 			-->
-			<field.person.id name="patient_id" caption="Regarding Patient"/>
+			<field.person.id name="patient_id" caption="Regarding Patient"  style="text" types="Patient"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => /org/#session.org_id#/dlg-add-Patient
@@ -86,7 +86,7 @@
 				name => patient_id
 				onKeyPressJS => return processKeypress_identifier(event)
 				options => 32
-				popup => HASH(0xc00030c)
+				popup => HASH(0xba72ea4)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -95,7 +95,7 @@
 				requiredInvalidMsg => Regarding Patient is required (can not be blank).
 				size => 16
 				type => text
-				types => ARRAY(0xba6fe00)
+				types => ARRAY(0xba69ca0)
 			-->
 			<field.text hidden="yes" name="patient_name" caption="patient_name"/>
 			<field.text hidden="yes" name="saved_patient_id" caption="saved_patient_id"/>
@@ -118,7 +118,7 @@
 			<!--  -->
 			<field.memo name="message" rows="5" cols="70" size="24"/>
 			<field.separator heading="Notes" name="notes_subhead"/>
-			<field.message.notes name="existing_notes" caption="*"/>
+			<field.message.notes name="existing_notes" caption="*" />
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => 
@@ -133,7 +133,7 @@
 				message => 
 				name => existing_notes
 				onKeyPressJS => return processKeypress_default(event)
-				popup => HASH(0xc024e08)
+				popup => HASH(0xc029bf4)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -154,7 +154,7 @@
 				<field.text caption="From"  name="from"/>
 				<field.text caption="send_on"  name="send_on"/>
 			</field.composite>
-			<field.person.id name="to" caption="To"/>
+			<field.person.id name="to" caption="To" required="yes" style="text"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => NONE
@@ -173,7 +173,7 @@
 				name => to
 				onKeyPressJS => return processKeypress_identifier(event)
 				options => 48
-				popup => HASH(0xba687d4)
+				popup => HASH(0xba63890)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -183,7 +183,7 @@
 				size => 40
 				type => not_an_identifier
 			-->
-			<field.person.id name="cc" caption="CC"/>
+			<field.person.id name="cc" caption="CC"  style="text"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => NONE
@@ -202,7 +202,7 @@
 				name => cc
 				onKeyPressJS => return processKeypress_identifier(event)
 				options => 32
-				popup => HASH(0xc00aa58)
+				popup => HASH(0xc026078)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -212,7 +212,7 @@
 				size => 40
 				type => not_an_identifier
 			-->
-			<field.person.id name="patient_id" caption="Regarding Patient"/>
+			<field.person.id name="patient_id" caption="Regarding Patient"  style="text" types="Patient"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => /org/#session.org_id#/dlg-add-Patient
@@ -231,7 +231,7 @@
 				name => patient_id
 				onKeyPressJS => return processKeypress_identifier(event)
 				options => 32
-				popup => HASH(0xc024e50)
+				popup => HASH(0xc027738)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -240,7 +240,7 @@
 				requiredInvalidMsg => Regarding Patient is required (can not be blank).
 				size => 16
 				type => text
-				types => ARRAY(0xba138f8)
+				types => ARRAY(0xba48690)
 			-->
 			<field.text hidden="yes" name="patient_name" caption="patient_name"/>
 			<field.text hidden="yes" name="saved_patient_id" caption="saved_patient_id"/>
@@ -261,7 +261,7 @@
 			<!--  -->
 			<field.memo name="message" rows="5" cols="70" size="24"/>
 			<field.separator heading="Notes" name="notes_subhead"/>
-			<field.message.notes name="existing_notes" caption="*"/>
+			<field.message.notes name="existing_notes" caption="*" />
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => 
@@ -276,7 +276,7 @@
 				message => 
 				name => existing_notes
 				onKeyPressJS => return processKeypress_default(event)
-				popup => HASH(0xba7843c)
+				popup => HASH(0x8ac0470)
 				postHtml => 
 				preHtml => 
 				priKey => 0

@@ -5,16 +5,16 @@
 		<dialog name="reckdate_claims_wl_invoice" heading="reckdate_claims_wl_invoice">
 			<field.text caption="Invoice ID" read-only="yes" name="invoice_id"/>
 			<field.text caption="User ID" read-only="yes" name="user_id"/>
-			<field.scheduling.date name="reck_date" caption="Reck Date"/>
+			<field.scheduling.date name="reck_date" caption="Reck Date" required="yes"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => 
 				caption => Reck Date
-				defaultValue => 11/09/2001
+				defaultValue => 11/14/2001
 				findPopup => 
 				findPopupAppendValue => 
 				flags => 3600
-				formatValue => CODE(0x8617e70)
+				formatValue => CODE(0x8617e68)
 				hint => 
 				hints => 
 				lengthInvalidMsg => Reck Date is too long (can be at most 10 characters).
@@ -23,9 +23,9 @@
 				name => reck_date
 				onBlurJS => validateChange_Date(event)
 				onKeyPressJS => return processKeypress_default(event)
-				onValidate => CODE(0x8617a50)
+				onValidate => CODE(0x8617a48)
 				options => 16
-				popup => HASH(0xba14e14)
+				popup => HASH(0xba0b02c)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -52,7 +52,7 @@
 			<field.text caption="Date" read-only="yes" name="date"/>
 			<field.text caption="Invoice ID" read-only="yes" name="invoice_id"/>
 			<field.text caption="Transfer From" read-only="yes" name="user_id"/>
-			<field.person.id name="responsible_id" caption="Transfer To"/>
+			<field.person.id name="responsible_id" caption="Transfer To" required="yes" style="text"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => /org/#session.org_id#/dlg-add-
@@ -71,7 +71,7 @@
 				name => responsible_id
 				onKeyPressJS => return processKeypress_identifier(event)
 				options => 48
-				popup => HASH(0xc022e14)
+				popup => HASH(0xac09c48)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -80,7 +80,7 @@
 				requiredInvalidMsg => Transfer To is required (can not be blank).
 				size => 16
 				type => text
-				types => ARRAY(0xba6974c)
+				types => ARRAY(0xba4b024)
 			-->
 			<field.memo caption="Reason For Transfer" name="comments" size="24"/>
 

@@ -132,12 +132,12 @@
 		<dialog name="postpersonalpayment" heading="postpersonalpayment">
 			<field.text hidden="yes" name="list_invoices" caption="list_invoices"/>
 			<field.text hidden="yes" name="credit_warning_flag" caption="credit_warning_flag"/>
-			<field.batchdateid name="batch_fields" caption="Batch ID Date"/>
+			<field.batchdateid name="batch_fields" caption="Batch ID Date" required="yes"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => 
 				caption => Batch ID Date
-				fields => ARRAY(0xba3c5d0)
+				fields => ARRAY(0xba41224)
 				findPopup => 
 				findPopupAppendValue => 
 				flags => 536
@@ -150,7 +150,7 @@
 				name => batch_fields
 				onKeyPressJS => return processKeypress_default(event)
 				options => 16
-				popup => HASH(0xb9efee0)
+				popup => HASH(0xb9f54f0)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -160,7 +160,7 @@
 				size => 24
 				type => text
 			-->
-			<field.person.id name="payer_id" caption="Patient/Person ID"/>
+			<field.person.id name="payer_id" caption="Patient/Person ID" required="yes" style="text"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => /org/#session.org_id#/dlg-add-
@@ -179,7 +179,7 @@
 				name => payer_id
 				onKeyPressJS => return processKeypress_identifier(event)
 				options => 48
-				popup => HASH(0xba36bb0)
+				popup => HASH(0xba3c158)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -188,7 +188,7 @@
 				requiredInvalidMsg => Patient/Person ID is required (can not be blank).
 				size => 16
 				type => text
-				types => ARRAY(0xba39fac)
+				types => ARRAY(0xba3e500)
 			-->
 			<field.currency caption="Total Payment Received" required="yes" max-length="1024" name="total_amount" size="10"/>
 			<field.select caption="Payment Type"  name="pay_type"/>
@@ -202,7 +202,7 @@
 			<field.select caption="Provider ID" prepend-blank="yes" name="provider_id" choices="query:person.selPersonBySessionOrgAndCategory"/>
 			<!--  -->
 			<field.separator heading="Outstanding Invoices" name="outstanding_heading"/>
-			<field.outstandinginvoices name="outstanding_invoices_list" caption="*"/>
+			<field.outstandinginvoices name="outstanding_invoices_list" caption="*" />
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => 
@@ -217,7 +217,7 @@
 				message => 
 				name => outstanding_invoices_list
 				onKeyPressJS => return processKeypress_default(event)
-				popup => HASH(0xba055a4)
+				popup => HASH(0xba0af3c)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -230,12 +230,12 @@
 
 		</dialog>
 
-		<dialog name="org_ipa" heading="$Command IPA Organization">
+		<dialog name="org_ipa" heading="create-data-cmd-heading:IPA Organization">
 			<field.text hidden="yes" name="clear_item_id" caption="clear_item_id"/>
 			<field.text hidden="yes" name="business_hrs_id" caption="business_hrs_id"/>
 			<field.text hidden="yes" name="area_served_id" caption="area_served_id"/>
 			<field.separator heading="Profile Information" name="gen_info_heading"/>
-			<field.organization.id name="parent_org_id" caption="Parent Organization ID"/>
+			<field.organization.id name="parent_org_id" caption="Parent Organization ID" />
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => /org/#session.org_id#/dlg-add-org-main
@@ -252,7 +252,7 @@
 				name => parent_org_id
 				onKeyPressJS => return processKeypress_identifier(event)
 				options => 32
-				popup => HASH(0xb9d96d0)
+				popup => HASH(0xb9df050)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -262,7 +262,7 @@
 				size => 16
 				type => text
 			-->
-			<field.organization.id.new name="org_id" caption="Organization ID"/>
+			<field.organization.id.new name="org_id" caption="Organization ID" required="yes"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => 
@@ -278,7 +278,7 @@
 				name => org_id
 				onKeyPressJS => return processKeypress_identifier(event)
 				options => 48
-				popup => HASH(0xb9daa08)
+				popup => HASH(0xb9e03b0)
 				postHtml =>  ;&lt;a href="
 				preHtml => 
 				priKey => 0
@@ -301,12 +301,12 @@
 				<field.phone caption="Phone" required="yes" max-length="1024" name="phone"/>
 				<field.phone caption="Fax"  max-length="1024" name="fax"/>
 			</field.composite>
-			<field.address name="address" caption="Mailing Address"/>
+			<field.address name="address" caption="Mailing Address" required="yes"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => 
 				caption => Mailing Address
-				fields => ARRAY(0xb9d8138)
+				fields => ARRAY(0xb9ddad0)
 				findPopup => 
 				findPopupAppendValue => 
 				flags => 530
@@ -320,7 +320,7 @@
 				namePrefix => addr_
 				onKeyPressJS => return processKeypress_default(event)
 				options => 16
-				popup => HASH(0xba08eac)
+				popup => HASH(0xba0e3fc)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -341,8 +341,8 @@
 
 		</dialog>
 
-		<dialog name="person_category" heading="$Command Person With A New Category">
-			<field.person.id name="person_id" caption="Person ID"/>
+		<dialog name="person_category" heading="create-data-cmd-heading:Person With A New Category">
+			<field.person.id name="person_id" caption="Person ID" required="yes" style="text" types="Patient,Guarantor,Insured-Person"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => /org/#session.org_id#/dlg-add-Patient
@@ -361,7 +361,7 @@
 				name => person_id
 				onKeyPressJS => return processKeypress_identifier(event)
 				options => 48
-				popup => HASH(0xb9da99c)
+				popup => HASH(0xb9e0344)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -370,19 +370,19 @@
 				requiredInvalidMsg => Person ID is required (can not be blank).
 				size => 16
 				type => text
-				types => ARRAY(0xba37330)
+				types => ARRAY(0xba3c1f4)
 			-->
 			<field.select caption="Category"  name="category" choices="Patient;Guarantor;Insured-Person"/>
 			<!--  -->
 
 		</dialog>
 
-		<dialog name="org_dept" heading="$Command Department Organization">
+		<dialog name="org_dept" heading="create-data-cmd-heading:Department Organization">
 			<field.text hidden="yes" name="clear_item_id" caption="clear_item_id"/>
 			<field.text hidden="yes" name="business_hrs_id" caption="business_hrs_id"/>
 			<field.text hidden="yes" name="area_served_id" caption="area_served_id"/>
 			<field.separator heading="Profile Information" name="gen_info_heading"/>
-			<field.organization.id name="parent_org_id" caption="Parent Organization ID"/>
+			<field.organization.id name="parent_org_id" caption="Parent Organization ID" />
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => /org/#session.org_id#/dlg-add-org-main
@@ -399,7 +399,7 @@
 				name => parent_org_id
 				onKeyPressJS => return processKeypress_identifier(event)
 				options => 32
-				popup => HASH(0xb9d967c)
+				popup => HASH(0xb9dda34)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -409,7 +409,7 @@
 				size => 16
 				type => text
 			-->
-			<field.organization.id.new name="org_id" caption="Organization ID"/>
+			<field.organization.id.new name="org_id" caption="Organization ID" required="yes"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => 
@@ -425,7 +425,7 @@
 				name => org_id
 				onKeyPressJS => return processKeypress_identifier(event)
 				options => 48
-				popup => HASH(0xba07a18)
+				popup => HASH(0xba0c010)
 				postHtml =>  ;&lt;a href="
 				preHtml => 
 				priKey => 0
@@ -448,12 +448,12 @@
 				<field.phone caption="Phone" required="yes" max-length="1024" name="phone"/>
 				<field.phone caption="Fax"  max-length="1024" name="fax"/>
 			</field.composite>
-			<field.address name="address" caption="Mailing Address"/>
+			<field.address name="address" caption="Mailing Address" required="yes"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => 
 				caption => Mailing Address
-				fields => ARRAY(0xba08ce4)
+				fields => ARRAY(0xba0d394)
 				findPopup => 
 				findPopupAppendValue => 
 				flags => 530
@@ -467,7 +467,7 @@
 				namePrefix => addr_
 				onKeyPressJS => return processKeypress_default(event)
 				options => 16
-				popup => HASH(0xba0b538)
+				popup => HASH(0xba10950)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -488,12 +488,12 @@
 
 		</dialog>
 
-		<dialog name="shortformPerson" heading="$Command Patient">
+		<dialog name="shortformPerson" heading="create-data-cmd-heading:Patient">
 			<field.text hidden="yes" name="home_phone_item_id" caption="home_phone_item_id"/>
 			<field.text hidden="yes" name="work_phone_item_id" caption="work_phone_item_id"/>
 			<field.text hidden="yes" name="driver_license_item_id" caption="driver_license_item_id"/>
 			<field.text hidden="yes" name="addr_item_id" caption="addr_item_id"/>
-			<field.person.id.new name="person_id" caption="Person / Patient ID"/>
+			<field.person.id.new name="person_id" caption="Person / Patient ID" />
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => 
@@ -509,7 +509,7 @@
 				name => person_id
 				onKeyPressJS => return processKeypress_identifier(event)
 				options => 32
-				popup => HASH(0xba36c1c)
+				popup => HASH(0xba3b594)
 				postHtml =>  ; &lt;a href="
 				preHtml => 
 				priKey => 0
@@ -520,12 +520,12 @@
 				size => 16
 				type => text
 			-->
-			<field.person.name name="person_id" caption="*"/>
+			<field.person.name name="person_id" caption="*" />
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => 
 				caption => person_id
-				fields => ARRAY(0xba39f94)
+				fields => ARRAY(0xba3bf9c)
 				findPopup => 
 				findPopupAppendValue => 
 				flags => 262144
@@ -537,7 +537,7 @@
 				name => person_id
 				onKeyPressJS => return processKeypress_default(event)
 				options => 0
-				popup => HASH(0xba376fc)
+				popup => HASH(0xba0c004)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -549,12 +549,12 @@
 			<field.select caption="Gender"  name="gender" choices="Male=1;Female=2" style="radio"/>
 			<!--  -->
 			<field.date caption="Date of Birth" name="date_of_birth" size="12"/>
-			<field.address name="address" caption="Home Address"/>
+			<field.address name="address" caption="Home Address" />
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => 
 				caption => Home Address
-				fields => ARRAY(0xba07b8c)
+				fields => ARRAY(0xba0d4e4)
 				findPopup => 
 				findPopupAppendValue => 
 				flags => 512
@@ -566,7 +566,7 @@
 				name => address
 				namePrefix => addr_
 				onKeyPressJS => return processKeypress_default(event)
-				popup => HASH(0xba0a178)
+				popup => HASH(0xba0e6a8)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -588,12 +588,12 @@
 
 		</dialog>
 
-		<dialog name="org_employer" heading="$Command Employer Organization">
+		<dialog name="org_employer" heading="create-data-cmd-heading:Employer Organization">
 			<field.text hidden="yes" name="clear_item_id" caption="clear_item_id"/>
 			<field.text hidden="yes" name="business_hrs_id" caption="business_hrs_id"/>
 			<field.text hidden="yes" name="area_served_id" caption="area_served_id"/>
 			<field.separator heading="Profile Information" name="gen_info_heading"/>
-			<field.organization.id name="parent_org_id" caption="Parent Organization ID"/>
+			<field.organization.id name="parent_org_id" caption="Parent Organization ID" />
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => /org/#session.org_id#/dlg-add-org-main
@@ -610,7 +610,7 @@
 				name => parent_org_id
 				onKeyPressJS => return processKeypress_identifier(event)
 				options => 32
-				popup => HASH(0xba055d4)
+				popup => HASH(0xba0af84)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -620,7 +620,7 @@
 				size => 16
 				type => text
 			-->
-			<field.organization.id.new name="org_id" caption="Organization ID"/>
+			<field.organization.id.new name="org_id" caption="Organization ID" required="yes"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => 
@@ -636,7 +636,7 @@
 				name => org_id
 				onKeyPressJS => return processKeypress_identifier(event)
 				options => 48
-				popup => HASH(0xba08d8c)
+				popup => HASH(0xba0d3a0)
 				postHtml =>  ;&lt;a href="
 				preHtml => 
 				priKey => 0
@@ -659,12 +659,12 @@
 				<field.phone caption="Phone" required="yes" max-length="1024" name="phone"/>
 				<field.phone caption="Fax"  max-length="1024" name="fax"/>
 			</field.composite>
-			<field.address name="address" caption="Mailing Address"/>
+			<field.address name="address" caption="Mailing Address" required="yes"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => 
 				caption => Mailing Address
-				fields => ARRAY(0xba0c53c)
+				fields => ARRAY(0xba11d8c)
 				findPopup => 
 				findPopupAppendValue => 
 				flags => 530
@@ -678,7 +678,7 @@
 				namePrefix => addr_
 				onKeyPressJS => return processKeypress_default(event)
 				options => 16
-				popup => HASH(0xb9d6a88)
+				popup => HASH(0xb9db32c)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -753,7 +753,7 @@
 			<!--  -->
 			<field.memo caption="If yes, describe how it was resolved and attach documents" name="issue_resolved_reason" size="24"/>
 			<field.separator heading="Table of Disputed Services" name="disputed_services_heading"/>
-			<field.twcc60 name="disputed_services" caption="*"/>
+			<field.twcc60 name="disputed_services" caption="*" />
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => 
@@ -769,7 +769,7 @@
 				message => 
 				name => disputed_services
 				onKeyPressJS => return processKeypress_default(event)
-				popup => HASH(0xba1dd7c)
+				popup => HASH(0xba2372c)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -1083,7 +1083,7 @@
 				<field.date caption="effective_begin_date" name="effective_begin_date" size="12"/>
 				<field.date caption="effective_end_date" name="effective_end_date" size="12"/>
 			</field.composite>
-			<field.rovingresource name="roving_physician" caption="Roving Physician"/>
+			<field.rovingresource name="roving_physician" caption="Roving Physician" />
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => 
@@ -1091,7 +1091,7 @@
 				choiceReadOnlyDelim => , 
 				fKeyDisplayCol => 0
 				fKeyStmt => selRovingPhysicianTypes
-				fKeyStmtMgr => App::Statements::Scheduling=HASH(0x8dbe7cc)
+				fKeyStmtMgr => App::Statements::Scheduling=HASH(0x8dbe3a4)
 				fKeyValueCol => 0
 				findPopup => 
 				findPopupAppendValue => 
@@ -1104,7 +1104,7 @@
 				name => roving_physician
 				onKeyPressJS => return processKeypress_default(event)
 				physician_field => _f_resource_id_from
-				popup => HASH(0xb9d800c)
+				popup => HASH(0xb9f3218)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -1115,7 +1115,7 @@
 				style => combo
 				type => select
 			-->
-			<field.person.id name="resource_id_from" caption="Resource ID (From)"/>
+			<field.person.id name="resource_id_from" caption="Resource ID (From)" required="yes" style="text" types="Physician"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => /org/#session.org_id#/dlg-add-Physician
@@ -1134,7 +1134,7 @@
 				name => resource_id_from
 				onKeyPressJS => return processKeypress_identifier(event)
 				options => 48
-				popup => HASH(0xb9d80e4)
+				popup => HASH(0xb9e03a4)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -1143,9 +1143,9 @@
 				requiredInvalidMsg => Resource ID (From) is required (can not be blank).
 				size => 30
 				type => text
-				types => ARRAY(0xba09f44)
+				types => ARRAY(0xba0e624)
 			-->
-			<field.person.id name="resource_id_to" caption="Resource ID (To)"/>
+			<field.person.id name="resource_id_to" caption="Resource ID (To)" required="yes" style="text" types="Physician"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => /org/#session.org_id#/dlg-add-Physician
@@ -1164,7 +1164,7 @@
 				name => resource_id_to
 				onKeyPressJS => return processKeypress_identifier(event)
 				options => 48
-				popup => HASH(0xba0eb8c)
+				popup => HASH(0xba14468)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -1173,9 +1173,9 @@
 				requiredInvalidMsg => Resource ID (To) is required (can not be blank).
 				size => 30
 				type => text
-				types => ARRAY(0xba3e10c)
+				types => ARRAY(0xba3e344)
 			-->
-			<field.organization.id name="facility_id" caption="Facility"/>
+			<field.organization.id name="facility_id" caption="Facility" />
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => /org/#session.org_id#/dlg-add-org-main
@@ -1192,7 +1192,7 @@
 				name => facility_id
 				onKeyPressJS => return processKeypress_identifier(event)
 				options => 32
-				popup => HASH(0xba0c620)
+				popup => HASH(0xba11f84)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -1201,17 +1201,17 @@
 				requiredInvalidMsg => Facility is required (can not be blank).
 				size => 16
 				type => text
-				types => ARRAY(0xba3751c)
+				types => ARRAY(0xba3ca74)
 			-->
 
 		</dialog>
 
-		<dialog name="org_pharmacy" heading="$Command Pharmacy">
+		<dialog name="org_pharmacy" heading="create-data-cmd-heading:Pharmacy">
 			<field.text hidden="yes" name="clear_item_id" caption="clear_item_id"/>
 			<field.text hidden="yes" name="business_hrs_id" caption="business_hrs_id"/>
 			<field.text hidden="yes" name="area_served_id" caption="area_served_id"/>
 			<field.separator heading="Profile Information" name="gen_info_heading"/>
-			<field.organization.id name="parent_org_id" caption="Parent Organization ID"/>
+			<field.organization.id name="parent_org_id" caption="Parent Organization ID" />
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => /org/#session.org_id#/dlg-add-org-main
@@ -1228,7 +1228,7 @@
 				name => parent_org_id
 				onKeyPressJS => return processKeypress_identifier(event)
 				options => 32
-				popup => HASH(0xba1df74)
+				popup => HASH(0xba238f4)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -1238,7 +1238,7 @@
 				size => 16
 				type => text
 			-->
-			<field.organization.id.new name="org_id" caption="Organization ID"/>
+			<field.organization.id.new name="org_id" caption="Organization ID" required="yes"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => 
@@ -1254,7 +1254,7 @@
 				name => org_id
 				onKeyPressJS => return processKeypress_identifier(event)
 				options => 48
-				popup => HASH(0xba067e4)
+				popup => HASH(0xba41fe0)
 				postHtml =>  ;&lt;a href="
 				preHtml => 
 				priKey => 0
@@ -1277,12 +1277,12 @@
 				<field.phone caption="Phone" required="yes" max-length="1024" name="phone"/>
 				<field.phone caption="Fax"  max-length="1024" name="fax"/>
 			</field.composite>
-			<field.address name="address" caption="Mailing Address"/>
+			<field.address name="address" caption="Mailing Address" required="yes"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => 
 				caption => Mailing Address
-				fields => ARRAY(0xba100b0)
+				fields => ARRAY(0xba15614)
 				findPopup => 
 				findPopupAppendValue => 
 				flags => 530
@@ -1296,7 +1296,7 @@
 				namePrefix => addr_
 				onKeyPressJS => return processKeypress_default(event)
 				options => 16
-				popup => HASH(0xba0fee8)
+				popup => HASH(0xba15470)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -1329,13 +1329,13 @@
 
 		</dialog>
 
-		<dialog name="ancillary_location" heading="$Command Ancillary Location">
+		<dialog name="ancillary_location" heading="create-data-cmd-heading:Ancillary Location">
 			<field.text hidden="yes" name="org_internal_id" caption="org_internal_id"/>
 			<field.text hidden="yes" name="add_mode" caption="add_mode"/>
 			<field.text hidden="yes" name="address_item_id" caption="address_item_id"/>
 			<field.text hidden="yes" name="phone_item_id" caption="phone_item_id"/>
 			<field.text hidden="yes" name="fax_item_id" caption="fax_item_id"/>
-			<field.organization.id name="org_id" caption="Ancillary Org ID"/>
+			<field.organization.id name="org_id" caption="Ancillary Org ID" read-only="yes" required="yes"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => /org/#session.org_id#/dlg-add-org-ancillary
@@ -1353,7 +1353,7 @@
 				name => org_id
 				onKeyPressJS => return processKeypress_identifier(event)
 				options => 52
-				popup => HASH(0xba0ff90)
+				popup => HASH(0xba14600)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -1364,12 +1364,12 @@
 				type => text
 			-->
 			<field.text caption="Location Name" required="yes" max-length="30" name="location_name" size="20"/>
-			<field.address name="address" caption=" Address"/>
+			<field.address name="address" caption=" Address" required="yes"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => 
 				caption =>  Address
-				fields => ARRAY(0xba07c34)
+				fields => ARRAY(0xba0d37c)
 				findPopup => 
 				findPopupAppendValue => 
 				flags => 528
@@ -1382,7 +1382,7 @@
 				namePrefix => addr_
 				onKeyPressJS => return processKeypress_default(event)
 				options => 16
-				popup => HASH(0xba17a30)
+				popup => HASH(0xba1cf98)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -1399,12 +1399,12 @@
 
 		</dialog>
 
-		<dialog name="org_insurance" heading="$Command Insurance Organization">
+		<dialog name="org_insurance" heading="create-data-cmd-heading:Insurance Organization">
 			<field.text hidden="yes" name="clear_item_id" caption="clear_item_id"/>
 			<field.text hidden="yes" name="business_hrs_id" caption="business_hrs_id"/>
 			<field.text hidden="yes" name="area_served_id" caption="area_served_id"/>
 			<field.separator heading="Profile Information" name="gen_info_heading"/>
-			<field.organization.id name="parent_org_id" caption="Parent Organization ID"/>
+			<field.organization.id name="parent_org_id" caption="Parent Organization ID" />
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => /org/#session.org_id#/dlg-add-org-main
@@ -1421,7 +1421,7 @@
 				name => parent_org_id
 				onKeyPressJS => return processKeypress_identifier(event)
 				options => 32
-				popup => HASH(0xba14eec)
+				popup => HASH(0xba1aaa8)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -1431,7 +1431,7 @@
 				size => 16
 				type => text
 			-->
-			<field.organization.id.new name="org_id" caption="Organization ID"/>
+			<field.organization.id.new name="org_id" caption="Organization ID" required="yes"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => 
@@ -1447,7 +1447,7 @@
 				name => org_id
 				onKeyPressJS => return processKeypress_identifier(event)
 				options => 48
-				popup => HASH(0xba0c5b4)
+				popup => HASH(0xba3b4d4)
 				postHtml =>  ;&lt;a href="
 				preHtml => 
 				priKey => 0
@@ -1470,12 +1470,12 @@
 				<field.phone caption="Phone" required="yes" max-length="1024" name="phone"/>
 				<field.phone caption="Fax"  max-length="1024" name="fax"/>
 			</field.composite>
-			<field.address name="address" caption="Mailing Address"/>
+			<field.address name="address" caption="Mailing Address" required="yes"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => 
 				caption => Mailing Address
-				fields => ARRAY(0xba2568c)
+				fields => ARRAY(0xba3b3f0)
 				findPopup => 
 				findPopupAppendValue => 
 				flags => 530
@@ -1489,7 +1489,7 @@
 				namePrefix => addr_
 				onKeyPressJS => return processKeypress_default(event)
 				options => 16
-				popup => HASH(0xba1a1c4)
+				popup => HASH(0xba1ea78)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -1510,10 +1510,10 @@
 
 		</dialog>
 
-		<dialog name="guarantor" heading="$Command Responsible Party">
+		<dialog name="guarantor" heading="create-data-cmd-heading:Responsible Party">
 			<field.text hidden="yes" name="resp_item_id" caption="resp_item_id"/>
 			<field.text hidden="yes" name="driver_license_item_id" caption="driver_license_item_id"/>
-			<field.person.id.new name="person_id" caption="Person/Patient ID"/>
+			<field.person.id.new name="person_id" caption="Person/Patient ID" />
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => 
@@ -1529,7 +1529,7 @@
 				name => person_id
 				onKeyPressJS => return processKeypress_identifier(event)
 				options => 32
-				popup => HASH(0xba09de8)
+				popup => HASH(0xba0f9fc)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -1539,14 +1539,14 @@
 				requiredInvalidMsg => Person/Patient ID is required (can not be blank).
 				size => 16
 				type => text
-				types => ARRAY(0xb9f6018)
+				types => ARRAY(0xba41218)
 			-->
-			<field.person.name name="person_id" caption="*"/>
+			<field.person.name name="person_id" caption="*" />
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => 
 				caption => person_id
-				fields => ARRAY(0xba07afc)
+				fields => ARRAY(0xba0d64c)
 				findPopup => 
 				findPopupAppendValue => 
 				flags => 262144
@@ -1558,7 +1558,7 @@
 				name => person_id
 				onKeyPressJS => return processKeypress_default(event)
 				options => 0
-				popup => HASH(0xb9d9478)
+				popup => HASH(0xba10998)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -1577,12 +1577,12 @@
 				<field.text caption="License Number"  name="license_number"/>
 				<field.text caption="State"  max-length="2" name="license_state" size="2"/>
 			</field.composite>
-			<field.address name="address" caption="Home Address"/>
+			<field.address name="address" caption="Home Address" required="yes"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => 
 				caption => Home Address
-				fields => ARRAY(0xba18a90)
+				fields => ARRAY(0xba193d4)
 				findPopup => 
 				findPopupAppendValue => 
 				flags => 530
@@ -1596,7 +1596,7 @@
 				namePrefix => addr_
 				onKeyPressJS => return processKeypress_default(event)
 				options => 16
-				popup => HASH(0xba09e00)
+				popup => HASH(0xb9deff0)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -1613,8 +1613,8 @@
 
 		</dialog>
 
-		<dialog name="password" heading="$Command Password">
-			<field.person.id name="person_id" caption="Person ID"/>
+		<dialog name="password" heading="create-data-cmd-heading:Password">
+			<field.person.id name="person_id" caption="Person ID" required="yes" style="text"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => /org/#session.org_id#/dlg-add-
@@ -1633,7 +1633,7 @@
 				name => person_id
 				onKeyPressJS => return processKeypress_identifier(event)
 				options => 48
-				popup => HASH(0xb9da8f4)
+				popup => HASH(0xba3b6cc)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -1642,9 +1642,9 @@
 				requiredInvalidMsg => Person ID is required (can not be blank).
 				size => 16
 				type => text
-				types => ARRAY(0xb9ea024)
+				types => ARRAY(0xb9eea80)
 			-->
-			<field.organization.id name="org_id" caption="Organization ID"/>
+			<field.organization.id name="org_id" caption="Organization ID" required="yes"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => /org/#session.org_id#/dlg-add-org-main
@@ -1661,7 +1661,7 @@
 				name => org_id
 				onKeyPressJS => return processKeypress_identifier(event)
 				options => 48
-				popup => HASH(0xba127a4)
+				popup => HASH(0xba17f88)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -1680,12 +1680,12 @@
 
 		</dialog>
 
-		<dialog name="org_ancillary" heading="$Command Ancillary Service Organization">
+		<dialog name="org_ancillary" heading="create-data-cmd-heading:Ancillary Service Organization">
 			<field.text hidden="yes" name="clear_item_id" caption="clear_item_id"/>
 			<field.text hidden="yes" name="business_hrs_id" caption="business_hrs_id"/>
 			<field.text hidden="yes" name="area_served_id" caption="area_served_id"/>
 			<field.separator heading="Profile Information" name="gen_info_heading"/>
-			<field.organization.id name="parent_org_id" caption="Parent Organization ID"/>
+			<field.organization.id name="parent_org_id" caption="Parent Organization ID" />
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => /org/#session.org_id#/dlg-add-org-main
@@ -1702,7 +1702,7 @@
 				name => parent_org_id
 				onKeyPressJS => return processKeypress_identifier(event)
 				options => 32
-				popup => HASH(0xba17ba4)
+				popup => HASH(0xba1d040)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -1712,7 +1712,7 @@
 				size => 16
 				type => text
 			-->
-			<field.organization.id.new name="org_id" caption="Organization ID"/>
+			<field.organization.id.new name="org_id" caption="Organization ID" required="yes"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => 
@@ -1728,7 +1728,7 @@
 				name => org_id
 				onKeyPressJS => return processKeypress_identifier(event)
 				options => 48
-				popup => HASH(0xb9d6b30)
+				popup => HASH(0xb9dda58)
 				postHtml =>  ;&lt;a href="
 				preHtml => 
 				priKey => 0
@@ -1751,12 +1751,12 @@
 				<field.phone caption="Phone" required="yes" max-length="1024" name="phone"/>
 				<field.phone caption="Fax"  max-length="1024" name="fax"/>
 			</field.composite>
-			<field.address name="address" caption="Mailing Address"/>
+			<field.address name="address" caption="Mailing Address" required="yes"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => 
 				caption => Mailing Address
-				fields => ARRAY(0xba1a2c0)
+				fields => ARRAY(0xba3b438)
 				findPopup => 
 				findPopupAppendValue => 
 				flags => 530
@@ -1770,7 +1770,7 @@
 				namePrefix => addr_
 				onKeyPressJS => return processKeypress_default(event)
 				options => 16
-				popup => HASH(0xba08ff0)
+				popup => HASH(0xb9df164)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -1804,7 +1804,7 @@
 
 		<dialog name="lab_order" heading="lab_order">
 			<field.text caption="Lab Company" read-only="yes" required="yes" name="lab_name"/>
-			<field.person.id name="person_id" caption="Patient ID"/>
+			<field.person.id name="person_id" caption="Patient ID" required="yes" style="text" types="Patient"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => /org/#session.org_id#/dlg-add-Patient
@@ -1823,7 +1823,7 @@
 				name => person_id
 				onKeyPressJS => return processKeypress_identifier(event)
 				options => 48
-				popup => HASH(0xba0ebd4)
+				popup => HASH(0xba13020)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -1832,9 +1832,9 @@
 				requiredInvalidMsg => Patient ID is required (can not be blank).
 				size => 16
 				type => text
-				types => ARRAY(0xba0c560)
+				types => ARRAY(0xba41068)
 			-->
-			<field.person.id name="provider_id" caption="Ordering Provider ID"/>
+			<field.person.id name="provider_id" caption="Ordering Provider ID" required="yes" style="text" types="Physician"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => /org/#session.org_id#/dlg-add-Physician
@@ -1853,7 +1853,7 @@
 				name => provider_id
 				onKeyPressJS => return processKeypress_identifier(event)
 				options => 48
-				popup => HASH(0xba14d24)
+				popup => HASH(0xba195c0)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -1862,7 +1862,7 @@
 				requiredInvalidMsg => Ordering Provider ID is required (can not be blank).
 				size => 16
 				type => text
-				types => ARRAY(0xba0ff84)
+				types => ARRAY(0xba146c0)
 			-->
 			<field.text hidden="yes" name="org_internal_id" caption="org_internal_id"/>
 			<field.text hidden="yes" name="org_id" caption="org_id"/>
@@ -1883,7 +1883,7 @@
 
 		<dialog name="document" heading="document">
 			<field.text caption="doc_id" read-only="yes" name="doc_id"/>
-			<field.person.id name="owner_id" caption="Owner ID"/>
+			<field.person.id name="owner_id" caption="Owner ID" required="yes" style="text"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => /org/#session.org_id#/dlg-add-
@@ -1902,7 +1902,7 @@
 				name => owner_id
 				onKeyPressJS => return processKeypress_identifier(event)
 				options => 48
-				popup => HASH(0xba1b3d0)
+				popup => HASH(0xba1aa18)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -1911,7 +1911,7 @@
 				requiredInvalidMsg => Owner ID is required (can not be blank).
 				size => 16
 				type => text
-				types => ARRAY(0xba10ff8)
+				types => ARRAY(0xba1562c)
 			-->
 			<field.text caption="Name" required="yes" name="doc_name"/>
 			<field.memo caption="Description" name="doc_description" size="24"/>
@@ -1923,7 +1923,7 @@
 		<dialog name="customize" heading="customize">
 			<field.text hidden="yes" name="item_id" caption="item_id"/>
 			<field.text caption="Column" read-only="yes" name="column"/>
-			<field.person.id name="resource_id" caption="Physician ID"/>
+			<field.person.id name="resource_id" caption="Physician ID" required="yes" style="text" types="Physician"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => /org/#session.org_id#/dlg-add-Physician
@@ -1942,7 +1942,7 @@
 				name => resource_id
 				onKeyPressJS => return processKeypress_identifier(event)
 				options => 48
-				popup => HASH(0xba05580)
+				popup => HASH(0xba169a4)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -1951,9 +1951,9 @@
 				requiredInvalidMsg => Physician ID is required (can not be blank).
 				size => 32
 				type => text
-				types => ARRAY(0xba0ffe4)
+				types => ARRAY(0xba1aa0c)
 			-->
-			<field.rovingresource name="roving_physician" caption="Roving Physician"/>
+			<field.rovingresource name="roving_physician" caption="Roving Physician" />
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => 
@@ -1961,7 +1961,7 @@
 				choiceReadOnlyDelim => , 
 				fKeyDisplayCol => 0
 				fKeyStmt => selRovingPhysicianTypes
-				fKeyStmtMgr => App::Statements::Scheduling=HASH(0x8dbe7cc)
+				fKeyStmtMgr => App::Statements::Scheduling=HASH(0x8dbe3a4)
 				fKeyValueCol => 0
 				findPopup => 
 				findPopupAppendValue => 
@@ -1974,7 +1974,7 @@
 				name => roving_physician
 				onKeyPressJS => return processKeypress_default(event)
 				physician_field => _f_resource_id
-				popup => HASH(0xba126b4)
+				popup => HASH(0xba146d8)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -1985,7 +1985,7 @@
 				style => combo
 				type => select
 			-->
-			<field.organization.id name="facility_id" caption="Facility"/>
+			<field.organization.id name="facility_id" caption="Facility" />
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => /org/#session.org_id#/dlg-add-org-main
@@ -2002,7 +2002,7 @@
 				name => facility_id
 				onKeyPressJS => return processKeypress_identifier(event)
 				options => 32
-				popup => HASH(0xba1cb10)
+				popup => HASH(0xba15740)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -2032,12 +2032,12 @@
 			<field.text hidden="yes" name="product_ins_id" caption="product_ins_id"/>
 			<field.text hidden="yes" name="next_payer_exists" caption="next_payer_exists"/>
 			<field.text caption="Invoice ID" required="yes" name="sel_invoice_id"/>
-			<field.batchdateid name="batch_fields" caption="Batch ID Date"/>
+			<field.batchdateid name="batch_fields" caption="Batch ID Date" required="yes"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => 
 				caption => Batch ID Date
-				fields => ARRAY(0xb9d7f34)
+				fields => ARRAY(0xba12dec)
 				findPopup => 
 				findPopupAppendValue => 
 				flags => 536
@@ -2050,7 +2050,7 @@
 				name => batch_fields
 				onKeyPressJS => return processKeypress_default(event)
 				options => 16
-				popup => HASH(0xba0fd2c)
+				popup => HASH(0xba146b4)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -2075,7 +2075,7 @@
 				<field.text caption="pay_ref"  max-length="128" name="pay_ref"/>
 			</field.composite>
 			<field.separator heading="Outstanding Items" name="outstanding_heading"/>
-			<field.outstandingitems name="outstanding_items_list" caption="*"/>
+			<field.outstandingitems name="outstanding_items_list" caption="*" />
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => 
@@ -2090,7 +2090,7 @@
 				message => 
 				name => outstanding_items_list
 				onKeyPressJS => return processKeypress_default(event)
-				popup => HASH(0xba389e0)
+				popup => HASH(0xb9ddb90)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -2107,12 +2107,12 @@
 
 		</dialog>
 
-		<dialog name="org_dir_entry" heading="$Command Provider Directory Entry">
+		<dialog name="org_dir_entry" heading="create-data-cmd-heading:Provider Directory Entry">
 			<field.text hidden="yes" name="clear_item_id" caption="clear_item_id"/>
 			<field.text hidden="yes" name="business_hrs_id" caption="business_hrs_id"/>
 			<field.text hidden="yes" name="area_served_id" caption="area_served_id"/>
 			<field.separator heading="Profile Information" name="gen_info_heading"/>
-			<field.organization.id name="parent_org_id" caption="Parent Organization ID"/>
+			<field.organization.id name="parent_org_id" caption="Parent Organization ID" />
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => /org/#session.org_id#/dlg-add-org-main
@@ -2129,7 +2129,7 @@
 				name => parent_org_id
 				onKeyPressJS => return processKeypress_identifier(event)
 				options => 32
-				popup => HASH(0xba17acc)
+				popup => HASH(0xba1bfa8)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -2139,7 +2139,7 @@
 				size => 16
 				type => text
 			-->
-			<field.organization.id.new name="org_id" caption="Organization ID"/>
+			<field.organization.id.new name="org_id" caption="Organization ID" required="yes"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => 
@@ -2155,7 +2155,7 @@
 				name => org_id
 				onKeyPressJS => return processKeypress_identifier(event)
 				options => 48
-				popup => HASH(0xba1a158)
+				popup => HASH(0xba239d8)
 				postHtml =>  ;&lt;a href="
 				preHtml => 
 				priKey => 0
@@ -2178,12 +2178,12 @@
 				<field.phone caption="Phone" required="yes" max-length="1024" name="phone"/>
 				<field.phone caption="Fax"  max-length="1024" name="fax"/>
 			</field.composite>
-			<field.address name="address" caption="Mailing Address"/>
+			<field.address name="address" caption="Mailing Address" required="yes"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => 
 				caption => Mailing Address
-				fields => ARRAY(0xba3624c)
+				fields => ARRAY(0xb9deef4)
 				findPopup => 
 				findPopupAppendValue => 
 				flags => 530
@@ -2197,7 +2197,7 @@
 				namePrefix => addr_
 				onKeyPressJS => return processKeypress_default(event)
 				options => 16
-				popup => HASH(0xba0c44c)
+				popup => HASH(0xba12ff0)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -2219,7 +2219,7 @@
 		</dialog>
 
 		<dialog name="eligibility" heading="Verify Eligibility">
-			<field.organization.id name="ins_org_id" caption="Insurance Org Id"/>
+			<field.organization.id name="ins_org_id" caption="Insurance Org Id" required="yes"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => /org/#session.org_id#/dlg-add-org-main
@@ -2236,7 +2236,7 @@
 				name => ins_org_id
 				onKeyPressJS => return processKeypress_identifier(event)
 				options => 48
-				popup => HASH(0xba08eac)
+				popup => HASH(0xba0c0b8)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -2254,11 +2254,11 @@
 
 		</dialog>
 
-		<dialog name="ins_workerscomp" heading="$Command Workers Compensation Plan">
+		<dialog name="ins_workerscomp" heading="create-data-cmd-heading:Workers Compensation Plan">
 			<field.text hidden="yes" name="phone_item_id" caption="phone_item_id"/>
 			<field.text hidden="yes" name="fax_item_id" caption="fax_item_id"/>
 			<field.text hidden="yes" name="address_item_id" caption="address_item_id"/>
-			<field.insurance.product.new name="ins_id" caption="Workers Compensation Plan ID"/>
+			<field.insurance.product.new name="ins_id" caption="Workers Compensation Plan ID" required="yes"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => 
@@ -2274,7 +2274,7 @@
 				name => ins_id
 				onKeyPressJS => return processKeypress_default(event)
 				options => 16
-				popup => HASH(0xb9e8dd4)
+				popup => HASH(0xba21250)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -2284,7 +2284,7 @@
 				size => 16
 				type => text
 			-->
-			<field.organization.id name="ins_org_id" caption="Insurance Org ID"/>
+			<field.organization.id name="ins_org_id" caption="Insurance Org ID" required="yes"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => /org/#session.org_id#/dlg-add-org-main
@@ -2301,7 +2301,7 @@
 				name => ins_org_id
 				onKeyPressJS => return processKeypress_identifier(event)
 				options => 48
-				popup => HASH(0xba3c5c4)
+				popup => HASH(0xba11fcc)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -2315,12 +2315,12 @@
 			<!--  -->
 			<field.text caption="E-Remittance Payer ID"  hint="(Only for non-Paper types)" max-length="16" name="remit_payer_id"/>
 			<field.separator heading="Contact Information" name="contact_heading"/>
-			<field.address name="billing_addr" caption="Billing Address"/>
+			<field.address name="billing_addr" caption="Billing Address" required="yes"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => 
 				caption => Billing Address
-				fields => ARRAY(0xba1c9a8)
+				fields => ARRAY(0xba23744)
 				findPopup => 
 				findPopupAppendValue => 
 				flags => 528
@@ -2333,7 +2333,7 @@
 				namePrefix => addr_
 				onKeyPressJS => return processKeypress_default(event)
 				options => 16
-				popup => HASH(0xb9dabac)
+				popup => HASH(0xba3c284)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -2350,12 +2350,12 @@
 
 		</dialog>
 
-		<dialog name="org_main" heading="$Command Main Organization">
+		<dialog name="org_main" heading="create-data-cmd-heading:Main Organization">
 			<field.text hidden="yes" name="clear_item_id" caption="clear_item_id"/>
 			<field.text hidden="yes" name="business_hrs_id" caption="business_hrs_id"/>
 			<field.text hidden="yes" name="area_served_id" caption="area_served_id"/>
 			<field.separator heading="Profile Information" name="gen_info_heading"/>
-			<field.organization.id name="parent_org_id" caption="Parent Organization ID"/>
+			<field.organization.id name="parent_org_id" caption="Parent Organization ID" />
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => /org/#session.org_id#/dlg-add-org-main
@@ -2372,7 +2372,7 @@
 				name => parent_org_id
 				onKeyPressJS => return processKeypress_identifier(event)
 				options => 32
-				popup => HASH(0xba0d9b0)
+				popup => HASH(0xba130c8)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -2382,7 +2382,7 @@
 				size => 16
 				type => text
 			-->
-			<field.organization.id.new name="org_id" caption="Organization ID"/>
+			<field.organization.id.new name="org_id" caption="Organization ID" required="yes"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => 
@@ -2398,7 +2398,7 @@
 				name => org_id
 				onKeyPressJS => return processKeypress_identifier(event)
 				options => 48
-				popup => HASH(0xba0d9d4)
+				popup => HASH(0xba12e94)
 				postHtml =>  ;&lt;a href="
 				preHtml => 
 				priKey => 0
@@ -2421,12 +2421,12 @@
 				<field.phone caption="Phone" required="yes" max-length="1024" name="phone"/>
 				<field.phone caption="Fax"  max-length="1024" name="fax"/>
 			</field.composite>
-			<field.address name="address" caption="Mailing Address"/>
+			<field.address name="address" caption="Mailing Address" required="yes"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => 
 				caption => Mailing Address
-				fields => ARRAY(0xb9da96c)
+				fields => ARRAY(0xb9f3218)
 				findPopup => 
 				findPopupAppendValue => 
 				flags => 530
@@ -2440,7 +2440,7 @@
 				namePrefix => addr_
 				onKeyPressJS => return processKeypress_default(event)
 				options => 16
-				popup => HASH(0xba100b0)
+				popup => HASH(0xba3b3f0)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -2461,13 +2461,13 @@
 
 		</dialog>
 
-		<dialog name="pharmacy_location" heading="$Command Pharmacy Location">
+		<dialog name="pharmacy_location" heading="create-data-cmd-heading:Pharmacy Location">
 			<field.text hidden="yes" name="org_internal_id" caption="org_internal_id"/>
 			<field.text hidden="yes" name="add_mode" caption="add_mode"/>
 			<field.text hidden="yes" name="address_item_id" caption="address_item_id"/>
 			<field.text hidden="yes" name="phone_item_id" caption="phone_item_id"/>
 			<field.text hidden="yes" name="fax_item_id" caption="fax_item_id"/>
-			<field.organization.id name="org_id" caption="Ancillary Org ID"/>
+			<field.organization.id name="org_id" caption="Ancillary Org ID" read-only="yes" required="yes"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => /org/#session.org_id#/dlg-add-org-ancillary
@@ -2485,7 +2485,7 @@
 				name => org_id
 				onKeyPressJS => return processKeypress_identifier(event)
 				options => 52
-				popup => HASH(0xba3a024)
+				popup => HASH(0xba0fad4)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -2496,12 +2496,12 @@
 				type => text
 			-->
 			<field.text caption="Location Name" required="yes" max-length="30" name="location_name" size="20"/>
-			<field.address name="address" caption=" Address"/>
+			<field.address name="address" caption=" Address" required="yes"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => 
 				caption =>  Address
-				fields => ARRAY(0xba17988)
+				fields => ARRAY(0xba108b4)
 				findPopup => 
 				findPopupAppendValue => 
 				flags => 528
@@ -2514,7 +2514,7 @@
 				namePrefix => addr_
 				onKeyPressJS => return processKeypress_default(event)
 				options => 16
-				popup => HASH(0xba08fd8)
+				popup => HASH(0xba0e48c)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -2535,7 +2535,7 @@
 			<field.date caption="Date of Request" name="request_date" size="12"/>
 			<field.select caption="Referral Urgency" required="yes" name="referral_urgency" choices="query:referral_ppms.selReferralUrgency" style="radio"/>
 			<!--  -->
-			<field.person.id name="user_id" caption="User ID"/>
+			<field.person.id name="user_id" caption="User ID" required="yes" style="text" types="Staff"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => /org/#session.org_id#/dlg-add-Staff
@@ -2554,7 +2554,7 @@
 				name => user_id
 				onKeyPressJS => return processKeypress_identifier(event)
 				options => 48
-				popup => HASH(0xba0d950)
+				popup => HASH(0xba1959c)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -2563,9 +2563,9 @@
 				requiredInvalidMsg => User ID is required (can not be blank).
 				size => 16
 				type => text
-				types => ARRAY(0xba08e34)
+				types => ARRAY(0xba15494)
 			-->
-			<field.person.id name="patient_id" caption="Patient"/>
+			<field.person.id name="patient_id" caption="Patient" required="yes" style="text" types="Patient"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => /org/#session.org_id#/dlg-add-Patient
@@ -2584,7 +2584,7 @@
 				name => patient_id
 				onKeyPressJS => return processKeypress_identifier(event)
 				options => 48
-				popup => HASH(0xba38854)
+				popup => HASH(0xba1a7e4)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -2593,7 +2593,7 @@
 				requiredInvalidMsg => Patient is required (can not be blank).
 				size => 16
 				type => text
-				types => ARRAY(0xb9d800c)
+				types => ARRAY(0xba0e45c)
 			-->
 			<field.text hidden="yes" name="old_person_id" caption="old_person_id"/>
 			<field.select caption="Primary Payer" required="yes" name="payer" choices="No Options"/>
@@ -2616,7 +2616,7 @@
 				<field.text caption="Modf"  name="modf2" size="5"/>
 			</field.composite>
 			<field.memo caption="Description" name="cpt_desc2" size="24"/>
-			<field.person.id name="requesting_physician" caption="Requesting Physician"/>
+			<field.person.id name="requesting_physician" caption="Requesting Physician" required="yes" style="text" types="Physician"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => /org/#session.org_id#/dlg-add-Physician
@@ -2635,7 +2635,7 @@
 				name => requesting_physician
 				onKeyPressJS => return processKeypress_identifier(event)
 				options => 48
-				popup => HASH(0xba14f70)
+				popup => HASH(0xba16b9c)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -2644,9 +2644,9 @@
 				requiredInvalidMsg => Requesting Physician is required (can not be blank).
 				size => 16
 				type => text
-				types => ARRAY(0xba36b2c)
+				types => ARRAY(0xba3b510)
 			-->
-			<field.person.id name="referring_physician" caption="Referring to"/>
+			<field.person.id name="referring_physician" caption="Referring to"  style="text" types="Referring-Doctor"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => /org/#session.org_id#/dlg-add-Referring-Doctor
@@ -2665,7 +2665,7 @@
 				name => referring_physician
 				onKeyPressJS => return processKeypress_identifier(event)
 				options => 32
-				popup => HASH(0xba18994)
+				popup => HASH(0xba1f9a8)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -2674,7 +2674,7 @@
 				requiredInvalidMsg => Referring to is required (can not be blank).
 				size => 16
 				type => text
-				types => ARRAY(0xba07b20)
+				types => ARRAY(0xba1f8d0)
 			-->
 			<field.text caption="Speciality"  name="speciality"/>
 			<field.select caption="Referral Type" prepend-blank="yes" name="referral_type" choices="query:referral_ppms.selReferralType"/>
@@ -2697,8 +2697,8 @@
 
 		</dialog>
 
-		<dialog name="personnel" heading="$Command Personnel">
-			<field.person.id name="person_id" caption="Person ID"/>
+		<dialog name="personnel" heading="create-data-cmd-heading:Personnel">
+			<field.person.id name="person_id" caption="Person ID" required="yes" style="text" types="Physician,Nurse,Staff,Superuser,Administrator"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => /org/#session.org_id#/dlg-add-Physician
@@ -2717,7 +2717,7 @@
 				name => person_id
 				onKeyPressJS => return processKeypress_identifier(event)
 				options => 48
-				popup => HASH(0xba0d824)
+				popup => HASH(0xba0ae1c)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -2727,7 +2727,7 @@
 				requiredInvalidMsg => Person ID is required (can not be blank).
 				size => 16
 				type => text
-				types => ARRAY(0xba0c440)
+				types => ARRAY(0xba11dc8)
 			-->
 			<field.select caption="Category"  name="category" choices="Physician;Nurse;Staff;Superuser;Administrator"/>
 			<!--  -->
@@ -2755,8 +2755,8 @@
 
 		</dialog>
 
-		<dialog name="feescheduledataentry" heading="$Command Fee Schedule Entry">
-			<field.catalog.id name="catalog_id" caption="Fee Schedule ID"/>
+		<dialog name="feescheduledataentry" heading="create-data-cmd-heading:Fee Schedule Entry">
+			<field.catalog.id name="catalog_id" caption="Fee Schedule ID" required="yes"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => /org/#session.org_id#/dlg-add-catalog
@@ -2773,7 +2773,7 @@
 				name => catalog_id
 				onKeyPressJS => return processKeypress_identifier(event)
 				options => 48
-				popup => HASH(0xb9efc7c)
+				popup => HASH(0xba10be4)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -2794,9 +2794,9 @@
 
 		</dialog>
 
-		<dialog name="referring_doctor" heading="$Command Referring Doctor">
+		<dialog name="referring_doctor" heading="create-data-cmd-heading:Referring Doctor">
 			<field.text hidden="yes" name="ref_phy_item_id" caption="ref_phy_item_id"/>
-			<field.person.id.new name="person_id" caption="Person/Patient ID"/>
+			<field.person.id.new name="person_id" caption="Person/Patient ID" />
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => 
@@ -2812,7 +2812,7 @@
 				name => person_id
 				onKeyPressJS => return processKeypress_identifier(event)
 				options => 32
-				popup => HASH(0xba13808)
+				popup => HASH(0xba143f0)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -2822,14 +2822,14 @@
 				requiredInvalidMsg => Person/Patient ID is required (can not be blank).
 				size => 16
 				type => text
-				types => ARRAY(0xb9d7ee0)
+				types => ARRAY(0xba3e3d4)
 			-->
-			<field.person.name name="person_id" caption="*"/>
+			<field.person.name name="person_id" caption="*" />
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => 
 				caption => person_id
-				fields => ARRAY(0xba36988)
+				fields => ARRAY(0xba0e408)
 				findPopup => 
 				findPopupAppendValue => 
 				flags => 262144
@@ -2841,7 +2841,7 @@
 				name => person_id
 				onKeyPressJS => return processKeypress_default(event)
 				options => 0
-				popup => HASH(0xba1b478)
+				popup => HASH(0xba1e8e0)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -2850,12 +2850,12 @@
 				size => 24
 				type => text
 			-->
-			<field.address name="address" caption="Work Address"/>
+			<field.address name="address" caption="Work Address" />
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => 
 				caption => Work Address
-				fields => ARRAY(0xb9d964c)
+				fields => ARRAY(0xba12d20)
 				findPopup => 
 				findPopupAppendValue => 
 				flags => 514
@@ -2868,7 +2868,7 @@
 				name => address
 				namePrefix => addr_
 				onKeyPressJS => return processKeypress_default(event)
-				popup => HASH(0xba1a398)
+				popup => HASH(0xba1fad4)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -3199,14 +3199,14 @@
 
 		</dialog>
 
-		<dialog name="batch" heading="$Command Batch">
+		<dialog name="batch" heading="create-data-cmd-heading:Batch">
 			<field.text caption="User ID" read-only="yes" name="user_id"/>
 			<field.text caption="Batch ID" required="yes" name="batch_id" size="12"/>
 			<field.date caption="Batch Date" name="batch_date" size="12"/>
 			<field.select caption="Batch Type" required="yes" prepend-blank="yes" name="batch_type" choices="Insurance Payments=insurance;Personal Payments=personal"/>
 			<!--  -->
 			<field.text caption="Invoice ID"  name="sel_invoice_id"/>
-			<field.person.id name="payer_id" caption="Patient/Person ID"/>
+			<field.person.id name="payer_id" caption="Patient/Person ID"  style="text"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => /org/#session.org_id#/dlg-add-
@@ -3225,7 +3225,7 @@
 				name => payer_id
 				onKeyPressJS => return processKeypress_identifier(event)
 				options => 32
-				popup => HASH(0xba1a1a0)
+				popup => HASH(0xba3f82c)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -3234,13 +3234,13 @@
 				requiredInvalidMsg => Patient/Person ID is required (can not be blank).
 				size => 16
 				type => text
-				types => ARRAY(0xba3b46c)
+				types => ARRAY(0xba3b4e0)
 			-->
 
 		</dialog>
 
 		<dialog name="payment_plan" heading="payment_plan">
-			<field.person.id name="person_id" caption="Patient ID"/>
+			<field.person.id name="person_id" caption="Patient ID" required="yes" style="text"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => /org/#session.org_id#/dlg-add-patient
@@ -3260,7 +3260,7 @@
 				name => person_id
 				onKeyPressJS => return processKeypress_identifier(event)
 				options => 48
-				popup => HASH(0xba21e84)
+				popup => HASH(0xba24c9c)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -3271,16 +3271,16 @@
 				type => text
 				useShortForm => 1
 			-->
-			<field.scheduling.date name="first_due" caption="First Payment Due Date"/>
+			<field.scheduling.date name="first_due" caption="First Payment Due Date" required="yes"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => 
 				caption => First Payment Due Date
-				defaultValue => 11/09/2001
+				defaultValue => 11/14/2001
 				findPopup => 
 				findPopupAppendValue => 
 				flags => 3600
-				formatValue => CODE(0x8617e70)
+				formatValue => CODE(0x8617e68)
 				hint => 
 				hints => 
 				lengthInvalidMsg => First Payment Due Date is too long (can be at most 10 characters).
@@ -3289,9 +3289,9 @@
 				name => first_due
 				onBlurJS => validateChange_Date(event)
 				onKeyPressJS => return processKeypress_default(event)
-				onValidate => CODE(0x8617a50)
+				onValidate => CODE(0x8617a48)
 				options => 16
-				popup => HASH(0xba1b304)
+				popup => HASH(0xba12edc)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -3339,7 +3339,7 @@
 				<field.text caption="From"  name="from"/>
 				<field.text caption="send_on"  name="send_on"/>
 			</field.composite>
-			<field.person.id name="to" caption="To"/>
+			<field.person.id name="to" caption="To" required="yes" style="text"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => NONE
@@ -3358,7 +3358,7 @@
 				name => to
 				onKeyPressJS => return processKeypress_identifier(event)
 				options => 48
-				popup => HASH(0xba1a284)
+				popup => HASH(0xba1ea90)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -3368,7 +3368,7 @@
 				size => 40
 				type => not_an_identifier
 			-->
-			<field.person.id name="cc" caption="CC"/>
+			<field.person.id name="cc" caption="CC"  style="text"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => NONE
@@ -3387,7 +3387,7 @@
 				name => cc
 				onKeyPressJS => return processKeypress_identifier(event)
 				options => 32
-				popup => HASH(0xb9da8a0)
+				popup => HASH(0xb9ee804)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -3397,7 +3397,7 @@
 				size => 40
 				type => not_an_identifier
 			-->
-			<field.person.id name="patient_id" caption="Regarding Patient"/>
+			<field.person.id name="patient_id" caption="Regarding Patient"  style="text" types="Patient"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => /org/#session.org_id#/dlg-add-Patient
@@ -3416,7 +3416,7 @@
 				name => patient_id
 				onKeyPressJS => return processKeypress_identifier(event)
 				options => 32
-				popup => HASH(0xba0d998)
+				popup => HASH(0xba12fb4)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -3425,7 +3425,7 @@
 				requiredInvalidMsg => Regarding Patient is required (can not be blank).
 				size => 16
 				type => text
-				types => ARRAY(0xb9d6d58)
+				types => ARRAY(0xba3c2c0)
 			-->
 			<field.text hidden="yes" name="patient_name" caption="patient_name"/>
 			<field.text hidden="yes" name="saved_patient_id" caption="saved_patient_id"/>
@@ -3446,7 +3446,7 @@
 			<!--  -->
 			<field.memo name="message" rows="5" cols="70" size="24"/>
 			<field.separator heading="Notes" name="notes_subhead"/>
-			<field.message.notes name="existing_notes" caption="*"/>
+			<field.message.notes name="existing_notes" caption="*" />
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => 
@@ -3461,7 +3461,7 @@
 				message => 
 				name => existing_notes
 				onKeyPressJS => return processKeypress_default(event)
-				popup => HASH(0xba189dc)
+				popup => HASH(0xba1562c)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -3475,12 +3475,12 @@
 
 		</dialog>
 
-		<dialog name="org_provider" heading="$Command Associated Provider Organization">
+		<dialog name="org_provider" heading="create-data-cmd-heading:Associated Provider Organization">
 			<field.text hidden="yes" name="clear_item_id" caption="clear_item_id"/>
 			<field.text hidden="yes" name="business_hrs_id" caption="business_hrs_id"/>
 			<field.text hidden="yes" name="area_served_id" caption="area_served_id"/>
 			<field.separator heading="Profile Information" name="gen_info_heading"/>
-			<field.organization.id name="parent_org_id" caption="Parent Organization ID"/>
+			<field.organization.id name="parent_org_id" caption="Parent Organization ID" />
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => /org/#session.org_id#/dlg-add-org-main
@@ -3497,7 +3497,7 @@
 				name => parent_org_id
 				onKeyPressJS => return processKeypress_identifier(event)
 				options => 32
-				popup => HASH(0xba2c2cc)
+				popup => HASH(0xba14618)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -3507,7 +3507,7 @@
 				size => 16
 				type => text
 			-->
-			<field.organization.id.new name="org_id" caption="Organization ID"/>
+			<field.organization.id.new name="org_id" caption="Organization ID" required="yes"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => 
@@ -3523,7 +3523,7 @@
 				name => org_id
 				onKeyPressJS => return processKeypress_identifier(event)
 				options => 48
-				popup => HASH(0xba1b34c)
+				popup => HASH(0xba28c0c)
 				postHtml =>  ;&lt;a href="
 				preHtml => 
 				priKey => 0
@@ -3546,12 +3546,12 @@
 				<field.phone caption="Phone" required="yes" max-length="1024" name="phone"/>
 				<field.phone caption="Fax"  max-length="1024" name="fax"/>
 			</field.composite>
-			<field.address name="address" caption="Mailing Address"/>
+			<field.address name="address" caption="Mailing Address" required="yes"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => 
 				caption => Mailing Address
-				fields => ARRAY(0xba14fc4)
+				fields => ARRAY(0xba12d50)
 				findPopup => 
 				findPopupAppendValue => 
 				flags => 530
@@ -3565,7 +3565,7 @@
 				namePrefix => addr_
 				onKeyPressJS => return processKeypress_default(event)
 				options => 16
-				popup => HASH(0xba0b370)
+				popup => HASH(0xba24c48)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -3607,7 +3607,7 @@
 
 		<dialog name="appointment" heading="appointment">
 			<field.text hidden="yes" name="event_id" caption="event_id"/>
-			<field.person.id name="attendee_id" caption="Patient ID"/>
+			<field.person.id name="attendee_id" caption="Patient ID"  style="text"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => /org/#session.org_id#/dlg-add-patient
@@ -3627,7 +3627,7 @@
 				name => attendee_id
 				onKeyPressJS => return processKeypress_identifier(event)
 				options => 32
-				popup => HASH(0xba15000)
+				popup => HASH(0xba22248)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -3646,12 +3646,12 @@
 			<!--  -->
 			<field.select caption="Super Bill Type"  name="superbill_id" choices="query:scheduling.sel_SuperBillTypesDropDown"/>
 			<!--  -->
-			<field.scheduling.datetimeonly name="appt_date_time" caption="*"/>
+			<field.scheduling.datetimeonly name="appt_date_time" caption="*" />
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => 
 				caption => appt_date_time
-				fields => ARRAY(0xba36988)
+				fields => ARRAY(0xba0e408)
 				findPopup => 
 				findPopupAppendValue => 
 				flags => 262144
@@ -3663,7 +3663,7 @@
 				name => appt_date_time
 				onKeyPressJS => return processKeypress_default(event)
 				ordinal => 0
-				popup => HASH(0xba0b244)
+				popup => HASH(0xba3e1b8)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -3672,12 +3672,12 @@
 				size => 24
 				type => text
 			-->
-			<field.scheduling.datetimeplus name="appt_date_time_0" caption="*"/>
+			<field.scheduling.datetimeplus name="appt_date_time_0" caption="*" />
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => 
 				caption => appt_date_time_0
-				fields => ARRAY(0xba0d980)
+				fields => ARRAY(0xba0e6f0)
 				findPopup => 
 				findPopupAppendValue => 
 				flags => 262144
@@ -3689,7 +3689,7 @@
 				name => appt_date_time_0
 				onKeyPressJS => return processKeypress_default(event)
 				ordinal => 0
-				popup => HASH(0xba3b694)
+				popup => HASH(0xba212c8)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -3699,7 +3699,7 @@
 				type => text
 			-->
 			<field.composite caption="*"  name="minutes_util_0">
-				<field.scheduling.minutes name="appt_minute_0" caption="Appt 1 Time Minute"/>
+				<field.scheduling.minutes name="appt_minute_0" caption="Appt 1 Time Minute" />
 				<!-- Total Field contents:
 					_spacerWidth => 0
 					addPopup => 
@@ -3714,7 +3714,7 @@
 					message => 
 					name => appt_minute_0
 					onKeyPressJS => return processKeypress_default(event)
-					popup => HASH(0xba0b550)
+					popup => HASH(0xba222cc)
 					postHtml => 
 					preHtml => 
 					priKey => 0
@@ -3725,7 +3725,7 @@
 					timeField => _f_appt_time_0
 					type => text
 				-->
-				<field.scheduling.ampm name="appt_am_0" caption="AM PM"/>
+				<field.scheduling.ampm name="appt_am_0" caption="AM PM" />
 				<!-- Total Field contents:
 					_spacerWidth => 0
 					addPopup => 
@@ -3740,7 +3740,7 @@
 					message => 
 					name => appt_am_0
 					onKeyPressJS => return processKeypress_default(event)
-					popup => HASH(0xba055f8)
+					popup => HASH(0xba23918)
 					postHtml => 
 					preHtml => 
 					priKey => 0
@@ -3752,12 +3752,12 @@
 					type => text
 				-->
 			</field.composite>
-			<field.scheduling.datetimeplus name="appt_date_time_1" caption="*"/>
+			<field.scheduling.datetimeplus name="appt_date_time_1" caption="*" />
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => 
 				caption => appt_date_time_1
-				fields => ARRAY(0xba1b544)
+				fields => ARRAY(0xba10bd8)
 				findPopup => 
 				findPopupAppendValue => 
 				flags => 262144
@@ -3769,7 +3769,7 @@
 				name => appt_date_time_1
 				onKeyPressJS => return processKeypress_default(event)
 				ordinal => 1
-				popup => HASH(0xba26d64)
+				popup => HASH(0xba2ec74)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -3779,7 +3779,7 @@
 				type => text
 			-->
 			<field.composite caption="*"  name="minutes_util_1">
-				<field.scheduling.minutes name="appt_minute_1" caption="Appt 2 Time Minute"/>
+				<field.scheduling.minutes name="appt_minute_1" caption="Appt 2 Time Minute" />
 				<!-- Total Field contents:
 					_spacerWidth => 0
 					addPopup => 
@@ -3794,7 +3794,7 @@
 					message => 
 					name => appt_minute_1
 					onKeyPressJS => return processKeypress_default(event)
-					popup => HASH(0xb9f18cc)
+					popup => HASH(0xb9f6e88)
 					postHtml => 
 					preHtml => 
 					priKey => 0
@@ -3805,7 +3805,7 @@
 					timeField => _f_appt_time_1
 					type => text
 				-->
-				<field.scheduling.ampm name="appt_am_1" caption="AM PM"/>
+				<field.scheduling.ampm name="appt_am_1" caption="AM PM" />
 				<!-- Total Field contents:
 					_spacerWidth => 0
 					addPopup => 
@@ -3820,7 +3820,7 @@
 					message => 
 					name => appt_am_1
 					onKeyPressJS => return processKeypress_default(event)
-					popup => HASH(0xb9f612c)
+					popup => HASH(0xb9f8424)
 					postHtml => 
 					preHtml => 
 					priKey => 0
@@ -3834,7 +3834,7 @@
 			</field.composite>
 			<field.boolean caption="Check for Conflicts"  name="conflict_check" style="check"/>
 			<field.text hidden="yes" name="duration" caption="duration"/>
-			<field.person.id name="resource_id" caption="Physician ID"/>
+			<field.person.id name="resource_id" caption="Physician ID" required="yes" style="text" types="Physician"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => /org/#session.org_id#/dlg-add-Physician
@@ -3853,7 +3853,7 @@
 				name => resource_id
 				onKeyPressJS => return processKeypress_identifier(event)
 				options => 48
-				popup => HASH(0xba22dc8)
+				popup => HASH(0xba27574)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -3862,9 +3862,9 @@
 				requiredInvalidMsg => Physician ID is required (can not be blank).
 				size => 32
 				type => text
-				types => ARRAY(0xba09f44)
+				types => ARRAY(0xba1bcfc)
 			-->
-			<field.rovingresource name="roving_physician" caption="Roving Physician"/>
+			<field.rovingresource name="roving_physician" caption="Roving Physician" />
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => 
@@ -3872,7 +3872,7 @@
 				choiceReadOnlyDelim => , 
 				fKeyDisplayCol => 0
 				fKeyStmt => selRovingPhysicianTypes
-				fKeyStmtMgr => App::Statements::Scheduling=HASH(0x8dbe7cc)
+				fKeyStmtMgr => App::Statements::Scheduling=HASH(0x8dbe3a4)
 				fKeyValueCol => 0
 				findPopup => 
 				findPopupAppendValue => 
@@ -3885,7 +3885,7 @@
 				name => roving_physician
 				onKeyPressJS => return processKeypress_default(event)
 				physician_field => _f_resource_id
-				popup => HASH(0xba42bc0)
+				popup => HASH(0xba48564)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -3905,7 +3905,7 @@
 			<!--  -->
 			<field.select caption="Waiting List"  name="waiting_patients" choices="query:scheduling.selWaitingPatients"/>
 			<!--  -->
-			<field.person.id name="app_verified_by" caption="Confirmed By"/>
+			<field.person.id name="app_verified_by" caption="Confirmed By" required="yes" style="text" types="Staff,Physician"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => /org/#session.org_id#/dlg-add-Staff
@@ -3924,7 +3924,7 @@
 				name => app_verified_by
 				onKeyPressJS => return processKeypress_identifier(event)
 				options => 48
-				popup => HASH(0xba4ac04)
+				popup => HASH(0xba4dc24)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -3933,19 +3933,19 @@
 				requiredInvalidMsg => Confirmed By is required (can not be blank).
 				size => 20
 				type => text
-				types => ARRAY(0xba453d8)
+				types => ARRAY(0xba4ad6c)
 				useShortForm => 1
 			-->
-			<field.scheduling.date name="app_verify_date" caption="Confirm Date"/>
+			<field.scheduling.date name="app_verify_date" caption="Confirm Date" required="yes"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => 
 				caption => Confirm Date
-				defaultValue => 11/09/2001
+				defaultValue => 11/14/2001
 				findPopup => 
 				findPopupAppendValue => 
 				flags => 3600
-				formatValue => CODE(0x8617e70)
+				formatValue => CODE(0x8617e68)
 				futureOnly => 0
 				hint => 
 				hints => 
@@ -3955,9 +3955,9 @@
 				name => app_verify_date
 				onBlurJS => validateChange_Date(event)
 				onKeyPressJS => return processKeypress_default(event)
-				onValidate => CODE(0x8617a50)
+				onValidate => CODE(0x8617a48)
 				options => 16
-				popup => HASH(0xba4d600)
+				popup => HASH(0xba51b0c)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -3973,12 +3973,12 @@
 		</dialog>
 
 		<dialog name="postcappayment" heading="postcappayment">
-			<field.batchdateid name="batch_fields" caption="Batch ID Date"/>
+			<field.batchdateid name="batch_fields" caption="Batch ID Date" required="yes"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => 
 				caption => Batch ID Date
-				fields => ARRAY(0xb9d818c)
+				fields => ARRAY(0xc0056c8)
 				findPopup => 
 				findPopupAppendValue => 
 				flags => 536
@@ -3991,7 +3991,7 @@
 				onKeyPressJS => return processKeypress_default(event)
 				options => 16
 				orgInternalIdFieldName => pay_to_org_id
-				popup => HASH(0xba16068)
+				popup => HASH(0xb9fb768)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -4003,7 +4003,7 @@
 			-->
 			<field.select caption="Pay To Org" required="yes" name="pay_to_org_id" choices="query:dialog.stmt3"/>
 			<!--  numPackages="0" pkgList="" stmtNum="3" -->
-			<field.person.id name="provider_id" caption="Physician ID"/>
+			<field.person.id name="provider_id" caption="Physician ID"  style="text" types="Physician"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => /org/#session.org_id#/dlg-add-Physician
@@ -4022,7 +4022,7 @@
 				name => provider_id
 				onKeyPressJS => return processKeypress_identifier(event)
 				options => 32
-				popup => HASH(0xba21c20)
+				popup => HASH(0xba26188)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -4031,9 +4031,9 @@
 				requiredInvalidMsg => Physician ID is required (can not be blank).
 				size => 16
 				type => text
-				types => ARRAY(0xba2aab8)
+				types => ARRAY(0xba30ca8)
 			-->
-			<field.insurance.product name="product_name" caption="Insurance Product"/>
+			<field.insurance.product name="product_name" caption="Insurance Product" />
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => /org/#session.org_id#/dlg-add-ins-product
@@ -4051,7 +4051,7 @@
 				name => product_name
 				onKeyPressJS => return processKeypress_default(event)
 				options => 0
-				popup => HASH(0xba13868)
+				popup => HASH(0xba1a730)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -4061,7 +4061,7 @@
 				size => 16
 				type => text
 			-->
-			<field.insurance.plan name="plan_name" caption="Insurance Plan"/>
+			<field.insurance.plan name="plan_name" caption="Insurance Plan" />
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => /org/#session.org_id#/dlg-add-ins-plan
@@ -4080,7 +4080,7 @@
 				name => plan_name
 				onKeyPressJS => return processKeypress_default(event)
 				options => 0
-				popup => HASH(0xba21dd0)
+				popup => HASH(0xba263d4)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -4106,7 +4106,7 @@
 				<field.date caption="effective_end_date" name="effective_end_date" size="12"/>
 			</field.composite>
 			<field.memo caption="Caption" name="caption" size="24"/>
-			<field.person.id name="r_ids" caption="Resource(s)"/>
+			<field.person.id name="r_ids" caption="Resource(s)" required="yes" style="text" types="Physician"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => /org/#session.org_id#/dlg-add-Physician
@@ -4125,7 +4125,7 @@
 				name => r_ids
 				onKeyPressJS => return processKeypress_identifier(event)
 				options => 48
-				popup => HASH(0xba1f104)
+				popup => HASH(0xba3bf3c)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -4134,9 +4134,9 @@
 				requiredInvalidMsg => Resource(s) is required (can not be blank).
 				size => 70
 				type => not_an_identifier
-				types => ARRAY(0xba4fae0)
+				types => ARRAY(0xba5431c)
 			-->
-			<field.rovingresource name="roving_physician" caption="Roving Physician"/>
+			<field.rovingresource name="roving_physician" caption="Roving Physician" />
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => 
@@ -4145,7 +4145,7 @@
 				choiceReadOnlyDelim => , 
 				fKeyDisplayCol => 0
 				fKeyStmt => selRovingPhysicianTypes
-				fKeyStmtMgr => App::Statements::Scheduling=HASH(0x8dbe7cc)
+				fKeyStmtMgr => App::Statements::Scheduling=HASH(0x8dbe3a4)
 				fKeyValueCol => 0
 				findPopup => 
 				findPopupAppendValue => 
@@ -4158,7 +4158,7 @@
 				name => roving_physician
 				onKeyPressJS => return processKeypress_default(event)
 				physician_field => _f_r_ids
-				popup => HASH(0xba1b250)
+				popup => HASH(0xba30ce4)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -4201,7 +4201,7 @@
 
 		<dialog name="appttype" heading="appttype">
 			<field.text caption="Appointment Type ID" read-only="yes" name="appt_type_id"/>
-			<field.person.id name="r_ids" caption="Resource ID(s)"/>
+			<field.person.id name="r_ids" caption="Resource ID(s)" required="yes" style="text" types="Physician"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => /org/#session.org_id#/dlg-add-Physician
@@ -4220,7 +4220,7 @@
 				name => r_ids
 				onKeyPressJS => return processKeypress_identifier(event)
 				options => 48
-				popup => HASH(0xba243b4)
+				popup => HASH(0xc043624)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -4229,7 +4229,7 @@
 				requiredInvalidMsg => Resource ID(s) is required (can not be blank).
 				size => 40
 				type => not_an_identifier
-				types => ARRAY(0xba179f4)
+				types => ARRAY(0xba1e850)
 			-->
 			<field.memo caption="Caption" name="caption" size="24"/>
 			<field.integer caption="Appointment Duration" default="10" required="yes" hint="Duration in Minutes" max-length="1024" name="duration" size="8"/>
@@ -4247,7 +4247,7 @@
 				<field.integer caption="PM Limits"  hint="Max # appointments of this type during PM hours" max-length="1024" name="pm_limit" size="8"/>
 				<field.integer caption="All Day Limits"  hint="Max # appointments of this type for entire day" max-length="1024" name="day_limit" size="8"/>
 			</field.composite>
-			<field.person.id name="rr_ids" caption="Associated Resource(s)"/>
+			<field.person.id name="rr_ids" caption="Associated Resource(s)"  style="text" types="Physician"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => /org/#session.org_id#/dlg-add-Physician
@@ -4266,7 +4266,7 @@
 				name => rr_ids
 				onKeyPressJS => return processKeypress_identifier(event)
 				options => 32
-				popup => HASH(0xba24630)
+				popup => HASH(0xba29bf0)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -4275,9 +4275,9 @@
 				requiredInvalidMsg => Associated Resource(s) is required (can not be blank).
 				size => 40
 				type => not_an_identifier
-				types => ARRAY(0xba3624c)
+				types => ARRAY(0xba224dc)
 			-->
-			<field.rovingresource name="roving_physician" caption="Roving Physician"/>
+			<field.rovingresource name="roving_physician" caption="Roving Physician" />
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => 
@@ -4286,7 +4286,7 @@
 				choiceReadOnlyDelim => , 
 				fKeyDisplayCol => 0
 				fKeyStmt => selRovingPhysicianTypes
-				fKeyStmtMgr => App::Statements::Scheduling=HASH(0x8dbe7cc)
+				fKeyStmtMgr => App::Statements::Scheduling=HASH(0x8dbe3a4)
 				fKeyValueCol => 0
 				findPopup => 
 				findPopupAppendValue => 
@@ -4299,7 +4299,7 @@
 				name => roving_physician
 				onKeyPressJS => return processKeypress_default(event)
 				physician_field => _f_rr_ids
-				popup => HASH(0xba4ac94)
+				popup => HASH(0xba52d1c)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -4315,8 +4315,8 @@
 
 		</dialog>
 
-		<dialog name="feescheduleentry" heading="$Command Fee Schedule Entry">
-			<field.feeschedulematrix name="feescheduleentries" caption="*"/>
+		<dialog name="feescheduleentry" heading="create-data-cmd-heading:Fee Schedule Entry">
+			<field.feeschedulematrix name="feescheduleentries" caption="*" />
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => 
@@ -4331,7 +4331,7 @@
 				message => 
 				name => feescheduleentries
 				onKeyPressJS => return processKeypress_default(event)
-				popup => HASH(0xba4fd5c)
+				popup => HASH(0xba5425c)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -4352,7 +4352,7 @@
 
 		</dialog>
 
-		<dialog name="book_marks" heading="$Command Bookmarks">
+		<dialog name="book_marks" heading="create-data-cmd-heading:Bookmarks">
 			<field.text caption="Caption" required="yes" hint="Please provide a friendly name of the bookmark" name="caption"/>
 			<field.text caption="URL" required="yes" hint="Please type in a URL" name="url"/>
 
@@ -4364,7 +4364,7 @@
 			<field.text hidden="yes" name="phy_item_id" caption="phy_item_id"/>
 			<field.text hidden="yes" name="parent_catalog_id" caption="Internal Catalog ID"/>
 			<field.text hidden="yes" name="internal_catalog_id" caption="Internal Catalog ID"/>
-			<field.catalog.id.new name="catalog_id" caption="Fee Schedule Name"/>
+			<field.catalog.id.new name="catalog_id" caption="Fee Schedule Name" required="yes"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => 
@@ -4380,7 +4380,7 @@
 				name => catalog_id
 				onKeyPressJS => return processKeypress_identifier(event)
 				options => 48
-				popup => HASH(0xba44068)
+				popup => HASH(0xba45b88)
 				postHtml =>  ; &lt;a href="
 				preHtml => 
 				priKey => 0
@@ -4398,7 +4398,7 @@
 				<field.date caption="effective_end_date" name="effective_end_date" size="12"/>
 			</field.composite>
 			<field.float caption="RVRBS Multiplier"  max-length="1024" name="rvrbs_multiplier" size="16"/>
-			<field.multiperson.id name="physician_id" caption="Physician ID"/>
+			<field.multiperson.id name="physician_id" caption="Physician ID" uppercase="yes"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => /org/#session.org_id#/dlg-add-Physician
@@ -4417,7 +4417,7 @@
 				onBlurJS => validateChange_UpperCase(event)
 				onKeyPressJS => return processKeypress_default(event)
 				options => 64
-				popup => HASH(0xba36904)
+				popup => HASH(0xba10a88)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -4426,9 +4426,9 @@
 				requiredInvalidMsg => Physician ID is required (can not be blank).
 				size => 40
 				type => text
-				types => ARRAY(0xba242f4)
+				types => ARRAY(0xba156b0)
 			-->
-			<field.multiorg.id name="org_id" caption=" Site Organization ID "/>
+			<field.multiorg.id name="org_id" caption=" Site Organization ID " uppercase="yes"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => /org/#session.org_id#/dlg-add-org-main
@@ -4446,7 +4446,7 @@
 				onBlurJS => validateChange_UpperCase(event)
 				onKeyPressJS => return processKeypress_default(event)
 				options => 64
-				popup => HASH(0xba0552c)
+				popup => HASH(0xba1bedc)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -4456,7 +4456,7 @@
 				size => 40
 				type => text
 			-->
-			<field.catalog.id name="parent_catalog_name" caption="Parent Fee Schedule ID"/>
+			<field.catalog.id name="parent_catalog_name" caption="Parent Fee Schedule ID" />
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => /org/#session.org_id#/dlg-add-catalog
@@ -4473,7 +4473,7 @@
 				name => parent_catalog_name
 				onKeyPressJS => return processKeypress_identifier(event)
 				options => 32
-				popup => HASH(0xba42b48)
+				popup => HASH(0xba48564)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -4513,12 +4513,12 @@
 				<field.date caption="To Date" name="service_end_date" size="12"/>
 			</field.composite>
 			<field.text hidden="yes" name="servtype" caption="servtype"/>
-			<field.procedureline name="cptModfField" caption="CPT / Modf"/>
+			<field.procedureline name="cptModfField" caption="CPT / Modf" />
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => 
 				caption => CPT / Modf
-				fields => ARRAY(0xba0b4cc)
+				fields => ARRAY(0xba222cc)
 				findPopup => 
 				findPopupAppendValue => 
 				flags => 512
@@ -4529,7 +4529,7 @@
 				message => 
 				name => cptModfField
 				onKeyPressJS => return processKeypress_default(event)
-				popup => HASH(0xba179b8)
+				popup => HASH(0xba3cb40)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -4538,7 +4538,7 @@
 				size => 24
 				type => text
 			-->
-			<field.diagnosescheckbox name="procdiags" caption="ICD-9 Codes"/>
+			<field.diagnosescheckbox name="procdiags" caption="ICD-9 Codes" required="yes"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => 
@@ -4556,7 +4556,7 @@
 				name => procdiags
 				onKeyPressJS => return processKeypress_default(event)
 				options => 16
-				popup => HASH(0xba208e8)
+				popup => HASH(0xba2c424)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -4570,12 +4570,12 @@
 				valueDelim => :
 			-->
 			<field.text caption="Fee Schedule(s)"  name="fee_schedules"/>
-			<field.procedurechargeunits name="proc_charge_fields" caption="Charge/Units"/>
+			<field.procedurechargeunits name="proc_charge_fields" caption="Charge/Units" />
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => 
 				caption => Charge/Units
-				fields => ARRAY(0xba46c78)
+				fields => ARRAY(0xba4aec8)
 				findPopup => 
 				findPopupAppendValue => 
 				flags => 512
@@ -4586,7 +4586,7 @@
 				message => 
 				name => proc_charge_fields
 				onKeyPressJS => return processKeypress_default(event)
-				popup => HASH(0xba453e4)
+				popup => HASH(0xba49554)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -4621,12 +4621,12 @@
 
 		</dialog>
 
-		<dialog name="auto_forward_msg" heading="$Command Auto Forward">
+		<dialog name="auto_forward_msg" heading="create-data-cmd-heading:Auto Forward">
 			<field.text hidden="yes" name="phone_id" caption="phone_id"/>
 			<field.text hidden="yes" name="internal_id" caption="internal_id"/>
 			<field.text hidden="yes" name="prescription_id" caption="prescription_id"/>
 			<field.composite caption="Phone Message"  name="phone_fields">
-				<field.person.id name="phone_msg_id" caption="Phone Message"/>
+				<field.person.id name="phone_msg_id" caption="Phone Message" required="yes" style="text"/>
 				<!-- Total Field contents:
 					_spacerWidth => 0
 					addPopup => /org/#session.org_id#/dlg-add-
@@ -4645,7 +4645,7 @@
 					name => phone_msg_id
 					onKeyPressJS => return processKeypress_identifier(event)
 					options => 48
-					popup => HASH(0xb9d93d0)
+					popup => HASH(0xba263f8)
 					postHtml => 
 					preHtml => 
 					priKey => 0
@@ -4654,13 +4654,13 @@
 					requiredInvalidMsg => Phone Message is required (can not be blank).
 					size => 16
 					type => text
-					types => ARRAY(0xb9eff1c)
+					types => ARRAY(0xba30c54)
 				-->
 				<field.select caption="Auto Forward" required="yes" name="phone_status" choices="Active=1;Inactive=0" style="radio"/>
 				<!--  -->
 			</field.composite>
 			<field.composite caption="Internal Message"  name="internal_fields">
-				<field.person.id name="internal_msg_id" caption="Internal Message"/>
+				<field.person.id name="internal_msg_id" caption="Internal Message" required="yes" style="text"/>
 				<!-- Total Field contents:
 					_spacerWidth => 0
 					addPopup => /org/#session.org_id#/dlg-add-
@@ -4679,7 +4679,7 @@
 					name => internal_msg_id
 					onKeyPressJS => return processKeypress_identifier(event)
 					options => 48
-					popup => HASH(0xb9f5fa0)
+					popup => HASH(0xb9fb3d8)
 					postHtml => 
 					preHtml => 
 					priKey => 0
@@ -4688,13 +4688,13 @@
 					requiredInvalidMsg => Internal Message is required (can not be blank).
 					size => 16
 					type => text
-					types => ARRAY(0xba281f0)
+					types => ARRAY(0xba31a18)
 				-->
 				<field.select caption="Auto Forward" required="yes" name="internal_status" choices="Active=1;Inactive=0" style="radio"/>
 				<!--  -->
 			</field.composite>
 			<field.composite caption="Prescription Message"  name="prescription_fields">
-				<field.person.id name="prescription_msg_id" caption="Prescription Message"/>
+				<field.person.id name="prescription_msg_id" caption="Prescription Message" required="yes" style="text"/>
 				<!-- Total Field contents:
 					_spacerWidth => 0
 					addPopup => /org/#session.org_id#/dlg-add-
@@ -4713,7 +4713,7 @@
 					name => prescription_msg_id
 					onKeyPressJS => return processKeypress_identifier(event)
 					options => 48
-					popup => HASH(0xba24648)
+					popup => HASH(0xba29d1c)
 					postHtml => 
 					preHtml => 
 					priKey => 0
@@ -4722,7 +4722,7 @@
 					requiredInvalidMsg => Prescription Message is required (can not be blank).
 					size => 16
 					type => text
-					types => ARRAY(0xba24594)
+					types => ARRAY(0xba12d50)
 				-->
 				<field.select caption="Auto Forward" required="yes" name="prescription_status" choices="Active=1;Inactive=0" style="radio"/>
 				<!--  -->
@@ -4730,10 +4730,10 @@
 
 		</dialog>
 
-		<dialog name="insured_Person" heading="$Command Insured Person">
+		<dialog name="insured_Person" heading="create-data-cmd-heading:Insured Person">
 			<field.text hidden="yes" name="resp_item_id" caption="resp_item_id"/>
 			<field.text hidden="yes" name="driver_license_item_id" caption="driver_license_item_id"/>
-			<field.person.id.new name="person_id" caption="Person/Patient ID"/>
+			<field.person.id.new name="person_id" caption="Person/Patient ID" />
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => 
@@ -4749,7 +4749,7 @@
 				name => person_id
 				onKeyPressJS => return processKeypress_identifier(event)
 				options => 32
-				popup => HASH(0xba17ab4)
+				popup => HASH(0xba1e8f8)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -4759,14 +4759,14 @@
 				requiredInvalidMsg => Person/Patient ID is required (can not be blank).
 				size => 16
 				type => text
-				types => ARRAY(0xba16008)
+				types => ARRAY(0xb9f9cec)
 			-->
-			<field.person.name name="person_id" caption="*"/>
+			<field.person.name name="person_id" caption="*" />
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => 
 				caption => person_id
-				fields => ARRAY(0xba0d818)
+				fields => ARRAY(0xba24e34)
 				findPopup => 
 				findPopupAppendValue => 
 				flags => 262144
@@ -4778,7 +4778,7 @@
 				name => person_id
 				onKeyPressJS => return processKeypress_default(event)
 				options => 0
-				popup => HASH(0xb9f47cc)
+				popup => HASH(0xba49560)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -4797,12 +4797,12 @@
 				<field.text caption="License Number"  name="license_number"/>
 				<field.text caption="State"  max-length="2" name="license_state" size="2"/>
 			</field.composite>
-			<field.address name="address" caption="Home Address"/>
+			<field.address name="address" caption="Home Address" required="yes"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => 
 				caption => Home Address
-				fields => ARRAY(0xba42bc0)
+				fields => ARRAY(0xba3ca38)
 				findPopup => 
 				findPopupAppendValue => 
 				flags => 530
@@ -4816,7 +4816,7 @@
 				namePrefix => addr_
 				onKeyPressJS => return processKeypress_default(event)
 				options => 16
-				popup => HASH(0xba40680)
+				popup => HASH(0xc00ead0)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -4834,12 +4834,12 @@
 		</dialog>
 
 		<dialog name="postrefund" heading="postrefund">
-			<field.batchdateid name="batch_fields" caption="Batch ID Date"/>
+			<field.batchdateid name="batch_fields" caption="Batch ID Date" required="yes"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => 
 				caption => Batch ID Date
-				fields => ARRAY(0xba43e94)
+				fields => ARRAY(0xba47340)
 				findPopup => 
 				findPopupAppendValue => 
 				flags => 536
@@ -4852,7 +4852,7 @@
 				name => batch_fields
 				onKeyPressJS => return processKeypress_default(event)
 				options => 16
-				popup => HASH(0xba29794)
+				popup => HASH(0xba434cc)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -4862,7 +4862,7 @@
 				size => 24
 				type => text
 			-->
-			<field.refundinvoices name="refund_invoices_list" caption="*"/>
+			<field.refundinvoices name="refund_invoices_list" caption="*" />
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => 
@@ -4877,7 +4877,7 @@
 				message => 
 				name => refund_invoices_list
 				onKeyPressJS => return processKeypress_default(event)
-				popup => HASH(0xba05358)
+				popup => HASH(0xba1d094)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -4891,7 +4891,7 @@
 
 		</dialog>
 
-		<dialog name="health_rule" heading="$Command Health Maintenance Rule">
+		<dialog name="health_rule" heading="create-data-cmd-heading:Health Maintenance Rule">
 			<field.text caption="Rule ID" required="yes" name="rule_id"/>
 			<field.composite caption="Start Age/End Age/Age Metric"  name="text_field">
 				<field.text caption="start_age"  max-length="3" name="start_age" size="3"/>
@@ -4907,7 +4907,7 @@
 				<field.select caption="Periodicity Metric"  name="periodicity_metric" choices="query:org.selTimeMetric"/>
 				<!--  -->
 			</field.composite>
-			<field.diagnoses name="diagnoses" caption="Diagnoses"/>
+			<field.diagnoses name="diagnoses" caption="Diagnoses" required="yes"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => 
@@ -4923,7 +4923,7 @@
 				name => diagnoses
 				onKeyPressJS => return processKeypress_default(event)
 				options => 16
-				popup => HASH(0xba417b0)
+				popup => HASH(0xba485dc)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -4965,7 +4965,7 @@
 			<!--  -->
 			<field.text caption="First Dose Details"  name="first_dose_specs"/>
 			<field.composite caption="*"  name="dates_multi">
-				<field.scheduling.date name="start_date" caption="Start Date"/>
+				<field.scheduling.date name="start_date" caption="Start Date" />
 				<!-- Total Field contents:
 					_spacerWidth => 0
 					addPopup => 
@@ -4974,7 +4974,7 @@
 					findPopup => 
 					findPopupAppendValue => 
 					flags => 3584
-					formatValue => CODE(0x8617e70)
+					formatValue => CODE(0x8617e68)
 					hint => 
 					hints => 
 					lengthInvalidMsg => Start Date is too long (can be at most 10 characters).
@@ -4983,8 +4983,8 @@
 					name => start_date
 					onBlurJS => validateChange_Date(event)
 					onKeyPressJS => return processKeypress_default(event)
-					onValidate => CODE(0x8617a50)
-					popup => HASH(0xba4d354)
+					onValidate => CODE(0x8617a48)
+					popup => HASH(0xba4f134)
 					postHtml => 
 					preHtml => 
 					priKey => 0
@@ -4994,7 +4994,7 @@
 					size => 10
 					type => date
 				-->
-				<field.scheduling.date name="end_date" caption="End Date"/>
+				<field.scheduling.date name="end_date" caption="End Date" />
 				<!-- Total Field contents:
 					_spacerWidth => 0
 					addPopup => 
@@ -5003,7 +5003,7 @@
 					findPopup => 
 					findPopupAppendValue => 
 					flags => 3584
-					formatValue => CODE(0x8617e70)
+					formatValue => CODE(0x8617e68)
 					hint => 
 					hints => 
 					lengthInvalidMsg => End Date is too long (can be at most 10 characters).
@@ -5012,8 +5012,8 @@
 					name => end_date
 					onBlurJS => validateChange_Date(event)
 					onKeyPressJS => return processKeypress_default(event)
-					onValidate => CODE(0x8617a50)
-					popup => HASH(0xba1b280)
+					onValidate => CODE(0x8617a48)
+					popup => HASH(0xba51890)
 					postHtml => 
 					preHtml => 
 					priKey => 0
@@ -5048,7 +5048,7 @@
 			<field.select caption="Priority" visible="no" name="priority" choices="Normal;Emergency;ASAP" style="radio"/>
 			<!--  -->
 			<field.memo caption="Notes" name="notes" rows="5" cols="50" size="24"/>
-			<field.person.id name="approved_by" caption="Prescription Approved By"/>
+			<field.person.id name="approved_by" caption="Prescription Approved By"  style="text"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => /org/#session.org_id#/dlg-add-
@@ -5067,7 +5067,7 @@
 				name => approved_by
 				onKeyPressJS => return processKeypress_identifier(event)
 				options => 32
-				popup => HASH(0xba43e64)
+				popup => HASH(0xba48744)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -5076,9 +5076,9 @@
 				requiredInvalidMsg => Prescription Approved By is required (can not be blank).
 				size => 16
 				type => text
-				types => ARRAY(0xb9d37a8)
+				types => ARRAY(0xb9fb6e4)
 			-->
-			<field.person.id name="get_approval_from" caption="Physician for Approval"/>
+			<field.person.id name="get_approval_from" caption="Physician for Approval"  style="text" types="Physician"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => /org/#session.org_id#/dlg-add-Physician
@@ -5097,7 +5097,7 @@
 				name => get_approval_from
 				onKeyPressJS => return processKeypress_identifier(event)
 				options => 32
-				popup => HASH(0xba494f8)
+				popup => HASH(0xba4f0ec)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -5106,9 +5106,9 @@
 				requiredInvalidMsg => Physician for Approval is required (can not be blank).
 				size => 16
 				type => text
-				types => ARRAY(0xc03de98)
+				types => ARRAY(0xba2efb0)
 			-->
-			<field.person.id name="prescribed_by" caption="Prescribed By"/>
+			<field.person.id name="prescribed_by" caption="Prescribed By"  style="text" types="Physician"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => /org/#session.org_id#/dlg-add-Physician
@@ -5127,7 +5127,7 @@
 				name => prescribed_by
 				onKeyPressJS => return processKeypress_identifier(event)
 				options => 32
-				popup => HASH(0xba4c254)
+				popup => HASH(0xba1a880)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -5136,12 +5136,12 @@
 				requiredInvalidMsg => Prescribed By is required (can not be blank).
 				size => 16
 				type => text
-				types => ARRAY(0xba22af8)
+				types => ARRAY(0xb9fb624)
 			-->
 			<field.text caption="Prescribed By (If not in system)"  name="other_prescribed_by"/>
 			<field.select caption="Prescription Output" prepend-blank="yes" name="destination" choices="Fax to Pharmacy=fax;Print to Printer=printer"/>
 			<!--  -->
-			<field.organization.id name="pharmacy_id" caption="Pharmacy"/>
+			<field.organization.id name="pharmacy_id" caption="Pharmacy" />
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => /org/#session.org_id#/dlg-add-org-main
@@ -5158,7 +5158,7 @@
 				name => pharmacy_id
 				onKeyPressJS => return processKeypress_identifier(event)
 				options => 32
-				popup => HASH(0xba4fb64)
+				popup => HASH(0xba598ec)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -5182,7 +5182,7 @@
 			<field.text hidden="yes" name="payment_due_date_id" caption="payment_due_date_id"/>
 			<field.date caption="Date" name="budget_date" size="12"/>
 			<field.currency caption="Balance to Budget"  max-length="1024" name="budget_balance" size="10"/>
-			<field.person.id name="staff_id" caption="Staff ID"/>
+			<field.person.id name="staff_id" caption="Staff ID" required="yes" style="text" types="Staff"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => /org/#session.org_id#/dlg-add-Staff
@@ -5201,7 +5201,7 @@
 				name => staff_id
 				onKeyPressJS => return processKeypress_identifier(event)
 				options => 48
-				popup => HASH(0xb9f1710)
+				popup => HASH(0xb9f6f0c)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -5210,7 +5210,7 @@
 				requiredInvalidMsg => Staff ID is required (can not be blank).
 				size => 16
 				type => text
-				types => ARRAY(0xba1dd04)
+				types => ARRAY(0xba0e6fc)
 			-->
 			<field.select caption="Cycle of Payment"  name="payment_cycle" choices="Monthly=monthly;Weekly=weekly;Bi-Weekly=biweekky"/>
 			<!--  -->
@@ -5219,12 +5219,12 @@
 		</dialog>
 
 		<dialog name="posttransfer" heading="posttransfer">
-			<field.batchdateid name="batch_fields" caption="Batch ID Date"/>
+			<field.batchdateid name="batch_fields" caption="Batch ID Date" required="yes"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => 
 				caption => Batch ID Date
-				fields => ARRAY(0xc0091f4)
+				fields => ARRAY(0xba0bf2c)
 				findPopup => 
 				findPopupAppendValue => 
 				flags => 536
@@ -5237,7 +5237,7 @@
 				name => batch_fields
 				onKeyPressJS => return processKeypress_default(event)
 				options => 16
-				popup => HASH(0xba5645c)
+				popup => HASH(0xba56dc4)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -5257,7 +5257,7 @@
 			<field.text caption="Invoice ID" required="yes" name="trans_to_invoice_id"/>
 			<field.memo caption="Comments" name="to_comments" size="24"/>
 			<field.separator heading="Invoices" name="transfer_invoices_heading"/>
-			<field.allinvoices name="transfer_invoices_list" caption="*"/>
+			<field.allinvoices name="transfer_invoices_list" caption="*" />
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => 
@@ -5272,7 +5272,7 @@
 				message => 
 				name => transfer_invoices_list
 				onKeyPressJS => return processKeypress_default(event)
-				popup => HASH(0xba295f0)
+				popup => HASH(0xba1f894)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -5292,12 +5292,12 @@
 			<field.text hidden="yes" name="current_status" caption="current_status"/>
 			<field.text hidden="yes" name="invoice_date" caption="invoice_date"/>
 			<field.text hidden="yes" name="batch_item_id" caption="batch_item_id"/>
-			<field.batchdateid name="batch_fields" caption="Batch ID Date"/>
+			<field.batchdateid name="batch_fields" caption="Batch ID Date" required="yes"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => 
 				caption => Batch ID Date
-				fields => ARRAY(0xb9f16e0)
+				fields => ARRAY(0xba47370)
 				findPopup => 
 				findPopupAppendValue => 
 				flags => 536
@@ -5310,7 +5310,7 @@
 				onKeyPressJS => return processKeypress_default(event)
 				options => 16
 				orgInternalIdFieldName => owner_id
-				popup => HASH(0xb9f6030)
+				popup => HASH(0xba1f828)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -5320,7 +5320,7 @@
 				size => 24
 				type => text
 			-->
-			<field.person.id name="client_id" caption="Patient ID"/>
+			<field.person.id name="client_id" caption="Patient ID" required="yes" style="text" types="Patient"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => /org/#session.org_id#/dlg-add-Patient
@@ -5339,7 +5339,7 @@
 				name => client_id
 				onKeyPressJS => return processKeypress_identifier(event)
 				options => 48
-				popup => HASH(0xba1f158)
+				popup => HASH(0xba0af24)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -5348,7 +5348,7 @@
 				requiredInvalidMsg => Patient ID is required (can not be blank).
 				size => 16
 				type => text
-				types => ARRAY(0xba24420)
+				types => ARRAY(0xba24dec)
 			-->
 			<field.composite caption="Payer ID/Type"  hint="If left blank, invoice will be billed to the 'Patient ID'" name="other_payer_fields">
 				<field.text caption="Payer ID"  name="bill_to_id"/>
@@ -5359,7 +5359,7 @@
 			<!--  -->
 			<field.select caption="Pay To Org"  name="owner_id" choices="query:dialog.stmt5"/>
 			<!--  numPackages="0" pkgList="" stmtNum="5" -->
-			<field.invoiceitems name="invoice_items" caption="Items"/>
+			<field.invoiceitems name="invoice_items" caption="Items" />
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => 
@@ -5376,7 +5376,7 @@
 				message => 
 				name => invoice_items
 				onKeyPressJS => return processKeypress_default(event)
-				popup => HASH(0xba2abcc)
+				popup => HASH(0xba1f8ac)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -5391,7 +5391,7 @@
 
 		<dialog name="catalog_item" heading="catalog_item">
 			<field.text hidden="yes" name="show_cap" caption="show_cap"/>
-			<field.catalog.id name="catalog_id" caption="Fee Schedule ID"/>
+			<field.catalog.id name="catalog_id" caption="Fee Schedule ID" required="yes"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => /org/#session.org_id#/dlg-add-catalog
@@ -5408,7 +5408,7 @@
 				name => catalog_id
 				onKeyPressJS => return processKeypress_identifier(event)
 				options => 48
-				popup => HASH(0xb9f60a8)
+				popup => HASH(0xb9f9c14)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -5442,7 +5442,7 @@
 
 		<dialog name="service_catalog" heading="service_catalog">
 			<field.text hidden="yes" name="internal_catalog_id" caption="internal_catalog_id"/>
-			<field.catalog.id.new name="catalog_id" caption="Service Catalog ID"/>
+			<field.catalog.id.new name="catalog_id" caption="Service Catalog ID" read-only="yes"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => 
@@ -5458,7 +5458,7 @@
 				name => catalog_id
 				onKeyPressJS => return processKeypress_identifier(event)
 				options => 36
-				popup => HASH(0xba4d2e8)
+				popup => HASH(0xba55708)
 				postHtml => 
 				preHtml => 
 				priKey => 0

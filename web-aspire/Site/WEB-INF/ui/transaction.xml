@@ -2,7 +2,7 @@
 
 <xaf>
 	<dialogs package="transaction">
-		<dialog name="medication_current" heading="$Command Current Medication">
+		<dialog name="medication_current" heading="create-data-cmd-heading:Current Medication">
 			<field.select caption="Medication Type" required="yes" name="trans_type"/>
 			<!--  -->
 			<field.date caption="Start Date" max-length="50" name="trans_begin_stamp" size="12"/>
@@ -13,18 +13,18 @@
 
 		</dialog>
 
-		<dialog name="alert_person" heading="$Command Alert">
+		<dialog name="alert_person" heading="create-data-cmd-heading:Alert">
 			<field.composite caption="*"  name="text_field">
-				<field.scheduling.date name="trans_begin_stamp" caption="Begin Alert"/>
+				<field.scheduling.date name="trans_begin_stamp" caption="Begin Alert" required="yes"/>
 				<!-- Total Field contents:
 					_spacerWidth => 0
 					addPopup => 
 					caption => Begin Alert
-					defaultValue => 11/09/2001
+					defaultValue => 11/14/2001
 					findPopup => 
 					findPopupAppendValue => 
 					flags => 3600
-					formatValue => CODE(0x8617e70)
+					formatValue => CODE(0x8617e68)
 					futureOnly => 0
 					hint => 
 					hints => 
@@ -34,9 +34,9 @@
 					name => trans_begin_stamp
 					onBlurJS => validateChange_Date(event)
 					onKeyPressJS => return processKeypress_default(event)
-					onValidate => CODE(0x8617a50)
+					onValidate => CODE(0x8617a48)
 					options => 16
-					popup => HASH(0xba4d588)
+					popup => HASH(0xba30bc4)
 					postHtml => 
 					preHtml => 
 					priKey => 0
@@ -46,7 +46,7 @@
 					size => 10
 					type => date
 				-->
-				<field.scheduling.date name="trans_end_stamp" caption="End Alert"/>
+				<field.scheduling.date name="trans_end_stamp" caption="End Alert" />
 				<!-- Total Field contents:
 					_spacerWidth => 0
 					addPopup => 
@@ -55,7 +55,7 @@
 					findPopup => 
 					findPopupAppendValue => 
 					flags => 3584
-					formatValue => CODE(0x8617e70)
+					formatValue => CODE(0x8617e68)
 					hint => 
 					hints => 
 					lengthInvalidMsg => End Alert is too long (can be at most 10 characters).
@@ -64,8 +64,8 @@
 					name => trans_end_stamp
 					onBlurJS => validateChange_Date(event)
 					onKeyPressJS => return processKeypress_default(event)
-					onValidate => CODE(0x8617a50)
-					popup => HASH(0xba12534)
+					onValidate => CODE(0x8617a48)
+					popup => HASH(0xba57c70)
 					postHtml => 
 					preHtml => 
 					priKey => 0
@@ -84,7 +84,7 @@
 			<!--  -->
 			<field.text caption="Caption" required="yes" name="caption"/>
 			<field.memo caption="Details" name="detail" size="24"/>
-			<field.person.id name="initiator_id" caption="Staff Member"/>
+			<field.person.id name="initiator_id" caption="Staff Member" required="yes" style="text" types="Physician,Staff,Nurse"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => /org/#session.org_id#/dlg-add-Physician
@@ -103,7 +103,7 @@
 				name => initiator_id
 				onKeyPressJS => return processKeypress_identifier(event)
 				options => 48
-				popup => HASH(0xc038fb4)
+				popup => HASH(0xc03e870)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -112,7 +112,7 @@
 				requiredInvalidMsg => Staff Member is required (can not be blank).
 				size => 16
 				type => text
-				types => ARRAY(0xc030114)
+				types => ARRAY(0xc034470)
 			-->
 			<field.select caption="Alert Status" required="yes" name="trans_status" choices="Active=2, InActive=3" style="radio"/>
 			<!--  -->
@@ -120,7 +120,7 @@
 		</dialog>
 
 		<dialog name="close_date" heading="Close Date">
-			<field.organization.id name="org_id" caption="Organization ID"/>
+			<field.organization.id name="org_id" caption="Organization ID" required="yes"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => /org/#session.org_id#/dlg-add-org-main
@@ -137,7 +137,7 @@
 				name => org_id
 				onKeyPressJS => return processKeypress_identifier(event)
 				options => 48
-				popup => HASH(0xba6c0e0)
+				popup => HASH(0xba704c4)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -147,7 +147,7 @@
 				size => 16
 				type => text
 			-->
-			<field.scheduling.date name="close_date" caption="Close Date"/>
+			<field.scheduling.date name="close_date" caption="Close Date" required="yes"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => 
@@ -156,7 +156,7 @@
 				findPopup => 
 				findPopupAppendValue => 
 				flags => 3600
-				formatValue => CODE(0x8617e70)
+				formatValue => CODE(0x8617e68)
 				hint => 
 				hints => Only batch date(s) greater than the Close Date will be valid
 				lengthInvalidMsg => Close Date is too long (can be at most 10 characters).
@@ -165,9 +165,9 @@
 				name => close_date
 				onBlurJS => validateChange_Date(event)
 				onKeyPressJS => return processKeypress_default(event)
-				onValidate => CODE(0x8617a50)
+				onValidate => CODE(0x8617a48)
 				options => 16
-				popup => HASH(0xba6ff44)
+				popup => HASH(0xba72db4)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -201,10 +201,10 @@
 
 		</dialog>
 
-		<dialog name="refill_request" heading="$Command Refill Request">
+		<dialog name="refill_request" heading="create-data-cmd-heading:Refill Request">
 			<field.memo caption="Refill" name="refill" size="24"/>
 			<field.date caption="Date" name="refilldate" size="12"/>
-			<field.person.id name="provider" caption="Physician"/>
+			<field.person.id name="provider" caption="Physician" required="yes" style="text" types="Physician"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => /org/#session.org_id#/dlg-add-Physician
@@ -223,7 +223,7 @@
 				name => provider
 				onKeyPressJS => return processKeypress_identifier(event)
 				options => 48
-				popup => HASH(0xc0299c4)
+				popup => HASH(0xc00edf4)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -232,9 +232,9 @@
 				requiredInvalidMsg => Physician is required (can not be blank).
 				size => 16
 				type => text
-				types => ARRAY(0xc02bf38)
+				types => ARRAY(0xc02f708)
 			-->
-			<field.person.id name="filler" caption="Refill Processor"/>
+			<field.person.id name="filler" caption="Refill Processor" required="yes" style="text"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => /org/#session.org_id#/dlg-add-nurse
@@ -254,7 +254,7 @@
 				name => filler
 				onKeyPressJS => return processKeypress_identifier(event)
 				options => 48
-				popup => HASH(0xc033dc4)
+				popup => HASH(0xc039a60)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -270,8 +270,8 @@
 
 		</dialog>
 
-		<dialog name="hospitalization" heading="$Command Hospitalization">
-			<field.person.id name="patient_id" caption="Patient ID"/>
+		<dialog name="hospitalization" heading="create-data-cmd-heading:Hospitalization">
+			<field.person.id name="patient_id" caption="Patient ID" required="yes" style="text"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => /org/#session.org_id#/dlg-add-
@@ -290,7 +290,7 @@
 				name => patient_id
 				onKeyPressJS => return processKeypress_identifier(event)
 				options => 48
-				popup => HASH(0xc0316d0)
+				popup => HASH(0xba7c8fc)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -299,7 +299,7 @@
 				requiredInvalidMsg => Patient ID is required (can not be blank).
 				size => 16
 				type => text
-				types => ARRAY(0xc036860)
+				types => ARRAY(0xc03d52c)
 			-->
 			<field.select caption="Type" required="yes" name="trans_type"/>
 			<!--  -->
@@ -311,7 +311,7 @@
 			<field.select caption="Hospital"  name="service_facility_id" choices="query:dialog.stmt19"/>
 			<!--  numPackages="0" pkgList="" stmtNum="19" -->
 			<field.text caption="Room Number"  name="caption"/>
-			<field.person.id name="provider_id" caption="Physician ID"/>
+			<field.person.id name="provider_id" caption="Physician ID"  style="text" types="Physician"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => /org/#session.org_id#/dlg-add-Physician
@@ -330,7 +330,7 @@
 				name => provider_id
 				onKeyPressJS => return processKeypress_identifier(event)
 				options => 32
-				popup => HASH(0xba0ff60)
+				popup => HASH(0xba5d2e0)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -339,14 +339,14 @@
 				requiredInvalidMsg => Physician ID is required (can not be blank).
 				size => 16
 				type => text
-				types => ARRAY(0xac09960)
+				types => ARRAY(0xba611ac)
 			-->
 			<field.select caption="In/Out Patient"  name="data_text_a" choices="In;Out"/>
 			<!--  -->
 			<field.text caption="Procedures"  hint="Enter CPT codes in a comma separated list" name="data_text_c"/>
 			<field.text caption="ICD-9 Codes"  hint="Enter ICD-9 codes in a comma separated list" name="detail"/>
 			<field.text caption="Prior Authorization"  name="auth_ref"/>
-			<field.person.id name="consult_id" caption="Consulting Physician ID"/>
+			<field.person.id name="consult_id" caption="Consulting Physician ID"  style="text" types="Physician"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => /org/#session.org_id#/dlg-add-Physician
@@ -365,7 +365,7 @@
 				name => consult_id
 				onKeyPressJS => return processKeypress_identifier(event)
 				options => 32
-				popup => HASH(0xba3630c)
+				popup => HASH(0xba0fa2c)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -374,9 +374,9 @@
 				requiredInvalidMsg => Consulting Physician ID is required (can not be blank).
 				size => 16
 				type => text
-				types => ARRAY(0xc0301c8)
+				types => ARRAY(0xc0331f0)
 			-->
-			<field.person.id name="data_text_b" caption="Referring Physician ID"/>
+			<field.person.id name="data_text_b" caption="Referring Physician ID"  style="text" types="Referring-Doctor"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => /org/#session.org_id#/dlg-add-Referring-Doctor
@@ -395,7 +395,7 @@
 				name => data_text_b
 				onKeyPressJS => return processKeypress_identifier(event)
 				options => 32
-				popup => HASH(0xc028ae4)
+				popup => HASH(0xc037290)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -404,14 +404,14 @@
 				requiredInvalidMsg => Referring Physician ID is required (can not be blank).
 				size => 16
 				type => text
-				types => ARRAY(0xba4ae44)
+				types => ARRAY(0xba5581c)
 			-->
 
 		</dialog>
 
-		<dialog name="phone_message" heading="$Command Phone Message">
+		<dialog name="phone_message" heading="create-data-cmd-heading:Phone Message">
 			<field.text hidden="yes" name="patient_phone_message" caption="patient_phone_message"/>
-			<field.person.id name="person_called" caption="Call From"/>
+			<field.person.id name="person_called" caption="Call From" required="yes" style="text"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => /org/#session.org_id#/dlg-add-patient
@@ -431,7 +431,7 @@
 				name => person_called
 				onKeyPressJS => return processKeypress_identifier(event)
 				options => 48
-				popup => HASH(0xc027468)
+				popup => HASH(0xc03d61c)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -442,7 +442,7 @@
 				size => 16
 				type => text
 			-->
-			<field.person.id name="provider" caption="Call For"/>
+			<field.person.id name="provider" caption="Call For" required="yes" style="text"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => /org/#session.org_id#/dlg-add-patient
@@ -462,7 +462,7 @@
 				name => provider
 				onKeyPressJS => return processKeypress_identifier(event)
 				options => 48
-				popup => HASH(0xac099e4)
+				popup => HASH(0xc037eac)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -484,7 +484,7 @@
 
 		</dialog>
 
-		<dialog name="tests" heading="$Command Tests/Measurements">
+		<dialog name="tests" heading="create-data-cmd-heading:Tests/Measurements">
 			<field.datetime caption="TestDate" name="trans_begin_stamp" size="20"/>
 			<field.text caption="Height"  name="height_value"/>
 			<field.text caption="Weight"  name="weight_value"/>
@@ -497,7 +497,7 @@
 
 		</dialog>
 
-		<dialog name="medication_prescribe" heading="$Command Prescription">
+		<dialog name="medication_prescribe" heading="create-data-cmd-heading:Prescription">
 			<field.select caption="Medication Type" required="yes" name="trans_type"/>
 			<!--  -->
 			<field.date caption="Start Date" max-length="50" name="trans_begin_stamp" size="12"/>
@@ -508,8 +508,8 @@
 
 		</dialog>
 
-		<dialog name="account_notes" heading="$Command Account Notes">
-			<field.person.id name="person_id" caption="Person ID"/>
+		<dialog name="account_notes" heading="create-data-cmd-heading:Account Notes">
+			<field.person.id name="person_id" caption="Person ID" read-only="yes" style="text" types="Patient"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => /org/#session.org_id#/dlg-add-Patient
@@ -528,7 +528,7 @@
 				name => person_id
 				onKeyPressJS => return processKeypress_identifier(event)
 				options => 36
-				popup => HASH(0xc031598)
+				popup => HASH(0xc037da4)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -537,15 +537,15 @@
 				requiredInvalidMsg => Person ID is required (can not be blank).
 				size => 16
 				type => text
-				types => ARRAY(0xc02d730)
+				types => ARRAY(0xc032f74)
 			-->
 			<field.memo caption="Notes" name="detail" size="24"/>
 			<field.date caption="Date" name="trans_begin_stamp" size="12"/>
 
 		</dialog>
 
-		<dialog name="on_call" heading="$Command On Call Note">
-			<field.person.id name="person_id" caption="Patient ID"/>
+		<dialog name="on_call" heading="create-data-cmd-heading:On Call Note">
+			<field.person.id name="person_id" caption="Patient ID" required="yes" style="text" types="Patient"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => /org/#session.org_id#/dlg-add-Patient
@@ -564,7 +564,7 @@
 				name => person_id
 				onKeyPressJS => return processKeypress_identifier(event)
 				options => 48
-				popup => HASH(0xc030054)
+				popup => HASH(0xc02d2d8)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -574,9 +574,9 @@
 				requiredInvalidMsg => Patient ID is required (can not be blank).
 				size => 16
 				type => text
-				types => ARRAY(0xba510ec)
+				types => ARRAY(0xba2b524)
 			-->
-			<field.person.id name="physician_id" caption="On Call Physician ID"/>
+			<field.person.id name="physician_id" caption="On Call Physician ID" required="yes" style="text" types="Physician,Referring-Doctor"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => /org/#session.org_id#/dlg-add-Physician
@@ -596,7 +596,7 @@
 				name => physician_id
 				onKeyPressJS => return processKeypress_identifier(event)
 				options => 48
-				popup => HASH(0xba5391c)
+				popup => HASH(0xb9dd98c)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -605,9 +605,9 @@
 				requiredInvalidMsg => On Call Physician ID is required (can not be blank).
 				size => 16
 				type => text
-				types => ARRAY(0xac0999c)
+				types => ARRAY(0xba7a328)
 			-->
-			<field.person.id name="reg_physician_id" caption="Patient's Regular Physician ID"/>
+			<field.person.id name="reg_physician_id" caption="Patient's Regular Physician ID"  style="text" types="Physician,Referring-Doctor"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => /org/#session.org_id#/dlg-add-Physician
@@ -626,7 +626,7 @@
 				name => reg_physician_id
 				onKeyPressJS => return processKeypress_identifier(event)
 				options => 32
-				popup => HASH(0xba0b574)
+				popup => HASH(0xc03544c)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -635,7 +635,7 @@
 				requiredInvalidMsg => Patient's Regular Physician ID is required (can not be blank).
 				size => 16
 				type => text
-				types => ARRAY(0xc034f24)
+				types => ARRAY(0xc031c44)
 			-->
 			<field.datetime caption="Date and Time of encounter" name="begin_stamp" size="20"/>
 			<field.select caption="Reason" prepend-blank="yes" name="reason" choices="Needs refill;Problem with medication;Having pain"/>
@@ -647,18 +647,18 @@
 
 		</dialog>
 
-		<dialog name="alert_org" heading="$Command Alert">
+		<dialog name="alert_org" heading="create-data-cmd-heading:Alert">
 			<field.composite caption="*"  name="text_field">
-				<field.scheduling.date name="trans_begin_stamp" caption="Begin Alert"/>
+				<field.scheduling.date name="trans_begin_stamp" caption="Begin Alert" required="yes"/>
 				<!-- Total Field contents:
 					_spacerWidth => 0
 					addPopup => 
 					caption => Begin Alert
-					defaultValue => 11/09/2001
+					defaultValue => 11/14/2001
 					findPopup => 
 					findPopupAppendValue => 
 					flags => 3600
-					formatValue => CODE(0x8617e70)
+					formatValue => CODE(0x8617e68)
 					futureOnly => 0
 					hint => 
 					hints => 
@@ -668,9 +668,9 @@
 					name => trans_begin_stamp
 					onBlurJS => validateChange_Date(event)
 					onKeyPressJS => return processKeypress_default(event)
-					onValidate => CODE(0x8617a50)
+					onValidate => CODE(0x8617a48)
 					options => 16
-					popup => HASH(0xc00a9bc)
+					popup => HASH(0xba73d54)
 					postHtml => 
 					preHtml => 
 					priKey => 0
@@ -680,7 +680,7 @@
 					size => 10
 					type => date
 				-->
-				<field.scheduling.date name="trans_end_stamp" caption="End Alert"/>
+				<field.scheduling.date name="trans_end_stamp" caption="End Alert" />
 				<!-- Total Field contents:
 					_spacerWidth => 0
 					addPopup => 
@@ -689,7 +689,7 @@
 					findPopup => 
 					findPopupAppendValue => 
 					flags => 3584
-					formatValue => CODE(0x8617e70)
+					formatValue => CODE(0x8617e68)
 					hint => 
 					hints => 
 					lengthInvalidMsg => End Alert is too long (can be at most 10 characters).
@@ -698,8 +698,8 @@
 					name => trans_end_stamp
 					onBlurJS => validateChange_Date(event)
 					onKeyPressJS => return processKeypress_default(event)
-					onValidate => CODE(0x8617a50)
-					popup => HASH(0xba5f588)
+					onValidate => CODE(0x8617a48)
+					popup => HASH(0xc026084)
 					postHtml => 
 					preHtml => 
 					priKey => 0
@@ -718,7 +718,7 @@
 			<!--  -->
 			<field.text caption="Caption" required="yes" name="caption"/>
 			<field.memo caption="Details" name="detail" size="24"/>
-			<field.person.id name="initiator_id" caption="Staff Member"/>
+			<field.person.id name="initiator_id" caption="Staff Member" required="yes" style="text" types="Physician,Staff,Nurse"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => /org/#session.org_id#/dlg-add-Physician
@@ -737,7 +737,7 @@
 				name => initiator_id
 				onKeyPressJS => return processKeypress_identifier(event)
 				options => 48
-				popup => HASH(0xc02d838)
+				popup => HASH(0xc03e96c)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -746,20 +746,20 @@
 				requiredInvalidMsg => Staff Member is required (can not be blank).
 				size => 16
 				type => text
-				types => ARRAY(0xba57a24)
+				types => ARRAY(0xba143fc)
 			-->
 			<field.select caption="Alert Status" required="yes" name="trans_status" choices="Active=2, InActive=3" style="radio"/>
 			<!--  -->
 
 		</dialog>
 
-		<dialog name="activeproblems_trans" heading="$Command Transient Diagnosis">
+		<dialog name="activeproblems_trans" heading="create-data-cmd-heading:Transient Diagnosis">
 
 		</dialog>
 
 		<dialog name="transfer_account" heading="Transfer Account">
 			<field.text caption="Person ID" read-only="yes" name="person_id"/>
-			<field.person.id name="transfer_id" caption="Transfer To"/>
+			<field.person.id name="transfer_id" caption="Transfer To" required="yes" style="text"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => /org/#session.org_id#/dlg-add-
@@ -778,7 +778,7 @@
 				name => transfer_id
 				onKeyPressJS => return processKeypress_identifier(event)
 				options => 48
-				popup => HASH(0xc0220d4)
+				popup => HASH(0xba77f4c)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -787,26 +787,26 @@
 				requiredInvalidMsg => Transfer To is required (can not be blank).
 				size => 16
 				type => text
-				types => ARRAY(0xc02d8a4)
+				types => ARRAY(0xac09b4c)
 			-->
 			<field.memo caption="Reason For Transfer" name="detail" size="24"/>
 			<field.date caption="Date" name="trans_begin_stamp" size="12"/>
 
 		</dialog>
 
-		<dialog name="activeproblems_perm" heading="$Command Permanent Diagnosis">
+		<dialog name="activeproblems_perm" heading="create-data-cmd-heading:Permanent Diagnosis">
 
 		</dialog>
 
-		<dialog name="activeproblems_icd" heading="$Command ICD Code">
+		<dialog name="activeproblems_icd" heading="create-data-cmd-heading:ICD Code">
 
 		</dialog>
 
-		<dialog name="activeproblems_notes" heading="$Command Permanent Diagnosis">
+		<dialog name="activeproblems_notes" heading="create-data-cmd-heading:Permanent Diagnosis">
 
 		</dialog>
 
-		<dialog name="activeproblems_surgical" heading="$Command Surgical Procedure">
+		<dialog name="activeproblems_surgical" heading="create-data-cmd-heading:Surgical Procedure">
 
 		</dialog>
 

@@ -3,7 +3,7 @@
 <xaf>
 	<dialogs package="invoice_worklist">
 		<dialog name="transfer_collection" heading="Transfer Invoice">
-			<field.person.id name="person_id" caption="Person ID"/>
+			<field.person.id name="person_id" caption="Person ID" read-only="yes" style="text"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => /org/#session.org_id#/dlg-add-
@@ -22,7 +22,7 @@
 				name => person_id
 				onKeyPressJS => return processKeypress_identifier(event)
 				options => 36
-				popup => HASH(0xba564d4)
+				popup => HASH(0xba69d0c)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -31,9 +31,9 @@
 				requiredInvalidMsg => Person ID is required (can not be blank).
 				size => 16
 				type => text
-				types => ARRAY(0xba6fd7c)
+				types => ARRAY(0xba766e4)
 			-->
-			<field.person.id name="transfer_id" caption="Transfer To"/>
+			<field.person.id name="transfer_id" caption="Transfer To" required="yes" style="text"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => /org/#session.org_id#/dlg-add-
@@ -52,7 +52,7 @@
 				name => transfer_id
 				onKeyPressJS => return processKeypress_identifier(event)
 				options => 48
-				popup => HASH(0xba415f4)
+				popup => HASH(0xba47448)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -61,7 +61,7 @@
 				requiredInvalidMsg => Transfer To is required (can not be blank).
 				size => 16
 				type => text
-				types => ARRAY(0xba1df80)
+				types => ARRAY(0xba72d6c)
 			-->
 			<field.memo caption="Reason For Transfer" name="detail" size="24"/>
 			<field.date caption="Date" name="date_data_b" size="12"/>

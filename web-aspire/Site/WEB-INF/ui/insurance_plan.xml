@@ -4,7 +4,7 @@
 	<dialogs package="insurance_plan">
 		<dialog name="ins_exists" heading="ins_exists">
 			<field.composite caption="Insurance Plan ID/Employer Plan ID"  name="ins_plan">
-				<field.insurance.product name="ins_id" caption="Insurance Plan ID"/>
+				<field.insurance.product name="ins_id" caption="Insurance Plan ID" />
 				<!-- Total Field contents:
 					_spacerWidth => 0
 					addPopup => /org/#session.org_id#/dlg-add-ins-product
@@ -22,7 +22,7 @@
 					name => ins_id
 					onKeyPressJS => return processKeypress_default(event)
 					options => 0
-					popup => HASH(0xba6d4a4)
+					popup => HASH(0xba73e74)
 					postHtml => 
 					preHtml => 
 					priKey => 0
@@ -41,7 +41,7 @@
 			<field.text caption="Member Number"  max-length="32" name="member_number"/>
 			<field.text caption="Policy Number"  max-length="32" name="policy_number"/>
 			<field.composite caption="Insured/Guarantor ID"  name="insured_guarantor_ids">
-				<field.person.id name="insured_id" caption="Insured ID"/>
+				<field.person.id name="insured_id" caption="Insured ID" required="yes" style="text" types="Patient"/>
 				<!-- Total Field contents:
 					_spacerWidth => 0
 					addPopup => /org/#session.org_id#/dlg-add-Patient
@@ -60,7 +60,7 @@
 					name => insured_id
 					onKeyPressJS => return processKeypress_identifier(event)
 					options => 48
-					popup => HASH(0xba4ece4)
+					popup => HASH(0xba4daec)
 					postHtml => 
 					preHtml => 
 					priKey => 0
@@ -69,9 +69,9 @@
 					requiredInvalidMsg => Insured ID is required (can not be blank).
 					size => 16
 					type => text
-					types => ARRAY(0xba44068)
+					types => ARRAY(0xba59b80)
 				-->
-				<field.person.id name="guarantor_id" caption="Guarantor ID"/>
+				<field.person.id name="guarantor_id" caption="Guarantor ID" required="yes" style="text" types="Patient"/>
 				<!-- Total Field contents:
 					_spacerWidth => 0
 					addPopup => /org/#session.org_id#/dlg-add-Patient
@@ -90,7 +90,7 @@
 					name => guarantor_id
 					onKeyPressJS => return processKeypress_identifier(event)
 					options => 48
-					popup => HASH(0xba565dc)
+					popup => HASH(0xba5c36c)
 					postHtml => 
 					preHtml => 
 					priKey => 0
@@ -99,10 +99,10 @@
 					requiredInvalidMsg => Guarantor ID is required (can not be blank).
 					size => 16
 					type => text
-					types => ARRAY(0xba12564)
+					types => ARRAY(0xba22344)
 				-->
 			</field.composite>
-			<field.person.id name="insured_id" caption="Insured ID"/>
+			<field.person.id name="insured_id" caption="Insured ID"  style="text" types="Patient"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => /org/#session.org_id#/dlg-add-Patient
@@ -121,7 +121,7 @@
 				name => insured_id
 				onKeyPressJS => return processKeypress_identifier(event)
 				options => 32
-				popup => HASH(0xba5ca1c)
+				popup => HASH(0xba6495c)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -130,7 +130,7 @@
 				requiredInvalidMsg => Insured ID is required (can not be blank).
 				size => 16
 				type => text
-				types => ARRAY(0xba5ba50)
+				types => ARRAY(0xba5d148)
 			-->
 			<field.select caption="Relationship to Insured"  name="rel_to_insured" choices="query:insurance.selInsuredRelation"/>
 			<!--  -->
@@ -155,12 +155,12 @@
 
 		</dialog>
 
-		<dialog name="ins_newplan" heading="$Command Insurance Plan">
+		<dialog name="ins_newplan" heading="create-data-cmd-heading:Insurance Plan">
 			<field.text hidden="yes" name="phone_item_id" caption="phone_item_id"/>
 			<field.text hidden="yes" name="fax_item_id" caption="fax_item_id"/>
 			<field.text hidden="yes" name="fee_item_id" caption="fee_item_id"/>
 			<field.text hidden="yes" name="item_id" caption="item_id"/>
-			<field.organization.id name="ins_org_id" caption="Insurance Organization ID"/>
+			<field.organization.id name="ins_org_id" caption="Insurance Organization ID" required="yes"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => /org/#session.org_id#/dlg-add-org-main
@@ -177,7 +177,7 @@
 				name => ins_org_id
 				onKeyPressJS => return processKeypress_identifier(event)
 				options => 48
-				popup => HASH(0xba58bcc)
+				popup => HASH(0xba558e8)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -187,7 +187,7 @@
 				size => 16
 				type => text
 			-->
-			<field.insurance.product.new name="ins_id" caption="Insurance Plan ID"/>
+			<field.insurance.product.new name="ins_id" caption="Insurance Plan ID" required="yes"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => 
@@ -203,7 +203,7 @@
 				name => ins_id
 				onKeyPressJS => return processKeypress_default(event)
 				options => 16
-				popup => HASH(0xba60580)
+				popup => HASH(0xba64b90)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -213,7 +213,7 @@
 				size => 16
 				type => text
 			-->
-			<field.organization.id name="ipa_org_id" caption="IPA"/>
+			<field.organization.id name="ipa_org_id" caption="IPA" />
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => /org/#session.org_id#/dlg-add-org-main
@@ -230,7 +230,7 @@
 				name => ipa_org_id
 				onKeyPressJS => return processKeypress_identifier(event)
 				options => 32
-				popup => HASH(0xba644a0)
+				popup => HASH(0xba6b1e4)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -241,12 +241,12 @@
 				type => text
 			-->
 			<field.text caption="Fee Schedules"  name="fee_schedules"/>
-			<field.address name="billing_addr" caption="Billing Address"/>
+			<field.address name="billing_addr" caption="Billing Address" required="yes"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => 
 				caption => Billing Address
-				fields => ARRAY(0xba72390)
+				fields => ARRAY(0xba77fdc)
 				findPopup => 
 				findPopupAppendValue => 
 				flags => 528
@@ -259,7 +259,7 @@
 				namePrefix => addr_
 				onKeyPressJS => return processKeypress_default(event)
 				options => 16
-				popup => HASH(0xba538bc)
+				popup => HASH(0xba56b54)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -317,7 +317,7 @@
 			<field.text hidden="yes" name="fax_item_id" caption="fax_item_id"/>
 			<field.text hidden="yes" name="fee_item_id" caption="fee_item_id"/>
 			<field.text hidden="yes" name="item_id" caption="item_id"/>
-			<field.organization.id name="ins_org_id" caption="Insurance Organization ID"/>
+			<field.organization.id name="ins_org_id" caption="Insurance Organization ID" required="yes"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => /org/#session.org_id#/dlg-add-org-main
@@ -334,7 +334,7 @@
 				name => ins_org_id
 				onKeyPressJS => return processKeypress_identifier(event)
 				options => 48
-				popup => HASH(0xb9e90c8)
+				popup => HASH(0xba1448c)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -344,7 +344,7 @@
 				size => 16
 				type => text
 			-->
-			<field.insurance.product.new name="ins_id" caption="Insurance Plan ID"/>
+			<field.insurance.product.new name="ins_id" caption="Insurance Plan ID" required="yes"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => 
@@ -360,7 +360,7 @@
 				name => ins_id
 				onKeyPressJS => return processKeypress_default(event)
 				options => 16
-				popup => HASH(0xba5376c)
+				popup => HASH(0xba52e6c)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -370,7 +370,7 @@
 				size => 16
 				type => text
 			-->
-			<field.organization.id name="ipa_org_id" caption="IPA"/>
+			<field.organization.id name="ipa_org_id" caption="IPA" />
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => /org/#session.org_id#/dlg-add-org-main
@@ -387,7 +387,7 @@
 				name => ipa_org_id
 				onKeyPressJS => return processKeypress_identifier(event)
 				options => 32
-				popup => HASH(0xba7849c)
+				popup => HASH(0xba7b824)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -398,12 +398,12 @@
 				type => text
 			-->
 			<field.text caption="Fee Schedules"  name="fee_schedules"/>
-			<field.address name="billing_addr" caption="Billing Address"/>
+			<field.address name="billing_addr" caption="Billing Address" required="yes"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => 
 				caption => Billing Address
-				fields => ARRAY(0xba5d98c)
+				fields => ARRAY(0xba6222c)
 				findPopup => 
 				findPopupAppendValue => 
 				flags => 528
@@ -416,7 +416,7 @@
 				namePrefix => addr_
 				onKeyPressJS => return processKeypress_default(event)
 				options => 16
-				popup => HASH(0xba1a248)
+				popup => HASH(0xba0add4)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -457,7 +457,7 @@
 				<field.text caption="Group Number"  max-length="32" name="group_number"/>
 			</field.composite>
 			<field.composite caption="Insured/Guarantor ID"  name="insured_guarantor_ids">
-				<field.person.id name="insured_id" caption="Insured ID"/>
+				<field.person.id name="insured_id" caption="Insured ID" required="yes" style="text" types="Patient"/>
 				<!-- Total Field contents:
 					_spacerWidth => 0
 					addPopup => /org/#session.org_id#/dlg-add-Patient
@@ -476,7 +476,7 @@
 					name => insured_id
 					onKeyPressJS => return processKeypress_identifier(event)
 					options => 48
-					popup => HASH(0xba732b4)
+					popup => HASH(0xba77da8)
 					postHtml => 
 					preHtml => 
 					priKey => 0
@@ -485,9 +485,9 @@
 					requiredInvalidMsg => Insured ID is required (can not be blank).
 					size => 16
 					type => text
-					types => ARRAY(0xba6d384)
+					types => ARRAY(0xba7196c)
 				-->
-				<field.person.id name="guarantor_id" caption="Guarantor ID"/>
+				<field.person.id name="guarantor_id" caption="Guarantor ID" required="yes" style="text" types="Patient"/>
 				<!-- Total Field contents:
 					_spacerWidth => 0
 					addPopup => /org/#session.org_id#/dlg-add-Patient
@@ -506,7 +506,7 @@
 					name => guarantor_id
 					onKeyPressJS => return processKeypress_identifier(event)
 					options => 48
-					popup => HASH(0xba565b8)
+					popup => HASH(0xba70704)
 					postHtml => 
 					preHtml => 
 					priKey => 0
@@ -515,10 +515,10 @@
 					requiredInvalidMsg => Guarantor ID is required (can not be blank).
 					size => 16
 					type => text
-					types => ARRAY(0xb9f48a4)
+					types => ARRAY(0xba2b500)
 				-->
 			</field.composite>
-			<field.person.id name="insured_id" caption="Insured ID"/>
+			<field.person.id name="insured_id" caption="Insured ID"  style="text" types="Patient"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => /org/#session.org_id#/dlg-add-Patient
@@ -537,7 +537,7 @@
 				name => insured_id
 				onKeyPressJS => return processKeypress_identifier(event)
 				options => 32
-				popup => HASH(0xba4ee70)
+				popup => HASH(0xba2b458)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -546,7 +546,7 @@
 				requiredInvalidMsg => Insured ID is required (can not be blank).
 				size => 16
 				type => text
-				types => ARRAY(0xba38908)
+				types => ARRAY(0xba3cd50)
 			-->
 			<field.select caption="Relationship to Insured"  name="rel_to_insured" choices="query:insurance.selInsuredRelation"/>
 			<!--  -->
@@ -574,10 +574,10 @@
 
 		</dialog>
 
-		<dialog name="ins_coverage" heading="$Command Personal Insurance Coverage">
+		<dialog name="ins_coverage" heading="create-data-cmd-heading:Personal Insurance Coverage">
 			<field.text hidden="yes" name="injury_item_id" caption="injury_item_id"/>
 			<field.text hidden="yes" name="owner_org_id" caption="owner_org_id"/>
-			<field.person.id name="person_id" caption="Patient ID"/>
+			<field.person.id name="person_id" caption="Patient ID" required="yes" style="text" types="Patient"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => /org/#session.org_id#/dlg-add-Patient
@@ -596,7 +596,7 @@
 				name => person_id
 				onKeyPressJS => return processKeypress_identifier(event)
 				options => 48
-				popup => HASH(0xba6be94)
+				popup => HASH(0xba6c660)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -605,9 +605,9 @@
 				requiredInvalidMsg => Patient ID is required (can not be blank).
 				size => 16
 				type => text
-				types => ARRAY(0xb9f5f10)
+				types => ARRAY(0xba544b4)
 			-->
-			<field.insurance.product name="product_name" caption="Insurance Product"/>
+			<field.insurance.product name="product_name" caption="Insurance Product" />
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => /org/#session.org_id#/dlg-add-ins-product
@@ -625,7 +625,7 @@
 				name => product_name
 				onKeyPressJS => return processKeypress_default(event)
 				options => 0
-				popup => HASH(0xba4c404)
+				popup => HASH(0xba2dd6c)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -635,7 +635,7 @@
 				size => 16
 				type => text
 			-->
-			<field.insurance.plan name="plan_name" caption="Insurance Plan"/>
+			<field.insurance.plan name="plan_name" caption="Insurance Plan" />
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => /org/#session.org_id#/dlg-add-ins-plan
@@ -654,7 +654,7 @@
 				name => plan_name
 				onKeyPressJS => return processKeypress_default(event)
 				options => 0
-				popup => HASH(0xba3b5d4)
+				popup => HASH(0xba0d58c)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -671,7 +671,7 @@
 			<field.select caption="Patient's Relationship to Insured" required="yes" prepend-blank="yes" name="rel_to_insured" choices="query:insurance.selInsuredRelation"/>
 			<!--  -->
 			<field.text caption="Other Relationship"  name="extra"/>
-			<field.person.id name="insured_id" caption="Insured Person ID"/>
+			<field.person.id name="insured_id" caption="Insured Person ID"  style="text" types="Insured-Person"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => /org/#session.org_id#/dlg-add-Insured-Person
@@ -690,7 +690,7 @@
 				name => insured_id
 				onKeyPressJS => return processKeypress_identifier(event)
 				options => 32
-				popup => HASH(0xba6ff38)
+				popup => HASH(0xc00e71c)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -699,9 +699,9 @@
 				requiredInvalidMsg => Insured Person ID is required (can not be blank).
 				size => 16
 				type => text
-				types => ARRAY(0xba56600)
+				types => ARRAY(0x8616a4c)
 			-->
-			<field.organization.id name="employer_org_id" caption="Insured Person's Employer"/>
+			<field.organization.id name="employer_org_id" caption="Insured Person's Employer" />
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => /org/#session.org_id#/dlg-add-org-employer
@@ -719,7 +719,7 @@
 				name => employer_org_id
 				onKeyPressJS => return processKeypress_identifier(event)
 				options => 32
-				popup => HASH(0xba2c0d4)
+				popup => HASH(0xba57cc4)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -756,7 +756,7 @@
 
 		</dialog>
 
-		<dialog name="ins_thirdparty" heading="$Command Third Party Payer">
+		<dialog name="ins_thirdparty" heading="create-data-cmd-heading:Third Party Payer">
 			<field.composite caption="Payer for Today ID/Type"  name="other_payer_fields">
 				<field.text caption="Payer for Today ID" required="yes" name="guarantor_id"/>
 				<field.select caption="Payer for Today Type"  name="guarantor_type" choices="Person=person;Organization=org"/>
@@ -768,13 +768,13 @@
 
 		</dialog>
 
-		<dialog name="ins_plan" heading="$Command Insurance Plan">
+		<dialog name="ins_plan" heading="create-data-cmd-heading:Insurance Plan">
 			<field.text hidden="yes" name="phone_item_id" caption="phone_item_id"/>
 			<field.text hidden="yes" name="fax_item_id" caption="fax_item_id"/>
 			<field.text hidden="yes" name="item_id" caption="item_id"/>
 			<field.text hidden="yes" name="ins_type" caption="ins_type"/>
 			<field.text hidden="yes" name="owner_org_id" caption="owner_org_id"/>
-			<field.organization.id name="ins_org_id" caption="Insurance Org Id"/>
+			<field.organization.id name="ins_org_id" caption="Insurance Org Id" required="yes"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => /org/#session.org_id#/dlg-add-org-insurance
@@ -792,7 +792,7 @@
 				name => ins_org_id
 				onKeyPressJS => return processKeypress_identifier(event)
 				options => 48
-				popup => HASH(0xba63168)
+				popup => HASH(0xba66284)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -802,7 +802,7 @@
 				size => 16
 				type => text
 			-->
-			<field.insurance.product name="product_name" caption="Product Name"/>
+			<field.insurance.product name="product_name" caption="Product Name" required="yes"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => /org/#session.org_id#/dlg-add-ins-product
@@ -821,7 +821,7 @@
 				name => product_name
 				onKeyPressJS => return processKeypress_default(event)
 				options => 16
-				popup => HASH(0xba604e4)
+				popup => HASH(0xba68eb0)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -831,7 +831,7 @@
 				size => 30
 				type => text
 			-->
-			<field.insurance.plan.new name="plan_name" caption="Plan Name"/>
+			<field.insurance.plan.new name="plan_name" caption="Plan Name" required="yes"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => 
@@ -848,7 +848,7 @@
 				name => plan_name
 				onKeyPressJS => return processKeypress_default(event)
 				options => 16
-				popup => HASH(0xba10f8c)
+				popup => HASH(0xba61098)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -858,7 +858,7 @@
 				size => 30
 				type => text
 			-->
-			<field.catalog.id name="fee_schedules" caption="Fee Schedule ID"/>
+			<field.catalog.id name="fee_schedules" caption="Fee Schedule ID" />
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => /org/#session.org_id#/dlg-add-catalog
@@ -875,7 +875,7 @@
 				name => fee_schedules
 				onKeyPressJS => return processKeypress_identifier(event)
 				options => 32
-				popup => HASH(0xba49570)
+				popup => HASH(0xba4968c)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -885,12 +885,12 @@
 				size => 16
 				type => text
 			-->
-			<field.address name="billing_addr" caption="Billing Address"/>
+			<field.address name="billing_addr" caption="Billing Address" required="yes"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => 
 				caption => Billing Address
-				fields => ARRAY(0xba45270)
+				fields => ARRAY(0xba31a0c)
 				findPopup => 
 				findPopupAppendValue => 
 				flags => 528
@@ -903,7 +903,7 @@
 				namePrefix => addr_
 				onKeyPressJS => return processKeypress_default(event)
 				options => 16
-				popup => HASH(0xba5ba5c)
+				popup => HASH(0xba56e6c)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -939,7 +939,7 @@
 
 		</dialog>
 
-		<dialog name="ins_product" heading="$Command Insurance Product">
+		<dialog name="ins_product" heading="create-data-cmd-heading:Insurance Product">
 			<field.text hidden="yes" name="phone_item_id" caption="phone_item_id"/>
 			<field.text hidden="yes" name="fax_item_id" caption="fax_item_id"/>
 			<field.text hidden="yes" name="item_id" caption="item_id"/>
@@ -948,7 +948,7 @@
 			<field.text hidden="yes" name="pre_org_id" caption="pre_org_id"/>
 			<field.text hidden="yes" name="owner_org_id" caption="owner_org_id"/>
 			<field.text hidden="yes" name="medigap_number_id" caption="medigap_number_id"/>
-			<field.organization.id name="ins_org_id" caption="Insurance Company Id"/>
+			<field.organization.id name="ins_org_id" caption="Insurance Company Id" required="yes"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => /org/#session.org_id#/dlg-add-org-insurance
@@ -966,7 +966,7 @@
 				name => ins_org_id
 				onKeyPressJS => return processKeypress_identifier(event)
 				options => 48
-				popup => HASH(0xba6ab8c)
+				popup => HASH(0xba69018)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -976,7 +976,7 @@
 				size => 16
 				type => text
 			-->
-			<field.insurance.product.new name="product_name" caption="Product Name"/>
+			<field.insurance.product.new name="product_name" caption="Product Name" required="yes"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => 
@@ -993,7 +993,7 @@
 				name => product_name
 				onKeyPressJS => return processKeypress_default(event)
 				options => 16
-				popup => HASH(0xba6d1e0)
+				popup => HASH(0xba704ac)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -1005,7 +1005,7 @@
 			-->
 			<field.select caption="Product Type" required="yes" name="ins_type"/>
 			<!--  -->
-			<field.catalog.id name="fee_schedules" caption="Fee Schedule ID"/>
+			<field.catalog.id name="fee_schedules" caption="Fee Schedule ID" />
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => /org/#session.org_id#/dlg-add-catalog
@@ -1022,7 +1022,7 @@
 				name => fee_schedules
 				onKeyPressJS => return processKeypress_identifier(event)
 				options => 32
-				popup => HASH(0xc021d5c)
+				popup => HASH(0xac099e4)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -1032,12 +1032,12 @@
 				size => 16
 				type => text
 			-->
-			<field.address name="billing_addr" caption="Billing Address"/>
+			<field.address name="billing_addr" caption="Billing Address" required="yes"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => 
 				caption => Billing Address
-				fields => ARRAY(0xba78214)
+				fields => ARRAY(0xba7a2c8)
 				findPopup => 
 				findPopupAppendValue => 
 				flags => 528
@@ -1050,7 +1050,7 @@
 				namePrefix => addr_
 				onKeyPressJS => return processKeypress_default(event)
 				options => 16
-				popup => HASH(0xc022ee0)
+				popup => HASH(0xc026348)
 				postHtml => 
 				preHtml => 
 				priKey => 0

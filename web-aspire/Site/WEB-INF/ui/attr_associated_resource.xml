@@ -2,9 +2,9 @@
 
 <xaf>
 	<dialogs package="attr_associated_resource">
-		<dialog name="resource_org" heading="$Command Associated Organization">
+		<dialog name="resource_org" heading="create-data-cmd-heading:Associated Organization">
 			<field.text hidden="yes" name="attr_path" caption="attr_path"/>
-			<field.organization.id name="value_text" caption="Org ID"/>
+			<field.organization.id name="value_text" caption="Org ID" required="yes"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => /org/#session.org_id#/dlg-add-org-main
@@ -21,7 +21,7 @@
 				name => value_text
 				onKeyPressJS => return processKeypress_identifier(event)
 				options => 48
-				popup => HASH(0xb9effd0)
+				popup => HASH(0xba485c4)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -34,8 +34,8 @@
 
 		</dialog>
 
-		<dialog name="resource_orgemp" heading="$Command Associated Employee">
-			<field.person.id name="emp_id" caption="Employee ID"/>
+		<dialog name="resource_orgemp" heading="create-data-cmd-heading:Associated Employee">
+			<field.person.id name="emp_id" caption="Employee ID"  style="text"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => /org/#session.org_id#/dlg-add-
@@ -54,7 +54,7 @@
 				name => emp_id
 				onKeyPressJS => return processKeypress_identifier(event)
 				options => 32
-				popup => HASH(0xba2ad34)
+				popup => HASH(0xba4b000)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -63,18 +63,18 @@
 				requiredInvalidMsg => Employee ID is required (can not be blank).
 				size => 16
 				type => text
-				types => ARRAY(0xba4c170)
+				types => ARRAY(0xba2b4f4)
 			-->
 
 		</dialog>
 
-		<dialog name="resource_session_physicians" heading="$Command Session Set Of Physicians">
+		<dialog name="resource_session_physicians" heading="create-data-cmd-heading:Session Set Of Physicians">
 			<field.select caption="Physician"  name="physician_list" choices="query:person.selResourceAssociations" size="5" style="multicheck"/>
 			<!--  -->
 
 		</dialog>
 
-		<dialog name="resource_nurse" heading="$Command Associated Physician">
+		<dialog name="resource_nurse" heading="create-data-cmd-heading:Associated Physician">
 			<field.text hidden="yes" name="attr_path" caption="attr_path"/>
 			<field.select caption="Physician Name" required="yes" name="value_text" choices="query:person.selResourceAssociations"/>
 			<!--  -->

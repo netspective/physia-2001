@@ -4,7 +4,7 @@
 	<dialogs package="referral_ppms_worklist">
 		<dialog name="referral_reck_date" heading="Referral Recheck Date">
 			<field.text caption="Referral ID" read-only="yes" name="referral_id"/>
-			<field.person.id name="person_id" caption="Patient ID"/>
+			<field.person.id name="person_id" caption="Patient ID" read-only="yes" style="text"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => /org/#session.org_id#/dlg-add-
@@ -23,7 +23,7 @@
 				name => person_id
 				onKeyPressJS => return processKeypress_identifier(event)
 				options => 36
-				popup => HASH(0xac09b28)
+				popup => HASH(0xc0261b0)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -32,19 +32,19 @@
 				requiredInvalidMsg => Patient ID is required (can not be blank).
 				size => 16
 				type => text
-				types => ARRAY(0xba6e614)
+				types => ARRAY(0xba769c0)
 			-->
 			<field.text caption="Requesting Physician" read-only="yes" name="requester_id"/>
-			<field.scheduling.date name="recheck_date" caption="Recheck Date"/>
+			<field.scheduling.date name="recheck_date" caption="Recheck Date" required="yes"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => 
 				caption => Recheck Date
-				defaultValue => 11/09/2001
+				defaultValue => 11/14/2001
 				findPopup => 
 				findPopupAppendValue => 
 				flags => 3600
-				formatValue => CODE(0x8617e70)
+				formatValue => CODE(0x8617e68)
 				hint => 
 				hints => 
 				lengthInvalidMsg => Recheck Date is too long (can be at most 10 characters).
@@ -53,9 +53,9 @@
 				name => recheck_date
 				onBlurJS => validateChange_Date(event)
 				onKeyPressJS => return processKeypress_default(event)
-				onValidate => CODE(0x8617a50)
+				onValidate => CODE(0x8617a48)
 				options => 16
-				popup => HASH(0xc00a794)
+				popup => HASH(0xba7b6e0)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -68,9 +68,9 @@
 
 		</dialog>
 
-		<dialog name="referral_notes" heading="$Command Referral Notes">
+		<dialog name="referral_notes" heading="create-data-cmd-heading:Referral Notes">
 			<field.text caption="Referral ID" read-only="yes" name="referral_id"/>
-			<field.person.id name="person_id" caption="Patient ID"/>
+			<field.person.id name="person_id" caption="Patient ID" read-only="yes" style="text"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => /org/#session.org_id#/dlg-add-
@@ -89,7 +89,7 @@
 				name => person_id
 				onKeyPressJS => return processKeypress_identifier(event)
 				options => 36
-				popup => HASH(0xac09a14)
+				popup => HASH(0xc00e890)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -98,7 +98,7 @@
 				requiredInvalidMsg => Patient ID is required (can not be blank).
 				size => 16
 				type => text
-				types => ARRAY(0xbff5594)
+				types => ARRAY(0xc026120)
 			-->
 			<field.text caption="Requesting Physician" read-only="yes" name="requester_id"/>
 			<field.memo caption="Notes" name="note" size="24"/>
@@ -108,7 +108,7 @@
 
 		<dialog name="transfer_referral" heading="Transfer Referral">
 			<field.text caption="Referral ID" read-only="yes" name="referral_id"/>
-			<field.person.id name="person_id" caption="Patient ID"/>
+			<field.person.id name="person_id" caption="Patient ID" read-only="yes" style="text"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => /org/#session.org_id#/dlg-add-
@@ -127,7 +127,7 @@
 				name => person_id
 				onKeyPressJS => return processKeypress_identifier(event)
 				options => 36
-				popup => HASH(0xba26cc8)
+				popup => HASH(0xba7ddc8)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -136,10 +136,10 @@
 				requiredInvalidMsg => Patient ID is required (can not be blank).
 				size => 16
 				type => text
-				types => ARRAY(0xba71118)
+				types => ARRAY(0xba77d9c)
 			-->
 			<field.text caption="Requesting Physician" read-only="yes" name="requester_id"/>
-			<field.person.id name="transfer_id" caption="Transfer To"/>
+			<field.person.id name="transfer_id" caption="Transfer To" required="yes" style="text" types="Staff"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => /org/#session.org_id#/dlg-add-Staff
@@ -158,7 +158,7 @@
 				name => transfer_id
 				onKeyPressJS => return processKeypress_identifier(event)
 				options => 48
-				popup => HASH(0xc02b098)
+				popup => HASH(0xc030994)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -167,7 +167,7 @@
 				requiredInvalidMsg => Transfer To is required (can not be blank).
 				size => 16
 				type => text
-				types => ARRAY(0xc0002d0)
+				types => ARRAY(0xba7b5fc)
 			-->
 			<field.memo caption="Reason For Transfer" name="detail" size="24"/>
 
@@ -175,7 +175,7 @@
 
 		<dialog name="close_referral" heading="Close Referral">
 			<field.text caption="Referral ID" read-only="yes" name="referral_id"/>
-			<field.person.id name="person_id" caption="Person ID"/>
+			<field.person.id name="person_id" caption="Person ID" read-only="yes" style="text"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => /org/#session.org_id#/dlg-add-
@@ -194,7 +194,7 @@
 				name => person_id
 				onKeyPressJS => return processKeypress_identifier(event)
 				options => 36
-				popup => HASH(0xc03b88c)
+				popup => HASH(0xba52fb0)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -203,7 +203,7 @@
 				requiredInvalidMsg => Person ID is required (can not be blank).
 				size => 16
 				type => text
-				types => ARRAY(0xba39f88)
+				types => ARRAY(0xba26170)
 			-->
 			<field.text caption="Requesting Physician" read-only="yes" name="requester_id"/>
 

@@ -2,8 +2,8 @@
 
 <xaf>
 	<dialogs package="person">
-		<dialog name="physician" heading="$Command Physician/Provider">
-			<field.person.id.new name="person_id" caption="Physician/Provider ID"/>
+		<dialog name="physician" heading="create-data-cmd-heading:Physician/Provider">
+			<field.person.id.new name="person_id" caption="Physician/Provider ID" />
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => 
@@ -19,7 +19,7 @@
 				name => person_id
 				onKeyPressJS => return processKeypress_identifier(event)
 				options => 32
-				popup => HASH(0xc0266a8)
+				popup => HASH(0xc02d14c)
 				postHtml => &lt;a href="
 				preHtml => 
 				priKey => 0
@@ -45,7 +45,7 @@
 			<!--  -->
 			<field.select caption="Person Type"  name="physician_type" choices="Physician;Physician Extender (direct billing);Other Clinical Service Provider (direct billing);Other Clinical Services Provider (alternate billing)" style="multicheck"/>
 			<!--  -->
-			<field.person.id name="bill_provider" caption="Doctor to bill for this provider"/>
+			<field.person.id name="bill_provider" caption="Doctor to bill for this provider"  style="text" types="Physician"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => /org/#session.org_id#/dlg-add-Physician
@@ -64,7 +64,7 @@
 				name => bill_provider
 				onKeyPressJS => return processKeypress_identifier(event)
 				options => 32
-				popup => HASH(0xc0241c4)
+				popup => HASH(0xc02c018)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -73,7 +73,7 @@
 				requiredInvalidMsg => Doctor to bill for this provider is required (can not be blank).
 				size => 16
 				type => text
-				types => ARRAY(0xba63168)
+				types => ARRAY(0xba66284)
 			-->
 			<field.composite caption="Job Title/Code"  name="job_code">
 				<field.text caption="Job Title"  name="job_title"/>
@@ -84,12 +84,12 @@
 				<field.text caption="Chart Number"  name="chart_number"/>
 			</field.composite>
 			<field.separator heading="Profile Information" name="gen_info_heading"/>
-			<field.person.name name="person_id" caption="*"/>
+			<field.person.name name="person_id" caption="*" />
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => 
 				caption => person_id
-				fields => ARRAY(0xc02503c)
+				fields => ARRAY(0xc02a6bc)
 				findPopup => 
 				findPopupAppendValue => 
 				flags => 294912
@@ -101,7 +101,7 @@
 				name => person_id
 				onKeyPressJS => return processKeypress_default(event)
 				options => 32768
-				popup => HASH(0xc024dfc)
+				popup => HASH(0xc029bdc)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -129,7 +129,7 @@
 			<field.select caption="Language Spoken"  name="language" choices="English;Spanish;French;German;Italian;Chinese;Japanese;Korean;Vietnamese;Other" style="multicheck"/>
 			<!--  -->
 			<field.text caption="Other Language"  name="other_language"/>
-			<field.person.id name="party_name" caption="Responsible Party"/>
+			<field.person.id name="party_name" caption="Responsible Party"  style="text" types="Guarantor,Patient,Physician,Nurse,Staff"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => /org/#session.org_id#/dlg-add-Guarantor
@@ -148,7 +148,7 @@
 				name => party_name
 				onKeyPressJS => return processKeypress_identifier(event)
 				options => 32
-				popup => HASH(0xc02c070)
+				popup => HASH(0xc0308bc)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -157,14 +157,14 @@
 				requiredInvalidMsg => Responsible Party is required (can not be blank).
 				size => 16
 				type => text
-				types => ARRAY(0xc024134)
+				types => ARRAY(0xc029e88)
 			-->
-			<field.association name="relation" caption="Relationship To Responsible Party/Other Relationship Name"/>
+			<field.association name="relation" caption="Relationship To Responsible Party/Other Relationship Name" required="yes"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => 
 				caption => Relationship To Responsible Party/Other Relationship Name
-				fields => ARRAY(0xc02bf38)
+				fields => ARRAY(0xc02f8d0)
 				findPopup => 
 				findPopupAppendValue => 
 				flags => 528
@@ -176,7 +176,7 @@
 				name => relation
 				onKeyPressJS => return processKeypress_default(event)
 				options => 16
-				popup => HASH(0xc02d760)
+				popup => HASH(0xc032ef0)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -201,12 +201,12 @@
 				<field.phone caption="Primary Pager"  max-length="1024" name="primary_pager"/>
 			</field.composite>
 			<field.phone caption="Alternate"  max-length="1024" name="alternate_phone"/>
-			<field.address name="address" caption="Home Address"/>
+			<field.address name="address" caption="Home Address" required="yes"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => 
 				caption => Home Address
-				fields => ARRAY(0xc03668c)
+				fields => ARRAY(0xc039838)
 				findPopup => 
 				findPopupAppendValue => 
 				flags => 530
@@ -220,7 +220,7 @@
 				namePrefix => addr_
 				onKeyPressJS => return processKeypress_default(event)
 				options => 16
-				popup => HASH(0xc039308)
+				popup => HASH(0xc03a958)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -538,16 +538,16 @@
 				<field.select caption="Facility ID" prepend-blank="yes" name="prov_id_facility_25" choices="query:org.selChildFacilityOrgs"/>
 				<!--  -->
 			</field.composite>
-			<field.scheduling.date name="billing_effective_date" caption="Effective Date"/>
+			<field.scheduling.date name="billing_effective_date" caption="Effective Date" />
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => 
 				caption => Effective Date
-				defaultValue => 11/09/2001
+				defaultValue => 11/14/2001
 				findPopup => 
 				findPopupAppendValue => 
 				flags => 3586
-				formatValue => CODE(0x8617e70)
+				formatValue => CODE(0x8617e68)
 				hint => 
 				hints => 
 				invisibleWhen => 1024
@@ -557,8 +557,8 @@
 				name => billing_effective_date
 				onBlurJS => validateChange_Date(event)
 				onKeyPressJS => return processKeypress_default(event)
-				onValidate => CODE(0x8617a50)
-				popup => HASH(0xc0d1ee8)
+				onValidate => CODE(0x8617a48)
+				popup => HASH(0xc0d4f3c)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -614,8 +614,8 @@
 
 		</dialog>
 
-		<dialog name="nurse" heading="$Command Nurse">
-			<field.person.id.new name="person_id" caption="Nurse ID"/>
+		<dialog name="nurse" heading="create-data-cmd-heading:Nurse">
+			<field.person.id.new name="person_id" caption="Nurse ID" />
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => 
@@ -631,7 +631,7 @@
 				name => person_id
 				onKeyPressJS => return processKeypress_identifier(event)
 				options => 32
-				popup => HASH(0xc022008)
+				popup => HASH(0xc02831c)
 				postHtml => &lt;a href="
 				preHtml => 
 				priKey => 0
@@ -657,7 +657,7 @@
 			<!--  -->
 			<field.select caption="Person Type"  name="physician_type" choices="Physician;Physician Extender (direct billing);Other Clinical Service Provider (direct billing);Other Clinical Services Provider (alternate billing)" style="multicheck"/>
 			<!--  -->
-			<field.person.id name="bill_provider" caption="Doctor to bill for this provider"/>
+			<field.person.id name="bill_provider" caption="Doctor to bill for this provider"  style="text" types="Physician"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => /org/#session.org_id#/dlg-add-Physician
@@ -676,7 +676,7 @@
 				name => bill_provider
 				onKeyPressJS => return processKeypress_identifier(event)
 				options => 32
-				popup => HASH(0xba453b4)
+				popup => HASH(0xba27514)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -685,7 +685,7 @@
 				requiredInvalidMsg => Doctor to bill for this provider is required (can not be blank).
 				size => 16
 				type => text
-				types => ARRAY(0xac09b28)
+				types => ARRAY(0xc0261b0)
 			-->
 			<field.composite caption="Job Title/Code"  name="job_code">
 				<field.text caption="Job Title"  name="job_title"/>
@@ -696,12 +696,12 @@
 				<field.text caption="Chart Number"  name="chart_number"/>
 			</field.composite>
 			<field.separator heading="Profile Information" name="gen_info_heading"/>
-			<field.person.name name="person_id" caption="*"/>
+			<field.person.name name="person_id" caption="*" />
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => 
 				caption => person_id
-				fields => ARRAY(0xac099d8)
+				fields => ARRAY(0xbffa88c)
 				findPopup => 
 				findPopupAppendValue => 
 				flags => 294912
@@ -713,7 +713,7 @@
 				name => person_id
 				onKeyPressJS => return processKeypress_default(event)
 				options => 32768
-				popup => HASH(0xac098f4)
+				popup => HASH(0xba757a8)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -741,7 +741,7 @@
 			<field.select caption="Language Spoken"  name="language" choices="English;Spanish;French;German;Italian;Chinese;Japanese;Korean;Vietnamese;Other" style="multicheck"/>
 			<!--  -->
 			<field.text caption="Other Language"  name="other_language"/>
-			<field.person.id name="party_name" caption="Responsible Party"/>
+			<field.person.id name="party_name" caption="Responsible Party"  style="text" types="Guarantor,Patient,Physician,Nurse,Staff"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => /org/#session.org_id#/dlg-add-Guarantor
@@ -760,7 +760,7 @@
 				name => party_name
 				onKeyPressJS => return processKeypress_identifier(event)
 				options => 32
-				popup => HASH(0xc039008)
+				popup => HASH(0xc0397c0)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -769,14 +769,14 @@
 				requiredInvalidMsg => Responsible Party is required (can not be blank).
 				size => 16
 				type => text
-				types => ARRAY(0xc02d790)
+				types => ARRAY(0xc0354ac)
 			-->
-			<field.association name="relation" caption="Relationship To Responsible Party/Other Relationship Name"/>
+			<field.association name="relation" caption="Relationship To Responsible Party/Other Relationship Name" required="yes"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => 
 				caption => Relationship To Responsible Party/Other Relationship Name
-				fields => ARRAY(0xc034fd8)
+				fields => ARRAY(0xc03a718)
 				findPopup => 
 				findPopupAppendValue => 
 				flags => 528
@@ -788,7 +788,7 @@
 				name => relation
 				onKeyPressJS => return processKeypress_default(event)
 				options => 16
-				popup => HASH(0xc0391b8)
+				popup => HASH(0xc03e810)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -813,12 +813,12 @@
 				<field.phone caption="Primary Pager"  max-length="1024" name="primary_pager"/>
 			</field.composite>
 			<field.phone caption="Alternate"  max-length="1024" name="alternate_phone"/>
-			<field.address name="address" caption="Home Address"/>
+			<field.address name="address" caption="Home Address" required="yes"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => 
 				caption => Home Address
-				fields => ARRAY(0xc00a9e0)
+				fields => ARRAY(0xc035464)
 				findPopup => 
 				findPopupAppendValue => 
 				flags => 530
@@ -832,7 +832,7 @@
 				namePrefix => addr_
 				onKeyPressJS => return processKeypress_default(event)
 				options => 16
-				popup => HASH(0xc03b97c)
+				popup => HASH(0xc02bdb4)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -875,8 +875,8 @@
 
 		</dialog>
 
-		<dialog name="staff" heading="$Command Staff Member">
-			<field.person.id.new name="person_id" caption="Staff ID"/>
+		<dialog name="staff" heading="create-data-cmd-heading:Staff Member">
+			<field.person.id.new name="person_id" caption="Staff ID" />
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => 
@@ -892,7 +892,7 @@
 				name => person_id
 				onKeyPressJS => return processKeypress_identifier(event)
 				options => 32
-				popup => HASH(0xba5633c)
+				popup => HASH(0xba0c1b4)
 				postHtml => &lt;a href="
 				preHtml => 
 				priKey => 0
@@ -918,7 +918,7 @@
 			<!--  -->
 			<field.select caption="Person Type"  name="physician_type" choices="Physician;Physician Extender (direct billing);Other Clinical Service Provider (direct billing);Other Clinical Services Provider (alternate billing)" style="multicheck"/>
 			<!--  -->
-			<field.person.id name="bill_provider" caption="Doctor to bill for this provider"/>
+			<field.person.id name="bill_provider" caption="Doctor to bill for this provider"  style="text" types="Physician"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => /org/#session.org_id#/dlg-add-Physician
@@ -937,7 +937,7 @@
 				name => bill_provider
 				onKeyPressJS => return processKeypress_identifier(event)
 				options => 32
-				popup => HASH(0xc027648)
+				popup => HASH(0xc02bd24)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -946,7 +946,7 @@
 				requiredInvalidMsg => Doctor to bill for this provider is required (can not be blank).
 				size => 16
 				type => text
-				types => ARRAY(0xc00a8cc)
+				types => ARRAY(0xba6c78c)
 			-->
 			<field.composite caption="Job Title/Code"  name="job_code">
 				<field.text caption="Job Title"  name="job_title"/>
@@ -957,12 +957,12 @@
 				<field.text caption="Chart Number"  name="chart_number"/>
 			</field.composite>
 			<field.separator heading="Profile Information" name="gen_info_heading"/>
-			<field.person.name name="person_id" caption="*"/>
+			<field.person.name name="person_id" caption="*" />
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => 
 				caption => person_id
-				fields => ARRAY(0xc0273fc)
+				fields => ARRAY(0xc029c9c)
 				findPopup => 
 				findPopupAppendValue => 
 				flags => 294912
@@ -974,7 +974,7 @@
 				name => person_id
 				onKeyPressJS => return processKeypress_default(event)
 				options => 32768
-				popup => HASH(0xc030078)
+				popup => HASH(0xc034500)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -1002,7 +1002,7 @@
 			<field.select caption="Language Spoken"  name="language" choices="English;Spanish;French;German;Italian;Chinese;Japanese;Korean;Vietnamese;Other" style="multicheck"/>
 			<!--  -->
 			<field.text caption="Other Language"  name="other_language"/>
-			<field.person.id name="party_name" caption="Responsible Party"/>
+			<field.person.id name="party_name" caption="Responsible Party"  style="text" types="Guarantor,Patient,Physician,Nurse,Staff"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => /org/#session.org_id#/dlg-add-Guarantor
@@ -1021,7 +1021,7 @@
 				name => party_name
 				onKeyPressJS => return processKeypress_identifier(event)
 				options => 32
-				popup => HASH(0xc034cc0)
+				popup => HASH(0xba4f200)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -1030,14 +1030,14 @@
 				requiredInvalidMsg => Responsible Party is required (can not be blank).
 				size => 16
 				type => text
-				types => ARRAY(0xba22c90)
+				types => ARRAY(0xba75a84)
 			-->
-			<field.association name="relation" caption="Relationship To Responsible Party/Other Relationship Name"/>
+			<field.association name="relation" caption="Relationship To Responsible Party/Other Relationship Name" required="yes"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => 
 				caption => Relationship To Responsible Party/Other Relationship Name
-				fields => ARRAY(0xc02eef8)
+				fields => ARRAY(0xc0353ec)
 				findPopup => 
 				findPopupAppendValue => 
 				flags => 528
@@ -1049,7 +1049,7 @@
 				name => relation
 				onKeyPressJS => return processKeypress_default(event)
 				options => 16
-				popup => HASH(0xc0390e0)
+				popup => HASH(0xc041088)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -1074,12 +1074,12 @@
 				<field.phone caption="Primary Pager"  max-length="1024" name="primary_pager"/>
 			</field.composite>
 			<field.phone caption="Alternate"  max-length="1024" name="alternate_phone"/>
-			<field.address name="address" caption="Home Address"/>
+			<field.address name="address" caption="Home Address" required="yes"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => 
 				caption => Home Address
-				fields => ARRAY(0xc02b110)
+				fields => ARRAY(0xc030748)
 				findPopup => 
 				findPopupAppendValue => 
 				flags => 530
@@ -1093,7 +1093,7 @@
 				namePrefix => addr_
 				onKeyPressJS => return processKeypress_default(event)
 				options => 16
-				popup => HASH(0xba2439c)
+				popup => HASH(0xc0435ac)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -1132,9 +1132,9 @@
 
 		</dialog>
 
-		<dialog name="patient" heading="$Command Patient/Person">
+		<dialog name="patient" heading="create-data-cmd-heading:Patient/Person">
 			<field.text hidden="yes" name="resp_self" caption="resp_self"/>
-			<field.person.id.new name="person_id" caption="Patient/Person ID"/>
+			<field.person.id.new name="person_id" caption="Patient/Person ID" />
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => 
@@ -1150,7 +1150,7 @@
 				name => person_id
 				onKeyPressJS => return processKeypress_identifier(event)
 				options => 32
-				popup => HASH(0xba6e800)
+				popup => HASH(0xba68cdc)
 				postHtml => &lt;a href="
 				preHtml => 
 				priKey => 0
@@ -1160,7 +1160,7 @@
 				requiredInvalidMsg => Patient/Person ID is required (can not be blank).
 				size => 16
 				type => text
-				types => ARRAY(0xba5633c)
+				types => ARRAY(0xba0c1b4)
 			-->
 			<field.text hidden="yes" name="acct_item_id" caption="acct_item_id"/>
 			<field.text hidden="yes" name="chart_item_id" caption="chart_item_id"/>
@@ -1177,7 +1177,7 @@
 			<!--  -->
 			<field.select caption="Person Type"  name="physician_type" choices="Physician;Physician Extender (direct billing);Other Clinical Service Provider (direct billing);Other Clinical Services Provider (alternate billing)" style="multicheck"/>
 			<!--  -->
-			<field.person.id name="bill_provider" caption="Doctor to bill for this provider"/>
+			<field.person.id name="bill_provider" caption="Doctor to bill for this provider"  style="text" types="Physician"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => /org/#session.org_id#/dlg-add-Physician
@@ -1196,7 +1196,7 @@
 				name => bill_provider
 				onKeyPressJS => return processKeypress_identifier(event)
 				options => 32
-				popup => HASH(0xba49504)
+				popup => HASH(0xc037eac)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -1205,7 +1205,7 @@
 				requiredInvalidMsg => Doctor to bill for this provider is required (can not be blank).
 				size => 16
 				type => text
-				types => ARRAY(0xba69704)
+				types => ARRAY(0xba67810)
 			-->
 			<field.composite caption="Job Title/Code"  name="job_code">
 				<field.text caption="Job Title"  name="job_title"/>
@@ -1216,12 +1216,12 @@
 				<field.text caption="Chart Number"  name="chart_number"/>
 			</field.composite>
 			<field.separator heading="Profile Information" name="gen_info_heading"/>
-			<field.person.name name="person_id" caption="*"/>
+			<field.person.name name="person_id" caption="*" />
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => 
 				caption => person_id
-				fields => ARRAY(0xc02306c)
+				fields => ARRAY(0xc026384)
 				findPopup => 
 				findPopupAppendValue => 
 				flags => 294912
@@ -1233,7 +1233,7 @@
 				name => person_id
 				onKeyPressJS => return processKeypress_default(event)
 				options => 32768
-				popup => HASH(0xba684a4)
+				popup => HASH(0xba622d4)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -1261,7 +1261,7 @@
 			<field.select caption="Language Spoken"  name="language" choices="English;Spanish;French;German;Italian;Chinese;Japanese;Korean;Vietnamese;Other" style="multicheck"/>
 			<!--  -->
 			<field.text caption="Other Language"  name="other_language"/>
-			<field.person.id name="party_name" caption="Responsible Party"/>
+			<field.person.id name="party_name" caption="Responsible Party"  style="text" types="Guarantor,Patient,Physician,Nurse,Staff"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => /org/#session.org_id#/dlg-add-Guarantor
@@ -1280,7 +1280,7 @@
 				name => party_name
 				onKeyPressJS => return processKeypress_identifier(event)
 				options => 32
-				popup => HASH(0xba139d0)
+				popup => HASH(0xba41f50)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -1289,14 +1289,14 @@
 				requiredInvalidMsg => Responsible Party is required (can not be blank).
 				size => 16
 				type => text
-				types => ARRAY(0xba6e6bc)
+				types => ARRAY(0xba719cc)
 			-->
-			<field.association name="relation" caption="Relationship To Responsible Party/Other Relationship Name"/>
+			<field.association name="relation" caption="Relationship To Responsible Party/Other Relationship Name" required="yes"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => 
 				caption => Relationship To Responsible Party/Other Relationship Name
-				fields => ARRAY(0xc0369e0)
+				fields => ARRAY(0xc03982c)
 				findPopup => 
 				findPopupAppendValue => 
 				flags => 528
@@ -1308,7 +1308,7 @@
 				name => relation
 				onKeyPressJS => return processKeypress_default(event)
 				options => 16
-				popup => HASH(0xba7744c)
+				popup => HASH(0xba27640)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -1333,12 +1333,12 @@
 				<field.phone caption="Primary Pager"  max-length="1024" name="primary_pager"/>
 			</field.composite>
 			<field.phone caption="Alternate"  max-length="1024" name="alternate_phone"/>
-			<field.address name="address" caption="Home Address"/>
+			<field.address name="address" caption="Home Address" required="yes"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => 
 				caption => Home Address
-				fields => ARRAY(0xc03db38)
+				fields => ARRAY(0xc0426e0)
 				findPopup => 
 				findPopupAppendValue => 
 				flags => 530
@@ -1352,7 +1352,7 @@
 				namePrefix => addr_
 				onKeyPressJS => return processKeypress_default(event)
 				options => 16
-				popup => HASH(0xb9f1638)
+				popup => HASH(0xb9f6d38)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -1364,7 +1364,7 @@
 			-->
 			<field.email caption="Email"  max-length="1024" name="email"/>
 			<field.separator heading="Employment" name="occup_heading"/>
-			<field.organization.id name="rel_id" caption="Employer ID"/>
+			<field.organization.id name="rel_id" caption="Employer ID" />
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => /org/#session.org_id#/dlg-add-org-employer
@@ -1383,7 +1383,7 @@
 				name => rel_id
 				onKeyPressJS => return processKeypress_identifier(event)
 				options => 32
-				popup => HASH(0xc02b200)
+				popup => HASH(0xba0d49c)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -1404,7 +1404,7 @@
 			</field.composite>
 			<field.separator heading="Care Provider" name="text_field"/>
 			<field.composite caption="*"  name="care_specialty">
-				<field.person.id name="care_provider" caption="Care Provider ID"/>
+				<field.person.id name="care_provider" caption="Care Provider ID"  style="text" types="Physician,Referring-Doctor"/>
 				<!-- Total Field contents:
 					_spacerWidth => 0
 					addPopup => /org/#session.org_id#/dlg-add-Physician
@@ -1423,7 +1423,7 @@
 					name => care_provider
 					onKeyPressJS => return processKeypress_identifier(event)
 					options => 32
-					popup => HASH(0xc03c9bc)
+					popup => HASH(0xba2761c)
 					postHtml => 
 					preHtml => 
 					priKey => 0
@@ -1432,7 +1432,7 @@
 					requiredInvalidMsg => Care Provider ID is required (can not be blank).
 					size => 16
 					type => text
-					types => ARRAY(0xba3642c)
+					types => ARRAY(0xc043414)
 				-->
 				<field.select caption="Specialty" prepend-blank="yes" name="specialty" choices="query:person.selMedicalSpeciality"/>
 				<!--  -->

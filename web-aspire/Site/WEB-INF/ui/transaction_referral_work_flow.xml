@@ -3,7 +3,7 @@
 <xaf>
 	<dialogs package="transaction_referral_work_flow">
 		<dialog name="referral_intake" heading="Show Followup Worklist">
-			<field.person.id name="person_id" caption="Intake Coordinator ID"/>
+			<field.person.id name="person_id" caption="Intake Coordinator ID" required="yes" style="text"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => /org/#session.org_id#/dlg-add-
@@ -22,7 +22,7 @@
 				name => person_id
 				onKeyPressJS => return processKeypress_identifier(event)
 				options => 48
-				popup => HASH(0xb9f473c)
+				popup => HASH(0xc00e824)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -31,14 +31,14 @@
 				requiredInvalidMsg => Intake Coordinator ID is required (can not be blank).
 				size => 16
 				type => text
-				types => ARRAY(0xc03407c)
+				types => ARRAY(0xba7b6b0)
 			-->
 
 		</dialog>
 
-		<dialog name="referral_person" heading="$Command Service Request">
+		<dialog name="referral_person" heading="create-data-cmd-heading:Service Request">
 			<field.separator heading="Patient Information" name="patient_info_heading"/>
-			<field.person.id name="person_id" caption="Person/Patient ID"/>
+			<field.person.id name="person_id" caption="Person/Patient ID" required="yes" style="text" types="Patient"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => /org/#session.org_id#/dlg-add-Patient
@@ -57,7 +57,7 @@
 				name => person_id
 				onKeyPressJS => return processKeypress_identifier(event)
 				options => 48
-				popup => HASH(0xac098e8)
+				popup => HASH(0xba1fa20)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -66,17 +66,17 @@
 				requiredInvalidMsg => Person/Patient ID is required (can not be blank).
 				size => 16
 				type => text
-				types => ARRAY(0xc02c0b8)
+				types => ARRAY(0xba77f4c)
 			-->
 
 		</dialog>
 
-		<dialog name="referral_auth" heading="$Command Referral">
+		<dialog name="referral_auth" heading="create-data-cmd-heading:Referral">
 			<field.text hidden="yes" name="name_item_id" caption="name_item_id"/>
 			<field.text hidden="yes" name="provider_item_id" caption="provider_item_id"/>
 			<field.text hidden="yes" name="prev_intake_form" caption="prev_intake_form"/>
 			<field.text caption="Service Request ID"  name="ref_id" size="6"/>
-			<field.person.id name="person_id" caption="Person/Patient ID"/>
+			<field.person.id name="person_id" caption="Person/Patient ID" required="yes" style="text" types="Patient"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => /org/#session.org_id#/dlg-add-Patient
@@ -95,7 +95,7 @@
 				name => person_id
 				onKeyPressJS => return processKeypress_identifier(event)
 				options => 48
-				popup => HASH(0xc034e58)
+				popup => HASH(0xc02d38c)
 				postHtml => 
 				preHtml => &lt;a href="
 				priKey => 0
@@ -104,10 +104,10 @@
 				requiredInvalidMsg => Person/Patient ID is required (can not be blank).
 				size => 16
 				type => text
-				types => ARRAY(0xc023024)
+				types => ARRAY(0xc029c6c)
 			-->
 			<field.separator heading="Tracking" name="text_field"/>
-			<field.person.id name="coordinator" caption="Intake Coordinator "/>
+			<field.person.id name="coordinator" caption="Intake Coordinator "  style="text"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => /org/#session.org_id#/dlg-add-
@@ -126,7 +126,7 @@
 				name => coordinator
 				onKeyPressJS => return processKeypress_identifier(event)
 				options => 32
-				popup => HASH(0xc03dc7c)
+				popup => HASH(0xba7cb48)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -135,7 +135,7 @@
 				requiredInvalidMsg => Intake Coordinator  is required (can not be blank).
 				size => 16
 				type => text
-				types => ARRAY(0xb9f491c)
+				types => ARRAY(0xba10b0c)
 			-->
 			<field.date caption="Referral Date" name="ref_date" size="12"/>
 			<field.currency caption="Source of Service Request" read-only="yes" max-length="1024" name="source_referral" size="7"/>
@@ -200,7 +200,7 @@
 		</dialog>
 
 		<dialog name="referral_enquiry" heading="Referral Inquiry">
-			<field.person.id name="auth_ref" caption="Authorization Number "/>
+			<field.person.id name="auth_ref" caption="Authorization Number " read-only="yes" style="text"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => /org/#session.org_id#/dlg-add-
@@ -219,7 +219,7 @@
 				name => auth_ref
 				onKeyPressJS => return processKeypress_identifier(event)
 				options => 36
-				popup => HASH(0xba13814)
+				popup => HASH(0xc02d1b8)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -228,7 +228,7 @@
 				requiredInvalidMsg => Authorization Number  is required (can not be blank).
 				size => 16
 				type => text
-				types => ARRAY(0xbff5594)
+				types => ARRAY(0xba4c354)
 			-->
 			<field.memo caption="Comments" name="comments" size="24"/>
 

@@ -2,14 +2,14 @@
 
 <xaf>
 	<dialogs package="attr">
-		<dialog name="contact_orginternet" heading="$Command URL">
-			<field.attribute.name name="attr_name" caption="*"/>
+		<dialog name="contact_orginternet" heading="create-data-cmd-heading:URL">
+			<field.attribute.name name="attr_name" caption="*" />
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => 
 				attrNameFmt => #field.attr_name#
 				caption => 
-				fKeyStmtMgr => App::Statements::Org=HASH(0x89eeeec)
+				fKeyStmtMgr => App::Statements::Org=HASH(0x89eeee4)
 				findPopup => 
 				findPopupAppendValue => 
 				flags => 512
@@ -21,7 +21,7 @@
 				name => attr_name
 				onKeyPressJS => return processKeypress_default(event)
 				options => 0
-				popup => HASH(0xba1c774)
+				popup => HASH(0xba28b1c)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -37,14 +37,14 @@
 
 		</dialog>
 
-		<dialog name="employment_salinfo" heading="$Command Salary Information">
-			<field.attribute.name name="attr_name" caption="*"/>
+		<dialog name="employment_salinfo" heading="create-data-cmd-heading:Salary Information">
+			<field.attribute.name name="attr_name" caption="*" />
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => 
 				attrNameFmt => #field.attr_name#
 				caption => 
-				fKeyStmtMgr => App::Statements::Org=HASH(0x89eeeec)
+				fKeyStmtMgr => App::Statements::Org=HASH(0x89eeee4)
 				findPopup => 
 				findPopupAppendValue => 
 				flags => 512
@@ -56,7 +56,7 @@
 				name => attr_name
 				onKeyPressJS => return processKeypress_default(event)
 				options => 0
-				popup => HASH(0xba1a0c8)
+				popup => HASH(0xba2ee3c)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -72,7 +72,7 @@
 
 		</dialog>
 
-		<dialog name="person_billing_event" heading="$Command Person Billing Event">
+		<dialog name="person_billing_event" heading="create-data-cmd-heading:Person Billing Event">
 			<field.integer caption="Billing Cycle" required="yes" hint="Day of Month (1..28)" max-length="2" name="value_int" size="2"/>
 			<field.composite caption="Name From"  name="name_from">
 				<field.text caption="value_text" uppercase="yes" max-length="1" name="value_text" size="1"/>
@@ -86,8 +86,8 @@
 
 		</dialog>
 
-		<dialog name="billinginfo" heading="$Command Electronic Billing Information">
-			<field.person.id name="person_id" caption="Physician ID"/>
+		<dialog name="billinginfo" heading="create-data-cmd-heading:Electronic Billing Information">
+			<field.person.id name="person_id" caption="Physician ID" required="yes" style="text" types="Physician"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => /org/#session.org_id#/dlg-add-Physician
@@ -106,7 +106,7 @@
 				name => person_id
 				onKeyPressJS => return processKeypress_identifier(event)
 				options => 48
-				popup => HASH(0xb9e8e64)
+				popup => HASH(0xba30a98)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -115,9 +115,9 @@
 				requiredInvalidMsg => Physician ID is required (can not be blank).
 				size => 16
 				type => text
-				types => ARRAY(0xb9d23b0)
+				types => ARRAY(0xba260f8)
 			-->
-			<field.organization.id name="org_id" caption="Organization ID"/>
+			<field.organization.id name="org_id" caption="Organization ID" required="yes"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => /org/#session.org_id#/dlg-add-org-main
@@ -134,7 +134,7 @@
 				name => org_id
 				onKeyPressJS => return processKeypress_identifier(event)
 				options => 48
-				popup => HASH(0xba44098)
+				popup => HASH(0xba16b24)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -147,16 +147,16 @@
 			<field.select caption="Clearing House"  name="billing_id_type" choices="Per-Se=0; THINet=2; Other=3"/>
 			<!--  -->
 			<field.text caption="Billing ID" required="yes" name="billing_id" size="16"/>
-			<field.scheduling.date name="billing_effective_date" caption="Effective Date"/>
+			<field.scheduling.date name="billing_effective_date" caption="Effective Date" />
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => 
 				caption => Effective Date
-				defaultValue => 11/09/2001
+				defaultValue => 11/14/2001
 				findPopup => 
 				findPopupAppendValue => 
 				flags => 3584
-				formatValue => CODE(0x8617e70)
+				formatValue => CODE(0x8617e68)
 				hint => 
 				hints => 
 				lengthInvalidMsg => Effective Date is too long (can be at most 10 characters).
@@ -165,8 +165,8 @@
 				name => billing_effective_date
 				onBlurJS => validateChange_Date(event)
 				onKeyPressJS => return processKeypress_default(event)
-				onValidate => CODE(0x8617a50)
-				popup => HASH(0xc008fb4)
+				onValidate => CODE(0x8617a48)
+				popup => HASH(0xba4884c)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -180,8 +180,8 @@
 
 		</dialog>
 
-		<dialog name="credential" heading="$Command Credentils">
-			<field.attribute.name name="value_textb" caption="ID Caption"/>
+		<dialog name="credential" heading="create-data-cmd-heading:Credentils">
+			<field.attribute.name name="value_textb" caption="ID Caption" required="yes"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => 
@@ -189,7 +189,7 @@
 				caption => ID Caption
 				choiceDelim => ;
 				choiceReadOnlyDelim => , 
-				fKeyStmtMgr => App::Statements::Org=HASH(0x89eeeec)
+				fKeyStmtMgr => App::Statements::Org=HASH(0x89eeee4)
 				findPopup => 
 				findPopupAppendValue => 
 				flags => 528
@@ -201,7 +201,7 @@
 				name => value_textb
 				onKeyPressJS => return processKeypress_default(event)
 				options => 16
-				popup => HASH(0xba25710)
+				popup => HASH(0xba2dcf4)
 				postHtml => 
 				preHtml => 
 				priKey => 1
@@ -220,20 +220,20 @@
 
 		</dialog>
 
-		<dialog name="misc_notes" heading="$Command Misc Notes">
+		<dialog name="misc_notes" heading="create-data-cmd-heading:Misc Notes">
 			<field.memo caption="Misc Notes" name="value_text" size="24"/>
 			<field.date caption="Date" name="value_date" size="12"/>
 
 		</dialog>
 
-		<dialog name="address_org" heading="$Command Address">
+		<dialog name="address_org" heading="create-data-cmd-heading:Address">
 			<field.text caption="Name"  name="address_name"/>
-			<field.address name="text_field" caption="Address"/>
+			<field.address name="text_field" caption="Address" required="yes"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => 
 				caption => Address
-				fields => ARRAY(0xba5551c)
+				fields => ARRAY(0xba495b4)
 				findPopup => 
 				findPopupAppendValue => 
 				flags => 528
@@ -246,7 +246,7 @@
 				namePrefix => 
 				onKeyPressJS => return processKeypress_default(event)
 				options => 16
-				popup => HASH(0xb9d7ee0)
+				popup => HASH(0xb9f54fc)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -259,7 +259,7 @@
 
 		</dialog>
 
-		<dialog name="allergy_intolerance" heading="$Command Medication Intolerance">
+		<dialog name="allergy_intolerance" heading="create-data-cmd-heading:Medication Intolerance">
 			<field.text required="yes" name="attr_name"/>
 			<field.select caption="Reaction(s)"  name="reactions" style="multicheck"/>
 			<!--  -->
@@ -268,14 +268,14 @@
 
 		</dialog>
 
-		<dialog name="contact_orgfax" heading="$Command Fax">
-			<field.attribute.name name="attr_name" caption="*"/>
+		<dialog name="contact_orgfax" heading="create-data-cmd-heading:Fax">
+			<field.attribute.name name="attr_name" caption="*" />
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => 
 				attrNameFmt => #field.attr_name#
 				caption => 
-				fKeyStmtMgr => App::Statements::Org=HASH(0x89eeeec)
+				fKeyStmtMgr => App::Statements::Org=HASH(0x89eeee4)
 				findPopup => 
 				findPopupAppendValue => 
 				flags => 512
@@ -287,7 +287,7 @@
 				name => attr_name
 				onKeyPressJS => return processKeypress_default(event)
 				options => 0
-				popup => HASH(0xc0016e8)
+				popup => HASH(0xba274cc)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -303,14 +303,14 @@
 
 		</dialog>
 
-		<dialog name="contact_orgbilling" heading="$Command Billing Contact">
-			<field.attribute.name name="attr_name" caption="*"/>
+		<dialog name="contact_orgbilling" heading="create-data-cmd-heading:Billing Contact">
+			<field.attribute.name name="attr_name" caption="*" />
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => 
 				attrNameFmt => #field.attr_name#
 				caption => 
-				fKeyStmtMgr => App::Statements::Org=HASH(0x89eeeec)
+				fKeyStmtMgr => App::Statements::Org=HASH(0x89eeee4)
 				findPopup => 
 				findPopupAppendValue => 
 				flags => 512
@@ -322,7 +322,7 @@
 				name => attr_name
 				onKeyPressJS => return processKeypress_default(event)
 				options => 0
-				popup => HASH(0xba40680)
+				popup => HASH(0xb9d6dc4)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -338,13 +338,13 @@
 
 		</dialog>
 
-		<dialog name="attendance" heading="$Command Attendance">
+		<dialog name="attendance" heading="create-data-cmd-heading:Attendance">
 			<field.text caption="Property Name" required="yes" name="value_textb"/>
 			<field.text caption="Property Value" required="yes" name="value_text"/>
 
 		</dialog>
 
-		<dialog name="org_notes" heading="$Command Org Notes">
+		<dialog name="org_notes" heading="create-data-cmd-heading:Org Notes">
 			<field.text caption="caption" required="yes" name="value_text"/>
 			<field.memo caption="Detail" name="value_textb" size="24"/>
 			<field.date caption="Begin Date" name="value_date" size="12"/>
@@ -352,14 +352,14 @@
 
 		</dialog>
 
-		<dialog name="person_additional" heading="$Command Additional Data">
-			<field.attribute.name name="attr_name" caption="*"/>
+		<dialog name="person_additional" heading="create-data-cmd-heading:Additional Data">
+			<field.attribute.name name="attr_name" caption="*" />
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => 
 				attrNameFmt => #field.attr_name#
 				caption => 
-				fKeyStmtMgr => App::Statements::Org=HASH(0x89eeeec)
+				fKeyStmtMgr => App::Statements::Org=HASH(0x89eeee4)
 				findPopup => 
 				findPopupAppendValue => 
 				flags => 512
@@ -371,7 +371,7 @@
 				name => attr_name
 				onKeyPressJS => return processKeypress_default(event)
 				options => 0
-				popup => HASH(0xba05460)
+				popup => HASH(0xba41fa4)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -387,14 +387,14 @@
 
 		</dialog>
 
-		<dialog name="contact_personpager" heading="$Command Pager">
-			<field.attribute.name name="attr_name" caption="*"/>
+		<dialog name="contact_personpager" heading="create-data-cmd-heading:Pager">
+			<field.attribute.name name="attr_name" caption="*" />
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => 
 				attrNameFmt => #field.attr_name#
 				caption => 
-				fKeyStmtMgr => App::Statements::Org=HASH(0x89eeeec)
+				fKeyStmtMgr => App::Statements::Org=HASH(0x89eeee4)
 				findPopup => 
 				findPopupAppendValue => 
 				flags => 512
@@ -406,7 +406,7 @@
 				name => attr_name
 				onKeyPressJS => return processKeypress_default(event)
 				options => 0
-				popup => HASH(0xba4059c)
+				popup => HASH(0xba10a88)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -422,14 +422,14 @@
 
 		</dialog>
 
-		<dialog name="address_person" heading="$Command Address">
+		<dialog name="address_person" heading="create-data-cmd-heading:Address">
 			<field.text caption="Name"  name="address_name"/>
-			<field.address name="text_field" caption="Address"/>
+			<field.address name="text_field" caption="Address" required="yes"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => 
 				caption => Address
-				fields => ARRAY(0xb9d2260)
+				fields => ARRAY(0xba2241c)
 				findPopup => 
 				findPopupAppendValue => 
 				flags => 528
@@ -442,7 +442,7 @@
 				namePrefix => 
 				onKeyPressJS => return processKeypress_default(event)
 				options => 16
-				popup => HASH(0xb9f3378)
+				popup => HASH(0xba145a0)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -455,14 +455,14 @@
 
 		</dialog>
 
-		<dialog name="contact_orgphone" heading="$Command Telephone">
-			<field.attribute.name name="attr_name" caption="*"/>
+		<dialog name="contact_orgphone" heading="create-data-cmd-heading:Telephone">
+			<field.attribute.name name="attr_name" caption="*" />
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => 
 				attrNameFmt => #field.attr_name#
 				caption => 
-				fKeyStmtMgr => App::Statements::Org=HASH(0x89eeeec)
+				fKeyStmtMgr => App::Statements::Org=HASH(0x89eeee4)
 				findPopup => 
 				findPopupAppendValue => 
 				flags => 512
@@ -474,7 +474,7 @@
 				name => attr_name
 				onKeyPressJS => return processKeypress_default(event)
 				options => 0
-				popup => HASH(0xba3b688)
+				popup => HASH(0xba2ec80)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -490,14 +490,14 @@
 
 		</dialog>
 
-		<dialog name="benefit_other" heading="$Command Other Benefit">
-			<field.attribute.name name="attr_name" caption="Caption"/>
+		<dialog name="benefit_other" heading="create-data-cmd-heading:Other Benefit">
+			<field.attribute.name name="attr_name" caption="Caption" required="yes"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => 
 				attrNameFmt => #field.attr_name#
 				caption => Caption
-				fKeyStmtMgr => App::Statements::Person=HASH(0x89bd520)
+				fKeyStmtMgr => App::Statements::Person=HASH(0x89bd518)
 				findPopup => 
 				findPopupAppendValue => 
 				flags => 536
@@ -509,7 +509,7 @@
 				name => attr_name
 				onKeyPressJS => return processKeypress_default(event)
 				options => 16
-				popup => HASH(0xb9f3330)
+				popup => HASH(0xb9f846c)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -526,14 +526,14 @@
 
 		</dialog>
 
-		<dialog name="contact_orgemail" heading="$Command E-mail">
-			<field.attribute.name name="attr_name" caption="*"/>
+		<dialog name="contact_orgemail" heading="create-data-cmd-heading:E-mail">
+			<field.attribute.name name="attr_name" caption="*" />
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => 
 				attrNameFmt => #field.attr_name#
 				caption => 
-				fKeyStmtMgr => App::Statements::Org=HASH(0x89eeeec)
+				fKeyStmtMgr => App::Statements::Org=HASH(0x89eeee4)
 				findPopup => 
 				findPopupAppendValue => 
 				flags => 512
@@ -545,7 +545,7 @@
 				name => attr_name
 				onKeyPressJS => return processKeypress_default(event)
 				options => 0
-				popup => HASH(0xba43f0c)
+				popup => HASH(0xba2ee18)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -561,14 +561,14 @@
 
 		</dialog>
 
-		<dialog name="benefit_retirement" heading="$Command Retirement Benefit">
-			<field.attribute.name name="attr_name" caption="Caption"/>
+		<dialog name="benefit_retirement" heading="create-data-cmd-heading:Retirement Benefit">
+			<field.attribute.name name="attr_name" caption="Caption" required="yes"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => 
 				attrNameFmt => #field.attr_name#
 				caption => Caption
-				fKeyStmtMgr => App::Statements::Person=HASH(0x89bd520)
+				fKeyStmtMgr => App::Statements::Person=HASH(0x89bd518)
 				findPopup => 
 				findPopupAppendValue => 
 				flags => 536
@@ -580,7 +580,7 @@
 				name => attr_name
 				onKeyPressJS => return processKeypress_default(event)
 				options => 16
-				popup => HASH(0xba36a84)
+				popup => HASH(0xb9f540c)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -597,15 +597,15 @@
 
 		</dialog>
 
-		<dialog name="preventivecare" heading="$Command Measure">
+		<dialog name="preventivecare" heading="create-data-cmd-heading:Measure">
 			<field.text hidden="yes" name="cpt_name" caption="cpt_name"/>
-			<field.attribute.name name="attr_name" caption="Problem"/>
+			<field.attribute.name name="attr_name" caption="Problem" required="yes"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => 
 				attrNameFmt => #field.attr_name#
 				caption => Problem
-				fKeyStmtMgr => App::Statements::Person=HASH(0x89bd520)
+				fKeyStmtMgr => App::Statements::Person=HASH(0x89bd518)
 				findPopup => 
 				findPopupAppendValue => 
 				flags => 536
@@ -617,7 +617,7 @@
 				name => attr_name
 				onKeyPressJS => return processKeypress_default(event)
 				options => 16
-				popup => HASH(0xba18958)
+				popup => HASH(0xba2128c)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -641,7 +641,7 @@
 
 		</dialog>
 
-		<dialog name="allergy_medication" heading="$Command Medication Allergy">
+		<dialog name="allergy_medication" heading="create-data-cmd-heading:Medication Allergy">
 			<field.text required="yes" name="attr_name"/>
 			<field.select caption="Reaction(s)"  name="reactions" style="multicheck"/>
 			<!--  -->
@@ -650,7 +650,7 @@
 
 		</dialog>
 
-		<dialog name="allergy_environmental" heading="$Command Environmental Allergy">
+		<dialog name="allergy_environmental" heading="create-data-cmd-heading:Environmental Allergy">
 			<field.text required="yes" name="attr_name"/>
 			<field.select caption="Reaction(s)"  name="reactions" style="multicheck"/>
 			<!--  -->
@@ -659,14 +659,14 @@
 
 		</dialog>
 
-		<dialog name="contact_personfax" heading="$Command Fax">
-			<field.attribute.name name="attr_name" caption="*"/>
+		<dialog name="contact_personfax" heading="create-data-cmd-heading:Fax">
+			<field.attribute.name name="attr_name" caption="*" />
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => 
 				attrNameFmt => #field.attr_name#
 				caption => 
-				fKeyStmtMgr => App::Statements::Org=HASH(0x89eeeec)
+				fKeyStmtMgr => App::Statements::Org=HASH(0x89eeee4)
 				findPopup => 
 				findPopupAppendValue => 
 				flags => 512
@@ -678,7 +678,7 @@
 				name => attr_name
 				onKeyPressJS => return processKeypress_default(event)
 				options => 0
-				popup => HASH(0xba455dc)
+				popup => HASH(0xb9f5550)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -694,14 +694,14 @@
 
 		</dialog>
 
-		<dialog name="contact_personphone" heading="$Command Telephone">
-			<field.attribute.name name="attr_name" caption="*"/>
+		<dialog name="contact_personphone" heading="create-data-cmd-heading:Telephone">
+			<field.attribute.name name="attr_name" caption="*" />
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => 
 				attrNameFmt => #field.attr_name#
 				caption => 
-				fKeyStmtMgr => App::Statements::Org=HASH(0x89eeeec)
+				fKeyStmtMgr => App::Statements::Org=HASH(0x89eeee4)
 				findPopup => 
 				findPopupAppendValue => 
 				flags => 512
@@ -713,7 +713,7 @@
 				name => attr_name
 				onKeyPressJS => return processKeypress_default(event)
 				options => 0
-				popup => HASH(0xba126c0)
+				popup => HASH(0xba1a838)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -729,21 +729,21 @@
 
 		</dialog>
 
-		<dialog name="claim_notes" heading="$Command Claim Notes">
+		<dialog name="claim_notes" heading="create-data-cmd-heading:Claim Notes">
 			<field.text caption="Invoice ID" read-only="yes" name="invoice_id"/>
 			<field.memo caption="Notes" name="value_text" size="24"/>
 			<field.date caption="Date" name="value_date" size="12"/>
 
 		</dialog>
 
-		<dialog name="benefit_insurance" heading="$Command Insurance Benefit">
-			<field.attribute.name name="attr_name" caption="Caption"/>
+		<dialog name="benefit_insurance" heading="create-data-cmd-heading:Insurance Benefit">
+			<field.attribute.name name="attr_name" caption="Caption" required="yes"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => 
 				attrNameFmt => #field.attr_name#
 				caption => Caption
-				fKeyStmtMgr => App::Statements::Person=HASH(0x89bd520)
+				fKeyStmtMgr => App::Statements::Person=HASH(0x89bd518)
 				findPopup => 
 				findPopupAppendValue => 
 				flags => 536
@@ -755,7 +755,7 @@
 				name => attr_name
 				onKeyPressJS => return processKeypress_default(event)
 				options => 16
-				popup => HASH(0xba4848c)
+				popup => HASH(0xb9d6ecc)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -772,20 +772,20 @@
 
 		</dialog>
 
-		<dialog name="blood_type" heading="$Command Blood Type">
+		<dialog name="blood_type" heading="create-data-cmd-heading:Blood Type">
 			<field.select caption="Blood Type"  name="value_text"/>
 			<!--  -->
 
 		</dialog>
 
-		<dialog name="contact_personemail" heading="$Command E-mail">
-			<field.attribute.name name="attr_name" caption="*"/>
+		<dialog name="contact_personemail" heading="create-data-cmd-heading:E-mail">
+			<field.attribute.name name="attr_name" caption="*" />
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => 
 				attrNameFmt => #field.attr_name#
 				caption => 
-				fKeyStmtMgr => App::Statements::Org=HASH(0x89eeeec)
+				fKeyStmtMgr => App::Statements::Org=HASH(0x89eeee4)
 				findPopup => 
 				findPopupAppendValue => 
 				flags => 512
@@ -797,7 +797,7 @@
 				name => attr_name
 				onKeyPressJS => return processKeypress_default(event)
 				options => 0
-				popup => HASH(0xb9d69c8)
+				popup => HASH(0xba24d8c)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -813,7 +813,7 @@
 
 		</dialog>
 
-		<dialog name="org_billing_event" heading="$Command Org Billing Event">
+		<dialog name="org_billing_event" heading="create-data-cmd-heading:Org Billing Event">
 			<field.integer caption="Billing Cycle" required="yes" hint="Day of Month (1..28)" max-length="2" name="value_int" size="2"/>
 			<field.composite caption="Name From"  name="name_from">
 				<field.text caption="value_text" uppercase="yes" max-length="1" name="value_text" size="1"/>
@@ -827,14 +827,14 @@
 
 		</dialog>
 
-		<dialog name="contact_personinternet" heading="$Command URL">
-			<field.attribute.name name="attr_name" caption="*"/>
+		<dialog name="contact_personinternet" heading="create-data-cmd-heading:URL">
+			<field.attribute.name name="attr_name" caption="*" />
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => 
 				attrNameFmt => #field.attr_name#
 				caption => 
-				fKeyStmtMgr => App::Statements::Org=HASH(0x89eeeec)
+				fKeyStmtMgr => App::Statements::Org=HASH(0x89eeee4)
 				findPopup => 
 				findPopupAppendValue => 
 				flags => 512
@@ -846,7 +846,7 @@
 				name => attr_name
 				onKeyPressJS => return processKeypress_default(event)
 				options => 0
-				popup => HASH(0xba3b688)
+				popup => HASH(0xb9ee990)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -862,14 +862,14 @@
 
 		</dialog>
 
-		<dialog name="employment_empinfo" heading="$Command Employment Information">
-			<field.attribute.name name="attr_name" caption="*"/>
+		<dialog name="employment_empinfo" heading="create-data-cmd-heading:Employment Information">
+			<field.attribute.name name="attr_name" caption="*" />
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => 
 				attrNameFmt => #field.attr_name#
 				caption => 
-				fKeyStmtMgr => App::Statements::Org=HASH(0x89eeeec)
+				fKeyStmtMgr => App::Statements::Org=HASH(0x89eeee4)
 				findPopup => 
 				findPopupAppendValue => 
 				flags => 512
@@ -881,7 +881,7 @@
 				name => attr_name
 				onKeyPressJS => return processKeypress_default(event)
 				options => 0
-				popup => HASH(0xb9f3234)
+				popup => HASH(0xba2efd4)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -897,8 +897,8 @@
 
 		</dialog>
 
-		<dialog name="office_location" heading="$Command Office Location">
-			<field.organization.id name="value_text" caption="Location Org ID"/>
+		<dialog name="office_location" heading="create-data-cmd-heading:Office Location">
+			<field.organization.id name="value_text" caption="Location Org ID" required="yes"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => /org/#session.org_id#/dlg-add-org-main
@@ -915,7 +915,7 @@
 				name => value_text
 				onKeyPressJS => return processKeypress_identifier(event)
 				options => 48
-				popup => HASH(0xb9d22a8)
+				popup => HASH(0xba17e74)
 				postHtml => 
 				preHtml => 
 				priKey => 0

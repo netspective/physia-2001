@@ -2,7 +2,7 @@
 
 <xaf>
 	<dialogs package="admin">
-		<dialog name="role_permission" heading="$Command Role Permission">
+		<dialog name="role_permission" heading="create-data-cmd-heading:Role Permission">
 			<field.select caption="Role" required="yes" name="roleID" choices="query:admin.selRoleIDs"/>
 			<!--  -->
 			<field.text caption="Permission" required="yes" name="permissionName" size="35"/>

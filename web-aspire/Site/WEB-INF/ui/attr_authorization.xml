@@ -2,8 +2,8 @@
 
 <xaf>
 	<dialogs package="attr_authorization">
-		<dialog name="auth_patientsign" heading="$Command Patient Signature Authorization">
-			<field.attribute.name name="value_textb" caption="Patient Signature"/>
+		<dialog name="auth_patientsign" heading="create-data-cmd-heading:Patient Signature Authorization">
+			<field.attribute.name name="value_textb" caption="Patient Signature" />
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => 
@@ -12,7 +12,7 @@
 				choiceReadOnlyDelim => , 
 				fKeyDisplayCol => 1
 				fKeyStmt => selPatientSign
-				fKeyStmtMgr => App::Statements::Person=HASH(0x89bd520)
+				fKeyStmtMgr => App::Statements::Person=HASH(0x89bd518)
 				fKeyValueCol => 0
 				findPopup => 
 				findPopupAppendValue => 
@@ -25,7 +25,7 @@
 				name => value_textb
 				onKeyPressJS => return processKeypress_default(event)
 				options => 0
-				popup => HASH(0xba496b4)
+				popup => HASH(0xba1e73c)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -42,8 +42,8 @@
 
 		</dialog>
 
-		<dialog name="auth_providerassign" heading="$Command Provider Assignment Indicator">
-			<field.attribute.name name="value_textb" caption="Provider Assignment"/>
+		<dialog name="auth_providerassign" heading="create-data-cmd-heading:Provider Assignment Indicator">
+			<field.attribute.name name="value_textb" caption="Provider Assignment" />
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => 
@@ -52,7 +52,7 @@
 				choiceReadOnlyDelim => , 
 				fKeyDisplayCol => 1
 				fKeyStmt => selProviderAssign
-				fKeyStmtMgr => App::Statements::Person=HASH(0x89bd520)
+				fKeyStmtMgr => App::Statements::Person=HASH(0x89bd518)
 				fKeyValueCol => 0
 				findPopup => 
 				findPopupAppendValue => 
@@ -65,7 +65,7 @@
 				name => value_textb
 				onKeyPressJS => return processKeypress_default(event)
 				options => 0
-				popup => HASH(0xba1110c)
+				popup => HASH(0xba518e4)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -82,15 +82,15 @@
 
 		</dialog>
 
-		<dialog name="auth_inforelease" heading="$Command Information Release Indicator">
-			<field.attribute.name name="value_int" caption="Patient has authorized release of medical information"/>
+		<dialog name="auth_inforelease" heading="create-data-cmd-heading:Information Release Indicator">
+			<field.attribute.name name="value_int" caption="Patient has authorized release of medical information" />
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => 
 				attrNameFmt => Information Release
 				caption => Patient has authorized release of medical information
 				defaultValue => 1
-				fKeyStmtMgr => App::Statements::Person=HASH(0x89bd520)
+				fKeyStmtMgr => App::Statements::Person=HASH(0x89bd518)
 				findPopup => 
 				findPopupAppendValue => 
 				flags => 512
@@ -102,7 +102,7 @@
 				name => value_int
 				onKeyPressJS => return processKeypress_default(event)
 				options => 0
-				popup => HASH(0xba2c020)
+				popup => HASH(0xba54388)
 				postHtml => 
 				preHtml => 
 				priKey => 0

@@ -2,9 +2,9 @@
 
 <xaf>
 	<dialogs package="attr_association">
-		<dialog name="assoc_contact_family" heading="$Command Family Contact">
+		<dialog name="assoc_contact_family" heading="create-data-cmd-heading:Family Contact">
 			<field.separator heading="Link to Existing Person Record" name="exists_heading"/>
-			<field.person.id name="rel_id" caption="Person ID"/>
+			<field.person.id name="rel_id" caption="Person ID"  style="text"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => /org/#session.org_id#/dlg-add-patient
@@ -24,7 +24,7 @@
 				name => rel_id
 				onKeyPressJS => return processKeypress_identifier(event)
 				options => 32
-				popup => HASH(0xba43eac)
+				popup => HASH(0xba1d1c0)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -37,12 +37,12 @@
 			<field.separator heading="Or Provide A Contact Name" name="notexists_heading"/>
 			<field.text caption="Full Name"  hint="Please provide the full name of the contact if a record does not exist for him/her. A link will not be created between the patient and contact." name="rel_name"/>
 			<field.separator heading="Contact Information" name="contact_heading"/>
-			<field.association name="relation" caption="*"/>
+			<field.association name="relation" caption="*" required="yes"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => 
 				caption => relation
-				fields => ARRAY(0xba36904)
+				fields => ARRAY(0xba472c8)
 				findPopup => 
 				findPopupAppendValue => 
 				flags => 262160
@@ -54,7 +54,7 @@
 				name => relation
 				onKeyPressJS => return processKeypress_default(event)
 				options => 16
-				popup => HASH(0xba455e8)
+				popup => HASH(0xb9d7c64)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -69,8 +69,8 @@
 
 		</dialog>
 
-		<dialog name="assoc_employment" heading="$Command Employment">
-			<field.organization.id name="rel_id" caption="Employer ID"/>
+		<dialog name="assoc_employment" heading="create-data-cmd-heading:Employment">
+			<field.organization.id name="rel_id" caption="Employer ID" />
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => /org/#session.org_id#/dlg-add-org-employer
@@ -88,7 +88,7 @@
 				name => rel_id
 				onKeyPressJS => return processKeypress_identifier(event)
 				options => 32
-				popup => HASH(0xba4845c)
+				popup => HASH(0xba495f0)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -109,9 +109,9 @@
 
 		</dialog>
 
-		<dialog name="assoc_contact_emergency" heading="$Command Emergency Contact">
+		<dialog name="assoc_contact_emergency" heading="create-data-cmd-heading:Emergency Contact">
 			<field.separator heading="Link to Existing Person Record" name="exists_heading"/>
-			<field.person.id name="rel_id" caption="Person ID"/>
+			<field.person.id name="rel_id" caption="Person ID"  style="text"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => /org/#session.org_id#/dlg-add-patient
@@ -131,7 +131,7 @@
 				name => rel_id
 				onKeyPressJS => return processKeypress_identifier(event)
 				options => 32
-				popup => HASH(0xba2445c)
+				popup => HASH(0xba10b6c)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -144,12 +144,12 @@
 			<field.separator heading="Or Provide A Contact Name" name="notexists_heading"/>
 			<field.text caption="Full Name"  hint="Please provide the full name of the contact if a record does not exist for him/her. A link will not be created between the patient and contact." name="rel_name"/>
 			<field.separator heading="Contact Information" name="contact_heading"/>
-			<field.association name="relation" caption="*"/>
+			<field.association name="relation" caption="*" required="yes"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => 
 				caption => relation
-				fields => ARRAY(0xba0eca0)
+				fields => ARRAY(0xba0e5ac)
 				findPopup => 
 				findPopupAppendValue => 
 				flags => 262160
@@ -161,7 +161,7 @@
 				name => relation
 				onKeyPressJS => return processKeypress_default(event)
 				options => 16
-				popup => HASH(0xb9f47f0)
+				popup => HASH(0xba0fa74)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -176,8 +176,8 @@
 
 		</dialog>
 
-		<dialog name="assoc_provider" heading="$Command Care Provider">
-			<field.person.id name="value_text" caption="Physician/Provider ID"/>
+		<dialog name="assoc_provider" heading="create-data-cmd-heading:Care Provider">
+			<field.person.id name="value_text" caption="Physician/Provider ID" required="yes" style="text" types="Physician,Referring-Doctor"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => /org/#session.org_id#/dlg-add-Physician
@@ -196,7 +196,7 @@
 				name => value_text
 				onKeyPressJS => return processKeypress_identifier(event)
 				options => 48
-				popup => HASH(0xba3a054)
+				popup => HASH(0xba3cad4)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -205,7 +205,7 @@
 				requiredInvalidMsg => Physician/Provider ID is required (can not be blank).
 				size => 16
 				type => text
-				types => ARRAY(0xba36b2c)
+				types => ARRAY(0xba2250c)
 			-->
 			<field.boolean caption="Is Primary Physician?"  hint="Please check the check-box if the Physician is Primary Physician " name="value_int" style="check"/>
 			<field.select caption="Specialty"  name="value_textb" choices="query:person.selMedicalSpeciality"/>

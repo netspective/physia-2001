@@ -5,7 +5,7 @@
 		<dialog name="catalog_copy" heading="catalog_copy">
 			<field.text hidden="yes" name="checkbox_validation" caption="checkbox_validation"/>
 			<field.text hidden="yes" name="internal_catalog_id" caption="internal_catalog_id"/>
-			<field.catalog.id name="catalog_id" caption="Existing Fee Schedule ID"/>
+			<field.catalog.id name="catalog_id" caption="Existing Fee Schedule ID" required="yes"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => /org/#session.org_id#/dlg-add-catalog
@@ -22,7 +22,7 @@
 				name => catalog_id
 				onKeyPressJS => return processKeypress_identifier(event)
 				options => 48
-				popup => HASH(0xba4ac40)
+				popup => HASH(0xba24d8c)
 				postHtml => 
 				preHtml => 
 				priKey => 0
@@ -33,7 +33,7 @@
 				type => text
 			-->
 			<field.separator name="text_field"/>
-			<field.catalog.id.new name="new_catalog_id" caption="New Fee Schedule Name"/>
+			<field.catalog.id.new name="new_catalog_id" caption="New Fee Schedule Name" required="yes"/>
 			<!-- Total Field contents:
 				_spacerWidth => 0
 				addPopup => 
@@ -49,7 +49,7 @@
 				name => new_catalog_id
 				onKeyPressJS => return processKeypress_identifier(event)
 				options => 48
-				popup => HASH(0xba1cb10)
+				popup => HASH(0xba27574)
 				postHtml => 
 				preHtml => 
 				priKey => 0
