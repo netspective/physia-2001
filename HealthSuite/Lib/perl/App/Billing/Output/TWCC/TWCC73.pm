@@ -1119,7 +1119,7 @@ sub box20
 					'y' => $y
 				},
 				{
-					'text' => "Safety/driving Issues",
+					'text' => "Safety/driving Issues)",
 					'fontWidth' => 7,
 					'x' => $x + 14,
 					'y' => $y - 54
