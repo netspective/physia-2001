@@ -484,8 +484,7 @@ sub handleAttrs
 	my $otherRelType = $page->field('other_rel_type');
 	$otherRelType = "\u$otherRelType";
 	my $relationship = $relType eq 'Other' ? "Other/$otherRelType" : $relType;
-	my $respSelf = $page->field('party_name') ne '' ? '' : $personId;
-	my $partyName =  $page->field('party_name') ne '' ? $page->field('party_name') : $page->field('resp_self');
+	my $partyName =  $page->field('party_name') ne '' ? $page->field('party_name') : $personId;
 
 	my $commandResponsible = $command eq 'update' &&  $page->field('resp_item_id') eq '' ? 'add' : $command;
 	$page->schemaAction(
@@ -497,7 +496,7 @@ sub handleAttrs
 			value_text => $partyName || undef,
 			value_textB => $relationship || undef,
 			_debug => 0
-			)if $partyName ne '';
+			);
 
 	$page->schemaAction(
 			'Person_Attribute', $command,
