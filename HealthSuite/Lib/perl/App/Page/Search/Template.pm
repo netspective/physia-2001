@@ -100,15 +100,23 @@ sub execute
 	my $template_active;
 	my $statement;
 	
-	if (defined $self->param('template_active') && $self->param('template_active') == 1)
-	{ 
-		$template_active = $self->param('template_active');
-		$statement = 'selEffectiveTemplate';
-	} 
+	if (defined $self->param('template_active'))
+	{
+		if ($self->param('template_active') == 1)
+		{ 
+			$template_active = $self->param('template_active');
+			$statement = 'selEffectiveTemplate';
+		} 
+		else
+		{
+			$template_active = 0;
+			$statement = 'selInEffectiveTemplate';
+		}
+	}
 	else
 	{
-		$template_active = 0;
-		$statement = 'selInEffectiveTemplate';
+		$template_active = 1;
+		$statement = 'selEffectiveTemplate';
 	}
 	
 	my @bindCols = ($self->session('org_internal_id'), $self->param('r_ids').'%', 
@@ -190,7 +198,6 @@ sub execute
 		$_->{months} ||= 'All';
 		$_->{days_of_month} ||= 'All';
 		
-		
 		my @rowData = (
 			$_->{template_id},
 			$_->{resources},
@@ -222,10 +229,11 @@ sub execute
 				{ head => 'Details', dataFmt => qq{
 					<nobr>Time: <b>#6# - #7# </b></nobr><br>
 					<nobr>Patient Types: #4#</nobr><br>
-					Visit Types: #5#<br>
+					Visit Types: <i>#5#</i><br>
 					<nobr>Months: #10#</nobr><br>
 					<nobr>Days of Month: #11#</nobr><br>
 					<nobr>Weekdays: #12# </nobr><br>
+					<nobr><b>#14#</b></nobr>
 					},
 				},
 				{ head => 'Available', colIdx => 13,},
