@@ -541,9 +541,11 @@ sub new
 	$params{options} = 0 unless exists $params{options};
 	$params{name} = 'person_id' unless $params{name};
 
+	my $lastNameOptions = ($params{options} == FLDFLAG_HOME) ? FLDFLAG_REQUIRED | FLDFLAG_HOME : FLDFLAG_REQUIRED;
+
 	$params{fields} = [
 			#new CGI::Dialog::Field(name => 'name_prefix', type => 'select', selOptions => ';Mr.;Mrs.;Ms.;Dr.', caption => 'Prefix'),
-			new CGI::Dialog::Field(name => 'name_last', caption => 'Last Name',	options => FLDFLAG_REQUIRED, size => 16),
+			new CGI::Dialog::Field(name => 'name_last', caption => 'Last Name',	options => $lastNameOptions, size => 16),
 			new CGI::Dialog::Field(name => 'name_first', caption => 'First Name', options => FLDFLAG_REQUIRED, size => 12),
 			new CGI::Dialog::Field(name => 'name_middle', caption => 'Middle Name',	size => 8),
 			new CGI::Dialog::Field(name => 'name_suffix', caption => 'Suffix', size => 16),

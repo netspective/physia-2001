@@ -84,7 +84,7 @@ sub initialize
 		new CGI::Dialog::Subhead(heading => 'Profile Information', name => 'gen_info_heading'),
 
 		# Person::Name is a 5-part multifield, w/fields named "name_*" where * is prefix|first|middle|last|suffix
-		new App::Dialog::Field::Person::Name(),
+		new App::Dialog::Field::Person::Name(options => FLDFLAG_HOME),
 		new CGI::Dialog::Field(type => 'bool', name => 'create_record', caption => 'Add record', style => 'check'),
 
 		new CGI::Dialog::MultiField(name => 'ssndatemf',
