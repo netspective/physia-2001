@@ -101,7 +101,7 @@ sub handlePage
 		if (defined $pathItems->[0] && defined $resource->{$pathItems->[0]})
 		{
 			$resource = $resource->{$pathItems->[0]};
-			$resourceId = $resource->{_id};
+			$resourceId .= "/" . $pathItems->[0];
 		}
 		elsif (defined $resource->{_default})
 		{
@@ -124,7 +124,7 @@ sub handlePage
 	# some pages will need their own ARLs for calling themselves as popups, so set it up now
 	#
 	my $arlAsPopup = $arl;
-	$arlAsPopup =~ s|^([^/]+)|$1\-p|;
+	$arlAsPopup =~ s|^(\w+)|$1\-p|;
 
 	# Remove the resource prefix from the ID
 	my $prefix = PAGE_RESOURCE_PREFIX;
