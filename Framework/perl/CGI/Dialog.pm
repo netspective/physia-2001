@@ -185,6 +185,7 @@ use vars qw(%FIELD_FLAGS_ATTRMAP);
 	'home' => FLDFLAG_HOME,
 	'sort' => FLDFLAG_SORT,
 	'prependBlank' => FLDFLAG_PREPENDBLANK,
+	'inlineCaption' => FLDFLAG_INLINECAPTION,
 	);
 
 # static method
@@ -659,12 +660,21 @@ sub getHtml
 		my $value = (defined $page->field($self->{name})) ? $page->field($self->{name}) : $self->{hint};
 		my $readOnly = ($self->{flags} & FLDFLAG_READONLY);
 		my $required = ($self->{flags} & FLDFLAG_REQUIRED) ? 'class="required"' : "";
+		
+		my $caption = '';
+		if ($self->{flags} & FLDFLAG_INLINECAPTION)
+		{
+			$caption = $self->{caption};
+			$caption = "<b>$caption</b> " if $self->{flags} & FLDFLAG_REQUIRED;
+			$caption = "<NOBR>$caption</NOBR> " if $self->{flags} & FLDFLAG_NOBRCAPTION;
+		}
+
 
 		if(! $readOnly)
 		{
 			my $javaScript = $self->generateJavaScript($page);
 			my $onFocus = $self->{hint} ? " onFocus='clearField(this)'" : '';
-			$html = $self->SUPER::getHtml($page, $dialog, $command, $dlgFlags, qq{<input name="$fieldName" type=$self->{type} value="$value" size=$self->{size} maxlength=$self->{maxLength} $javaScript$onFocus $required>});
+			$html = $self->SUPER::getHtml($page, $dialog, $command, $dlgFlags, qq{$caption<input name="$fieldName" type=$self->{type} value="$value" size=$self->{size} maxlength=$self->{maxLength} $javaScript$onFocus $required>});
 		}
 		else
 		{
