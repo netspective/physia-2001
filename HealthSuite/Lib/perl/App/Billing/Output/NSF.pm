@@ -235,7 +235,7 @@ sub createOutputFile
 
 	open(OUTFILE,">$self->{outFile}");
 	my $outString = join("\n", @{$outDataRef});
-    $outString = $outString . "\n";
+	#$outString = $outString . "\n";
 	print OUTFILE uc($outString);
 	close(OUTFILE);
 
