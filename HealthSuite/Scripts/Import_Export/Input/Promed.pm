@@ -10,30 +10,35 @@ use Dumpvalue;
 use App::Data::Manipulate;
 use App::Universal;
 
-use base qw(Driver::Input::DBI);
+use base qw(Driver::Input);
 use vars qw($STMTMGR);
 
 sub init
 {
 	my $self = shift;
-	$self->dbiConnectKey("dbi:Proxy:hostname=medina;port=3333;dsn=dbi:ODBC:PROMED_SAMPLE");
-	$self->statements('org_data', 'select * from mwadd');
-	$self->statements('phy_data', 'select * from mwphy');	
-	$self->statements('pat_data', 'select * from mwpat');		
-	$self->statements('prt_data', 'select * from mwpra');	
-	$self->statements('ins_data', 'select * from mwins');	
-	$self->statements('refdoc_data', 'select * from mwrph');		
+	#only need one connection string
+	$self->newSource('Promed');
+	my $source=$self->getSource('Promed');	
+	$self->dbiConnectKey('Promed',"dbi:Proxy:hostname=medina;port=3333;dsn=dbi:ODBC:PROMED_SAMPLE");
+	print $self->dbiConnectKey('Promed') . "\n";
+	$self->statements('Promed','org_data', 'select * from mwadd');	
+	$self->statements('Promed','phy_data', 'select * from mwphy');	
+	$self->statements('Promed','pat_data', 'select * from mwpat');		
+	$self->statements('Promed','prt_data', 'select * from mwpra where State = ?');	
+	$self->statements('Promed','ins_data', 'select * from mwins');	
+	$self->statements('Promed','refdoc_data', 'select * from mwrph');		
 }
 
 
 sub populateOrgData
 {
 	my $self = shift;
-	my $dbh = $self->dbh();
+	my $source = $self->getSource('Promed');
+	my $dbh = $source->dbh();
 	my $dataModel = $self->dataModel();	
 	
 	#Pull Org Data 
-	my $sth = $self->execute('org_data');
+	my $sth = $source->execute('org_data');
 	
 	#Store Org Data into Object		
 	my $count=0;
@@ -106,11 +111,11 @@ sub populateOrgData
 sub populatePrtData
 {
 	my $self = shift;
-	my $dbh = $self->dbh();
 	my $dataModel = $self->dataModel();	
 	#Pull Org Data 
-	my $sth = $self->execute('prt_data');
-	
+	my $source=$self->getSource('Promed');	
+	my $sth = $self->execute('Promed','prt_data',['FL']);
+	#my $sth = $source->execute('prt_data',["FL"]);
 	#Store Practice Data into Object	
 	my $count=0;	
 	while (my $rowData = $sth->fetch()) 
@@ -540,7 +545,7 @@ sub populateInsData
 							);
 		$org->mailingAddress($address);	
 		$org->add_insuranceProduct($insProduct);		
-		$dataModel->orgs->add_all($org);					
+		$dataModel->orgs->add_all($org);	
 	};		
 }
 
@@ -549,20 +554,21 @@ sub populateInsData
 sub populateDataModel
 {
 	my $self = shift;
-	my $dbh = $self->dbh();
+	#my $dbh = $self->dbh();
 	my $dataModel = $self->dataModel();
 
 	#Obtain Org data
 	$self->populatePrtData();		
-	$self->populateOrgData();		
-	$self->populatePhyData();
-	$self->populateRefDocData();	
-	$self->populatePatData();
+	#$self->populateOrgData();		
+	#$self->populatePhyData();
+	
+	#$self->populateRefDocData();	
+	#$self->populatePatData();
 	#$self->populateInsData();		
 	
-	#my $dumper = new Dumpvalue;
-        #$dumper->dumpValue($dataModel->orgs);
-	#exit;
+	my $dumper = new Dumpvalue;
+        $dumper->dumpValue($dataModel->orgs);
+	exit;
 	
 	return $self->errors_size == 0 ? 1 : 0;
 }
