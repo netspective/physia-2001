@@ -1176,6 +1176,12 @@ sub prepare_view_summary
 							<a href='/invoice/$invoiceId/dialog/hold'>Place Claim On Hold</a>
 							</FONT>
 						</TD>" : '' ]}
+						@{[ $invStatus != $void && $invStatus != $closed ?
+						"<TD>
+							<FONT FACE='Arial,Helvetica' SIZE=2>
+							<a href='/invoice/$invoiceId/dialog/postinvoicepayment?paidBy=personal'>Apply Personal Payment</a>
+							</FONT>
+						</TD>" : '' ]}
 					</TR>
 			};
 		}
