@@ -25,14 +25,14 @@ sub recordType
 sub wasLastPayerMedicare
 {
 	my ($self, $flags, $inpClaim) = @_;
-	
+
 	#print "Payer ID is: ", $inpClaim->{policy}->[$flags->{RECORDFLAGS_NONE}]->getPayerId(), "\n";
 	#print "Payer is: ", $inpClaim->{policy}->[$flags->{RECORDFLAGS_NONE}]->getName , "\n";
-	
-	if ($flags->{RECORDFLAGS_NONE} > 0) 
+
+	if ($flags->{RECORDFLAGS_NONE} > 0)
 	{
 		my $testName = $inpClaim->{policy}->[$flags->{RECORDFLAGS_NONE} - 1]->getName();
-		if($testName eq	'Medicare')		
+		if($testName eq	'Medicare')
 		{
 			return 1;
 		}
@@ -50,7 +50,7 @@ sub formatData
 
 
     my $wasPayerMedicare = wasLastPayerMedicare($self, $flags, $inpClaim);
-	
+
 my %nsfType = (NSF_HALLEY . "" =>
 	sprintf("%-3s%-2s%-17s%1s%1s%-2s%-5s%-4s%-17s%-16s%-20s%-17s%-16s%1s%-15s%-15s%1s%1s%2s%-17s%-8s%-20s%-10s%-2s%1s%-3s%1s%-8s%1s%1s%-7s%-25s%-15s%-1s%-28s%-7s%-9s",
 	$self->recordType(),
@@ -59,9 +59,10 @@ my %nsfType = (NSF_HALLEY . "" =>
 	substr($inpClaim->getFilingIndicator(),0,1), 	# 'P',or 'M' or 'I'
 	substr(($wasPayerMedicare == 1) ? 'Z' : $inpClaim->{policy}->[$flags->{RECORDFLAGS_NONE}]->getSourceOfPayment(),0,1),
 	substr(($wasPayerMedicare == 1) ? 'MG' : $refClaimInsured->getTypeCode(),0,2),   # insurance type code
-	substr(($wasPayerMedicare == 1) ? $inpClaim->{insured}->[0]->getMedigapNo() : $inpClaim->{policy}->[$flags->{RECORDFLAGS_NONE}]->getPayerId(),0,5),           # payer organization id
+	substr($inpClaim->{policy}->[$flags->{RECORDFLAGS_NONE}]->getPayerId(),0,5),           # payer organization id
 	substr($inpClaim->{policy}->[$flags->{RECORDFLAGS_NONE}]->getPayerId(),length($inpClaim->getPayerId())-4,4),#$spaces,  # payer claim office number
- 	substr($inpClaim->{policy}->[$flags->{RECORDFLAGS_NONE}]->getName,0,17),#substr($refClaimInsured->getInsurancePlanOrProgramName(),0,17),
+#	substr($inpClaim->{policy}->[$flags->{RECORDFLAGS_NONE}]->getName,0,17),#substr($refClaimInsured->getInsurancePlanOrProgramName(),0,17),
+	substr($inpClaim->{policy}->[$flags->{RECORDFLAGS_NONE}]->getName(),0,17),
  	$spaces,										 # payer name filler
 	substr($refClaimInsured->getPolicyGroupOrFECANo(),0,20),
 	$spaces,   										 # Group name
@@ -89,7 +90,7 @@ my %nsfType = (NSF_HALLEY . "" =>
 	$spaces,										 # payee number
 	$spaces, 										 # med reserve
 	substr($inpClaim->{policy}->[$flags->{RECORDFLAGS_NONE}]->getPayerId(),0,7),  # halley payer id
-	$spaces,										 # medigap id
+	$$refClaimInsured->getMedigapNo(),	# medigap id
 	),
 	NSF_THIN . "" =>
 	sprintf("%-3s%-2s%-17s%-1s%-1s%2s%-5s%-4s%-33s%-20s%-33s%-1s%-15s%-15s%-1s%-1s%-2s%-25s%-20s%-12s%-1s%-3s%-1s%-8s%-1s%-1s%-7s%-25s%-25s%-1s%-1s%-33s",
