@@ -73,7 +73,6 @@ sub initialize
 	}
 
 	$self->addContent(
-		new CGI::Dialog::Field(type => 'hidden', name => 'org_owner_id_hidden'),
 		new App::Dialog::Field::Organization::ID::New(caption => $orgIdCaption,
 			name => 'org_id',
 			options => FLDFLAG_REQUIRED,
@@ -289,8 +288,6 @@ sub populateData
 	$STMTMGR_ORG->createFieldsFromSingleRow($page, STMTMGRFLAG_NONE, 'selRegistry', $orgId);
 	my $orgData = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_NONE, 'selRegistry', $orgId);
 
-	$page->field('org_owner_id_hidden', $orgData->{owner_org_id});
-
 	my $categories = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selCategory', $orgId);
 	my @categories = split(/\s,\s/, $categories);
 	$page->field('member_name', @categories);
@@ -328,13 +325,12 @@ sub execute_add
 	}
 
 	my $orgId = $page->field('org_id');
-	my $ownerOrgId = $self->{orgtype} eq 'main' ? $orgId : $page->session('org_id');
 	## First create new Org record
 	$page->schemaAction(
 			'Org', $command,
 			org_id => $orgId || undef,
 			parent_org_id => $page->field('parent_org_id') || undef,
-			owner_org_id => $ownerOrgId || undef,
+			owner_org_id => $page->session('org_id'),
 			tax_id => $page->field('tax_id') || $taxId,
 			name_primary => $page->field('name_primary') || undef,
 			name_trade => $page->field('name_trade') || undef,
@@ -535,7 +531,7 @@ sub execute_update
 			'Org', $command,
 			org_id => $orgId,
 			parent_org_id => $page->field('parent_org_id') || undef,
-			owner_org_id => $page->field('org_owner_id_hidden') || undef,
+			owner_org_id => $page->session('org_id'),
 			tax_id => $page->field('tax_id') || undef,
 			name_primary => $page->field('name_primary') || undef,
 			name_trade => $page->field('name_trade') || undef,
