@@ -117,14 +117,16 @@ $STMTMGR_REPORT_SCHEDULING = new App::Statements::Report::Scheduling(
 					WHERE 	owner_org_id = :4
 					AND 	org_internal_id = e.facility_id
 				)
-				AND	e.start_time >= TO_DATE(:2, '$SQLSTMT_DEFAULTDATEFORMAT') + :5
-				AND	e.start_time <  TO_DATE(:3, '$SQLSTMT_DEFAULTDATEFORMAT') + 1 + :5
-				AND	e.event_id = ea.parent_id
-				AND	e.event_id = t.parent_event_id
+				AND e.start_time >= TO_DATE(:2, '$SQLSTMT_DEFAULTDATEFORMAT') + :5
+				AND e.start_time <  TO_DATE(:3, '$SQLSTMT_DEFAULTDATEFORMAT') + 1 + :5
+				AND e.event_id = ea.parent_id
+				AND e.event_id = t.parent_event_id
 				AND e.event_status < 3
-				AND	i.main_transaction = t.trans_id
-				AND	ii.parent_id = i.invoice_id
-				AND	ii.code is not NULL
+				AND i.main_transaction = t.trans_id
+				AND i.invoice_status != 16
+				AND i.parent_invoice_id is NULL
+				AND ii.parent_id = i.invoice_id
+				AND ii.code is not NULL
 			GROUP BY ii.code
 			ORDER BY 1
 		},
@@ -152,8 +154,9 @@ $STMTMGR_REPORT_SCHEDULING = new App::Statements::Report::Scheduling(
 				OR ii.data_text_b is NULL)
 			AND ii.item_type != @{[ App::Universal::INVOICEITEMTYPE_VOID ]}
 			AND i.main_transaction = t.trans_id
-			AND e.event_id = t.parent_event_id
+			AND i.invoice_status != 16
 			AND i.parent_invoice_id is NULL
+			AND e.event_id = t.parent_event_id
 		},
 		excludeDiscardedAppts => qq{AND e.event_status < 3},
 		publishDefn => $STMTRPTDEFN_DETAIL_APPT_SCHEDULE,
@@ -174,11 +177,11 @@ $STMTMGR_REPORT_SCHEDULING = new App::Statements::Report::Scheduling(
 					WHERE owner_org_id = :4
 					AND org_internal_id = e.facility_id
 				)
-				AND	ea.value_type = @{[ App::Universal::EVENTATTRTYPE_APPOINTMENT ]}
-				AND	e.CHECKIN_STAMP >= TO_DATE(:2, '$SQLSTMT_DEFAULTDATEFORMAT') + :5
-				AND	e.CHECKIN_STAMP <  TO_DATE(:3, '$SQLSTMT_DEFAULTDATEFORMAT') + 1 + :5
-				AND	e.event_id = ea.parent_id
-				AND	e.CHECKOUT_STAMP is NULL
+				AND ea.value_type = @{[ App::Universal::EVENTATTRTYPE_APPOINTMENT ]}
+				AND e.CHECKIN_STAMP >= TO_DATE(:2, '$SQLSTMT_DEFAULTDATEFORMAT') + :5
+				AND e.CHECKIN_STAMP <  TO_DATE(:3, '$SQLSTMT_DEFAULTDATEFORMAT') + 1 + :5
+				AND e.event_id = ea.parent_id
+				AND e.CHECKOUT_STAMP is NULL
 			GROUP BY to_char(e.CHECKIN_STAMP, '$SQLSTMT_DEFAULTDATEFORMAT')
 			ORDER BY 1 desc
 		},
@@ -221,10 +224,10 @@ $STMTMGR_REPORT_SCHEDULING = new App::Statements::Report::Scheduling(
 					WHERE owner_org_id = :4
 					AND org_internal_id = e.facility_id
 				)
-				AND	ea.value_type = @{[ App::Universal::EVENTATTRTYPE_APPOINTMENT ]}
-				AND	e.scheduled_stamp >= TO_DATE(:2, '$SQLSTMT_DEFAULTDATEFORMAT') + :5
-				AND	e.scheduled_stamp <  TO_DATE(:3, '$SQLSTMT_DEFAULTDATEFORMAT') + 1 + :5
-				AND	e.event_id = ea.parent_id
+				AND ea.value_type = @{[ App::Universal::EVENTATTRTYPE_APPOINTMENT ]}
+				AND e.scheduled_stamp >= TO_DATE(:2, '$SQLSTMT_DEFAULTDATEFORMAT') + :5
+				AND e.scheduled_stamp <  TO_DATE(:3, '$SQLSTMT_DEFAULTDATEFORMAT') + 1 + :5
+				AND e.event_id = ea.parent_id
 			GROUP BY to_char(e.scheduled_stamp -:5, '$SQLSTMT_DEFAULTDATEFORMAT')
 			ORDER BY 1 desc
 		},
@@ -275,11 +278,13 @@ $STMTMGR_REPORT_SCHEDULING = new App::Statements::Report::Scheduling(
 					WHERE owner_org_id = :4
 					AND org_internal_id = e.facility_id
 				)
-				AND	t.parent_event_id = e.event_id
-				AND	i.main_transaction = t.trans_id
-				AND	ib.bill_id = i.billing_id
-				AND	ins.ins_internal_id = ib.bill_ins_id
-				AND	ct.id = ins.ins_type
+				AND t.parent_event_id = e.event_id
+				AND i.main_transaction = t.trans_id
+				AND i.parent_invoice_id is NULL
+				AND i.invoice_status != 16
+				AND ib.bill_id = i.billing_id
+				AND ins.ins_internal_id = ib.bill_ins_id
+				AND ct.id = ins.ins_type
 			GROUP BY ct.caption
 		UNION
 			SELECT	ct.caption, count(distinct e.event_id) as count
@@ -304,11 +309,13 @@ $STMTMGR_REPORT_SCHEDULING = new App::Statements::Report::Scheduling(
 					WHERE owner_org_id = :4
 					AND org_internal_id = e.facility_id
 				)
-				AND	t.parent_event_id = e.event_id
-				AND	i.main_transaction = t.trans_id
-				AND	ib.bill_id = i.billing_id
-				AND	ib.bill_ins_id is NULL
-				AND	ct.id = 0
+				AND t.parent_event_id = e.event_id
+				AND i.main_transaction = t.trans_id
+				AND i.parent_invoice_id is NULL
+				AND i.invoice_status != 16
+				AND ib.bill_id = i.billing_id
+				AND ib.bill_ins_id is NULL
+				AND ct.id = 0
 			GROUP BY ct.caption
 		},
 		
