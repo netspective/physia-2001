@@ -237,7 +237,8 @@ $STMTMGR_COMPONENT_INVOICE = new App::Statements::Component::Invoice(
 			sum(i.unit_cost) as year_to_date_unit_cost
 			from invoice_charges i
 			, ref_cpt r,person p, transaction t,
-			Transaction_type tt
+			Transaction_type tt,
+			org o
 			where  r.CPT (+) = i.code
 			AND p.person_id= provider
 			AND (p.person_id = :1 OR :1 IS NULL)
@@ -245,6 +246,8 @@ $STMTMGR_COMPONENT_INVOICE = new App::Statements::Component::Invoice(
 			AND (:3 IS NULL OR :3 = i.facility)
 			AND (:4 IS NULL OR :4 <=i.code) 
 			AND (:5 is NULL OR :5 >=i.code)
+			AND o.org_internal_id = i.facility
+			AND o.owner_org_id = :6	
 			AND t.trans_id (+)= i.trans_id
 			AND tt.id (+)= t.trans_type
 			group by r.name,p.short_sortable_name,
@@ -677,8 +680,8 @@ $STMTMGR_COMPONENT_INVOICE = new App::Statements::Component::Invoice(
 				i.client_id
 			from 	event e, transaction t, org o, transaction_type tt,
 				person p, person p1, person p2, invoice i, invoice_billing ib
-			where 	trunc(e.start_time) >= to_date(?, 'mm/dd/yyyy')
-			and 	trunc(e.start_time) <= to_date(?, 'mm/dd/yyyy')
+			where 	trunc(e.start_time) >= to_date(:1, 'mm/dd/yyyy')
+			and 	trunc(e.start_time) <= to_date(:2, 'mm/dd/yyyy')
 			and	e.event_id = t.parent_event_id
 			and 	e.facility_id = o.org_internal_id
 			and	t.trans_type = tt.id
@@ -690,6 +693,7 @@ $STMTMGR_COMPONENT_INVOICE = new App::Statements::Component::Invoice(
 			and  	ib.bill_party_type in (0,1)
 			and	ib.bill_sequence = 1
 			and	ib.invoice_item_id is NULL
+			and	o.owner_org_id = :3
 			union all
 			select 	p1.complete_name, trunc(e.start_time),
 				to_char(e.start_time, 'HH12:MIAM'),
@@ -701,8 +705,8 @@ $STMTMGR_COMPONENT_INVOICE = new App::Statements::Component::Invoice(
 				i.client_id
 			from 	event e, transaction t, org o, org o1, transaction_type tt,
 				person p, person p1, invoice i, invoice_billing ib
-			where 	trunc(e.start_time) >= to_date(?, 'mm/dd/yyyy')
-			and 	trunc(e.start_time) <= to_date(?, 'mm/dd/yyyy')
+			where 	trunc(e.start_time) >= to_date(:1, 'mm/dd/yyyy')
+			and 	trunc(e.start_time) <= to_date(:2, 'mm/dd/yyyy')
 			and	e.event_id = t.parent_event_id
 			and 	e.facility_id = o.org_internal_id
 			and	t.trans_type = tt.id
@@ -714,6 +718,7 @@ $STMTMGR_COMPONENT_INVOICE = new App::Statements::Component::Invoice(
 			and  	ib.bill_party_type in (2,3)
 			and	ib.bill_sequence = 1
 			and	ib.invoice_item_id is NULL
+			and	o.owner_org_id = :3
 			ORDER BY  2,12
 			},
 	sqlStmtBindParamDescr => ['Provider ID for provider_by_location View'],
