@@ -540,13 +540,18 @@ sub send_page_header
 	if ( $self->{flags} & PAGEFLAG_INCLUDEDEFAULTSCRIPTS )
 	{
 		$html .= qq{
-			<SCRIPT SRC='/lib/page.js'></SCRIPT>
-			<SCRIPT>
+			<script language="JavaScript">var _version = 1.0;</script>
+			<script language="JavaScript1.1">_version = 1.1;</script>
+			<script language="JavaScript1.2">_version = 1.2;</script>
+			<script language="JavaScript1.3">_version = 1.3;</script>
+			<script language="JavaScript1.4">_version = 1.4;</script>
+			<script src='/lib/page.js' language="JavaScript1.2"></script>
+			<script>
 			if(typeof pageLibraryLoaded == 'undefined')
 			{
 				alert('ERROR: /lib/page.js could not be loaded');
 			}
-			</SCRIPT>
+			</script>
 		};
 	}
 	$html .= qq{
@@ -593,7 +598,7 @@ sub send_page_body
 	$html = join('', @{$self->{page_content_header}}) unless $flags & PAGEFLAG_ISFRAMEBODY;
 	unless($flags & PAGEFLAG_ISFRAMEHEAD)
 	{
-		$html .= qq{<div style="width: 100%; margin: 10">} . join('', @{$self->{page_content}}) . "</div>";
+		$html .= qq{<div style="width: 100%; margin: 10">} . join('', @{$self->{page_content}}) . "</div><br>";
 		$html .= join('', @{$self->{page_content_footer}});
 	}
 
