@@ -75,7 +75,6 @@ sub prepare_view_createBatchPaperClaims
 	$self->redirect("/paperclaims/$listName?enter=$listFile");
 }
 
-
 sub createBatchPaperClaims
 {
 	my ($self, $claims, $orgInternalId, $drawBackground) = @_;
@@ -99,7 +98,7 @@ sub createBatchPaperClaims
 	for (@{$claims})
 	{
 		push(@claimsHtml, qq{
-			<a href="/invoice/$_/summary" title="View Invoice $_ Summary">$_</a>
+			<a href="/invoice/$_/summary" title="View Claim $_ Summary">$_</a>
 		});
 	}
 	open (LISTFILE, ">$listFile") || die "Unable to open list file $listFile: $!\n";
