@@ -2048,6 +2048,7 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 			and 10 > (
 				select count(*) from perSess_Activity pa2
 				where pa.activity_stamp < pa2.activity_stamp
+				and pa.person_id = pa2.person_id
 			)
 		order by pa.activity_stamp desc
 	},
