@@ -284,6 +284,7 @@
 		<column name="main_transaction" indexed="yes" parentref="transaction.trans_id" required="yes" descr="The identifier of the main transaction that the invoice is being created for"/>
 		<column name="owner" type="entity" descr="Information about which entity is creating/sending the invoice (sender)"/>
 		<column name="client" type="entity" descr="Information about which entity that received the products/service"/>
+		<column name="billing_id" parentref="Invoice_Billing.bill_id" descr="The current payer (invoice billing record) for this invoice"/>
 		<column name="total_cost" type="currency" calc="trigger" descr="The total cost of the invoice (maintained automatically)"/>
 		<column name="total_items" type="integer" calc="trigger" descr="The total number of items (minus 'phantom' adjustment items) in the invoice"/>
 		<column name="total_adjust" type="currency" calc="trigger" descr="The total dollar amount of adjustments made to the invoice"/>
