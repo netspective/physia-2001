@@ -18,6 +18,7 @@ sub prepare_page_content_header
 sub prepare
 {
 	my $self = shift;
+	my $sessionUser = $self->session('user_id');
 	$self->addContent(qq{
 		<center>
 		<table border="0" cellspacing="0" cellpadding="5" align="center"><tr valign="top"><td>
@@ -60,7 +61,7 @@ sub prepare
 			</td><td>
 				<font face="arial,helvetica" size=2>
 					<b>Add</b> a new
-					<a href="/org/#session.org_id#/dlg-add-org-assoc-provider">Provider Directory Entry</a>
+					<a href="/org/#session.org_id#/dlg-add-org-dir-entry">Provider Directory Entry</a>
 				</font>
 			</td></tr>
 
@@ -78,7 +79,8 @@ sub prepare
 				<font face="arial,helvetica" size=2>
 					<b>Lookup</b>
 					<a href="/worklist/referral">Service Request Worklist</a>,
-					<a href="/worklist/referral?user=physician">Referral Followup Worklist</a>
+					<a href="/worklist/referral?user=physician">Everybody Referral Followup Worklist</a>,
+					<a href="/worklist/referral?user=$sessionUser">Personal Referral Followup Worklist</a>
 				</font>
 			</td></tr><tr valign=top bgcolor=white><td align="right">
 				$IMAGETAGS{'icons/arrow_right_red'}
