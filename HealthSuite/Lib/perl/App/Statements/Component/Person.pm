@@ -177,7 +177,27 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 	publishComp_stpe => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.addresses', [$personId], 'panelEdit'); },
 },
 
-#----------------------------------------------------------------------------------------------------------------------
+#----------------------------------------------------------------------------------------------------------------------------------------------------------
+
+'person.miscNotes' => {
+	sqlStmt => qq{
+			select 	parent_id, item_name, item_id, value_text
+				from  Person_Attribute
+			where  	parent_id = ?
+			and item_name = 'Misc Notes'			
+		},
+	publishDefn =>
+		{
+			columnDefn => [				
+					{ head => 'Misc Notes', dataFmt => 'Misc Notes (<A HREF = "/person/#0#/profile">#0#</A>)#3#' },
+				],			
+		},
+	publishComp_st => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->session('user_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.sessionActivity', [$personId]); },
+	publishComp_stp => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('user_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.sessionActivity', [$personId], 'panel'); },
+	publishComp_stpe => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('user_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.sessionActivity', [$personId], 'panelEdit'); },
+},
+
+#-------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 'person.sessionActivity' => {
 	sqlStmt => qq{
