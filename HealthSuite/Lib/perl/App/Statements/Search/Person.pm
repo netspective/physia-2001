@@ -183,7 +183,7 @@ my %personTemplates = (
 #
 # HEY! If you add anything to @categories you must add the array index below
 #
-my @categories = ('physician', 'nurse', 'staff', 'patient', 'associate', 'referring-Doctor', 'physician-ref');
+my @categories = ('physician', 'nurse', 'staff', 'patient', 'associate', 'referring-Doctor', 'physician-ref', 'insured-Person');
 my @categorySqls = ();
 foreach my $category (@categories)
 {
@@ -214,6 +214,7 @@ foreach my $category (@categories)
 }
 
 # If you add anything to @categories, you must also add it below as $categorySqls[x]
+
 $STMTMGR_PERSON_SEARCH = new App::Statements::Search::Person(
 	%personTemplates,
 	%{$categorySqls[0]},
@@ -223,6 +224,7 @@ $STMTMGR_PERSON_SEARCH = new App::Statements::Search::Person(
 	%{$categorySqls[4]},
 	%{$categorySqls[5]},
 	%{$categorySqls[6]},
+	%{$categorySqls[7]}
 );
 
 1;
