@@ -219,6 +219,19 @@ sub populateData
 	my $guarantorName =  $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_NONE, 'selAttribute', $personId, $guarantor);
 	$guarantorName->{'value_text'} eq $personId ? $page->field('resp_self', 1) : $page->field('party_name', $guarantorName->{'value_text'});
 	$page->field('resp_item_id', $guarantorName->{'item_id'});
+	my $relation = $guarantorName->{'value_textb'};
+	my @itemNamefragments = split('/', $relation);
+
+		if($itemNamefragments[0] eq 'Other')
+		{
+			$page->field('rel_type', $itemNamefragments[0]);
+			$page->field('other_rel_type', $itemNamefragments[1]);
+		}
+
+		else
+		{
+			$page->field('rel_type', $itemNamefragments[0]);
+		}
 
 	my $bloodType = 'BloodType';
 	my $bloodTypecap =  $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_NONE, 'selAttribute', $personId, $bloodType);
@@ -466,14 +479,21 @@ sub handleAttrs
 			_debug => 0
 		) if $member ne 'Patient';
 
+	my $relType = $page->field('rel_type');
+	my $otherRelType = $page->field('other_rel_type');
+	$otherRelType = "\u$otherRelType";
+	my $relationship = $relType eq 'Other' ? "Other/$otherRelType" : $relType;
+
 	my $partyName =  $page->field('resp_self') ne '' ? $personId : $page->field('party_name');
+	my $commandResponsible = $command eq 'update' &&  $page->field('resp_item_id') eq '' ? 'add' : $command;
 	$page->schemaAction(
-			'Person_Attribute', $command,
+			'Person_Attribute', $commandResponsible,
 			parent_id => $personId || undef,
 			item_id => $page->field('resp_item_id') || undef,
 			item_name => 'Guarantor' || undef,
 			value_type => App::Universal::ATTRTYPE_EMERGENCY || undef,
 			value_text => $partyName || undef,
+			value_textB => $relationship || undef,
 			value_int => 1,
 			_debug => 0
 			)if $partyName ne '';
