@@ -20,3 +20,5 @@ B981 - Allow HCFA 1500 PDF to be pre-printed (PP) or plain. Pre-printed means al
 [No Bug] - Added capability to make upto 4 multiple appointments at a time.
 
 [No Bug] - Fixed sorting problem in Person lookups
+
+B656 - Added denied option to the status field in 'Refill Request' dialog
