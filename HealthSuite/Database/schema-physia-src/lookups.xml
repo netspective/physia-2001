@@ -660,6 +660,12 @@
 				<col name="abbrev">99</col>
 				<col name="result">2</col>
 			</row>
+			<row>
+				<col name="id">22</col>
+				<col name="caption">EPSDT Office Visit</col>
+				<col name="abbrev">S</col>
+				<col name="result">2</col>
+			</row>
 		</data>
 	</table>
 
