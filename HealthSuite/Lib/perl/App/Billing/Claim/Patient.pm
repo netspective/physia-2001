@@ -160,6 +160,7 @@ sub setAccountNo
 sub getRelationshipToInsured
 {
 	my ($self) = @_;
+	print (($self->{relationshipToInsured} eq "") ? DEFAULT_RELATION_SHIP_TO_INSURED : $self->{relationshipToInsured});
 	return ($self->{relationshipToInsured} eq "") ? DEFAULT_RELATION_SHIP_TO_INSURED : $self->{relationshipToInsured};
 }
 

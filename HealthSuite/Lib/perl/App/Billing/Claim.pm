@@ -124,12 +124,11 @@ sub getEMCId
 {
 	my $self = shift;
 	my @ids;
-	$ids[4]= $self->{renderingProvider}->getMedicareId();
-	$ids[5]= $self->{renderingProvider}->getMedicaidId();
-	
-	my @payerCodes = (4, 5);
-	
-	$self->{providerEMCId} = ((grep{$_ eq $self->{insType}} @payerCodes) ? $ids[$self->{insType}] : $self->{renderingProvider}->getPIN());
+	$ids[MEDICARE]= $self->{payToOrganization}->getMedicareId();
+	$ids[MEDICAID]= $self->{payToOrganization}->getMedicaidId();
+	$ids[WORKERSCOMP]= $self->{payToOrganization}->getWorkersComp();
+	my @payerCodes =(MEDICARE, MEDICAID, WORKERSCOMP);
+	$self->{providerEMCId} = (($self->{insType} =~ /[@payerCodes]/) ? $ids[$self->{insType}] : $self->{renderingProvider}->getPIN());
 	return $self->{providerEMCId};
 }
 

@@ -52,10 +52,11 @@ sub processFile
 	
 	$self->{medicareClaimsList} = new App::Billing::Claims;
 	$self->{medicaidClaimsList} = new App::Billing::Claims;
-    $self->{payerClaimsBatch} = {	
-									4 => $self->{medicareClaimsList},
-									5 => $self->{medicaidClaimsList}
-								 };	
+	$self->{workerscompClaimsList} = new App::Billing::Claims;
+    $self->{payerClaimsBatch} = {	4 => $self->{medicareClaimsList},
+					5 => $self->{medicaidClaimsList},
+					6 => $self->{workerscompClaimsList}
+				 };	
 
 	
 	$self->makeBatches($tempClaims);
@@ -128,7 +129,7 @@ sub makeBatches
     #
 
 	# fetch each element i.e. claim from claims array one by one
-	my @payerCodes = (MEDICARE, MEDICAID);
+	my @payerCodes = (MEDICARE, MEDICAID, WORKERSCOMP);
 	
 	for $claimValue (0..$#$claims)
 	{
@@ -142,7 +143,9 @@ sub makeBatches
 			 else
 			 {
 				# get the providerID from claim
-				$providerID = $claims->[$claimValue]->{payToProvider}->getFederalTaxId();
+				#$providerID = $claims->[$claimValue]->{payToProvider}->getFederalTaxId();
+				$providerID = $claims->[$claimValue]->getEMCId();
+
 				# add it in array without duplication
 				if ($self->checkForDuplicate($providerID) eq 0)
 				{
@@ -219,7 +222,15 @@ sub makeSelectedClaimsList
 			foreach $claim (@$claims)
 			{
 				# get providerId from claim
-				$providerID = $claim->{payToProvider}->getFederalTaxId();
+				 if ($self->{nsfType} == NSF_HALLEY)
+			     {
+					#$providerID = $claim->{payToProvider}->getFederalTaxId();
+					$providerID = $claim->getEMCId();
+				}
+				elsif($self->{nsfType} == NSF_ENVOY)
+				{
+					$providerID = $claim->{payToProvider}->getFederalTaxId();
+				}
 				
 				# check it against batch element value
 				if ($providerID eq $batchValue)

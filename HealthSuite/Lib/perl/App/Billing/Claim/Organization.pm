@@ -26,7 +26,15 @@ sub new
 	$self->{specialityId} = undef;
 	$self->{organizationType} = undef;
 	$self->{type} = undef;
-
+	$self->{CLIA} = undef;
+	$self->{employerNumber} = undef;
+	$self->{medicaidId} = undef;
+	$self->{medicareId} = undef;
+	$self->{workersComp} = undef;
+	$self->{uPin} = undef;
+	$self->{taxId} = undef;
+	$self->{taxTypeId} = undef;
+		
 	return bless $self, $type;
 }
 
@@ -35,6 +43,124 @@ sub property
 	my ($self, $name, $value) = @_;
 	$self->{$name} = $value if defined $value;
 	return $self->{$name};
+}
+
+sub setTaxTypeId
+{
+	my ($self,$value) = @_;
+	my $temp = 
+		{
+		   '0' => 'E',
+		   '1' => 'S', 
+		   '2' => 'X',
+		   };
+	$self->{taxTypeId} = $temp->{$value};	
+}
+
+sub getTaxTypeId
+{
+	my ($self) = @_;
+	
+	return $self->{taxTypeId};
+
+}
+
+sub getTaxId
+{
+	my ($self) = @_;
+	
+	return $self->{taxId};
+}
+
+sub setTaxId
+{
+	my ($self,$value) = @_;
+
+	$self->{taxId} = $value;
+}
+
+sub getUPin
+{
+	my ($self) = @_;
+	
+	return $self->{uPin};
+}
+
+sub setUPin
+{
+	my ($self,$value) = @_;
+
+	$self->{uPin} = $value;
+}
+
+sub getCLIA
+{
+	my ($self) = @_;
+	
+	return $self->{CLIA};
+}
+
+sub setCLIA
+{
+	my ($self,$value) = @_;
+
+	$self->{CLIA} = $value;
+}
+
+sub getEmployerNumber
+{
+	my ($self) = @_;
+	
+	return $self->{employerNumber};
+}
+
+sub setEmployerNumber
+{
+	my ($self,$value) = @_;
+
+	$self->{employerNumber} = $value;
+}
+
+sub getMedicaidId
+{
+	my ($self) = @_;
+	
+	return $self->{medicaidId};
+}
+
+sub setMedicaidId
+{
+	my ($self,$value) = @_;
+
+	$self->{medicaidId} = $value;
+}
+
+sub getMedicareId
+{
+	my ($self) = @_;
+	
+	return $self->{medicareId};
+}
+
+sub setMedicareId
+{
+	my ($self,$value) = @_;
+
+	$self->{medicareId} = $value;
+}
+
+sub getWorkersComp
+{
+	my ($self) = @_;
+	
+	return $self->{workersComp};
+}
+
+sub setWorkersComp
+{
+	my ($self,$value) = @_;
+
+	$self->{workersComp} = $value;
 }
 
 sub getType
@@ -81,7 +207,8 @@ sub getGRP
 sub getFederalTaxId
 {
 	my $self = shift;
-	return $self->{federalTaxId};
+	
+	return ($self->{federalTaxId} eq "" ? $self->{taxId} : $self->{federalTaxId});
 }
 
 sub getName

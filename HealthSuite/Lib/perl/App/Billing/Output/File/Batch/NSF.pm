@@ -13,6 +13,9 @@ use App::Billing::Output::File::Batch::Header::NSF1;
 use App::Billing::Output::File::Batch::Header::NSF2;
 use App::Billing::Output::File::Batch::Trailer::NSF;
 
+# for exporting NSF Constants
+use App::Billing::Universal;
+
 
 sub new
 {
@@ -76,8 +79,8 @@ sub processBatch
 	$self->{batchTotalCharges}=0;	
 	$self->{bXXX}=0;
 	$self->{yXXX}=0;
-
 	
+		
 	$self->prepareBatchHeader($tempClaims,$params{outArray}, $params{nsfType});
 		
 	$self->{nsfClaimObjs} = new App::Billing::Output::File::Batch::Claim::NSF();
@@ -195,6 +198,23 @@ sub checkSamePayToAndRenderProvider
 	}
 }	 			
 	   	
+sub checkSamePayToOrgAndRenderProvider
+{
+	my ($shift,$tempClaim) = @_;
+		
+	if ((($tempClaim->{payToOrganization}->{address}->getAddress1()) eq  ($tempClaim->{renderingProvider}->{address}->getAddress1())) &&
+		(($tempClaim->{payToOrganization}->{address}->getAddress2()) eq  ($tempClaim->{renderingProvider}->{address}->getAddress2())) &&
+		(($tempClaim->{payToOrganization}->{address}->getCity()) eq  ($tempClaim->{renderingProvider}->{address}->getCity())) &&
+		(($tempClaim->{payToOrganization}->{address}->getState()) eq  ($tempClaim->{renderingProvider}->{address}->getState())) &&
+		(($tempClaim->{payToOrganization}->{address}->getZipCode()) eq  ($tempClaim->{renderingProvider}->{address}->getZipCode())))
+	{
+		return 1;
+	}
+	else
+	{
+		return 0;
+	}
+}	 			
 
 
 1;

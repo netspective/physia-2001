@@ -48,7 +48,7 @@ sub formatData
 	my ($self, $container, $flags, $inpClaim, $nsfType) = @_;
 	my $spaces = ' ';
 	my $firstClaim = $inpClaim->[0];
-	my $claimPayToProvider = $firstClaim->{payToProvider};
+	my $claimPayToProvider = $firstClaim->{payToOrganization};
 	my $claimRenderingProvider = $firstClaim->{renderingProvider};
 	my $emcId;
 	
@@ -70,7 +70,7 @@ my %nsfType = ( NSF_HALLEY . "" =>
 	  $self->numToStr(4,0,$container->getSequenceNo()),
 	  $spaces, # batch id
   	  $self->numToStr(9,0,$claimPayToProvider->getFederalTaxId()),  # ne '') ? $claimCareProvider->getFederalTaxId() : $spaces,
-	  substr($claimPayToProvider->getSiteId(),0,6), # site id
+	  $spaces, #substr($claimPayToProvider->getSiteId(),0,6), # site id
 	  substr($claimPayToProvider->getTaxTypeId(),0,1), # taxId Type
 	  $spaces, # reserved filler 
 	  $spaces, # reserved filler
@@ -82,9 +82,9 @@ my %nsfType = ( NSF_HALLEY . "" =>
 	  $spaces, # provider XTID
 	  $spaces, # other no2.
 	  substr(($claimPayToProvider->getTaxTypeId() =~ /['E','X']/) ? $firstClaim->{payToOrganization}->getName() : $spaces ,0,18),
-	  substr($claimPayToProvider->getLastName(),0,20),
-	  substr($claimPayToProvider->getFirstName(),0,10),
-	  substr($claimPayToProvider->getMiddleInitial(),0,1),
+	  $spaces, #substr($claimPayToProvider->getLastName(),0,20),
+	  $spaces, #substr($claimPayToProvider->getFirstName(),0,10),
+	  $spaces, #substr($claimPayToProvider->getMiddleInitial(),0,1),
 	  substr($claimPayToProvider->getSpecialityId(),0,3), # speciality code
 	  $spaces, # speciality license code
 	  $spaces, # state license number
@@ -101,21 +101,21 @@ my %nsfType = ( NSF_HALLEY . "" =>
 	  $self->numToStr(4,0,$container->getSequenceNo()),
 	  $spaces, # batch id
   	  $self->numToStr(9,0,$claimPayToProvider->getFederalTaxId()),  # ne '') ? $claimCareProvider->getFederalTaxId() : $spaces,
-	  substr($claimPayToProvider->getSiteId(),0,6), # site id
+	  $spaces, #substr($claimPayToProvider->getSiteId(),0,6), # site id
 	  substr($claimPayToProvider->getTaxTypeId(),0,1), # taxId Type
 	  substr((($firstClaim->getFilingIndicator() eq 'P') && ($firstClaim->getSourceOfPayment() eq 'C')) ? $claimPayToProvider->getMedicareId() : $spaces,0,10), # medicare no.
 	  $spaces, # provider UPIN USIN ID
 	  $spaces, # reserved field
       substr((($firstClaim->getFilingIndicator() eq 'P') && ($firstClaim->getSourceOfPayment() eq 'D')) ? $claimPayToProvider->getMedicaidId() : $spaces,0,10) , # medicaid no.
 	  substr((($firstClaim->getFilingIndicator() eq 'P') && ($firstClaim->getSourceOfPayment() eq 'H')) ? $claimPayToProvider->getChampusId() : $spaces,0,10), # champus no.
-	  substr((($firstClaim->getFilingIndicator() =~ /['P','M']/) || ($firstClaim->getSourceOfPayment() =~ /['G','P']/)) ? $claimPayToProvider->getBlueShieldId() : $spaces,0,13), # bluesield no.
+	  substr((($firstClaim->getFilingIndicator() =~ /['P','M']/) || ($firstClaim->getSourceOfPayment() =~ /['G','P']/)) ? $spaces : $spaces,0,13), # $claimPayToProvider->getBlueShieldId() bluesield no.
 	  $spaces, # commercial no.
 	  $spaces, # other no1.
 	  $spaces, # other no2.
 	  substr(($claimPayToProvider->getTaxTypeId() =~ /['E','X']/) ? $firstClaim->{payToOrganization}->getName() : $spaces ,0,18),
-	  substr(($claimPayToProvider->getTaxTypeId() =~ /['S']/) ? $claimPayToProvider->getLastName() : $spaces,0,20),
-	  substr(($claimPayToProvider->getTaxTypeId() =~ /['S']/) ? $claimPayToProvider->getFirstName() : $spaces,0,10),
-	  substr(($claimPayToProvider->getTaxTypeId() =~ /['S']/) ? $claimPayToProvider->getMiddleInitial() : $spaces,0,1),
+	  substr(($claimPayToProvider->getTaxTypeId() =~ /['S']/) ? $spaces : $spaces,0,20), # $claimPayToProvider->getLastName()
+	  substr(($claimPayToProvider->getTaxTypeId() =~ /['S']/) ? $spaces : $spaces,0,10), # $claimPayToProvider->getFirstName()
+	  substr(($claimPayToProvider->getTaxTypeId() =~ /['S']/) ? $spaces : $spaces,0,1), # $claimPayToProvider->getMiddleInitial()
 	  substr($claimPayToProvider->getSpecialityId(),0,3), # speciality code
 	  $spaces, # speciality license code
 	  $spaces, # state license number
@@ -124,7 +124,7 @@ my %nsfType = ( NSF_HALLEY . "" =>
 	  $spaces, # filler national
 	  $spaces, # filler local
 	  $spaces, # reserved filler
-	  substr(($container->checkSamePayToAndRenderProvider($inpClaim->[0]) eq '0') ? 'N' : 'Y',0,1)
+	  substr(($container->checkSamePayToOrgAndRenderProvider($inpClaim->[0]) eq '0') ? 'N' : 'Y',0,1)
 	  )	
    );
    	

@@ -73,12 +73,12 @@ my %nsfType = ( NSF_HALLEY . "" =>
 	  $self->numToStr(4,0,$container->getSequenceNo()),
 	  $spaces, # batch id
 	  substr($claimPayToOrganization->getOrganizationType(),0,3), # type organization
-	  substr(($container->checkSamePayToAndRenderProvider($inpClaim->[0]) eq '0') ? $claimRenderingProvierAddress->getAddress1() : $spaces,0,30),
-	  substr(($container->checkSamePayToAndRenderProvider($inpClaim->[0]) eq '0') ? $claimRenderingProvierAddress->getAddress2() : $spaces,0,30),
-	  substr(($container->checkSamePayToAndRenderProvider($inpClaim->[0]) eq '0') ? $claimRenderingProvierAddress->getCity() : $spaces,0,20),
-	  substr(($container->checkSamePayToAndRenderProvider($inpClaim->[0]) eq '0') ? $claimRenderingProvierAddress->getState() : $spaces,0,2),
-	  substr(($container->checkSamePayToAndRenderProvider($inpClaim->[0]) eq '0') ? $claimRenderingProvierAddress->getZipCode().$self->numToStr(9 - length($claimRenderingProvierAddress->getZipCode()),0,$claimRenderingProvierAddress->getZipCode()) : $spaces,0,5),
-	  substr(($container->checkSamePayToAndRenderProvider($inpClaim->[0]) eq '0') ? $claimRenderingProvierAddress->getTelephoneNo(): $spaces,0,10), # service Phone No.
+	  substr(($container->checkSamePayToOrgAndRenderProvider($inpClaim->[0]) eq '0') ? $claimRenderingProvierAddress->getAddress1() : $spaces,0,30),
+	  substr(($container->checkSamePayToOrgAndRenderProvider($inpClaim->[0]) eq '0') ? $claimRenderingProvierAddress->getAddress2() : $spaces,0,30),
+	  substr(($container->checkSamePayToOrgAndRenderProvider($inpClaim->[0]) eq '0') ? $claimRenderingProvierAddress->getCity() : $spaces,0,20),
+	  substr(($container->checkSamePayToOrgAndRenderProvider($inpClaim->[0]) eq '0') ? $claimRenderingProvierAddress->getState() : $spaces,0,2),
+	  substr(($container->checkSamePayToOrgAndRenderProvider($inpClaim->[0]) eq '0') ? $claimRenderingProvierAddress->getZipCode().$self->numToStr(9 - length($claimRenderingProvierAddress->getZipCode()),0,$claimRenderingProvierAddress->getZipCode()) : $spaces,0,5),
+	  substr(($container->checkSamePayToOrgAndRenderProvider($inpClaim->[0]) eq '0') ? $claimRenderingProvierAddress->getTelephoneNo(): $spaces,0,10), # service Phone No.
 	  substr($claimPayToProviderAddress->getAddress1(),0,30),
 	  substr($claimPayToProviderAddress->getAddress2(),0,30),
 	  substr($claimPayToProviderAddress->getCity(),0,20),

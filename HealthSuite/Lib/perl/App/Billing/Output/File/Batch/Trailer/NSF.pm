@@ -44,13 +44,12 @@ sub formatData
 	my ($self, $container, $flags, $inpClaim, $nsfType) = @_;
 	my $spaces = ' ';
 	my $firstClaim = $inpClaim->[0];
-	my $claimPayToProvider = $firstClaim->{payToProvider};
+	my $claimPayToProvider = $firstClaim->{payToOrganization};
 	my $emcId;
 	
-	foreach my $eachClaim (@$inpClaim)
+	for my $eachClaim (0..$#$inpClaim)
 	{
-		$emcId = $eachClaim->getEMCId();
-		
+		$emcId = $inpClaim->[$eachClaim]->getEMCId();		
 		if ($emcId ne "")
 		{
 			last;
