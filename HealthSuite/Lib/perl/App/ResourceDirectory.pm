@@ -29,11 +29,8 @@ use App::Statements::Transaction;
 ##############################################################################
 
 use App::Page;
-use App::Page::Catalog;
 use App::Page::ChangeLog;
-use App::Page::Component;
 use App::Page::Construct;
-use App::Page::Dialog;
 use App::Page::Error;
 use App::Page::Home;
 use App::Page::Help;
@@ -41,6 +38,7 @@ use App::Page::Invoice;
 use App::Page::Org;
 use App::Page::Person;
 use App::Page::Schedule;
+use App::Page::SDE;
 use App::Page::Report;
 use App::Page::WorkList;
 
@@ -206,7 +204,6 @@ $SEARCH_CLASSES = {
 	'create' => 'App::Page::Construct',
 	'modify' => 'App::Page::Construct',
 	'delete' => 'App::Page::Construct',
-	'dialog' => 'App::Page::Dialog',
 	'error' => 'App::Page::Error',
 	'org' => 'App::Page::Org',
 	'person' => 'App::Page::Person',
@@ -215,8 +212,7 @@ $SEARCH_CLASSES = {
 	'search' => $SEARCH_CLASSES,
 	'lookup' => $SEARCH_CLASSES,
 	'changes' => 'App::Page::ChangeLog',
-	'catalog' => 'App::Page::Catalog',
-	'component' => 'App::Page::Component',
+	'sde' => 'App::Page::SDE',
 	'worklist' => 'App::Page::WorkList',
 );
 
