@@ -47,8 +47,8 @@ use constant CONTENT_HTML => qq{
 					<OPTION VALUE="/org/#session.org_id#/dlg-add-claim">Claim</OPTION>
 					<OPTION VALUE="/org/#session.org_id#/dlg-add-catalog">Fee Schedule</OPTION>
 					<OPTION VALUE="/org/#session.org_id#/dlg-add-catalog-item">Fee Schedule Item</OPTION>
-					<OPTION VALUE="/org/#session.org_id#/dlg-add-ins-newplan">Insurance Plan</OPTION>
-					<OPTION VALUE="/org/#session.org_id#/dlg-add-ins-workerscomp">Workers Comp Plan</OPTION>
+					<OPTION VALUE="/org/#session.org_id#/dlg-add-ins-product">Insurance Product</OPTION>
+					<OPTION VALUE="/org/#session.org_id#/dlg-add-ins-plan">Insurance Plan</OPTION>
 				</SELECT>
 			</TD>
 		</TR>
