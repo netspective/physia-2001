@@ -65,7 +65,7 @@ sub pingDB
 	my $dbh = shift;
 	
 	eval {
-		$dbh->ping();
+		$dbh->ping() or die $dbh->errstr();
 	};
 	my $error = $@;
 	$@ = undef;
