@@ -124,7 +124,14 @@ $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
 				     		,i.units,
 				     	 0)
 				     ) as batch_units
-			FROM 	invoice_charges i, person p, transaction_type tt, ref_cpt r
+			FROM 	invoice_charges i, person p, transaction_type tt,
+				(
+					select cpt code, name
+					from ref_cpt
+					union all
+					select epsdt code, name
+					from ref_epsdt
+				) r
 			WHERE (:1 IS NULL OR provider= :1 )
 			AND (i.invoice_date) BETWEEN to_date(:2,'MM/DD/YYYY')
 			AND to_date(:3,'MM/DD/YYYY')
@@ -133,10 +140,10 @@ $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
 			AND (:6 is NULL OR :6 >=i.code)
 			AND owner_org_id = :7
 			AND tt.id (+)= i.trans_type
-			AND r.cpt(+)=i.code
+			AND r.code(+)=i.code
 			AND p.person_id = i.provider
-			AND i.invoice_id in 
-				(select parent_id from invoice_item ii 
+			AND i.invoice_id in
+				(select parent_id from invoice_item ii
 				where (ii.service_begin_date >= to_date(:8,'$SQLSTMT_DEFAULTDATEFORMAT') OR :8 is NULL)
 				AND (ii.service_end_date <= to_date(:9,'$SQLSTMT_DEFAULTDATEFORMAT') OR :9 is NULL)
 				AND ii.item_type in (0,1,2)
@@ -180,6 +187,7 @@ $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
 			AND	iia.adjustment_id  (+) = ic.adjustment_id
 			AND	pm.id (+)= iia.pay_method
 			AND	(:2 IS NULL OR upper(pm.caption) = upper(:2))
+			AND (:7 IS NULL OR ic.payer_id = :7) 
 			GROUP BY p.simple_name,pm.caption,
 				ic.payer_type,	ic.payer_id,
 				ic.pay_type
@@ -215,15 +223,16 @@ $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
 			AND	p.person_id (+)= t.provider_id
 			AND	t.receiver_id =org.org_internal_id
 			AND	org.owner_org_id = :6
+			AND :7 IS NULL
 			GROUP BY p.simple_name,
 				nvl(data_text_b,data_text_a)
 			ORDER BY 1,4,3,5
 
 		},
 	},
-	
-	
-	#This query has a distinct because a patient could be on multiple billing cycles	
+
+
+	#This query has a distinct because a patient could be on multiple billing cycles
 	'selPatientInBillCycle'=>
 	{
 		sqlStmt=>
@@ -242,7 +251,7 @@ $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
 			GROUP BY oa.value_int
 		},
 	},
-	
+
 	'selBillCycleData'=>
 	{
 		sqlStmt=>
@@ -265,17 +274,17 @@ $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
 				AND	(aic.service_facility_id = :2 or :2 IS NULL)
 				AND	owner_org_id = :4
 				AND	s.statement_id = sii.parent_id
-			)	
+			)
 		},
-	},	
-		
+	},
+
 	'selFourBillCycleData'=>
 	{
 		sqlStmt=>
 		qq
 		{
-			SELECT * 
-			FROM 
+			SELECT *
+			FROM
 			(
 			SELECT	count (*) as stmt_count , sum(amount_due) as amount, to_char(TRANsMISSION_STAMP,'$SQLSTMT_DEFAULTDATEFORMAT') as cycle_date
 			FROM	Statement s
@@ -289,10 +298,10 @@ $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
 				AND	(aic.service_facility_id = :2 or :2 IS NULL)
 				AND	owner_org_id = :4
 				AND	s.statement_id = sii.parent_id
-			)	
+			)
 			GROUP BY to_char(TRANsMISSION_STAMP,'$SQLSTMT_DEFAULTDATEFORMAT')
 			ORDER BY to_char(TRANsMISSION_STAMP,'$SQLSTMT_DEFAULTDATEFORMAT')
-			) 
+			)
 			WHERE ROWNUM < 5
 		},
 	},
@@ -320,14 +329,14 @@ aic.batch_id,
                         AND        to_date(:2,'MM/DD/YYYY')
                         AND        (:3 IS NULL OR facility = :3)
                         AND        (:4 IS NULL OR provider = :4)
-                        AND        owner_org_id = :5	
+                        AND        owner_org_id = :5
                         AND        aic.batch_id between :6 AND :7
                         AND	   pm.id = aic.pay_type
                         GROUP BY aic.invoice_date , pm.caption,aic.payer_id,iia.pay_ref,aic.payer_type
 ,aic.batch_id
-                        ORDER BY aic.invoice_date , pm.caption,aic.payer_id,iia.pay_ref                        
+                        ORDER BY aic.invoice_date , pm.caption,aic.payer_id,iia.pay_ref
 		},
-		
+
 	},
 
 ######
@@ -351,15 +360,15 @@ aic.batch_id,
                         AND        to_date(:2,'MM/DD/YYYY')
                         AND        (:3 IS NULL OR facility = :3)
                         AND        (:4 IS NULL OR provider = :4)
-                        AND        owner_org_id = :5	
+                        AND        owner_org_id = :5
                         AND        aic.batch_id between :6 AND :7
                         AND	   pm.id = aic.pay_type
 			AND		pm.caption = 'Check'
                         GROUP BY aic.invoice_date , pm.caption,aic.payer_id,iia.pay_ref,aic.payer_type,aic.invoice_id
 ,aic.batch_id
-                        ORDER BY aic.invoice_date , aic.payer_id,iia.pay_ref                        
+                        ORDER BY aic.invoice_date , aic.payer_id,iia.pay_ref
 		},
-		
+
 	},
 
 
@@ -395,8 +404,9 @@ aic.batch_id,
 			AND	iia.adjustment_id  (+) = ic.adjustment_id
 			AND	pm.id (+)= iia.pay_method
 			AND	(:2 IS NULL OR upper(pm.caption) = upper(:2))
+			AND (:7 IS NULL OR ic.payer_id = :7) 
 			GROUP BY  pm.caption,
-				ic.payer_type,	
+				ic.payer_type,
 				ic.pay_type
 			UNION
 			SELECT	max('ALL') provider,
@@ -428,7 +438,8 @@ aic.batch_id,
 			AND 	to_date(:5,'MM/DD/YYYY')
 			AND	provider_id is not null
 			AND	p.person_id (+)= t.provider_id
-			GROUP BY 'ALL' 				
+			AND :7 IS NULL
+			GROUP BY 'ALL'
 			ORDER BY 1,3,4,5
 
 		},
@@ -440,7 +451,7 @@ aic.batch_id,
 		sqlStmt=>
 		qq
 		{SELECT invoice_id
-		FROM invoice 
+		FROM invoice
 		WHERE parent_invoice_id = :1
 		AND parent_invoice_id IS NOT NULL
 		}
@@ -540,23 +551,23 @@ aic.batch_id,
 				AND to_date(:2,'$SQLSTMT_DEFAULTDATEFORMAT')
 				AND (facility = :3 OR :3 is NULL)
 				AND (provider =:4 OR :4 is NULL)
-				AND invoice_charges.owner_org_id = :5	
+				AND invoice_charges.owner_org_id = :5
 				AND ( :6 IS NULL OR
 					(service_begin_date >= to_date(:6,'$SQLSTMT_DEFAULTDATEFORMAT')	 OR
-					 (   	service_begin_date is NULL 
-					 	AND real_invoice_date >= to_date(:6,'$SQLSTMT_DEFAULTDATEFORMAT') 
+					 (   	service_begin_date is NULL
+					 	AND real_invoice_date >= to_date(:6,'$SQLSTMT_DEFAULTDATEFORMAT')
 					 	AND (adj_type !=0 or adj_type is NULL)
 					 )
 					)
-				    )	
-				AND (:7 IS NULL OR 
+				    )
+				AND (:7 IS NULL OR
 					(service_end_date <= to_date(:7,'$SQLSTMT_DEFAULTDATEFORMAT') OR
 					 (
-					 	service_begin_date is NULL 
-					 	AND real_invoice_date <= to_date(:7,'$SQLSTMT_DEFAULTDATEFORMAT') 
+					 	service_begin_date is NULL
+					 	AND real_invoice_date <= to_date(:7,'$SQLSTMT_DEFAULTDATEFORMAT')
 					 	AND (adj_type !=0 or adj_type is NULL)
 					 )
-					) 
+					)
 				     )
 				GROUP BY to_char(invoice_date,'YYYY'),to_char(invoice_date,'MONTH'),to_char(invoice_date,'MM')
 				ORDER BY 13, to_char(invoice_date,'MM')
@@ -605,13 +616,13 @@ aic.batch_id,
 			AND	(:4 IS NULL OR service_facility_id = :4)
 			AND 	a.invoice_status <> 15
 			AND	entire_invoice_balance <> 0
-			AND a.invoice_id in 
+			AND a.invoice_id in
 				(select parent_id from invoice_item ii
 					where (ii.service_begin_date >= to_date(:5, 'MM/DD/YYYY') OR :5 is NULL)
 					AND (ii.service_end_date <= to_date(:6, 'MM/DD/YYYY') OR :6 is NULL)
 					AND ii.item_type in (0,1,2)
 					AND ii.data_text_b is NULL
-				)			
+				)
 			GROUP BY bill_to_id
 			--having sum(total_pending) <> 0
 		},
@@ -665,13 +676,13 @@ aic.batch_id,
 			AND	(:4 IS NULL OR service_facility_id = :4)
 			AND	a.invoice_status <> 15
 			AND	p.person_id (+) = a.person_id
-			AND a.invoice_id in 
+			AND a.invoice_id in
 				(select parent_id from invoice_item ii
 					where (ii.service_begin_date >= to_date(:5, 'MM/DD/YYYY') OR :5 is NULL)
 					AND (ii.service_end_date <= to_date(:6, 'MM/DD/YYYY') OR :6 is NULL)
 					AND ii.item_type in (0,1,2)
 					AND ii.data_text_b is NULL
-				)			
+				)
 			GROUP BY a.invoice_id,a.invoice_date,a.bill_to_id,ist.caption, a.person_id,
 			p.simple_name
 			having sum(balance)<> 0
@@ -685,7 +696,7 @@ aic.batch_id,
 				{ colIdx => 2, head => 'Svc Date', dataFmt => '#2#' },
 				{ colIdx => 3, head => 'Status', dataFmt => '#3#'},
 				{ colIdx => 4, head => 'Client', dataFmt => '#4#' },
-				{ colIdx => 9, head => 'Client Name'},				
+				{ colIdx => 9, head => 'Client Name'},
 				{ colIdx => 5, head => 'Payer', dataFmt => '#5#' },
 				{ colIdx => 6, head => 'Charges',summarize=>'sum', dataFmt => '#6#', dformat => 'currency' },
 				{ colIdx => 7, head => 'Adjust',summarize=>'sum', dataFmt => '#7#', dformat => 'currency' },
@@ -765,11 +776,11 @@ aic.batch_id,
 			WHERE	(a.person_id = :1 or :1 is NULL)
 			AND 	(invoice_item_id is NULL  or item_type in (3) )
 			AND EXISTS
-			(SELECT 1 
+			(SELECT 1
 			 FROM person_org_category poc
 			 WHERE poc.person_id = a.person_id
 			 AND poc.org_internal_id  = :2
-			 )			
+			 )
 			AND	entire_invoice_balance <> 0
 			AND 	p.person_id = a.person_id
 			AND	a.invoice_status <> 15
@@ -826,20 +837,20 @@ aic.batch_id,
 			AND 	p.person_id = a.person_id
 			AND	a.invoice_status <> 15
 			AND	EXISTS
-			(SELECT 1 
+			(SELECT 1
 			 FROM person_org_category poc
 			 WHERE poc.person_id = a.person_id
 			 AND poc.org_internal_id  = :2
 			 )
 			AND 	(:3 IS NULL OR care_provider_id = :3)
 			AND	(:4 IS NULL OR service_facility_id = :4)
-			AND a.invoice_id in 
+			AND a.invoice_id in
 				(select parent_id from invoice_item ii
 					where (ii.service_begin_date >= to_date(:5, 'MM/DD/YYYY') OR :5 is NULL)
 					AND (ii.service_end_date <= to_date(:6, 'MM/DD/YYYY') OR :6 is NULL)
 					AND ii.item_type in (0,1,2)
 					AND ii.data_text_b is NULL
-				)			
+				)
 			GROUP BY a.person_id, p.simple_name
 			having sum(total_pending)> 0
 		},
@@ -880,7 +891,7 @@ aic.batch_id,
 				sum(nvl(a.total_adjust,0)),
 				sum(nvl(a.balance,0))
 			FROM	agedpayments a, person p,
-				invoice_status ist 
+				invoice_status ist
 			WHERE	(a.person_id = :1 or :1 is NULL)
 			AND 	(invoice_item_id is NULL  or item_type in (3) )
 			AND	(bill_party_type in (0,1) or (bill_party_type=3 AND item_type=3 AND total_pending <>0 ))
@@ -888,7 +899,7 @@ aic.batch_id,
 			AND 	p.person_id = a.person_id
 			AND 	ist.id = a.invoice_status
 			AND	EXISTS
-			(SELECT 1 
+			(SELECT 1
 			 FROM person_org_category poc
 			 WHERE poc.person_id = a.person_id
 			 AND poc.org_internal_id  = :2
@@ -896,13 +907,13 @@ aic.batch_id,
 			AND 	(:3 IS NULL OR care_provider_id = :3)
 			AND	(:4 IS NULL OR service_facility_id = :4)
 			AND	a.invoice_status <> 15
-			AND a.invoice_id in 
+			AND a.invoice_id in
 				(select parent_id from invoice_item ii
 					where (ii.service_begin_date >= to_date(:5, 'MM/DD/YYYY') OR :5 is NULL)
 					AND (ii.service_end_date <= to_date(:6, 'MM/DD/YYYY') OR :6 is NULL)
 					AND ii.item_type in (0,1,2)
 					AND ii.data_text_b is NULL
-				)			
+				)
 			GROUP BY a.invoice_id,a.invoice_date,a.bill_to_id,ist.caption
 			having sum(balance)<> 0
 		},
@@ -962,18 +973,18 @@ aic.batch_id,
 				sum(nvl(a.total_adjust,0)),
 				sum(nvl(a.balance,0))
 			FROM	agedpayments a, person p,
-				invoice_status ist 
+				invoice_status ist
 			WHERE	(a.person_id = :1 or :1 is NULL)
 			AND 	(invoice_item_id is NULL  or item_type in (3) )
 			AND 	a.balance <> 0
 			AND 	p.person_id = a.person_id
 			AND 	ist.id = a.invoice_status
 			AND EXISTS
-			(SELECT 1 
+			(SELECT 1
 			 FROM person_org_category poc
 			 WHERE poc.person_id = a.person_id
 			 AND poc.org_internal_id  = :2
-			 )		
+			 )
 			AND 	(:3 IS NULL OR care_provider_id = :3)
 			AND	(:4 IS NULL OR service_facility_id = :4)
 			AND	a.invoice_status <> 15
@@ -1134,7 +1145,7 @@ aic.batch_id,
                 AND (batch_id <= :6 OR :6 is NULL)
 		AND o.org_internal_id = rc.facility
 		AND o.owner_org_id = :7
-        GROUP by care_provider_id 
+        GROUP by care_provider_id
         },
 
 	'sel_daily_audit_detail' => qq{
@@ -1161,7 +1172,7 @@ aic.batch_id,
 		pm.caption as pay_type ,
 		p.simple_name simple_name
 	FROM	invoice_charges,
-		--org o, 
+		--org o,
 		person p, payment_method pm
 	WHERE 	invoice_date = to_date(:1,'$SQLSTMT_DEFAULTDATEFORMAT')
 		AND (facility = :2 or :2 IS NULL )
@@ -1175,7 +1186,7 @@ aic.batch_id,
 		)
 		--AND o.org_internal_id = invoice_charges.facility
 		--AND o.owner_org_id = :6
-		AND invoice_charges.owner_org_id = :6	
+		AND invoice_charges.owner_org_id = :6
 		AND client_id = p.person_id
 	order by invoice_id
 	},
@@ -1200,7 +1211,7 @@ aic.batch_id,
 		AND (batch_id <= :6 OR :6 is NULL)
 		--AND o.org_internal_id = invoice_charges.facility
 		--AND i.owner_org_id = :7
-		AND invoice_charges.owner_org_id = :7			
+		AND invoice_charges.owner_org_id = :7
 	group by invoice_date
 },
 
@@ -1226,7 +1237,7 @@ aic.batch_id,
 		AND (batch_id <= :6 OR :6 is NULL)
 		--AND o.org_internal_id = invoice_charges.facility
 		--AND o.owner_org_id = :7
-		AND invoice_charges.owner_org_id = :7	
+		AND invoice_charges.owner_org_id = :7
 
 	group by to_char(invoice_date,'MM/YYYY')
 	order by invoice_date asc},
@@ -1246,7 +1257,7 @@ aic.batch_id,
 				)
 	AND  		e.event_id = ea.parent_id
 	AND e.start_time between to_date(:1|| ' 12:00 AM', '$SQLSTMT_DEFAULTSTAMPFORMAT') + :5
-	AND to_date(:2 || ' 11:59 PM', '$SQLSTMT_DEFAULTSTAMPFORMAT') + :5	
+	AND to_date(:2 || ' 11:59 PM', '$SQLSTMT_DEFAULTSTAMPFORMAT') + :5
 	--AND      e.start_time between to_date(:1,'$SQLSTMT_DEFAULTDATEFORMAT')
 	--AND      to_date(:2,'$SQLSTMT_DEFAULTDATEFORMAT')
 	AND      at.id = ea.value_int
@@ -1274,7 +1285,7 @@ aic.batch_id,
 		--AND      e.start_time between to_date(:1,'$SQLSTMT_DEFAULTDATEFORMAT')
 		--AND      to_date(:2,'$SQLSTMT_DEFAULTDATEFORMAT')
 		AND e.start_time between to_date(:1|| ' 12:00 AM', '$SQLSTMT_DEFAULTSTAMPFORMAT') + :5
-		AND to_date(:2 || ' 11:59 PM', '$SQLSTMT_DEFAULTSTAMPFORMAT') + :5			
+		AND to_date(:2 || ' 11:59 PM', '$SQLSTMT_DEFAULTSTAMPFORMAT') + :5
 		AND      at.id = ea.value_int
 		AND      e.event_status in (1,2)
 		AND      at.caption = 'Established Patient'
@@ -1282,6 +1293,30 @@ aic.batch_id,
 		ORDER BY start_time asc
 	},
 
+	'sel_monthly_audit_newpatient_count_new' => qq{
+		SELECT count( distinct client_id) as count, to_char(invoice_date, 'MM/YYYY') invoice_prd
+		FROM invoice_charges 
+		WHERE   invoice_date between to_date(:1,'$SQLSTMT_DEFAULTDATEFORMAT')
+			AND to_date(:2,'$SQLSTMT_DEFAULTDATEFORMAT')
+			AND (facility = :3 OR :3 is NULL)
+			AND (care_provider_id =:4 OR :4 is NULL)
+			AND owner_org_id = :5
+			AND code in ('99201','99202','99203','99204','99205','99381','99382','99383','99384','99385','99386','99387')
+			GROUP BY to_char(invoice_date, 'MM/YYYY')
+	},
+
+	'sel_monthly_audit_estpatient_count_new' => qq{
+		SELECT count( distinct client_id) as count, to_char(invoice_date, 'MM/YYYY') invoice_prd
+		FROM invoice_charges 
+		WHERE   invoice_date between to_date(:1,'$SQLSTMT_DEFAULTDATEFORMAT')
+			AND to_date(:2,'$SQLSTMT_DEFAULTDATEFORMAT')
+			AND (facility = :3 OR :3 is NULL)
+			AND (care_provider_id =:4 OR :4 is NULL)
+			AND owner_org_id = :5
+			AND code in ('99211','99212','99213','99214','99215','99391','99392','99393','99394','99395','99396','99397')
+			GROUP BY to_char(invoice_date, 'MM/YYYY')
+	},
+	
 	'sel_monthly_audit_detail' => qq{
 	SELECT	invoice_charges.invoice_id ,
 		to_char(invoice_date,'MM/DD/YY') as invoice_batch_date,
@@ -1306,7 +1341,7 @@ aic.batch_id,
 		pm.caption as pay_type ,
 		p.simple_name
 	FROM 	invoice_charges,
-	--org o, 
+	--org o,
 		person p,payment_method pm
 	WHERE 	to_char(invoice_date,'MM/YYYY') = :1
 	AND	invoice_date between to_date(:7,'$SQLSTMT_DEFAULTDATEFORMAT')
@@ -1322,7 +1357,7 @@ aic.batch_id,
 		)
 	--AND 	o.org_internal_id = invoice_charges.facility
 	--AND 	o.owner_org_id = :6
-	AND invoice_charges.owner_org_id = :6	
+	AND invoice_charges.owner_org_id = :6
 	AND 	client_id = p.person_id
 	ORDER BY  invoice_date asc
 	},
