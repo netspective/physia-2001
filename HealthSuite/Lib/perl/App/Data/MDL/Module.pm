@@ -8,6 +8,7 @@ use Dumpvalue;
 use DBI::StatementManager;
 use App::Statements::Insurance;
 use App::Statements::Org;
+use App::Statements::Person;
 use Devel::ChangeLog;
 use vars qw(@ISA @CHANGELOG);
 
@@ -91,6 +92,11 @@ sub new
 sub connect
 {
 	my ($self, $flags, $connectStr) = @_;
+}
+
+sub param
+{
+	return undef;
 }
 
 sub schemaAction
@@ -304,13 +310,12 @@ sub importAssociations
 				value_text => $item->{_text});
 		}
 	}
+
 	if(my $list = $assocs->{'emergency-contact'})
 	{
 		$list = [$list] if ref $list eq 'HASH';
 		foreach my $item (@$list)
 		{
-			#my $dv = new Dumpvalue;
-			#$dv->dumpValue($item);
 			$self->schemaAction($flags, $attrTable, 'add',
 				parent_id => $parentId,
 				item_name => "$item->{relationship}",
@@ -320,22 +325,23 @@ sub importAssociations
 				value_textB =>$item->{phone}->{_text});
 		}
 	}
+
 	if(my $list = $assocs->{provider})
 	{
 		$list = [$list] if ref $list eq 'HASH';
 		foreach my $item (@$list)
 		{
-			#my $dv = new Dumpvalue;
-			#$dv->dumpValue($item);
+			my $medSpecCode = $item->{specialty};
+			my $medSpecCaption = $STMTMGR_PERSON->getSingleValue($self, STMTMGRFLAG_CACHE, 'selMedicalSpecialtyCaption', $medSpecCode);
 			$self->schemaAction($flags, $attrTable, 'add',
 				parent_id => $parentId,
-				item_name => "$item->{'provider-relation'}",
+				item_name => $medSpecCaption,
 				value_type => App::Universal::ATTRTYPE_PROVIDER,
 				value_text => $item->{id},
-				value_int => $item->{'exist-person'},
-				value_textB =>$item->{phone}->{_text});
+				value_textB => $medSpecCode);
 		}
 	}
+
 	if(my $list = $assocs->{family})
 		{
 			$list = [$list] if ref $list eq 'HASH';
