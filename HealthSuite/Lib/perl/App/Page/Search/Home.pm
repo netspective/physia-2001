@@ -129,7 +129,8 @@ sub prepare
 						<b>Add</b> a new
 						<a href="/org/#session.org_id#/dlg-add-org-provider">Provider</a>
 					</font>
-				</td></tr></table>
+				</td></tr>
+				</table>
 				<p>
 				<table bgcolor=white border=0 cellspacing=1 cellpadding=2><tr valign=top bgcolor=white><td valign="middle">
 					$IMAGETAGS{'icons/accounting'}
@@ -186,6 +187,7 @@ sub prepare
 					<font face="arial,helvetica" size=2>
 						<b>Add</b> a new <a href="/org/#session.org_id#/dlg-add-patient">Patient</a>,
 						<a href="/org/#session.org_id#/dlg-add-physician">Physician / Provider</a>,
+						<a href="/org/#session.org_id#/dlg-add-referring-doctor">Referring Doctor</a>,
 						<a href="/org/#session.org_id#/dlg-add-nurse">Nurse</a>, or
 						<a href="/org/#session.org_id#/dlg-add-staff">Staff Member</a>
 					</font>
@@ -337,7 +339,7 @@ sub prepare
 					</font>
 				</td></tr></table>
 			</td></tr></table>
-				
+
 			</td></tr></table>
 			</center>
 		});
