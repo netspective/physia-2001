@@ -1,0 +1,76 @@
+<?xml version="1.0"?>
+
+<!-- QDL Query Definition Language -->
+
+<component>
+	<query-defn id="Catalog" abbrev="Cat">
+
+		<!-- Fields -->
+
+		<!-- CATALOG FIELDS -->
+		<field id="catalog_id" caption="Fee Schedule ID" join="catalog" column="catalog_id"/>
+		<field id="catalog_name" caption="Fee Schedule Name" join="catalog" column="caption"/>
+		<field id="catalog_description" caption="Fee Schedule Description" join="catalog" column="description"/>
+		<field id="org_internal_id" join="catalog" column="org_internal_id"/>		
+		<field id="catalog_type" join="catalog" column="catalog_type"/>		
+		<field id="catalog_ffs_cap" join="catalog_attribute" column="value_int"/>
+		
+		<!-- MISC PROCEDURE CODE FIELDS -->
+		<field id="misc_code" join="misc_procedure" caption="Misc Procedure Code" column="code"/>
+		<field id="misc_name" caption="Misc Procedure Name" join="misc_procedure" column="name"/>
+		<field id="misc_description" caption="Misc Procedure Description" join="misc_procedure" column="description"/>
+		<field id="misc_description" caption="Misc Procedure Code" join="misc_procedure" column="code"/>		
+		
+		<!-- FEE SCHEDULE ITEM FIELDS -->
+		<field id="fee_item_name" caption="Fee Schedule Item ID" join="fee_schedule_item" column="name"/>
+		<field id="fee_item_description" caption="Fee Schedule Item Description" join="fee_schedule_item" column="description"/>
+		<field id="fee_code" join="fee_schedule_item" caption="Fee Schedule Item Code " column="code"/>		
+		<field id="fee_modifier" join="fee_schedule_item" caption="Fee Schedule Item Modifier" column="modifier"/>				
+		<field id="fee_cost" join="fee_schedule_item" column="unit_cost"/>
+		<field id="fee_cap_ffs" join="fee_schedule_item" column="flags"/>	
+		
+		
+
+		<!-- SERVICE TYPE FIELDS-->
+		
+		<!-- joins -->
+		<join id="catalog" table="offering_catalog" autoinclude="1"/>
+		<join id="misc_procedure" table="offering_catalog_entry" condition="catalog.catalog_type =#constant.CATALOGTYPE_MISCPROCEDURE# AND catalog.internal_catalog_id = misc_procedure.catalog_id 
+										    AND misc_procedure.entry_type=#constant.CATALOGENTRYTYPE_MISC_PROCEDURE#"/>
+		<join id="fee_schedule_item" table="offering_catalog_entry" condition="catalog.catalog_type=#constant.CATALOGTYPE_FEESCHEDULE# AND catalog.internal_catalog_id = fee_schedule_item.catalog_id "/>		
+		<join id="catalog_attribute" table="OFCATALOG_ATTRIBUTE" condition="catalog_attribute.parent_id = catalog.internal_catalog_id"/>
+				
+		<!-- Styles -->
+		<view id="all">
+			<column id="catalog_id"/>
+			<column id="catalog_name"/>
+			<column id="catalog_description"/>
+			<column id="DECODE({catalog_ffs_cap},1,'(Capitated)','(FFS)')"/>
+			<and-conditions>
+				<condition field="org_internal_id" comparison="is" criteria="#session.org_internal_id#"/>
+				<condition field="catalog_type" comparison="is" criteria="#constant.CATALOGTYPE_FEESCHEDULE#"/>				
+			</and-conditions>			
+		</view>		
+		
+
+		<!-- Styles -->
+		<view id="misc">
+			<column id="misc_code"/>		
+			<column id="misc_name"/>
+			<column id="misc_description"/>
+			<condition field="org_internal_id" comparison="is" criteria="#session.org_internal_id#"/>
+		</view>
+
+		<!-- Styles -->
+		<view id="item" >
+			<column id="fee_code" />
+			<column id="fee_modifier" />			
+			<column id="fee_item_name"/>
+			<column id="fee_cost" />		
+			<column id="DECODE({fee_cap_ffs},1,'(FFS)','(Capitated)')"/>
+			<condition field="org_internal_id" comparison="is" criteria="#session.org_internal_id#"/>
+		</view>
+
+	</query-defn>
+</component>
+
