@@ -37,7 +37,8 @@
 	</release-info>
 
 	<deliverables>
-		<deliverable id="">
+		<deliverable id="1983">
+			Removed specified claim statuses from Claim Worklist Setup.
 		</deliverable>
 		
 	</deliverables>
