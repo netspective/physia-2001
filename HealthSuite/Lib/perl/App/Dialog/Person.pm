@@ -413,7 +413,6 @@ sub handleRegistry
 	}	
 
 
-
 }
 
 sub handleAttrs
