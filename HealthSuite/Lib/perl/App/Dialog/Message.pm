@@ -3,7 +3,7 @@ package App::Dialog::Message;
 ##############################################################################
 
 use strict;
-use SDE::CVS ('$Id: Message.pm,v 1.8 2001-01-07 03:30:17 thai_nguyen Exp $', '$Name:  $');
+use SDE::CVS ('$Id: Message.pm,v 1.9 2001-01-08 15:37:34 thai_nguyen Exp $', '$Name:  $');
 use CGI::Validator::Field;
 use CGI::Dialog;
 use base qw(CGI::Dialog);
@@ -489,7 +489,7 @@ sub sendMessage
 		item_name => 'Return Phones',
 		value_type => App::Universal::ATTRTYPE_PHONE,
 		value_text => join(',', @{$messageData{'return_phones'}}),
-	);
+	) if defined $messageData{'return_phones'};
 }
 
 sub updateRecipientFlags
@@ -538,7 +538,7 @@ package App::Dialog::Message::Notes;
 ##############################################################################
 
 use strict;
-use SDE::CVS ('$Id: Message.pm,v 1.8 2001-01-07 03:30:17 thai_nguyen Exp $', '$Name:  $');
+use SDE::CVS ('$Id: Message.pm,v 1.9 2001-01-08 15:37:34 thai_nguyen Exp $', '$Name:  $');
 use CGI::Dialog;
 use base qw(CGI::Dialog::ContentItem);
 
