@@ -348,16 +348,17 @@ sub executePostPayment
 		next if $payAmt eq '';
 
 		my $invoiceId = $page->param("_f_invoice_$line\_invoice_id");
+		my $comments = $page->param("_f_invoice_$line\_comments");
 
 		my $itemId = $page->schemaAction(
 			'Invoice_Item', 'add',
 			parent_id => $invoiceId,
 			item_type => defined $itemType ? $itemType : undef,
+			comments => $comments || undef,
 			_debug => 0
 		);
 
 		# Create adjustment for the item
-		my $comments = $page->param("_f_invoice_$line\_comments");
 		my $adjItemId = $page->schemaAction(
 			'Invoice_Item_Adjust', 'add',
 			adjustment_type => defined $adjType ? $adjType : undef,
