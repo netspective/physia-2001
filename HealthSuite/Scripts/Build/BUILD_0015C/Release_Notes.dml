@@ -45,7 +45,12 @@
 		<deliverable id="1152">
 			PDF printing on secondary claims (it was already there;confirmed its existence)
 		</deliverable>
-
+		<deliverable id="1246">
+			Added activity logs to showup the messages in 'My Recent Activity (Today)' component
+		</deliverable>
+		<deliverable id="1244">
+			Updated the code to add the the same 'Ins Product' and 'Ins Plan' under a different main org
+		</deliverable>		
 	</deliverables>
 </release-notes>
 
