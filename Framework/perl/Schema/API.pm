@@ -9,7 +9,7 @@ package Schema::API;
 use strict;
 use DBI;
 use Schema;
-use enum qw(BITMASK:SCHEMAAPIFLAG_ LOGSQL EXECSQL UNITSQL);
+use enum qw(BITMASK:SCHEMAAPIFLAG_ LOGSQL EXECSQL UNITSQL EMBEDVALUES);
 use constant DEFAULT_SCHEMAAPIFLAGS => SCHEMAAPIFLAG_EXECSQL;
 
 use vars qw(@ISA @EXPORT $cachedDbHdls $cachedSchemaFiles $cachedSchemaNames);
@@ -20,6 +20,7 @@ use vars qw(@ISA @EXPORT $cachedDbHdls $cachedSchemaFiles $cachedSchemaNames);
 	SCHEMAAPIFLAG_EXECSQL
 	SCHEMAAPIFLAG_LOGSQL
 	SCHEMAAPIFLAG_UNITSQL
+	SCHEMAAPIFLAG_EMBEDVALUES
 );
 
 $cachedDbHdls = {};        # useful in Velocigen/mod_perl environment
@@ -219,13 +220,14 @@ sub Table::insertRec
 		}
 	}
 
-	my $flags = $page->{schemaFlags};
-	my ($sql,$colValue, $errors) = $self->createInsertSql($colDataRef);
+	my $flags = $page->{schemaFlags};	
+	my $options = $flags & SCHEMAAPIFLAG_EMBEDVALUES ? { ignoreUndefs => 1, ignoreColsNotFound => 0 } : { ignoreUndefs => 1, ignoreColsNotFound => 0 , placeHolder =>1} ;
+	my ($sql,$colValue, $errors) = $self->createInsertSql($colDataRef,$options);
 	$sql = $page->replaceVars($sql) if $page && $page->can('replaceVars');	
 	my $sqlCol = $sql || colDataAsStr("[DATA] Update ($self->{name}): ", $colDataRef);
 	$sqlCol .= "  " . join ',',@$colValue;
 	push(@{$page->{sqlLog}}, [$sqlCol, $errors]) if $flags & SCHEMAAPIFLAG_LOGSQL;			
-	#$page->addDebugStmt($sql) if $colDataRef->{_debug} && $page;	
+	$page->addDebugStmt($sql) if $colDataRef->{_debug} && $page;	
 	$page->storeSql($sql,$colValue,$errors) if $page && $page->can('unitWork') &&$page->unitWork();		
 	return 1 unless $flags & SCHEMAAPIFLAG_EXECSQL;
 
@@ -269,13 +271,13 @@ sub Table::updateRec
 	die "no database connected" if ! $schema->{dbh};
 
 	my $flags = $page->{schemaFlags};
-	my ($sql, $colValue,$errors) = $self->createUpdateSql($colDataRef);
+	my $options = $flags & SCHEMAAPIFLAG_EMBEDVALUES ? { ignoreUndefs => 0, ignoreColsNotFound => 0 } : { ignoreUndefs => 0, ignoreColsNotFound => 0 , placeHolder =>1 }  ;
+	my ($sql, $colValue,$errors) = $self->createUpdateSql($colDataRef,$options);
 	$sql = $page->replaceVars($sql) if $page && $page->can('replaceVars');
-	my $sqlCol = $sql || colDataAsStr("[DATA] Update ($self->{name}): ", $colDataRef);
+	my $sqlCol = $sql || colDataAsStr("[DATA] Update ($self->{name}): ", $colDataRef);	
 	$sqlCol .= "  " . join ',',@$colValue;
 	push(@{$page->{sqlLog}}, [$sqlCol, $errors]) if $flags & SCHEMAAPIFLAG_LOGSQL;			
-	#push(@{$page->{sqlLog}}, [$sql || colDataAsStr("[DATA] Update ($self->{name}): ", $colDataRef), $errors]) if $flags & SCHEMAAPIFLAG_LOGSQL;	
-	#$page->addDebugStmt($sql) if $colDataRef->{_debug} && $page;
+	$page->addDebugStmt($sql) if $colDataRef->{_debug} && $page;
 	$page->storeSql($sql,$colValue,$errors) if $page && $page->can('unitWork') &&$page->unitWork();		
 	return 1 unless $flags & SCHEMAAPIFLAG_EXECSQL;
 
@@ -316,12 +318,13 @@ sub Table::deleteRec
 	die "no database connected" if ! $schema->{dbh};
 
 	my $flags = $page->{schemaFlags};
-	my ($sql, $colValue,$errors) = $self->createDeleteSql($colDataRef);
+	my $options = $flags & SCHEMAAPIFLAG_EMBEDVALUES ? { ignoreUndefs => 1, ignoreColsNotFound => 0  } : { ignoreUndefs => 1, ignoreColsNotFound => 0 , placeHolder =>1} ;
+	my ($sql, $colValue,$errors) = $self->createDeleteSql($colDataRef,$options);
 	$sql = $page->replaceVars($sql) if $page && $page->can('replaceVars');
 	my $sqlCol = $sql || colDataAsStr("[DATA] Update ($self->{name}): ", $colDataRef);
 	$sqlCol .= "  " . join ',',@$colValue;
 	push(@{$page->{sqlLog}}, [$sqlCol, $errors]) if $flags & SCHEMAAPIFLAG_LOGSQL;			
-	#$page->addDebugStmt($sql) if $colDataRef->{_debug} && $page;
+	$page->addDebugStmt($sql) if $colDataRef->{_debug} && $page;
 	$page->storeSql($sql,$colValue,$errors) if $page && $page->can('unitWork') &&$page->unitWork();	
 	return 1 unless $flags & SCHEMAAPIFLAG_EXECSQL;
 	if(scalar(@{$errors}) == 0)
