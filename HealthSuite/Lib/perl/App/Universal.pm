@@ -25,6 +25,7 @@ use constant DOCSPEC_FAX => 5000;
 use constant MSGSUBTYPE_MESSAGE => 0;
 use constant MSGSUBTYPE_PHONE_MESSAGE => 1;
 use constant MSGSUBTYPE_PRESCRIPTION => 2;
+use constant MSGSUBTYPE_LABORDER => 3;
 
 #DOCUMENT SOURCE TYPES
 use constant DOCSRCTYPE_PHYSIA => 0;
