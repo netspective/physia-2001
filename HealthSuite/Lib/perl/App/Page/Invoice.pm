@@ -814,19 +814,18 @@ sub getIntelliCodeResultsHtml
 {
 	my ($self, $claim) = @_;
 
+	my $invoiceId = $self->param('invoice_id');
 	my $patient = $claim->getCareReceiver();
 	my @diags = ();
 
 	foreach (@{$claim->{diagnosis}})
 	{
 		push(@diags, $_->{diagnosis});
-		#push(@diags, $_->{diagnosis}) if $_->{diagnosis};
 	}
 
 	my @procs = ();
 	foreach (@{$claim->{procedures}})
 	{
-		#next unless $_->{cpt}; # because we can have "phantom" items for payments
 		push(@procs, [$_->{cpt}, $_->{modifier} || undef, split(/,/, $_->{diagnosis})]);
 	}
 
@@ -837,6 +836,8 @@ sub getIntelliCodeResultsHtml
 			dateOfBirth => $patient->getDateOfBirth(),
 			diags => \@diags,
 			procs => \@procs,
+			invoiceId => $invoiceId,
+			personId => $patient->getId(),
 		);
 
 	return @errors ? ('<UL><LI>' . join('<LI>', @errors) . '</UL>') : 'No discrepancies found';
@@ -1088,9 +1089,10 @@ sub prepare_view_summary
 		push(@allDiags, $_->getDiagnosis());
 	}
 
-	my $selfPay = App::Universal::CLAIMTYPE_SELFPAY;
-	my $submitted = App::Universal::INVOICESTATUS_SUBMITTED;
+	my $selfPay = App::Universal::CLAIMTYPE_SELFPAY;	
 	my $onHold = App::Universal::INVOICESTATUS_ONHOLD;
+	my $submitted = App::Universal::INVOICESTATUS_SUBMITTED;
+	my $transferred = App::Universal::INVOICESTATUS_TRANSFERRED;
 	my $void = App::Universal::INVOICESTATUS_VOID;
 	my $hcfaInvoiceType = App::Universal::INVOICETYPE_HCFACLAIM;
 	my $genericInvoiceType = App::Universal::INVOICETYPE_SERVICE;
@@ -1126,7 +1128,7 @@ sub prepare_view_summary
 							</FONT>
 						</TD>" : '' ]}
 
-						@{[ $invStatus != $onHold && $invStatus < $submitted ?
+						@{[ $invStatus != $onHold && $invStatus < $transferred ?
 						"<TD>
 							<FONT FACE='Arial,Helvetica' SIZE=2>
 							<a href='/invoice/$invoiceId/dialog/hold'>Place Claim On Hold</a>
@@ -1330,15 +1332,25 @@ sub prepare_view_submit
 {
 	my $self = shift;
 	my $invoiceId = $self->param('invoice_id');
+	my $claim = $self->property('activeClaim');
+	my $patient = $claim->getCareReceiver();
+	my $patientId = $patient->getId();
 
-	my $handler = \&{'App::Dialog::Procedure::execAction_submit'};
-	eval
+	if(my $errorCount = App::IntelliCode::getNSFerrorCount($self, $invoiceId, $patientId))
 	{
-		&{$handler}($self, 'add');
-	};
-	$self->addError($@) if $@;
+		$self->addContent(q{<B style='color:red'>Cannot submit claim. Please check IntelliCode errors.</B>});
+	}
+	else
+	{
+		my $handler = \&{'App::Dialog::Procedure::execAction_submit'};
+		eval
+		{
+			&{$handler}($self, 'add');
+		};
+		$self->addError($@) if $@;
 
-	$self->redirect("/invoice/$invoiceId/summary");
+		$self->redirect("/invoice/$invoiceId/summary");
+	}
 }
 
 sub prepare_view_history
@@ -1610,6 +1622,7 @@ sub prepare_page_content_header
 	my $onHold = App::Universal::INVOICESTATUS_ONHOLD;
 	my $pending = App::Universal::INVOICESTATUS_PENDING;
 	my $submitted = App::Universal::INVOICESTATUS_SUBMITTED;
+	my $transferred = App::Universal::INVOICESTATUS_TRANSFERRED;
 	my $void = App::Universal::INVOICESTATUS_VOID;
 	my $selfPay = App::Universal::CLAIMTYPE_SELFPAY;
 	my $hcfaInvoiceType = App::Universal::INVOICETYPE_HCFACLAIM;
@@ -1680,7 +1693,7 @@ sub prepare_page_content_header
 						@{[ $invType == $genericInvoiceType && $invStatus != $void ? "<option value='/invoice/$invoiceId/dlg-update-invoice'>Edit Invoice</option>" : '' ]}
 						@{[ $invStatus < $submitted && $invStatus != $void && $totalItems > 0 && $invType == $hcfaInvoiceType ? "<option value='/invoice/$invoiceId/submit'>Submit Claim for Transfer</option>" : '' ]}
 						<!-- @{[ $invStatus != $pending && $invStatus < $submitted && $invStatus != $void && $totalItems > 0 && $invType == $hcfaInvoiceType ? "<option value='/invoice/$invoiceId/review'>Submit Claim for Review</option>" : '' ]} -->
-						@{[ $invStatus != $onHold && $invStatus < $submitted && $invStatus != $void ? "<option value='/invoice/$invoiceId/dialog/hold'>Place Claim On Hold</option>" : '' ]}
+						@{[ $invStatus != $onHold && $invStatus < $transferred && $invStatus != $void ? "<option value='/invoice/$invoiceId/dialog/hold'>Place Claim On Hold</option>" : '' ]}
 						@{[ $invStatus < $submitted && $invStatus != $void && $invType == $hcfaInvoiceType ? "<option value='/invoice/$invoiceId/dialog/claim/remove'>Void Claim</option>" : '' ]}
 						@{[ $invStatus < $submitted && $invStatus != $void && $invType == $genericInvoiceType ? "<option value='/invoice/$invoiceId/dlg-remove-invoice'>Void Invoice</option>" : '' ]}
 						@{[ $invStatus >= $submitted && $invStatus != $void && $invType == $hcfaInvoiceType ? "<option value='/invoice/$invoiceId/dialog/problem'>Report Problems with this Claim</option>" : '' ]}
