@@ -20,7 +20,7 @@ use Data::Publish;
 use Text::CSV;
 
 use base qw(CGI::Dialog);
-use SDE::CVS ('$Id: Query.pm,v 1.8 2000-10-16 15:10:45 robert_jenks Exp $','$Name:  $');
+use SDE::CVS ('$Id: Query.pm,v 1.9 2000-11-06 15:28:22 thai_nguyen Exp $','$Name:  $');
 use vars qw(%RESOURCE_MAP);
 
 
@@ -647,7 +647,7 @@ sub execute
 						else
 						{
 							$options->{placeholder} = defined $condOpData->{placeholder} ? $condOpData->{placeholder} : '?';
-							$options->{placeholder} =~ s|\?|TO_DATE(\?, 'MM/DD/YYYY HH:MI PM')|g;
+							$options->{placeholder} =~ s|\?|TO_DATE(\?, 'MM/DD/YYYY HH:MI PM') + #session.GMT_DAYOFFSET#|g;
 						}
 						last;
 					};
@@ -659,7 +659,7 @@ sub execute
 						else
 						{
 							$options->{placeholder} = defined $condOpData->{placeholder} ? $condOpData->{placeholder} : '?';
-							$options->{placeholder} =~ s|\?|TO_DATE(\?, 'HH:MI PM')|g;
+							$options->{placeholder} =~ s|\?|TO_DATE(\?, 'HH:MI PM') + #session.GMT_DAYOFFSET#|g;
 						}
 						last;
 					};
