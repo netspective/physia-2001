@@ -59,6 +59,7 @@ $STMTRPTDEFN_DEFAULT =
 
 		{ head => 'Home Phone',
 			dataFmt => '#5#',
+			options => PUBLCOLFLAG_DONTWRAP,
 		},
 
 		{ head => 'Chart',
@@ -132,9 +133,9 @@ $APPOINTMENT_TABLES
 			AND aat.id = ea.value_int
 			AND Event.owner_id = ?
 			AND at.appt_type_id (+) = Event.appt_type
-			AND pa.parent_id = patient.person_id (+)
-			AND pa.value_type = 10
-			AND pa.item_name = 'Home'
+			AND pa.parent_id (+) = patient.person_id
+			AND pa.value_type (+) = 10
+			AND pa.item_name (+) = 'Home'
 		%orderBy%
 	)
 	WHERE rownum <= $LIMIT
