@@ -336,25 +336,39 @@ sub prepare_view_apptsheet
 	
 	my ($apptSheetStartTime, $apptSheetEndTime) = $self->getApptSheetTimes();
 	
+	my $flags = APPTSHEET_ALL;
+	my $addColumn_legend;
+	
+	if ($self->flagIsSet(App::Page::PAGEFLAG_ISPOPUP))
+	{
+		$flags &= ~APPTSHEET_TEMPLATE;
+		$flags &= ~APPTSHEET_CUSTOMIZE;
+	}
+	else
+	{
+		$addColumn_legend = qq{
+			<TD>
+				<img src='/resources/icons/arrow_right_red.gif'>
+				<a href="javascript: location = '/schedule/apptsheet/customize/add';" style='font-size:8pt; font-family: Tahoma'>
+				<b><nobr>Add Column</nobr></b></a>
+				<br>
+				@{[$apptSheet->getLegendHtml($self)]}
+			</TD>
+		};
+	}
+
 	my $content = qq{
 		<TABLE cellpadding=5>
 			<TR valign=top>
 				<TD>
 					<TABLE BGCOLOR='#DDDDDD' BORDER=0 CELLSPACING=1 CELLPADDING=0>
 						<TR>
-							<TD>@{[$apptSheet->getHtml($self, $apptSheetStartTime, $apptSheetEndTime, APPTSHEET_ALL)]}</TD>
+							<TD>@{[$apptSheet->getHtml($self, $apptSheetStartTime, $apptSheetEndTime, $flags)]}</TD>
 						</TR>
 					</TABLE>
 				</TD>
-
-				<TD>
-					<img src='/resources/icons/arrow_right_red.gif'>
-					<a href="javascript: location = '/schedule/apptsheet/customize/add';" style='font-size:8pt; font-family: Tahoma'>
-					<b><nobr>Add Column</nobr></b></a>
-					<br>
-					@{[$apptSheet->getLegendHtml($self)]}
-				</TD>
-
+				
+				$addColumn_legend
 			</TR>
 
 		</TABLE>
@@ -564,6 +578,12 @@ sub getApptSheetHeaderHtml
 					<input name=right type=button value='>' onClick="updatePage('$nextDay')" title="Goto $nDay">
 			</td>
 			</FORM>
+			
+			<TD align=center>
+				<img src='/resources/icons/arrow_right_red.gif'>
+				<a href="javascript:doActionPopup('/schedule-p/apptsheet', null, 'toolbar,scrollbars,resizable');" style='font-size:8pt; font-family: Tahoma'>
+				<b><nobr>Print</nobr></b></a>
+			</TD>
 
 			<FORM name="actionForm" method=POST>
 			<td ALIGN=RIGHT>
