@@ -173,40 +173,6 @@
 		<enum>Org Reschedule</enum>
 	</table>
 
-	<table name="HCFA1500_Modifier_Code" abbrev="HcfaMod" type="Enumeration">
-		<param name="capsize">128</param>
-		<enum id="20">20 Microsurgery</enum>
-		<enum id="21">21 Prolonged Evaluation and Management Services</enum>
-		<enum id="22">22 Unusual Procedural Services</enum>
-		<enum id="23">23 Unusual Anesthesia</enum>
-		<enum id="24">24 Unrelated Eval and Mngmnt Services by Same Physician During a Postoperative Period</enum>
-		<enum id="25">25 Significant, Separately Identifiable Evaluation and Mgmt Services by the Same Physician/Day of the Procedure/Service</enum>
-		<enum id="26">26 Professional Component</enum>
-		<enum id="32">32 Mandated Services</enum>
-		<enum id="47">47 Anesthesia by Surgeon</enum>
-		<enum id="50">50 Bilateral Procedure</enum>
-		<enum id="51">51 Multiple Procedures</enum>
-		<enum id="52">52 Reduced Services</enum>
-		<enum id="53">53 Discontinued Procedure</enum>
-		<enum id="54">54 Surgical Care Only</enum>
-		<enum id="55">55 Postoperative Management Only</enum>
-		<enum id="56">56 Preoperative Management Only</enum>
-		<enum id="57">57 Decision for Surgery</enum>
-		<enum id="58">58 Staged or Related Procedure or Service by the Same Physician During the Postoperative Period</enum>
-		<enum id="59">59 Distinct Procedural Service</enum>
-		<enum id="62">62 Two Surgeons</enum>
-		<enum id="66">66 Surgical Team</enum>
-		<enum id="76">76 Repeat Procedure by Same Physician</enum>
-		<enum id="77">77 Repeat Procedure by Another Physician</enum>
-		<enum id="78">78 Return to the Operating Room for a Related Procedure During the Postoperative Period</enum>
-		<enum id="79">79 Unrelated Procedure or Service by the Same Physician During the Postoperative Period</enum>
-		<enum id="80">80 Assistant Surgeon</enum>
-		<enum id="81">81 Minimum Assistant Surgeon</enum>
-		<enum id="82">82 Assistant Surgeon When Qualified Resident Surgeon not Available</enum>
-		<enum id="90">90 Reference (Outside) Laboratory</enum>
-		<enum id="99">99 Multiple Modifiers</enum>
-	</table>
-
 	<table name="Trans_Related_To" abbrev="TrnRel" type="Enumeration">
 		<enum>Employment</enum>
 		<enum>Auto Accident</enum>
