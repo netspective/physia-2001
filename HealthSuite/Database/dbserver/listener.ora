@@ -26,3 +26,25 @@ SID_LIST_LISTENER =
     )
   )
 
+TESTLISTENER =
+  (DESCRIPTION_LIST =
+    (DESCRIPTION =
+      (ADDRESS = (PROTOCOL = IPC)(KEY = EXTPROC0))
+      (PROTOCOL_STACK =
+        (PRESENTATION = TTC)
+        (SESSION = NS)
+      )
+    )
+    (DESCRIPTION =
+      (ADDRESS = (PROTOCOL = TCP)(HOST = boron)(PORT = 1526))
+      )
+    )
+  )
+
+SID_LIST_TESTLISTENER =
+  (SID_LIST =
+    (SID_DESC =
+      (SID_NAME =  SDETEST)
+    )
+  )
+

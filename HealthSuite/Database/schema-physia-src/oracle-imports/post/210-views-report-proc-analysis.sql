@@ -14,7 +14,7 @@ and 	i.invoice_id = ii.parent_id
 and 	tt.id = t.trans_type 
 and 	ii.code = cpt.cpt
 and 	poc.person_id = t.provider_id
-and 	poc.org_id = t.service_facility_id
+and 	poc.org_internal_id = t.service_facility_id
 and 	poc.person_id = p.person_id
 and 	poc.category = 'Physician'
 and	ii.item_type in (1,2)
@@ -40,7 +40,7 @@ and 	i.invoice_id = ii.parent_id
 and 	tt.id = t.trans_type 
 and 	ii.code = cpt.cpt
 and 	poc.person_id = t.provider_id
-and 	poc.org_id = t.service_facility_id
+and 	poc.org_internal_id = t.service_facility_id
 and 	poc.person_id = p.person_id
 and 	poc.category = 'Physician'
 and	ii.item_type in (1,2)

@@ -1,4 +1,4 @@
-create or replace procedure enable_FK_constraints
+create or replace procedure enable_noval_FK_constraints
                                      is 
                                      
        	v_constr_name user_constraints.constraint_name%type;
@@ -18,7 +18,7 @@ begin
 		
 		exit when c_constr_name%notfound;
 		
-		v_sql_stmt := 'alter table '||v_table_name||' enable validate constraint '||v_constr_name;
+		v_sql_stmt := 'alter table '||v_table_name||' enable novalidate constraint '||v_constr_name;
 
 		execute immediate v_sql_stmt;
 		
