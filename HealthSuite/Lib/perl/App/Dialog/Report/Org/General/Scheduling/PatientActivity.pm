@@ -109,7 +109,7 @@ sub execute
 		</td>				
 		</tr>									
 		<td>
-			<b style="font-size:8pt; font-family:Tahoma">Date Appointments Entered</b>
+			<nobr><b style="font-size:8pt; font-family:Tahoma">Appointments Scheduled</b></nobr>
 			@{[$STMTMGR_REPORT_SCHEDULING->createHtml($page, STMTMGRFLAG_NONE, 'sel_dateEntered',
 				[$internalFacilityId, $startDate, $endDate,$orgInternalId, $gmtDayOffset]) ]}
 		</td>				
@@ -155,7 +155,7 @@ sub prepare_detail_CPT
 	my $orgInternalId = $page->session('org_internal_id');
 	my $gmtDayOffset = $page->session('GMT_DAYOFFSET');
 
-	$page->addContent("<b>$cpt Procedures</b><br><br>",
+	$page->addContent("<b>Procedure Code '$cpt'</b><br><br>",
 		$STMTMGR_REPORT_SCHEDULING->createHtml($page, STMTMGRFLAG_NONE, 'sel_detailPatientsCPT',
 			[$cpt, $internalFacilityId, $startDate, $endDate, $orgInternalId, $gmtDayOffset])
 	);

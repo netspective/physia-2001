@@ -65,7 +65,7 @@ $STMTFMT_DETAIL_APPT_SCHEDULE = qq{
 		AND	(:2 IS NULL OR facility_id = :2)
 		AND EXISTS
 		(
-			SELECT 	1 
+			SELECT 	'x'
 			FROM 	org
 			WHERE 	owner_org_id = :5
 			AND 	org_internal_id = e.facility_id
@@ -73,25 +73,25 @@ $STMTFMT_DETAIL_APPT_SCHEDULE = qq{
 		AND	e.event_id = ea.parent_id
 		AND e.start_time >= TO_DATE(:3, '$SQLSTMT_DEFAULTDATEFORMAT') + :6
 		AND	e.start_time <  TO_DATE(:4, '$SQLSTMT_DEFAULTDATEFORMAT') + 1 + :6
-		ORDER BY 5	
+		ORDER BY 5, 7
 };
 
 $STMTMGR_REPORT_SCHEDULING = new App::Statements::Report::Scheduling(
 
 	# -----------------------------------------------------------------------------------------
 	'sel_patientsCPT' =>{
-				sqlStmt => qq{
-				SELECT	ii.code,count(distinct(e.event_id)) as count
-				FROM	Event e, 
-					Event_Attribute ea,
-					transaction t,
-					invoice i,
-					invoice_item ii															
-				WHERE	ea.value_type = @{[ App::Universal::EVENTATTRTYPE_APPOINTMENT ]}
+		sqlStmt => qq{
+			SELECT	ii.code,count(distinct(e.event_id)) as count
+			FROM	Event e, 
+				Event_Attribute ea,
+				transaction t,
+				invoice i,
+				invoice_item ii															
+			WHERE	ea.value_type = @{[ App::Universal::EVENTATTRTYPE_APPOINTMENT ]}
 				AND (:1 IS NULL OR facility_id = :1)
 				AND EXISTS
 				(
-					SELECT 	1 
+					SELECT 	'x'
 					FROM 	org
 					WHERE 	owner_org_id = :4 
 					AND 	org_internal_id = e.facility_id
@@ -103,19 +103,20 @@ $STMTMGR_REPORT_SCHEDULING = new App::Statements::Report::Scheduling(
 				AND	i.main_transaction = t.trans_id
 				AND	ii.parent_id = i.invoice_id
 				AND	ii.code is not NULL
-				GROUP BY ii.code
-				},
-				publishDefn => 	{
-					columnDefn =>
-					[
-					{head => 'Procedure Code',
-						url =>q{javascript:doActionPopup('#hrefSelfPopup#&detail=CPT&CPT=#&{?}#',
-							null,'location,status,width=800,height=600,scrollbars,resizable')}, 
-						hint => 'View Details' },
-					{head => 'Count', dAlign => 'right',summarize=>'sum'},
-					],
-				},				
-			},
+			GROUP BY ii.code
+			ORDER BY 1
+		},
+		publishDefn => 	{
+			columnDefn =>
+			[
+			{head => 'Procedure Code',
+				url =>q{javascript:doActionPopup('#hrefSelfPopup#&detail=CPT&CPT=#&{?}#',
+					null,'location,status,width=800,height=600,scrollbars,resizable')}, 
+				hint => 'View Details' },
+			{head => 'Count', dAlign => 'right',summarize=>'sum'},
+			],
+		},				
+	},
 
 	'sel_detailPatientsCPT' =>{
 		_stmtFmt => $STMTFMT_DETAIL_APPT_SCHEDULE,
@@ -135,12 +136,12 @@ $STMTMGR_REPORT_SCHEDULING = new App::Statements::Report::Scheduling(
 	'sel_missingEncounter' =>
 	{
 		sqlStmt=>qq{
-				SELECT 	to_char(e.CHECKIN_STAMP,'MM/DD/YYYY'), count (*)
-				FROM 	Event e, Event_Attribute ea
-				WHERE	(:1 IS NULL OR facility_id = :1)
+			SELECT 	to_char(e.CHECKIN_STAMP, '$SQLSTMT_DEFAULTDATEFORMAT'), count (*)
+			FROM 	Event e, Event_Attribute ea
+			WHERE	(:1 IS NULL OR facility_id = :1)
 				AND EXISTS
 				(
-					SELECT 	1 
+					SELECT 	'x'
 					FROM 	org
 					WHERE 	owner_org_id = :4 
 					AND 	org_internal_id = e.facility_id
@@ -150,8 +151,9 @@ $STMTMGR_REPORT_SCHEDULING = new App::Statements::Report::Scheduling(
 				AND	e.CHECKIN_STAMP <  TO_DATE(:3, '$SQLSTMT_DEFAULTDATEFORMAT') + 1 + :5
 				AND	e.event_id = ea.parent_id
 				AND	e.CHECKOUT_STAMP is NULL
-				GROUP BY to_char(e.CHECKIN_STAMP,'MM/DD/YYYY')
-			   },
+			GROUP BY to_char(e.CHECKIN_STAMP, '$SQLSTMT_DEFAULTDATEFORMAT')
+			ORDER BY 1 desc
+		},
 			publishDefn => 	{
 					columnDefn =>
 					[
@@ -177,7 +179,7 @@ $STMTMGR_REPORT_SCHEDULING = new App::Statements::Report::Scheduling(
 				WHERE	(:1 IS NULL OR facility_id = :1)
 				AND EXISTS
 				(
-					SELECT 	1 
+					SELECT 	'x'
 					FROM 	org
 					WHERE 	owner_org_id = :3
 					AND 	org_internal_id = e.facility_id
@@ -209,26 +211,27 @@ $STMTMGR_REPORT_SCHEDULING = new App::Statements::Report::Scheduling(
 	'sel_dateEntered' =>
 	{
 		sqlStmt=>qq{
-			SELECT 	to_char(e.scheduled_stamp -:5, '$SQLSTMT_DEFAULTDATEFORMAT'), count (*)
+			SELECT to_char(e.scheduled_stamp -:5, '$SQLSTMT_DEFAULTDATEFORMAT'), count (*)
 			FROM 	Event e, Event_Attribute ea
 			WHERE	(:1 IS NULL OR facility_id = :1)
-			AND EXISTS
-			(
-				SELECT 	'x'
-				FROM 	org
-				WHERE 	owner_org_id = :4 
-				AND 	org_internal_id = e.facility_id
-			)
-			AND	ea.value_type = @{[ App::Universal::EVENTATTRTYPE_APPOINTMENT ]}
-			AND	e.scheduled_stamp >= TO_DATE(:2, '$SQLSTMT_DEFAULTDATEFORMAT') + :5
-			AND	e.scheduled_stamp <  TO_DATE(:3, '$SQLSTMT_DEFAULTDATEFORMAT') + 1 + :5
-			AND	e.event_id = ea.parent_id				
+				AND EXISTS
+				(
+					SELECT 	'x'
+					FROM 	org
+					WHERE 	owner_org_id = :4 
+					AND 	org_internal_id = e.facility_id
+				)
+				AND	ea.value_type = @{[ App::Universal::EVENTATTRTYPE_APPOINTMENT ]}
+				AND	e.scheduled_stamp >= TO_DATE(:2, '$SQLSTMT_DEFAULTDATEFORMAT') + :5
+				AND	e.scheduled_stamp <  TO_DATE(:3, '$SQLSTMT_DEFAULTDATEFORMAT') + 1 + :5
+				AND	e.event_id = ea.parent_id				
 			GROUP BY to_char(e.scheduled_stamp -:5, '$SQLSTMT_DEFAULTDATEFORMAT')
+			ORDER BY 1 desc
 		},
 			publishDefn => 	{
 					columnDefn =>
 					[
-					{head => 'Date Appointment Entered',url =>q{javascript:doActionPopup('#hrefSelfPopup#&detail=date_entered&entered=#&{?}#',
+					{head => 'Date',url =>q{javascript:doActionPopup('#hrefSelfPopup#&detail=date_entered&entered=#&{?}#',
 						null,'location,status,width=800,height=600,scrollbars,resizable')},
 						hint => 'View Details' 
 					},
@@ -290,7 +293,7 @@ $STMTMGR_REPORT_SCHEDULING = new App::Statements::Report::Scheduling(
 				and (:1 IS NULL OR facility_id = :1)
 				AND EXISTS
 				(
-					SELECT 	1 
+					SELECT 	'x'
 					FROM 	org
 					WHERE 	owner_org_id = :4 
 					AND 	org_internal_id = e.facility_id
@@ -347,7 +350,7 @@ $STMTMGR_REPORT_SCHEDULING = new App::Statements::Report::Scheduling(
 				and (:1 IS NULL OR facility_id = :1)
 				AND EXISTS
 				(
-					SELECT 	1 
+					SELECT 	'x'
 					FROM 	org
 					WHERE 	owner_org_id = :4 
 					AND 	org_internal_id = Event.facility_id
@@ -388,7 +391,7 @@ $STMTMGR_REPORT_SCHEDULING = new App::Statements::Report::Scheduling(
 				and (:1 IS NULL OR facility_id = :1)
 				AND EXISTS
 				(
-					SELECT 	1 
+					SELECT 	'x'
 					FROM 	org
 					WHERE 	owner_org_id = :4 
 					AND 	org_internal_id = Event.facility_id
@@ -429,7 +432,7 @@ $STMTMGR_REPORT_SCHEDULING = new App::Statements::Report::Scheduling(
 				and (:1 IS NULL OR facility_id = :1)
 				AND EXISTS
 				(
-					SELECT 	1 
+					SELECT 	'x'
 					FROM 	org
 					WHERE 	owner_org_id = :4 
 					AND 	org_internal_id = Event.facility_id
