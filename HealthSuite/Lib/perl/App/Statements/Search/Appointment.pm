@@ -74,7 +74,7 @@ $STMTRPTDEFN_DEFAULT =
 };
 
 my $APPOINTMENT_COLUMNS = qq
-{ patient.complete_name,
+{ patient.simple_name,
 	to_char(event.start_time, '$SQLSTMT_DEFAULTSTAMPFORMAT') as start_time,
 	ep2.value_text as resource_id,
 	aat.caption as patient_type,
@@ -145,14 +145,14 @@ $STMTMGR_APPOINTMENT_SEARCH = new App::Statements::Search::Appointment(
 		publishDefn => $STMTRPTDEFN_DEFAULT,
 		orderBy => 'order by event.start_time, event.event_id',
 	},
-	
+
 	'sel_appointment_orderbyName' =>
 	{
 		sqlStmt => $STMTFMT_SEL_APPOINTMENT,
 		publishDefn => $STMTRPTDEFN_DEFAULT,
 		orderBy => 'order by patient.name_last, patient.name_first, patient.name_middle',
 	},
-	
+
 );
 
 1;
