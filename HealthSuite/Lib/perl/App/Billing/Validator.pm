@@ -86,10 +86,10 @@ sub getCallSequences
 sub numToStr
 {
 	my($self,$len,$lenDec,$tarString) = @_;
-	my @temp1 = split(/\./,$tarString); 
+	my @temp1 = split(/\./,$tarString);
 
 	my $fg =  "0" x ($len - length($temp1[0])).$temp1[0]."0" x ($lenDec - length($temp1[1])).$temp1[1];
-	return $fg; 
+	return $fg;
 }
 
 
@@ -111,7 +111,7 @@ sub checkLength
 			{
 				$self->{valMgr}->addError($self->getId()."  ".$claim->getPayerId()."  ".$claim->getId(),' 1000 ', $fld.' Length is greater than '.$length,$self->{claim});
 			}
-		}	
+		}
 		elsif ($condition == (LESS + EQUAL))
 		{
 			if (length($value) <= $length)
@@ -125,7 +125,7 @@ sub checkLength
 			{
 				$self->{valMgr}->addError($self->getId()."  ".$claim->getPayerId()."  ".$claim->getId(),' 1001 ' ,$fld.' Length is less than '.$length,$self->{claim});
 			}
-		}	
+		}
 		elsif ($condition == EQUAL)
 		{
 			if (length($value) == $length)
@@ -140,12 +140,12 @@ sub checkLength
 				$self->{valMgr}->addError($self->getId()."  ".$claim->getPayerId()."  ".$claim->getId(),' 1002 ' , $fld.' Length is not equal to '.$length,$self->{claim});
 			}
 		}
-	}	
+	}
 }
 
 sub checkValue
 {
-	
+
 	my ($self, $condition, $value1, $value2, $claim, $fld) = @_;
 	if(($value1 ne '') || ($value2 ne ''))
 	{
@@ -156,14 +156,14 @@ sub checkValue
 				$self->{valMgr}->addError($self->getId()."  ".$claim->getPayerId()."  ".$claim->getId(),' 1000 ', $fld,$self->{claim});
 			}
 		}
-		
+
 		elsif ($condition == (GREATER))
 		{
 			if ($value1 > $value2)
 			{
 				$self->{valMgr}->addError($self->getId()."  ".$claim->getPayerId()."  ".$claim->getId(),' 1000 ', $fld,$self->{claim});
 			}
-		}	
+		}
 		elsif ($condition == (LESS + EQUAL))
 		{
 			if ($value1 <= $value2)
@@ -176,14 +176,14 @@ sub checkValue
 			if ($value1 < $value2)
 			{
 				$self->{valMgr}->addError($self->getId()."  ".$claim->getPayerId()."  ".$claim->getId(),' 1001 ' ,$fld,$self->{claim});
-			}	
-		}	
+			}
+		}
 		elsif ($condition == EQUAL)
 		{
 			if ($value1 != $value2)
 			{
 				$self->{valMgr}->addError($self->getId()."  ".$claim->getPayerId()."  ".$claim->getId(),' 1002 ' , $fld,$self->{claim});
-			}	
+			}
 		}
 		elsif ($condition == NOT_EQUAL)
 		{
@@ -200,38 +200,38 @@ sub checkAlpha
 {
 	my ($self, $condition, $positionFrom, $positionTo, $value,$claim,$fld) = @_;
 	my $tempValue;
-	
+
 	if($value ne '')
 	{
 		if (($positionFrom ne '') && ($positionTo ne ''))
-		{	
+		{
 			$tempValue = substr($value,$positionFrom-1,$positionTo-1);
-		}	
+		}
 		else
 		{
 			$tempValue = $value;
-		}	
-	
+		}
+
 		if ($condition == CONTAINS)
 		{
 			if (($value =~ /\d/) || ($value =~ /\W/))
 			{
 				$self->{valMgr}->addError($self->getId."  ".$claim->getPayerId()."  ".$claim->getId(),' 1003 ', $fld.' Contains Non-Alpha characters',$self->{claim});
-			}	
-		}	
+			}
+		}
 		elsif ($condition == NOT_CONTAINS)
 		{
 			if (not (($value =~ /\d/) || ($value =~ /\W/)))
 			{
 				$self->{valMgr}->addError($self->getId."  ".$claim->getPayerId()."  ".$claim->getId(),' 1003 ', $fld.' Contains Alpha characters',$self->{claim});
 			}
-		}		
+		}
 		elsif ($condition == NOT_ALL)
 		{
 			if (not($value =~ /\d/))
 			{
 				$self->{valMgr}->addError($self->getId."  ".$claim->getPayerId()."  ".$claim->getId(),' 1003 ', $fld.' Contains All Alpha characters',$self->{claim});
-		
+
 			}
 		}
 	}
@@ -244,31 +244,31 @@ sub checkAlphanumeric
 {
 	my ($self, $condition, $positionFrom, $positionTo, $value, $claim, $fld) = @_;
 	my $tempValue;
-	
+
 	if($value ne '')
 	{
 		if (($positionFrom ne '') && ($positionTo ne ''))
-		{	
+		{
 			$tempValue = substr($value,$positionFrom-1,$positionTo-1);
-		}	
+		}
 		else
 		{
 			$tempValue = $value;
-		}	
+		}
 		if ($condition == CONTAINS)
 		{
 			if ($tempValue =~ /\W/i)
 			{
 				$self->{valMgr}->addError($self->getId."  ".$claim->getPayerId()."  ".$claim->getId(),' 1003 ', $fld.' Contains Non-Alphanumeric characters',$self->{claim});
 			}
-		}	
+		}
 		elsif ($condition == NOT_CONTAINS)
 		{
 			if ($tempValue =~ /\w/i)
 			{
 				$self->{valMgr}->addError($self->getId."  ".$claim->getPayerId()."  ".$claim->getId(),' 1003 ', $fld.' Contains Alphanumeric characters',$self->{claim});
 			}
-		}		
+		}
 		elsif ($condition == NOT_ALL)
 		{
 			if (not($tempValue =~ /\W/i))
@@ -292,17 +292,17 @@ sub checkValidValues
 	{
 		# check wether the positions are given or not
 		$tempValue = (($positionFrom ne '') && ($positionTo ne '')) ? substr($value,$positionFrom-1,$positionTo):$value;
-		
+
 		if ($condition == CONTAINS)
-		{ 
+		{
  			if ($valuesFlag == CHECK_CHARACTERS)
- 		  	{  
+ 		  	{
 				my $val2 = join("@@",@values);
-			
+
 				$val2 =~ s/([-,\\])/\\$1/g;
 
 				@values = split("@@",$val2);
-			
+
 				my $m = length($value);
 
 				if ($value !~ /[@values]{$m}/)
@@ -314,31 +314,31 @@ sub checkValidValues
 				}
 
 		  	}
-		  	
+
 		  	if ($valuesFlag == CHECK_EXACT_VALUES)
  		  	{
-	 			 my $val5 = "(".join(")|(",@values).")";	
+	 			 my $val5 = "(".join(")|(",@values).")";
 
 			 	 if ($val5 !~ /$value/)
 				 {
 					$self->{valMgr}->addError($self->getId."  ".$claim->getPayerId()."  ".$claim->getId(),' 1004 ', $fld.' Contains Invalid values ',$self->{claim});
 					return;
-			 	 } 
+			 	 }
 		  	}
-		  
-	  
+
+
 		}
 		else
 		{
-		
+
 			if ($valuesFlag == CHECK_CHARACTERS)
-			{  
+			{
 				my $val2 = join("@@",@values);
-				
+
 				$val2 =~ s/([-,\\])/\\$1/g;
 
 				@values = split("@@",$val2);
-			
+
 				my $m = length($value);
 
 				if ($value =~ /[@values]{$m}/)
@@ -347,7 +347,7 @@ sub checkValidValues
 					return;
 				}
 			}
-		  	
+
 		   	if ($valuesFlag == CHECK_EXACT_VALUES)
  		   	{
 	 			my $val5 = "(".join(")|(",@values).")";
@@ -356,31 +356,31 @@ sub checkValidValues
 			 	{
 					$self->{valMgr}->addError($self->getId."  ".$claim->getPayerId()."  ".$claim->getId(),' 1004 ', $fld.' Contains Invalid values ',$self->{claim});
 					return;
-			 	} 
+			 	}
 		   	}
-		  
+
 		}
-	}	
+	}
 }
 
 sub checkSameCharacter
 {
 	my ($self,$condition,$positionFrom,$positionTo,$value,$claim,$fld, @characterList) = @_;
 	my ($tempValue,$length,$list,$val,@values);
-	
+
 	if($value ne '')
 	{
 		# check wether the positions are given or not
 		$tempValue = (($positionFrom ne '') && ($positionTo ne '')) ? substr($value,$positionFrom-1,$positionTo):$value;
-	
+
 		$length = length($tempValue);
 
 		foreach $val (@characterList)
 		{
 			$val = $val x $length;
 			push(@values, $val);
-		}		
-			
+		}
+
 		$list = "(".join(")|(",@values).")";
 
 		if ($condition == CONTAINS)
@@ -388,7 +388,7 @@ sub checkSameCharacter
 			if (not $tempValue =~ /$list/)
 			{
 				$self->{valMgr}->addError($self->getId."  ".$claim->getPayerId()."  ".$claim->getId(),' 1004 ', $fld.' Contains Invalid values ',$self->{claim});
-			}	
+			}
 		}
 		else
 		{
@@ -396,14 +396,14 @@ sub checkSameCharacter
 			{
 				$self->{valMgr}->addError($self->getId."  ".$claim->getPayerId()."  ".$claim->getId(),' 1004 ', $fld.' Contains Invalid values ',$self->{claim});
 	    	}
-		}  	
+		}
 	}
 }
 
 sub isRequired
 {
 	my ($self,$value,$claim,$fld) = @_;
-	
+
 	if ($value eq '')
 	{
 		$self->{valMgr}->addError($self->getId()."  ".$claim->getPayerId()."  ".$claim->getId(),' 1005 ', $fld.' Value is required ',$self->{claim});
@@ -415,7 +415,7 @@ sub isRequired
 sub notRequired
 {
 	my ($self,$value,$claim,$fld) = @_;
-	
+
 	if ($value ne '')
 	{
 		$self->{valMgr}->addError($self->getId()."  ".$claim->getPayerId()."  ".$claim->getId(),' 1005 ', $fld.' Value must be empty ',$self->{claim});
@@ -424,9 +424,9 @@ sub notRequired
 
 sub getYear
 {
-	
+
 	my $self = shift;
-	
+
 	my $date = localtime();
 	my @dateStr = substr(localtime(),20,4);
 
@@ -442,7 +442,7 @@ sub getMonth
 				   		 MAY => '05', JUN => '06', JUL => '07', AUG => '08',
 				 		 SEP => '09', OCT => '10', NOV => '11',	DEC => '12'
 						};
-	
+
 	my $date = localtime();
 	my $month = $monthSequence->{uc(substr(localtime(),4,3))};
 
@@ -451,7 +451,7 @@ sub getMonth
 
 sub getDay
 {
-	
+
 	my $self = shift;
 	my $day = substr(localtime(),8,2);
 	$day =~ s/ /0/;
@@ -462,9 +462,9 @@ sub getDay
 sub checkDate
 {
 	my ($self, $condition, $val, $claim, $fld,$targetDate) = @_;
-	
+
 	my $date = (($targetDate eq "") ? $self->getYear.$self->getMonth.$self->getDay : $targetDate) ;
-	
+
 	if($val ne '')
 	{
 		if ($condition == (GREATER + EQUAL))
@@ -472,16 +472,16 @@ sub checkDate
 			if($val < $date)
 			{
 				my $msg = (($targetDate eq "") ? ' Must be greater than or equal to current date' : '');
-				$self->{valMgr}->addError($self->getId() . "  " .$claim->getPayerId()."  ". $claim->getId(),' 1006 ', $fld . $msg ,$self->{claim});	
+				$self->{valMgr}->addError($self->getId() . "  " .$claim->getPayerId()."  ". $claim->getId(),' 1006 ', $fld . $msg ,$self->{claim});
 				return;
-			}		
+			}
 		}
 		elsif  ($condition == (LESS + EQUAL))
 		{
 			if($val > $date)
 			{
 				my $msg = (($targetDate eq "") ? ' Must be less than current date' : '');
-				$self->{valMgr}->addError($self->getId() . "  " .$claim->getPayerId()."  ". $claim->getId(),' 1006 ',$fld . $msg,$self->{claim});	
+				$self->{valMgr}->addError($self->getId() . "  " .$claim->getPayerId()."  ". $claim->getId(),' 1006 ',$fld . $msg,$self->{claim});
 				return;
 			}
 		}
@@ -490,7 +490,7 @@ sub checkDate
 			if($date != $val)
 			{
 				my $msg = (($targetDate eq "") ? ' Must be equal than current date' : '');
-				$self->{valMgr}->addError($self->getId() . "  " .$claim->getPayerId()."  ". $claim->getId(),' 1006 ',$fld . $msg ,$self->{claim});	
+				$self->{valMgr}->addError($self->getId() . "  " .$claim->getPayerId()."  ". $claim->getId(),' 1006 ',$fld . $msg ,$self->{claim});
 				return;
 			}
 		}
@@ -502,8 +502,8 @@ sub checkValidDate
 {
 
 	my ($self,$date, $claim, $fld) = @_;
-	
-		
+
+
 	if(($date ne '') || length($date) > 0)
 	{
 		# check length of date
@@ -512,7 +512,7 @@ sub checkValidDate
 			$self->{valMgr}->addError($self->getId()."  ".$claim->getPayerId()."  ".$claim->getId(),' 1006 ',$fld.' Invalid Date Length ',$self->{claim});
 			return;
 		}
-	
+
 		# check numeric
 		if ($date =~ /\D/i)
 		{
@@ -540,61 +540,61 @@ sub checkValidNames
 {
 	my ($self,$condition,$lastName,$firstName,$middleInitial,$claim, $fld) = @_;
 	my @numbers = ('A'..'Z','a'..'z');
-	my $alpha; 
-	
+	my $alpha;
+
 	if(($lastName ne '')||($firstName ne '') || ($middleInitial ne ''))
 	{
-		
+
 		if(($lastName ne '') && ($firstName ne '') && ($middleInitial ne ''))
-		{				
+		{
 			if (($lastName eq '') && ($firstName ne ''))
 			{
 				$self->{valMgr}->addError($self->getId."  ".$claim->getPayerId()."  ".$claim->getId(),' 1200 ',$fld.' First name exist but not Last Name ',$self->{claim});
 			}
-	 
+
 			if ((($lastName eq '') || ($firstName eq '')) && ($middleInitial ne ''))
 			{
 				$self->{valMgr}->addError($self->getId."  ".$claim->getPayerId()."  ".$claim->getId(),' 1200 ', $fld.' For Middle Initial First and Last name must be present ',$self->{claim});
-			} 	
+			}
 
-		
+
 		    $alpha = join("",@numbers);
     		if ((not($lastName =~ /^[$alpha]/)) || (not($firstName =~ /^[$alpha]/)) || (not($middleInitial =~ /^[$alpha]/)))
 			{
 				$self->{valMgr}->addError($self->getId."  ".$claim->getPayerId()."  ".$claim->getId(),' 1200 ', $fld.' Character at position 1 in First,Last and Middle initial must be A-Z ',$self->{claim});
 			}
-	
+
 			my $tempLast = substr($lastName,1,length($lastName));
 			my $tempFirst = substr($firstName,1,length($firstName));
 			my $tempMiddle = substr($middleInitial,0,length($middleInitial));
-		
+
 			if ($condition == INDIVIDUAL_NAME)
 			{
 				my @validForIndividual = ('A'..'Z','a'..'z','-',' ');
 				$self->checkValidValues(CONTAINS,'','',$tempLast,$claim,$fld . 'Last Name',@validForIndividual);
-				$self->checkValidValues(CONTAINS,'','',$tempFirst,$claim,$fld . 'First Name',@validForIndividual);		
+				$self->checkValidValues(CONTAINS,'','',$tempFirst,$claim,$fld . 'First Name',@validForIndividual);
 				$self->checkValidValues(CONTAINS,'','',$tempMiddle,$claim,$fld . 'Middle Initial',@validForIndividual);
 			}
 			elsif($condition == ORGANIZATION_NAME)
 			{
 				my @validForOrganization = ('A'..'Z','a'..'z',0..9,'-',' ',',','&','#');
-		
+
 				$self->checkValidValues(CONTAINS,'','',$tempLast,$claim,$fld . 'Last Name',@validForOrganization);
 			}
 		}
 	}
-		
+
 }
 
 
 sub checkValidAddress
 {
 	my ($self,$addressA,$addressB,$city,$state,$zipCode,$claim, $fld) = @_;
-	my $values; 
+	my $values;
 	my @validAddressValues = ('A'..'Z','a'..'z','-',' ',',','&','#','/');
 	my @validAddressValuesLines = ('A'..'Z','a'..'z','-',' ',',','&','#','/',0..9);
-									
-	if(($addressA ne '') || ($addressB ne '') || ($city ne '') || ($state ne '') || ($zipCode ne ''))				 
+
+	if(($addressA ne '') || ($addressB ne '') || ($city ne '') || ($state ne '') || ($zipCode ne ''))
 	{
 	 	 if ($addressA ne '')
 	 	{
@@ -606,31 +606,31 @@ sub checkValidAddress
 			{
 				$self->checkValidValues(CONTAINS,'','',$addressB,$claim,$fld . ' Address 2',@validAddressValuesLines);
 			}
-	 	}	
-	 
+	 	}
+
  		if ($city ne '')
  		{
  			$self->checkValidValues(CONTAINS,'','',$city,$claim,$fld . ' City ',@validAddressValues);
  			$self->checkLength(LESS,'','',$city,2,$claim,$fld . ' City ');
-		}		
-	 
+		}
+
 	 	if ($state ne '')
  		{
-	 	 	
+
 	 	 	$self->checkValidValues(CONTAINS,'','',$state,$claim,$fld . ' State ',App::Billing::Locale::USCodes::getStates());
-	 
+
 	 		if ($zipCode ne '')
 			{
 				$self->checkLength(GREATER,'','',$zipCode,9,$claim,$fld . ' ZipCode ');
 				$self->checkValidValues(CONTAINS,'','',$zipCode,$claim,$fld . ' ZipCode ',(0..9));
-				
-							
+
+
 				if (not(App::Billing::Locale::USCodes::isValidZipCode($state, $zipCode)))
 				{
-					$self->{valMgr}->addError($self->getId()."  ".$claim->getPayerId()."  ".$claim->getId(),' 1300 ', $fld.' Zip Code out of State Range ',$claim);	
-					
-				}	  
-	    	}		
+					$self->{valMgr}->addError($self->getId()."  ".$claim->getPayerId()."  ".$claim->getId(),' 1300 ', $fld.' Zip Code out of State Range ',$claim);
+
+				}
+	    	}
     	}
     }
 }
@@ -639,25 +639,25 @@ sub checkValidAddress
 sub checkValidTelephoneNo
 {
 	my ($self,$telephoneNo,$area,$claim,$fld) = @_;
-	
-				
+
+
 	if ($telephoneNo ne '')
 	{
 		$self->checkValidValues(CONTAINS,'','',$telephoneNo,$claim,$fld . ' Telephone Number ',(0..9));
 		$self->checkLength(NOT_EQUAL,'','',$telephoneNo,10,$claim,$fld . '');
-		
+
 		if ($area ne '')
 		{
 			$self->checkValidValues(CONTAINS,'','',substr($telephoneNo,0,3),$claim,$fld . ' Telephone Number Area Code ',App::Billing::Locale::USCodes::getAreaCodes($area));
-		}		
+		}
 	}
-}	
+}
 
 
 sub getSubmissionSerialNo
 {
     my $self = shift;
-    
+
 	my ($hash,$value,$key,%params);
 
 	open(CONF,"conf.txt");
@@ -666,12 +666,12 @@ sub getSubmissionSerialNo
 	{
 		chop;
 		($hash,$value) = split(/=/);
-		 $hash =~ s/ //;			
+		 $hash =~ s/ //;
 		$params{$hash} = $value;
 	}
-	
+
 	close(CONF);
-		
+
 	return $params{SUBMISSION_SERIAL_NO};
 }
 
@@ -679,10 +679,10 @@ sub checkValidSerialAndDate
 {
 	my ($self,$claim)=@_ ;
 	my ($targetdate ,$targetSrl);
-	
+
 	$targetdate = $self->getYear().$self->getMonth().$self->getDay();
 	$targetSrl = $self->getSubmissionSerialNo();
-	
+
 	open (INPUT,'valid.txt');
 	my $data={};
 	my $abc="JK";
@@ -712,15 +712,15 @@ sub checkCountOfBatches
 {
 	my ($self,$claims) = @_;
 	my ($providerID,$claimValue);
-	
+
 	$self->{batchesIndex} = 0;
-	
+
 	# fetch each element i.e. claim from claims array one by one
 	for $claimValue (0..$#$claims)
 	{
-		
+
 		# get the providerID from claim
-		$providerID = $claims->[$claimValue]->{payToProvider}->getFederalTaxId();
+		$providerID = $claims->[$claimValue]->{payToProvider}->getTaxId();
 		# add it in array without duplication
 		if ($self->checkForDuplicate($providerID) eq 0)
 		{
@@ -746,7 +746,7 @@ sub checkForDuplicate
 			return	1;
 		}
 	}
-	
+
 	return 0;
 }
 
@@ -754,46 +754,46 @@ sub checkForDuplicate
 sub getAge
 {
 	my ($self, $date1, $date2, $years, $months, $days) = @_;
-	
+
 	if ($date1 eq '')
 	{
 		$self->{valMgr}->addError($self->getId()."  ".$self->{claim}->getPayerId()."  ".$self->{claim}->getId(),' 2000 ', 'Patient Date of Birth is Required');
-		
+
 		return 0;
 	}
-	
+
 	if ($date2 eq '')
 	{
 		$date2 =  $self->getDate();
 	}
-	
+
 	$$years = substr($date2,0,4) - substr($date1,0,4);
 	$$months = (substr($date2,4,2) - substr($date1,4,2));
 	$$days  = (substr($date2,6,2) - substr($date1,6,2));
-	
+
 	if ($$days < 0)
 	{
 		$$days = 30 - (($$days) * (-1));
 	}
-	
+
 	if($$months < 0)
 	{
 		$$years--;
 		$$months = 12 - ($$months * (-1));
 	}
-	
+
 }
 
 sub getDate
 {
 
 	my $self = shift;
-	
+
 	my $monthSequence = {JAN => '01', FEB => '02', MAR => '03', APR => '04',
 				   		 MAY => '05', JUN => '06', JUL => '07', AUG => '08',
 				 		 SEP => '09', OCT => '10', NOV => '11',	DEC => '12'
 						};
-	
+
 	my $date = localtime();
 	my $month = $monthSequence->{uc(substr(localtime(),4,3))};
 	my @dateStr = ($month, substr(localtime(),8,2), substr(localtime(),20,4));
@@ -803,7 +803,7 @@ sub getDate
 	$dateStr[1] =~ s/ /0/;
 
 	return $dateStr[0].$dateStr[2].$dateStr[1];
-	
+
 }
 
 sub convertDateToCCYYMMDD
@@ -813,7 +813,7 @@ sub convertDateToCCYYMMDD
 				   		 MAY => '05', JUN => '06', JUL => '07', AUG => '08',
 				 		 SEP => '09', OCT => '10', NOV => '11',	DEC => '12'
 						};
-						
+
 
 	$date =~ s/-//g;
 	if (length($date) == 8)
@@ -826,9 +826,9 @@ sub convertDateToCCYYMMDD
 	}
 	elsif(length($date) == 9)
 	{
-		return substr($date,5,4) . $monthSequence->{uc(substr($date,2,3))} . substr($date,0,2);	
+		return substr($date,5,4) . $monthSequence->{uc(substr($date,2,3))} . substr($date,0,2);
 	}
-					
+
 }
 
 
@@ -851,16 +851,16 @@ sub getDiagnosisPtr
 	my ($self, $currentClaim,$code ) = @_;
 	my $diagnosisMap = {};
 	my $ptr;
-	
+
 	if ($code ne "")
-	{	
-		$diagnosisMap->{$currentClaim->{'diagnosis'}->[0]->getDiagnosis()} = 1 
+	{
+		$diagnosisMap->{$currentClaim->{'diagnosis'}->[0]->getDiagnosis()} = 1
 		if defined ($currentClaim->{'diagnosis'}->[0]->getDiagnosis);
-		$diagnosisMap->{$currentClaim->{'diagnosis'}->[1]->getDiagnosis()} = 2  
+		$diagnosisMap->{$currentClaim->{'diagnosis'}->[1]->getDiagnosis()} = 2
 		if defined $currentClaim->{'diagnosis'}->[1]->getDiagnosis;
-		$diagnosisMap->{$currentClaim->{'diagnosis'}->[2]->getDiagnosis()} = 3 
+		$diagnosisMap->{$currentClaim->{'diagnosis'}->[2]->getDiagnosis()} = 3
 		if defined $currentClaim->{'diagnosis'}->[2]->getDiagnosis;
-		$diagnosisMap->{$currentClaim->{'diagnosis'}->[3]->getDiagnosis()} = 4 
+		$diagnosisMap->{$currentClaim->{'diagnosis'}->[3]->getDiagnosis()} = 4
 		if defined $currentClaim->{'diagnosis'}->[3]->getDiagnosis;
 
 		$ptr = $diagnosisMap->{$code};
@@ -870,8 +870,8 @@ sub getDiagnosisPtr
 		$ptr = "";
 	}
 
-	
-		
+
+
 	return $ptr;
 
 }
