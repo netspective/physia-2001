@@ -394,6 +394,9 @@ use constant INVOICEBILLTYPE_THIRDPARTYPERSON => 1;
 use constant INVOICEBILLTYPE_THIRDPARTYORG => 2;
 use constant INVOICEBILLTYPE_THIRDPARTYINS => 3;
 
+#INVOICE SUBMISSION
+use constant SUBMIT_SAMEPAYER => 1;
+use constant SUBMIT_NEXTPAYER => 2;
 
 #INVOICE ITEM QUANTITY
 use constant INVOICEITEM_QUANTITY => 1;				#default quantity for optimized proc entry is 1
