@@ -155,7 +155,8 @@ sub prepare_detail_payment
 			$_->{patient_id}='';
 			$_->{simple_name}='';
 		};
-
+		next if  ($_->{total_charges} ==0 && $_->{misc_charges}==0 && $_->{person_write_off}==0 && $_->{insurance_write_off}==0 && 
+			  $_->{insurance_pay} ==0 && $_->{person_pay}==0 && $_->{refund} ==0 );	
 		my @rowData =
 		(
 			$capInv,
