@@ -40,13 +40,15 @@ sub initialize
 	$self->SUPER::initialize();
 	$self->addContent(
 		new CGI::Dialog::Field(type => 'hidden', name => 'nurse_title_item_id'),
+		new CGI::Dialog::Field(type => 'hidden', name => 'nurse_license_item_id'),
 
 		new CGI::Dialog::Subhead(heading => 'Certification', name => 'cert_for_nurse', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,),
 
-		new CGI::Dialog::MultiField(caption =>'Nursing License/Exp Date', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
+		new CGI::Dialog::MultiField(caption =>'Nursing License/Exp Date', name=> 'nurse_license', hints => "'Exp Date' and 'License Required' should be entered if there is a 'Nursing License'.",
 			fields => [
-				new CGI::Dialog::Field(caption => 'RN #', name => 'rn_number', options => FLDFLAG_REQUIRED),
-				new CGI::Dialog::Field(type=> 'date', caption => 'Date of Expiration', name => 'rn_number_exp_date', defaultValue => '', options => FLDFLAG_REQUIRED),
+				new CGI::Dialog::Field(caption => 'RN #', name => 'rn_number'),
+				new CGI::Dialog::Field(type=> 'date', caption => 'Date of Expiration', name => 'rn_number_exp_date', defaultValue => ''),
+				new CGI::Dialog::Field(type => 'bool', name => 'check_license', caption => 'License Required',	style => 'check'),
 				]),
 		new CGI::Dialog::MultiField(caption =>'Specialty Certification/Exp Date', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
 			fields => [
@@ -140,6 +142,30 @@ sub makeStateChanges
 	$self->SUPER::makeStateChanges($page, $command, $dlgFlags);
 }
 
+sub customValidate
+{
+	my ($self, $page) = @_;
+
+	my $licenseNum = $self->getField('nurse_license')->{fields}->[0];
+	my $licenseDate = $self->getField('nurse_license')->{fields}->[1];
+	my $licenseCheck = $self->getField('nurse_license')->{fields}->[2];
+
+	if($page->field('rn_number') ne '' && ($page->field('check_license') eq '' || $page->field('rn_number_exp_date') eq ''))
+	{
+		$licenseNum->invalidate($page, "'Exp Date' and 'License Required' should be entered when 'Nursing License' is entered");
+	}
+	elsif($page->field('check_license') ne '' && ($page->field('rn_number') eq '' || $page->field('rn_number_exp_date') eq ''))
+	{
+		$licenseNum->invalidate($page, "'Nursing License' and 'Exp Date' should be entered when 'Exp Date' is entered");
+	}
+	elsif($page->field('rn_number_exp_date') ne '' && ($page->field('rn_number') eq '' || $page->field('check_license') eq ''))
+	{
+		$licenseNum->invalidate($page, "'Nursing License' and 'License Required' should be entered when 'Exp Date' is entered");
+	}
+
+
+}
+
 sub execute_add
 {
 	my ($self, $page, $command, $flags) = @_;
@@ -158,15 +184,6 @@ sub execute_add
 			#parent_org_id => $page->session('org_id') || undef,
 			_debug => 0
 	);
-	$page->schemaAction(
-			'Person_Attribute', $command,
-			parent_id => $page->field('person_id'),
-			item_name => 'RN',
-			value_type => 500,
-			value_text => $page->field('rn_number')  || undef,
-			value_dateA=> $page->field('rn_number_exp_date') || undef,
-			_debug => 0
-	) if $page->field('rn_number') ne '';
 
 	$page->schemaAction(
 			'Person_Attribute', $command,
@@ -174,7 +191,7 @@ sub execute_add
 			item_name => 'Specialty',
 			value_type => 500,
 			value_text => $page->field('specialty1')  || undef,
-			value_dateA=> $page->field('specialty1_exp_date') || undef,
+			value_dateA => $page->field('specialty1_exp_date') || undef,
 			_debug => 0
 	) if $page->field('specialty1') ne '';
 
@@ -184,7 +201,7 @@ sub execute_add
 			item_name => 'Specialty',
 			value_type => 500,
 			value_text => $page->field('specialty2')  || undef,
-			value_dateA=> $page->field('specialty2_exp_date') || undef,
+			value_dateA => $page->field('specialty2_exp_date') || undef,
 			_debug => 0
 	) if $page->field('specialty2') ne '';
 
@@ -194,7 +211,7 @@ sub execute_add
 			item_name => 'Specialty',
 			value_type => 500,
 			value_text => $page->field('specialty3')  || undef,
-			value_dateA=> $page->field('specialty3_exp_date') || undef,
+			value_dateA => $page->field('specialty3_exp_date') || undef,
 			_debug => 0
 	) if $page->field('specialty3') ne '';
 
