@@ -134,7 +134,7 @@ sub makeStateChanges
 	}
 	$self->updateFieldFlags('start_sep', FLDFLAG_INVISIBLE, $hideStartInfo);
 	$self->updateFieldFlags('nextaction_redirecturl', FLDFLAG_INVISIBLE, $hideStartInfo);
-	$page->field('nextaction_redirecturl', $page->param('arl')) if $hideStartInfo;
+	$page->field('nextaction_redirecturl', '/' . $page->param('arl')) if $hideStartInfo;
 }
 
 sub execute
