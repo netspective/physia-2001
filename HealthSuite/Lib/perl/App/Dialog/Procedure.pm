@@ -726,17 +726,17 @@ sub storeFacilityInfo
 			_debug => 0
 		);
 
-	#$page->schemaAction(
-	#		'Invoice_Address', $command,
-	#		parent_id => $invoiceId,
-	#		address_name => 'Pay To Org',
-	#		line1 => $billingFacilityPayAddr->{line1},
-	#		line2 => $billingFacilityPayAddr->{line2} || undef,
-	#		city => $billingFacilityPayAddr->{city},
-	#		state => $billingFacilityPayAddr->{state},
-	#		zip => $billingFacilityPayAddr->{zip},
-	#		_debug => 0
-	#);
+	$page->schemaAction(
+			'Invoice_Address', $command,
+			parent_id => $invoiceId,
+			address_name => 'Pay To Org',
+			line1 => $billingFacilityPayAddr->{line1},
+			line2 => $billingFacilityPayAddr->{line2} || undef,
+			city => $billingFacilityPayAddr->{city},
+			state => $billingFacilityPayAddr->{state},
+			zip => $billingFacilityPayAddr->{zip},
+			_debug => 0
+	);
 
 
 	##SERVICE FACILITY INFORMATION

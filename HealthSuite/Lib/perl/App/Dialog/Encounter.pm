@@ -416,15 +416,15 @@ sub populateData
 		$page->field('billing_contact', $billContactData->{value_text});
 		$page->field('billing_phone', $billContactData->{value_textb});
 
-		#my $payToOrg = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoiceAttr', $invoiceId, 'Pay To Org/Name');
-		#$page->field('pay_to_org_item_id', $payToOrg->{item_id});
-		#$page->field('pay_to_org_id', $payToOrg->{value_textb});
+		my $payToOrg = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoiceAttr', $invoiceId, 'Pay To Org/Name');
+		$page->field('pay_to_org_item_id', $payToOrg->{item_id});
+		$page->field('pay_to_org_id', $payToOrg->{value_textb});
 
-		#my $payToOrgTaxId = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoiceAttr', $invoiceId, 'Pay To Org/Tax ID');
-		#$page->field('pay_to_org_tax_item_id', $payToOrgTaxId->{item_id});
+		my $payToOrgTaxId = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoiceAttr', $invoiceId, 'Pay To Org/Tax ID');
+		$page->field('pay_to_org_tax_item_id', $payToOrgTaxId->{item_id});
 
-		#my $payToOrgPhone = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoiceAttr', $invoiceId, 'Pay To Org/Phone');
-		#$page->field('pay_to_org_phone_item_id', $payToOrgPhone->{item_id});
+		my $payToOrgPhone = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoiceAttr', $invoiceId, 'Pay To Org/Phone');
+		$page->field('pay_to_org_phone_item_id', $payToOrgPhone->{item_id});
 
 		my $claimFiling = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoiceAttr', $invoiceId, 'Claim Filing/Indicator');
 		$page->field('claim_filing_item_id', $claimFiling->{item_id});
@@ -1261,45 +1261,45 @@ sub handleInvoiceAttrs
 			_debug => 0
 		);
 
-	#my $payToOrgIntId = $page->field('pay_to_org_id');
-	#my $payToFacilityInfo = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_NONE, 'selRegistry', $payToOrgIntId);
-	#my $payToFacilityPhone = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_NONE, 'selAttributeByItemNameAndValueTypeAndParent', $payToOrgIntId, 'Primary', App::Universal::ATTRTYPE_PHONE);
-	#my $payToOrgId = $payToFacilityInfo->{org_id};
-	#$page->schemaAction(
-	#		'Invoice_Attribute', $command,
-	#		item_id => $page->field('pay_to_org_item_id') || undef,
-	#		parent_id => $invoiceId,
-	#		item_name => 'Pay To Org/Name',
-	#		value_type => defined $textValueType ? $textValueType : undef,
-	#		value_text => $payToFacilityInfo->{name_primary} || undef,
-	#		value_textB => $payToOrgId || undef,
-	#		value_int => $payToOrgIntId || undef,
-	#		_debug => 0
-	#);
+	my $payToOrgIntId = $page->field('billing_facility_id');
+	my $payToFacilityInfo = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_NONE, 'selRegistry', $payToOrgIntId);
+	my $payToFacilityPhone = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_NONE, 'selAttributeByItemNameAndValueTypeAndParent', $payToOrgIntId, 'Primary', App::Universal::ATTRTYPE_PHONE);
+	my $payToOrgId = $payToFacilityInfo->{org_id};
+	$page->schemaAction(
+			'Invoice_Attribute', $command,
+			item_id => $page->field('pay_to_org_item_id') || undef,
+			parent_id => $invoiceId,
+			item_name => 'Pay To Org/Name',
+			value_type => defined $textValueType ? $textValueType : undef,
+			value_text => $payToFacilityInfo->{name_primary} || undef,
+			value_textB => $payToOrgId || undef,
+			value_int => $payToOrgIntId || undef,
+			_debug => 0
+	);
 
-	#$page->schemaAction(
-	#		'Invoice_Attribute', $command,
-	#		item_id => $page->field('pay_to_org_tax_item_id') || undef,
-	#		parent_id => $invoiceId,
-	#		item_name => 'Pay To Org/Tax ID',
-	#		value_type => defined $textValueType ? $textValueType : undef,
-	#		value_text => $payToFacilityInfo->{tax_id} || undef,
-	#		value_textB => $payToOrgId || undef,
-	#		value_int => $payToOrgIntId || undef,
-	#		_debug => 0
-	#);
+	$page->schemaAction(
+			'Invoice_Attribute', $command,
+			item_id => $page->field('pay_to_org_tax_item_id') || undef,
+			parent_id => $invoiceId,
+			item_name => 'Pay To Org/Tax ID',
+			value_type => defined $textValueType ? $textValueType : undef,
+			value_text => $payToFacilityInfo->{tax_id} || undef,
+			value_textB => $payToOrgId || undef,
+			value_int => $payToOrgIntId || undef,
+			_debug => 0
+	);
 
-	#$page->schemaAction(
-	#		'Invoice_Attribute', $command,
-	#		item_id => $page->field('pay_to_org_phone_item_id') || undef,
-	#		parent_id => $invoiceId,
-	#		item_name => 'Pay To Org/Phone',
-	#		value_type => defined $phoneValueType ? $phoneValueType : undef,
-	#		value_text => $payToFacilityPhone->{value_text} || undef,
-	#		value_textB => $payToOrgId || undef,
-	#		value_int => $payToOrgIntId || undef,
-	#		_debug => 0
-	#);
+	$page->schemaAction(
+			'Invoice_Attribute', $command,
+			item_id => $page->field('pay_to_org_phone_item_id') || undef,
+			parent_id => $invoiceId,
+			item_name => 'Pay To Org/Phone',
+			value_type => defined $phoneValueType ? $phoneValueType : undef,
+			value_text => $payToFacilityPhone->{value_text} || undef,
+			value_textB => $payToOrgId || undef,
+			value_int => $payToOrgIntId || undef,
+			_debug => 0
+	);
 
 	my $feeSchedules = $page->param("_f_proc_active_catalogs");
 	$page->schemaAction(
