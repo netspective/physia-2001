@@ -14,7 +14,7 @@ use vars qw(@ISA @EXPORT $STMTMGR_PERSON_SEARCH $ITEMNAME_PATH $STMTFMT_SEL_PERS
 
 $ITEMNAME_PATH = 'Home';
 $STMTFMT_SEL_PERSON = qq{
-			select	per.person_id, per.complete_name as name, per.ssn,
+			select	per.person_id, per.simple_name as name, per.ssn,
 					to_char(per.date_of_birth, '$SQLSTMT_DEFAULTDATEFORMAT'),
 					att.value_text as value_text,
 					cat.category
@@ -23,7 +23,7 @@ $STMTFMT_SEL_PERSON = qq{
 					and per.person_id = att.parent_id(+)
 					and att.value_type(+) = @{[ App::Universal::ATTRTYPE_PHONE ]}
 					and att.item_name(+) = '$ITEMNAME_PATH'
-					and cat.org_id = ? 
+					and cat.org_id = ?
 					and %whereCond%
 					%catCond%
 			%orderBy%
