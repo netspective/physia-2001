@@ -107,6 +107,11 @@ $STMTMGR_ORG = new App::Statements::Org(
 		select id, caption
 			from Time_Metric
 		},
+	'selOrgCategory' => qq{
+		select member_name
+			from Org_Category
+			where parent_id = ?
+		},
 );
 
 1;
