@@ -8,6 +8,7 @@ use CGI::Dialog;
 use App::Universal;
 use CGI::Validator::Field;
 use App::Dialog::Field::Person;
+use App::Dialog::Field::Scheduling;
 use DBI::StatementManager;
 use App::Statements::Transaction;
 use App::Statements::Invoice;
@@ -41,7 +42,7 @@ sub new
 			name => 'org_id',
 			options => FLDFLAG_REQUIRED,
 		),
-		new CGI::Dialog::Field(caption => 'Close Date',
+		new App::Dialog::Field::Scheduling::Date(caption => 'Close Date',
 			name => 'close_date', 
 			type => 'date',
 			options => FLDFLAG_REQUIRED,

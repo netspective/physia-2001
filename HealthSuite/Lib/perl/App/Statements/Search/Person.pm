@@ -25,7 +25,14 @@ $STMTFMT_SEL_PERSON = qq{
 			account.value_text as account,
 			chart.value_text as chart,
 			cat.category,
-			initcap(per.simple_name) AS name
+			initcap(per.simple_name) AS name,
+			(select 1 from dual
+				where exists (select 'x' from transaction t
+					where t.trans_owner_id = per.person_id
+						and t.trans_status = @{[ App::Universal::TRANSSTATUS_ACTIVE ]}
+						and t.trans_type = @{[ App::Universal::TRANSTYPE_ALERTAPPOINTMENT ]}
+				)
+			) as appt_alert
 		FROM
 			person per,
 			person_org_category cat,
@@ -50,7 +57,11 @@ $STMTRPTDEFN_DEFAULT =
 {
 	columnDefn =>
 			[
-				{ head => 'ID', url => q{javascript:setSimpleName('#9#');chooseEntry('#&{?}#', null, null, '#8#','#9#');}, },
+				{ head => 'ID', 
+					url => q{javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
+						chooseEntry('#&{?}#', null, null, '#8#','#9#');
+					}, 
+				},
 				{ head => 'Last Name' },
 				{ head => 'First Name' },
 				{ head => 'SSN'},
@@ -69,15 +80,15 @@ my %personTemplates = (
 	'sel_id' =>
 		{
 			_stmtFmt => $STMTFMT_SEL_PERSON,
-			 whereCond => 'upper(per.person_id) = ?',
-			 orderBy => 'order by upper(per.person_id)',
+			 whereCond => 'per.person_id = ?',
+			 orderBy => 'order by per.person_id',
 			publishDefn => $STMTRPTDEFN_DEFAULT,
 		},
 	'sel_id_like' =>
 		{
 			_stmtFmt => $STMTFMT_SEL_PERSON,
-			 whereCond => 'upper(per.person_id) like ?',
-			 orderBy => 'order by upper(per.person_id)',
+			 whereCond => 'per.person_id like ?',
+			 orderBy => 'order by per.person_id',
 			 publishDefn => $STMTRPTDEFN_DEFAULT,
 		},
 	'sel_lastname' =>

@@ -10,35 +10,29 @@
 		<field id="facility_id" caption="Facility ID" join="facility" column="org_id"/>
 		<field id="physician_id" caption="Physician ID" join="event_attr_patientid" column="value_textB"/>
 		<field id="patient_id" caption="Patient ID" join="event_attr_patientid" column="value_text"/>
-		<field id="patient_name" caption="Patient Name" join="person" column="simple_name"/>
+		<field id="patient_name" caption="Patient Name" join="person" column="simple_name" columndefn="initcap(simple_name)"/>
 		<field id="patient_lastname" caption="Patient Last Name" join="person" column="name_last"/>
 		<field id="patient_firstname" caption="Patient First Name" join="person" column="name_first"/>
 		<field id="start_time" caption="Appointment Time" join="event" column="start_time" columndefn="TO_CHAR(event.start_time,'IYYYMMDDHH24MI')" ui-datatype="stamp"/>
 		<field id="appt_status" caption="Appointment Status" join="appt_status" column="caption"/>
 		<field id="duration" caption="Duration" join="event" column="duration" ui-datatype="integer"/>
 		<field id="appt_type" caption="Appointment Type" join="appt_type" column="caption"/>
-		
 		<field id="scheduled_by" caption="Scheduled By" join="event" column="scheduled_by_id"/>
 		<field id="scheduled_on" caption="Scheduled On" join="event" column="scheduled_stamp" columndefn="TO_CHAR(event.scheduled_stamp,'IYYYMMDDHH24MI')" ui-datatype="stamp"/>
-		
 		<field id="checked_in_by" caption="Checked-In By" join="event" column="checkin_by_id"/>
 		<field id="checked_in" caption="Checked-In On" join="event" column="checkin_stamp" columndefn="TO_CHAR(event.checkin_stamp,'IYYYMMDDHH24MI')" ui-datatype="stamp"/>
-		
 		<field id="checked_out_by" caption="Checked-Out By" join="event" column="checkout_by_id"/>
 		<field id="checked_out" caption="Checked-Out On" join="event" column="checkout_stamp" columndefn="TO_CHAR(event.checkout_stamp,'IYYYMMDDHH24MI')" ui-datatype="stamp"/>
-		
 		<field id="discard_by" caption="Discarded By" join="event" column="discard_by_id"/>
 		<field id="discard_on" caption="Discarded On" join="event" column="discard_stamp" columndefn="TO_CHAR(event.discard_stamp,'IYYYMMDDHH24MI')" ui-datatype="stamp"/>
 		<field id="appt_discard_type" caption="Discard Type" join="appt_discard_type" column="caption"/>
-		
 		<field id="chart" caption="Patient Chart #" join="per_attr_chart" column="value_text"/>
 		<field id="account" caption="Patient Account #" join="per_attr_account" column="value_text"/>
-		<field id="subject" caption="Reason for Visit" join="event" column="subject"/>
-		
-		<field id="remarks" caption="Remarks" join="event" column="remarks"/>
-		<field id="discard_remarks" caption="Discard Remarks" join="event" column="discard_remarks"/>
-		
+		<field id="subject" caption="Reason for Visit" join="event" column="subject" columndefn="initcap(subject)"/>
+		<field id="remarks" caption="Remarks" join="event" column="remarks" columndefn="initcap(remarks)"/>
+		<field id="discard_remarks" caption="Discard Remarks" join="event" column="discard_remarks" columndefn="initcap(discard_remarks)"/>
 		<field id="event_id" caption="Event ID" join="event" column="event_id"/>
+		<field id="home_phone" caption="Home Phone" join="per_attr_phone_home" column="value_text" ui-datatype="phone"/>
 		
 		<!-- Joins -->
 		<join id="event" table="event" autoinclude="1"/>
@@ -50,6 +44,7 @@
 		<join id="appt_status" table="appt_status" condition="appt_status.id = event.event_status"/>
 		<join id="appt_discard_type" table="appt_discard_type" condition="appt_discard_type.id (+) = event.discard_type"/>
 		<join id="appt_type" table="appt_type" condition="appt_type.appt_type_id (+) = event.appt_type"/>
+		<join id="per_attr_phone_home" table="person_attribute" condition="person.person_id = per_attr_phone_home.parent_id (+) AND per_attr_phone_home.value_type (+) = #constant.ATTRTYPE_PHONE# AND per_attr_phone_home.item_name (+) = 'Home'"/>
 		
 		<!-- Views -->
 		<view id="all" distinct="yes">
@@ -58,7 +53,9 @@
 			<column id="patient_name"/>
 			<column id="physician_id"/>
 			<column id="appt_type"/>
+			<column id="subject"/>
 			<column id="facility_id"/>
+			<column id="home_phone"/>
 			<column id="account"/>
 			<column id="chart"/>
 			<order-by id="start_time"/>
@@ -71,7 +68,9 @@
 			<column id="patient_name"/>
 			<column id="physician_id"/>
 			<column id="appt_type"/>
+			<column id="subject"/>
 			<column id="facility_id"/>
+			<column id="home_phone"/>
 			<column id="account"/>
 			<column id="chart"/>
 			<order-by id="start_time"/>
@@ -87,7 +86,9 @@
 			<column id="patient_name"/>
 			<column id="physician_id"/>
 			<column id="appt_type"/>
+			<column id="subject"/>
 			<column id="facility_id"/>
+			<column id="home_phone"/>
 			<column id="account"/>
 			<column id="chart"/>
 			<order-by id="start_time"/>
@@ -103,7 +104,9 @@
 			<column id="patient_name"/>
 			<column id="physician_id"/>
 			<column id="appt_type"/>
+			<column id="subject"/>
 			<column id="facility_id"/>
+			<column id="home_phone"/>
 			<column id="account"/>
 			<column id="chart"/>
 			<order-by id="start_time"/>
@@ -119,7 +122,9 @@
 			<column id="patient_name"/>
 			<column id="physician_id"/>
 			<column id="appt_type"/>
+			<column id="subject"/>
 			<column id="facility_id"/>
+			<column id="home_phone"/>
 			<column id="account"/>
 			<column id="chart"/>
 			<order-by id="start_time"/>

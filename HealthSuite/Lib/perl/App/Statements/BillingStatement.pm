@@ -50,7 +50,7 @@ my $SELECT_OUTSTANDING_CLAIMS = qq{
 		)
 	UNION
 	SELECT plan_id * (-1) as invoice_id, pp.person_id as bill_to_id, pp.billing_org_id as
-		billing_facility_id, 'Payment Plan' as provider_id, null as care_provider_id,
+		billing_facility_id, 'Payment Plan' as provider_id, NULL as care_provider_id,
 		pp.person_id as client_id, pp.payment_min as total_cost, 0 as total_adjust, pp.balance,
 		to_char(pp.first_due, '$SQLSTMT_DEFAULTDATEFORMAT') as invoice_date, 0 as bill_party_type,
 		0 as insurance_receipts,
@@ -184,7 +184,8 @@ $STMTMGR_STATEMENTS = new App::Statements::BillingStatement(
 			and Transaction.trans_id = Invoice.main_transaction
 			and not exists (select 'x' from person_attribute pa
 				where pa.parent_id = Transaction.provider_id
-					and pa.value_type = 960
+					and pa.value_type = @{[ App::Universal::ATTRTYPE_BILLING_INFO ]}
+					and pa.item_name = 'Physician Clearing House ID'
 					and pa.value_intb = 1)
 		order by invoice_id
 	},
@@ -296,6 +297,24 @@ $STMTMGR_STATEMENTS = new App::Statements::BillingStatement(
 			where rownum < 5
 		},
 	},
+
+	'sel_testStatements_Org' => {
+		sqlStmt => $SELECT_OUTSTANDING_CLAIMS,
+		ProviderClause => qq{AND not exists (select 'x' from person_attribute pa
+			where pa.parent_id = t.provider_id
+				and pa.value_type = 960
+				and pa.value_intb = 1
+			)
+		},
+		ExcludeAlreadySentClause => undef,
+	},
+
+	'sel_testStatements_Provider' => {
+		sqlStmt => $SELECT_OUTSTANDING_CLAIMS,
+		ProviderClause => qq{AND t.provider_id = :2},
+		ExcludeAlreadySentClause => undef,
+	},
+
 );
 
 1;

@@ -143,7 +143,8 @@ sub getForm
 		
 		<SCRIPT SRC='/lib/calendar.js'></SCRIPT>
 		<input name='start_date' id='start_date' size=10 maxlength=10 title='Start Date'
-			value="@{[$self->param('start_date') || UnixDate ('today', '%m/%d/%Y')]}">
+			value="@{[$self->param('start_date') || UnixDate ('today', '%m/%d/%Y')]}"
+			onblur="validateChange_Date(event)">
 		<A HREF="javascript: showCalendar(document.search_form.start_date);">
 			<img src='/resources/icons/calendar2.gif' title='Show calendar' BORDER=0></A>
 

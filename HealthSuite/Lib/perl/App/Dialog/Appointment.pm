@@ -25,6 +25,7 @@ use App::Component::WorkList::PatientFlow;
 
 use App::Schedule::Utilities;
 use App::Utilities::Invoice;
+
 use vars qw(%RESOURCE_MAP);
 
 use base qw(CGI::Dialog);
@@ -34,9 +35,9 @@ use base qw(CGI::Dialog);
 		_class => 'App::Dialog::Appointment',
 		_arl_add => ['person_id', 'resource_id', 'facility_id', 'start_stamp', 'patient_type', 'appt_type'],
 		_arl_modify => ['event_id'],
-		_arl_cancel => ['event_id'],
+		_arl_cancel => ['event_id', 'invoice_id'],
 		_arl_noshow => ['event_id'],
-		_arl_reschedule => ['event_id'],
+		_arl_reschedule => ['event_id', 'invoice_id'],
 		_arl_confirm => ['event_id'],
 		_modes => ['add', 'update', 'remove', 'noshow', 'cancel', 'reschedule', 'confirm'],
 	},
@@ -67,7 +68,7 @@ sub new
 		size => 32,
 		maxLength => 64,
 		useShortForm => 1,
-		incSimpleName=>1,
+		incSimpleName => 1,
 	);
 	$physField->clearFlag(FLDFLAG_IDENTIFIER); # because we can have roving resources, too.
 
@@ -95,7 +96,7 @@ sub new
 			size => 40,
 			options => FLDFLAG_REQUIRED
 		),
-		new CGI::Dialog::Field(caption => 'Symptoms',
+		new CGI::Dialog::Field(caption => 'Symptoms / Remarks',
 			type => 'memo', name => 'remarks'
 		),
 		new CGI::Dialog::Field(caption => 'Appointment Type',
@@ -697,11 +698,26 @@ sub handle_page
 	my ($self, $page, $command) = @_;
 
 	my $eventId = $page->field('parent_event_id') || $page->param('event_id');
+	if ($eventId)
+	{
+		my $patientId = $STMTMGR_SCHEDULING->getSingleValue($page, STMTMGRFLAG_CACHE,
+			'sel_apptAlert', $eventId);
+		$page->addContent(qq{
+			<script>
+				alertPopup("/popup/alerts/$patientId");
+			</script>
+		}) if $patientId;
+	}
 
 	my $returnUrl = $self->getReferer($page);
-	my ($status, $person, $stamp) = checkEventStatus($page, $eventId);
 
-	if ($status =~ /in|out/ && $command =~ /cancel|noshow|reschedule|update/)
+	my ($status, $person, $stamp) = checkEventStatus($page, $eventId);
+	
+	if ($status =~ /in/ && $command =~ /cancel|reschedule/)
+	{
+		$self->SUPER::handle_page($page, $command);
+	}
+	elsif ($status =~ /in|out/ && $command =~ /cancel|noshow|reschedule|update/)
 	{
 		$page->addContent(qq{
 			<font face=Verdana size=3>
@@ -856,7 +872,9 @@ sub execute
 			elsif ($command eq 'noshow' || $command eq 'cancel')
 			{
 				my $discardType = $command eq 'cancel' ? 0: 1;
-				my $discardRemarks = $command eq 'cancel' ? $page->field('cancel_remarks') : $page->field('discard_remarks');
+				my $discardRemarks = $command eq 'cancel' ? $page->field('cancel_remarks') : 
+					$page->field('discard_remarks');
+				
 				$page->schemaAction(
 					'Event', 'update',
 					event_id => $eventId,
@@ -867,6 +885,9 @@ sub execute
 					discard_remarks => $discardRemarks || undef,
 					_debug => 0
 				);
+
+				my $invoiceId = $page->param('invoice_id');
+				voidInvoice($page, $invoiceId) if ($command eq 'cancel' && $invoiceId);
 
 				$self->handleWaitingList($page, $eventId);
 			}
@@ -915,6 +936,9 @@ sub execute
 						_debug => 0
 					);
 				}
+
+				my $invoiceId = $page->param('invoice_id');
+				voidInvoice($page, $invoiceId) if ($invoiceId);
 
 				$self->handleWaitingList($page, $eventId);
 			}

@@ -210,8 +210,8 @@ sub getHeaderRecord
 {
 	my ($statement, $uniqueStatementId) = @_;
 
-	my $internalStatementId = $STMTMGR_STATEMENTS->getSingleValue($page, STMTMGRFLAG_CACHE,
-		'sel_internalStatementId', $uniqueStatementId);
+	my $suffix = $statement->{paymentPlan} ? 'PP' : $STMTMGR_STATEMENTS->getSingleValue($page, 
+		STMTMGRFLAG_CACHE, 'sel_internalStatementId', $uniqueStatementId);
 
 	my @fromAddress = getOrgAddress($statement->{payToId}, 'Mailing');
 	my @payToAddress = getOrgAddress($statement->{payToId}, 'Payment');
@@ -222,7 +222,7 @@ sub getHeaderRecord
 		@fromAddress,
 		getSendToAddress($statement->{billToId}, $statement->{billPartyType}),
 		@payToAddress,
-		$statement->{clientId} . '-' . $internalStatementId,
+		$statement->{clientId} . '-' . $suffix,
 		$statement->{patientName},
 		$TODAY,
 		numToStr($statement->{amountDue}),
@@ -326,7 +326,7 @@ sub getPersonAddress
 	}
 	else
 	{
-		return (' ', ' ', ' ', ' ', ' ', ' ');
+		return ($personId, ' ', ' ', ' ', ' ', ' ');
 	}
 }
 

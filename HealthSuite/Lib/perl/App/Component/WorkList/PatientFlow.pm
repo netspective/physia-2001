@@ -194,6 +194,7 @@ sub getComponentHtml
 		<style>
 			a.today {text-decoration:none; font-family:Verdana; font-size:8pt}
 			strong {font-family:Tahoma; font-size:8pt; font-weight:normal}
+			a.alert {text-decoration:none; font-size:8pt; background-color:red; color:white; hover-color:yellow}
 		</style>
 	};
 
@@ -211,8 +212,12 @@ sub getComponentHtml
 
 		my $alertHtml;
 		if ($alertExists) {
-			$alertHtml = qq{<a href="javascript:doActionPopup('/popup/alerts/$_->{patient_id}')"
-				class=today title="View $_->{patient_id} Alert(s)"><b>Alert<b></a>
+			$alertHtml = qq{<table><tr><td>
+				<a href="javascript:alertPopup('/popup/alerts/$_->{patient_id}');" class="alert"
+				title="View $_->{patient_id} Alert(s)"
+				onmouseover='anchorMouseOver(this, "green")' onmouseout='anchorMouseOut(this, "white")'>
+				<b>ALERT<b></a>
+				</td></tr></table>
 			};
 		}
 
@@ -272,8 +277,8 @@ sub getComponentHtml
 
 		my @rowData = (
 			qq{<nobr>
-				<A HREF='$arlPrefix/dlg-reschedule-appointment/$_->{event_id}' TITLE='Reschedule Appointment'>$IMAGETAGS{'icons/square-lgray-hat-sm'}</A>
-				<A HREF='$arlPrefix/dlg-cancel-appointment/$_->{event_id}' TITLE='Cancel Appointment'>$IMAGETAGS{'icons/action-edit-remove-x'}</A>
+				<A HREF='$arlPrefix/dlg-reschedule-appointment/$_->{event_id}/$_->{invoice_id}' TITLE='Reschedule Appointment'>$IMAGETAGS{'icons/square-lgray-hat-sm'}</A>
+				<A HREF='$arlPrefix/dlg-cancel-appointment/$_->{event_id}/$_->{invoice_id}' TITLE='Cancel Appointment'>$IMAGETAGS{'icons/action-edit-remove-x'}</A>
 				<A HREF='$arlPrefix/dlg-noshow-appointment/$_->{event_id}' TITLE='No-Show Appointment'>$IMAGETAGS{'icons/schedule-noshow'}</A>
 				</nobr><br>
 				$alertHtml

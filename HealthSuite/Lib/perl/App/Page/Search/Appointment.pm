@@ -40,11 +40,24 @@ sub handleARL
 		$self->param('appt_status', "$apptStatus,$apptStatus") if $apptStatus;
 		$self->param('event_id', $eventId);
 
+		$self->param('search_from_dash_date', $fromDate);
 		$fromDate =~ s/\-/\//g;
 		$self->param('search_from_date', $fromDate);
+		
+		$self->param('search_to_dash_date', $toDate);
 		$toDate =~ s/\-/\//g;
 		$self->param('search_to_date', $toDate);
 		$self->param('searchAgain', 1);
+	}
+	else
+	{
+		my $fromDate = $self->param('search_from_date');
+		$fromDate =~ s/\//\-/g;
+		$self->param('search_from_dash_date', $fromDate);
+		
+		my $toDate = $self->param('search_to_date');
+		$toDate =~ s/\//\-/g;
+		$self->param('search_to_dash_date', $toDate);
 	}
 
 	return $self->SUPER::handleARL($arl, $params, $rsrc, $pathItems);
@@ -118,8 +131,10 @@ sub getForm
 		</script>
 
 		&nbsp Date Range:
-		<input name='search_from_date' size=10 maxlength=10 value="@{[$self->param('search_from_date')]}" title='From Date'>
-		<input name='search_to_date' size=10 maxlength=10 value="@{[$self->param('search_to_date')]}" title='To Date'>
+		<input name='search_from_date' size=10 maxlength=10 value="@{[$self->param('search_from_date')]}"
+			onblur="validateChange_Date(event)" title='From Date'>
+		<input name='search_to_date' size=10 maxlength=10 value="@{[$self->param('search_to_date')]}" 
+			onblur="validateChange_Date(event)" title='To Date'>
 		<nobr>
 			&nbsp <input name='unAvailEventSearch' type=checkbox $unAvailEventSearchChecked>
 			Appointments Outside Available Templates
@@ -338,6 +353,7 @@ sub execute
 						$_->{appt_type},
 						$_->{account_number},
 						$_->{chart_number},
+						$_->{patient_name},
 					);
 
 					push(@data, \@rowData);

@@ -44,6 +44,7 @@ sub defaultRowRptFormat
 		$self->{attributes}->{appt_type},
 		$self->{attributes}->{account_number},
 		$self->{attributes}->{chart_number},
+		$self->{attributes}->{patient_name},
 	);
 }
 

@@ -461,7 +461,7 @@ sub buildRows
 			my $hourAm = $hour == 12 ? $hour : $hour == 0 ? 12 : $hour % 12;
 
 			my $start_stamp = sprintf ("%02d-%02d-%04d_%02d:00_%s", $date[1], $date[2], $date[0], $hourAm, $am);
-			my $apptHref = "javascript:doActionPopup('/schedule/dlg-add-appointment//$resource_id/$facility_id/$start_stamp',null,'width=620,height=500,scrollbars,resizable');";
+			my $apptHref = "javascript:doActionPopup('/schedule/dlg-add-appointment//$resource_id/$facility_id/$start_stamp',null,'width=620,height=550,scrollbars,resizable');";
 
 			$apptSheetRef->[$hour][$col] = qq{
 				<td valign=center align=center rowspan=1 bgcolor=$hourbgColor width=$hourWidth >

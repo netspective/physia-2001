@@ -261,6 +261,7 @@ $STMTMGR_REPORT_SCHEDULING = new App::Statements::Report::Scheduling(
 				AND e.start_time >= TO_DATE(:2, '$SQLSTMT_DEFAULTDATEFORMAT') + :5
 				AND e.start_time <  TO_DATE(:3, '$SQLSTMT_DEFAULTDATEFORMAT') + 1 + :5
 				AND e.event_id = ea.parent_id
+				AND e.event_status < 3
 				AND e.checkin_stamp is NOT NULL
 				AND e.checkout_stamp is NULL
 			GROUP BY to_char(e.CHECKIN_STAMP - :5, '$SQLSTMT_DEFAULTDATEFORMAT')
@@ -291,6 +292,7 @@ $STMTMGR_REPORT_SCHEDULING = new App::Statements::Report::Scheduling(
 			AND e.start_time >= TO_DATE(:3, '$SQLSTMT_DEFAULTDATEFORMAT') + :6
 			AND e.start_time <  TO_DATE(:4, '$SQLSTMT_DEFAULTDATEFORMAT') + 1 + :6
 		},
+		excludeDiscardedAppts => qq{AND e.event_status < 3},
 		publishDefn => $STMTRPTDEFN_DETAIL_APPT_SCHEDULE,
 	},
 

@@ -71,6 +71,7 @@ sub populateStatementsHash
 			$statements{$key}->{paymentPlan} = - $_->{invoice_id};
 			$statements{$key}->{amountDue} = $_->{total_cost};
 			$_->{total_cost} = 0;
+			$_->{invoice_id} = 'PP' . -($_->{invoice_id});
 		}
 		else
 		{

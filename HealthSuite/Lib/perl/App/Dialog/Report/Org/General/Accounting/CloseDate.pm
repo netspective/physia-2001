@@ -6,9 +6,11 @@ use strict;
 use Carp;
 use App::Dialog::Report;
 use App::Universal;
+use App::Dialog::Field::Scheduling;
 
 use CGI::Dialog;
 use CGI::Validator::Field;
+
 use DBI::StatementManager;
 use Data::Publish;
 use App::Statements::Report::CloseDate;
@@ -16,9 +18,9 @@ use App::Statements::Person;
 
 use Date::Manip;
 
-use vars qw(@ISA $INSTANCE);
+use vars qw($INSTANCE);
 
-@ISA = qw(App::Dialog::Report);
+use base qw(App::Dialog::Report);
 
 sub publishDefn
 {
@@ -47,7 +49,7 @@ sub new
 	my $self = App::Dialog::Report::new(@_, id => 'rpt-close-date',	heading => 'Close Date Report');
 
 	$self->addContent(
-		new CGI::Dialog::Field(caption => 'Close Date',
+		new App::Dialog::Field::Scheduling::Date(caption => 'Close Date',
 			name => 'close_date',
 			type=> 'date',
 			defaultValue => '',
@@ -92,6 +94,17 @@ sub execute
 	my $fiscalYear = $cMonth >= $fiscalMonth ? $cYear : $cYear -1;
 	my $fiscalYearBeginDate = "$fiscalMonth/01/$fiscalYear";
 
+	my $lastCloseDate = $STMTMGR_REPORT_CLOSEDATE->getSingleValue($page, STMTMGRFLAG_NONE,
+		'sel_lastCloseDate', $orgInternalId);
+	$page->schemaAction('Org_Attribute', 'add',
+		item_id => undef,
+		parent_id => $orgInternalId,
+		item_name => 'Retire Batch Date',
+		item_type => 0,
+		value_type => App::Universal::ATTRTYPE_DATE,
+		value_date => '01/01/1900',
+	) unless $lastCloseDate;
+	
 	my $orgDay = $STMTMGR_REPORT_CLOSEDATE->getRowAsHash($page, STMTMGRFLAG_NONE,
 		'sel_orgTotalsForDate', $orgInternalId, $closeDate);
 

@@ -53,9 +53,9 @@ $STMTFMT_SEL_EVENTS = qq{
 		ea.value_textB as resource_id,
 		patient.name_last || ', ' || substr(patient.name_first,1,1) as short_patient_name,
 		patient.complete_name as patient_complete_name,
-		e.subject,
+		initcap(e.subject) as subject,
 		aat.caption as patient_type,
-		e.remarks,
+		initcap(e.remarks) as remarks,
 		e.event_status,
 		e.facility_id,
 		to_char(e.checkin_stamp - :1, '$SQLSTMT_DEFAULTSTAMPFORMAT') as checkin_stamp,
@@ -65,7 +65,8 @@ $STMTFMT_SEL_EVENTS = qq{
 		e.scheduled_by_id,
 		to_char(e.scheduled_stamp - :1, '$SQLSTMT_DEFAULTSTAMPFORMAT') as scheduled_stamp,
 		at.caption as appt_type,
-		e.appt_type as appt_type_id
+		e.appt_type as appt_type_id,
+		initcap(patient.complete_sortable_name) as patient_name
 	from Appt_Type at, Appt_Status stat, Appt_Attendee_type aat, Person patient,
 		Event_Attribute ea, Event e
 	where e.start_time >= to_date(:2, 'yyyy,mm,dd') + :1
@@ -166,7 +167,7 @@ $STMTMGR_SCHEDULING = new App::Statements::Scheduling(
 				and Appt_Discard_type.id(+) = Event.discard_type
 		}
 	},
-	
+
 	'sel_voidInvoice' => qq{
 		select Invoice.invoice_id, to_char(value_date - :1, '$SQLSTMT_DEFAULTSTAMPFORMAT')
 			as void_stamp, Invoice_History.cr_user_id
@@ -603,6 +604,18 @@ $STMTMGR_SCHEDULING = new App::Statements::Scheduling(
 				and e.owner_id = ?
 			order by e.start_time
 		},
+	},
+	
+	'sel_apptAlert' => qq{
+		select value_text as patient_id 
+		from event_attribute ea, event e
+		where e.event_id = :1
+			and ea.parent_id = e.event_id
+			and exists (select 'x' from transaction t
+				where t.trans_owner_id = ea.value_text
+					and t.trans_status = @{[ App::Universal::TRANSSTATUS_ACTIVE ]}
+					and t.trans_type = @{[ App::Universal::TRANSTYPE_ALERTAPPOINTMENT ]}
+			)
 	},
 );
 

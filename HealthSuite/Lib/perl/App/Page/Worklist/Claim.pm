@@ -103,7 +103,7 @@ sub prepare_view_resubmit
 		<h3><u>Resubmit Claim</u></h3>
 		<font face=Verdana size=3>
 		This function will resubmit Claim <b>$invoiceId</b>. &nbsp;
-		Click here to <a href="/invoice/$invoiceId/submit?resubmit=1"> resubmit</a>.
+		Click here to <a href="/invoice/$invoiceId/submit?resubmit=2"> resubmit</a>.
 		</font>
 	});
 	return 1;

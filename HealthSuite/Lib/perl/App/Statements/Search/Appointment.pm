@@ -23,36 +23,50 @@ $STMTRPTDEFN_DEFAULT =
 {
 	columnDefn =>
 	[
-		{ head => 'Time',
+		{ head => 'Appointment Date Time',
 			colIdx => 1,
 			url => q{javascript: ! isActionPopupWindow() ? chooseEntry('#9#') : window.close()},
+			hint => 'Perform On-Select Function',
 			options => PUBLCOLFLAG_DONTWRAP,
 		},
 
-		{ head => 'Account / Chart',
-			dataFmt => 'Account: #14#<br>Chart: #15#'
+		{ head => 'Physician/Facility',
+			#dataFmt => '#2# <br> #7#',
+			dataFmt => qq{
+				<a href="javascript:chooseItem('/search/appointment/#2#//#param.action#/#param.search_from_dash_date#/#param.search_to_dash_date#')"
+					title='View #2# Appointments' style='text-decoration:none'>#2#</a> <br>
+				<a href="javascript:chooseItem('/search/appointment//#7#/#param.action#/#param.search_from_dash_date#/#param.search_to_dash_date#')"
+					title='View #7# Appointments' style='text-decoration:none'>#7#</a>
+			},
 		},
 
-		{
-			head => 'Details',
-			dataFmt => q{<nobr>
-				<a href="javascript:chooseItem('/person/#12#/profile')" title='View #12# Profile'
-					style='text-decoration:none'>#0# (#12#)</a>
-				- #3# </nobr> <BR>
-				Home Phone: <b>#5#</b> <BR>
-				<i>#6#</i> with
-				<a href="javascript:chooseItem('/search/appointment/#2#')"
-					title='View #2# Appointments' style='text-decoration:none'>#2#</a>
-				at
-				<a href="javascript:chooseItem('/search/appointment//#7#')"
-					title='View #7# Appointments' style='text-decoration:none'>#7#</a>
-				<BR>
-				Appt Type: #13#<BR>
-				Reason for Visit: <b>#4#</b><BR>
-				#8# <br>
-				Scheduled by #10# <br>
-				on #11#
-			}
+		{ head => 'Patient Name',
+			dataFmt => qq
+			{	<a href="javascript:chooseItem('/person/#12#/profile')" title='View #12# Profile'
+				style='text-decoration:none'>#16# (#12#)</a> <br>
+				Scheduled by: #10#
+			},
+			options => PUBLCOLFLAG_DONTWRAP,
+		},
+
+		{ head => 'Patient Type',
+			dataFmt => '#3#',
+		},
+
+		{ head => 'Reason for Visit',
+			dataFmt => '#4#',
+		},
+
+		{ head => 'Home Phone',
+			dataFmt => '#5#',
+		},
+
+		{ head => 'Chart',
+			dataFmt => '#15#',
+		},
+
+		{ head => 'Account',
+			dataFmt => '#14#',
 		},
 	],
 };
@@ -61,12 +75,12 @@ my $APPOINTMENT_COLUMNS = qq
 {	patient.simple_name,
 	TO_CHAR(event.start_time - ?, '$SQLSTMT_DEFAULTSTAMPFORMAT') AS start_time,
 	ea.value_textB AS resource_id,
-	aat.caption AS patient_type,
-	event.subject,
+	replace(aat.caption, 'Patient', null) AS patient_type,
+	initcap(event.subject) as subject,
 	pa.value_text as home_phone,
 	stat.caption,
 	org.org_id,
-	event.remarks,
+	initcap(event.remarks) as remarks,
 	event.event_id,
 	scheduled_by_id,
 	TO_CHAR(scheduled_stamp - ?, '$SQLSTMT_DEFAULTSTAMPFORMAT') AS scheduled_stamp,
@@ -81,7 +95,8 @@ my $APPOINTMENT_COLUMNS = qq
 		FROM Person_Attribute  pa
 		WHERE pa.parent_id = patient.person_id
 			AND pa.item_name = 'Patient/Chart Number'
-	) as chart_number
+	) as chart_number,
+	initcap(patient.complete_sortable_name) as patient_name
 };
 
 my $APPOINTMENT_TABLES = qq{
@@ -103,7 +118,7 @@ $APPOINTMENT_COLUMNS
 		FROM
 $APPOINTMENT_TABLES
 		WHERE
-			upper(Org.org_id) like upper(?)
+			Org.org_id like upper(?)
 			AND Event.facility_id = org.org_internal_id
 			AND Event.start_time BETWEEN
 				TO_DATE(?, '$SQLSTMT_DEFAULTSTAMPFORMAT')

@@ -12,6 +12,7 @@
 
 var WINDOWNAME_FINDPOPUP = '_physia_findPopup';
 var WINDOWNAME_ACTIONPOPUP = '_physia_actionPopup';
+var WINDOWNAME_ALERTPOPUP = '_physia_alertPopup';
 
 // These constants MUST be kept identical to what is in CGI::Validator::Field
 var FLDFLAG_INVISIBLE = 1;
@@ -911,7 +912,7 @@ function isLookupWindow()
 
 //This function only works for person_id to simple_name
 //Set span value to show simple name
-function setSimpleName(itemValue)
+function setSimpleName(itemValue, popupAlert, popupUrl)
 {
 	if(isLookupWindow())
 	{
@@ -919,9 +920,20 @@ function setSimpleName(itemValue)
 		if(eval(spanObj))
 		{
 			spanObj.innerHTML = itemValue + " ";
+			if (popupAlert == 1)
+			{
+				alertPopup(popupUrl);
+			}
 		}
 	}
 };
+
+function alertPopup(popupUrl)
+{
+	var popUpWindow;
+	popUpWindow = open(popupUrl, WINDOWNAME_ALERTPOPUP, 'width=500, height=350, scrollbars, resizable');
+	popUpWindow.focus();
+}
 
 function populateControl(what, closeWindow, secondItem)
 {
