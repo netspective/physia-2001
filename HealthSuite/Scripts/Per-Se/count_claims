@@ -1,0 +1,4 @@
+. /etc/profile
+. $HOME/.bash_profile
+
+countTransferred.pl -db=db-pro_new > /tmp/count_claims.log 2>&1
