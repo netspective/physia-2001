@@ -173,6 +173,7 @@ use App::Dialog::Transaction::PhoneMessage;
 use App::Dialog::Transaction::RefillRequest;
 use App::Dialog::Personnel;
 use App::Dialog::Eligibility;
+use App::Dialog::EligibilityPatient;
 
 #use App::Dialog::UserProblems;
 use App::Dialog::WorkersComp;
