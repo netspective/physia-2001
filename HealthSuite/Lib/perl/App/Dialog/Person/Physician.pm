@@ -44,7 +44,56 @@ sub initialize
 	$self->addContent(
 		new CGI::Dialog::Field(type => 'hidden', name => 'phy_type_item_id'),
 
-		new CGI::Dialog::Subhead(heading => 'Certification/Accreditations', name => 'cert_for_physician', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE),
+		new CGI::Dialog::Subhead(heading => 'ID Numbers', name => 'id_numbers', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE),
+			new CGI::Dialog::MultiField(caption =>'Memorial Sisters Of Charity/Exp Date', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
+				fields => [
+					new CGI::Dialog::Field(caption => 'Memorial Sisters Of Charity', name => 'charity_id'),
+					new CGI::Dialog::Field(type=> 'date', caption => 'Date of Expiration', name => 'mem_exp_date', defaultValue => '')
+					]),
+			new CGI::Dialog::MultiField(caption =>'EPSTD Number/Exp Date', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
+				fields => [
+					new CGI::Dialog::Field(caption => 'EPSTD Number', name => 'provider_num'),
+					new CGI::Dialog::Field(type=> 'date', caption => 'Date of Expiration', name => 'esptd_exp_date', defaultValue => '')
+					]),
+			new CGI::Dialog::MultiField(caption =>'UPIN/Exp Date', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
+				fields => [
+					new CGI::Dialog::Field(  caption => 'UPIN', name => 'upin'),
+					new CGI::Dialog::Field(type=> 'date', caption => 'Date of Expiration', name => 'upin_exp_date', defaultValue => ''),
+					]),
+			new CGI::Dialog::MultiField(caption =>'Medicare/Exp Date', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
+				fields => [
+					new CGI::Dialog::Field( caption => 'Medicare', name => 'medicare'),
+					new CGI::Dialog::Field(type=> 'date', caption => 'Date of Expiration', name => 'medicare_exp_date', futureOnly => 1, defaultValue => ''),
+					]),
+			new CGI::Dialog::MultiField(caption =>'Medicaid/Exp Date', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
+				fields => [
+					new CGI::Dialog::Field( caption => 'Medicaid', name => 'medicaid'),
+					new CGI::Dialog::Field(type=> 'date', caption => 'Date of Expiration', name => 'medicaid_exp_date', futureOnly => 1, defaultValue => ''),
+					]),
+			new CGI::Dialog::MultiField(caption =>'BCBS #/Exp Date', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
+				fields => [
+					new CGI::Dialog::Field(caption => 'bcbs#', name => 'bcbs_num'),
+					new CGI::Dialog::Field(type=> 'date', caption => 'Date of Expiration', name => 'bcbs_exp_date', futureOnly => 1, defaultValue => ''),
+					]),
+			new CGI::Dialog::MultiField(caption =>'Railroad Medicare/Exp Date', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
+				fields => [
+					new CGI::Dialog::Field(caption => 'railroad_medic', name => 'rail_medic'),
+					new CGI::Dialog::Field(type=> 'date', caption => 'Date of Expiration', name => 'rail_exp_date', futureOnly => 1, defaultValue => ''),
+					]),
+			new CGI::Dialog::MultiField(caption =>'Champus/Exp Date', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
+				fields => [
+					new CGI::Dialog::Field(caption => 'champus', name => 'champus'),
+					new CGI::Dialog::Field(type=> 'date', caption => 'Date of Expiration', name => 'champus_exp_date', futureOnly => 1, defaultValue => ''),
+					]),
+			new CGI::Dialog::MultiField(caption =>'WC #/Exp Date', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
+				fields => [
+					new CGI::Dialog::Field(caption => 'wc#', name => 'wc_num'),
+					new CGI::Dialog::Field(type=> 'date', caption => 'Date of Expiration', name => 'wc_exp_date', futureOnly => 1, defaultValue => ''),
+				]),
+		#new CGI::Dialog::Field(caption => 'Memorial Sisters Of Charity', name => 'charity_id'),
+		#new CGI::Dialog::Field(caption => 'EPSTD Number', name => 'provider_num'),
+
+ 		new CGI::Dialog::Subhead(heading => 'Certification/Accreditations', name => 'cert_for_physician', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE),
 
 		new CGI::Dialog::MultiField(caption => '1. Specialty/Sequence', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE, name => 'specialty1',
 			fields => [
@@ -107,21 +156,6 @@ sub initialize
 							new CGI::Dialog::Field(caption => 'Accreditations', name => 'accreditations'),
 							new CGI::Dialog::Field(type=> 'date', caption => 'Date of Expiration', name => 'accredit_exp_date', defaultValue => ''),
 							]),
-		new CGI::Dialog::MultiField(caption =>'UPIN/Exp Date', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
-			fields => [
-				new CGI::Dialog::Field(  caption => 'UPIN', name => 'upin'),
-				new CGI::Dialog::Field(type=> 'date', caption => 'Date of Expiration', name => 'upin_exp_date', defaultValue => ''),
-				]),
-		new CGI::Dialog::MultiField(caption =>'Medicare/Exp Date', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
-			fields => [
-				new CGI::Dialog::Field( caption => 'Medicare', name => 'medicare'),
-				new CGI::Dialog::Field(type=> 'date', caption => 'Date of Expiration', name => 'medicare_exp_date', futureOnly => 1, defaultValue => ''),
-				]),
-		new CGI::Dialog::MultiField(caption =>'Medicaid/Exp Date', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
-			fields => [
-				new CGI::Dialog::Field( caption => 'Medicaid', name => 'medicaid'),
-				new CGI::Dialog::Field(type=> 'date', caption => 'Date of Expiration', name => 'medicaid_exp_date', futureOnly => 1, defaultValue => ''),
-				]),
 		new CGI::Dialog::MultiField(caption =>'Tax ID/Type/Exp Date', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
 			fields => [
 				new CGI::Dialog::Field(caption => 'Tax ID', name => 'tax_id'),
@@ -165,26 +199,6 @@ sub initialize
 				new CGI::Dialog::Field(caption => 'State', name => 'state3'),
 				new CGI::Dialog::Field(caption => 'License', name => 'license3'),
 				new CGI::Dialog::Field(type=> 'date', caption => 'Date of Expiration', name => 'state3_exp_date', futureOnly => 1, defaultValue => ''),
-				]),
-		new CGI::Dialog::MultiField(caption =>'BCBS #/Exp Date', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
-			fields => [
-				new CGI::Dialog::Field(caption => 'bcbs#', name => 'bcbs_num'),
-				new CGI::Dialog::Field(type=> 'date', caption => 'Date of Expiration', name => 'bcbs_exp_date', futureOnly => 1, defaultValue => ''),
-				]),
-		new CGI::Dialog::MultiField(caption =>'Railroad Medicare/Exp Date', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
-			fields => [
-				new CGI::Dialog::Field(caption => 'railroad_medic', name => 'rail_medic'),
-				new CGI::Dialog::Field(type=> 'date', caption => 'Date of Expiration', name => 'rail_exp_date', futureOnly => 1, defaultValue => ''),
-				]),
-		new CGI::Dialog::MultiField(caption =>'Champus/Exp Date', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
-			fields => [
-				new CGI::Dialog::Field(caption => 'champus', name => 'champus'),
-				new CGI::Dialog::Field(type=> 'date', caption => 'Date of Expiration', name => 'champus_exp_date', futureOnly => 1, defaultValue => ''),
-				]),
-		new CGI::Dialog::MultiField(caption =>'WC #/Exp Date', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
-			fields => [
-				new CGI::Dialog::Field(caption => 'wc#', name => 'wc_num'),
-				new CGI::Dialog::Field(type=> 'date', caption => 'Date of Expiration', name => 'wc_exp_date', futureOnly => 1, defaultValue => ''),
 				]),
 		new CGI::Dialog::MultiField(caption =>'National Provider Indentification/Exp Date', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
 			fields => [
@@ -431,6 +445,29 @@ sub execute_add
 			value_dateEnd => $page->field('dps_exp_date') || undef,
 			_debug => 0
 	) if $page->field('dps') ne '';
+
+	$page->schemaAction(
+			'Person_Attribute', $command,
+			parent_id => $personId || undef,
+			item_name => 'Memorial Sisters Charity',
+			value_type => App::Universal::ATTRTYPE_LICENSE,
+			value_text => $page->field('charity_id') || undef,
+			value_textB => 'Memorial Sisters Charity' || undef,
+			value_dateEnd => $page->field('mem_exp_date') || undef,
+			_debug => 0
+		) if $page->field('charity_id');
+
+	$page->schemaAction(
+			'Person_Attribute', $command,
+			parent_id => $personId || undef,
+			item_name => 'Provider Number',
+			value_type => App::Universal::ATTRTYPE_LICENSE,
+			value_text => $page->field('provider_num') || undef,
+			value_textB => 'Provider Number' || undef,
+			value_dateEnd => $page->field('esptd_exp_date') || undef,
+			_debug => 0
+		) if $page->field('provider_num');
+
 
 
 	#State Licenses
