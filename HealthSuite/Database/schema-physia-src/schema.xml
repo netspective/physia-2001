@@ -106,6 +106,8 @@
 	<table name="Insurance" abbrev="InsRec" type="Audit,Secure,Restrict_Rows">
 		<description>An insurance record that belongs to a person or organization</description>
 		<column name="ins_internal_id" type="autoinc" primarykey="yes" descr="Unique insurance record identification (in entire system) for internal use"/>
+		<column name="plan_ins_id" lookupref="Insurance.ins_internal_id" descr="ins_internal_id of plan if exist, otherwize NULL"/>
+		<column name="product_ins_id" lookupref="Insurance.ins_internal_id" descr="ins_internal_id of product"/>
 		<column name="product_name" type="text" size="30" descr="The ID given to an insurance product (by an end-user)"/>
 		<column name="record_type" lookupref="Insurance_Record_Type" descr="The type of information held in this record"/>
 		<column name="parent_ins_id" lookupref="Insurance.ins_internal_id" descr="If this record was 'inherited' from an existing record, then this is the original record id (otherwise NULL)"/>
@@ -168,6 +170,7 @@
 		<column name="trans_status" lookupref="Transaction_Status.id" required="yes" default="0" descr="The current status of this transaction (inactive, active, other, etc)"/>
 		<column name="trans_status_reason" type="text" size="128" descr="The reason the transaction is in its current status"/>
 		<column name="trans_substatus" type="longint" descr="The current status of this transaction (varies depending upon subtype)"/>
+		<column name="invoice_id" indexed="yes" lookupref="Invoice.invoice_id" descr="Invoice id for invoice related to this transaction"/>
 		<column name="trans_substatus_reason" type="text" size="128" descr="The reason the transaction is in its current status (varies depending upon subtype)"/>
 		<column name="caption" type="text" size="128" descr="Freeform text explanation of transaction (summary)"/>
 		<column name="detail" type="text" size="512" descr="Freeform text explanation of transaction (detail)"/>
@@ -293,7 +296,7 @@
 	<table name="Invoice_Item" abbrev="InvItem" type="Audit,Secure,">
 		<description>An individual line item on a invoice</description>
 		<column name="item_id" type="autoinc" primarykey="yes" descr="Unique ID for specific invoice line item record"/>
-		<column name="parent_id" parentref="Invoice.invoice_id" descr="The parent Invoice"/>
+		<column name="parent_id" indexed="yes" parentref="Invoice.invoice_id" descr="The parent Invoice"/>
 		<column name="item_type" lookupref="Inv_Item_Type" descr="The primary item type"/>
 		<column name="item_subtype" type="integer" descr="Secondary information about the item type (perhaps describing some attributes)"/>
 		<column name="parent_item_id" selfref="Invoice_Item.item_id" descr="The parent item ID, if a parent-child relationship is required"/>
@@ -360,7 +363,7 @@
 		<column name="flags" type="longint" default="0" descr="Any adjustment-specific bitmask flags (see source code)"/>
 		<column name="payer" type="entity" descr="Person/organization/entity making the payment(s)"/>
 		<column name="refund_to" type="entity" descr="Person/organization/entity receiving the refund"/>
-		<column name="parent_id" parentref="Invoice_Item.item_id" descr="The charge for which the adjustment is being made"/>
+		<column name="parent_id" indexed="yes" parentref="Invoice_Item.item_id" descr="The charge for which the adjustment is being made"/>
 		<column name="plan_allow" type="currency" descr="Total that health plan will allow"/>
 		<column name="plan_paid" type="currency" descr="Total that health plan paid"/>
 		<column name="deductible" type="currency" descr="Total that applied towards deductible"/>
