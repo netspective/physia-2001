@@ -15,12 +15,14 @@ use File::Spec;
 use Getopt::Long;
 use File::Basename;
 
+my @allModules = ('icd', 'cpt', 'hcpcs', 'envoy', 'epayer', 'rvu');
+
 sub printUsage
 {
 	print qq{
-Usage:  @{[basename $0]} <connect string> [icd cpt hcpcs envoy epayer]
+Usage:  @{[basename $0]} <connect string> [ @{[ join(' ', @allModules) ]} ]
 If no module is specified, the default is to load ALL modules.
-		
+
 Example: @{[basename $0]} sde_prime/sde\@sdedbs02 icd cpt
 to only load icd and cpt modules.
 	};
@@ -30,11 +32,11 @@ to only load icd and cpt modules.
 sub Main
 {
 	my $connectString = shift;
-	my @modules = @_ ? @_ : ('icd', 'cpt', 'hcpcs', 'envoy', 'epayer','rvu');
-		
+	my @modules = @_ ? @_ : @allModules;
+
 	printUsage() unless $connectString;
 	$connectString =~ s/\@/\@dbi:Oracle:/;
-	
+
 	my $dataSrcPath = 'R:';
 	#my $dataSrcPath = 'H:/HealthSuite-RefData';
 	my $properties =
@@ -49,16 +51,15 @@ sub Main
 		dataSrcEnvoyPath => File::Spec->catfile($dataSrcPath, 'envoy'),
 		dataSrcNtisPath => File::Spec->catfile($dataSrcPath, 'ntis'),
 		dataSrcPersePath => File::Spec->catfile($dataSrcPath, 'perse'),
-		dataSrcRBRVSPath => File::Spec->catfile($dataSrcPath, 'rbrvs'),				
+		dataSrcRBRVSPath => File::Spec->catfile($dataSrcPath, 'rbrvs'),
 		rvuFile => grep ('rvu' , @modules),
 	};
-
 
 	importICDInfo($properties, transformDBI => 1) if grep(/icd/, @modules);
 	importCPTInfo($properties, transformDBI => 1) if grep(/cpt/, @modules);
 	importHCPCSInfo($properties, transformDBI => 1) if grep(/hcpcs/, @modules);
 	importEnvoyPayers($properties, transformDBI => 1) if grep(/envoy/, @modules);
-	importEPayers($properties, transformDBI => 1) if grep(/epayer/, @modules);		
+	importEPayers($properties, transformDBI => 1) if grep(/epayer/, @modules);
 	importGPCIInfo($properties, transformDBI => 1) if grep(/rvu/, @modules);
 	importRVUInfo($properties, transformDBI => 1) if grep(/rvu/, @modules);
 }
@@ -76,7 +77,7 @@ sub importRVUInfo
 	my $end_yr = "31-DEC-$year";
 	print "REF_PFS_RVU BEGIN YEAR => $begin_yr END YEAR =>$end_yr \n";
 	$importer->obtain(App::Data::Manipulate::DATAMANIPFLAG_VERBOSE, $dataCollection,
-						srcFile => File::Spec->catfile($properties->{dataSrcRBRVSPath}, 'pprrvu'.$year.'.xls'));			
+						srcFile => File::Spec->catfile($properties->{dataSrcRBRVSPath}, 'pprrvu'.$year.'.xls'));
 	if($importer->haveErrors())
 	{
 		$importer->printErrors();
@@ -98,7 +99,7 @@ sub importRVUInfo
 			  TLT_NON_FAC_RVU, TLT_TRANS_NON_FAC_RVU, TLT_FAC_RVU,TLT_TRANS_FAC_RVU , PC_TC_IND,
 			  GLOBAL_SURGERY, PREOP_PERCENT,INTRAOP_PERCENT,POSTOP_PERCENT,MULTI_PROCEDURE,
 			  BILAT_SURGERY,  ASST_SURGERY,CO_SURGEONS, TEAM_SURGERY, PHY_SUPERVISE,
-			   BILL_MED_CODE ,  ENDO_BASE_CODE ,CONVERSION_FACT)       
+			   BILL_MED_CODE ,  ENDO_BASE_CODE ,CONVERSION_FACT)
 			values ('$begin_yr','$end_yr',?,?,?,?,?,?,?,?,
 				?,?,?,?,?,?,?,?,?,?,
 				?,?,?,?,?,?,?,?,?,?,
@@ -124,7 +125,7 @@ sub importGPCIInfo
 	die "For rvu a two digit year must be supplied  [ example : rvu00 for rvu for 2000 ]" if ! $year;
 	$importer->obtain(App::Data::Manipulate::DATAMANIPFLAG_VERBOSE, $dataCollection,
 						srcFileGPCI=> File::Spec->catfile($properties->{dataSrcRBRVSPath}, $year.'gpcis.xls'),
-						srcFileLocal => File::Spec->catfile($properties->{dataSrcRBRVSPath}, $year.'locco.xls'),						
+						srcFileLocal => File::Spec->catfile($properties->{dataSrcRBRVSPath}, $year.'locco.xls'),
 						);
 	if($importer->haveErrors())
 	{
@@ -141,11 +142,11 @@ sub importGPCIInfo
 		$exporter->transform(App::Data::Manipulate::DATAMANIPFLAG_SHOWPROGRESS, $dataCollection,
 			connect => $properties->{connectStr},
 			doBefore => "delete REF_GPCI WHERE EFF_BEGIN_DATE='$begin_yr' ",
-			insertStmt => "insert into REF_GPCI			
+			insertStmt => "insert into REF_GPCI
 			( EFF_BEGIN_DATE  ,EFF_END_DATE ,
- 			  CARRIER_NUMBER  , LOCALITY_NUMBER , 			  
- 			  LOCALITY_NAME    , STATE  , 			  
-			  COUNTY  ,     WORK ,            
+ 			  CARRIER_NUMBER  , LOCALITY_NUMBER ,
+ 			  LOCALITY_NAME    , STATE  ,
+			  COUNTY  ,     WORK ,
  			  PRACTICE_EXPENSE ,MAL_PRACTICE )
  			 values
  			  ('$begin_yr','$end_yr'  ,?,?,?,?,?,?,?,?) ",
@@ -308,7 +309,7 @@ sub importEnvoyPayers
 		$exporter->transform(App::Data::Manipulate::DATAMANIPFLAG_SHOWPROGRESS, $dataCollection,
 			connect => $properties->{connectStr},
 			doBefore => "delete from REF_EPAYER where psource = 1//Deleting Envoy Payers.",
-			insertStmt => "insert into REF_EPAYER (id, name, ptype, state, flags, remarks, psource) 
+			insertStmt => "insert into REF_EPAYER (id, name, ptype, state, flags, remarks, psource)
 				values (?, ?, ?, ?, ?, ?, 1)",
 			verifyCountStmt => "select count(*) from REF_EPAYER where psource =1",
 		);
@@ -320,7 +321,7 @@ sub importEPayers
 {
 	my ($properties, %params) = @_;
 	my $dataCollection = new App::Data::Collection;
-	
+
 	my $importer = new App::Data::Obtain::Perse::Epayer;
 	my $dataCollection = $params{collection} || new App::Data::Collection;
 
