@@ -22,19 +22,14 @@ sub new
 	my $self = App::Dialog::Directory::new(@_, id => 'provider-service', heading => 'Service');
 
 	$self->addContent(
-			new CGI::Dialog::Field(caption =>'Service',
-						name => 'service',
-						options => FLDFLAG_REQUIRED,
-						size => 6,
-						maxLength => 6),
-			#new CGI::Dialog::Field(caption =>'Service',
-			#			name => 'service',
-			#			options => FLDFLAG_PREPENDBLANK,
-			#			fKeyStmtMgr => $STMTMGR_TRANSACTION,
-			#			fKeyStmt => 'selIntakeService',
-			#			fKeyDisplayCol => 1,
-			#			fKeyValueCol => 0),
-			);
+						new CGI::Dialog::Field(caption =>'Service',
+								name => 'service',
+								options => FLDFLAG_PREPENDBLANK|FLDFLAG_REQUIRED,
+								fKeyStmtMgr => $STMTMGR_TRANSACTION,
+								fKeyStmt => 'selReferralType',
+								fKeyDisplayCol => 1,
+								fKeyValueCol => 0),
+					);
 	$self->addFooter(new CGI::Dialog::Buttons);
 
 	$self;
