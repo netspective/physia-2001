@@ -725,7 +725,7 @@ sub getItemsHtml
 
 sub getPayerHtml
 {
-	my ($self, $payer) = @_;
+	my ($self, $payer, $planOrProductName) = @_;
 
 	my @info = ();
 	foreach (sort keys %$payer)
@@ -736,7 +736,7 @@ sub getPayerHtml
 	my $addr = $payer->{address};
 
 	return qq{
-		$payer->{name} ($payer->{id})<br>
+		$planOrProductName ($payer->{id})<br>
 		$addr->{address1}<br>
 		@{[ $addr->{address2} ? "$addr->{address2}<br>" : '']}
 		$addr->{city}, $addr->{state} $addr->{zipCode}<br>
@@ -1066,9 +1066,7 @@ sub prepare_view_summary
 	my $patient = $self->getPersonHtml($claim->{careReceiver});
 	my $provider = $self->getPersonHtml($claim->{renderingProvider});
 	my $service = $self->getOrgHtml($claim->{renderingOrganization});
-	#my $payer = $claim->getInsurancePlanOrProductName();	  # the following gets the org name of the insurance, not the plan: $self->getPayerHtml($claim->{payer});
-	#my $payer = $claim->getInsurancePlanOrProgramName();
-	my $payer = $self->getPayerHtml($claim->{payer});
+	my $payer = $self->getPayerHtml($claim->{payer}, $claim->{insured}->[0]->{policyGroupName});
 	my $invStatus = $claim->getStatus();
 	my $invType = $claim->getInvoiceType();
 	my $claimType = $claim->getInvoiceSubtype();
@@ -1194,7 +1192,7 @@ sub prepare_view_summary
 			</TR>
 			<TR VALIGN=TOP>
 				<TD><FONT FACE="Arial,Helvetica" SIZE=2>$patient</TD>
-				<TD><FONT FACE="Arial,Helvetica" SIZE=2>$provider<br>$service</TD>
+				<TD><FONT FACE="Arial,Helvetica" SIZE=2>$provider<br><br>$service</TD>
 				@{[ $claimType != $selfPay ? $payerPane : '' ]}
 			</TR>
 		</TABLE>
