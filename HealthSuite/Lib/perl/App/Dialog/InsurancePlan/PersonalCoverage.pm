@@ -36,6 +36,7 @@ sub new
 	croak 'schema parameter required' unless $schema;
 
 	$self->addContent(
+		new CGI::Dialog::Field(type => 'hidden', name => 'injury_item_id'),
 		new App::Dialog::Field::Person::ID(
 			caption => 'Patient ID',
 			types => ['Patient'],
@@ -118,6 +119,12 @@ sub new
 			column => 'Insurance.member_number',
 			options => FLDFLAG_REQUIRED
 			),
+		new CGI::Dialog::Field(
+					caption => 'Date Of Injury',
+					name => 'injury_date',
+					type => 'date',
+					defaultValue => '',
+					),
 
 		# Coverage Information
 		new CGI::Dialog::Subhead(
@@ -200,7 +207,7 @@ sub new
 	$self->addFooter(
 		new CGI::Dialog::Buttons(
 			nextActions_add => [
-				['', '', 1],
+				['Return to Previous Screen', '', 1],
 				['Add Another Insurance Coverage', "/person/%field.person_id%/dlg-add-ins-coverage"],
 				['Go to Person Profile', "/person/%field.person_id%/profile"],
 				],
@@ -241,6 +248,13 @@ sub populateData
 		my $empOrgId = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selId', $page->field('employer_org_id'));
 		$page->field('employer_org_id', $empOrgId);
 	}
+
+	my $injuryData = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE,
+			'selInsuranceAttr_Org', $insIntId, 'Injury Information');
+
+	$page->field('injury_date', $injuryData->{'value_text'});
+	$page->field('injury_item_id', $injuryData->{'item_id'});
+
 }
 
 
@@ -362,13 +376,18 @@ sub execute
 	my $ownerOrgIntId = $page->session('org_internal_id');
 	# Since Ins Plan is not required, the parent record could be a Plan or Product record
 	my $parentRecord;
+	my $planInsId = '';
+	my $productInsId = '';
 	if ($page->field('plan_name'))
 	{
 		$parentRecord = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selPlanRecord', $ownerOrgIntId, $page->field('plan_name'));
+		$planInsId = $parentRecord->{'ins_internal_id'};
 	}
 	else
 	{
 		$parentRecord = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selProductRecord', $ownerOrgIntId, $page->field('product_name'));
+		$productInsId = $parentRecord->{'ins_internal_id'};
+
 	}
 	my $empOrgIntId = $page->field('employer_org_id') ? $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgId', $ownerOrgIntId, $page->field('employer_org_id')) : undef;
 	my $insIntId = $page->schemaAction(
@@ -376,31 +395,44 @@ sub execute
 		ins_internal_id			=> $page->param('ins_internal_id') || undef,
 		parent_ins_id			=> $parentRecord->{'ins_internal_id'} || undef,
 		product_name			=> $parentRecord->{'product_name'} || undef,
-		plan_name				=> $page->field('plan_name') || undef,
-		record_type				=> App::Universal::RECORDTYPE_PERSONALCOVERAGE,
+		plan_name			=> $page->field('plan_name') || undef,
+		record_type			=> App::Universal::RECORDTYPE_PERSONALCOVERAGE,
 		owner_person_id			=> $page->param('person_id') || $page->field('person_id') || undef,
-		ins_org_id				=> $parentRecord->{'ins_org_id'} || undef,
+		ins_org_id			=> $parentRecord->{'ins_org_id'} || undef,
 		owner_org_id			=> $ownerOrgIntId,
 		bill_sequence			=> $page->field('bill_sequence'),
-		ins_type				=> $parentRecord->{'ins_type'} || undef,
+		ins_type			=> $parentRecord->{'ins_type'} || undef,
 		employer_org_id			=> $empOrgIntId || undef,
-		group_name				=> $page->field('group_name') || undef,
+		group_name			=> $page->field('group_name') || undef,
 		group_number			=> $page->field('group_number') || undef,
 		member_number			=> $page->field('member_number') || undef,
-		insured_id				=> $page->field('insured_id') || undef,
+		insured_id			=> $page->field('insured_id') || undef,
 		guarantor_id			=> $page->field('guarantor_id') || undef,
 		rel_to_insured			=> $page->field('rel_to_insured') || undef,
-		extra					=> $page->field('extra') || undef,
+		extra				=> $page->field('extra') || undef,
 		indiv_deduct_remain		=> $page->field('indiv_deduct_remain') || undef,
-		family_deduct_remain	=> $page->field('family_deduct_remain') || undef,
-		copay_amt				=> $page->field('copay_amt') || undef,
+		family_deduct_remain		=> $page->field('family_deduct_remain') || undef,
+		copay_amt			=> $page->field('copay_amt') || undef,
 		coverage_begin_date		=> $page->field('coverage_begin_date') || undef,
 		coverage_end_date		=> $page->field('coverage_end_date') || undef,
-		indiv_deductible_amt	=> $page->field('indiv_deductible_amt') || undef,
-		family_deductible_amt	=> $page->field('family_deductible_amt') || undef,
+		indiv_deductible_amt		=> $page->field('indiv_deductible_amt') || undef,
+		family_deductible_amt		=> $page->field('family_deductible_amt') || undef,
 		percentage_pay			=> $page->field('percentage_pay') || undef,
-		threshold				=> $page->field('threshold') || undef,
+		threshold			=> $page->field('threshold') || undef,
+		#product_ins_id                  => $productInsId || undef,
+		#plan_ins_id 			=> $planInsId || undef,
 		_debug => 0
+		);
+
+		my $parentId = $command eq 'add' ? $insIntId : $page->param('ins_internal_id');
+		my $injuryCommand = $page->field('injury_item_id') eq '' ? 'add' : $command;
+		$page->schemaAction(
+			'Insurance_Attribute', $injuryCommand,
+			item_id => $page->field('injury_item_id') || undef,
+			parent_id => $parentId || undef,
+			item_name => 'Injury Information',
+			value_text => $page->field('injury_date') || undef,
+			_debug => 0
 		);
 
 	$self->handlePostExecute($page, $command, $flags);
