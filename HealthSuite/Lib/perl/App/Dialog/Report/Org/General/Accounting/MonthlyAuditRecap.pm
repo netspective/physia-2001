@@ -125,7 +125,7 @@ sub prepare_detail_payment
 			{colIdx => 11,head => 'Ins W/O', summarize => 'sum',  dformat => 'currency' },
 			{colIdx => 12,head => 'Ins Rcpts', summarize => 'sum',  dformat => 'currency' },
 			{colIdx => 13,head => 'Per Rcpts', summarize => 'sum',  dformat => 'currency' },
-			{colIdx => 14,head => 'Refund', summarize => 'sum',  dformat => 'currency',},
+			{colIdx => 14,head => 'Rcpt Adj', summarize => 'sum',  dformat => 'currency',},
 			{colIdx => 15,head => 'Payment Type', dAlign => 'center',},
 		],
 	};
@@ -252,7 +252,7 @@ sub execute
 			{ colIdx => 6, head => 'Bal Trans', summarize => 'sum', dataFmt => '#7#', dformat => 'currency' },
 			{ colIdx => 7, head => 'Ins Rcpts', summarize => 'sum', dataFmt => '#9#', dformat => 'currency' },
 			{ colIdx => 8, head => 'Per Rcpts', summarize => 'sum', dataFmt => '#8#', dformat => 'currency' },
-			{ colIdx => 9, head => 'Refunds', summarize => 'sum',  dformat => 'currency' },
+			{ colIdx => 9, head => 'Rcpt Adj', summarize => 'sum',  dformat => 'currency' },
 			{ colIdx => 10, head =>'Ttl Rcpts', summarize => 'sum', dformat => 'currency' },
 			{ colIdx => 11, head =>'Collection %' ,tAlign=>'RIGHT',sAlign=>'RIGHT',tDataFmt=>'&{sum_percent:10,12}',sDataFmt=>'&{sum_percent:10,12}' ,dAlign=>'RIGHT'},
 			{ colIdx => 15, head =>'New Patient', tAlign=>'center',sAlign=>'center',summarize => 'sum',dataFmt => '#15#', dAlign => 'CENTER'},
