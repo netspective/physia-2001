@@ -152,10 +152,9 @@ sub prepare_page_content_header
 	my $functions = $self->getMenu_Simple(App::Page::MENUFLAG_SELECTEDISLARGER,
 		'_pm_view',
 		[
-			[$dateTitle, "/worklist/date", 'date'],
-			['Recent Activity', "/worklist/recentActivity", 'recentActivity'],
-			['Setup', "/worklist/collection/setup", 'setup', ],
-			#['Setup', "#SETUP", 'setup'],
+			#[$dateTitle, "/worklist/date", 'date'],
+			#['Recent Activity', "/worklist/recentActivity", 'recentActivity'],
+			#['Setup', "/worklist/collection/setup", 'setup', ],
 			
 		], ' | ');
 
