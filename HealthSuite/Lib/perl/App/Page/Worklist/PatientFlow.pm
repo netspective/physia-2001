@@ -146,7 +146,7 @@ sub prepare_page_content_header
 
 	$self->SUPER::prepare_page_content_header(@_);
 
-	my $heading = "Work List";
+	my $heading = "Patient Flow Work List";
 	my $dateTitle = decodeDate($self->param('_seldate'));
 	
 	my $urlPrefix = "/worklist/patientflow";
@@ -384,7 +384,7 @@ sub initialize
 	$self->SUPER::initialize(@_);
 
 	$self->addLocatorLinks(
-		['WorkList', '/worklist'],
+		['Patient Flow', '/worklist/patientflow'],
 	);
 }
 
