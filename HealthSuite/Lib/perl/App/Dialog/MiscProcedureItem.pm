@@ -85,7 +85,7 @@ sub new
 	
 	$self->addFooter(new CGI::Dialog::Buttons(
 		nextActions_add => [
-			['Add Another Misc Procedure Item', "/org/#session.org_id#/dlg-add-misc-procedure-item/#param.trans_id#"],
+			['Add Another Misc Procedure Item', "/org/#session.org_id#/dlg-add-misc-procedure-item/#param.parent_entry_id#"],
 			['Show Current Misc Procedure Items', '/search/miscprocedure/detail/#param.parent_entry_id#'],
 			],
 		cancelUrl => $self->{cancelUrl} || undef));
