@@ -133,6 +133,14 @@
 			show the new 'Prescribe Medication' dialog.
 		</deliverable>
 
+		<deliverable id="1726">
+			Changed hospitalization dialog according to Karen's document. Now links to and prefills add hospital claim
+		</deliverable>
+
+		<deliverable id="1730">
+			Using simple name in recently visited patients component in pt flow and verification worklists.
+		</deliverable>
+
 		<deliverable id="1732">
 			Added practices to pay to org drop down in Add Invoice dialog.
 		</deliverable>
