@@ -36,6 +36,9 @@
 		</deliverable>	
 		<deliverable id="788">
 			UI:  Added a new option called 'Unemployed' in the 'Employment' drop-down list'.
-		</deliverable>		
+		</deliverable>	
+		<deliverable id="1128">
+			UI:  Added a new field called 'Clearing House ID' in the MainOrg dialog and it is displayed in the profile header'.
+		</deliverable>			
 	</deliverables>
 </release-notes>
