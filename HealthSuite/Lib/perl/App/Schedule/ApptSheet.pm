@@ -453,9 +453,11 @@ sub buildRows
 			my $resource_id = $self->{inputSpec}[$col][1];
 			my $facility_id = $self->{inputSpec}[$col][2];
 			my @date = Decode_Date_US($self->{inputSpec}[$col][0]);
-			my $start_stamp = sprintf ("%02d-%02d-%04d_%02d:00", $date[1], $date[2], $date[0], $hour);
-			my $duration = 10;
-
+			
+			my $am = $hour >= 12 ? 'PM' : 'AM';
+			my $hourAm = $hour == 12 ? $hour : $hour % 12;
+			
+			my $start_stamp = sprintf ("%02d-%02d-%04d_%02d:00_%s", $date[1], $date[2], $date[0], $hourAm, $am);
 			my $apptHref = "javascript:doActionPopup('/schedule/dlg-add-appointment//$resource_id/$facility_id/$start_stamp',null,'width=620,height=500,scrollbars,resizable');";
 
 			$apptSheetRef->[$hour][$col] = qq{

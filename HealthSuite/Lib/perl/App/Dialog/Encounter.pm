@@ -334,7 +334,8 @@ sub populateData
 		$page->field('event_id', $eventId);
 		$STMTMGR_SCHEDULING->createFieldsFromSingleRow($page, STMTMGRFLAG_NONE, 'selEncountersCheckIn/Out', $eventId);
 
-		$invoiceId = $page->param('invoice_id', $STMTMGR_INVOICE->getSingleValue($page, STMTMGRFLAG_NONE, 'selInvoiceIdByEventId', $eventId));
+		$invoiceId = $page->param('invoice_id', $STMTMGR_INVOICE->getSingleValue($page, 
+			STMTMGRFLAG_NONE, 'selInvoiceIdByEventId', $eventId));
 
 		$page->field('eventFieldsAreSet', 1);
 	}
@@ -440,14 +441,14 @@ sub populateData
 		}
 	}
 
-	return unless $flags & CGI::Dialog::DLGFLAG_ADD_DATAENTRY_INITIAL;
+	#return unless $flags & CGI::Dialog::DLGFLAG_ADD_DATAENTRY_INITIAL;
 
-	#set service facility to session org
-	if(my $orgId = $page->session('org_id'))
+	if ($eventId)
 	{
-		$page->field('service_facility_id', $orgId);
-		#$page->field('billing_facility_id', $orgId);
-		#$page->field('pay_to_org_id', $orgId);
+		my $event = $STMTMGR_SCHEDULING->getRowAsHash($page, STMTMGRFLAG_NONE,
+				'selExistingApptInfo', $eventId);
+	
+		$page->field('service_facility_id', $event->{facility_id});
 	}
 }
 

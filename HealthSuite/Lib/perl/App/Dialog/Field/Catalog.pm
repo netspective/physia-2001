@@ -17,44 +17,16 @@ sub new
 {
 	my ($type, %params) = @_;
 
-	#
-	# you can pass in a "types => ['x', 'y']" and "notTypes => ['a']"
-	# to restrict/expand the selection
-	#
-
-	$params{name} = 'catalog_id' unless $params{name};
+	$params{name} = 'catalog_id' unless exists $params{name};
+	$params{type} = 'text' unless exists $params{type};
+	$params{size} = 16 unless exists $params{size};
+	$params{maxLength} = 32 unless exists $params{maxLength};
 
 	$params{options} = 0 unless exists $params{options};
 	$params{options} |= FLDFLAG_IDENTIFIER;
 
-	$params{type} = 'text';
-	$params{size} = 16 unless $params{size};
-	$params{maxLength} = 32;
-
 	return CGI::Dialog::Field::new($type, %params);
 }
-
-sub isValid
-{
-	my ($self, $page, $validator) = @_;
-
-	my $command = $page->property(CGI::Dialog::PAGEPROPNAME_COMMAND . '_' . $validator->id());
-
-	return () if $command ne 'add';
-
-	if($self->SUPER::isValid($page, $validator))
-	{
-		my $value = $page->field($self->{name});
-		$self->invalidate($page, "$self->{caption} '$value' already exists.")
-			if $STMTMGR_CATALOG->recordExists($page, STMTMGRFLAG_NONE, 'selCatalogById', $value);
-	}
-
-	# return TRUE if there were no errors, FALSE (0) if there were errors
-	return $page->haveValidationErrors() ? 0 : 1;
-}
-
-
-
 
 ##############################################################################
 package App::Dialog::Field::Catalog::ID;
@@ -105,10 +77,10 @@ sub new
 	}
 	else
 	{
-		$params{type} = 'text';
-		$params{size} = 16;
-		$params{maxLength} = 32;
-		$params{findPopup} = '/lookup/catalog';
+		$params{type} = 'text' unless exists $params{type};
+		$params{size} = 16 unless exists $params{size};
+		$params{maxLength} = 32 unless exists $params{maxLength};
+		$params{findPopup} = '/lookup/catalog' unless exists $params{findPopup};
 	}
 	return CGI::Dialog::Field::new($type, %params);
 }
@@ -117,21 +89,14 @@ sub isValid
 {
 	my ($self, $page, $validator) = @_;
 
+	return 0 unless $self->SUPER::isValid($page, $validator);
+	
 	my $command = $page->property(CGI::Dialog::PAGEPROPNAME_COMMAND . '_' . $validator->id());
 	my $value = $page->field($self->{name});
 
-	return 1 if $command ne 'add' || $value eq '';
+	$self->invalidate($page, qq{$self->{caption} '$value' does not exist.}) 
+		unless $STMTMGR_CATALOG->getRowAsHash($page,STMTMGRFLAG_NONE, 'selCatalogById', $value);
 
-	return 0 unless $self->SUPER::isValid($page, $validator);
-
-	my $createCatalogHref = "javascript:doActionPopup('/org-p/#session.org_id#/dlg-add-catalog/$value');";
-	#my $createCatalogHref = "javascript:doActionPopup('/create-p/catalog/$value');";
-
-	$self->invalidate($page, qq{$self->{caption} '$value' does not exist.<br><img src="/resources/icons/arrow_right_red.gif">
-			<a href="$createCatalogHref">Add Catalog '$value' now</a>
-		}) unless $STMTMGR_CATALOG->getRowAsHash($page,STMTMGRFLAG_NONE, 'selCatalogById', $value);
-
-	# return TRUE if there were no errors, FALSE (0) if there were errors
 	return $page->haveValidationErrors() ? 0 : 1;
 }
 

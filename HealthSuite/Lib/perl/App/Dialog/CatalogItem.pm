@@ -36,8 +36,10 @@ sub new
 	$self->addContent(
 		new App::Dialog::Field::Catalog::ID(caption => 'Fee Schedule ID',
 			name => 'catalog_id',
+			type => 'integer',
 			options => FLDFLAG_REQUIRED,
 			findPopup => '/lookup/catalog',
+			hints => 'Numeric Fee Schedule ID',
 		),
 		new CGI::Dialog::Field(caption => 'Fee Schedule Entry Type',
 			name => 'entry_type',
@@ -51,9 +53,9 @@ sub new
 			selOptions => "Capitated:0,FFS:1",
 			type => 'select',
 			style => 'radio',
-			#options => FLDFLAG_REQUIRED,
 		),
 		new CGI::Dialog::MultiField(
+			name => 'code_modifier',
 			fields => [
 				new CGI::Dialog::Field::TableColumn(caption => 'Code',
 					name => 'code',
@@ -111,9 +113,11 @@ sub new
 		new CGI::Dialog::Field::TableColumn(caption => 'Parent Entry ID',
 			name => 'parent_entry_id',
 			schema => $schema,
+			size => 16,
 			column => 'Offering_Catalog_Entry.parent_entry_id',
 			findPopup => '/lookup/catalog/detail/itemValue',
 			findPopupControlField => '_f_catalog_id',
+			hints => 'Numeric Entry ID',
 		),
 		new CGI::Dialog::Field(type => 'hidden', name => 'add_mode'),
 	);
@@ -150,13 +154,16 @@ sub makeStateChanges_special
 sub populateData_add
 {
 	my ($self, $page, $command, $activeExecMode, $flags) = @_;
+	
+	$self->makeStateChanges_special($page);
+	return unless $flags & CGI::Dialog::DLGFLAG_DATAENTRY_INITIAL;
+	
 	$page->field('catalog_id', $page->param('catalog_id'));
 	$page->field('parent_entry_id', $page->param('parent_entry_id'));
 	$page->field('entry_type', 100);
 	$page->field('status', 1);
 	$page->field('cost_type', 1);
 	$page->field('add_mode', 1);
-	$self->makeStateChanges_special($page);	
 }
 
 sub populateData_update
@@ -200,8 +207,8 @@ sub checkDupEntry
 				'sel_catalogEntry_by_catalogTypeCode', $code, $entryType, $fs);
 		}
 		
-		my $field = $self->getField('catalog_id');
-		$field->invalidate($page, qq{Entry already exists in the system.}) if $entryExists;
+		my $field = $self->getField('code_modifier');
+		$field->invalidate($page, qq{Entry '$code' already exists in the system for Fee Schedule '$fs'.}) if $entryExists;
 	}
 }
 
@@ -211,6 +218,7 @@ sub customValidate
 	
 	my $fs = $page->param('_f_catalog_id');
 	my $entryType = $page->param('_f_entry_type');
+	
 	my $code = $page->param('_f_code');
 	my $modifier = $page->param('_f_modifier');
 	
@@ -218,7 +226,7 @@ sub customValidate
 	
 	if (
 		(! $page->param('_f_name') || ! $page->param('_f_description')) &&
-		(grep(/$entryType/, (App::Universal::CATALOGENTRYTYPE_ICD, App::Universal::CATALOGENTRYTYPE_CPT, App::Universal::CATALOGENTRYTYPE_HCPCS)) )
+		(grep(/^$entryType$/, (App::Universal::CATALOGENTRYTYPE_ICD, App::Universal::CATALOGENTRYTYPE_CPT, App::Universal::CATALOGENTRYTYPE_HCPCS)) )
 	)
 	{
 		my $codeInfo;

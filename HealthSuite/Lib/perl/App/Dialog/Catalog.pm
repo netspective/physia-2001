@@ -70,8 +70,8 @@ sub new
 			name => 'catalog_id', 
 			size => 20,
 			options => FLDFLAG_REQUIRED,
-			postHtml => "&nbsp; <a href=\"javascript:doActionPopup('/lookup/catalog');\">Lookup existing Fee Schedule</a>"
-			#findPopup => '/lookup/catalog',
+			postHtml => "&nbsp; <a href=\"javascript:doActionPopup('/lookup/catalog');\">Lookup Fee Schedules</a>",
+			hints => 'Textual Fee Schedule Name',
 		),
 		new CGI::Dialog::Field::TableColumn(
 			name => 'catalog_type',
@@ -98,7 +98,8 @@ sub new
 			name => 'parent_catalog_id',
 			schema => $schema, 
 			column => 'Offering_Catalog_Entry.catalog_id',
-			findPopup => '/lookup/catalog/'
+			findPopup => '/lookup/catalog/',
+			hints => 'Numeric Fee Schedule ID',
 		),
 		new CGI::Dialog::Field(caption => 'Capitated Contract',
 			name => 'capitated_contract',
@@ -130,7 +131,7 @@ sub populateData_add
 {
 	my ($self, $page, $command, $activeExecMode, $flags) = @_;
 
-	#return unless $flags & CGI::Dialog::DLGFLAG_UPDORREMOVE_DATAENTRY_INITIAL;
+	return unless $flags & CGI::Dialog::DLGFLAG_DATAENTRY_INITIAL;
 	$page->field('parent_catalog_id', $page->param('parent_catalog_id'));
 	$page->field('add_mode', 1);
 }
@@ -175,7 +176,9 @@ sub checkDupName
 		'sel_catalog_by_id_orgId', $page->field('catalog_id'), $page->session('org_id'));
 
 	my $field = $self->getField('catalog_id');
-	$field->invalidate($page, qq{Fee Schedule Name already exists for this Org.}) 
+	my $fieldValue = $page->field('catalog_id');
+	
+	$field->invalidate($page, qq{Fee Schedule Name '$fieldValue' already exists for this Org.}) 
 		if $catalogExists;
 }
 
