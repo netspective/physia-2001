@@ -21,6 +21,8 @@
 		<column name="lab_order_status" lookupref="Lab_Order_Status.id" descr="Lab Order Status"/>								
 		<column name="lab_internal_id" lookupref="Org.org_internal_id"  indexed="yes" descr="Internal ID of Lab that will perform this test"/>				
 		<column name="org_internal_id" lookupref="Org.org_internal_id"  indexed="yes" descr="Internal ID of Main Org"/>						
+		<column name="location_address_id" lookupref="Org_Address.item_id" descr="Address ID of Location to send Lab Order"/>						
+		
 	</table>	
 	
 	<table name="Lab_Order_Status" abbrev="LabOrdSts" type="Enumeration">
