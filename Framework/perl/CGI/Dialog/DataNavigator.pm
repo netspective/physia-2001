@@ -3,7 +3,7 @@ package CGI::Dialog::DataNavigator;
 ##############################################################################
 
 use strict;
-use SDE::CVS ('$Id: DataNavigator.pm,v 1.1 2000-11-06 21:15:21 robert_jenks Exp $', '$Name:  $');
+use SDE::CVS ('$Id: DataNavigator.pm,v 1.2 2000-11-08 02:48:20 robert_jenks Exp $', '$Name:  $');
 use CGI::Dialog;
 use base qw(CGI::Dialog);
 
@@ -13,7 +13,7 @@ use vars qw(%RESOURCE_MAP);
 
 sub new
 {
-	my $self = CGI::Dialog::new(@_, id => 'query', headColor => '#FFFFFF', bgColor => '#98ACCE');
+	my $self = CGI::Dialog::new(@_, id => 'query', headColor => '#FFFFFF', bgColor => '#CDD3DB');
 	my $page = $self->{page} or die "Page object is invalid";
 
 	# Make sure we have a publish definition
@@ -24,6 +24,8 @@ sub new
 
 	# Drill down to get the appropriate publDefn
 	my $publDefn = $self->getDrilledPublishDefn($page, $self->{publDefn});
+
+	my $outRows = defined $publDefn->{'dnOutRows'} ? $publDefn->{'dnOutRows'} : 10;
 
 	$self->addContent(
 		new CGI::Dialog::Field(type => 'hidden', name => 'drill_depth', defaultValue => 0,),
@@ -78,14 +80,14 @@ package CGI::Dialog::DataNavigator::Results;
 ##############################################################################
 
 use strict;
-use SDE::CVS ('$Id: DataNavigator.pm,v 1.1 2000-11-06 21:15:21 robert_jenks Exp $', '$Name:  $');
+use SDE::CVS ('$Id: DataNavigator.pm,v 1.2 2000-11-08 02:48:20 robert_jenks Exp $', '$Name:  $');
 use Data::Publish;
 use CGI::Dialog;
 use CGI::ImageManager;
 use DBI::StatementManager;
 use base qw(CGI::Dialog::ContentItem);
 
-use constant STATEMENT_FLAGS => STMTMGRFLAG_DYNAMICSQL | STMTMGRFLAG_REPLACEVARS;
+use constant DN_STATEMENT_FLAGS => STMTMGRFLAG_DYNAMICSQL | STMTMGRFLAG_REPLACEVARS;
 
 use vars qw(%RESOURCE_MAP);
 %RESOURCE_MAP=();
@@ -177,7 +179,7 @@ sub getStmtHandle
 	# create a DBI statement handle
 	eval {
 		my $stmtMgr = new DBI::StatementManager();
-		$sth = $stmtMgr->execute($page, STATEMENT_FLAGS, $sql, @$bindParams);
+		$sth = $stmtMgr->execute($page, DN_STATEMENT_FLAGS, $sql, @$bindParams);
 	};
 	if ($@)
 	{
@@ -196,7 +198,7 @@ sub createPublDefn
 {
 	my $self = shift;
 	my ($page, $sth, $publDefn) = @_;
-	prepareStatementColumns($page, STATEMENT_FLAGS, $sth, $publDefn) unless defined $publDefn->{columnDefn};
+	prepareStatementColumns($page, DN_STATEMENT_FLAGS, $sth, $publDefn) unless defined $publDefn->{columnDefn};
 
 	#$publDefn->{select} = {
 	#	type => 'checkbox',
@@ -264,7 +266,7 @@ sub getQueryHtml
 	my $html = '';
 
 	# Use Data::Publish to format the results
-	$html .= createHtmlFromStatement($page, STATEMENT_FLAGS, $sth, $publDefn, {style => 'datanav', maxRows => $page->field('out_rows')});
+	$html .= createHtmlFromStatement($page, DN_STATEMENT_FLAGS, $sth, $publDefn, {style => 'datanav', maxRows => $page->field('out_rows')});
 	$page->property('nextPageExists', $sth->fetch());
 	$sth->finish();
 
@@ -283,7 +285,7 @@ package CGI::Dialog::DataNavigator::Ancestors;
 ##############################################################################
 
 use strict;
-use SDE::CVS ('$Id: DataNavigator.pm,v 1.1 2000-11-06 21:15:21 robert_jenks Exp $', '$Name:  $');
+use SDE::CVS ('$Id: DataNavigator.pm,v 1.2 2000-11-08 02:48:20 robert_jenks Exp $', '$Name:  $');
 use CGI::Dialog;
 use CGI::ImageManager;
 use base qw(CGI::Dialog::ContentItem);
@@ -336,7 +338,7 @@ package CGI::Dialog::DataNavigator::MultiActions;
 ##############################################################################
 
 use strict;
-use SDE::CVS ('$Id: DataNavigator.pm,v 1.1 2000-11-06 21:15:21 robert_jenks Exp $', '$Name:  $');
+use SDE::CVS ('$Id: DataNavigator.pm,v 1.2 2000-11-08 02:48:20 robert_jenks Exp $', '$Name:  $');
 use CGI::Dialog;
 use CGI::ImageManager;
 use base qw(CGI::Dialog::ContentItem);
@@ -352,7 +354,7 @@ sub getHtml
 	my $startRow = $page->field('start_row') || 0;
 	my $outRows = $page->field('out_rows') || 10;
 
-	my $html = qq{<table cellspacing="0" cellpadding="0" width="100%" border="0" bgcolor="#98ACCE"><tr>};
+	my $html = qq{<table cellspacing="0" cellpadding="0" width="100%" border="0" bgcolor="#CDD3DB"><tr>};
 
 	# Add multi-row action buttons
 	#$html .= qq{<td valign="middle">
@@ -461,7 +463,7 @@ package CGI::Dialog::DataNavigator::StatusBar;
 ##############################################################################
 
 use strict;
-use SDE::CVS ('$Id: DataNavigator.pm,v 1.1 2000-11-06 21:15:21 robert_jenks Exp $', '$Name:  $');
+use SDE::CVS ('$Id: DataNavigator.pm,v 1.2 2000-11-08 02:48:20 robert_jenks Exp $', '$Name:  $');
 use CGI::Dialog;
 use CGI::ImageManager;
 use base qw(CGI::Dialog::ContentItem);
@@ -484,7 +486,7 @@ package CGI::Dialog::DataNavigator::JavaScript;
 ##############################################################################
 
 use strict;
-use SDE::CVS ('$Id: DataNavigator.pm,v 1.1 2000-11-06 21:15:21 robert_jenks Exp $', '$Name:  $');
+use SDE::CVS ('$Id: DataNavigator.pm,v 1.2 2000-11-08 02:48:20 robert_jenks Exp $', '$Name:  $');
 use CGI::Dialog;
 use CGI::ImageManager;
 use base qw(CGI::Dialog::ContentItem);
