@@ -356,6 +356,7 @@
 		<column name="bill_id" lookupref="Invoice_Billing.bill_id" descr="The billing record if adjustment is being made in response to a bill"/>
 		<column name="flags" type="longint" default="0" descr="Any adjustment-specific bitmask flags (see source code)"/>
 		<column name="payer" type="entity" descr="Person/organization/entity making the payment(s)"/>
+		<column name="refund_to" type="entity" descr="Person/organization/entity receiving the refund"/>
 		<column name="parent_id" parentref="Invoice_Item.item_id" descr="The charge for which the adjustment is being made"/>
 		<column name="plan_allow" type="currency" descr="Total that health plan will allow"/>
 		<column name="plan_paid" type="currency" descr="Total that health plan paid"/>
