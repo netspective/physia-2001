@@ -37,38 +37,48 @@ sub new
 
 	croak 'schema parameter required' unless $schema;
 	$self->addContent(
-			new App::Dialog::Field::Organization::ID(
-					caption => 'Organization ID',
-					name => 'org_id',	
-					options=>FLDFLAG_REQUIRED
-			),
-			new CGI::Dialog::Field(name => 'close_date', 
-						caption => 'Close Date',						
-						type => 'date',
-						options=>FLDFLAG_REQUIRED,
-						hints=>'Only batch date(s) greater than the Close Date will be valid',
-						defaultValue=>''),	
-			new CGI::Dialog::Field(type => 'bool', name => 'create_record', caption => 'Set Close Date', style => 'check',		
-				invisibleWhen=>CGI::Dialog::DLGFLAG_ADD | CGI::Dialog::DLGFLAG_UPDORREMOVE),			
-			new CGI::Dialog::Field(type => 'select',
-							style => 'radio',
-							selOptions => 'Yes:1;No:0',
-							caption => 'Apply to Child Organizations',
-							preHtml => "<B><FONT COLOR=DARKRED>",
-							postHtml => "</FONT></B>",
-							name => 'childern',options=>FLDFLAG_REQUIRED,
-				defaultValue => '0',),
-						
-		);
-		$self->{activityLog} =
-		{
-			level => 1,
-			scope =>'org_attribute',
-			key => "#field.org_id#",
-			data => "Create Close Date Include Childern : #field.childern#"
-		};
-		$self->addFooter(new CGI::Dialog::Buttons);
-		return $self;
+		new App::Dialog::Field::Organization::ID(caption => 'Organization ID',
+			name => 'org_id',
+			options => FLDFLAG_REQUIRED,
+		),
+		new CGI::Dialog::Field(caption => 'Close Date',
+			name => 'close_date', 
+			type => 'date',
+			options => FLDFLAG_REQUIRED,
+			hints => 'Only batch date(s) greater than the Close Date will be valid',
+			defaultValue => '',
+		),	
+		new CGI::Dialog::Field(caption => 'Set Close Date',
+			name => 'create_record',
+			type => 'bool',
+			style => 'check',
+			invisibleWhen => CGI::Dialog::DLGFLAG_ADD | CGI::Dialog::DLGFLAG_UPDORREMOVE
+		),
+		new CGI::Dialog::Field(caption => 'Apply to Child Organizations',
+			name => 'children',
+			type => 'select',
+			style => 'radio',
+			selOptions => 'Yes:1;No:0',
+			preHtml => "<B><FONT COLOR=DARKRED>",
+			postHtml => "</FONT></B>",
+			options=>FLDFLAG_REQUIRED,
+			defaultValue => '0',
+		),
+		new CGI::Dialog::Field(caption => 'Run Close Date Report',
+			name => 'run_report',
+			type => 'bool',
+			style => 'check',
+		),
+);
+	$self->{activityLog} =
+	{
+		level => 1,
+		scope =>'org_attribute',
+		key => "#field.org_id#",
+		data => "Create Close Date Include children : #field.children#"
+	};
+	$self->addFooter(new CGI::Dialog::Buttons);
+	return $self;
 }
 
 sub populateData
@@ -84,9 +94,10 @@ sub customValidate
 	my ($self, $page) = @_;
 	
 
-	my $childern = $page->field('childern');
+	my $children = $page->field('children');
 	my $parent_id = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgId', $page->session('org_internal_id'), $page->field('org_id'));			
-	my $children_orgs = $STMTMGR_ORG->getRowsAsHashList($page,STMTMGRFLAG_NONE,'selCloseDateChildParentOrgIds',$page->session('org_internal_id'),$parent_id,$childern );
+	my $children_orgs = $STMTMGR_ORG->getRowsAsHashList($page,STMTMGRFLAG_NONE,'selCloseDateChildParentOrgIds',
+		$page->session('org_internal_id'), $parent_id, $children );
 	my $closeDate = $page->field('close_date');	
 	my $closeField	=$self->getField('close_date');
 	my $setField = $self->getField('create_record');
@@ -96,7 +107,7 @@ sub customValidate
 	#perform this validation
 	
 	return 1 if $page->field('create_record') ne '';
-	#Check if Org or If Select Childern Org have a closed date that will not be in sequence		
+	#Check if Org or If Select children Org have a closed date that will not be in sequence		
 	foreach (@$children_orgs)
 	{
 		my $item = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_NONE, 'selAttributeItemDateByItemNameAndValueTypeAndParent', $_->{org_internal_id},'Retire Batch Date',$CLOSE_ATTRR_TYPE);	
@@ -129,11 +140,12 @@ sub customValidate
 sub execute
 {
 	my ($self, $page, $command,$flags) = @_;	
-	my $childern = $page->field('childern');
+	my $children = $page->field('children');
 	my $parent_id = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgId', $page->session('org_internal_id'), $page->field('org_id'));		
 	
 	
-	my $children_orgs = $STMTMGR_ORG->getRowsAsHashList($page,STMTMGRFLAG_NONE,'selCloseDateChildParentOrgIds',$page->session('org_internal_id'),$parent_id,$childern );
+	my $children_orgs = $STMTMGR_ORG->getRowsAsHashList($page,STMTMGRFLAG_NONE, 
+		'selCloseDateChildParentOrgIds',$page->session('org_internal_id'), $parent_id, $children );
 	foreach (@$children_orgs)
 	{		
 		#Check if Org Id already has a close batch date if so do an update otherwise do an insert	
@@ -149,9 +161,14 @@ sub execute
 				value_date => $page->field('close_date')
 			);
 	}
-	$page->param('home','/') unless $page->param('home') ;#Set home value if it is not set
-	$self->handlePostExecute($page, $command, $flags);	
 	
+	#$page->param('home','/') unless $page->param('home') ;#Set home value if it is not set
+	
+	$page->param('_dialogreturnurl', $page->field('run_report') ? 
+		"/report/Accounting/CloseDate?close_date=@{[$page->field('close_date')]}" : 
+		$page->param('home') ? $page->param('home') : '/');
+		
+	$self->handlePostExecute($page, $command, $flags);	
 }
 
 
