@@ -18,6 +18,7 @@ use vars qw(@ISA @EXPORT);
 @EXPORT = qw(
 	createTextFromData
 	createTextRowsFromData
+	wrapMessage
 );
 
 use constant FORMATTER => new Number::Format(INT_CURR_SYMBOL => '$');
@@ -826,6 +827,63 @@ sub generateTitleCallback {
 #		$sheet->MVPrint (0, 2, " ");
 	};
 }
+
+sub wrapMessage {
+        my ( $message, $trash, $prefix, $splitChars ) = @_;
+        $trash = 72 unless $trash;
+        $prefix = '' unless $prefix;
+        $splitChars = ' ' unless $splitChars;
+        my $pattern = "([$splitChars\n])";
+
+        ### Take away n characters from wrapping threshold for the prefix.
+        $trash -= length($prefix);
+
+        my $originalMessage = $$message;
+        my @messageWords = split /$pattern/, $originalMessage;
+        my $newMessage = '';
+
+        my $currentLine = '';
+        foreach my $word (@messageWords) {
+                if ($word eq "\n") {
+                        ### Newlines which are part of the message should be preserved...
+                        $newMessage .= $prefix.$currentLine.$word;
+                        $currentLine = '';
+                } elsif ((length($currentLine) + length($word)) > $trash) {
+                        ### If we add this word to the line, it'll take it over threshold...
+                        ### So make it the first word in the next line...
+                        if (length($word) > $trash) {
+                                $currentLine .= $word;
+                        } else {
+                                $newMessage .= $prefix.$currentLine."\n";
+                                $currentLine = $word;
+                        }
+
+                        ### Lines longer than the threshold are hard-thresholded and wrapped...
+                        ### This part is not reached unless the $word is longer than threshold...
+                        while (length($currentLine) > $trash) {
+                                ### nextLine holds all characters beyond the $trash'th char...
+                                my $nextLine = substr $currentLine, $trash - 1;
+                                ### currentLine now holds the first $trash characters...
+                                $currentLine = substr $currentLine, 0, $trash - 1;
+                                $newMessage .= $prefix.$currentLine."\n";
+                                $currentLine = $nextLine;
+                        }
+                } else {
+                        ### Adding this word will not raise any flags, so DO IT!
+                        $currentLine .= $word;
+                }
+        }
+
+        $currentLine =~ s/\n/\n$prefix/g;
+        $newMessage .= $prefix.$currentLine."\n" if ($currentLine);
+        if (defined wantarray()) {
+                return $newMessage;
+        } else {
+                $$message = $newMessage;
+        }
+
+        return;
+}                                
 
 1;
 
