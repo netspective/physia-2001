@@ -55,9 +55,13 @@ my %pubDefn = (
 				<a href="$baseArl/dlg-add-close-claims-wl-invoice/#{invoice_id}#" title='Close Invoice #{invoice_id}#'>$IMAGETAGS{'icons/black_c'}</a>
 			},
 		},
-		{head => 'Patient ID', dataFmt => '<a href="/person/#{patient_id}#/account">#{patient_id}#</a>',},
-		{head => 'Claim ID', dataFmt => '<a href="/invoice/#{invoice_id}#/history">#{invoice_id}#</a>',},
-		{head => 'Ins Org ID', dataFmt => '<a href="/org/#{ins_org_id}#/profile">#{ins_org_id}#</a>',},
+		{	head => 'Patient', dataFmt => '<a href="/person/#{patient_id}#/account" title="View #{patient_id}# Account">#{patient_name}#</a>',
+			hAlign => 'left', options => PUBLCOLFLAG_DONTWRAP,
+		},
+		{head => 'Claim ID', dataFmt => '<a href="/invoice/#{invoice_id}#/history" title="View Claim #{invoice_id}# History">#{invoice_id}#</a>',},
+		{	head => 'Ins Org ID', dataFmt => '<a href="/org/#{ins_org_id}#/profile" title="View #{ins_org_id}# Profile">#{ins_org_id}#</a>',
+			hAlign => 'left',
+		},
 		{head => 'Carrier Phone', dataFmt => '#{ins_phone}#', options => PUBLCOLFLAG_DONTWRAP,},
 		{head => 'Claim Status', dataFmt => '#{invoice_status}#', dAlign => 'center'},
 		{head => 'Balance', colIdx => '#{balance}#', dformat => 'currency'},
@@ -88,6 +92,7 @@ sub claimQuery
 		'invoice_age',
 		'invoice_date',
 		'member_number',
+		'patient_name',
 	);
 
 	return $query;
@@ -140,9 +145,10 @@ sub buildSqlStmt
 				invoice.balance,
 				trunc(sysdate - invoice.invoice_date) AS invoice_age,
 				TO_CHAR(invoice.invoice_date,'IYYYMMDD') AS invoice_date,
-				insurance.member_number AS member_number
+				insurance.member_number AS member_number,
+				initcap(simple_name) as patient_name
 			FROM
-				PERSON_TABLE
+				person,
 				transaction,
 				org_attribute,
 				org,
@@ -165,6 +171,7 @@ sub buildSqlStmt
 					where parent_id = ? and parent_org_id = ? and item_name = ?))
 				AND (invoice.invoice_status in (select value_int from person_attribute
 					where parent_id = ? and parent_org_id = ? and item_name = ?))
+				AND (person.person_id = invoice.client_id)
 				insuranceProductsConstraints
 				lastNameFromConstraint
 				lastNameToConstraint
@@ -188,8 +195,10 @@ sub buildSqlStmt
 				invoice.balance,
 				trunc(sysdate - invoice.invoice_date) AS invoice_age,
 				TO_CHAR(invoice.invoice_date,'IYYYMMDD') AS invoice_date,
-				insurance.member_number AS member_number
+				insurance.member_number AS member_number,
+				initcap(simple_name) as patient_name
 			FROM
+				person,
 				org_attribute,
 				org,
 				invoice_status,
@@ -219,6 +228,7 @@ sub buildSqlStmt
 						)
 					)
 				)
+				AND person.person_id = invoice.client_id
 	};
 
 	my $orgInternalId = $self->session('org_internal_id');
@@ -258,28 +268,23 @@ sub buildSqlStmt
 
 	if ($lnFrom)
 	{
-		my $lastNameFromWhereClause = qq{AND person.person_id = invoice.client_id and upper(person.name_last) >= ?};
-		$sqlStmt =~ s/PERSON_TABLE/person,/;
+		my $lastNameFromWhereClause = qq{AND upper(person.name_last) >= ?};
 		$sqlStmt =~ s/lastNameFromConstraint/$lastNameFromWhereClause/;
 		push(@bindParams, uc($lnFrom));
 	}
 	else
 	{
-		$sqlStmt =~ s/PERSON_TABLE// unless $lnTo;
 		$sqlStmt =~ s/lastNameFromConstraint//;
 	}
 
 	if ($lnTo)
 	{
-		$sqlStmt =~ s/PERSON_TABLE/person,/ unless $lnFrom;
-
-		my $lastNameToWhereClause = qq{AND person.person_id = invoice.client_id and upper(person.name_last) <= ?};
+		my $lastNameToWhereClause = qq{AND upper(person.name_last) <= ?};
 		$sqlStmt =~ s/lastNameToConstraint/$lastNameToWhereClause/;
 		push(@bindParams, uc($lnTo) . 'ZZZZ');
 	}
 	else
 	{
-		$sqlStmt =~ s/PERSON_TABLE//;
 		$sqlStmt =~ s/lastNameToConstraint//;
 	}
 
