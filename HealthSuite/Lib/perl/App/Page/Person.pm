@@ -717,6 +717,7 @@ sub prepare_view_chart
 				<TD>
 					<font size=1 face=arial>
 					#component.stpt-person.careProviders#<BR>
+					#component.stpt-person.bloodType#<BR>
 					#component.stpt-person.allergies#<BR>
 					#component.stpt-person.preventiveCare#<BR>
 					#component.stpt-person.advancedDirectives#<BR>
