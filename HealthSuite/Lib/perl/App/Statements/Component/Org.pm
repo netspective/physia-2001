@@ -377,7 +377,7 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 
 'org.personnel' => {
 	sqlStmt => qq{
-			select 	p.complete_name, pa.category, pa.person_id
+			select 	p.complete_name, pa.category, pa.person_id, pa.org_id
 			from 	person_org_category pa, person p
 			where	pa.org_id = ?
 				and pa.category <> 'Patient'
@@ -392,7 +392,7 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 			{head => 'Name', colIdx => 0, dataFmt => '<A HREF = "/person/#2#/profile">#2# #0#</A>'},
 			{head => 'Type', colIdx => 1, dataFmt => '#1#'},
 		],
-		bullets => 'stpe-#my.stmtId#/dlg-update-password/#2#/#param.org_id#?home=#param.home#',
+		bullets => 'stpe-#my.stmtId#/dlg-update-password/#2#/#3#?home=/org/#3#/personnel',
 	},
 	publishDefn_panel =>
 	{
@@ -421,7 +421,8 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 			],
 		},
 		stdIcons =>	{
-			updUrlFmt => '#param.home#/../stpe-#my.stmtId#/dlg-update-#1#/#2#?home=#param.home#', delUrlFmt => '#param.home#/../stpe-#my.stmtId#/dlg-remove-#1#/#2#?home=#param.home#',
+			#updUrlFmt => '#param.home#/../stpe-#my.stmtId#/dlg-update-#1#/#2#?home=#param.home#', delUrlFmt => '#param.home#/../stpe-#my.stmtId#/dlg-remove-#1#/#2#?home=#param.home#',
+			updUrlFmt => '#param.home#/../stpe-#my.stmtId#/dlg-update-password/#2#/#3#?home=/org/#3#/personnel', delUrlFmt => '#param.home#/../stpe-#my.stmtId#/dlg-remove-#1#/#2#?home=/org/#3#/personnel',
 		},
 	},
 	publishComp_st => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.personnel', [$orgId] ); },

@@ -310,9 +310,9 @@ $STMTMGR_PERSON = new App::Statements::Person(
 	},
 	'insPersonLogin' => qq{
 		insert into Person_Login 
-		(cr_session_id, cr_stamp, cr_user_id, person_id, org_id, password, quantity)
+		(cr_session_id, cr_stamp, cr_user_id, cr_org_id, person_id, org_id, password, quantity)
 		values 
-		(?            , sysdate , ?         , ?        , ?     , ?       , ?)
+		(?            , sysdate , ?         , ?        , ?        , ?     , ?       , ?)
 	},
 	'updSessionsTimeout' => qq{
 		update person_session set status = 2

@@ -905,6 +905,16 @@ function completePopupAction(closeWindow)
 	if(closeWindow) parent.close();
 }
 
+function confirmPassword(Form)
+{
+	if ((Form._f_password.value != Form._f_confirm_password.value) && (Form._f_confirm_password.value != '') )
+	{
+		alert("Passwords are NOT confirmed.  Please re-enter.");
+		Form._f_confirm_password.value = '';
+		Form._f_password.focus();
+	}
+}
+
 //
 // The following variable is set so that pages that call this library can check
 // to see if the library was successfully loaded. The code to verify the package
