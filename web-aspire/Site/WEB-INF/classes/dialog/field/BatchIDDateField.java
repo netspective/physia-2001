@@ -8,14 +8,14 @@ import com.xaf.form.*;
 import com.xaf.form.field.*;
 import com.xaf.value.*;
 
-public class BatchIDFieldField extends DialogField
+public class BatchIDDateField extends DialogField
 {
-	public BatchIDFieldField()
+	public BatchIDDateField()
 	{
 		super();
 	}
 
-	public BatchIDFieldField(String aName, String aCaption)
+	public BatchIDDateField(String aName, String aCaption)
 	{
 		super(aName, aCaption);
 	}
