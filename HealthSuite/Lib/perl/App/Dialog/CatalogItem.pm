@@ -139,8 +139,9 @@ sub makeStateChanges_special
 {
 	my ($self, $page) = @_;
 	
-	my $recExist = $STMTMGR_CATALOG->getRowAsHash($page, STMTMGRFLAG_NONE, 'sel_Catalog_Attribute',
-		$page->field('catalog_id'), App::Universal::ATTRTYPE_BOOLEAN, 'Capitated Contract');
+	my $recExist;	
+	$recExist = $STMTMGR_CATALOG->getRowAsHash($page, STMTMGRFLAG_NONE, 'sel_Catalog_Attribute',
+		$page->field('catalog_id'), App::Universal::ATTRTYPE_BOOLEAN, 'Capitated Contract')if ($page->field('catalog_id'));
 	
 	$self->updateFieldFlags('flags', FLDFLAG_INVISIBLE, ! $recExist->{value_int});
 	$page->field('flags', 0) unless $recExist->{value_int};
