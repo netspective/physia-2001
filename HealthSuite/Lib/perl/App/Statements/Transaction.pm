@@ -433,6 +433,13 @@ $STMTMGR_TRANSACTION = new App::Statements::Transaction(
 
 					)
 		},
+'selReferralType' => qq
+		{
+			SELECT
+					distinct serv_category,name
+			FROM  ref_service_category
+			ORDER BY  name
+		},
 	'selServiceProcedureData' =>qq
 		{
 			SELECT 	trans_id, trans_owner_type, trans_owner_id, parent_event_id, parent_trans_id,
