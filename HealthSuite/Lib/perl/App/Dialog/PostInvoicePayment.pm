@@ -407,8 +407,14 @@ sub customValidate
 		my $nextBillingInfo = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoiceBillingByInvoiceIdAndBillSeq', $invoiceId, $billingInfo->{bill_sequence} + 1);
 
 		my $invoiceStat = $invoiceInfo->{invoice_status};
-		if($nextBillingInfo->{bill_id} && ! $page->field('next_payer_alert') && $invoiceInfo->{balance} > 0 && $invoiceInfo->{balance} > $totalAdjsApplied
-			&& ($invoiceStat == App::Universal::INVOICESTATUS_EXTNLREJECT || $invoiceStat == App::Universal::INVOICESTATUS_INTNLREJECT || $invoiceStat == App::Universal::INVOICESTATUS_PAYAPPLIED))
+		if( 
+			$nextBillingInfo->{bill_id} && ! $page->field('next_payer_alert') && $invoiceInfo->{balance} > 0 && $invoiceInfo->{balance} > $totalAdjsApplied && 
+			(
+				($invoiceStat >= App::Universal::INVOICESTATUS_INTNLREJECT && $invoiceStat <= App::Universal::INVOICESTATUS_MTRANSFERRED) ||
+				$invoiceStat == App::Universal::INVOICESTATUS_EXTNLREJECT || $invoiceStat == App::Universal::INVOICESTATUS_AWAITINSPAYMENT ||
+				$invoiceStat == App::Universal::INVOICESTATUS_PAYAPPLIED || $invoiceStat == App::Universal::INVOICESTATUS_PAPERCLAIMPRINTED
+			) 
+		    )
 		{
 			my $getNextPayerAlert = $self->getField('next_payer_alert');
 			$self->updateFieldFlags('next_payer_alert', FLDFLAG_INVISIBLE, 0);
