@@ -18,13 +18,6 @@ use App::Dialog::WorklistSetup;
 use base 'App::Page::WorkList';
 use vars qw(%RESOURCE_MAP);
 %RESOURCE_MAP = (
-	'worklist/_default' => {
-		_views => [
-			{caption => 'Today', name => 'date',},
-			{caption => 'Recent Activity', name => 'recentActivity',},
-			{caption => 'Setup', name => 'setup',},
-			],
-		},
 	'worklist/patientflow' => {
 		_views => [
 			{caption => 'Today', name => 'date',},
@@ -39,9 +32,9 @@ my $baseArl = '/worklist/patientflow';
 sub prepare_view_date
 {
 	my ($self) = @_;
-	
+
 	$self->param('person_id', $self->session('user_id'));
-	
+
 	$self->addContent(qq{
 		<TABLE BORDER=0 CELLSPACING=1 CELLPADDING=0>
 			<TR VALIGN=TOP>
@@ -57,7 +50,7 @@ sub prepare_view_date
 					#component.stp-person.phoneMessage#<BR>
 					#component.stp-person.refillRequest#<BR>
 				</TD>
-				<TD>&nbsp;</TD>			
+				<TD>&nbsp;</TD>
 				<TD>
 					#component.lookup-records#<BR>
 				</TD>
@@ -117,7 +110,7 @@ sub prepare_view_recentActivity
 sub prepare_view_setup
 {
 	my ($self) = @_;
-	
+
 	my $dialog = new App::Dialog::WorklistSetup(schema => $self->{schema});
 	$self->addContent('<br>');
 	$dialog->handle_page($self, 'add');
@@ -128,6 +121,7 @@ sub prepare_page_content_footer
 {
 	my $self = shift;
 	return 1 if $self->flagIsSet(App::Page::PAGEFLAG_ISPOPUP);
+	return 1 if $self->param('_pm_view') eq 'setup';
 
 	push(@{$self->{page_content_footer}}, '<P>', App::Page::Search::getSearchBar($self, 'apptslot'));
 	$self->SUPER::prepare_page_content_footer(@_);
@@ -138,11 +132,11 @@ sub prepare_page_content_footer
 sub decodeDate
 {
 	my ($date) = @_;
-	
+
 	$date = 'today' unless ParseDate($date);
 	my @date_ = Decode_Date_US(UnixDate($date, '%m/%d/%Y'));
 	my @today = Today();
-	
+
 	if (Delta_Days(@date_, @today) == 0)
 	{
 		return "Today";
@@ -168,7 +162,7 @@ sub prepare_page_content_header
 
 	my $heading = "Patient Flow Work List";
 	my $dateTitle = decodeDate($self->param('_seldate'));
-	
+
 	my $urlPrefix = "/worklist/patientflow";
 	my $functions = $self->getMenu_Simple(App::Page::MENUFLAG_SELECTEDISLARGER,
 		'_pm_view',
@@ -176,7 +170,7 @@ sub prepare_page_content_header
 			[$dateTitle, "$urlPrefix/date", 'date'],
 			['Recent Activity', "$urlPrefix/recentActivity", 'recentActivity'],
 			['Setup', "$urlPrefix/setup", 'setup', ],
-			
+
 		], ' | ');
 
 	push(@{$self->{page_content_header}},
@@ -199,7 +193,7 @@ sub prepare_page_content_header
 		</TABLE>
 	}, @{[ $self->param('dialog') ? '<p>' : '' ]});
 
-	push(@{$self->{page_content_header}}, $self->getControlBarHtml()) 
+	push(@{$self->{page_content_header}}, $self->getControlBarHtml())
 		unless ($self->param('noControlBar'));
 
 	return 1;
@@ -211,7 +205,7 @@ sub getControlBarHtml
 
 	my $selectedDate = $self->param('_seldate') || $self->session('selectedDate') || 'today';
 	$self->param('_seldate', $selectedDate);
-	
+
 	$selectedDate = 'today' unless ParseDate($selectedDate);
 	my $fmtDate = UnixDate($selectedDate, '%m/%d/%Y');
 
@@ -234,7 +228,7 @@ sub getControlBarHtml
 
 	my @dateSelected = Decode_Date_US($fmtDate);
 	my $timeFieldsHtml;
-	
+
 	if (Delta_Days(@dateSelected, Today()) == 0)
 	{
 		$self->param('Today', 1);
@@ -325,7 +319,7 @@ sub getControlBarHtml
 		} else {
 			$time2 = $self->session('time2');
 		}
-		
+
 
 		$timeFieldsHtml = qq{
 			&nbsp; &nbsp;
@@ -338,7 +332,7 @@ sub getControlBarHtml
 			<INPUT TYPE=HIDDEN NAME="_f_action_change_controls" VALUE="1">
 			<input type=submit value="Go">
 		};
-		
+
 	}
 
 	return qq{
@@ -410,7 +404,7 @@ sub initialize
 
 	# Check user's permission to page
 	my $activeView = $self->param('_pm_view');
-	if ($activeView) 
+	if ($activeView)
 	{
 		#unless($self->hasPermission("page/worklist/patientflow/$activeView"))
 		unless($self->hasPermission("page/worklist/patientflow"))
@@ -418,7 +412,7 @@ sub initialize
 			$self->disable(
 					qq{
 						<br>
-						You do not have permission to view this information. 
+						You do not have permission to view this information.
 						Permission page/worklist/patientflow is required.
 
 						Click <a href='javascript:history.back()'>here</a> to go back.
@@ -433,7 +427,7 @@ sub handleARL
 	#return 0 if $self->SUPER::handleARL($arl, $params, $rsrc, $pathItems) == 0;
 
 	$self->param('person_id', $self->session('person_id')) unless $self->param('person_id');
-	
+
 	# see if the ARL points to showing a dialog, panel, or some other standard action
 	unless($self->arlHasStdAction($rsrc, $pathItems, 1))
 	{
@@ -444,7 +438,7 @@ sub handleARL
 			&{$handleMethod}($self, $arl, $params, $rsrc, $pathItems);
 		}
 	}
-	
+
 	$self->param('_dialogreturnurl', $baseArl);
 	$self->printContents();
 	$self->session('selectedDate', $self->param('_seldate')) if $self->param('_seldate');
@@ -460,7 +454,7 @@ sub handleARL_date
 		$pathItems->[2] =~ s/\-/\//g;
 		$self->param('_seldate', $pathItems->[2]);
 	}
-	
+
 	$self->param('noControlBar', 0);
 }
 
