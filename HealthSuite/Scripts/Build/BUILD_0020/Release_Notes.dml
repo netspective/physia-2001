@@ -103,5 +103,10 @@
 			Correct error by loading RVU 2001 data into Reference tables.
 		</deliverable>
 
+		<deliverable id="2041">
+			Corrected error  with Fee schedules not pulling correct entry if Modifier was included in the invoice
+		</deliverable>
+
+
 	</deliverables>
 </release-notes>
