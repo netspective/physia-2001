@@ -233,6 +233,7 @@ sub isValid
 		
 		#READ - If @allFeeSchedules line for charge is changed also change the @listFeeSchedule line		
 		my @listFeeSchedules = @defaultFeeSchedules ? @defaultFeeSchedules : @insFeeSchedules;
+		$page->param("_f_proc_active_catalogs", join(',', @listFeeSchedules));
 		my $svc_type=App::IntelliCode::getSvcType($page, $procedure, $modifier || undef,\@listFeeSchedules);
 		my $count_type = scalar(@$svc_type);
 		my $count=0;
@@ -266,7 +267,6 @@ sub isValid
 		{
 			$count =0;
 			my @allFeeSchedules = @defaultFeeSchedules ? @defaultFeeSchedules : @insFeeSchedules;
-			$page->param("_f_proc_active_catalogs", join(',', @allFeeSchedules));
 			
 			my $fsResults = App::IntelliCode::getItemCost($page, $procedure, $modifier || undef, \@allFeeSchedules);
 			my $resultCount = scalar(@$fsResults);
