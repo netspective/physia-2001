@@ -4377,7 +4377,7 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 	{
 		# automatically inherites columnDefn and other items from publishDefn
 		style => 'panel.transparent.static',
-		frame => { heading => 'Lab Tests' },
+		frame => { heading => 'Ancillary Tests' },
 		bullets => '/person/#param.person_id#/stpe-person.labOrderDetail?id=#2#&home=#homeArl#',
 
 	},
@@ -4390,12 +4390,12 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 	publishDefn_panelEdit =>
 	{
 		style => 'panel.edit',
-		frame => { heading => 'Lab Order Entry' },
+		frame => { heading => 'Ancillary Test Entry' },
 				columnDefn =>
 				[
 				{colIdx => 1,hint=>"Add Order Entry to #1#" , hAlign=>'left', head => 'Lab Company',},
 				{colIdx => 3, dAlign=>'right', head => 'Entries'},
-				{dAlign=>'right', dataFmt=>'Add', url=>'/person/#param.person_id#/dlg-add-lab-order?home=#homeArl#&org_id=#0#', hint=>'Add Lab Order Entry'},
+				{dAlign=>'right', dataFmt=>'Add', url=>'/person/#param.person_id#/dlg-add-lab-order?home=#homeArl#&org_id=#0#', hint=>'Add Ancillary Test Entry'},
 				],
 	},
 	publishComp_stp => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.labOrderSummary', [$page->session('org_internal_id'),$personId], 'panel'); },
@@ -4435,7 +4435,7 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 	{
 		# automatically inherites columnDefn and other items from publishDefn
 		style => 'panel.transparent.static',
-		frame => { heading => 'Lab Tests' },
+		frame => { heading => 'Ancillary Tests' },
 
 	},
 	publishDefn_panelTransp =>
@@ -4447,7 +4447,7 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 	publishDefn_panelEdit =>
 	{
 		#style => 'panel.edit',
-		frame => { heading => 'Edit Lab Order' ,
+		frame => { heading => 'Edit Ancillary Test' ,
 				closeUrl => '#param.home#',
 			},
 

@@ -28,7 +28,7 @@ use vars qw(@ISA %RESOURCE_MAP %PROCENTRYABBREV %RESOURCE_MAP %ITEMTOFIELDMAP %C
 
 sub new
 {
-	my ($self, $command) = CGI::Dialog::new(@_, id => 'catalog', heading => '$Command Lab Order');
+	my ($self, $command) = CGI::Dialog::new(@_, id => 'catalog', heading => '$Command Ancillary Test');
 
 	my $schema = $self->{schema};
 
