@@ -246,8 +246,9 @@ sub isValid
 
 		if( $charges eq '' && ($feeSchedules[0] ne '' || $insFeeSchedules[0] ne '') )
 		{
-			my @allFeeSchedules = @feeSchedules || @insFeeSchedules;
-			my $fsResults = App::IntelliCode::getItemCost($page, $procedure, $modifier, \@allFeeSchedules);
+			my @allFeeSchedules = @feeSchedules ? @feeSchedules : @insFeeSchedules;
+			
+			my $fsResults = App::IntelliCode::getItemCost($page, $procedure, $modifier || undef, \@allFeeSchedules);
 			my $resultCount = scalar(@$fsResults);
 			if($resultCount == 0)
 			{
