@@ -80,7 +80,7 @@ sub getHtml
 	my ($self, $page, $startHour, $endHour, $flags) = @_;
 
 	$self->init($page) unless @PATIENT_TYPES;
-	
+
 	my @apptSheet = ();
 	my $html = $self->addStyle($page);
 
@@ -384,7 +384,7 @@ sub buildHeader
 								<option value='/schedule/dlg-add-appointment//$resource_id/$facility_id/'>Add Appointment</option>
 								<option value='#'>*Verify Insurance</option>
 								<option value='/search/apptslot/$resource_id,$facility_id,$dashDate/1'>Find Slot</option>
-								<option value='/schedule/dlg-add-template/$resource_id/$facility_id'>Create Template</option>
+								<option value='/schedule/dlg-add-template/$resource_id/$facility_id'>Add Template</option>
 								<option value='/search/template/$resource_id,$facility_id/1'>View Templates</option>
 								<option value='/search/appointment/$resource_id,$facility_id,0,$dashDate,$dashDate/1'>Print Schedule</option>
 								$customizeOption
@@ -453,10 +453,10 @@ sub buildRows
 			my $resource_id = $self->{inputSpec}[$col][1];
 			my $facility_id = $self->{inputSpec}[$col][2];
 			my @date = Decode_Date_US($self->{inputSpec}[$col][0]);
-			
+
 			my $am = $hour >= 12 ? 'PM' : 'AM';
 			my $hourAm = $hour == 12 ? $hour : $hour % 12;
-			
+
 			my $start_stamp = sprintf ("%02d-%02d-%04d_%02d:00_%s", $date[1], $date[2], $date[0], $hourAm, $am);
 			my $apptHref = "javascript:doActionPopup('/schedule/dlg-add-appointment//$resource_id/$facility_id/$start_stamp',null,'width=620,height=500,scrollbars,resizable');";
 
@@ -544,7 +544,7 @@ sub getAppointments
 			my $firstInit = $short_patient_name	=~ /(.)$/;
 			my $u = uc($1);
 			$short_patient_name =~ s/.$/$u/;
-			
+
 			my $patient_complete_name = $slots[$i]->{attributes}->{patient_complete_name};
 			my $patient_id = $slots[$i]->{attributes}->{patient_id};
 			my $event_id = $slots[$i]->{attributes}->{event_id};
