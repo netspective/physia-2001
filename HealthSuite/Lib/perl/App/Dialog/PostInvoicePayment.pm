@@ -255,6 +255,7 @@ sub execute
 
 	my $paidBy = $page->param('paidBy') || 'personal';
 	my $nextPayerExists = $page->field('next_payer_exists');
+	my $submitNextPayer = $page->field('next_payer_alert');
 	my $reopenClaim = $page->field('reopen_alert');
 	my $invoiceId = $page->param('invoice_id') || $page->param('_sel_invoice_id') || $page->field('sel_invoice_id');
 	my $batchId = $page->field('batch_id');
@@ -347,8 +348,9 @@ sub execute
 		#if payments are applied to a submitted claim, don't want to change status because otherwise it will not be picked up for transfer/billing
 		$newStatus = App::Universal::INVOICESTATUS_SUBMITTED;
 	}
-	elsif($invoiceBalance == 0 && 
-			($claimType == App::Universal::CLAIMTYPE_SELFPAY || ($invoice->{flags} & App::Universal::INVOICEFLAG_DATASTOREATTR && ! $nextPayerExists)) 
+	elsif(
+		$invoiceBalance == 0 && 
+			($claimType == App::Universal::CLAIMTYPE_SELFPAY || $submitNextPayer == 2)
 		)
 	{
 		$newStatus = App::Universal::INVOICESTATUS_CLOSED;
@@ -365,7 +367,7 @@ sub execute
 
 	#Redirect
 	my $newInvoiceId;
-	if($page->field('next_payer_alert') == 1)
+	if($submitNextPayer == 1)
 	{
 		$newInvoiceId = handleDataStorage($page, $invoiceId, App::Universal::RESUBMIT_NEXTPAYER);
 	}
