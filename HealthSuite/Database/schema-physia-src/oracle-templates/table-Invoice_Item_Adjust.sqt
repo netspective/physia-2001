@@ -252,19 +252,17 @@ begin
         adjustment_amount,
         plan_paid,
         pay_method,
-        o.owner_org_id,
+        i.owner_id,
         i.billing_id,
         t.trans_type,
         i.parent_invoice_id,
         i.invoice_subtype,
         iia.pay_date
-    FROM invoice i ,  transaction t ,	
-	invoice_item_adjust iia , invoice_item ii, org o
+    FROM invoice i , transaction t, invoice_item_adjust iia , invoice_item ii
     WHERE t.trans_id = i.main_transaction 			
 	AND ii.parent_id  = i.invoice_id
 	AND iia.parent_id = ii.item_id
 	AND NOT (invoice_status =15 AND parent_invoice_id is not null)
-	and o.org_internal_id = service_facility_id
 	and iia.adjustment_id=v_adjustment_id;
 
    end loop; 
