@@ -108,10 +108,10 @@ sub initialize
 
 		new CGI::Dialog::Field(caption => 'Primary Payer', type => 'select', name => 'payer'),
 		
-		new CGI::Dialog::MultiField(caption => 'Third-Party ID/Type', name => 'other_payer_fields',
+		new CGI::Dialog::MultiField(caption => 'Payer for Today ID/Type', name => 'other_payer_fields',
 			fields => [
-				new CGI::Dialog::Field(caption => 'Third-Party Payer for Today', name => 'other_payer_id'),
-				new CGI::Dialog::Field(type => 'select', selOptions => 'Person;Organization', caption => 'Third-Party Type', name => 'other_payer_type'),
+				new CGI::Dialog::Field(caption => 'Payer for Today ID', name => 'other_payer_id'),
+				new CGI::Dialog::Field(type => 'select', selOptions => 'Person;Organization', caption => 'Payer for Today Type', name => 'other_payer_type'),
 			]),
 
 
