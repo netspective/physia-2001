@@ -135,8 +135,9 @@ sub getBatches
 
 	for my $claimIndex (0..$#$claims)
 	{
-		$providerID = $claims->[$claimIndex]->{payToOrganization}->getFederalTaxId();
+		$providerID = $claims->[$claimIndex]->{payToOrganization}->getTaxId();
 		$providerID =~ s/ //g;
+		$providerID =~ s/\-//g;
 
 		push(@{$tempBatches->{$providerID}},$claims->[$claimIndex]);
 	} # end of claims list loop
@@ -162,8 +163,8 @@ sub getHeaderTrailerData
     my ($self, $tempClaims) = @_;
 	#my ($hash,$value,$key,$tempSerial);
 	my $params1 = {};
-    
-        
+
+
 	$params1->{SUBMITTER_ID} = 'S03135';
 	$params1->{SUBMISSION_SERIAL_NO} = $self->numToStr(6,0,$self->{serialNumber});
 	$params1->{SUBMITTER_NAME} = 'PHYSIA';

@@ -118,7 +118,7 @@ my %payerType = ( THIN_MEDICARE . "" =>
 	  $self->batchType(),
 	  $self->numToStr(4,0,$container->getSequenceNo()), # batch no
 	  $self->numToStr(6,0,$container->getSequenceNo()),  # batch id
-  	  $self->numToStr(9,0,$taxId()),  # ne '') ? $claimCareProvider->getFederalTaxId() : $spaces,
+  	  $self->numToStr(9,0,$taxId),  # ne '') ? $claimCareProvider->getFederalTaxId() : $spaces,
 	  $spaces, # reserved
 	  substr($taxIdType,0,1), # taxId Type
 	  $spaces, # national provider id
