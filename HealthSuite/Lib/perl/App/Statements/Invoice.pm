@@ -120,6 +120,12 @@ $STMTMGR_INVOICE = new App::Statements::Invoice(
 		and invoice_date ?
 		order by invoice_date desc
 		},
+	'selServiceOrgByInvoiceId'=>q{
+		SELECT	t.service_facility_id
+		FROM	transaction t, invoice i
+		WHERE	i.invoice_id = :1
+		AND	i.main_transaction = t.trans_id
+		},				
 	'selInvoiceAddr' => q{
 		select *
 		from invoice_address
