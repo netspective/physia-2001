@@ -29,35 +29,34 @@ sub main
 {
 	my $args = new Getopt::Declare(q{
 	[strict]
-	-type <id:s>				Process data of the -type 
-								[required]
+	-type <id:s>				Process data of the -type [required] - example -type semnet
 	
-	-test					The data being processed should be done in test mode
+	-test					The data being processed should be done in test mode - not implemented
 
-	-userid <id:s>				Force the user id to this person (person_id)
-	-orgid <id:i>				Force the organization id to this organization (org_internal_id).  
+	-userid <id:s>				Force the user id to this person (person_id) - not implemented
+	-orgid <id:i>				Force the organization id to this organization (org_internal_id) - not implemented  
 						
 	
-	-createid <id:s>			Set cr_user_id to this value.  If not provided default to  IMPORT_PHYSIA
+	-createid <id:s>			Set cr_user_id to this value. Default IMPORT_PHYSIA. Example -cretedid IMPORT_SEMNET
 
-	-delta <level:i>			Run load as a delta process to <level>
+	-delta <level:i>			Run load as a delta process to <level> - not implemented
 						1: Run full delta performing insert update and deletes to DB
 						2: Run delta process performing inserts and updates to DB  and 
 						produce report for deletes
 						3: Produce delta report do not alter DB
 						
-	-loadFile <id:s>			Run process and creates a load file [default is to load database]				
+	-loadFile <id:s>			Run process and creates a load file [default is to load database] - not implemented				
 	
-	-connectkey <key:s>			Use <key> as connect string instead of what's specified in App::Configuration
-	-schema <file>				Use <file> as schema definition file instead of what's specified in 
-						App::Configuration
+	-connectkey <key:s>			Use <key> as connect string instead of what's specified in App::Configuration - not implemented
 	
-	-file <files>...			Process one or more files. 
+	-schema <file>				Use <file> as schema definition file instead of what's specified in App::Configuration  - not implemented 
+	
+	-file <files>...			Process one or more files.  - not implemented 
 							Each item is treated as a parameter for File::DosGlob, 
 							files not found are ignored unless -verbose is specified
 	
 	-verbose				Turn on verbose messages
-	-debug <level:i>			Turn on debugging messages to <level>
+	-debug <level:i>			Turn on debugging messages to <level>  - not implemented 
 	});
 	
 	print "Running in TEST mode.\n" if $args->{'-test'};
