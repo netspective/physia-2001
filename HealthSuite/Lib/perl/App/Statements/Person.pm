@@ -121,7 +121,7 @@ $STMTMGR_PERSON = new App::Statements::Person(
 			and value_type = id
 		},
 	'selRelationship' => qq{
-		select caption from relationship
+		select caption from resp_party_relationship
 		},
 	'selPatientSign' => qq{
 		select abbrev, caption from auth_signature
