@@ -75,9 +75,9 @@ $STMTRPTDEFN_DEFAULT =
 	},
 	columnDefn =>
 	[
-		{ head => 'ID', url => 'javascript:chooseEntry("#&{?}#")', hint => 'Created on: #10#' },
+		{ head => 'ID', url => q{javascript:chooseEntry('#&{?}#')}, hint => 'Created on: #10#' },
 		{ head => 'IC' },
-		{ head => 'Patient', url => qq{javascript:chooseItem("/person/#&{?}#/account")}},
+		{ head => 'Patient', url => q{javascript:chooseItem('/person/#&{?}#/account')} },
 		#{ head => 'Inv Date' },
 		{ head => 'Svc Date' },
 		{ head => 'Status' },
