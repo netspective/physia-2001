@@ -330,7 +330,6 @@ sub execute
 	my $ownerOrgId = $page->session('org_internal_id');
 	my $insOrgInternalId = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgId', $ownerOrgId, $insOrgId);
 	my $planName = $page->field('plan_name');
-	my $ownerOrgId = $page->session('org_internal_id');
 
 	my $insIntId = $page->schemaAction(
 				'Insurance', $command,
