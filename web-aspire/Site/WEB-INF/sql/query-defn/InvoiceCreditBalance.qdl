@@ -1,0 +1,42 @@
+<?xml version="1.0"?>
+
+<!-- QDL Query Definition Language -->
+
+<component>
+	<query-defn id="InvoiceCreditBalance" caption="Invoice Credit Balance" db="Oracle">
+
+		<!-- Fields -->
+		<field id="person_id" join="invoice" column="client_id"/>
+		<field id="person_name" caption="Patient Name" join="person" column="simple_name"/>
+		<field id="invoice_id" caption="Invoice ID" join="invoice" column="invoice_id"/>
+		<field id="balance" caption="Credit Amount" join="invoice" column="balance" ui-datatype="currency"/>
+		<field id="patient_lastname" caption="Patient Last Name" join="person" column="name_last"/>
+		<field id="patient_firstname" caption="Patient First Name" join="person" column="name_first"/>
+		<field id="age" join="invoice" columndefn="trunc(sysdate) - trunc(invoice.invoice_date)" caption="Age"/>
+		<field id="invoice_date" join="invoice" column="invoice_date"/>
+		<field id="invoice_status" join="invoice" column="invoice_status"/>
+
+		<field id="service_facility_id" join="transaction" column="service_facility_id"/>
+		<field id="physician_id" join="transaction" column="care_provider_id"/>
+		<field id="product_name" join="insurance" column="product_name"/>
+
+		<!-- Joins -->
+		<join id="invoice" table="invoice" autoinclude="1"/>
+		<join id="person" table="person" condition="person.person_id = invoice.client_id"/>
+		<join id="transaction" table="transaction" condition="transaction.trans_id = invoice.main_transaction"/>
+		<join id="invoice_billing" table="invoice_billing" condition="invoice_billing.bill_id = invoice.billing_id"/>
+		<join id="insurance" table="insurance" requires="invoice_billing" condition="insurance.ins_internal_id (+) = invoice_billing.bill_ins_id"/>
+
+		<!-- Views -->
+		<view id="all" distinct="yes">
+			<column id="person_id"/>
+			<column id="person_name"/>
+			<column id="invoice_id"/>
+			<column id="balance"/>
+			<column id="age"/>
+		</view>
+
+	</query-defn>
+</component>
+
+

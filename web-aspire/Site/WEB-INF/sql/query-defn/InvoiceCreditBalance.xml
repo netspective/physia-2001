@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xaf>
+<query-defn id="InvoiceCreditBalance" caption="Invoice Credit Balance" dbms="Oracle">
+<field id="person_id" caption="" join="invoice" column="client_id"/>
+<field id="person_name" caption="Patient Name" join="person" column="simple_name"/>
+<field id="invoice_id" caption="Invoice ID" join="invoice" column="invoice_id"/>
+<field id="balance" caption="Credit Amount" dialog-field="field.currency" join="invoice" column="balance"/>
+<field id="patient_lastname" caption="Patient Last Name" join="person" column="name_last"/>
+<field id="patient_firstname" caption="Patient First Name" join="person" column="name_first"/>
+<field id="age" caption="Age" join="invoice" column-expr="trunc(sysdate) - trunc(invoice.invoice_date)"/>
+<field id="invoice_date" caption="" join="invoice" column="invoice_date"/>
+<field id="invoice_status" caption="" join="invoice" column="invoice_status"/>
+<field id="service_facility_id" caption="" join="transaction" column="service_facility_id"/>
+<field id="physician_id" caption="" join="transaction" column="care_provider_id"/>
+<field id="product_name" caption="" join="insurance" column="product_name"/>
+<join id="invoice" table="invoice"/>
+<join id="person" table="person" condition="person.person_id = invoice.client_id"/>
+<join id="transaction" table="transaction" condition="transaction.trans_id = invoice.main_transaction"/>
+<join id="invoice_billing" table="invoice_billing" condition="invoice_billing.bill_id = invoice.billing_id"/>
+<join id="insurance" table="insurance" imply-join="invoice_billing" condition="insurance.ins_internal_id (+) = invoice_billing.bill_ins_id"/>
+<select id="all" heading="">
+<display field="person_id"/>
+<display field="person_name"/>
+<display field="invoice_id"/>
+<display field="balance"/>
+<display field="age"/>
+</select>
+</query-defn>
+</xaf>

@@ -1,0 +1,48 @@
+<?xml version="1.0"?>
+
+<!-- QDL Query Definition Language -->
+
+<component>
+	<query-defn id="Statement" db="Oracle">
+
+		<!-- Fields -->
+		<field id="statement_id" join="statement" column="statement_id"/>
+		<field id="cr_org_internal_id" join="statement" column="cr_org_internal_id"/>
+		<field id="row_num" column="rownum"/>
+		<field id="patient_id" join="statement" caption="Patient ID" column="patient_id"/>
+		<field id="statement_source" caption="Clearing House" join="stmt_src" column="caption"/>
+		<field id="transmission_stamp" join="statement" caption="Transmission Date" column="transmission_stamp" columndefn="TO_CHAR(statement.transmission_stamp, 'IYYYMMDD')" ui-datatype="date"/>
+		<field id="transmission_status" join="trans_status" caption="Transmission Status" column="caption"/>
+		<field id="ack_stamp" join="statement" caption="Acknowledge Date" column="ack_stamp" columndefn="TO_CHAR(statement.ack_stamp, 'IYYYMMDD')" ui-datatype="date"/>
+		<field id="int_stmt_id" join="statement" caption="Internal Statement ID" column="int_statement_id"/>
+		<field id="ext_stmt_id" join="statement" caption="External Statement ID" column="ext_statement_id"/>
+		<field id="amount_due" join="statement" caption="Statement Balance" column="amount_due" ui-datatype="currency"/>
+		<field id="invoice_ids" join="statement" caption="Invoice ID(s)" column="inv_ids"/>
+
+		
+		<!-- Joins -->
+		<join id="statement" table="statement" autoinclude="1"/>
+		<join id="stmt_src" table="electronic_payer_source" condition="stmt_src.id = statement.statement_source"/>
+		<join id="trans_status" table="transmission_status" condition="trans_status.id = statement.transmission_status"/>
+		<join id="patient" table="person" condition="patient.person_id = statement.patient_id"/>
+
+		
+		<!-- Views -->
+		<view id="all" caption="None" distinct="yes" href="/invoice/{invoice_id}/summary">
+			<column id="statement_source"/>
+			<column id="transmission_stamp"/>
+			<column id="transmission_status"/>
+			<column id="patient_id"/>
+			<column id="ack_stamp"/>
+			<column id="int_stmt_id"/>
+			<column id="ext_stmt_id"/>
+			<column id="invoice_ids"/>
+			<column id="amount_due"/>
+			<condition field="cr_org_internal_id" comparison="is" criteria="#session.org_internal_id#"/>
+			<order-by id="statement_source"/>
+		</view>
+
+	</query-defn>
+</component>
+
+

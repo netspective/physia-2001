@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xaf>
+<query-defn id="InvoiceIPA" caption="Associated Org Invoice" dbms="Oracle">
+<field id="invoice_id" caption="Claim #" join="invoice" column="invoice_id"/>
+<field id="row_num" caption="" join="" column="rownum"/>
+<field id="owner_id" caption="" join="invoice" column="owner_id"/>
+<field id="total_items" caption="Item Count" join="invoice" column="total_items"/>
+<field id="total_cost" caption="Total Charges" dialog-field="field.currency" join="invoice" column="total_cost"/>
+<field id="total_adjust" caption="Total Adjustments" dialog-field="field.currency" join="invoice" column="total_adjust"/>
+<field id="balance" caption="Balance" dialog-field="field.currency" join="invoice" column="balance"/>
+<field id="invoice_date" caption="Date of Visit" dialog-field="field.date" join="invoice" column="invoice_date" column-expr="TO_CHAR(invoice.invoice_date, 'IYYYMMDD')"/>
+<field id="patient_id" caption="Patient ID" join="invoice" column="client_id"/>
+<field id="submitter_id" caption="Submitter ID" join="invoice" column="submitter_id"/>
+<field id="invoice_status" caption="Claim Status" join="inv_stat" column="caption"/>
+<field id="patient_ssn" caption="Patient SSN" join="patient" column="SSN"/>
+<field id="patient_lastname" caption="Patient Last Name" join="patient" column="name_last"/>
+<field id="service_begin_date" caption="Service Begin Date" dialog-field="field.date" join="item_servdate" column="service_begin_date" column-expr="TO_CHAR(MIN(item_servdate.service_begin_date), 'IYYYMMDD')"/>
+<field id="service_end_date" caption="Service End Date" dialog-field="field.date" join="item_servdate" column="service_begin_date" column-expr="TO_CHAR(MAX(item_servdate.service_begin_date), 'IYYYMMDD')"/>
+<field id="provider_id" caption="Rendering Provider ID" join="rend_provider" column="person_id"/>
+<field id="provider_upin" caption="Physician UPIN" join="inv_attr_upin" column="value_text"/>
+<field id="employer" caption="Employer" join="bill_payer_ins_emp" column="org_id"/>
+<field id="bill_party_type" caption="" join="bill_payer" column="bill_party_type"/>
+<field id="payer_type" caption="Payer Type" join="bill_party_type" column="caption"/>
+<field id="payer" caption="Payer" join="bill_payer" column="bill_to_id"/>
+<field id="payer_person_id" caption="Payer Person" join="bill_payer_person" column="person_id"/>
+<field id="payer_org_id" caption="Payer Org" join="bill_payer_org" column="org_id"/>
+<field id="parent_org_id" caption="Associated Org ID" join="parent_org" column="org_id"/>
+<field id="parent_org_name" caption="Associated Org Name" join="parent_org" column="name_primary"/>
+<field id="assn_org_id" caption="" join="orgassn" column="org_internal_id"/>
+<join id="invoice" table="invoice"/>
+<join id="inv_stat" table="invoice_status" condition="inv_stat.id (+) = invoice.invoice_status"/>
+<join id="patient" table="person" condition="patient.person_id (+) = invoice.client_id"/>
+<join id="item_servdate" table="invoice_item" condition="item_servdate.parent_id (+) = invoice.invoice_id"/>
+<join id="inv_attr_upin" table="invoice_attribute" condition="inv_attr_upin.parent_id (+) = invoice.invoice_id AND inv_attr_upin.item_name (+) = 'Ref Provider/Identification'"/>
+<join id="bill_payer" table="invoice_billing" condition="bill_payer.bill_id (+) = invoice.billing_id"/>
+<join id="bill_payer_ins" table="insurance" imply-join="bill_payer" condition="bill_payer.bill_ins_id = bill_payer_ins.ins_internal_id (+)"/>
+<join id="bill_payer_ins_emp" table="org" imply-join="bill_payer_ins" condition="bill_payer_ins.employer_org_id = bill_payer_ins_emp.org_internal_id (+)"/>
+<join id="bill_party_type" table="invoice_bill_party_type" imply-join="bill_payer" condition="bill_party_type.id = bill_payer.bill_party_type"/>
+<join id="bill_payer_person" table="person" imply-join="bill_payer" condition="bill_payer_person.person_id (+) = bill_payer.bill_to_id"/>
+<join id="bill_payer_org" table="org" imply-join="bill_payer" condition="TO_CHAR(bill_payer_org.org_internal_id (+)) = bill_payer.bill_to_id"/>
+<join id="main_trans" table="transaction" condition="invoice.main_transaction = main_trans.trans_id"/>
+<join id="rend_provider" table="person" imply-join="main_trans" condition="main_trans.care_provider_id = rend_provider.person_id (+)"/>
+<join id="orgassn" table="Org_ASSOCIATION" imply-join="invoice" condition="invoice.owner_id = orgassn.assn_org_internal_id AND orgassn.org_assn_status = 0 AND ( orgassn.org_assn_type = 110 or orgassn.org_assn_type = 1)"/>
+<join id="parent_org" table="org" imply-join="orgassn" condition="orgassn.assn_org_internal_id=parent_org.org_internal_id and parent_org.parent_org_id is NULL"/>
+<select id="all" heading="None">
+<display field="invoice_id"/>
+<display field="total_items"/>
+<display field="patient_id"/>
+<display field="provider_upin"/>
+<display field="service_begin_date"/>
+<display field="invoice_status"/>
+<display field="payer_type"/>
+<display field="payer_person_id"/>
+<display field="payer_org_id"/>
+<display field="total_cost"/>
+<display field="total_adjust"/>
+<display field="balance"/>
+<order-by field="invoice_id"/>
+<condition field="assn_org_id" comparison="is" value="#session.org_internal_id#"/>
+</select>
+</query-defn>
+</xaf>

@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xaf>
+<query-defn id="organization" caption="Organization" dbms="">
+<field id="id" caption="Org ID" join="org" column="org_id"/>
+<field id="row_number" caption="Row" join="" column="rownum"/>
+<field id="name" caption="Name" join="org" column="name_primary"/>
+<field id="trade_name" caption="Trade Name" join="org" column="name_trade"/>
+<field id="tax_id" caption="Tax ID" join="org" column="tax_id"/>
+<field id="categories" caption="Categories" join="org" column="category"/>
+<field id="time_zone" caption="Time Zone" join="org" column="time_zone"/>
+<field id="mailing_address_line_1" caption="Mailing Address - Line 1" join="org_addr_mail" column="line1"/>
+<field id="mailing_address_line_2" caption="Mailing Address - Line 2" join="org_addr_mail" column="line2"/>
+<field id="mailing_address_city" caption="Mailing Address - City" join="org_addr_mail" column="city"/>
+<field id="mailing_address_state" caption="Mailing Address - State" join="org_addr_mail" column="state"/>
+<field id="mailing_address_zip" caption="Mailing Address - Zip Code" join="org_addr_mail" column="zip"/>
+<field id="street_address_line_1" caption="Street Address - Line 1" join="org_addr_street" column="line1"/>
+<field id="street_address_line_2" caption="Street Address - Line 2" join="org_addr_street" column="line2"/>
+<field id="street_address_city" caption="Street Address - City" join="org_addr_street" column="city"/>
+<field id="street_address_state" caption="Street Address - State" join="org_addr_street" column="state"/>
+<field id="street_address_zip" caption="Street Address - Zip Code" join="org_addr_street" column="zip"/>
+<field id="payment_address_line_1" caption="Payment Address - Line 1" join="org_addr_payment" column="line1"/>
+<field id="payment_address_line_2" caption="Payment Address - Line 2" join="org_addr_payment" column="line2"/>
+<field id="payment_address_city" caption="Payment Address - City" join="org_addr_payment" column="city"/>
+<field id="payment_address_state" caption="Payment Address - State" join="org_addr_payment" column="state"/>
+<field id="payment_address_zip" caption="Payment Address - Zip Code" join="org_addr_payment" column="zip"/>
+<field id="any_address_line_1" caption="Any Address - Line 1" join="org_addr_any" column="line1"/>
+<field id="any_address_line_2" caption="Any Address - Line 2" join="org_addr_any" column="line2"/>
+<field id="any_address_city" caption="Any Address - City" join="org_addr_any" column="city"/>
+<field id="any_address_state" caption="Any Address - State" join="org_addr_any" column="state"/>
+<field id="any_address_zip" caption="Any Address - Zip Code" join="org_addr_any" column="zip"/>
+<field id="primary_phone" caption="Primary Phone Number" join="org_attr_pphone" column="value_text"/>
+<field id="billing_phone" caption="Billing Phone Number" join="org_attr_billing" column="value_text"/>
+<field id="primary_fax" caption="Primary Fax Number" join="org_attr_pfax" column="value_text"/>
+<field id="any_phone" caption="Any Phone Number" join="org_attr_aphone" column="value_text"/>
+<field id="billing_contact" caption="Billing Contact" join="org_attr_billing" column="value_textb"/>
+<field id="category" caption="Category" join="org_category" column="member_name"/>
+<field id="owner_org_id" caption="Owner Org ID" join="org" column="owner_org_id"/>
+<field id="created" caption="Date Created" join="org" column="cr_stamp"/>
+<field id="createdby" caption="Created By" join="org" column="cr_user_id"/>
+<join id="org" table="org"/>
+<join id="org_category" table="org_category" condition="org_category.parent_id (+) = org.org_internal_id"/>
+<join id="org_addr_mail" table="org_address" condition="org_addr_mail.parent_id (+) = org.org_internal_id AND org_addr_mail.address_name (+) = 'Mailing'"/>
+<join id="org_addr_street" table="org_address" condition="org_addr_street.parent_id (+) = org.org_internal_id AND org_addr_street.address_name (+) = 'Street'"/>
+<join id="org_addr_payment" table="org_address" condition="org_addr_payment.parent_id (+) = org.org_internal_id AND org_addr_payment.address_name (+) = 'Payment'"/>
+<join id="org_addr_any" table="org_address" condition="org_addr_any.parent_id (+) = org.org_internal_id"/>
+<join id="org_attr_pphone" table="org_attribute" condition="org_attr_pphone.parent_id (+) = org.org_internal_id AND org_attr_pphone.value_type (+) = #constant.ATTRTYPE_PHONE# AND org_attr_pphone.item_name (+) = 'Primary'"/>
+<join id="org_attr_billing" table="org_attribute" condition="org_attr_billing.parent_id (+) = org.org_internal_id AND org_attr_billing.value_type (+) = #constant.ATTRTYPE_BILLING_PHONE# AND org_attr_billing.item_name (+) = 'Contact Information'"/>
+<join id="org_attr_pfax" table="org_attribute" condition="org_attr_pfax.parent_id (+) = org.org_internal_id AND org_attr_pfax.value_type (+) = #constant.ATTRTYPE_FAX# AND org_attr_pfax.item_name (+) = 'Primary'"/>
+<join id="org_attr_aphone" table="org_attribute" condition="org_attr_aphone.parent_id = org.org_internal_id AND org_attr_aphone.value_type IN (#constant.ATTRTYPE_PHONE#, #constant.ATTRTYPE_BILLING_PHONE#)"/>
+<select id="all" heading="None">
+<display field="id"/>
+<display field="name"/>
+<display field="categories"/>
+<order-by column-expr="upper({name})"/>
+<order-by column-expr="upper({id})"/>
+<condition field="owner_org_id" comparison="is" value="#session.org_internal_id#"/>
+</select>
+<select id="department" heading="Departments">
+<display field="id"/>
+<display field="name"/>
+<display field="categories"/>
+<order-by column-expr="upper({name})"/>
+<order-by column-expr="upper({id})"/>
+<condition field="owner_org_id" comparison="is" value="#session.org_internal_id#" connector="and"/>
+<condition field="category" comparison="is" value="Department"/>
+</select>
+<select id="employer" heading="Employers">
+<display field="id"/>
+<display field="name"/>
+<display field="categories"/>
+<order-by column-expr="upper({name})"/>
+<order-by column-expr="upper({id})"/>
+<condition field="owner_org_id" comparison="is" value="#session.org_internal_id#" connector="and"/>
+<condition field="category" comparison="is" value="Employer"/>
+</select>
+<select id="insurance" heading="Insurers">
+<display field="id"/>
+<display field="name"/>
+<display field="categories"/>
+<order-by column-expr="upper({name})"/>
+<order-by column-expr="upper({id})"/>
+<condition field="owner_org_id" comparison="is" value="#session.org_internal_id#" connector="and"/>
+<condition field="category" comparison="is" value="Insurance"/>
+</select>
+<select id="provider" heading="Providers">
+<display field="id"/>
+<display field="name"/>
+<display field="categories"/>
+<order-by column-expr="upper({name})"/>
+<order-by column-expr="upper({id})"/>
+<condition field="owner_org_id" comparison="is" value="#session.org_internal_id#"/>
+</select>
+</query-defn>
+</xaf>

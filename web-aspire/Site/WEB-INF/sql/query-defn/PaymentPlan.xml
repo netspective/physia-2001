@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xaf>
+<query-defn id="payment_plan" caption="Payment Plan" dbms="Oracle">
+<field id="plan_id" caption="" join="payment_plan" column="plan_id"/>
+<field id="owner_org_id" caption="" join="payment_plan" column="owner_org_id"/>
+<field id="patient_name" caption="Patient Name" join="person" column="simple_name"/>
+<field id="patient_lastname" caption="Patient Last Name" join="person" column="name_last"/>
+<field id="patient_firstname" caption="Patient First Name" join="person" column="name_first"/>
+<field id="org_id" caption="Billing Org" join="org" column="org_id"/>
+<field id="payment_min" caption="Min Payment" dialog-field="field.currency" join="payment_plan" column="payment_min"/>
+<field id="payment_cycle" caption="Payment Cycle" join="payment_plan" column="payment_cycle"/>
+<field id="first_due" caption="First Due Date" dialog-field="field.date" join="payment_plan" column="first_due" column-expr="TO_CHAR(payment_plan.first_due,'IYYYMMDD')"/>
+<field id="next_due" caption="Next Due Date" dialog-field="field.date" join="payment_plan" column="next_due" column-expr="TO_CHAR(payment_plan.next_due,'IYYYMMDD')"/>
+<field id="lastpay_date" caption="Last Pay Date" dialog-field="field.date" join="payment_plan" column="lastpay_date" column-expr="TO_CHAR(payment_plan.lastpay_date,'IYYYMMDD')"/>
+<field id="lastpay_amount" caption="Last Pay Amount" dialog-field="field.currency" join="payment_plan" column="lastpay_amount"/>
+<field id="laststmt_date" caption="Last Statement Date" dialog-field="field.date" join="payment_plan" column="lastpay_date" column-expr="TO_CHAR(payment_plan.laststmt_date,'IYYYMMDD')"/>
+<field id="balance" caption="Balance" dialog-field="field.currency" join="payment_plan" column="balance"/>
+<field id="inv_ids" caption="Claim IDs" join="payment_plan" column="inv_ids"/>
+<join id="payment_plan" table="payment_plan"/>
+<join id="person" table="person" condition="person.person_id = payment_plan.person_id"/>
+<join id="org" table="org" condition="org.org_internal_id = payment_plan.billing_org_id"/>
+<select id="all" heading="">
+<display field="plan_id"/>
+<display field="patient_name"/>
+<display field="payment_min"/>
+<display field="payment_cycle"/>
+<display field="first_due"/>
+<display field="next_due"/>
+<display field="lastpay_date"/>
+<display field="lastpay_amount"/>
+<display field="laststmt_date"/>
+<display field="balance"/>
+<display field="inv_ids"/>
+<condition field="owner_org_id" comparison="is" value="#session.org_internal_id#"/>
+</select>
+</query-defn>
+</xaf>

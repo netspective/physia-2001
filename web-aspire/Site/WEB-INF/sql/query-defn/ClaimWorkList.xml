@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xaf>
+<query-defn id="ClaimWorkList" caption="" dbms="Oracle">
+<field id="patient_id" caption="Patient ID" join="invoice" column="client_id"/>
+<field id="invoice_id" caption="Invoice ID" join="invoice" column="invoice_id"/>
+<field id="ins_org_id" caption="Insurance Org ID" join="org" column="org_id"/>
+<field id="ins_org_internal_id" caption="Ins Internal Org ID" join="org" column="org_internal_id"/>
+<field id="ins_phone" caption="Carrier Phone" join="org_attribute" column="value_text"/>
+<field id="invoice_status" caption="Claim Status" join="invoice_status" column="caption"/>
+<field id="balance" caption="Balance" dialog-field="field.currency" join="invoice" column="balance"/>
+<field id="invoice_age" caption="Age" join="invoice" column-expr="trunc(sysdate - invoice.invoice_date)"/>
+<field id="invoice_date" caption="Invoice Date" dialog-field="field.date" join="invoice" column="invoice_date" column-expr="TO_CHAR(invoice.invoice_date,'IYYYMMDD')"/>
+<field id="cr_date" caption="Create Date" dialog-field="field.date" join="invoice" column="cr_stamp" column-expr="TO_CHAR(invoice.cr_stamp,'IYYYMMDD')"/>
+<field id="member_number" caption="Member No." join="insurance" column="member_number"/>
+<field id="service_facility" caption="" join="transaction" column="service_facility_id"/>
+<field id="invoice_subtype" caption="" join="invoice" column="invoice_subtype"/>
+<field id="owner_id" caption="" join="invoice" column="owner_id"/>
+<field id="inv_status" caption="" join="invoice" column="invoice_status"/>
+<field id="physician_id" caption="" join="transaction" column="care_provider_id"/>
+<field id="name_last" caption="" join="person" column="name_last"/>
+<field id="patient_name" caption="" join="person" column="simple_name"/>
+<field id="product_name" caption="" join="insurance" column="product_name"/>
+<join id="invoice" table="invoice"/>
+<join id="invoice_billing" table="invoice_billing" condition="invoice_billing.bill_id = invoice.billing_id"/>
+<join id="org_attribute" table="org_attribute" imply-join="invoice_billing" condition="org_attribute.parent_id = org.org_internal_id AND org_attribute.value_type = 10 AND org_attribute.item_name = 'Primary'"/>
+<join id="insurance" table="insurance" imply-join="invoice_billing" condition="insurance.ins_internal_id (+) = invoice_billing.bill_ins_id"/>
+<join id="org" table="org" imply-join="invoice_billing" condition="TO_CHAR(org.org_internal_id (+)) = invoice_billing.bill_to_id"/>
+<join id="invoice_status" table="invoice_status" condition="invoice_status.id = invoice.invoice_status"/>
+<join id="transaction" table="transaction" condition="transaction.trans_id = invoice.main_transaction"/>
+<join id="person" table="person" condition="person.person_id = invoice.client_id"/>
+<select id="all" heading="">
+<display field="patient_id"/>
+<display field="invoice_id"/>
+<display field="ins_org_id"/>
+<display field="ins_phone"/>
+<display field="invoice_status"/>
+<display field="balance"/>
+<display field="invoice_date"/>
+<display field="member_number"/>
+<condition field="owner_id" comparison="is" value="#session.org_internal_id#" connector="and"/>
+<condition field="invoice_subtype" comparison="isnot" value="0" connector="and"/>
+<condition field="invoice_subtype" comparison="isnot" value="7"/>
+</select>
+</query-defn>
+</xaf>

@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xaf>
+<query-defn id="catalog" caption="Catalog" dbms="">
+<field id="catalog_id" caption="Catalog ID" join="catalog" column="catalog_id"/>
+<field id="catalog_name" caption="Catalog Name" join="catalog" column="caption"/>
+<field id="catalog_description" caption="Catalog Description" join="catalog" column="description"/>
+<field id="org_internal_id" caption="" join="catalog" column="org_internal_id"/>
+<field id="catalog_type" caption="" join="catalog" column="catalog_type"/>
+<field id="catalog_type_caption" caption="Catalog Type" join="catalog_type" column="caption"/>
+<field id="catalog_ffs_cap" caption="" join="catalog_attribute" column="value_int"/>
+<field id="catalog_ffs_cap_name" caption="Contract Type" join="cat_attr_contract_type" column-expr="DECODE(value_int,1,'Capitated','FFS')"/>
+<field id="item_code" caption="Item Code" join="catalog_item" column="code"/>
+<field id="item_name" caption="Item Name" join="catalog_item" column="name"/>
+<field id="item_description" caption="Item Description" join="catalog_item" column="description"/>
+<field id="item_modifier" caption="Item Modifier" join="catalog_item" column="modifier"/>
+<field id="item_cost" caption="Item Cost" dialog-field="field.currency" join="catalog_item" column="unit_cost"/>
+<field id="item_type" caption="" join="catalog_item" column="entry_type"/>
+<field id="item_type_name" caption="" join="catalog_entry_type" column="caption"/>
+<join id="catalog" table="offering_catalog"/>
+<join id="catalog_type" table="offering_catalog_type" condition="catalog.catalog_type = catalog_type.id"/>
+<join id="catalog_item" table="offering_catalog_entry" condition="catalog_item.catalog_id (+) = catalog.internal_catalog_id"/>
+<join id="cat_attr_contract_type" table="ofcatalog_attribute" condition="cat_attr_contract_type.parent_id (+) = catalog.internal_catalog_id AND cat_attr_contract_type.item_name (+) = 'Capitated Contract'"/>
+<join id="catalog_entry_type" table="catalog_entry_type" imply-join="catalog_item" condition="catalog_item.entry_type = catalog_entry_type.id"/>
+<select id="all" heading="Fee Schedules">
+<display field="catalog_id"/>
+<display field="catalog_type_caption"/>
+<display field="catalog_name"/>
+<display field="catalog_description"/>
+<display field="catalog_ffs_cap_name"/>
+<condition field="org_internal_id" comparison="is" value="#session.org_internal_id#" connector="and"/>
+<condition field="catalog_type" comparison="is" value="#constant.CATALOGTYPE_FEESCHEDULE#"/>
+</select>
+<select id="fee_schedule_items" heading="Fee Schedule Items">
+<display field="item_code"/>
+<display field="item_name"/>
+<display field="item_description"/>
+<display field="item_modifier"/>
+<display field="item_cost"/>
+<display field="item_type_name"/>
+<condition field="org_internal_id" comparison="is" value="#session.org_internal_id#" connector="and"/>
+<condition field="catalog_type" comparison="is" value="#constant.CATALOGTYPE_FEESCHEDULE#"/>
+</select>
+<select id="misc_items" heading="Misc Procedure Items">
+<display field="item_code"/>
+<display field="item_name"/>
+<display field="item_description"/>
+<condition field="org_internal_id" comparison="is" value="#session.org_internal_id#" connector="and"/>
+<condition field="item_type" comparison="is" value="#constant.CATALOGENTRYTYPE_MISC_PROCEDURE#"/>
+</select>
+</query-defn>
+</xaf>

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Project>
+	<Folder FolderName="XML Files" ExtStr="xml;cml;math;mtx;rdf;smil;svg;wml">
+		<File FilePath=".\Appointment.qdl" HomeFolder="Yes"/>
+		<File FilePath=".\Catalog.qdl" HomeFolder="Yes"/>
+		<File FilePath=".\ClaimWorkList.qdl" HomeFolder="Yes"/>
+		<File FilePath=".\Document.qdl" HomeFolder="Yes"/>
+		<File FilePath=".\FinancialTransaction.qdl" HomeFolder="Yes"/>
+		<File FilePath=".\FinancialTransactionIPA.qdl" HomeFolder="Yes"/>
+		<File FilePath=".\Invoice.qdl" HomeFolder="Yes"/>
+		<File FilePath=".\InvoiceCreditBalance.qdl" HomeFolder="Yes"/>
+		<File FilePath=".\InvoiceIPA.qdl" HomeFolder="Yes"/>
+		<File FilePath=".\InvoiceWorkList.qdl" HomeFolder="Yes"/>
+		<File FilePath=".\LabOrder.qdl" HomeFolder="Yes"/>
+		<File FilePath=".\Message.qdl" HomeFolder="Yes"/>
+		<File FilePath=".\Observation.qdl" HomeFolder="Yes"/>
+		<File FilePath=".\Organization.qdl" HomeFolder="Yes"/>
+		<File FilePath=".\PaymentPlan.qdl" HomeFolder="Yes"/>
+		<File FilePath=".\Person.qdl" HomeFolder="Yes"/>
+		<File FilePath=".\ReferralPPMS.qdl" HomeFolder="Yes"/>
+		<File FilePath=".\Statement.qdl" HomeFolder="Yes"/>
+	</Folder>
+	<Folder FolderName="XSL Files" ExtStr="xsl;xslt"/>
+	<Folder FolderName="HTML Files" ExtStr="html;htm;xhtml;asp"/>
+	<Folder FolderName="DTD/Schemas" ExtStr="dtd;dcd;xdr;biz;xsd"/>
+	<Folder FolderName="Entities" ExtStr="ent"/>
+</Project>

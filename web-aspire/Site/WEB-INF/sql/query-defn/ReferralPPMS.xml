@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xaf>
+<query-defn id="ReferralPPMS" caption="Referral Worklist" dbms="Oracle">
+<field id="referral_id" caption="" join="person_referral" column="referral_id"/>
+<field id="request_date" caption="" join="person_referral" column="request_date"/>
+<field id="person_id" caption="Patient ID" join="person" column="person_id"/>
+<field id="name_last" caption="Last Name" join="person" column="name_last"/>
+<field id="user_id" caption="User ID" join="person_referral" column="user_id"/>
+<field id="name" caption="Name" join="person" column="simple_name"/>
+<field id="ins_org" caption="Insurance" join="org" column="name_primary"/>
+<field id="requester_id" caption="Physician" join="person_referral" column="requester_id"/>
+<field id="speciality" caption="Speciality" join="person_referral" column="speciality"/>
+<field id="referral_begin_date" caption="Begin Date" join="person_referral" column="referral_begin_date"/>
+<field id="referral_end_date" caption="End Date" join="person_referral" column="referral_end_date"/>
+<field id="completion_date" caption="Completion Date" join="person_referral" column="completion_date"/>
+<field id="referral_urgency" caption="Referral Urgency" join="person_referral" column="referral_urgency"/>
+<field id="referral_status" caption="Referral Status" join="person_referral" column="referral_status"/>
+<field id="referral_status_date" caption="Referral Status Date" join="person_referral" column="referral_status_date"/>
+<field id="product_name" caption="Product" join="insurance" column="product_name"/>
+<field id="expiryDays" caption="Days to Expire" join="person_referral" column-expr="trunc(person_referral.referral_end_date - sysdate)"/>
+<field id="recheck_date" caption="" join="person_referral" column="recheck_date"/>
+<join id="person_referral" table="person_referral"/>
+<join id="person" table="person" condition="person.person_id = person_referral.person_id"/>
+<join id="org" table="org" condition="org.org_internal_id = person_referral.ins_org_internal_id"/>
+<join id="insurance" table="insurance" condition="person_referral.ins_org_internal_id = insurance.ins_org_id AND person_referral.product_internal_id = insurance.ins_internal_id"/>
+<select id="all" heading="">
+<display field="request_date"/>
+<display field="person_id"/>
+<display field="name"/>
+<display field="ins_org"/>
+<display field="requester_id"/>
+<display field="speciality"/>
+<display field="referral_begin_date"/>
+<display field="referral_end_date"/>
+</select>
+</query-defn>
+</xaf>

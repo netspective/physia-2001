@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xaf>
+<query-defn id="person" caption="Person" dbms="Oracle">
+<field id="person_id" caption="Person ID" join="person" column="person_id"/>
+<field id="row_num" caption="" join="" column="rownum"/>
+<field id="ssn" caption="SSN" dialog-field="field.ssn" join="person" column="SSN"/>
+<field id="name_first" caption="First Name" join="person" column="name_first"/>
+<field id="name_middle" caption="Middle Name" join="person" column="name_middle"/>
+<field id="name_last" caption="Last Name" join="person" column="name_last"/>
+<field id="name_suffix" caption="Name Suffix" join="person" column="name_suffix"/>
+<field id="simple_name" caption="Full Name" join="person" column="simple_name"/>
+<field id="dob" caption="Date of Birth" dialog-field="field.date" join="person" column="date_of_birth" column-expr="TO_CHAR(person.date_of_birth,'IYYYMMDD')"/>
+<field id="age" caption="Age" dialog-field="field.number" join="person" column-expr="TRUNC((SYSDATE - person.date_of_birth)/365)"/>
+<field id="gender" caption="Gender" join="gender" column="caption"/>
+<field id="marital_status" caption="Marital Status" join="mstat" column="caption"/>
+<field id="ethnicity" caption="Ethnicity" join="per_ethnicity" column="member_name"/>
+<field id="language" caption="Language" join="per_language" column="member_name"/>
+<field id="home_address_line_1" caption="Home Address - Line 1" join="per_addr_home" column="line1"/>
+<field id="home_address_line_2" caption="Home Address - Line 2" join="per_addr_home" column="line2"/>
+<field id="home_address_city" caption="Home Address - City" join="per_addr_home" column="city"/>
+<field id="home_address_state" caption="Home Address - State" join="per_addr_home" column="state"/>
+<field id="home_address_zip" caption="Home Address - Zip Code" dialog-field="field.zip" join="per_addr_home" column="zip"/>
+<field id="work_address_line_1" caption="Work Address - Line 1" join="per_addr_work" column="line1"/>
+<field id="work_address_line_2" caption="Work Address - Line 2" join="per_addr_work" column="line2"/>
+<field id="work_address_city" caption="Work Address - City" join="per_addr_work" column="city"/>
+<field id="work_address_state" caption="Work Address - State" join="per_addr_work" column="state"/>
+<field id="work_address_zip" caption="Work Address - Zip Code" dialog-field="field.zip" join="per_addr_work" column="zip"/>
+<field id="alt_address_line_1" caption="Alternate Address - Line 1" join="per_addr_alt" column="line1"/>
+<field id="alt_address_line_2" caption="Alternate Address - Line 2" join="per_addr_alt" column="line2"/>
+<field id="alt_address_city" caption="Alternate Address - City" join="per_addr_alt" column="city"/>
+<field id="alt_address_state" caption="Alternate Address - State" join="per_addr_alt" column="state"/>
+<field id="alt_address_zip" caption="Alternate Address - Zip Code" dialog-field="field.zip" join="per_addr_alt" column="zip"/>
+<field id="any_address_line_1" caption="Any Address - Line 1" join="per_addr_any" column="line1"/>
+<field id="any_address_line_2" caption="Any Address - Line 2" join="per_addr_any" column="line2"/>
+<field id="any_address_city" caption="Any Address - City" join="per_addr_any" column="city"/>
+<field id="any_address_state" caption="Any Address - State" join="per_addr_any" column="state"/>
+<field id="any_address_zip" caption="Any Address - Zip Code" dialog-field="field.zip" join="per_addr_any" column="zip"/>
+<field id="home_phone" caption="Home Phone" dialog-field="field.phone" join="per_attr_phone_home" column="value_text"/>
+<field id="work_phone" caption="Work Phone" dialog-field="field.phone" join="per_attr_phone_work" column="value_text"/>
+<field id="cell_phone" caption="Cellular Phone" dialog-field="field.phone" join="per_attr_phone_cell" column="value_text"/>
+<field id="alt_phone" caption="Alternate Phone" dialog-field="field.phone" join="per_attr_phone_alt" column="value_text"/>
+<field id="any_phone" caption="Any Phone" dialog-field="field.phone" join="per_attr_phone_any" column="value_text"/>
+<field id="home_fax" caption="Home Fax" dialog-field="field.phone" join="per_attr_fax_home" column="value_text"/>
+<field id="work_fax" caption="Work Fax" dialog-field="field.phone" join="per_attr_fax_work" column="value_text"/>
+<field id="alt_fax" caption="Alternate Fax" dialog-field="field.phone" join="per_attr_fax_alt" column="value_text"/>
+<field id="any_fax" caption="Any Fax" dialog-field="field.phone" join="per_attr_fax_any" column="value_text"/>
+<field id="category" caption="Category" join="per_org_category" column="category"/>
+<field id="category_org" caption="" join="per_org_category" column="org_internal_id"/>
+<field id="account" caption="Account #" join="per_account" column="value_text"/>
+<field id="chart" caption="Chart #" join="per_chart" column="value_text"/>
+<field id="employer_id" caption="Employer ID" join="per_attr_employer" column="value_text"/>
+<field id="employer_name" caption="Employer Name" join="per_employer_org" column="name_primary"/>
+<field id="guarantor_id" caption="Guarantor ID" join="per_attr_guarantor" column="value_text"/>
+<field id="guarantor_relation" caption="Guarantor Relation" join="per_attr_guarantor" column="value_textb"/>
+<field id="created" caption="Date Created" dialog-field="field.stamp" join="person" column="cr_stamp" column-expr="TO_CHAR(person.cr_stamp, 'IYYYMMDDHHMISS')"/>
+<field id="createdby" caption="Created By" join="person" column="cr_user_id"/>
+<join id="person" table="person"/>
+<join id="per_org_category" table="person_org_category" condition="person.person_id = per_org_category.person_id (+)"/>
+<join id="gender" table="gender" condition="person.gender = gender.id (+)"/>
+<join id="mstat" table="marital_status" condition="person.marital_status = mstat.id (+)"/>
+<join id="per_ethnicity" table="person_ethnicity" condition="person.person_id = per_ethnicity.parent_id (+)"/>
+<join id="per_language" table="person_language" condition="person.person_id = per_language.parent_id (+)"/>
+<join id="per_addr_home" table="person_address" condition="person.person_id = per_addr_home.parent_id (+) AND per_addr_home.address_name (+) = 'Home'"/>
+<join id="per_addr_work" table="person_address" condition="person.person_id = per_addr_work.parent_id (+) AND per_addr_work.address_name (+) = 'Work'"/>
+<join id="per_addr_alt" table="person_address" condition="person.person_id = per_addr_alt.parent_id (+) AND per_addr_alt.address_name (+) = 'Alternate'"/>
+<join id="per_addr_any" table="person_address" condition="person.person_id = per_addr_any.parent_id (+)"/>
+<join id="per_attr_phone_home" table="person_attribute" condition="person.person_id = per_attr_phone_home.parent_id (+) AND per_attr_phone_home.value_type (+) = #constant.ATTRTYPE_PHONE# AND per_attr_phone_home.item_name (+) = 'Home'"/>
+<join id="per_attr_phone_work" table="person_attribute" condition="person.person_id = per_attr_phone_work.parent_id (+) AND per_attr_phone_work.value_type (+) = #constant.ATTRTYPE_PHONE# AND per_attr_phone_work.item_name (+) = 'Work'"/>
+<join id="per_attr_phone_cell" table="person_attribute" condition="person.person_id = per_attr_phone_cell.parent_id (+) AND per_attr_phone_cell.value_type (+) = #constant.ATTRTYPE_PHONE# AND per_attr_phone_cell.item_name (+) = 'Cellular'"/>
+<join id="per_attr_phone_alt" table="person_attribute" condition="person.person_id = per_attr_phone_alt.parent_id (+) AND per_attr_phone_alt.value_type (+) = #constant.ATTRTYPE_PHONE# AND per_attr_phone_alt.item_name (+) = 'Alternate'"/>
+<join id="per_attr_phone_any" table="person_attribute" condition="per_attr_phone_any.parent_id = person.person_id AND per_attr_phone_any.value_type = #constant.ATTRTYPE_PHONE#"/>
+<join id="per_attr_fax_home" table="person_attribute" condition="person.person_id = per_attr_fax_home.parent_id (+) AND per_attr_fax_home.value_type (+) = #constant.ATTRTYPE_FAX# AND per_attr_fax_home.item_name (+) = 'Home'"/>
+<join id="per_attr_fax_work" table="person_attribute" condition="person.person_id = per_attr_fax_work.parent_id (+) AND per_attr_fax_work.value_type (+) = #constant.ATTRTYPE_FAX# AND per_attr_fax_work.item_name (+) = 'Work'"/>
+<join id="per_attr_fax_alt" table="person_attribute" condition="person.person_id = per_attr_fax_alt.parent_id (+) AND per_attr_fax_alt.value_type (+) = #constant.ATTRTYPE_FAX# AND per_attr_fax_alt.item_name (+) = 'Alternate'"/>
+<join id="per_attr_fax_any" table="person_attribute" condition="person.person_id = per_attr_fax_any.parent_id (+) AND per_attr_fax_any.value_type (+) = #constant.ATTRTYPE_FAX#"/>
+<join id="per_account" table="person_attribute" condition="person.person_id = per_account.parent_id (+) AND per_account.value_type (+) = 0 AND per_account.item_name (+) = 'Patient/Account Number'"/>
+<join id="per_chart" table="person_attribute" condition="person.person_id = per_chart.parent_id (+) AND per_chart.value_type (+) = 0 AND per_chart.item_name (+) = 'Patient/Chart Number'"/>
+<join id="per_attr_employer" table="person_attribute" condition="person.person_id = per_attr_employer.parent_id (+) AND per_attr_employer.value_type (+) &gt;= #constant.ATTRTYPE_EMPLOYEDFULL# AND per_attr_employer.value_type (+) &lt;= #constant.ATTRTYPE_STUDENTPART#"/>
+<join id="per_employer_org" table="org" imply-join="per_attr_employer" condition="per_attr_employer.value_int = per_employer_org.org_internal_id (+)"/>
+<join id="per_attr_guarantor" table="person_attribute" condition="person.person_id = per_attr_guarantor.parent_id (+) AND per_attr_guarantor.item_name (+) = 'Guarantor'"/>
+<select id="all" heading="None">
+<display field="person_id"/>
+<display field="name_last"/>
+<display field="name_first"/>
+<display field="dob"/>
+<display field="ssn"/>
+<display field="home_phone"/>
+<display field="account"/>
+<display field="chart"/>
+<display field="category"/>
+<order-by column-expr="upper({name_last})"/>
+<order-by column-expr="upper({name_first})"/>
+<order-by field="dob"/>
+<condition field="category_org" comparison="is" value="#session.org_internal_id#"/>
+</select>
+<select id="nurse" heading="Nurses">
+<display field="person_id"/>
+<display field="name_last"/>
+<display field="name_first"/>
+<display field="dob"/>
+<display field="ssn"/>
+<display field="home_phone"/>
+<display field="account"/>
+<display field="chart"/>
+<display field="category"/>
+<order-by column-expr="upper({name_last})"/>
+<order-by column-expr="upper({name_first})"/>
+<order-by field="dob"/>
+<condition field="category_org" comparison="is" value="#session.org_internal_id#" connector="and"/>
+<condition field="category" comparison="is" value="Nurse"/>
+</select>
+<select id="physician" heading="Physicians">
+<display field="person_id"/>
+<display field="name_last"/>
+<display field="name_first"/>
+<display field="dob"/>
+<display field="ssn"/>
+<display field="home_phone"/>
+<display field="account"/>
+<display field="chart"/>
+<display field="category"/>
+<order-by field="name_last"/>
+<order-by field="name_first"/>
+<order-by field="dob"/>
+<condition field="category_org" comparison="is" value="#session.org_internal_id#" connector="and"/>
+<condition field="category" comparison="is" value="Physician"/>
+</select>
+<select id="staff" heading="Staff Members">
+<display field="person_id"/>
+<display field="name_last"/>
+<display field="name_first"/>
+<display field="dob"/>
+<display field="ssn"/>
+<display field="home_phone"/>
+<display field="account"/>
+<display field="chart"/>
+<display field="category"/>
+<order-by field="name_last"/>
+<order-by field="name_first"/>
+<order-by field="dob"/>
+<condition field="category_org" comparison="is" value="#session.org_internal_id#" connector="and"/>
+<condition field="category" comparison="is" value="Staff"/>
+</select>
+<select id="patient" heading="Patients">
+<display field="person_id"/>
+<display field="name_last"/>
+<display field="name_first"/>
+<display field="dob"/>
+<display field="ssn"/>
+<display field="home_phone"/>
+<display field="account"/>
+<display field="chart"/>
+<display field="category"/>
+<order-by field="name_last"/>
+<order-by field="name_first"/>
+<order-by field="dob"/>
+<condition field="category_org" comparison="is" value="#session.org_internal_id#" connector="and"/>
+<condition field="category" comparison="is" value="Patient"/>
+</select>
+<select id="administrator" heading="Administrators">
+<display field="person_id"/>
+<display field="name_last"/>
+<display field="name_first"/>
+<display field="dob"/>
+<display field="ssn"/>
+<display field="home_phone"/>
+<display field="account"/>
+<display field="chart"/>
+<display field="category"/>
+<order-by field="name_last"/>
+<order-by field="name_first"/>
+<order-by field="dob"/>
+<condition field="category_org" comparison="is" value="#session.org_internal_id#" connector="and"/>
+<condition field="category" comparison="is" value="Administrator"/>
+</select>
+<select id="superuser" heading="SuperUsers">
+<display field="person_id"/>
+<display field="name_last"/>
+<display field="name_first"/>
+<display field="dob"/>
+<display field="ssn"/>
+<display field="home_phone"/>
+<display field="account"/>
+<display field="chart"/>
+<display field="category"/>
+<order-by field="name_last"/>
+<order-by field="name_first"/>
+<order-by field="dob"/>
+<condition field="category_org" comparison="is" value="#session.org_internal_id#" connector="and"/>
+<condition field="category" comparison="is" value="Superuser"/>
+</select>
+</query-defn>
+</xaf>

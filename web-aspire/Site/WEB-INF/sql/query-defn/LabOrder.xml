@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xaf>
+<query-defn id="LabOrder" caption="Lab Orders " dbms="Oracle">
+<field id="patient_name" caption="Patients Simple Name" join="person" column="simple_name"/>
+<field id="person_id" caption="Patients ID" join="lab_order" column="person_id"/>
+<field id="date_order" caption="Date Lab Ordered" dialog-field="field.stamp" join="lab_order" column="date_order" column-expr="TO_CHAR(lab_order.date_order,'IYYYMMDDHH24MI')"/>
+<field id="date_done" caption="Date Lab Completed" join="lab_order" column="date_done"/>
+<field id="provider_id" caption="Provider ID" join="lab_order" column="provider_id"/>
+<field id="result_id" caption="Contact's Person ID" join="lab_order" column="result_id"/>
+<field id="lab_comments" caption="Comments to the Lab" join="lab_order" column="lab_comments"/>
+<field id="patient_comments" caption="Comments to the Patient" join="lab_order" column="patient_comments"/>
+<field id="instruction" caption="Instruction to the Patient" join="lab_order" column="instructions"/>
+<field id="org_internal_id" caption="" join="lab_order" column="org_internal_id"/>
+<field id="lab_order_id" caption="" join="lab_order" column="lab_order_id"/>
+<field id="lab_name" caption="Lab Company Name" join="org" column="name_primary"/>
+<field id="status" caption="Lab Status" join="lab_status" column="caption"/>
+<field id="test_entry_id" caption="" join="lab_order_entry" column="test_entry_id"/>
+<field id="test_type" caption="" join="catalog" column="caption"/>
+<field id="lab_test_id" caption="Lab Company Name" join="lab_order_entry" column="lab_code"/>
+<field id="lab_entry_id" caption="Lab Company Name" join="lab_order_entry" column="entry_id"/>
+<field id="lab_parent_id" caption="" join="lab_entry" column="parent_entry_id"/>
+<field id="lab_test_name" caption="Lab Company Name" join="lab_order_entry" column="caption"/>
+<field id="lab_test_entry_id" caption="Lab Company Name" join="lab_entry" column="entry_id"/>
+<field id="selection" caption="Lab Company Name" join="lab_order_entry" column="modifier"/>
+<field id="list" caption="Lab Company Name" join="lab_order_entry" column="panel_test_name"/>
+<field id="lab_panel_id" caption="" join="lab_panel" column="lab_code"/>
+<field id="lab_panel_name" caption="" join="lab_panel" column="caption"/>
+<field id="lab_panel_price" caption="" join="lab_panel" column="physician_cost"/>
+<field id="lab_panel_parent_id" caption="" join="lab_panel" column="parent_entry_id"/>
+<join id="lab_order" table="person_lab_order"/>
+<join id="person" table="person" condition="person.person_id=lab_order.person_id"/>
+<join id="org" table="org" condition="org.org_internal_id=lab_order.lab_internal_id"/>
+<join id="lab_order_entry" table="lab_order_entry" condition="lab_order_entry.parent_id=lab_order.lab_order_id"/>
+<join id="lab_status" table="lab_order_status" condition="lab_status.id=lab_order.lab_order_status"/>
+<join id="catalog" table="offering_catalog" condition="lab_entry.catalog_id  = catalog.internal_catalog_id"/>
+<select id="all" heading="Lab Results">
+<display field="patient_name"/>
+<display field="person_id"/>
+<display field="date_order"/>
+<display field="date_done"/>
+<display field="provider_id"/>
+<display field="lab_comments"/>
+<display field="patient_comments"/>
+<display field="instruction"/>
+<display field="lab_name"/>
+<display field="status"/>
+<display field="test_entry_id"/>
+<display field="lab_test_entry_id"/>
+<display field="test_type"/>
+<order-by field="lab_order_id"/>
+<condition field="org_internal_id" comparison="is" value="#session.org_internal_id#"/>
+</select>
+</query-defn>
+</xaf>

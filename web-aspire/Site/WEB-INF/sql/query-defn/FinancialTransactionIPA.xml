@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xaf>
+<query-defn id="FinancialTransactionIPA" caption="Associated Org Financial Transaction" dbms="Oracle">
+<field id="invoice_id" caption="Invoice ID" join="autoinv" column="invoice_id"/>
+<field id="assn_org_id" caption="" join="orgassn" column="org_internal_id"/>
+<field id="service_begin_date" caption="Service Begin Date" dialog-field="field.date" join="autoinv" column="service_begin_date"/>
+<field id="service_end_date" caption="Service End Date" dialog-field="field.date" join="autoinv" column="service_end_date"/>
+<field id="description" caption="Description" join="autoinv" column="caption"/>
+<field id="code" caption="Code" join="autoinv" column="code"/>
+<field id="unit_cost" caption="Unit Cost" dialog-field="field.currency" join="autoinv" column="unit_cost"/>
+<field id="quantity" caption="Units" dialog-field="field.number" join="autoinv" column="units"/>
+<field id="charges" caption="Charges (Unit Cost x Units)" dialog-field="field.currency" join="autoinv" column="charges"/>
+<field id="adjustment_amt" caption="Adjustment Amount" dialog-field="field.currency" join="autoinv" column="adjustment_amount"/>
+<field id="writeoff_amt" caption="Writeoff Amount" dialog-field="field.currency" join="autoinv" column="writeoff_amount"/>
+<field id="ajustment_plan_paid" caption="Insurance Payement" dialog-field="field.currency" join="autoinv" column="plan_paid"/>
+<field id="bill_facility_id" caption="Billing Facility ID" join="bill_facility_org" column="org_id"/>
+<field id="bill_facility_name" caption="Billing Facility Name" join="bill_facility_org" column="name_primary"/>
+<field id="srv_facility_id" caption="Service Facility ID" join="srv_facility_org" column="org_id"/>
+<field id="srv_facility_name" caption="Service Facility Name" join="srv_facility_org" column="name_primary"/>
+<field id="srv_facility_addr_line1" caption="Service Facility Address - Line 1" join="srv_facility_addr" column="line1"/>
+<field id="srv_facility_addr_city" caption="Service Facility Address - City" join="srv_facility_addr" column="city"/>
+<field id="srv_facility_addr_state" caption="Service Facility Address - State" join="srv_facility_addr" column="state"/>
+<field id="srv_facility_addr_zip" caption="Service Facility Address - Zip" join="srv_facility_addr" column="zip"/>
+<field id="bill_facility_addr_line1" caption="Billing Facility Address - Line 1" join="bill_facility_addr" column="line1"/>
+<field id="bill_facility_addr_city" caption="Billing Facility Address - City" join="bill_facility_addr" column="city"/>
+<field id="bill_facility_addr_state" caption="Billing Facility Address - State" join="bill_facility_addr" column="state"/>
+<field id="bill_facility_addr_zip" caption="Billing Facility Address - Zip" join="bill_facility_addr" column="zip"/>
+<field id="patient_id" caption="Patient ID" join="autoinv" column="client_id"/>
+<field id="patient_name" caption="Patient Name" join="patient" column="simple_name"/>
+<field id="patient_dob" caption="Patient Date of Birth" dialog-field="field.date" join="patient" column="date_of_birth"/>
+<field id="patient_age" caption="Patient Age" dialog-field="field.number" join="patient" column-expr="TRUNC((SYSDATE - patient.date_of_birth)/365)"/>
+<field id="patient_gender" caption="Patient Gender" join="patient_gender" column="caption"/>
+<field id="patient_addr_home_line1" caption="Patient Address - Line 1" join="patient_addr_home" column="line1"/>
+<field id="patient_addr_home_city" caption="Patient Address - City" join="patient_addr_home" column="city"/>
+<field id="patient_addr_home_state" caption="Patient Address - State" join="patient_addr_home" column="state"/>
+<field id="patient_addr_home_zip" caption="Patient Address - Zip" join="patient_addr_home" column="zip"/>
+<field id="patient_employer_id" caption="Patient Employer ID" join="patient_attr_employer" column="value_text"/>
+<field id="patient_employer_name" caption="Patient Employer Name" join="patient_employer_org" column="name_primary"/>
+<field id="patient_guarantor_id" caption="Patient Guarantor" join="patient_attr_guarantor" column="value_text"/>
+<field id="patient_guarantor_relation" caption="Patient Guarantor Relationship" join="patient_attr_guarantor" column="value_textb"/>
+<field id="parent_org_id" caption="Associated Org ID" join="parent_org" column="org_id"/>
+<field id="parent_org_name" caption="Associated Org Name" join="parent_org" column="name_primary"/>
+<field id="payer_person_id" caption="Payer Person ID" join="invitem_adjust_payer_person" column="person_id"/>
+<field id="payer_person_name" caption="Payer Person Name" join="invitem_adjust_payer_person" column="simple_name"/>
+<field id="payer_org_id" caption="Payer Org ID" join="invitem_adjust_payer_org" column="org_id"/>
+<field id="payer_org_name" caption="Payer Org Name" join="invitem_adjust_payer_org" column="name_primary"/>
+<join id="autoinv" table="auto_invoice_chrg"/>
+<join id="orgassn" table="Org_ASSOCIATION" imply-join="autoinv" condition="autoinv.owner_org_id = orgassn.assn_org_internal_id AND orgassn.org_assn_status = 0 AND ( orgassn.org_assn_type = 110 or orgassn.org_assn_type = 1)"/>
+<join id="bill_facility_org" table="org" imply-join="autoinv" condition="autoinv.billing_facility_id = bill_facility_org.org_internal_id (+)"/>
+<join id="bill_facility_addr" table="org_address" imply-join="bill_facility_org" condition="bill_facility_org.org_internal_id = bill_facility_addr.parent_id (+) AND bill_facility_addr.address_name (+) = 'Payment'"/>
+<join id="srv_facility_org" table="org" imply-join="autoinv" condition="autoinv.billing_facility_id = srv_facility_org.org_internal_id (+)"/>
+<join id="srv_facility_addr" table="org_address" imply-join="srv_facility_org" condition="srv_facility_org.org_internal_id = srv_facility_addr.parent_id (+) AND srv_facility_addr.address_name (+) = 'Mailing'"/>
+<join id="patient" table="person" imply-join="autoinv" condition="autoinv.client_id = patient.person_id (+)"/>
+<join id="patient_gender" table="gender" imply-join="patient" condition="patient.gender = patient_gender.id (+)"/>
+<join id="patient_addr_home" table="person_address" imply-join="patient" condition="patient.person_id = patient_addr_home.parent_id (+) AND patient_addr_home.address_name (+) = 'Home'"/>
+<join id="patient_attr_employer" table="person_attribute" imply-join="patient" condition="patient.person_id = patient_attr_employer.parent_id (+) AND patient_attr_employer.value_type (+) &gt;= #constant.ATTRTYPE_EMPLOYEDFULL# AND patient_attr_employer.value_type (+) &lt;= #constant.ATTRTYPE_STUDENTPART#"/>
+<join id="patient_employer_org" table="org" imply-join="patient_attr_employer" condition="patient_attr_employer.value_int = patient_employer_org.org_internal_id (+)"/>
+<join id="patient_attr_guarantor" table="person_attribute" imply-join="patient" condition="patient.person_id = patient_attr_guarantor.parent_id (+) AND patient_attr_guarantor.item_name (+) = 'Guarantor'"/>
+<join id="parent_org" table="org" imply-join="orgassn" condition="orgassn.assn_org_internal_id=parent_org.org_internal_id and parent_org.parent_org_id is NULL"/>
+<join id="invitem_adjust_payer_type" table="entity_type" imply-join="autoinv" condition="autoinv.payer_type = invitem_adjust_payer_type.id (+)"/>
+<join id="invitem_adjust_payer_org" table="org" imply-join="autoinv" condition="autoinv.payer_id = TO_CHAR(invitem_adjust_payer_org.org_internal_id (+))"/>
+<join id="invitem_adjust_payer_person" table="person" imply-join="autoinv" condition="autoinv.payer_id = invitem_adjust_payer_person.person_id (+)"/>
+<select id="all" heading="None">
+<display field="invoice_id"/>
+<order-by field="invoice_id"/>
+<condition field="assn_org_id" comparison="is" value="#session.org_internal_id#"/>
+</select>
+</query-defn>
+</xaf>

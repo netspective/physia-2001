@@ -1,0 +1,89 @@
+<?xml version="1.0"?>
+
+<!-- QDL Query Definition Language -->
+
+<component>
+	<query-defn id="catalog" caption="Catalog" abbrev="Cat">
+
+		<!-- Fields -->
+
+		<!-- CATALOG -->
+		<field id="catalog_id" caption="Catalog ID" join="catalog" column="catalog_id"/>
+		<field id="catalog_name" caption="Catalog Name" join="catalog" column="caption"/>
+		<field id="catalog_description" caption="Catalog Description" join="catalog" column="description"/>
+		<field id="org_internal_id" join="catalog" column="org_internal_id"/>		
+		<field id="catalog_type" join="catalog" column="catalog_type"/>
+		<field id="catalog_type_caption" caption="Catalog Type" join="catalog_type" column="caption"/>		
+		<field id="catalog_ffs_cap" join="catalog_attribute" column="value_int"/>
+		<field id="catalog_ffs_cap_name" caption="Contract Type" join="cat_attr_contract_type" columndefn="DECODE(value_int,1,'Capitated','FFS')"/>
+		<!-- CATALOG ITEMS -->
+		<field id="item_code" join="catalog_item" column="code" caption="Item Code"/>
+		<field id="item_name" join="catalog_item" column="name" caption="Item Name"/>
+		<field id="item_description" join="catalog_item" column="description" caption="Item Description"/>
+		<field id="item_modifier" join="catalog_item" column="modifier" caption="Item Modifier"/>
+		<field id="item_cost" join="catalog_item" column="unit_cost" caption="Item Cost" ui-datatype="currency"/>
+		<field id="item_type" join="catalog_item" column="entry_type"/>
+		<field id="item_type_name" join="catalog_entry_type" column="caption"/>
+		
+		<!-- Joins -->
+		<join id="catalog" table="offering_catalog" autoinclude="1"/>
+		<join id="catalog_type" table="offering_catalog_type" condition="catalog.catalog_type = catalog_type.id"/>
+		<join id="catalog_item" table="offering_catalog_entry" condition="catalog_item.catalog_id (+) = catalog.internal_catalog_id"/>
+		<join id="cat_attr_contract_type" table="ofcatalog_attribute" condition="cat_attr_contract_type.parent_id (+) = catalog.internal_catalog_id AND cat_attr_contract_type.item_name (+) = 'Capitated Contract'"/>
+		<join id="catalog_entry_type" table="catalog_entry_type" requires="catalog_item" condition="catalog_item.entry_type = catalog_entry_type.id"/>
+		
+		<!-- Views -->
+
+		<!-- Fee Schedule Views -->
+		<view id="all" caption="Fee Schedules">
+			<column id="catalog_id"/>
+			<column id="catalog_type_caption"/>
+			<column id="catalog_name"/>
+			<column id="catalog_description"/>
+			<column id="catalog_ffs_cap_name"/>
+			<and-conditions>
+				<condition field="org_internal_id" comparison="is" criteria="#session.org_internal_id#"/>
+				<condition field="catalog_type" comparison="is" criteria="#constant.CATALOGTYPE_FEESCHEDULE#"/>				
+			</and-conditions>			
+		</view>		
+		<view id="fee_schedule_items" caption="Fee Schedule Items">
+			<column id="item_code"/>
+			<column id="item_name"/>
+			<column id="item_description"/>
+			<column id="item_modifier"/>
+			<column id="item_cost"/>
+			<column id="item_type_name"/>
+			<and-conditions>
+				<condition field="org_internal_id" comparison="is" criteria="#session.org_internal_id#"/>
+				<condition field="catalog_type" comparison="is" criteria="#constant.CATALOGTYPE_FEESCHEDULE#"/>
+			</and-conditions>			
+		</view>		
+		
+
+		<!-- Misc Procedure Views -->
+		<!--
+		<view id="misc" caption="Misc Procedures">
+			<column id="catalog_id"/>
+			<column id="catalog_type_caption"/>
+			<column id="catalog_name"/>
+			<column id="catalog_description"/>
+			<column id="catalog_ffs_cap_name"/>
+			<and-conditions>
+				<condition field="org_internal_id" comparison="is" criteria="#session.org_internal_id#"/>
+				<condition field="catalog_type" comparison="is" criteria="#constant.CATALOGTYPE_MISCPROCEDURE#"/>
+			</and-conditions>
+		</view>
+		-->
+		<view id="misc_items" caption="Misc Procedure Items">
+			<column id="item_code"/>		
+			<column id="item_name"/>
+			<column id="item_description"/>
+			<and-conditions>
+				<condition field="org_internal_id" comparison="is" criteria="#session.org_internal_id#"/>
+				<condition field="item_type" comparison="is" criteria="#constant.CATALOGENTRYTYPE_MISC_PROCEDURE#"/>
+			</and-conditions>
+		</view>
+		
+	</query-defn>
+</component>
+

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xaf>
+<query-defn id="Message" caption="" dbms="Oracle">
+<field id="message_id" caption="Message ID" join="message_doc" column="doc_id"/>
+<field id="doc_spec_type" caption="" join="message_doc" column="doc_spec_type"/>
+<field id="doc_spec_subtype" caption="" join="message_doc" column="doc_spec_subtype"/>
+<field id="date_sent" caption="Date Sent" dialog-field="field.stamp" join="message_doc" column="doc_orig_stamp"/>
+<field id="date_read" caption="Date Read" dialog-field="field.stamp" join="message_doc" column="doc_recv_stamp"/>
+<field id="from_id" caption="From" join="message_doc" column="doc_source_id"/>
+<field id="to_id" caption="To" join="attr_to" column="value_text"/>
+<field id="to_status" caption="" join="attr_to" column="value_int"/>
+<field id="cc_id" caption="CC" join="attr_cc" column="value_text"/>
+<field id="cc_status" caption="" join="attr_cc" column="value_int"/>
+<field id="recipient_type" caption="" join="attr_recipient" column="item_name"/>
+<field id="recipient_id" caption="" join="attr_recipient" column="value_text"/>
+<field id="recipient_status" caption="" join="attr_recipient" column="value_int"/>
+<field id="subject" caption="Subject" join="message_doc" column="doc_name"/>
+<field id="message" caption="Message" join="message_doc" column="doc_content_small"/>
+<field id="repatient_id" caption="Regarding Patient ID" join="attr_repatient" column="value_text"/>
+<field id="repatient_name" caption="Regarding Patient Name" join="per_repatient" column="simple_name" column-expr="initcap(simple_name)"/>
+<field id="deliver_record" caption="Deliver with record" join="attr_repatient" column="value_int"/>
+<field id="permed_id" caption="Person Medication ID" join="message_doc" column="doc_data_a"/>
+<field id="priority" caption="Priority" join="message_doc" column="doc_data_b"/>
+<field id="to_ids" caption="To" join="message_doc" column="doc_dest_ids"/>
+<field id="owner_org_id" caption="" join="message_doc" column="cr_org_internal_id"/>
+<join id="message_doc" table="document"/>
+<join id="attr_to" table="document_attribute" imply-join="message_doc" condition="message_doc.doc_id = attr_to.parent_id AND attr_to.value_type = #constant.ATTRTYPE_PERSON_ID# AND attr_to.item_name = 'To'"/>
+<join id="attr_cc" table="document_attribute" imply-join="message_doc" condition="message_doc.doc_id = attr_cc.parent_id (+) AND attr_cc.value_type (+) = #constant.ATTRTYPE_PERSON_ID# AND attr_cc.item_name (+) = 'CC'"/>
+<join id="attr_recipient" table="document_attribute" imply-join="message_doc" condition="message_doc.doc_id = attr_recipient.parent_id (+) AND attr_recipient.value_type (+) = #constant.ATTRTYPE_PERSON_ID# AND attr_recipient.item_name IN ('To', 'CC')"/>
+<join id="attr_repatient" table="document_attribute" imply-join="message_doc" condition="message_doc.doc_id = attr_repatient.parent_id (+) AND attr_repatient.value_type (+) = #constant.ATTRTYPE_PATIENT_ID# AND attr_repatient.item_name (+) = 'Regarding Patient'"/>
+<join id="per_repatient" table="person" imply-join="attr_repatient" condition="attr_repatient.value_text = per_repatient.person_id (+)"/>
+<select id="all" heading="None">
+<display field="message_id"/>
+<display field="date_sent"/>
+<display field="from_id"/>
+<display field="to_id"/>
+<display field="cc_id"/>
+<display field="subject"/>
+<display field="repatient_id"/>
+<display field="to_ids"/>
+<order-by field="date_sent"/>
+<condition field="doc_spec_type" comparison="is" value="#constant.DOCSPEC_INTERNAL#"/>
+</select>
+</query-defn>
+</xaf>

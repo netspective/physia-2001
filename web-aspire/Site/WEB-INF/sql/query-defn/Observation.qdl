@@ -1,0 +1,92 @@
+<?xml version="1.0"?>
+
+<!-- QDL Query Definition Language -->
+
+<component>
+	<query-defn id="Observation" caption="Lab Results" db="Oracle">
+
+		<!-- Observation Fields -->
+		<field id="observation_id" join="observation" column="observation_id" caption="Obs. ID" ui-datatype="integer"/>
+		<field id="parent_obs_id" join="observation" column="parent_obs_id" caption="Parent Obs. ID" ui-datatype="integer"/>
+		<field id="obs_status" join="observation" column="obs_status"/>
+		<field id="obs_status_caption" join="observation_status" column="caption" caption="Obs. Status"/>
+		<field id="parent_doc_id" join="observation" column="parent_doc_id" caption="Parent Document ID"/>
+		<field id="obs_sequence" join="observation" column="obs_sequence" caption="Obs. Seq."/>
+		<field id="observee_id" join="observation" column="observee_id" caption="Observee ID"/>
+		<field id="observee_name" join="observation" column="observee_name" caption="Observee Name"/>
+		<field id="observer_id" join="observation" column="observer_id" caption="Observer ID"/>
+		<field id="observer_name" join="observation" column="observer_name" caption="Observer Name"/>
+		<field id="observer_org_int_id" join="observation" column="observer_org_id"/>
+		<field id="observer_org_id" join="observer_org" column="org_id" caption="Observer Org ID"/>
+		<field id="req_control_num" join="observation" column="req_control_num" caption="Requestors Control Number"/>
+		<field id="prod_control_num" join="observation" column="prod_control_num" caption="Producers Control Number"/>
+		<field id="battery_id" join="observation" column="battery_id" caption="Obs. Test ID"/>
+		<field id="battery_text" join="observation" column="battery_text" caption="Obs. Test Name"/>
+		<field id="battery_coding" join="observation" column="battery_coding" caption="Obs. Coding System"/>
+		<field id="alt_battery_id" join="observation" column="alt_battery_id" caption="Alt. Obs. Test ID"/>
+		<field id="alt_battery_text" join="observation" column="alt_battery_text" caption="Alt. Obs. Test Name"/>
+		<field id="alt_battery_coding" join="observation" column="alt_battery_coding" caption="Alt. Obs. Coding System"/>
+		<field id="specimen_collection_stamp" join="observation" column="specimen_collection_stamp" caption="Collected On" columndefn="TO_CHAR(observation.specimen_collection_stamp, 'IYYYMMDDHHMISS')" ui-datatype="stamp"/>
+		<field id="obs_report_stamp" join="observation" column="obs_report_stamp" caption="Reported On" columndefn="TO_CHAR(observation.obs_report_stamp, 'IYYYMMDDHHMISS')" ui-datatype="stamp"/>
+		<field id="obs_order_status" join="observation" column="obs_order_status" caption="Order Status"/>
+		<field id="observee_simple_name" join="observee_person" column="simple_name" caption="Observee Simple Name"/>
+		
+		<!-- Result Fields -->
+		<field id="result_id" join="observation_result" column="result_id" caption="Result ID" ui-datatype="integer"/>
+		<field id="parent_obs_id" join="observation_result" column="parent_obs_id" ui-datatype="integer"/>
+		<field id="result_producer_id" join="observation_result" column="result_producer_id" caption="Producer ID"/>
+		<field id="result_sequence" join="observation_result" column="result_sequence" caption="Result Sequence" ui-datatype="integer"/>
+		<field id="result_obs_id" join="observation_result" column="result_obs_id" caption="Result Oberservation ID"/>
+		<field id="result_obs_text" join="observation_result" column="result_obs_text" caption="Result Observation Text"/>
+		<field id="result_obs_coding" join="observation_result" column="result_obs_coding" caption="Result Observation Coding"/>
+		<field id="result_value_type" join="observation_result" column="result_value_type" caption="Result Value Type"/>
+		<field id="result_value_text" join="observation_result" column="result_value_text" caption="Result Value Text"/>
+		<field id="result_value_num" join="observation_result" column="result_value_num" caption="Result Value Number"/>
+		<field id="result_units_id" join="observation_result" column="result_units_id" caption="Result Units"/>
+		<field id="result_units_text" join="observation_result" column="result_units_text" caption="Result Units Text"/>
+		<field id="result_units_coding" join="observation_result" column="result_units_coding" caption="Results Units Coding"/>
+		<field id="alt_units_id" join="observation_result" column="alt_units_id" caption="Alternate Result Units"/>
+		<field id="alt_units_text" join="observation_result" column="alt_units_text" caption="Alternate Result Units Text"/>
+		<field id="alt_units_coding" join="observation_result" column="alt_units_coding" caption="Alternate Result Units Coding"/>
+		<field id="result_normal_range" join="observation_result" column="result_normal_range" caption="Results Normal Range"/>
+		<field id="result_abnormal_flags" join="observation_result" column="result_abnormal_flags" caption="Results Abnormal Flags"/>
+		<field id="result_abnormal_nature" join="observation_result" column="result_abnormal_nature" caption="Results Abnormal Nature"/>
+		<field id="result_order_status" join="observation_result" column="result_order_status" caption="Results Order Status"/>
+		<field id="result_notes" join="observation_result" column="result_notes" caption="Result Notes"/>
+		
+		<!-- Joins -->
+		<join id="observation" table="observation" autoinclude="1"/>
+		<join id="observation_status" table="document_association_status" condition="observation.obs_status = observation_status.id (+)"/>
+		<join id="parent_document" table="document" condition="observation.parent_doc_id = parent_document.doc_id"/>
+		<join id="observer_org" table="org" condition="observation.observer_org_id = observer_org.org_internal_id (+)"/>
+		<join id="observation_result" table="observation_result" condition="observation.observation_id = observation_result.parent_obs_id (+)"/>
+		<join id="observee_person" table="person" condition="observation.observee_id = observee_person.person_id (+)"/>
+		
+		<!-- Views -->
+		<view id="all" caption="Lab Results">
+			<column id="observation_id"/>
+			<column id="obs_status_caption"/>
+			<column id="obs_sequence"/>
+			<column id="observee_id"/>
+			<column id="observer_id"/>
+			<column id="battery_id"/>
+			<column id="battery_text"/>
+			<column id="specimen_collection_stamp"/>
+			<order-by id="obs_report_stamp" order="desc"/>
+			<condition field="observer_org_int_id" comparison="is" criteria="#session.org_internal_id#"/>
+		</view>
+		<view id="results" caption="Lab Result Details">
+			<column id="observation_id"/>
+			<column id="result_id"/>
+			<column id="result_producer_id"/>
+			<column id="result_sequence"/>
+			<column id="result_obs_id"/>
+			<column id="result_obs_text"/>
+			<order-by id="observation_id"/>
+			<order-by id="result_sequence"/>
+			<condition field="observer_org_int_id" comparison="is" criteria="#session.org_internal_id#"/>
+		</view>
+	</query-defn>
+</component>
+
+

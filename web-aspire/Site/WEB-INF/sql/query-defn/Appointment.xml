@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xaf>
+<query-defn id="appointment" caption="Appointment" dbms="Oracle">
+<field id="owner_id" caption="" join="event" column="owner_id"/>
+<field id="facility_id" caption="Facility ID" join="facility" column="org_id"/>
+<field id="physician_id" caption="Physician ID" join="event_attr_patientid" column="value_textB"/>
+<field id="patient_id" caption="Patient ID" join="event_attr_patientid" column="value_text"/>
+<field id="patient_name" caption="Patient Name" join="person" column="simple_name" column-expr="initcap(simple_name)"/>
+<field id="patient_lastname" caption="Patient Last Name" join="person" column="name_last"/>
+<field id="patient_firstname" caption="Patient First Name" join="person" column="name_first"/>
+<field id="start_time" caption="Appointment Time" dialog-field="field.stamp" join="event" column="start_time" column-expr="TO_CHAR(event.start_time,'IYYYMMDDHH24MI')"/>
+<field id="appt_status" caption="Appointment Status" join="appt_status" column="caption"/>
+<field id="duration" caption="Duration" dialog-field="field.integer" join="event" column="duration"/>
+<field id="appt_type" caption="Appointment Type" join="appt_type" column="caption"/>
+<field id="scheduled_by" caption="Scheduled By" join="event" column="scheduled_by_id"/>
+<field id="scheduled_on" caption="Scheduled On" dialog-field="field.stamp" join="event" column="scheduled_stamp" column-expr="TO_CHAR(event.scheduled_stamp,'IYYYMMDDHH24MI')"/>
+<field id="checked_in_by" caption="Checked-In By" join="event" column="checkin_by_id"/>
+<field id="checked_in" caption="Checked-In On" dialog-field="field.stamp" join="event" column="checkin_stamp" column-expr="TO_CHAR(event.checkin_stamp,'IYYYMMDDHH24MI')"/>
+<field id="checked_out_by" caption="Checked-Out By" join="event" column="checkout_by_id"/>
+<field id="checked_out" caption="Checked-Out On" dialog-field="field.stamp" join="event" column="checkout_stamp" column-expr="TO_CHAR(event.checkout_stamp,'IYYYMMDDHH24MI')"/>
+<field id="discard_by" caption="Discarded By" join="event" column="discard_by_id"/>
+<field id="discard_on" caption="Discarded On" dialog-field="field.stamp" join="event" column="discard_stamp" column-expr="TO_CHAR(event.discard_stamp,'IYYYMMDDHH24MI')"/>
+<field id="appt_discard_type" caption="Discard Type" join="appt_discard_type" column="caption"/>
+<field id="chart" caption="Patient Chart #" join="per_attr_chart" column="value_text"/>
+<field id="account" caption="Patient Account #" join="per_attr_account" column="value_text"/>
+<field id="subject" caption="Reason for Visit" join="event" column="subject" column-expr="initcap(subject)"/>
+<field id="remarks" caption="Remarks" join="event" column="remarks" column-expr="initcap(remarks)"/>
+<field id="discard_remarks" caption="Discard Remarks" join="event" column="discard_remarks" column-expr="initcap(discard_remarks)"/>
+<field id="event_id" caption="Event ID" join="event" column="event_id"/>
+<field id="home_phone" caption="Home Phone" dialog-field="field.phone" join="per_attr_phone_home" column="value_text"/>
+<join id="event" table="event"/>
+<join id="facility" table="org" condition="event.facility_id = facility.org_internal_id"/>
+<join id="event_attr_patientid" table="event_attribute" condition="event_attr_patientid.parent_id = event.event_id"/>
+<join id="per_attr_chart" table="person_attribute" imply-join="event_attr_patientid" condition="per_attr_chart.parent_id (+) = event_attr_patientid.value_text AND per_attr_chart.item_name (+) = 'Patient/Chart Number'"/>
+<join id="per_attr_account" table="person_attribute" imply-join="event_attr_patientid" condition="per_attr_account.parent_id (+) = event_attr_patientid.value_text AND per_attr_account.item_name (+) = 'Patient/Account Number'"/>
+<join id="person" table="person" condition="person.person_id = event_attr_patientid.value_text"/>
+<join id="appt_status" table="appt_status" condition="appt_status.id = event.event_status"/>
+<join id="appt_discard_type" table="appt_discard_type" condition="appt_discard_type.id (+) = event.discard_type"/>
+<join id="appt_type" table="appt_type" condition="appt_type.appt_type_id (+) = event.appt_type"/>
+<join id="per_attr_phone_home" table="person_attribute" condition="person.person_id = per_attr_phone_home.parent_id (+) AND per_attr_phone_home.value_type (+) = #constant.ATTRTYPE_PHONE# AND per_attr_phone_home.item_name (+) = 'Home'"/>
+<select id="all" heading="">
+<display field="start_time"/>
+<display field="patient_id"/>
+<display field="patient_name"/>
+<display field="physician_id"/>
+<display field="appt_type"/>
+<display field="subject"/>
+<display field="facility_id"/>
+<display field="home_phone"/>
+<display field="account"/>
+<display field="chart"/>
+<order-by field="start_time"/>
+<condition field="owner_id" comparison="is" value="#session.org_internal_id#"/>
+</select>
+<select id="scheduled" heading="">
+<display field="start_time"/>
+<display field="patient_id"/>
+<display field="patient_name"/>
+<display field="physician_id"/>
+<display field="appt_type"/>
+<display field="subject"/>
+<display field="facility_id"/>
+<display field="home_phone"/>
+<display field="account"/>
+<display field="chart"/>
+<order-by field="start_time"/>
+<condition field="owner_id" comparison="is" value="#session.org_internal_id#" connector="and"/>
+<condition field="appt_status" comparison="is" value="Scheduled"/>
+</select>
+<select id="in-Progress" heading="">
+<display field="start_time"/>
+<display field="patient_id"/>
+<display field="patient_name"/>
+<display field="physician_id"/>
+<display field="appt_type"/>
+<display field="subject"/>
+<display field="facility_id"/>
+<display field="home_phone"/>
+<display field="account"/>
+<display field="chart"/>
+<order-by field="start_time"/>
+<condition field="owner_id" comparison="is" value="#session.org_internal_id#" connector="and"/>
+<condition field="appt_status" comparison="is" value="In Progress"/>
+</select>
+<select id="complete" heading="">
+<display field="start_time"/>
+<display field="patient_id"/>
+<display field="patient_name"/>
+<display field="physician_id"/>
+<display field="appt_type"/>
+<display field="subject"/>
+<display field="facility_id"/>
+<display field="home_phone"/>
+<display field="account"/>
+<display field="chart"/>
+<order-by field="start_time"/>
+<condition field="owner_id" comparison="is" value="#session.org_internal_id#" connector="and"/>
+<condition field="appt_status" comparison="is" value="Complete"/>
+</select>
+<select id="discard" heading="">
+<display field="start_time"/>
+<display field="patient_id"/>
+<display field="patient_name"/>
+<display field="physician_id"/>
+<display field="appt_type"/>
+<display field="subject"/>
+<display field="facility_id"/>
+<display field="home_phone"/>
+<display field="account"/>
+<display field="chart"/>
+<order-by field="start_time"/>
+<condition field="owner_id" comparison="is" value="#session.org_internal_id#" connector="and"/>
+<condition field="appt_status" comparison="is" value="Discard"/>
+</select>
+</query-defn>
+</xaf>

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xaf>
+<query-defn id="InvoiceWorkList" caption="Invoice WorkList" dbms="Oracle">
+<field id="owner_id" caption="Worklist invoice will appear" join="InvWork" column="owner_id"/>
+<field id="person_id" caption="Patient ID" join="InvWork" column="person_id"/>
+<field id="responsible_id" caption="Person responisble for invoice (Collector)" join="InvWork" column="responsible_id"/>
+<field id="reck_date" caption="Reck Date" join="InvWork" column="reck_date"/>
+<field id="invoice_id" caption="Invoice ID" join="InvWork" column="invoice_id"/>
+<field id="comments" caption="Invoice Comments" join="InvWork" column="comments"/>
+<field id="org_internal_id" caption="" join="InvWork" column="org_internal_id"/>
+<field id="data_date_a" caption="" join="InvWork" column="data_date_a"/>
+<field id="name" caption="Name" join="person" column="simple_name"/>
+<field id="balance" caption="Balance" dialog-field="field.currency" join="invoice" column="balance"/>
+<field id="invoice_date" caption="Invoice Date" join="invoice" column="invoice_date"/>
+<field id="invoice_worklist_id" caption="Worklist ID" join="InvWork" column="invoice_worklist_id"/>
+<field id="worklist_status" caption="Worklist Status" join="InvWork" column="worklist_status"/>
+<field id="worklist_type" caption="Worklist Type" join="InvWork" column="worklist_type"/>
+<field id="age" caption="Age" join="invoice" column-expr="trunc(sysdate) - trunc(invoice.invoice_date)"/>
+<join id="InvWork" table="Invoice_Worklist" condition="NOT EXISTS (SELECT 1 FROM payment_plan pp,payment_plan_inv_ids  ppii      WHERE pp.person_id = InvWork.person_id       AND   ppii.parent_id = pp.plan_id      AND   ppii.member_name = InvWork.invoice_id      AND   pp.next_due &gt;sysdate-5   )"/>
+<join id="person" table="person" condition="person.person_id=InvWork.person_id"/>
+<join id="invoice" table="invoice" condition="invoice.invoice_id=InvWork.invoice_id"/>
+<select id="all" heading="TEST">
+<display field="owner_id"/>
+<display field="person_id"/>
+<display field="responsible_id"/>
+<display field="reck_date"/>
+<display field="data_date_a"/>
+<display field="invoice_id"/>
+<display field="comments"/>
+<display field="name"/>
+<display field="balance"/>
+<display field="invoice_date"/>
+<display field="invoice_worklist_id"/>
+<display field="age"/>
+<condition field="org_internal_id" comparison="is" value="#session.org_internal_id#"/>
+</select>
+</query-defn>
+</xaf>

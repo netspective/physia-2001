@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xaf>
+<query-defn id="FinancialTransaction" caption="Financial Transaction" dbms="Oracle">
+<field id="item_id" caption="Invoice Item ID" join="invitem" column="item_id"/>
+<field id="item_type" caption="Invoice Item Type" join="invitem_type" column="caption"/>
+<field id="hcfa_service_place" caption="Service Place" join="invitem_srv_place" column="caption"/>
+<field id="hcfa_service_type" caption="Service Type" join="invitem_srv_type" column="caption"/>
+<field id="invoice_id" caption="Invoice ID" join="invoice" column="invoice_id"/>
+<field id="invoice_owner_id" caption="" join="invoice" column="owner_id"/>
+<field id="invoice_date" caption="Invoice Date" dialog-field="field.date" join="invoice" column="invoice_date"/>
+<field id="service_begin_date" caption="Service Begin Date" dialog-field="field.date" join="invitem" column="service_begin_date"/>
+<field id="service_end_date" caption="Service End Date" dialog-field="field.date" join="invitem" column="service_end_date"/>
+<field id="description" caption="Description" join="invitem" column="caption"/>
+<field id="code" caption="Code" join="invitem" column="code"/>
+<field id="code_type" caption="Code Type" join="invitem_codetype" column="caption"/>
+<field id="cpt_desc" caption="CPT Description" join="cpt" column="description"/>
+<field id="modifier" caption="Modifier" join="invitem" column="modifier"/>
+<field id="unit_cost" caption="Unit Cost" dialog-field="field.currency" join="invitem" column="unit_cost"/>
+<field id="quantity" caption="Quantity" dialog-field="field.number" join="invitem" column="quantity"/>
+<field id="extended_cost" caption="Extended Cost" dialog-field="field.currency" join="invitem" column="extended_cost"/>
+<field id="rel_diags" caption="ICD9" join="invitem" column="rel_diags"/>
+<field id="comments" caption="Comments" join="invitem" column="comments"/>
+<field id="bill_provider_id" caption="Billing Provider ID" join="main_trans" column="provider_id"/>
+<field id="bill_provider_name" caption="Billing Provider Name" join="bill_provider" column="simple_name"/>
+<field id="rend_provider_id" caption="Rendering Provider ID" join="main_trans" column="care_provider_id"/>
+<field id="rend_provider_name" caption="Rendering Provider Name" join="rend_provider" column="simple_name"/>
+<field id="bill_facility_id" caption="Billing Facility ID" join="bill_facility_org" column="org_id"/>
+<field id="bill_facility_name" caption="Billing Facility Name" join="bill_facility_org" column="name_primary"/>
+<field id="bill_facility_addr_line1" caption="Billing Facility Address - Line 1" join="bill_facility_addr" column="line1"/>
+<field id="bill_facility_addr_city" caption="Billing Facility Address - City" join="bill_facility_addr" column="city"/>
+<field id="bill_facility_addr_state" caption="Billing Facility Address - State" join="bill_facility_addr" column="state"/>
+<field id="bill_facility_addr_zip" caption="Billing Facility Address - Zip" join="bill_facility_addr" column="zip"/>
+<field id="srv_facility_id" caption="Service Facility ID" join="srv_facility_org" column="org_id"/>
+<field id="srv_facility_name" caption="Service Facility Name" join="srv_facility_org" column="name_primary"/>
+<field id="srv_facility_addr_line1" caption="Service Facility Address - Line 1" join="srv_facility_addr" column="line1"/>
+<field id="srv_facility_addr_city" caption="Service Facility Address - City" join="srv_facility_addr" column="city"/>
+<field id="srv_facility_addr_state" caption="Service Facility Address - State" join="srv_facility_addr" column="state"/>
+<field id="srv_facility_addr_zip" caption="Service Facility Address - Zip" join="srv_facility_addr" column="zip"/>
+<field id="adjustment_id" caption="Adjustment ID" join="invitem_adjust" column="adjustment_id"/>
+<field id="adjustment_type" caption="Adjustment Type" join="invitem_adjust_type" column="caption"/>
+<field id="adjustment_amt" caption="Adjustment Amount" dialog-field="field.currency" join="invitem_adjust" column="adjustment_amount"/>
+<field id="adjustment_amt_net" caption="Net Adjustment" dialog-field="field.currency" join="invitem_adjust" column="net_adjust"/>
+<field id="ajustment_plan_allowed" caption="Plan Allowed" dialog-field="field.currency" join="invitem_adjust" column="plan_allow"/>
+<field id="ajustment_plan_paid" caption="Plan Paid" dialog-field="field.currency" join="invitem_adjust" column="plan_paid"/>
+<field id="writeoff_code" caption="Writeoff Code" join="invitem_adjust" column="writeoff_code"/>
+<field id="writeoff_amt" caption="Writeoff Amount" dialog-field="field.currency" join="invitem_adjust" column="writeoff_amount"/>
+<field id="patient_id" caption="Patient ID" join="invoice" column="client_id"/>
+<field id="patient_name" caption="Patient Name" join="patient" column="simple_name"/>
+<field id="patient_dob" caption="Patient Date of Birth" dialog-field="field.date" join="patient" column="date_of_birth"/>
+<field id="patient_age" caption="Patient Age" dialog-field="field.number" join="patient" column-expr="TRUNC((SYSDATE - patient.date_of_birth)/365)"/>
+<field id="patient_gender" caption="Patient Gender" join="patient_gender" column="caption"/>
+<field id="patient_addr_home_line1" caption="Patient Address - Line 1" join="patient_addr_home" column="line1"/>
+<field id="patient_addr_home_city" caption="Patient Address - City" join="patient_addr_home" column="city"/>
+<field id="patient_addr_home_state" caption="Patient Address - State" join="patient_addr_home" column="state"/>
+<field id="patient_addr_home_zip" caption="Patient Address - Zip" join="patient_addr_home" column="zip"/>
+<field id="patient_employer_id" caption="Patient Employer ID" join="patient_attr_employer" column="value_text"/>
+<field id="patient_employer_name" caption="Patient Employer Name" join="patient_employer_org" column="name_primary"/>
+<field id="patient_guarantor_id" caption="Patient Guarantor" join="patient_attr_guarantor" column="value_text"/>
+<field id="patient_guarantor_relation" caption="Patient Guarantor Relationship" join="patient_attr_guarantor" column="value_textb"/>
+<field id="batch_create_id" caption="Invoice Item Batch ID" join="invoice_attr_batch" column="value_text"/>
+<field id="batch_create_date" caption="Invoice Item Batch Date" dialog-field="field.date" join="invoice_attr_batch" column="value_date"/>
+<field id="batch_adjust_id" caption="Adjustment Batch ID" join="invoice_attr_batch_adjust" column="value_text"/>
+<field id="batch_adjust_date" caption="Adjustment Batch Date" dialog-field="field.date" join="invoice_attr_batch_adjust" column="value_date"/>
+<field id="payer_type" caption="Payer Type" join="invitem_adjust_payer_type" column="caption"/>
+<field id="payer_person_id" caption="Payer Person ID" join="invitem_adjust_payer_person" column="person_id"/>
+<field id="payer_person_name" caption="Payer Person Name" join="invitem_adjust_payer_person" column="simple_name"/>
+<field id="payer_org_id" caption="Payer Org ID" join="invitem_adjust_payer_org" column="org_id"/>
+<field id="payer_org_name" caption="Payer Org Name" join="invitem_adjust_payer_org" column="name_primary"/>
+<join id="invitem" table="invoice_item"/>
+<join id="invoice" table="invoice" condition="invitem.parent_id = invoice.invoice_id"/>
+<join id="invitem_type" table="inv_item_type" condition="invitem.item_type = invitem_type.id (+)"/>
+<join id="invitem_srv_place" table="hcfa1500_service_place_code" condition="invitem.hcfa_service_place = invitem_srv_place.id (+)"/>
+<join id="invitem_srv_type" table="hcfa1500_service_type_code" condition="invitem.hcfa_service_type = invitem_srv_type.id (+)"/>
+<join id="invitem_codetype" table="catalog_entry_type" condition="invitem.code_type = invitem_codetype.id (+)"/>
+<join id="main_trans" table="transaction" imply-join="invoice" condition="invoice.main_transaction = main_trans.trans_id"/>
+<join id="bill_provider" table="person" imply-join="main_trans" condition="main_trans.provider_id = bill_provider.person_id (+)"/>
+<join id="rend_provider" table="person" imply-join="main_trans" condition="main_trans.care_provider_id = rend_provider.person_id (+)"/>
+<join id="invitem_adjust" table="invoice_item_adjust" condition="invitem.item_id = invitem_adjust.parent_id (+)"/>
+<join id="invitem_adjust_payer_type" table="entity_type" imply-join="invitem_adjust" condition="invitem_adjust.payer_type = invitem_adjust_payer_type.id (+)"/>
+<join id="invitem_adjust_payer_org" table="org" imply-join="invitem_adjust" condition="invitem_adjust.payer_id = TO_CHAR(invitem_adjust_payer_org.org_internal_id (+))"/>
+<join id="invitem_adjust_payer_person" table="person" imply-join="invitem_adjust" condition="invitem_adjust.payer_id = invitem_adjust_payer_person.person_id (+)"/>
+<join id="invitem_adjust_type" table="adjust_method" imply-join="invitem_adjust" condition="invitem_adjust.adjustment_type = invitem_adjust_type.id (+)"/>
+<join id="patient" table="person" imply-join="invoice" condition="invoice.client_id = patient.person_id (+)"/>
+<join id="patient_gender" table="gender" imply-join="patient" condition="patient.gender = patient_gender.id (+)"/>
+<join id="patient_addr_home" table="person_address" imply-join="patient" condition="patient.person_id = patient_addr_home.parent_id (+) AND patient_addr_home.address_name (+) = 'Home'"/>
+<join id="patient_attr_employer" table="person_attribute" imply-join="patient" condition="patient.person_id = patient_attr_employer.parent_id (+) AND patient_attr_employer.value_type (+) &gt;= #constant.ATTRTYPE_EMPLOYEDFULL# AND patient_attr_employer.value_type (+) &lt;= #constant.ATTRTYPE_STUDENTPART#"/>
+<join id="patient_employer_org" table="org" imply-join="patient_attr_employer" condition="patient_attr_employer.value_int = patient_employer_org.org_internal_id (+)"/>
+<join id="patient_attr_guarantor" table="person_attribute" imply-join="patient" condition="patient.person_id = patient_attr_guarantor.parent_id (+) AND patient_attr_guarantor.item_name (+) = 'Guarantor'"/>
+<join id="bill_facility_org" table="org" imply-join="main_trans" condition="main_trans.billing_facility_id = bill_facility_org.org_internal_id (+)"/>
+<join id="bill_facility_addr" table="org_address" imply-join="bill_facility_org" condition="bill_facility_org.org_internal_id = bill_facility_addr.parent_id (+) AND bill_facility_addr.address_name (+) = 'Payment'"/>
+<join id="srv_facility_org" table="org" imply-join="main_trans" condition="main_trans.billing_facility_id = srv_facility_org.org_internal_id (+)"/>
+<join id="srv_facility_addr" table="org_address" imply-join="srv_facility_org" condition="srv_facility_org.org_internal_id = srv_facility_addr.parent_id (+) AND srv_facility_addr.address_name (+) = 'Mailing'"/>
+<join id="invoice_attr_batch" table="invoice_attribute" imply-join="invoice" condition="invoice.invoice_id = invoice_attr_batch.parent_id (+) AND invoice_attr_batch.item_name (+) = 'Invoice/Creation/Batch ID'"/>
+<join id="invoice_attr_batch_adjust" table="invoice_attribute" imply-join="invitem_adjust" condition="invitem_adjust.adjustment_id = invoice_attr_batch_adjust.value_int (+) AND invoice_attr_batch_adjust.item_name (+) = 'Invoice/Payment/Batch ID'"/>
+<join id="cpt" table="ref_cpt" condition="invitem.code = cpt.cpt (+)"/>
+<select id="all" heading="None">
+<display field="invoice_id"/>
+<display field="item_id"/>
+<display field="adjustment_id"/>
+<display field="item_type"/>
+<display field="extended_cost"/>
+<display field="adjustment_type"/>
+<display field="adjustment_amt"/>
+<display field="description"/>
+<display field="patient_name"/>
+<display field="bill_provider_id"/>
+<display field="bill_facility_id"/>
+<display field="rend_provider_id"/>
+<display field="srv_facility_id"/>
+<order-by field="invoice_id"/>
+<order-by field="item_id"/>
+<order-by field="adjustment_id"/>
+<condition field="invoice_owner_id" comparison="is" value="#session.org_internal_id#"/>
+</select>
+</query-defn>
+</xaf>

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xaf>
+<query-defn id="Statement" caption="" dbms="Oracle">
+<field id="statement_id" caption="" join="statement" column="statement_id"/>
+<field id="cr_org_internal_id" caption="" join="statement" column="cr_org_internal_id"/>
+<field id="row_num" caption="" join="" column="rownum"/>
+<field id="patient_id" caption="Patient ID" join="statement" column="patient_id"/>
+<field id="statement_source" caption="Clearing House" join="stmt_src" column="caption"/>
+<field id="transmission_stamp" caption="Transmission Date" dialog-field="field.date" join="statement" column="transmission_stamp" column-expr="TO_CHAR(statement.transmission_stamp, 'IYYYMMDD')"/>
+<field id="transmission_status" caption="Transmission Status" join="trans_status" column="caption"/>
+<field id="ack_stamp" caption="Acknowledge Date" dialog-field="field.date" join="statement" column="ack_stamp" column-expr="TO_CHAR(statement.ack_stamp, 'IYYYMMDD')"/>
+<field id="int_stmt_id" caption="Internal Statement ID" join="statement" column="int_statement_id"/>
+<field id="ext_stmt_id" caption="External Statement ID" join="statement" column="ext_statement_id"/>
+<field id="amount_due" caption="Statement Balance" dialog-field="field.currency" join="statement" column="amount_due"/>
+<field id="invoice_ids" caption="Invoice ID(s)" join="statement" column="inv_ids"/>
+<join id="statement" table="statement"/>
+<join id="stmt_src" table="electronic_payer_source" condition="stmt_src.id = statement.statement_source"/>
+<join id="trans_status" table="transmission_status" condition="trans_status.id = statement.transmission_status"/>
+<join id="patient" table="person" condition="patient.person_id = statement.patient_id"/>
+<select id="all" heading="None">
+<display field="statement_source"/>
+<display field="transmission_stamp"/>
+<display field="transmission_status"/>
+<display field="patient_id"/>
+<display field="ack_stamp"/>
+<display field="int_stmt_id"/>
+<display field="ext_stmt_id"/>
+<display field="invoice_ids"/>
+<display field="amount_due"/>
+<order-by field="statement_source"/>
+<condition field="cr_org_internal_id" comparison="is" value="#session.org_internal_id#"/>
+</select>
+</query-defn>
+</xaf>
