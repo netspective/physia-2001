@@ -3,7 +3,7 @@ package App::Dialog::Medication;
 ##############################################################################
 
 use strict;
-use SDE::CVS ('$Id: Medication.pm,v 1.6 2000-12-21 16:17:10 radha_kotagiri Exp $', '$Name:  $');
+use SDE::CVS ('$Id: Medication.pm,v 1.7 2000-12-22 05:47:50 thai_nguyen Exp $', '$Name:  $');
 use CGI::Validator::Field;
 use CGI::Dialog;
 use base qw(CGI::Dialog);
@@ -443,8 +443,9 @@ sub execute_add
 		$self->sendApprovalRequest($page, $command, $flags);
 	}
 
-	$self->handlePostExecute($page, $command, $flags | CGI::Dialog::DLGFLAG_IGNOREREDIRECT);
-	return "\u$command completed.";
+	$self->handlePostExecute($page, $command, $flags);
+	#$self->handlePostExecute($page, $command, $flags | CGI::Dialog::DLGFLAG_IGNOREREDIRECT);
+	#return "\u$command completed.";
 }
 
 
