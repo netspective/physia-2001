@@ -18,6 +18,9 @@ use App::Dialog::Field::BatchDateID;
 use Date::Manip;
 
 use vars qw(@ISA %RESOURCE_MAP);
+use constant NEXTACTION_PATIENTSUMMARY => "/person/%field.payer_id%/profile";
+use constant NEXTACTION_PATIENTACCT => "/person/%field.payer_id%/account";
+use constant NEXTACTION_PATIENTWORKLIST => "/worklist/patientflow";
 
 @ISA = qw(CGI::Dialog);
 
@@ -73,7 +76,14 @@ sub new
 		key => "#param.person_id#",
 		data => "personalpayment of '#field.total_amount#' to <a href='/person/#param.person_id#/profile'>#param.person_id#</a>"
 	};
-	$self->addFooter(new CGI::Dialog::Buttons(cancelUrl => $self->{cancelUrl} || undef));
+
+	$self->addFooter(new CGI::Dialog::Buttons(
+						nextActions => [
+							['Go to Patient Summary', NEXTACTION_PATIENTSUMMARY, 1],
+							['Go to Patient Account', NEXTACTION_PATIENTACCT],
+							['Return to Patient Flow Work List', NEXTACTION_PATIENTWORKLIST],
+							],
+						cancelUrl => $self->{cancelUrl} || undef));
 
 	return $self;
 }
@@ -319,9 +329,8 @@ sub executePrePayment
 		value_int => $adjItemId || undef,
 		_debug => 0
 	);
-	$page->session('batch_id', $batchId);
 
-	$page->param('_dialogreturnurl', "/person/$payerId/account");
+	$page->session('batch_id', $batchId);
 }
 
 sub executePostPayment
@@ -420,8 +429,6 @@ sub executePostPayment
 			App::Dialog::Procedure::execAction_submit($page, 'add', $invoiceId);
 		}
 	}
-
-	$page->param('_dialogreturnurl', "/person/$payerId/account");
 }
 
 1;

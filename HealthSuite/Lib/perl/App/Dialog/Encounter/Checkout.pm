@@ -29,6 +29,7 @@ use base qw(App::Dialog::Encounter);
 
 use constant NEXTACTION_CLAIMSUMM => "/invoice/%param.invoice_id%/summary";
 use constant NEXTACTION_PATIENTACCT => "/person/%field.attendee_id%/account";
+use constant NEXTACTION_POSTTRANSFER => "/person/%field.attendee_id%/dlg-add-posttransfer";
 use constant NEXTACTION_PRINTRECEIPT => "/";
 use constant NEXTACTION_APPOINTMENTS => "/schedule";
 use constant NEXTACTION_WORKLIST => "/worklist";
@@ -54,6 +55,7 @@ sub initialize
 		nextActions => [
 			['Go to Claim Summary', NEXTACTION_CLAIMSUMM],
 			['Go to Patient Account', NEXTACTION_PATIENTACCT],
+			['Post Transfer for this Patient', NEXTACTION_POSTTRANSFER],
 			['Go to Appointments', NEXTACTION_APPOINTMENTS],
 			['Return to Work List', NEXTACTION_WORKLIST],
 		],

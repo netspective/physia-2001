@@ -26,6 +26,9 @@ use Date::Manip;
 
 use base qw(App::Dialog::Encounter);
 
+use constant NEXTACTION_POSTPAYMENT => "/person/%field.attendee_id%/dlg-add-postpersonalpayment";
+use constant NEXTACTION_PATIENTWORKLIST => "/worklist/patientflow";
+
 sub initialize
 {
 	my $self = shift;
@@ -33,16 +36,21 @@ sub initialize
 	$self->heading('Check-In');
 
 	$self->SUPER::initialize();
+
 	$self->{activityLog} =
-			{
-				scope =>'person',
-				key => "#field.person_id#",
-				data => qq{Checkin <a href='/person/#field.attendee_id#/profile'>#field.attendee_id#</a> 
-					<br>(Appt Time: #field.start_time#)
-				}
+	{
+		scope =>'person',
+		key => "#field.person_id#",
+		data => "Checkin <a href='/person/#field.attendee_id#/profile'>#field.attendee_id#</a><br>(Appt Time: #field.start_time#)"
 	};
 
-	$self->addFooter(new CGI::Dialog::Buttons);
+	$self->addFooter(new CGI::Dialog::Buttons(
+						nextActions => [
+							['Post Payment for this Patient', NEXTACTION_POSTPAYMENT],
+							['Return to Patient Flow Work List', NEXTACTION_PATIENTWORKLIST],
+							],
+						cancelUrl => $self->{cancelUrl} || undef));
+
 	return $self;
 }
 
