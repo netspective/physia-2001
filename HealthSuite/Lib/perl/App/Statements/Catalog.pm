@@ -107,6 +107,10 @@ $STMTMGR_CATALOG = new App::Statements::Catalog(
 						where oce.entry_id = ?
 			and oc.internal_catalog_id = oce.catalog_id
 	},
+
+
+	#----CPT QUERIES
+
 	'selGenericCPT_LikeCode' => q{
 		select cpt, name, description
 		from ref_cpt
@@ -122,6 +126,10 @@ $STMTMGR_CATALOG = new App::Statements::Catalog(
 		from ref_cpt
 		where cpt = upper(?)
 	},
+
+
+	#----HCPCS QUERIES
+
 	'selGenericHCPCS_LikeCode' => q{
 		select hcpcs, name, description
 		from ref_hcpcs
@@ -137,6 +145,10 @@ $STMTMGR_CATALOG = new App::Statements::Catalog(
 		from ref_hcpcs
 		where hcpcs = upper(?)
 	},
+
+
+	#----ICD QUERIES
+
 	'selGenericICD_LikeCode' => q{
 		select icd, descr
 		from ref_icd
@@ -152,10 +164,32 @@ $STMTMGR_CATALOG = new App::Statements::Catalog(
 		from ref_icd
 		where icd = upper(?)
 	},
+
+
+	#----MODIFIER QUERIES
+
 	'selGenericModifier' => q{
 		select caption
 		from HCFA1500_Modifier_Code
 		where id = ?
+	},
+	'selGenericModifierCodeId' => q{
+		select id
+		from HCFA1500_Modifier_Code
+		where id = ?
+	},
+	'selModifierCode' => q{
+		select caption
+			from HCFA1500_Modifier_Code
+			where id = ?
+	},
+
+
+	#----SERVICE PLACE QUERIES
+
+	'selAllServicePlaceId' => q{
+		select id
+		from HCFA1500_Service_Place_Code
 	},
 	'selGenericServicePlaceId' => q{
 		select id
@@ -177,6 +211,14 @@ $STMTMGR_CATALOG = new App::Statements::Catalog(
 		from HCFA1500_Service_Place_Code
 		where abbrev = ?
 	},
+
+
+	#----SERVICE TYPE QUERIES
+
+	'selAllServiceTypeId' => q{
+		select id
+		from HCFA1500_Service_Type_Code
+	},
 	'selGenericServiceTypeId' => q{
 		select id
 		from HCFA1500_Service_Type_Code
@@ -197,14 +239,13 @@ $STMTMGR_CATALOG = new App::Statements::Catalog(
 		from HCFA1500_Service_Type_Code
 		where abbrev = ?
 	},
-	'selGenericModifierCodeId' => q{
-		select id
-		from HCFA1500_Modifier_Code
-		where id = ?
-	},
-	'selModifierCode' => q{
+
+
+	#----OTHER QUERIES
+
+	'selCatalogEntryTypeCapById' => q{
 		select caption
-			from HCFA1500_Modifier_Code
+			from catalog_entry_type
 			where id = ?
 	},
 	'selCatalogItemByNameByType' => q{
@@ -256,14 +297,6 @@ $STMTMGR_CATALOG = new App::Statements::Catalog(
 		and parent_id is not null
 		and rownum < 16
 		order by read_count desc
-	},
-	'selAllServicePlaceId' => q{
-		select id
-		from HCFA1500_Service_Place_Code
-	},
-	'selAllServiceTypeId' => q{
-		select id
-		from HCFA1500_Service_Type_Code
 	},
 
 	'sel_catalogEntry_by_catalogTypeCodeModifier' => {
