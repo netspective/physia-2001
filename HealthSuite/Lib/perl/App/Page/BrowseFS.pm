@@ -160,7 +160,20 @@ sub prepare
 			my @fileData = <ENTRYFILE>;
 			if($entryFlags & NAVGFILEFLAG_RAWTEXT)
 			{
-				$self->addContent('<PRE>', @fileData, '</PRE>');
+				if ($self->param('linenumbers'))
+				{
+					my $lineNumber = 1;
+					my @numberedFileData = ();
+					for (@fileData)
+					{
+						push(@numberedFileData, sprintf("%4d  ", $lineNumber++) . $_);
+					}
+					$self->addContent('<PRE>', @numberedFileData, '</PRE>');
+				}
+				else
+				{
+					$self->addContent('<PRE>', @fileData, '</PRE>');
+				}
 			}
 			elsif ($entryFlags & NAVGFILEFLAG_EXCEL)
 			{
