@@ -1945,6 +1945,204 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 	publishComp_stpe => sub { my ($page, $flags, $orgId) = @_; $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.closingDateInfo',  [$page->param('org_id')], 'panelEdit'); },
 	publishComp_stpt => sub { my ($page, $flags, $orgId) = @_; $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.closingDateInfo',  [$page->param('org_id')], 'panelTransp'); },
 },
+#------------------------------------------------------------------------------------------------------------------------
+'org.LabTestSummary' => {
+	sqlStmt => qq{
+				SELECT('Labs'),
+				count (oce.entry_id),
+				300,internal_catalog_id,oce.entry_type
+				FROM offering_catalog oc,org o,
+				offering_catalog_entry oce
+				WHERE o.owner_org_id = :2
+				AND	o.org_id = :1
+				AND	o.org_internal_id = oc.org_internal_id
+				AND	oce.entry_type (+)= 300
+				AND	oce.catalog_id(+)=oc.internal_catalog_id
+				AND	parent_entry_id is null
+				AND	oc.catalog_type =5
+				GROUP BY internal_catalog_id,oce.entry_type
+				union
+				SELECT ('Radiology'),
+				count (oce.entry_id),
+				310,internal_catalog_id,oce.entry_type
+				FROM offering_catalog oc,org o,
+				offering_catalog_entry oce
+				WHERE o.owner_org_id = :2
+				AND	o.org_id = :1
+				AND	o.org_internal_id = oc.org_internal_id
+				AND	oce.entry_type (+)= 310
+				AND	oce.catalog_id(+)=oc.internal_catalog_id
+				AND	parent_entry_id is null
+				AND	oc.catalog_type =5
+				GROUP BY internal_catalog_id	,oce.entry_type
+				union				
+				SELECT 'Other',
+				count (oce.entry_id),
+				999,internal_catalog_id,oce.entry_type
+				FROM offering_catalog oc,org o,
+				offering_catalog_entry oce
+				WHERE o.owner_org_id = :2
+				AND	o.org_id = :1
+				AND	o.org_internal_id = oc.org_internal_id
+				AND	oce.entry_type (+)= 999
+				AND	oce.catalog_id(+)=oc.internal_catalog_id
+				AND	parent_entry_id is null
+				AND	oc.catalog_type =5
+				GROUP BY internal_catalog_id	,oce.entry_type
+			},
+	sqlvar_entityName => 'OrgInternal ID for LAB',
+	sqlStmtBindParamDescr => ['Org Internal ID'],
+	publishDefn => {
+				#bullets => '/org/#param.org_id#/dlg-update-contract/#6#?home=#homeArl#',
+				columnDefn =>
+				[
+				{colIdx => 0, hAlign=>'left',  head => 'Test Type', url=>qq{/org/#param.org_id#/catalog?catalog=labtest_detail&labtest_detail=#4#&id=#3#}},
+				{colIdx => 1,hAlign=>'left', head => 'Entries',tDataFmt => '&{sum:1} Entries', },
+				{head=>'Action' ,dataFmt=>'Add', url=>'/org/#param.org_id#/dlg-add-lab-test/#3#?lab_type=#2#&home=#homeArl#'},
+				],
+			banner =>
+			{
+				actionRows =>
+				[
+				#{caption => qq{ Add <A HREF='/org/#param.org_id#/dlg-add-contract?home=#homeArl#'>Lab </A> }},	
+				 #{caption => qq{ Add <A HREF='/org/#param.org_id#/dlg-add-contract?home=#homeArl#'>X-Ray </A> }},				
+				 #{caption => qq{ Add <A HREF='/org/#param.org_id#/dlg-add-contract?home=#homeArl#'>Other </A> }},								 
+				],
+				contentColor=>'#EEEEEE',
+			},
+
+
+			},
+	publishDefn_panel =>
+	{
+		# automatically inherites columnDefn and other items from publishDefn
+		style => 'panel.transparent.static',
+		contentColor=>'#EEEEEE',
+		frame => {
+			heading => 'Lab Tests',
+			addUrl => '/org/#param.org_id#/stpe-#my.stmtId#?home=#homeArl#',
+			},
+	},
+	publishComp_stp => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.LabTestSummary', [$orgId,$page->session('org_internal_id')], 'panel'); },
+},
+#-----------------------------------------------------------------------------------------------------------------------
+
+#------------------------------------------------------------------------------------------------------------------------
+'org.LabTestDetail' => {
+	sqlStmt => qq{
+				SELECT  oce.code,
+					oce.name,
+					oce.modifier,
+					oce.entry_id,
+					oce.catalog_id,
+					oce.entry_type,
+					oce.unit_cost,
+					oce.data_num
+				FROM 	offering_catalog oc,org o,
+					offering_catalog_entry oce
+				WHERE 	o.owner_org_id = :2
+				AND	o.org_id = :1
+				AND	o.org_internal_id = oc.org_internal_id
+				AND	oce.entry_type = :3
+				AND	oce.catalog_id=oc.internal_catalog_id
+				AND	parent_entry_id is null
+		},
+	sqlvar_entityName => 'OrgInternal ID for LAB',
+	sqlStmtBindParamDescr => ['Org Internal ID'],
+	publishDefn => {
+				#bullets => '/org/#param.org_id#/dlg-update-contract/#6#?home=#homeArl#',
+				columnDefn =>
+				[
+				{colIdx => 0, tDataFmt => '&{count:0} Tests',hAlign=>'left', head => 'Test ID'},
+				{colIdx => 1, hAlign=>'left', head => 'Test Name'},				
+				{colIdx => 2, hAlign=>'left', head => 'Selection'},					
+				{colIdx => 6, hAlign=>'left', head => 'Physician Cost',dformat=>'currency'},								
+				{colIdx => 7, hAlign=>'left', head => 'Patient Cost',dformat=>'currency'},												
+				{colIdx => 3,hAlign=>'left',head=>'Actions',
+						dataFmt => q{<A HREF="/org/#param.org_id#/dlg-update-lab-test/#3#"
+					TITLE='Modify Lab Test'>
+					<img src="/resources/icons/black_m.gif" BORDER=0></A>
+					<A HREF="/org/#param.org_id#/dlg-remove-lab-test/#3#"
+										TITLE='Delete Lab Test'>
+					<img src="/resources/icons/black_d.gif" BORDER=0></A> },
+				},				
+				],
+			banner =>
+			{
+				actionRows =>
+				[
+				{caption => qq{ Add <A HREF='/org/#param.org_id#/dlg-add-lab-test/#param.id#?home=#homeArl#'>Test</A> }},	
+				],
+				contentColor=>'#EEEEEE',
+			},
+
+
+			},
+	publishDefn_panel =>
+	{
+		# automatically inherites columnDefn and other items from publishDefn
+		style => 'panel.transparent.static',
+		contentColor=>'#EEEEEE',
+		frame => {
+			heading =>"#param.caption# Tests",
+			addUrl => '/org/#param.org_id#/stpe-#my.stmtId#?home=#homeArl#',
+			},
+	},
+	publishComp_stp => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_id');  
+			#get Caption from catalog_entry_type
+			my $caption = $STMTMGR_CATALOG->getSingleValue($page,STMTMGRFLAG_NONE,'selCatalogEntryTypeCapById',$page->param('labtest_detail')||undef);
+			$page->param('caption',$caption);
+			$STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.LabTestDetail', [$orgId,$page->session('org_internal_id'),$page->param('labtest_detail')||undef], 'panel'); },
+},
+#------------------------------------------------------------------------------------------------------------------------
+#------------------------------------------------------------------------------------------------------------------------
+'org.AllLabOrder' => {
+	sqlStmt => qq{
+			Select	org_id,primary_name,org_internal_id
+			FROM	org ,ORG_CATEGORY oc
+			WHERE  	owner_org_id= :1 
+			AND	oc.parent_id = org.org_internal_id
+			AND	oc.member_name='Lab'			
+			order by org_id
+			},
+	sqlvar_entityName => 'OrgInternal ID for LAB',
+	sqlStmtBindParamDescr => ['Org Internal ID'],
+	publishDefn => {
+				#bullets => '/org/#param.org_id#/dlg-update-contract/#6#?home=#homeArl#',
+				columnDefn =>
+				[
+				{colIdx => 0, hAlign=>'left', head => 'Lab ID'},
+				{colIdx => 1, hAlign=>'left', head => 'Lab Name'},				
+				{colIdx => 3,hAlign=>'left',head=>'Actions',
+						dataFmt => q{<A HREF="/org/#param.org_id#/dlg-add-lab-order/#3#"
+					TITLE='Modify Lab Test'>
+					<img src="/resources/icons/black_m.gif" BORDER=0></A>},				
+				}
+				],
+			banner =>
+			{
+				actionRows =>
+				[
+				{caption => qq{ Add <A HREF='/org/#param.org_id#/dlg-add-lab-test?home=#homeArl#'>Test</A> }},	
+				],
+				contentColor=>'#EEEEEE',
+			},
+
+
+			},
+	publishDefn_panel =>
+	{
+		# automatically inherites columnDefn and other items from publishDefn
+		style => 'panel.transparent.static',
+		contentColor=>'#EEEEEE',
+		frame => {
+			heading => 'Lab Tests',
+			addUrl => '/org/#param.org_id#/stpe-#my.stmtId#?home=#homeArl#',
+			},
+	},
+	publishComp_stp => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.AllLabOrder', [$orgId,$page->session('org_internal_id')], 'panel'); },
+},
+#------------------------------------------------------------------------------------------------------------------------
 
 ),
 
