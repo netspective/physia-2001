@@ -36,7 +36,6 @@ sub prepare
 	my $serviceProvider = "$claim->{renderingProvider}->{firstName} $claim->{renderingProvider}->{middleInitial} $claim->{renderingProvider}->{lastName} ($claim->{renderingProvider}->{id})";
 	my $patientHtml = $self->getPatientHtml($claim->{careReceiver});
 	my $orgHtml = $self->getOrgHtml($claim);
-	my $eventId = $self->param('event_id');
 
 	my $previousBalance = $STMTMGR_INVOICE->getRowAsHash($self, STMTMGRFLAG_CACHE,
 		'sel_previousBalance', $invoiceId, $invoiceId);
@@ -167,7 +166,7 @@ sub prepare
 	my $gmtDayOffset = $self->session('GMT_DAYOFFSET');
 	my $futureAppts = $STMTMGR_SCHEDULING->getRowsAsHashList($self, STMTMGRFLAG_CACHE,
 		'sel_futureAppointments', $gmtDayOffset, $claim->{careReceiver}->{id}, 
-		$self->session('org_internal_id'), $eventId);
+		$self->session('org_internal_id'));
 		
 	my $apptHtml = qq{
 		<b><u>Next Appointments</u>:</b><br>

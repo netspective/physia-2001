@@ -346,7 +346,7 @@ sub getComponentHtml
 			$_->{parent_invoice_id} || $_->{invoice_id},
 			$_->{patient_id},
 
-			$_->{invoice_id} ? qq{<a href='javascript:doActionPopup("/patientbill/$_->{invoice_id}/$_->{event_id}")' class=today title="Print Patient Bill $_->{invoice_id}">Print</a>} : undef,
+			$_->{invoice_id} ? qq{<a href='javascript:doActionPopup("/patientbill/$_->{invoice_id}")' class=today title="Print Patient Bill $_->{invoice_id}">Print</a>} : undef,
 
 			$patientBalance,
 		);
