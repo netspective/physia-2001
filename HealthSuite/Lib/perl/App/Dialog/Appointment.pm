@@ -216,6 +216,15 @@ sub new
 			futureOnly => 0,
 			options => FLDFLAG_REQUIRED,
 		),
+		new CGI::Dialog::Field(caption => 'Action',
+			name => 'verify_action',
+			choiceDelim =>',',
+			selOptions => "Talked to Patient,Left Message, Unable to Reach, Incorrect Phone Number",
+			type => 'select',
+			style => 'radio',
+			options => FLDFLAG_REQUIRED,
+		),
+		
 	);
 	$self->{activityLog} =
 	{
@@ -291,6 +300,7 @@ sub makeStateChanges
 	
 	$self->updateFieldFlags('app_verified_by', FLDFLAG_INVISIBLE, $command !~ m/^(confirm)$/);
 	$self->updateFieldFlags('app_verify_date', FLDFLAG_INVISIBLE, $command !~ m/^(confirm)$/);
+	$self->updateFieldFlags('verify_action', FLDFLAG_INVISIBLE, $command !~ m/^(confirm)$/);
 	
 	my $fmap = $self->{fieldMap};
 	my $field = $self->{content}->[$fmap->{appt_date_time}]->{fields}->[2];
@@ -651,9 +661,12 @@ sub execute
 			person_id => $page->field('attendee_id'),
 			app_verified_by => $page->field('app_verified_by'),
 			app_verify_date => $page->field('app_verify_date'),
+			verify_action => $page->field('verify_action'),
 			owner_org_id => $page->session('org_internal_id'),
 		);
 
+		$page->param('_dialogreturnurl', '/worklist/patientflow') 
+			unless $page->param('_dialogreturnurl');
 		$self->handlePostExecute($page, $command, $flags);
 	}
 

@@ -118,6 +118,7 @@
 		<column name="med_verify_date" type="date" descr="Date of Medical verification"/>
 		<column name="per_verified_by" lookupref="Person.person_id" descr="The ID of the person doing the Personal verification"/>
 		<column name="per_verify_date" type="date" descr="Date of Personal verification"/>
+		<column name="verify_action" type="text" size="64" descr="Action taken to verify appointment"/>
 		<column name="owner_org_id" lookupref="Org.org_internal_id" required="yes" indexed="yes" descr="The organization which owns this record"/>
 	</table>
 	

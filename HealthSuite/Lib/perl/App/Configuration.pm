@@ -172,6 +172,7 @@ sub getDefaultConfig
 	'db-pro_test' => getDefaultConfig('Production Test Configuration', CONFIGGROUP_TEST, 'pro_test/pro@dbi:Oracle:SDEDBS03'),
 	'db-pro_new' => getDefaultConfig('New Production Configuration', CONFIGGROUP_PRO, 'pro_new/pro@dbi:Oracle:SDEDBS03'),
 	'db-sde01' => getDefaultConfig('New SWDev Configuration', CONFIGGROUP_SWDEV, 'sde01/sde@dbi:Oracle:SDEDBS04'),
+	'db-pro_thai' => getDefaultConfig('Production Test Configuration', CONFIGGROUP_TEST, 'pro_thai/pro@dbi:Oracle:SDEDBS03'),
 	'db-sde02' => getDefaultConfig('New SWDev Configuration', CONFIGGROUP_SWDEV, 'sde02/sde@dbi:Oracle:SDEDBS04'),
 
 	# New SUN Databases
