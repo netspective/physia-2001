@@ -29,6 +29,7 @@ use constant NEXTACTION_ADDPROC => "/invoice/%param.invoice_id%/dialog/procedure
 use constant NEXTACTION_CLAIMSUMM => "/invoice/%param.invoice_id%/summary";
 use constant NEXTACTION_PATIENTACCT => "/person/%field.attendee_id%/account";
 use constant NEXTACTION_CREATECLAIM => "/org/#session.org_id#/dlg-add-claim";
+use constant NEXTACTION_WORKLIST => "/worklist";
 
 %PROCENTRYABBREV = abbrev qw(place type lab modifier cpt units emergency reference comments);
 
@@ -64,10 +65,11 @@ sub initialize
 
 	$self->addFooter(new CGI::Dialog::Buttons(
 						nextActions_add => [
-							['Add a Procedure', NEXTACTION_ADDPROC, 1],
-							['Go to Claim Summary', NEXTACTION_CLAIMSUMM],
+							#['Add a Procedure', NEXTACTION_ADDPROC],
+							['Go to Claim Summary', NEXTACTION_CLAIMSUMM, 1],
 							['Go to Patient Account', NEXTACTION_PATIENTACCT],
 							['Add Another Claim', NEXTACTION_CREATECLAIM],
+							['Return to Work List', NEXTACTION_WORKLIST],
 							],
 						cancelUrl => $self->{cancelUrl} || undef));
 
@@ -85,6 +87,7 @@ sub makeStateChanges
 	$self->updateFieldFlags('subject', FLDFLAG_INVISIBLE, 1);
 	$self->updateFieldFlags('remarks', FLDFLAG_INVISIBLE, 1);
 	$self->updateFieldFlags('subject', FLDFLAG_INVISIBLE, 1);
+	$self->updateFieldFlags('confirmed_info', FLDFLAG_INVISIBLE, 1);
 	#$self->updateFieldFlags('payment_heading', FLDFLAG_INVISIBLE, 1);
 	#$self->updateFieldFlags('method', FLDFLAG_INVISIBLE, 1);
 	#$self->updateFieldFlags('check_number', FLDFLAG_INVISIBLE, 1);
