@@ -14,11 +14,14 @@ use CGI::Validator::Field;
 use App::Dialog::Field::Invoice;
 use App::Universal;
 use Date::Manip;
-use Devel::ChangeLog;
 
-use vars qw(@ISA @CHANGELOG);
+use vars qw(@ISA %RESOURCE_MAP);
 
 @ISA = qw(CGI::Dialog);
+
+%RESOURCE_MAP = (
+	'postpayment' => {},
+);
 
 sub new
 {
@@ -284,8 +287,6 @@ sub execute
 					_debug => 0
 				);
 
-
-
 			#Update the invoice
 
 			my $invoice = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selInvoice', $invoiceId);
@@ -300,9 +301,6 @@ sub execute
 					balance => defined $invoiceBalance ? $invoiceBalance : undef,
 					_debug => 0
 				);
-
-
-
 
 
 			#Create history attribute for this adjustment
