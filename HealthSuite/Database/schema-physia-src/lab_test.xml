@@ -53,9 +53,17 @@
 	<table name="Lab_Order_Entry" abbrev="LabOrdEnt" type="Audit,Secure">
 		<description>Contains Lab order Entry request for a patient</description>
 		<column name="entry_id" type="autoinc" primarykey="yes" descr="Unique Lab Order ID"/>
+		<column name="parent_entry_id" selfref="Lab_Order_Entry.entry_id" indexed="yes" descr="If this item is a child of another item (like a group)"/>		
 		<column name="parent_id" parentref="person_lab_order.lab_order_id" descr="Unique Lab Order ID"/>				
 		<column name="test_entry_id" lookupref="offering_catalog_entry.entry_id" descr="Unique Lab Order ID"/>						
 		<column name="options" abbrev="o" type="text_set" descr="List of options for this test"/>								
+		<column name="caption" type="text" size="64" descr="The caption of the item"/>				
+		<column name="lab_code" type="text" size="64" descr="The code of the item"/>								
+		<column name="charge_code" type="text" size="64" descr="The code of the item"/>										
+		<column name="physician_cost" type="currency" descr="The cost to physician for lab order"/>												
+		<column name="patient_cost" type="currency" descr="The cost to patient for lab order"/>														
+		<column name="modifier" type="text" size="64" descr="Information about order"/>														
+		<column name="panel_test_name" type="text" size="512" descr="Comma seperated list of panel test names"/>
 	</table>		
 </schema>
 
