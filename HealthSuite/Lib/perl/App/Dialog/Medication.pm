@@ -3,7 +3,7 @@ package App::Dialog::Medication;
 ##############################################################################
 
 use strict;
-use SDE::CVS ('$Id: Medication.pm,v 1.12 2000-12-28 19:25:20 radha_kotagiri Exp $', '$Name:  $');
+use SDE::CVS ('$Id: Medication.pm,v 1.13 2000-12-28 23:31:41 thai_nguyen Exp $', '$Name:  $');
 use CGI::Validator::Field;
 use CGI::Dialog;
 use base qw(CGI::Dialog);
@@ -15,6 +15,7 @@ use App::Statements::Document;
 use App::Dialog::Message::Prescription;
 use App::Dialog::Field::Scheduling;
 use Date::Calc qw(:all);
+use App::Page;
 
 use vars qw(%RESOURCE_MAP);
 %RESOURCE_MAP = (
@@ -151,46 +152,39 @@ sub new
 				),
 			],
 		),
-		new CGI::Dialog::Field(
+		new CGI::Dialog::Field(caption => 'Priority',
 			name => 'priority',
-			caption => 'Priority',
 			type => 'select',
 			selOptions => 'Normal;Emergency;ASAP',
 			style => 'radio',
 			defaultValue => 'Normal',
 			options => FLDFLAG_INVISIBLE,
 		),
-		new CGI::Dialog::Field(
+		new CGI::Dialog::Field(caption => 'Notes',
 			name => 'notes',
-			caption => 'Notes',
 			type => 'memo',
 			rows => 5,
 			cols => 50,
 			hint => 'Notes will not be printed on the prescription',
 		),
-		new App::Dialog::Field::Person::ID(
+		new App::Dialog::Field::Person::ID(caption => 'Prescription Approved By',
 			name => 'approved_by',
-			caption => 'Prescription Approved By',
 		),
-		new App::Dialog::Field::Person::ID(
+		new App::Dialog::Field::Person::ID(caption => 'Physician for Approval',
 			name => 'get_approval_from',
-			caption => 'Physician for Approval',
 		),
-		new CGI::Dialog::Field(
+		new CGI::Dialog::Field(caption => 'Prescription Output',
 			name => 'destination',
-			caption => 'Prescription Output',
 			type => 'select',
 			selOptions => 'Fax to Pharmacy:fax;Print to Printer:printer',
 			options => FLDFLAG_PREPENDBLANK,
 			onChangeJS => 'onChangeDestination();',
 		),
-		new App::Dialog::Field::Organization::ID(
+		new App::Dialog::Field::Organization::ID(caption => 'Pharmacy',
 			name => 'pharmacy_id',
-			caption => 'Pharmacy',
 		),
-		new CGI::Dialog::Field(
+		new CGI::Dialog::Field(caption => 'Printer',
 			name => 'printer',
-			caption => 'Printer',
 		),
 		new CGI::Dialog::Field(
 			name => 'status',
@@ -245,7 +239,6 @@ sub new
 	return $self;
 }
 
-
 sub getSupplementaryHtml
 {
 	my ($self, $page, $command) = @_;
@@ -267,6 +260,8 @@ sub makeStateChanges
 	my $isNurse = grep {$_ eq 'Nurse'} @{$page->session('categories')};
 	my $isPhysician = grep {$_ eq 'Physician'} @{$page->session('categories')};
 
+	$command = 'prescribe' if $page->flagIsSet(PAGEFLAG_ISHANDHELD);
+	
 	if ($command eq 'add')
 	{
 		$self->setFieldFlags('approved_by', FLDFLAG_INVISIBLE);
@@ -424,7 +419,6 @@ sub populateData
 
 }
 
-
 sub execute_add
 {
 	my $self = shift;
@@ -462,10 +456,7 @@ sub execute_add
 	}
 
 	$self->handlePostExecute($page, $command, $flags);
-	#$self->handlePostExecute($page, $command, $flags | CGI::Dialog::DLGFLAG_IGNOREREDIRECT);
-	#return "\u$command completed.";
 }
-
 
 sub execute_prescribe
 {
@@ -473,13 +464,11 @@ sub execute_prescribe
 	return $self->execute_add(@_);
 }
 
-
 sub execute_refill
 {
 	my $self = shift;
 	return $self->execute_add(@_);
 }
-
 
 sub execute_update
 {
@@ -513,7 +502,6 @@ sub execute_update
 	$self->handlePostExecute($page, $command, $flags | CGI::Dialog::DLGFLAG_IGNOREREDIRECT);
 	return "\u$command completed.";
 }
-
 
 sub execute_approve
 {
@@ -572,6 +560,5 @@ sub sendApprovalRequest
 		permedId => $page->param('permed_id'),
 	);
 }
-
 
 1;

@@ -20,7 +20,7 @@ $STMTFMT_SEL_PERSON = qq{
 			per.name_last,
 			per.name_first,
 			per.ssn,
-			TO_CHAR(per.date_of_birth, '$SQLSTMT_DEFAULTDATEFORMAT'),
+			TO_CHAR(per.date_of_birth, '$SQLSTMT_DEFAULTDATEFORMAT') as dob,
 			hphone.value_text AS home_phone,
 			account.value_text as account,
 			chart.value_text as chart,

@@ -22,19 +22,31 @@ sub new
 
 sub getHtml
 {
-	my $self = shift;
-	my $page = shift;
+	my ($self, $page) = @_;
+	my $html;
 	
-	my $html = '';
-	if(my $sth = $STMTMGR_HANDHELD->execute($page, 0, 'sel_inPatients', 
-					$page->session('user_id'),
-					$page->session('org_internal_id')))
+	my $inPatients = $STMTMGR_HANDHELD->getRowsAsHashList($page, 0, 'sel_inPatients',
+		$page->session('user_id'), $page->session('org_internal_id') );
+		
+	if (@{$inPatients})
 	{
-		while(my $row = $sth->fetch())
+		for (@{$inPatients})
 		{
-			$html .= qq{<b>$row->[0]</b><br><a href="Manage_Patient?pid=$row->[4]">$row->[2]</a> ($row->[3])<br>$row->[5]<br>Room: @{[$row->[1] || 'N/A']}<p>};
+			$html .= qq{<br>
+				<b>$_->{hospital_name}</b><br>
+				Room: $_->{room}<br>
+				$_->{patient_name} <a href='Manage_Patient?pid=$_->{patient_id}'>$_->{patient_id}</a><br>
+				Admitted: $_->{begin_date}<br>
+				ICDs: $_->{diags}<br>
+				CPTs: $_->{procs}<br>
+			};
 		}
 	}
+	else
+	{
+		$html = 'No Hospital patients found.<br>';
+	}
+	
 	return $html;
 }
 

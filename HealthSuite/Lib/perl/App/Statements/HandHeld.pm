@@ -42,11 +42,18 @@ my $BASE_APPT_SQL = qq{
 					and parent_org_id = :4
 			)
 		)
-		and astat.id = e.event_status
+		AND astat.id = e.event_status
+	ORDER BY e.start_time
 };
 
 # -------------------------------------------------------------------------------------------
 $STMTMGR_HANDHELD = new App::Statements::HandHeld(
+
+	'sel_allAppts' => {
+		sqlStmt => $BASE_APPT_SQL,
+		apptStatusClause => undef,
+		sqlStmtBindParamDescr => ["\$page->session('GMT_DAYOFFSET')", 'Date', 'Provider person_id', "\$page->session('org_internal_id')"],
+	},
 
 	'sel_scheduledAppts' => {
 		sqlStmt => $BASE_APPT_SQL,
@@ -65,13 +72,14 @@ $STMTMGR_HANDHELD = new App::Statements::HandHeld(
 	},
 
 	'sel_inPatients' => qq{
-		select related_data as hospital_name,
+		select o.name_primary as hospital_name,
 			caption as room,
 			initcap(simple_name) as patient_name,
 			provider_id,
 			trans_owner_id as patient_id,
-			trans_status_reason as complaint
-		from Person, Transaction
+			to_char(trans_begin_stamp, '$SQLSTMT_DEFAULTDATEFORMAT') as begin_date,
+			detail as diags, data_text_c as procs
+		from Org o, Person, Transaction
 		where trans_type between 11000 and 11999
 			and trans_status = @{[ App::Universal::TRANSSTATUS_ACTIVE ]}
 			and trans_begin_stamp >= sysdate - data_num_a
@@ -84,6 +92,7 @@ $STMTMGR_HANDHELD = new App::Statements::HandHeld(
 				)
 			)
 			and person.person_id = transaction.trans_owner_id
+			and o.org_internal_id = transaction.service_facility_id
 	},
 
 	'sel_patientDemographics' => qq{
@@ -92,7 +101,7 @@ $STMTMGR_HANDHELD = new App::Statements::HandHeld(
 			home.value_text as home_phone,
 			work.value_text as work_phone,
 			to_char(date_of_birth, 'mm/dd/yyyy') as dob,
-			decode(gender, 1, 'M', 2, 'F', 'U') as gender,
+			decode(gender, 1, 'Male', 2, 'Female', 'Gender Unknown') as gender,
 			trunc((sysdate - date_of_birth)/365) as age
 		from person_attribute home, person_attribute work, person_address, person
 		where person_id = upper(:1)
@@ -105,51 +114,34 @@ $STMTMGR_HANDHELD = new App::Statements::HandHeld(
 
 	'sel_patientInsurance' => qq{
 		SELECT
-			ins_internal_id,
-			parent_ins_id,
 			product_name,
 			plan_name,
-			DECODE(bill_sequence,1,'Primary',2,'Secondary',3,'Tertiary',4,'Quaternary',5,'W. Comp', 98, 'Terminated', 99, 'InActive', 'Active'),
-			owner_person_id,
-			ins_org_id,
-			indiv_deductible_amt,
-			family_deductible_amt,
-			percentage_pay,
-			copay_amt,
+			DECODE(bill_sequence,1,'Primary', 2,'Secondary', 3,'Tertiary', 4,'Quaternary', 5,'W. Comp', '') as bill_sequence,
 			guarantor_name,
-			decode(ins_type, 7, 'thirdparty', 'coverage') AS ins_type,
-			guarantor_id,
-			guarantor_type,
-			(
-				SELECT 	b.org_id
-				FROM org b
-				WHERE b.org_internal_id = i.ins_org_id
-			) AS org_id,
-			(
-				SELECT 	g.org_id
-				FROM org g
-				WHERE guarantor_type = 1
-				AND  g.org_internal_id = i.guarantor_id
-			),
-			i.coverage_begin_date,
-			i.coverage_end_date
-		FROM insurance i
+			ct.caption,
+			o.org_id
+		FROM claim_type ct, org o, insurance i
 		WHERE record_type = @{[ App::Universal::RECORDTYPE_PERSONALCOVERAGE ]}
-		AND owner_person_id = upper(:1)
+			AND owner_person_id = upper(:1)
+			AND o.org_internal_id (+)= i.ins_org_id
+			AND ct.id = i.ins_type
+		GROUP BY
+			product_name,
+			plan_name,
+			bill_sequence,
+			guarantor_name,
+			ct.caption,
+			o.org_id,
+			guarantor_name
 		ORDER BY bill_sequence
 	},
 
 	'sel_patientActiveMeds' => qq{
 		SELECT
-			permed_id,
-			med_name,
-			dose,
-			dose_units,
+			permed_id, med_name, dose, dose_units, frequency, route,
 			TO_CHAR(start_date, '$SQLSTMT_DEFAULTDATEFORMAT') as start_date,
 			TO_CHAR(end_date, '$SQLSTMT_DEFAULTDATEFORMAT') as end_date,
-			frequency,
-			num_refills,
-			approved_by
+			frequency, num_refills, approved_by
 		FROM
 			Person_Medication
 		WHERE
@@ -163,7 +155,7 @@ $STMTMGR_HANDHELD = new App::Statements::HandHeld(
 	'sel_patientActiveProblems' => qq{
 		select to_char(t.curr_onset_date, '$SQLSTMT_DEFAULTDATEFORMAT') as curr_onset_date,
 			to_char(t.trans_begin_stamp, '$SQLSTMT_DEFAULTDATEFORMAT') as trans_date,
-			ref.name, t.provider_id, '(ICD ' || t.code || ')' as code
+			initcap(ref.name) as name, t.provider_id, 'ICD ' || t.code as code
 		from ref_icd ref, transaction t
 		where t.trans_owner_id = upper(:1)
 			and t.trans_owner_type = 0

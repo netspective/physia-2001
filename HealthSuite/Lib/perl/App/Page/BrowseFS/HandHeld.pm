@@ -31,8 +31,8 @@ sub initialize
 		rootURLCaption => 'Mobile',
 		rootHeading => 'Mobile',
 		);
-	
-	if(my $patientId = $self->param('pid'))
+
+	if (my $patientId = $self->param('pid'))
 	{
 		if($patientId ne $self->session('active_person_id'))
 		{
@@ -40,6 +40,8 @@ sub initialize
 			$self->session('active_person_name', $STMTMGR_HANDHELD->getSingleValue($self, STMTMGRFLAG_DYNAMICSQL, 'select short_sortable_name from person where person_id = ?', $patientId));
 		}
 	}
+	
+	$self->param('person_id', $self->session('active_person_id'));
 }
 
 sub prepare_page_content_header
@@ -49,8 +51,9 @@ sub prepare_page_content_header
 	my $browseInfo = $self->property('browseInfo');
 	my $heading = $browseInfo->{rootHeading} || 'No rootHeading provided';
 	my $insideItem = 0;
+	my $instance = undef;
 	
-	if(my $instance = $self->property('activeInstance'))
+	if($instance = $self->property('activeInstance'))
 	{
 		$heading = $instance->heading();
 		$insideItem = 1;
@@ -63,6 +66,7 @@ sub prepare_page_content_header
 
 	my $locLinks = $self->{page_locator_links};
 	my $contentHeader = $self->{page_content_header};
+	my $inHome = 0;
 	if($insideItem || scalar(@$locLinks) > 2)
 	{
 		my $location = '<a href="/mobile" border=0><img src="/resources/images/icons/home-sm.gif"></a>';
@@ -70,17 +74,24 @@ sub prepare_page_content_header
 		for(my $loc = 2; $loc <= $lastLoc; $loc++)
 		{
 			$location .= ' <img src="/resources/images/icons/arrow-right-orange.gif"> ';
-			$location .= "<a href='@{[$locLinks->[$loc]->[App::Page::MENUITEM_HREF]]}' border=0>@{[$locLinks->[$loc]->[App::Page::MENUITEM_CAPTION]]}</a>";
+			$location .= "<a href='@{[$locLinks->[$loc]->[App::Page::MENUITEM_HREF]]}' border=0>
+				@{[$locLinks->[$loc]->[App::Page::MENUITEM_CAPTION]]}</a>";
 		}
 		unshift(@$contentHeader, $location);
 	}
 	else
 	{
 		unshift(@$contentHeader, '<img src="/resources/images/design/mobile-home-graphic.gif">');
+		$inHome = 1;
 	}
 	push(@$contentHeader, "<br>User: @{[ $self->session('user_id') ]}\@@{[ $self->session('org_id') ]}");
 	push(@$contentHeader, "<br>Date: @{[ $self->session('active_date') ]}");
-	push(@$contentHeader, "<br>Patient: @{[ $self->session('active_person_name') || 'none' ]}");
+	
+	push(@$contentHeader, "<br>Patient: @{[ $self->session('active_person_name') ]}" .
+		" (@{[ $self->session('active_person_id') ]})")
+		#if $instance && $instance->can('showActivePatient') && $instance->showActivePatient();
+		if ($self->session('active_person_id'));
+
 	push(@$contentHeader, '<hr size=1>');
 
 	unshift(@{$self->{page_head}}, "<title>$heading</title>");

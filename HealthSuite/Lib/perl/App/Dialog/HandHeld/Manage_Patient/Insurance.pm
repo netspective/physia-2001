@@ -1,5 +1,5 @@
 ##############################################################################
-package App::Dialog::HandHeld::Appointments::All;
+package App::Dialog::HandHeld::Insurance;
 ##############################################################################
 
 use strict;
@@ -18,8 +18,8 @@ use vars qw(@ISA $INSTANCE);
 sub new
 {
 	my $class = shift;
-	my $self = App::Dialog::HandHeld::new($class, id => 'all', heading => 'All', @_);
-	$self->{sqlStmtId} = 'sel_allAppts';
+	my $self = App::Dialog::HandHeld::new($class, id => 'demographics', heading => 'Insurance', @_);
+	$self->{sqlStmtId} = 'sel_patientInsurance';
 	
 	return $self;
 }
@@ -31,10 +31,7 @@ sub getHtml
 	
 	my $html = '';
 	if(my $sth = $STMTMGR_HANDHELD->execute($page, 0, $self->{sqlStmtId}, 
-			$page->session('GMT_DAYOFFSET'), 
-			$page->session('active_date'),
-			$page->session('user_id'),
-			$page->session('org_internal_id')))
+		$page->session('active_person_id')))
 	{
 		if (my $row = $sth->fetch())
 		{
@@ -47,7 +44,7 @@ sub getHtml
 		}
 		else
 		{
-			$html = "No Appointment Found.";
+			$html = "No Data Found.";
 		}
 	}
 	return $html;
@@ -57,8 +54,9 @@ sub getRowHtml
 {
 	my ($row) = @_;	
 	
-	return qq{$row->[0] $row->[2] (<a href="../Manage_Patient?pid=$row->[1]">$row->[1]</a>)
-		<br>&nbsp;&nbsp;&nbsp;$row->[3] ($row->[4])<br>
+	return qq{
+		@{[ $row->[2] ? $row->[2] . ': ' . $row->[5] : $row->[4] . ' ' . $row->[3] ]}<br>
+		@{[ $row->[2] ? $row->[4] : '' ]}<br>
 	};
 }
 
