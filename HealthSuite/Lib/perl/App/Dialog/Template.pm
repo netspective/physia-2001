@@ -171,9 +171,6 @@ sub new
 			data => "template 'Template ID <a href='/search/template'>#field.template_id#</a>'"
 		};
 
-	$self->addFooter(new CGI::Dialog::Buttons);
-	#$self->addFooter(new CGI::Dialog::Buttons);
-
 	$self->addFooter(new CGI::Dialog::Buttons(
 		nextActions_update => [
 			['', '', 1],
