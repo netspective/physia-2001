@@ -57,7 +57,7 @@ sub new
 			new CGI::Dialog::Field(type => 'bool', name => 'create_record', caption => 'Inactivate Coverage?',style => 'check'),
 			#new CGI::Dialog::Field(caption => 'Fee Schedules', name => 'fee_schedules'),
 			new CGI::Dialog::Subhead(heading => 'General Plan Information', name => 'gen_plan_heading'),
-			new CGI::Dialog::MultiField(caption =>'Group Name/Group Number', name => 'group',
+			new CGI::Dialog::MultiField(caption =>"Insured's Employer Name/Group Number", name => 'group',
 				fields => [
 						new CGI::Dialog::Field::TableColumn(
 							schema => $schema,
@@ -91,7 +91,7 @@ sub new
 			#				options => FLDFLAG_REQUIRED)
 			#		]),
 
-						new App::Dialog::Field::Person::ID(caption => 'Insured ID',
+						new App::Dialog::Field::Person::ID(caption => 'Insured Person ID',
 							types => ['Patient'],
 							name => 'insured_id', options => FLDFLAG_REQUIRED
 							),
