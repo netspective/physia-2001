@@ -31,7 +31,8 @@ use vars qw(@ISA %RESOURCE_MAP);
 			'attr-' .App::Universal::ATTRTYPE_RETIRED(),
 			'attr-' .App::Universal::ATTRTYPE_STUDENTFULL(),
 			'attr-' .App::Universal::ATTRTYPE_STUDENTPART(),
-			'attr-' .App::Universal::ATTRTYPE_EMPLOYUNKNOWN()
+			'attr-' .App::Universal::ATTRTYPE_EMPLOYUNKNOWN(),
+			'attr-' .App::Universal::ATTRTYPE_UNEMPLOYED(),
 			],
 		},
 );
