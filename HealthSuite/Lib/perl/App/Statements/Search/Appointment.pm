@@ -108,6 +108,7 @@ my $STMTFMT_SEL_APPOINTMENT = qq{
 		and stat.id between ? and ?
 		and aat.id = ep1.value_int
 		and et.id = event.event_type
+		and event.owner_id = ?
 	%orderBy%
 };
 
@@ -126,6 +127,7 @@ my $STMTFMT_SEL_APPOINTMENT_CONFLICT = qq{
 		and stat.id = event.event_status
 		and aat.id = ep1.value_int
 		and et.id = event.event_type
+		and event.owner_id = ?
 	%orderBy%
 };
 
