@@ -27,6 +27,7 @@ sub new
 		new CGI::Dialog::Field(
 				caption => 'Modifier',
 				name => "procmodifier$nameSuffix",
+				findPopup => '/lookup/modifier', 
 				type => 'text', size => 4),
 		#new CGI::Dialog::Field(
 		#		caption => 'Diagnoses',
