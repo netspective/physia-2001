@@ -1,5 +1,7 @@
 use strict;
 use App::Data::Collection;
+use App::Data::Transform::DBI;
+
 use App::Data::Obtain::Ntis::CPTinfo;
 use App::Data::Obtain::InfoX::ICDinfo;
 use App::Data::Obtain::HCFA::HCPCS;
@@ -7,15 +9,18 @@ use App::Data::Obtain::Envoy::Payers;
 use App::Data::Obtain::Perse::Epayer;
 use App::Data::Obtain::RBRVS::RVU;
 use App::Data::Obtain::RBRVS::GPCI;
-use App::Data::Transform::DBI;
+use App::Data::Obtain::TXgulf::FeeSchedules;
+
 use File::Path;
 use FindBin qw($Bin);
 use Benchmark;
 use File::Spec;
 use Getopt::Long;
 use File::Basename;
+use Date::Manip;
 
-my @allModules = ('icd', 'cpt', 'hcpcs', 'envoy', 'epayer', 'rvu');
+$ENV{TZ} = 'EST' unless exists $ENV{TZ};
+my @allModules = ('icd', 'cpt', 'hcpcs', 'envoy', 'epayer', 'rvu' . UnixDate('today', '%y'));
 
 sub printUsage
 {
@@ -39,20 +44,25 @@ sub Main
 
 	my $dataSrcPath = 'R:';
 	#my $dataSrcPath = 'H:/HealthSuite-RefData';
+
+	my @rvuFile = grep(/rvu/, @modules);
+	
 	my $properties =
 	{
 		startTime => new Benchmark,
 		#connectStr => 'demo01/demo@dbi:Oracle:SDEDBS02',
+		#dataSrcPath => 'Q:',
+
 		connectStr => $connectString,
 		scriptPath => $Bin,
-		dataSrcPath => 'Q:',
 		dataSrcInfoXPath => File::Spec->catfile($dataSrcPath, 'info-x'),
 		dataSrcHCFAPath => File::Spec->catfile($dataSrcPath, 'hcfa'),
 		dataSrcEnvoyPath => File::Spec->catfile($dataSrcPath, 'envoy'),
 		dataSrcNtisPath => File::Spec->catfile($dataSrcPath, 'ntis'),
 		dataSrcPersePath => File::Spec->catfile($dataSrcPath, 'perse'),
 		dataSrcRBRVSPath => File::Spec->catfile($dataSrcPath, 'rbrvs'),
-		rvuFile => grep ('rvu' , @modules),
+		rvuFile => \@rvuFile,
+		dataSrcRTXgulfPath => File::Spec->catfile($dataSrcPath, 'TXgulf'),
 	};
 
 	importICDInfo($properties, transformDBI => 1) if grep(/icd/, @modules);
@@ -62,6 +72,8 @@ sub Main
 	importEPayers($properties, transformDBI => 1) if grep(/epayer/, @modules);
 	importGPCIInfo($properties, transformDBI => 1) if grep(/rvu/, @modules);
 	importRVUInfo($properties, transformDBI => 1) if grep(/rvu/, @modules);
+	
+	importTXGULFfs($properties, transformDBI => 1) if grep(/tgcmgfs/, @modules);
 }
 
 sub importRVUInfo
@@ -70,12 +82,12 @@ sub importRVUInfo
 
 	my $importer = new App::Data::Obtain::RBRVS::RVU;
 	my $dataCollection = $params{collection} || new App::Data::Collection;
-	my $year=$properties->{rvuFile};
-	$year =~s/\D+//;
+	my $year = $properties->{rvuFile}->[0];
+	$year =~ s/\D+//;
 	die "For rvu a two digit year must be supplied  [ example : rvu00 for rvu for 2000 ]" if ! $year;
 	my $begin_yr = "01-JAN-$year";
 	my $end_yr = "31-DEC-$year";
-	print "REF_PFS_RVU BEGIN YEAR => $begin_yr END YEAR =>$end_yr \n";
+	print "\nREF_PFS_RVU BEGIN YEAR => $begin_yr END YEAR =>$end_yr \n";
 	$importer->obtain(App::Data::Manipulate::DATAMANIPFLAG_VERBOSE, $dataCollection,
 						srcFile => File::Spec->catfile($properties->{dataSrcRBRVSPath}, 'pprrvu'.$year.'.xls'));
 	if($importer->haveErrors())
@@ -92,7 +104,7 @@ sub importRVUInfo
 
 		$exporter->transform(App::Data::Manipulate::DATAMANIPFLAG_SHOWPROGRESS, $dataCollection,
 			connect => $properties->{connectStr},
-			doBefore => "delete from REF_PFS_RVU WHERE EFF_BEGIN_DATE = '$begin_yr' ",
+			doBefore => "delete from REF_PFS_RVU WHERE EFF_BEGIN_DATE = to_date('$begin_yr', 'dd-MON-yy') ",
 			insertStmt => "insert into REF_PFS_RVU ( EFF_BEGIN_DATE, EFF_END_DATE,CODE,MODIFIER ,
 			  DESCRIPTION, STATUS_CODE , MEDICARE_IND , WORK_RVU , NON_FAC_PE_RVU ,
 			  NA_IND, TRANS_NON_FAC_PE_RVU , FAC_PE_RVU,TRANS_FAC_PE_RVU,MAL_PRACTICE_RVU ,
@@ -104,12 +116,11 @@ sub importRVUInfo
 				?,?,?,?,?,?,?,?,?,?,
 				?,?,?,?,?,?,?,?,?,?,
 				?,?)",
-			#verifyCountStmt => "select count(*) from REF_PFS_RU",
+			verifyCountStmt => "select count(*) from REF_PFS_RVU",
 		);
 		$exporter->printErrors();
 	}
 }
-
 
 sub importGPCIInfo
 {
@@ -117,11 +128,11 @@ sub importGPCIInfo
 
 	my $importer = new App::Data::Obtain::RBRVS::GPCI;
 	my $dataCollection = $params{collection} || new App::Data::Collection;
-	my $year=$properties->{rvuFile};
-	$year =~s/\D+//;
+	my $year = $properties->{rvuFile}->[0];
+	$year =~ s/\D+//;
 	my $begin_yr = "01-JAN-$year";
 	my $end_yr = "31-DEC-$year";
-	print "GPCI BEGIN YEAR => $begin_yr END YEAR =>$end_yr \n";
+	print "\nGPCI BEGIN YEAR => $begin_yr END YEAR =>$end_yr \n";
 	die "For rvu a two digit year must be supplied  [ example : rvu00 for rvu for 2000 ]" if ! $year;
 	$importer->obtain(App::Data::Manipulate::DATAMANIPFLAG_VERBOSE, $dataCollection,
 						srcFileGPCI=> File::Spec->catfile($properties->{dataSrcRBRVSPath}, $year.'gpcis.xls'),
@@ -156,15 +167,14 @@ sub importGPCIInfo
 	}
 }
 
-
-
 sub importCPTInfo
 {
 	my ($properties, %params) = @_;
 
 	my $importer = new App::Data::Obtain::Ntis::CPTinfo;
 	my $dataCollection = $params{collection} || new App::Data::Collection;
-
+	print "\n";
+	
 	$importer->obtain(App::Data::Manipulate::DATAMANIPFLAG_VERBOSE, $dataCollection,
 		cptShortFile => File::Spec->catfile($properties->{dataSrcInfoXPath}, 'cpt_short.txt'),
 		cptLongFile => File::Spec->catfile($properties->{dataSrcInfoXPath}, 'cpt_long.txt'),
@@ -206,6 +216,7 @@ sub importICDInfo
 
 	my $importer = new App::Data::Obtain::InfoX::ICDinfo;
 	my $dataCollection = $params{collection} || new App::Data::Collection;
+	print "\n";
 
 	$importer->obtain(App::Data::Manipulate::DATAMANIPFLAG_VERBOSE, $dataCollection,
 		icdEditFile => File::Spec->catfile($properties->{dataSrcInfoXPath}, 'Icd1Edit.txt'),
@@ -248,6 +259,7 @@ sub importHCPCSInfo
 
 	my $importer = new App::Data::Obtain::HCFA::HCPCS;
 	my $dataCollection = $params{collection} || new App::Data::Collection;
+	print "\n";
 
 	$importer->obtain(App::Data::Manipulate::DATAMANIPFLAG_VERBOSE, $dataCollection,
 						srcFile => File::Spec->catfile($properties->{dataSrcHCFAPath}, '99ANWEB.XLS'));
@@ -279,6 +291,7 @@ sub importEnvoyPayers
 {
 	my ($properties, %params) = @_;
 	my $dataCollection = new App::Data::Collection;
+	print "\n";
 
 	my $payersPath = File::Spec->catfile($properties->{dataSrcEnvoyPath}, 'payers-08-13-99-msword');
 	my $importer = new App::Data::Obtain::Envoy::Payers;
@@ -324,6 +337,7 @@ sub importEPayers
 
 	my $importer = new App::Data::Obtain::Perse::Epayer;
 	my $dataCollection = $params{collection} || new App::Data::Collection;
+	print "\n";
 
 	$importer->obtain(App::Data::Manipulate::DATAMANIPFLAG_VERBOSE, $dataCollection,
 		ePayersFile => File::Spec->catfile($properties->{dataSrcPersePath}, 'perse_payers.csv'),
@@ -347,6 +361,94 @@ sub importEPayers
 				(id, id2, name, psource, ptype)
 			values (?, ?, ?, ?, ?)",
 			verifyCountStmt => "select count(*) from REF_Epayer where psource =2",
+		);
+		$exporter->printErrors();
+	}
+}
+
+sub importTXGULFfs
+{
+	my ($properties, %params) = @_;
+
+	my $importer = new App::Data::Obtain::TXgulf::FeeSchedules;
+	my $dataCollection = $params{collection} || new App::Data::Collection;
+
+	die "\nPlease set Environment Variable ORG_ID for this import." unless exists $ENV{ORG_ID};
+	die "\nPlease set Environment Variable CATALOG_ID_OFFSET for this import." 
+		unless exists $ENV{CATALOG_ID_OFFSET};
+	
+	print "\n";
+	
+	goto IMPORT_ENTRIES;
+	
+	$importer->obtain(App::Data::Manipulate::DATAMANIPFLAG_VERBOSE, $dataCollection,
+		srcFile=> File::Spec->catfile($properties->{dataSrcRTXgulfPath}, 'TXGULF Fee Schedules.xls'),
+		importAction => 'IMPORT_FEE_SCHEDULE',
+	);
+
+	if($importer->haveErrors())
+	{
+		$importer->printErrors();
+		die "there are errors";
+	}
+
+	undef $importer;
+
+	if($params{transformDBI})
+		{
+			my $exporter = new App::Data::Transform::DBI;
+
+			$exporter->transform(App::Data::Manipulate::DATAMANIPFLAG_SHOWPROGRESS, $dataCollection,
+				connect => $properties->{connectStr},
+				doBefore => qq{delete from Offering_Catalog where catalog_id in ('REGULAR', 'MC_99',
+					'BCBS', 'MEDICAID', 'WC', 'ML_IPA', 'USFHP', 'CIGNA_CAP', 'NYLC_UTMB', 'CL_IPA',
+					'UMC', 'PRUD', 'KIM_CAP', 'RVU', 'MMG', 'MC2000', 'KELSEY', 'TRICARE', 'NINETEEN',
+					'TWENTY') //
+					delete from Offering_Catalog where catalog_id in (...) },
+				insertStmt => qq{insert into Offering_Catalog
+					(cr_stamp, cr_org_id, catalog_id, caption, org_id, catalog_type, description)
+					values (sysdate, 'PHYSIA', ?, ?, '$ENV{ORG_ID}', 0, 'Imported Fee Schedule')
+				},
+				verifyCountStmt => "select count(*) from Offering_Catalog",
+			);
+			$exporter->printErrors();
+	}
+
+	# ---------------------------------------------------------------------------------------
+	
+	IMPORT_ENTRIES:
+	
+	$importer = new App::Data::Obtain::TXgulf::FeeSchedules;
+	$dataCollection = $params{collection} || new App::Data::Collection;
+	print "\n";
+
+	$importer->obtain(App::Data::Manipulate::DATAMANIPFLAG_VERBOSE, $dataCollection,
+		srcFile=> File::Spec->catfile($properties->{dataSrcRTXgulfPath}, 'TXGULF Fee Schedules.xls'),
+		importAction => 'IMPORT_FS_ENTRIES',
+		catalog_id_offset => $ENV{CATALOG_ID_OFFSET},		
+	);
+
+	if($importer->haveErrors())
+	{
+		$importer->printErrors();
+		die "there are errors";
+	}
+	
+	undef $importer;
+	
+	if($params{transformDBI})
+	{
+		my $exporter = new App::Data::Transform::DBI;
+
+		$exporter->transform(App::Data::Manipulate::DATAMANIPFLAG_SHOWPROGRESS, $dataCollection,
+			connect => $properties->{connectStr},
+			doBefore => "delete from Offering_catalog_Entry where catalog_id >= $ENV{CATALOG_ID_OFFSET}
+				// delete from Offering_catalog_Entry where catalog_id >= $ENV{CATALOG_ID_OFFSET}",
+			insertStmt => "insert into Offering_Catalog_Entry
+				(catalog_id, entry_type, flags, status, code, name, default_units, cost_type, unit_cost,
+				description)
+			values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+			verifyCountStmt => "select count(*) from Offering_Catalog_Entry where catalog_id >= $ENV{CATALOG_ID_OFFSET}",
 		);
 		$exporter->printErrors();
 	}
