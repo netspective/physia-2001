@@ -251,7 +251,8 @@
 		</deliverable>
 
 		<deliverable id="1497">
-			Additional next actions for placing claim on hold and adding hospital claim added to claim dialog and patient choose action.
+			Additional next actions for placing claim on hold and adding hospital claim added to claim dialog and patient choose action. 
+			Additional fix - added on hold field to claim and hospital claim dialogs. Removed on hold from next action.
 		</deliverable>
 
 		<deliverable id="1510">
