@@ -41,7 +41,7 @@
 		</deliverable>
 
 		<deliverable id="1512">
-			Deleted the validation check on the 'Nursing License' field in the 'Add Nurse' dialog
+			Deleted the validation check on the 'License Required' check-box field of the 'Nursing License' in the 'Add Nurse' dialog
 		</deliverable>
 		<deliverable id="1517">
 			Report (patient activity staff) : The patient activity staff report was not converting from GMT to local timezone so work done late in a day would appear on the wrong date.
