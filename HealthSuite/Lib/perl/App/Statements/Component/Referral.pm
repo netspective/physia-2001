@@ -185,7 +185,7 @@ $STMTMGR_COMPONENT_REFERRAL = new App::Statements::Component::Referral(
 			SELECT
 				(SELECT parent_trans_id FROM transaction WHERE trans_id = t.parent_trans_id) as referral_id,
 				trans_id as intake_id,
-				 data_date_a as review_date,
+				 data_date_b as review_date,
 				 consult_id as patient,
 				 (
 					SELECT r.caption
@@ -218,7 +218,7 @@ $STMTMGR_COMPONENT_REFERRAL = new App::Statements::Component::Referral(
 				SELECT
 					parent_trans_id as referral_id,
 					trans_id as intake_id,
-					data_date_a as review_date,
+					data_date_b as review_date,
 					consult_id as patient,
 					 (
 						SELECT r.caption
