@@ -1,0 +1,101 @@
+From: Robert Jenks [rjenks@animefest.org]
+Sent: Thursday, October 18, 2001 2:07 AM
+To: Shahid N. Shah
+Subject: HealthSuite loading instructions...
+
+HealthSuite requires the following system environment:
+
+RedHat Linux (6.2 or 7.1)
+  7.1 is highly recommended for it's extra security patches and software,
+  but there are two problems.  You will have to manually install an old
+  version of Perl.  Oracle 8.1.7 is not supported on RH7.x yet.
+
+Perl 5.005
+  This is an old version.  It comes with RH6.2, but newer releases
+  of RedHat ship with Perl 5.6 which is not compatible with the pdflib
+  library that HealthSuite depends on.  The old version of Perl can be
+  downloaded from:
+  http://www.perl.com/CPAN/src/perl5.005_03.tar.gz
+
+Apache 1.3.22 / mod_perl 1.26 / mod_ssl ?
+  If you use RH 7.1 you may be able to use the apache, mod_perl, and
+  mod_ssl included.  The mod_perl included with RH6.2 is too old and
+  never worked to begin with.
+
+  Apache can be downloaded from:  http://httpd.apache.org/
+  mod_perl can be downloaded from: http://perl.apache.org/
+
+  You should always use the latest stable build of apache and mod_perl.
+
+  You may also want or need to install mod_ssl.
+
+  mod_ssl is available from http://www.mod_ssl.org/
+
+  I wrote two shell scripts which may be useful (if modified) to assist in
+  building a custom apache with mod_perl & mod_ssl:
+
+  neon.physia.com:/usr/src/install_httpd.sh
+  neon.physia.com:/usr/src/install_httpd_no_ssl.sh
+
+pdflib 2.01
+  Required for the Adobe PDF HCFA1500 rendering.
+  Available from: neon.physia.com:/usr/src/pdflib-2.01.tar.gz
+
+Oracle 8i (8.1.7)
+  A full oracle client install is required where HealthSuite is to be installed.
+  This is necessary to build the Perl Oracle database driver.  When you
+  install DBD::Oracle (below) you will need to enter the path where you
+  installed the oracle client to.
+  The following web site was VERY helpful the first time I installed Oracle
+  under Linux:
+  http://jordan.fortwayne.com/oracle/
+
+Perl CPAN modules:
+  First install the CPAN.pm module itself.  This will facilitate installing the
+  other modules.  You can get it from:
+
+
+http://cpan.valueclick.com/modules/by-category/23_Miscellaneous_Modules/CPAN
+/CPAN-1.59.tar.gz
+
+  Once you have the cpan module installed you can execute the 'cpan'
+  command from the unix prompt, then type 'install module_name' to
+   install all of the following modules:
+
+ Apache::Constants
+ Apache::Session
+ Apache::Session::NullLocker
+ Benchmark
+ CGI
+ CGI::Carp
+ Class::Struct
+ DBI
+ DBD::Oracle
+ Data::Dumper
+ Date::Calc
+ Date::Manip
+ Devel::Symdump
+ Dumpvalue
+ enum
+ Exporter
+ File::Basename
+ File::Copy
+ File::Path
+ File::Spec
+ HTML::TokeParser
+ LWP::Simple
+ LWP::UserAgent
+ Mail::Sendmail
+ Number::Format
+ Set::IntSpan
+ Set::Scalar
+ Storable
+ Text::Abbrev
+ Text::Template
+ Win32::OLE::Const
+ Win32::OLE
+ XML::DOM
+ XML::Generator
+ XML::Parser
+ XML::Struct
+
