@@ -379,7 +379,7 @@ sub addTransactionAndInvoice
 		main_transaction => $transId || undef,
 		submitter_id => $sessUser || undef,
 		owner_type => defined $orgType ? $orgType : undef,
-		owner_id => $page->field('owner_id') || undef,
+		owner_id => $sessOrg || undef,
 		client_type => defined $personType ? $personType : undef,
 		client_id => $personId || undef,
 		_debug => 0
