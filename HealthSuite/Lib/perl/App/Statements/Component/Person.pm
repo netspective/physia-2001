@@ -781,7 +781,7 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 			select ins_internal_id, parent_ins_id, product_name,  decode(record_type, 3, 'coverage') as record_type,
 					plan_name, decode(bill_sequence,1,'Primary',2,'Secondary',3,'Tertiary',4,'Quaternary',5,'W. Comp', 98, 'Terminated', 99, 'InActive'),
 					owner_person_id, ins_org_id, indiv_deductible_amt, family_deductible_amt, percentage_pay,
-					copay_amt, guarantor_name, decode(ins_type, 7, 'Third-Party Payer') as ins_type
+					copay_amt, guarantor_name, decode(ins_type, 7, 'thirdparty', 'coverage') as ins_type
 			from insurance
 			where record_type = 3
 			and owner_person_id = ?
@@ -803,8 +803,7 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 			#{ colIdx => 1, head => 'Employer', dataFmt => '#1#' },
 			#{ colIdx => 2, head => 'ID', dataFmt => '<A HREF = "/org/#2#/profile">#2#</A>' },
 		],
-		bullets => 'stpe-#my.stmtId#/dlg-update-ins-#3#/#0#?home=/#param.arl#',
-		frame => { addUrl => 'stpe-#my.stmtId#/dlg-add-ins-coverage?home=/#param.arl#' },
+		bullets => 'stpe-#my.stmtId#/dlg-update-ins-#13#/#0#?home=/#param.arl#',
 	},
 	publishDefn_panel =>
 	{
@@ -840,7 +839,9 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 			[
 				{
 					caption => qq{ Choose <A HREF= '#param.home#/../stpe-#my.stmtId#/dlg-add-ins-coverage?home=#param.home#'>Personal Insurance Coverage</A> },
-					hints => ''
+				},
+				{
+					caption => qq{ Choose <A HREF= '#param.home#/../stpe-#my.stmtId#/dlg-add-ins-thirdparty?home=#param.home#'>Third Party Payer</A> },
 				},
 				#{
 				#	caption => qq{ Choose <A HREF= '#param.home#/../stpe-#my.stmtId#/dlg-add-ins-exists?home=#param.home#'>Insurance Plan</A> },
@@ -857,7 +858,7 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 			],
 		},
 		stdIcons =>	{
-			updUrlFmt => '#param.home#/../stpe-#my.stmtId#/dlg-update-ins-#3#/#0#?home=#param.home#', delUrlFmt => '#param.home#/../stpe-#my.stmtId#/dlg-remove-ins-#3#/#0#?home=#param.home#',
+			updUrlFmt => '#param.home#/../stpe-#my.stmtId#/dlg-update-ins-#13#/#0#?home=#param.home#', delUrlFmt => '#param.home#/../stpe-#my.stmtId#/dlg-remove-ins-#13#/#0#?home=#param.home#',
 		},
 	},
 	publishComp_st => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.insurance', [$personId]); },
