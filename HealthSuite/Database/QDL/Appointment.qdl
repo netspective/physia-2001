@@ -3,7 +3,7 @@
 <!-- QDL Query Definition Language -->
 
 <component>
-	<query-defn id="Appointment" db="Oracle">
+	<query-defn id="appointment" caption="Appointment" db="Oracle">
 
 		<!-- Fields -->
 		<field id="owner_id" join="event" column="owner_id"/>

@@ -1,0 +1,48 @@
+<?xml version="1.0"?>
+
+<!-- QDL Query Definition Language -->
+
+<component>
+	<query-defn id="Document" db="Oracle">
+
+		<!-- Fields -->
+		<field id="doc_id" caption="Document ID" join="document" column="doc_id"/>
+		<field id="doc_id_alias" caption="Document ID Alias" join="document" column="doc_id_alias"/>
+		<field id="doc_mime_type" caption="MIME Type" join="document" column="doc_mime_type"/>
+		<field id="spec_type" join="document" column="doc_spec_type"/>
+		<field id="spec_type_caption" caption="Specification Type" join="doc_spec_type" column="caption"/>
+		<field id="spec_subtype" caption="Specification SubType" join="document" column="doc_spec_subtype"/>
+		<field id="source_type" join="document" column="doc_source_type"/>
+		<field id="source_type_caption" caption="Source Type" join="source_type" column="caption"/>
+		<field id="source_id" join="document" column="doc_source_id"/>
+		<field id="source_person_id" caption="Source Person ID" join="person_source" column="person_id"/>
+		<field id="source_org_id" caption="Source Org ID" join="org_source" column="org_id"/>
+		<field id="name" caption="Document Name" join="document" column="doc_name"/>
+		<field id="description" caption="Document Description" join="document" column="doc_description"/>
+		<field id="created" caption="Document Created" join="document" column="doc_orig_stamp" ui-datatype="stamp"/>
+		<field id="received" caption="Document Received" join="document" column="doc_recv_stamp" ui-datatype="stamp"/>
+
+		<!-- Joins -->
+		<join id="document" table="document" autoinclude="1"/>
+		<join id="doc_spec_type" table="document_specification" condition="document.doc_spec_type = doc_spec_type.id (+)"/>
+		<join id="person_source" table="person" condition="document.doc_source_id = person_source.person_id (+)"/>
+		<join id="org_source" table="org" condition="document.doc_source_id = TO_CHAR(org_source.org_internal_id (+))"/>
+		<join id="source_type" table="document_source_type" condition="document.doc_source_type = source_type.id (+)"/>
+		
+		<!-- Views -->
+		<view id="all" caption="None" distinct="yes">
+			<column id="doc_id"/>
+			<column id="name"/>
+			<column id="description"/>
+			<column id="created"/>
+			<column id="received"/>
+			<column id="source_type_caption"/>
+			<column id="source_person_id"/>
+			<column id="source_org_id"/>
+			<order-by id="received"/>
+			<condition field="doc_id" comparison="isdefined"/>
+		</view>
+	</query-defn>
+</component>
+
+

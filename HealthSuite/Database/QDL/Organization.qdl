@@ -3,7 +3,7 @@
 <!-- QDL Query Definition Language -->
 
 <component>
-	<query-defn id="Organization" abbrev="org">
+	<query-defn id="organization" caption="Organization" abbrev="org">
 
 		<!-- Fields -->
 		<field id="id" caption="Org ID" join="org" column="org_id"/>

@@ -3,7 +3,7 @@
 <!-- QDL Query Definition Language -->
 
 <component>
-	<query-defn id="Invoice" db="Oracle">
+	<query-defn id="invoice" caption="Invoice" db="Oracle">
 
 		<!-- Fields -->
 		<field id="invoice_id" caption="Claim #" join="invoice" column="invoice_id"/>
@@ -29,6 +29,7 @@
 		<field id="payer" caption="Payer" join="bill_payer" column="bill_to_id"/>
 		<field id="payer_person_id" caption="Payer Person" join="bill_payer_person" column="person_id"/>
 		<field id="payer_org_id" caption="Payer Org" join="bill_payer_org" column="org_id"/>
+		<field id="claim_type_caption" caption="Claim Type" join="claim_type" column="caption"/>
 		
 		<!-- Joins -->
 		<join id="invoice" table="invoice" autoinclude="1"/>
@@ -44,6 +45,7 @@
 		<join id="bill_payer_org" table="org" requires="bill_payer" condition="TO_CHAR(bill_payer_org.org_internal_id (+)) = bill_payer.bill_to_id"/>
 		<join id="main_trans" table="transaction" condition="invoice.main_transaction = main_trans.trans_id"/>
 		<join id="rend_provider" table="person" requires="main_trans" condition="main_trans.care_provider_id = rend_provider.person_id (+)"/>
+		<join id="claim_type" table="claim_type" condition="invoice.invoice_subtype = claim_type.id (+)"/>
 		
 		<!-- Views -->
 		<view id="all" caption="None" distinct="yes" href="/invoice/{invoice_id}/summary">
