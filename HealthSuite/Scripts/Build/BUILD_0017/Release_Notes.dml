@@ -31,6 +31,11 @@
 			Implement Claims Work List.  *** Big-Time DB Change Required ***
 		</deliverable>
 
+		<deliverable id="712">
+			Initial implementation of Payment Plan.  The core functionality is there.  Still need to 
+			tie down various loose ends like hooking up to Statements and Billing Cycles.
+		</deliverable>
+
 		<deliverable id="964">
 			UI:  Added Person Simple Name to :
 			+ Collection Worklist dialogs: 
@@ -86,12 +91,16 @@
 		</deliverable>		
 
 		<deliverable id="1262">
-			UI: The Electronic Billing Information component has now been moved form the Insurance tab
-			of an organization to the Clearing House tab.
-			UI: Adding/Editing a Billing Information from an Org's Clearing House tab changes the
-			org-wide clearing house information
-			UI: Adding/Editing a Billing Information from a Person's Associate tab changes that person's
-			clearing house information only.
+			UI: Implement functionality to enter Clearing House Billing IDs for Orgs and for individual
+			Physicians. <b>VERY IMPORTANT (FOR PRODUCTION ONLY):</b>  The checkbox labeled 'Process Live Claims' serves as
+			a flag to indicate live claim processing to the cron job running on the back-end to submit
+			claims to Clearing Houses.  Please be sure it is unchecked when there are claims still in
+			test mode (like TXGULF).  And check the box to enable live claim processing batch jobs for
+			the specified Org.
+		</deliverable>
+
+		<deliverable id="1264">
+			Limit display of EDI reports to 10 reports.  Not really testable on the test box.
 		</deliverable>
 		
 		<deliverable id="1301">
