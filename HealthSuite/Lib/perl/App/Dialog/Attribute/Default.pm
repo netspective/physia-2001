@@ -264,7 +264,7 @@ sub initialize
 		$self->{activityLog} = {
 			scope =>'person_attribute',
 			key => "#param.person_id#",
-			data => "$self->{propValueCaption} to <a href='/person/#param.person_id#/profile'>'#param.person_id#'</a>"
+			data => "#field.attr_name# $self->{propValueCaption} to <a href='/person/#param.person_id#/profile'>'#param.person_id#'</a>"
 		};
 	}
 	elsif($entityType eq 'org')
