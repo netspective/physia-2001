@@ -91,6 +91,7 @@ sub makeStateChanges
 
 	$self->updateFieldFlags('checkin_stamp', FLDFLAG_INVISIBLE, 1);
 	$self->updateFieldFlags('confirmed_info', FLDFLAG_INVISIBLE, 1);
+	$self->updateFieldFlags('hosp_org_fields', FLDFLAG_INVISIBLE, 1);
 
 	$self->setFieldFlags('attendee_id', FLDFLAG_READONLY);
 }
