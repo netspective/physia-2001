@@ -14,6 +14,10 @@ use DBI::StatementManager;
 use App::Statements::Report::Accounting;
 use App::Statements::Org;
 use Data::Publish;
+use Data::TextPublish;
+use App::Configuration;
+use App::Device;
+use App::Statements::Device;
 
 use vars qw(@ISA $INSTANCE);
 
@@ -45,6 +49,22 @@ sub new
 							postHtml => "</FONT></B>",
 							name => 'format',options=>FLDFLAG_REQUIRED,
 				defaultValue => '0',),			
+			new CGI::Dialog::Field(
+				name => 'printReport',
+				type => 'bool',
+				style => 'check',
+				caption => 'Print report',
+				defaultValue => 0
+			),
+
+			new CGI::Dialog::Field(
+				caption =>'Printer',
+				name => 'printerQueue',
+				options => FLDFLAG_PREPENDBLANK,
+				fKeyStmtMgr => $STMTMGR_DEVICE,
+				fKeyStmt => 'sel_org_devices',
+				fKeyDisplayCol => 0
+			),
 			);
 			new CGI::Dialog::Field(type => 'hidden',name=>'title');
 	$self->addFooter(new CGI::Dialog::Buttons);
@@ -79,7 +99,19 @@ sub execute
 	my $orgIntId = undef;
 	$orgIntId = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgId', $page->session('org_internal_id'), $orgId) if $orgId;
 	my @data=undef;	
+
+	my $hardCopy = $page->field('printReport');
 	my $html;
+	my $textOutputFilename;
+
+	# Get a printer device handle...
+	my $printerAvailable = 1;
+	my $printerDevice;
+	$printerDevice = ($page->field('printerQueue') ne '') ? $page->field('printerQueue') : App::Device::getPrinter ($page, 0);
+	my $printHandle = App::Device::openPrintHandle ($printerDevice, "-o cpi=17 -o lpi=6");
+	
+	$printerAvailable = 0 if (ref $printHandle eq 'SCALAR');
+
 	my $allPub =
 	{
 		columnDefn =>
@@ -203,15 +235,54 @@ sub execute
 	if($format_report != 0)
 	{		
 		$html .= createHtmlFromData($page, 0, \@data,$allPub);			
+		$textOutputFilename = createTextRowsFromData($page, 0, \@data, $allPub);
+		$html = ($textOutputFilename ? qq{<a href="/temp$textOutputFilename">Printable version</a> <br>} : "" ) . $html;
 		$self->heading("Revenue Collection Report");
+
+		if ($hardCopy == 1 and $printerAvailable) {
+			my $reportOpened = 1;
+			open (ASCIIREPORT, $textOutputFilename) or $reportOpened = 0;
+			if ($reportOpened) {
+				while (my $reportLine = <ASCIIREPORT>) {
+					print $printHandle $reportLine;
+				}
+			}
+			close ASCIIREPORT;
+		}
 	}
 	else
 	{
+		my ($collFilename, $prodFilename);
 		$html .="<b>PRODUCTION INFORMATION<b>";
 		$html .= createHtmlFromData($page, 0, \@data,$collPub);
+		$collFilename = createTextRowsFromData($page, 0, \@data, $collPub);
 		$html .="<BR><BR><b>COLLECTION INFORMATION<b>";
 		$html .= createHtmlFromData($page, 0, \@data2,$prodPub);	
+		$prodFilename = createTextRowsFromData($page, 0, \@data2, $prodPub);
+		$html = ($prodFilename ? qq{<a href="/temp$prodFilename">Collection Information (Printable version)</a> <br>} : "" ) . $html;
+		$html = ($collFilename ? qq{<a href="/temp$collFilename">Production Information (Printable version)</a> <br>} : "" ) . $html;
 		$self->heading("Revenue / Collection Report");
+
+		if ($hardCopy == 1 and $printerAvailable) {
+			my $reportOpened = 1;
+			my $tempDir = $CONFDATA_SERVER->path_temp();
+			open (ASCIIREPORT, $tempDir.$collFilename) or $reportOpened = 0;
+			if ($reportOpened) {
+				while (my $reportLine = <ASCIIREPORT>) {
+					print $printHandle $reportLine;
+				}
+			}
+			close ASCIIREPORT;
+
+			my $reportOpened = 1;
+			open (ASCIIREPORT, $tempDir.$prodFilename) or $reportOpened = 0;
+			if ($reportOpened) {
+				while (my $reportLine = <ASCIIREPORT>) {
+					print $printHandle $reportLine;
+				}
+			}
+			close ASCIIREPORT;
+		}
 	}
 	return $html
 	
