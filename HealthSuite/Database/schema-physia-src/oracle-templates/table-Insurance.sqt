@@ -32,7 +32,7 @@ prompt -----------------------------------------------------------------------;
 		code => 
 		[
 			"if :new.guarantor_id is not NULL then",
-			"	:new.guarantor_name := pkg_Entity.getEntityDisplay(0, :new.guarantor_id);",
+			"	:new.guarantor_name := pkg_Entity.getEntityDisplay(:new.guarantor_type, :new.guarantor_id);",
 			"end if;",
 		]);		
 }
