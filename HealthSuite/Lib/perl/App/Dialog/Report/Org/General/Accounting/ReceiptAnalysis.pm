@@ -29,6 +29,13 @@ sub new
 	my $self = App::Dialog::Report::new(@_, id => 'rpt-acct-receipt-analysis', heading => 'Receipt Analysis');
 
 	$self->addContent(
+			new CGI::Dialog::Field::Duration(
+				options=>FLDFLAG_REQUIRED,
+				name => 'batch',
+				caption => 'Batch Report Date',
+				begin_caption => 'Report Begin Date',
+				end_caption => 'Report End Date',
+				),		
 			new App::Dialog::Field::Person::ID(caption =>'Provider ID',types => ['Physician'], name => 'person_id', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE),
 			new CGI::Dialog::Field(caption =>'Payment Type',
 					name => 'transaction_type',
@@ -38,14 +45,7 @@ sub new
 					fKeyDisplayCol => 0
 					),
 
-			new CGI::Dialog::Field(caption => 'Batch ID', size => 12,name=>'batch_id'),					
-			new CGI::Dialog::Field::Duration(
-				options=>FLDFLAG_REQUIRED,
-				name => 'batch',
-				caption => 'Batch Report Date',
-				begin_caption => 'Report Begin Date',
-				end_caption => 'Report End Date',
-				),		
+			new CGI::Dialog::Field(caption => 'Batch ID', size => 12,name=>'batch_id'),						
 			new CGI::Dialog::Field(
 				name => 'printReport',
 				type => 'bool',
