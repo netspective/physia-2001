@@ -10,8 +10,8 @@ use App::Universal;
 use CGI::Dialog;
 use CGI::Validator::Field;
 use DBI::StatementManager;
-
-use App::Statements::Component::Invoice;
+use Data::Publish;
+use App::Statements::Report::ClaimStatus;
 
 use vars qw(@ISA $INSTANCE);
 
@@ -21,7 +21,7 @@ sub new
 {
 	my $self = App::Dialog::Report::new(@_, id => 'rpt-acct-claim-status', heading => 'Claim Status');
 
-	$self->addContent(
+	$self->addContent(	
 			new CGI::Dialog::Field::Duration(
 				name => 'report',
 				caption => 'Start/End Report Date',
@@ -32,11 +32,13 @@ sub new
 				),				
 			new CGI::Dialog::Field(name => 'claim_status',
 				caption => 'Claim Status',
-				enum => 'invoice_status',					
+				fKeyStmtMgr => $STMTMGR_RPT_CLAIM_STATUS,									
+				fKeyStmt => 'sel_claim_status',
+				fKeyDisplayCol => 0,
+				fKeyValueCol => 1,
 				style => 'multicheck',	
 				defaultValue => 0
 				),
-
 			);
 	$self->addFooter(new CGI::Dialog::Buttons);
 
@@ -53,30 +55,121 @@ sub populateData
 	$page->field('report_end_date', $startDate);
 }
 
+sub customValidate
+{
+	my ($self, $page) = @_;
+	my $status = join(',',  $page->field('claim_status'));
+	my $statusField = $self->getField('claim_status');
+	$statusField->invalidate($page, "Claim status not selected.  To view all claim status select 'All Claims'.") if $status eq ''; 
+}
+
+sub buildSqlStmt
+{
+
+	my ($self, $page, $flags) = @_;
+	my $reportBeginDate = $page->field('report_begin_date');
+	my $reportEndDate = $page->field('report_end_date');
+	my $status = join(',',  $page->field('claim_status'));		
+	my $orgId = $page->session('org_id');
+	my $statusClause='';	
+	$statusClause = qq{i_s.id in ($status)  and} if !($status=~m/-1/) ;		   
+	my $dateClause ;
+	$dateClause =qq{ and  trunc(i.invoice_date) between to_date('$reportBeginDate', 'mm/dd/yyyy') and to_date('$reportEndDate', 'mm/dd/yyyy')}if($reportBeginDate ne '' && $reportEndDate ne '');
+	$dateClause =qq{ and  trunc(i.invoice_date) <= to_date('$reportEndDate', 'mm/dd/yyyy')	} if($reportBeginDate eq '' && $reportEndDate ne '');
+	$dateClause =qq{ and  trunc(i.invoice_date) >= to_date('$reportBeginDate', 'mm/dd/yyyy') } if($reportBeginDate ne '' && $reportEndDate eq '');
+	my $orderBy = qq{order by i.invoice_date desc , i.invoice_id asc };
+
+	my $whereClause = qq{where $statusClause
+						i.owner_type = 1
+					and 	i.owner_id = '$orgId'		
+					and 	bs.id =ib.bill_sequence 
+					and     i.invoice_status = i_s.id			
+					and     t.trans_id = i.main_transaction
+					and     ib.invoice_id = i.invoice_id														
+					and  	ct.id = t.bill_type	
+					and 	ib.BILL_SEQUENCE = 1 
+					$dateClause
+				   };			   
+	
+	my $columns = qq{i.invoice_id,
+			i.total_items, i.client_id,
+			to_char(i.invoice_date, 'MM/dd/YYYY') as invoice_date,
+			i_s.caption as invoice_status,
+			ib.bill_to_id,
+			i.total_cost,
+			i.total_adjust,
+			i.balance,
+			i.reference,
+			ct.caption,
+			bs.caption as cap};
+			
+   	
+	my $fromTable= qq{invoice i,
+		   	invoice_status i_s,
+		   	transaction t,
+		   	invoice_billing ib,		
+		   	claim_type ct,
+			bill_sequence bs};
+			
+	my $sqlStmt = qq {select  $columns	
+			  from 	$fromTable
+				$whereClause
+				$orderBy		};
+			
+	
+	return $sqlStmt;	
+}
+
 
 sub execute
 {
 	my ($self, $page, $command, $flags) = @_;
+	my $pub = {
+		columnDefn => [
+			{ colIdx => 0, head => 'Invoice ID', hAlign => 'center',dAlign => 'center',dataFmt => '#0#' },
+			{ colIdx => 1, head => 'Number Of Items',dAlign => 'center', dataFmt => '#1#' },
+			{ colIdx => 2, head => 'Client ID', dAlign => 'center',dataFmt => '#2#' },
+			{ colIdx => 3, head => 'Invoice Date', dAlign => 'center',dataFmt => '#3#' },
+			{ colIdx => 4, head => 'Invoice Status',dAlign => 'center' ,dataFmt => '#4#' },
+			{ colIdx => 5, head => 'Bill To ID', dAlign => 'center',dataFmt => '#5#' },			
+			{ colIdx => 6, head => 'Total Cost', hAlign => 'center', dAlign => 'center', dataFmt => '#6#', dformat => 'currency' },			
+			{ colIdx => 7, head => 'Total Adjustment', dAlign =>'center', dataFmt => '#7#', dformat => 'currency' },
+			{ colIdx => 8, head => 'Balance', dAlign => 'center',dataFmt => '#8#', dformat => 'currency' },
+			{ colIdx => 9, head => 'Reference', dAlign => 'center',dataFmt => '#9#' },
+			{ colIdx => 10, head => 'Bill To Type', dAlign => 'center',dataFmt => '#10#' },
+			#{ colIdx => 11, head => 'Bill Sequence', dAlign => 'center',dataFmt => '#11#' },
+			
+		],
+	};
+		
+	my $sqlStmt = $self->buildSqlStmt($page, $flags);			
+	my $claimStatus = $STMTMGR_RPT_CLAIM_STATUS->getRowsAsHashList($page,STMTMGRFLAG_DYNAMICSQL,$sqlStmt);
+	my @data = ();	
+	foreach (@$claimStatus)
+	{
+		my @rowData = (
+		$_->{invoice_id},		
+		$_->{total_items}||'0',
+		$_->{client_id},
+		$_->{invoice_date},
+		$_->{invoice_status},
+		$_->{bill_to_id},
+		$_->{total_cost},
+		$_->{total_adjust},
+		$_->{balance},
+		$_->{reference},
+		$_->{caption},
+		$_->{cap});
+		push(@data, \@rowData);
+	};
+	my $html = createHtmlFromData($page, 0, \@data,$pub);
+	return $html;
+	
+}	
+	
+	
 
-	my $reportBeginDate = $page->field('report_begin_date');
-	my $reportEndDate = $page->field('report_end_date');
-	my $status = join(',',  $page->field('claim_status')) || $page->field('claim_status');
-	my $orgId = $page->session('org_id');
 
-	#$page->addDebugStmt("status, orgid, begindate, enddate are $status , $orgId, $reportBeginDate, $reportEndDate");
-	#return 	$STMTMGR_COMPONENT_INVOICE->createHtml($page, 0, 'invoice.claimStatus',$status eq 'all' || $status eq 'incomplete' ? [uc($orgId)] : [$status, uc($orgId)]);
-	return 	$STMTMGR_COMPONENT_INVOICE->createHtml($page, STMTMGRFLAG_NONE, 'invoice.claimStatus',[$status , $orgId, $reportBeginDate, $reportEndDate]);
-
-}
-
-#select 	invoice_id, total_items, client_id, invoice_date as invoice_date,
-#	invoice_status as invoice_status, bill_to_id, total_cost, total_adjust,
-#	balance, reference, bill_to_type
-#from 	invoice
-#where	invoice_status in (0,1)
-#and 	owner_type = 1
-#and 	owner_id = 'CLMEDGRP'
-#order by invoice_date DESC
 
 
 
