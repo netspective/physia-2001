@@ -293,18 +293,25 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 
 'person.refillRequest' => {
 	sqlStmt => qq{
-			select 	value_type, item_id, parent_id, item_name, value_text, %simpleDate:value_date%, value_textB
+			select 	value_type, item_id, parent_id, item_name, value_text, %simpleDate:value_date%, value_textB, decode(value_intB,0,'Pending',1,'Filled')
 				from  Person_Attribute
 			where  	parent_id = ?
 			and item_name = 'Refill Request'
-
+			and value_int is null
+			union
+                        select  value_type, item_id, parent_id, item_name, value_text, %simpleDate:value_date%, value_textB, decode(value_intB,0,'Pending',1,'Filled')
+                                from  Person_Attribute
+                        where   parent_id = ?
+                        and item_name = 'Refill Request'
+                        and value_int is not null
+			and value_intB = 0
 		},
-		sqlStmtBindParamDescr => ['Person ID for Attribute Table'],
+		sqlStmtBindParamDescr => ['Person ID for Attribute Table', 'Person ID for Attribute Table'],
 
 	publishDefn =>
 	{
 		columnDefn => [
-			{ dataFmt => '#6# (#5#): #4#' },
+			{ dataFmt => '#6# (#5#): #4# (#7#)' },
 		],
 		bullets => 'stpe-#my.stmtId#/dlg-update-attr-refillreq-#0#/#1#?home=/#param.arl#',
 		frame => { addUrl => 'stpe-#my.stmtId#/dlg-add-refill-request?home=/#param.arl#' },
@@ -337,10 +344,10 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 		},
 	},
 
-	publishComp_st => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.refillRequest', [$personId]); },
-	publishComp_stp => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.refillRequest', [$personId], 'panel'); },
-	publishComp_stpe => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.refillRequest', [$personId], 'panelEdit'); },
-	publishComp_stpt => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.refillRequest', [$personId], 'panelTransp'); },
+	publishComp_st => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.refillRequest', [$personId,$personId]); },
+	publishComp_stp => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.refillRequest', [$personId,$personId], 'panel'); },
+	publishComp_stpe => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.refillRequest', [$personId,$personId], 'panelEdit'); },
+	publishComp_stpt => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.refillRequest', [$personId,$personId], 'panelTransp'); },
 },
 
 
