@@ -125,7 +125,7 @@ sub new
 	$self->{activityLog} =
 		{
 			scope =>'offering_catalog_entry',
-			key => "#field.catalog_id#",
+		key => "#field.catalog_id#",
 			data => "Fee Schedule Entry '#param.entry_id# #field.entry_id#' <a href='/search/catalog/detail/#field.catalog_id#'>#field.catalog_id#</a>"
 	};
 	
@@ -170,16 +170,14 @@ sub populateData_update
 {
 	my ($self, $page, $command, $activeExecMode, $flags) = @_;
 
+	$self->makeStateChanges_special($page);
 	return unless $flags & CGI::Dialog::DLGFLAG_UPDORREMOVE_DATAENTRY_INITIAL;
 
 	my $entryId = $page->param('entry_id');
-	if(! $STMTMGR_CATALOG->createFieldsFromSingleRow($page, STMTMGRFLAG_NONE, 'selCatalogItemById',$entryId))
+	unless ($STMTMGR_CATALOG->createFieldsFromSingleRow($page, STMTMGRFLAG_NONE, 
+		'selCatalogItemById', $entryId))
 	{
-		$page->addError("Catalog Item ID '$entryId' not found.");
-	}
-	else
-	{
-		$self->makeStateChanges_special($page);
+		$page->addError("Entry ID $entryId does not exist.");
 	}
 }
 

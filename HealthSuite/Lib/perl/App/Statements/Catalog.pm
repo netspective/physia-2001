@@ -24,6 +24,11 @@ $STMTMGR_CATALOG = new App::Statements::Catalog(
 		from offering_catalog
 		where internal_catalog_id = ?
 	},
+	'sel_internalCatId_orgId' => qq{
+		select * from Offering_Catalog
+		where internal_catalog_id = ?
+			and org_id = ?
+	},
 	'sel_catalog_by_id_orgId' => qq{
 		select * from Offering_catalog
 		where catalog_id = ?
