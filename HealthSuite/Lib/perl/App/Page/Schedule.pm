@@ -19,11 +19,12 @@ use App::Statements::Search::Appointment;
 use vars qw(%RESOURCE_MAP);
 use base 'App::Page';
 %RESOURCE_MAP = (
-	'schedule' => {_views => [
-		{caption => 'Schedule', name => 'apptsheet',},
-		{caption => 'Assign', name => 'assign',},
-		{caption => 'handleWaitingList', name => 'handleWaitingList',},
-		#{caption => 'Patient Lookup', name => 'patientLookup',},
+	'schedule' => {
+		_views => [
+			{caption => 'Schedule', name => 'apptsheet',},
+			{caption => 'Assign', name => 'assign',},
+			{caption => 'handleWaitingList', name => 'handleWaitingList',},
+			{caption => 'apptcol', name => 'apptcol',},
 		],
 	},
 );
