@@ -35,7 +35,7 @@ sub initialize
 	$self->addContent(
 		new App::Dialog::Field::Attribute::Name(
 			type => 'select',
-			selOptions => 'DEA;DPS;Medicaid;Medicare;UPIN;Tax ID;IRS;Board Certification;BCBS;Railroad Medicare;Champus;WC#;National Provider Identification;Nursing/License',
+			selOptions => 'DEA;DPS;Medicaid;Medicare;UPIN;Tax ID;IRS;Board Certification;BCBS;Railroad Medicare;Champus;WC#;National Provider Identification;Nursing/License;Memorial Sisters Charity;Provider Number',
 			caption => 'License',
 			name => 'value_textb',
 			options => FLDFLAG_REQUIRED,
