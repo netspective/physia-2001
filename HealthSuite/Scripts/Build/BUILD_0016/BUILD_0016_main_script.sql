@@ -45,7 +45,10 @@ alter table invoice_item_aud drop (reference);
 start tables-code/Invoice_Item
 
 start tables/Ethnicity
-start data/Ethnicity 
+start data/Ethnicity
+
+commit;
+
 
 
 
