@@ -619,6 +619,7 @@ sub getHtml
 			<INPUT TYPE="HIDDEN" NAME="_f_proc_$line\_service_type" TYPE='text' size=10 VALUE='@{[ $page->param("_f_proc_$line\_service_type")]}'/>
 			<INPUT TYPE="HIDDEN" NAME="_f_proc_$line\_use_fee" TYPE='text' size=10 VALUE='@{[ $page->param("_f_proc_$line\_use_fee")]}'/>
 			<INPUT TYPE="HIDDEN" NAME="_f_proc_$line\_code_type" TYPE='text' size=10 VALUE='@{[ $page->param("_f_proc_$line\_code_type")]}'/>
+			<INPUT TYPE="HIDDEN" NAME="_f_proc_$line\_prev_code" TYPE='text' size=10 VALUE='@{[ $page->param("_f_proc_$line\_prev_code")]}'/>
 
 			<TR VALIGN=TOP>
 				<SCRIPT>

@@ -398,14 +398,20 @@ sub populateData
 		#my $servPlaceCode = $STMTMGR_CATALOG->getSingleValue($page, STMTMGRFLAG_CACHE, 'selGenericServicePlaceById', $procedures->[0]->{hcfa_service_place});
 		#$page->param('_f_proc_service_place', $servPlaceCode);
 
+		my $servTypeCode;
+		my $line;
 		my $totalProcs = scalar(@{$procedures});
+
+		#For regular procedures (not children of explosion codes)
 		foreach my $idx (0..$totalProcs-1)
 		{
 			#NOTE: data_text_a stores the indexes of the rel_diags (which are actual codes, not pointers)
+			#NOTE: data_text_c indicates if the line item is a child of an explosion code
 
-			my $servTypeCode = $STMTMGR_CATALOG->getSingleValue($page, STMTMGRFLAG_CACHE, 'selGenericServiceTypeById', $procedures->[$idx]->{hcfa_service_type});
+			next if $procedures->[$idx]->{data_text_c} eq 'explosion';
+			$servTypeCode = $STMTMGR_CATALOG->getSingleValue($page, STMTMGRFLAG_CACHE, 'selGenericServiceTypeById', $procedures->[$idx]->{hcfa_service_type});
 
-			my $line = $idx + 1;
+			$line = $idx + 1;
 			$page->param("_f_proc_$line\_item_id", $procedures->[$idx]->{item_id});
 			$page->param("_f_proc_$line\_dos_begin", $procedures->[$idx]->{service_begin_date});
 			$page->param("_f_proc_$line\_dos_end", $procedures->[$idx]->{service_end_date});
@@ -413,7 +419,7 @@ sub populateData
 			$page->param("_f_proc_$line\_procedure", $procedures->[$idx]->{code});
 			$page->param("_f_proc_$line\_modifier", $procedures->[$idx]->{modifier});
 			$page->param("_f_proc_$line\_units", $procedures->[$idx]->{quantity});
-			#$page->param("_f_proc_$line\_charges", $procedures->[$idx]->{unit_cost});	#don't want to populate this in the event fee schedules should change
+			#$page->param("_f_proc_$line\_charges", $procedures->[$idx]->{unit_cost});						#don't want to populate this in the event fee schedules should change
 			$page->param("_f_proc_$line\_emg", @{[ ($procedures->[$idx]->{emergency} == 1 ? 'on' : '' ) ]});
 			$page->param("_f_proc_$line\_comments", $procedures->[$idx]->{comments});
 			$page->param("_f_proc_$line\_diags", $procedures->[$idx]->{data_text_a});
@@ -421,6 +427,39 @@ sub populateData
 			$page->param("_f_proc_$line\_ffs_flag", $procedures->[$idx]->{data_num_a});
 		}
 
+		#For children of explosion codes
+		my $parentCode;
+		$line = 0;
+		my $prevCode;
+		foreach my $idx (0..$totalProcs-1)
+		{
+			#NOTE: data_text_a stores the indexes of the rel_diags (which are actual codes, not pointers)
+			#NOTE: data_text_c indicates if the line item is a child of an explosion code
+			$parentCode = $procedures->[$idx]->{parent_code};
+			next if $parentCode eq '';
+			next if $procedures->[$idx]->{data_text_c} ne 'explosion';
+			next if $prevCode eq $parentCode;			
+			$prevCode = $parentCode;
+
+			#next if $parentCode eq $procedures->[$idx-1]->{parent_code};
+			$servTypeCode = $STMTMGR_CATALOG->getSingleValue($page, STMTMGRFLAG_CACHE, 'selGenericServiceTypeById', $procedures->[$idx]->{hcfa_service_type});
+
+			$line = $idx + 1;
+			$page->param("_f_proc_$line\_item_id", $procedures->[$idx]->{item_id});
+			$page->param("_f_proc_$line\_dos_begin", $procedures->[$idx]->{service_begin_date});
+			$page->param("_f_proc_$line\_dos_end", $procedures->[$idx]->{service_end_date});
+			#$page->param("_f_proc_$line\_service_type", $servTypeCode);
+			$page->param("_f_proc_$line\_procedure", $parentCode);
+			$page->param("_f_proc_$line\_prev_code", $parentCode);
+			$page->param("_f_proc_$line\_modifier", $procedures->[$idx]->{modifier});
+			$page->param("_f_proc_$line\_units", $procedures->[$idx]->{quantity});
+			#$page->param("_f_proc_$line\_charges", $procedures->[$idx]->{unit_cost});						#don't want to populate this in the event fee schedules should change
+			$page->param("_f_proc_$line\_emg", @{[ ($procedures->[$idx]->{emergency} == 1 ? 'on' : '' ) ]});
+			$page->param("_f_proc_$line\_comments", $procedures->[$idx]->{comments});
+			$page->param("_f_proc_$line\_diags", $procedures->[$idx]->{data_text_a});
+			$page->param("_f_proc_$line\_actual_diags", $procedures->[$idx]->{rel_diags});
+			$page->param("_f_proc_$line\_ffs_flag", $procedures->[$idx]->{data_num_a});
+		}
 
 		$STMTMGR_TRANSACTION->createFieldsFromSingleRow($page, STMTMGRFLAG_NONE, 'selTransCreateClaim', $invoiceInfo->{main_transaction});
 		$STMTMGR_INVOICE->createFieldsFromSingleRow($page, STMTMGRFLAG_NONE, 'selInvoiceAttrIllness',$invoiceId);
@@ -1904,6 +1943,13 @@ sub handleProcedureItems
 		next if $page->param("_f_proc_$line\_dos_begin") eq 'From' || $page->param("_f_proc_$line\_dos_end") eq 'To';
 		next unless $page->param("_f_proc_$line\_dos_begin") && $page->param("_f_proc_$line\_dos_end");
 
+		my $removeProc = $page->param("_f_proc_$line\_remove");
+		my $cptCode = $page->param("_f_proc_$line\_procedure");
+		my $prevCptCode = $page->param("_f_proc_$line\_prev_code");
+		my $itemId = $page->param("_f_proc_$line\_item_id");
+
+		$command = 'add' if ! $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selInvoiceItem', $itemId);
+
 		if($isHospClaim)
 		{
 			$servProviderId = $page->param("_f_proc_$line\_service_provider_id");
@@ -1914,25 +1960,49 @@ sub handleProcedureItems
 			#$page->addError("Line $line: $setProviderPair eq $currProviderPair");
 		}
 
-		my $cptCode = $page->param("_f_proc_$line\_procedure");
 		#if cpt is a misc procedure code, get children and create invoice item for each child
 		my $miscProcChildren = $STMTMGR_CATALOG->getRowsAsHashList($page, STMTMGRFLAG_CACHE, 'selMiscProcChildren', $sessOrgIntId, $cptCode);
-		if($miscProcChildren->[0]->{code})
+		if($miscProcChildren->[0]->{code} && ! $removeProc)
 		{
-			createExplosionItems($self, $page, $command, $line, $invoiceId, $cptCode, $miscProcChildren);
+			if($cptCode ne $prevCptCode && $prevCptCode ne '')
+			{
+				my $prevExplCodeInvItems = $STMTMGR_INVOICE->getRowsAsHashList($page, STMTMGRFLAG_CACHE, 'selExplCodeInvItems', $invoiceId, $prevCptCode);
+				foreach my $prevExplCodeItem (@{$prevExplCodeInvItems})
+				{
+					voidProcedureItem($self, $page, $command, $flags, $invoiceId, $prevExplCodeItem->{item_id});
+				}
+				$command = 'add';
+			}
+
+			handleExplosionItems($self, $page, $command, $line, $invoiceId, $cptCode, $miscProcChildren);
 			next;
 		}
-
-		my $removeProc = $page->param("_f_proc_$line\_remove");
-		my $itemId = $page->param("_f_proc_$line\_item_id");
-		if(! $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selInvoiceItem', $itemId))
+		elsif($cptCode ne $prevCptCode && $prevCptCode ne '' && ! $removeProc)
 		{
+			my $prevExplCodeInvItems = $STMTMGR_INVOICE->getRowsAsHashList($page, STMTMGRFLAG_CACHE, 'selExplCodeInvItems', $invoiceId, $prevCptCode);
+			foreach my $prevExplCodeItem (@{$prevExplCodeInvItems})
+			{
+				voidProcedureItem($self, $page, $command, $flags, $invoiceId, $prevExplCodeItem->{item_id});
+			}
 			$command = 'add';
 		}
-		elsif($removeProc)
+
+		if($removeProc)
 		{
-			voidProcedureItem($self, $page, $command, $flags, $invoiceId, $itemId);
-			next;
+			if($miscProcChildren->[0]->{code})
+			{
+				my $explCodeInvItems = $STMTMGR_INVOICE->getRowsAsHashList($page, STMTMGRFLAG_CACHE, 'selExplCodeInvItems', $invoiceId, $cptCode);
+				foreach my $explCodeItem (@{$explCodeInvItems})
+				{
+					voidProcedureItem($self, $page, $command, $flags, $invoiceId, $explCodeItem->{item_id});
+				}
+				next;
+			}
+			else
+			{
+				voidProcedureItem($self, $page, $command, $flags, $invoiceId, $itemId);
+				next;
+			}
 		}
 
 		#get caption for cpt code
@@ -1941,13 +2011,13 @@ sub handleProcedureItems
 		$epsdtShortName = $STMTMGR_CATALOG->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selGenericEPSDTCode', $cptCode);
 		$codeShortName = $cptShortName->{name} || $hcpcsShortName->{name} || $epsdtShortName->{name};
 
-		#convert type to it's foreign key id
+		#convert service type to it's foreign key id
 		my $servType = $page->param("_f_proc_$line\_service_type");
 		my $servTypeId = $STMTMGR_CATALOG->getSingleValue($page, STMTMGRFLAG_CACHE, 'selGenericServiceTypeByAbbr', $servType);
 
 		my $emg = $page->param("_f_proc_$line\_emg") eq 'on' ? 1 : 0;
 		my %record = (
-			item_id => $itemId || undef,
+			item_id => $command eq 'add' ? undef : $itemId,
 			service_begin_date => $page->param("_f_proc_$line\_dos_begin") || undef,	#default for service start date is today
 			service_end_date => $page->param("_f_proc_$line\_dos_end") || undef,		#default for service end date is today
 			hcfa_service_place => defined $servPlaceId ? $servPlaceId : undef,			#
@@ -1979,7 +2049,7 @@ sub handleProcedureItems
 	}
 }
 
-sub createExplosionItems
+sub handleExplosionItems
 {
 	my ($self, $page, $command, $line, $invoiceId, $explCode, $miscProcChildren) = @_;
 
