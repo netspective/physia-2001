@@ -10,7 +10,7 @@ use CGI;
 use CGI::Page;
 use Apache::HealthSuite::PracticeManagement;
 
-print "Caching iSyndacate News...";
+print "Caching iSyndicate News...";
 use App::Component::News;
 eval{
 	my $news;
