@@ -84,7 +84,7 @@ $STMTMGR_COMPONENT_WORKLIST = new App::Statements::Component::WorkList(
 'worklist.group-account-notes' => {
 
 			sqlStmt => qq{
-				select complete_name, count (*) as count, min(trans_begin_stamp),max(trans_begin_stamp),
+				select simple_name, count (*) as count, min(trans_begin_stamp),max(trans_begin_stamp),
 				trans_owner_id
 				from transaction t, person
 				where 	trans_owner_id = person_id and
@@ -98,7 +98,7 @@ $STMTMGR_COMPONENT_WORKLIST = new App::Statements::Component::WorkList(
 				 	AND trans_subtype = 'Owner'
 				 	AND provider_id = :1
 				 )				
-				group by complete_name,trans_owner_id
+				group by simple_name,trans_owner_id
 			},
 			sqlStmtBindParamDescr => ['Person ID for transaction table'],
 
