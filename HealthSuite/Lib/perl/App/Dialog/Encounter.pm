@@ -45,6 +45,7 @@ sub initialize
 		new CGI::Dialog::Field(type => 'hidden', name => 'trans_id'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'condition_item_id'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'prior_auth_item_id'),
+		new CGI::Dialog::Field(type => 'hidden', name => 'resub_number_item_id'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'deduct_item_id'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'assignment_item_id'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'accept_assignment'),
@@ -53,9 +54,6 @@ sub initialize
 		new CGI::Dialog::Field(type => 'hidden', name => 'hospital_item_id'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'cntrl_num_item_id'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'bill_contact_item_id'),
-		#new CGI::Dialog::Field(type => 'hidden', name => 'pay_to_org_item_id'),
-		#new CGI::Dialog::Field(type => 'hidden', name => 'pay_to_org_tax_item_id'),
-		#new CGI::Dialog::Field(type => 'hidden', name => 'pay_to_org_phone_item_id'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'claim_filing_item_id'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'fee_schedules_item_id'),
 		#new CGI::Dialog::Field(type => 'hidden', name => 'batch_item_id'),
@@ -233,6 +231,7 @@ sub initialize
 			]),
 
 		new CGI::Dialog::Field(caption => 'Prior Authorization Number', name => 'prior_auth'),
+		new CGI::Dialog::Field(caption => 'Medicaid Resubmission Number', name => 'resub_number'),
 
 		new CGI::Dialog::Field(type => 'select',
 				style => 'radio',
@@ -324,9 +323,10 @@ sub makeStateChanges
 
 	my $invoiceId = $page->param('invoice_id');
 	my $invoiceInfo = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoice', $invoiceId);
+	my $invoiceStatus = $invoiceInfo->{invoice_status};
 
 	my $submitOrder = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoiceAttr', $invoiceId, 'Submission Order');
-	unless($submitOrder->{value_int} == 0 || $invoiceInfo->{invoice_status} > App::Universal::INVOICESTATUS_SUBMITTED)
+	unless($submitOrder->{value_int} == 0 || $invoiceStatus > App::Universal::INVOICESTATUS_SUBMITTED)
 	{
 		$self->setFieldFlags('batch_fields', FLDFLAG_READONLY);
 		$self->setFieldFlags('attendee_id', FLDFLAG_READONLY);
@@ -346,6 +346,11 @@ sub makeStateChanges
 		$self->setFieldFlags('disability_dates', FLDFLAG_READONLY);
 		$self->setFieldFlags('hosp_dates', FLDFLAG_READONLY);
 		$self->setFieldFlags('prior_auth', FLDFLAG_READONLY);
+	}
+
+	unless($invoiceInfo->{invoice_subtype} == App::Universal::CLAIMTYPE_MEDICAID && ($invoiceStatus == App::Universal::INVOICESTATUS_PAYAPPLIED || $invoiceStatus == App::Universal::INVOICESTATUS_CLOSED) )
+	{
+		$self->setFieldFlags('resub_number', FLDFLAG_INVISIBLE, 1);
 	}
 }
 
@@ -468,6 +473,7 @@ sub populateData
 		$STMTMGR_INVOICE->createFieldsFromSingleRow($page, STMTMGRFLAG_NONE, 'selInvoiceAttrHospitalization',$invoiceId);
 		$STMTMGR_INVOICE->createFieldsFromSingleRow($page, STMTMGRFLAG_NONE, 'selInvoiceAttrAssignment',$invoiceId);
 		$STMTMGR_INVOICE->createFieldsFromSingleRow($page, STMTMGRFLAG_NONE, 'selInvoiceAuthNumber',$invoiceId);
+		$STMTMGR_INVOICE->createFieldsFromSingleRow($page, STMTMGRFLAG_NONE, 'selInvoiceMedicaidResubNumber',$invoiceId);
 		$STMTMGR_INVOICE->createFieldsFromSingleRow($page, STMTMGRFLAG_NONE, 'selInvoiceDeductible',$invoiceId);
 
 		#my $batchInfo = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoiceAttr', $invoiceId, 'Invoice/Creation/Batch ID');
@@ -487,16 +493,6 @@ sub populateData
 		$page->field('bill_contact_item_id', $billContactData->{item_id});
 		$page->field('billing_contact', $billContactData->{value_text});
 		$page->field('billing_phone', $billContactData->{value_textb});
-
-		#my $payToOrg = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoiceAttr', $invoiceId, 'Pay To Org/Name');
-		#$page->field('pay_to_org_item_id', $payToOrg->{item_id});
-		#$page->field('pay_to_org_id', $payToOrg->{value_textb});
-
-		#my $payToOrgTaxId = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoiceAttr', $invoiceId, 'Pay To Org/Tax ID');
-		#$page->field('pay_to_org_tax_item_id', $payToOrgTaxId->{item_id});
-
-		#my $payToOrgPhone = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoiceAttr', $invoiceId, 'Pay To Org/Phone');
-		#$page->field('pay_to_org_phone_item_id', $payToOrgPhone->{item_id});
 
 		my $claimFiling = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoiceAttr', $invoiceId, 'Claim Filing/Indicator');
 		$page->field('claim_filing_item_id', $claimFiling->{item_id});
@@ -1299,6 +1295,17 @@ sub handleInvoiceAttrs
 			item_name => 'Prior Authorization Number',
 			value_type => defined $textValueType ? $textValueType : undef,
 			value_text => $page->field('prior_auth') || undef,
+			_debug => 0
+		);
+
+	$page->schemaAction(
+			'Invoice_Attribute', $command,
+			item_id => $page->field('resub_number_item_id') || undef,
+			parent_id => $invoiceId,
+			item_name => 'Medicaid/Resubmission',
+			value_type => defined $textValueType ? $textValueType : undef,
+			value_text => $page->field('resub_number') || undef,
+			#value_textB => (reference),
 			_debug => 0
 		);
 
