@@ -42,7 +42,7 @@ $STMTFMT_SEL_INVOICETYPE = qq{
 		i.invoice_id,
 		i.total_items,
 		ist.caption,
-		i.total_cost, 
+		i.total_cost,
 		i.total_adjust,
 		i.balance,
 		i.client_id,
@@ -175,7 +175,7 @@ $STMTMGR_INVOICE = new App::Statements::Invoice(
 		FROM	transaction t, invoice i
 		WHERE	i.invoice_id = :1
 		AND	i.main_transaction = t.trans_id
-		},				
+		},
 	'selInvoiceAddr' => q{
 		select *
 		from invoice_address
@@ -196,7 +196,7 @@ $STMTMGR_INVOICE = new App::Statements::Invoice(
 		from invoice
 		where balance > 0
 			and client_id = ?
-			and owner_id = ?			
+			and owner_id = ?
 			and invoice_status != 15
 			and invoice_status != 16
 			and invoice_subtype = 0
@@ -558,9 +558,9 @@ $STMTMGR_INVOICE = new App::Statements::Invoice(
 		select cpt
 		from ref_cpt
 		where cpt = ?
-			and cpt in ('99201','99202','99203','99204','99205','99211','99212','99213','99214','99215')	
+			and cpt in ('99201','99202','99203','99204','99205','99211','99212','99213','99214','99215')
 	},
-	
+
 	'selFSHierarchy' => qq{
 		select per.value_int as fs, 1 as fs_order
 		from person_attribute per, org_attribute org, insurance_attribute insplan, insurance_attribute insprod
@@ -611,6 +611,14 @@ $STMTMGR_INVOICE = new App::Statements::Invoice(
 		where insprod.parent_id = :4
 			and insprod.item_name = 'Fee Schedule'
 		ORDER BY 2 asc
+	},
+	'selPaymentMethod' => qq{
+		select caption
+		from Payment_Method
+		UNION
+		select 'Payment'
+		from dual
+
 	},
 );
 
