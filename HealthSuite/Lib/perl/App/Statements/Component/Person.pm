@@ -1573,7 +1573,7 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 			{ head => 'Freq', colIdx => 5,},
 			{ head => 'Refills', dataFmt => '#6# Refills', },
 			{ head => 'Approved By', colIdx => 7,},
-			{ head => 'Print', colIdx => 8, dataFmt => '<a href="/popup/prescription_pdf?permed_id=#0#">Print Prescription</a>'},
+			{ head => 'Print', colIdx => 8, dataFmt => '<a href=javascript:doActionPopup(\'/popup/prescription_pdf?permed_id=#0#\');>Print Prescription</a>'},
 		],
 		bullets => [
 			'/person/#param.person_id#/stpe-#my.stmtId#/dlg-update-medication/#0#?home=#homeArl#',
