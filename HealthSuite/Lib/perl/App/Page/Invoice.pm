@@ -1578,35 +1578,6 @@ sub prepare_view_intellicode
 
 }
 
-sub prepare_view_review
-{
-	my $self = shift;
-
-	my $invoiceId = $self->param('invoice_id');
-	my $todaysDate = UnixDate('today', $self->defaultUnixDateFormat());
-
-	$self->schemaAction(
-			'Invoice', 'update',
-			invoice_id => $invoiceId,
-			invoice_status => App::Universal::INVOICESTATUS_PENDING,
-			_debug => 0
-		);
-
-	## Then, create invoice attributes for history of invoice status
-	$self->schemaAction(
-			'Invoice_Attribute', 'add',
-			parent_id => $invoiceId,
-			item_name => 'Invoice/History/Item',
-			value_type => App::Universal::ATTRTYPE_HISTORY,
-			value_text => 'Pending',
-			value_textB => $self->field('comments') || undef,
-			value_date => $todaysDate,
-			_debug => 0
-	);
-
-	$self->redirect("/invoice/$invoiceId/summary");
-}
-
 sub prepare_view_submit
 {
 	my $self = shift;
@@ -1768,14 +1739,9 @@ sub prepare_view_1500
 	$self->addContent(@$html) if $html;
 	$self->addError('Problem in sub prepare_view_1500', $@) if $@;
 
-	$self->schemaAction(
-		'Invoice_Attribute', 'add',
-		parent_id => $invoiceId,
-		item_name => 'Invoice/History/Item',
-		value_type => App::Universal::ATTRTYPE_HISTORY,
+	addHistoryItem($self, $invoiceId,
 		value_text => 'Claim viewed',
 		value_date => $todaysDate,
-		_debug => 0
 	);
 
 	return 1;
@@ -1792,7 +1758,7 @@ sub prepare_view_1500edit
 
 	eval
 	{
-#		my $output = new pdflib;
+		#my $output = new pdflib;
 		my $output = new App::Billing::Output::HTML;
 		$output->processClaims(outArray => $html, claimList => $claimList, TEMPLATE_PATH => File::Spec->catfile($CONFDATA_SERVER->path_BillingTemplate(), 'Edit1500.dat'));
 	};
@@ -1818,7 +1784,7 @@ sub prepare_view_1500pdf
 
 	eval
 	{
-#		my $output = new pdflib;
+		#my $output = new pdflib;
 		my $output = new App::Billing::Output::PDF;
 		$output->processClaims(outFile => File::Spec->catfile($CONFDATA_SERVER->path_PDFOutput, $pdfName), claimList => $claimList, drawBackgroundForm => $plain ? 0 : 1);
 	};
@@ -1829,22 +1795,11 @@ sub prepare_view_1500pdf
 	my $claimPrintHistoryItem = $STMTMGR_INVOICE->getRowAsHash($self, STMTMGRFLAG_NONE, 'selClaimPrintHistoryItemByUser', $invoiceId, $sessUser);
 	my $timeDiff = $claimPrintHistoryItem->{timenow} - $claimPrintHistoryItem->{cr_stamp};
 
-	#$self->addError("Cr User Id: $claimPrintHistoryItem->{cr_user_id}");
-	#$self->addError("Session User Id: $sessUser");
-	#$self->addError("Time Now: $claimPrintHistoryItem->{timenow}");
-	#$self->addError("Cr Stamp: $claimPrintHistoryItem->{cr_stamp}");
-	#$self->addError("Time Diff: $timeDiff");
-
 	return 1 if $claimPrintHistoryItem->{cr_user_id} eq $sessUser && $timeDiff < 10;
 
-	$self->schemaAction(
-		'Invoice_Attribute', 'add',
-		parent_id => $invoiceId,
-		item_name => 'Invoice/History/Item',
-		value_type => App::Universal::ATTRTYPE_HISTORY,
+	addHistoryItem($self, $invoiceId,
 		value_text => 'Claim printed',
 		value_date => $todaysDate,
-		_debug => 0
 	);
 
 	return 1;
