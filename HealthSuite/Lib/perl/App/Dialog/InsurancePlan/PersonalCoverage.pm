@@ -184,7 +184,7 @@ sub new
 
 			$self->addFooter(new CGI::Dialog::Buttons(
 							nextActions_add => [
-								['Add Another Insurance Coverage', "/person/%field.person_hidden%/dlg-add-ins-coverage?_f_product_name=%field.product%&_f_ins_org_id=%field.ins_comp%&_f_plan_name=%field.plan%&_f_bill_sequence=%field.bill_sequence%", 1],
+								['Add Another Insurance Coverage', "/person/%field.person_hidden%/dlg-add-ins-coverage?_f_product_name=%field.product%&_f_ins_org_id=%field.ins_comp%&_f_plan_name=%field.plan%", 1],
 								['Go to Person Profile', "/person/%field.person_hidden%/profile"],
 							],
 								cancelUrl => $self->{cancelUrl} || undef
@@ -280,7 +280,7 @@ sub customValidate
 		}
 
 		my $coverageCaptionInc = $STMTMGR_INSURANCE->getSingleValue($page,STMTMGRFLAG_NONE,'selInsuranceBillCaption',$previousSequence);
-		$billSeq->invalidate($page, "'$coverageCaptionInc Insurance' cannot be replaced with '$coverageCaption Insurance' because '$coverageCaptionInc Insurance' should exist for '$personId' inorder to add '$coverageCaption Insurance'. ") if ( $sequence > $previousSequence);
+		$billSeq->invalidate($page, "'$coverageCaptionInc Insurance' cannot be replaced with '$coverageCaption Insurance' because '$coverageCaptionInc Insurance' should exist for '$personId' inorder to add '$coverageCaption Insurance'. ") if ( $sequence > $previousSequence  && $command eq 'update');
 	}
 
 
@@ -301,11 +301,23 @@ sub customValidate
 				my $createInsCoverageHref = "'/person/#param.person_id#/dlg-add-ins-coverage/?_f_bill_sequence=#field.bill_seq_hidden#'";
 				$billSeq->invalidate($page, "Do u want to Create a New <a href=$createInsCoverageHref>'$billCaption Personal Insurance Coverage'</a>.<br> Or Click The Check Box To Inactivate this Coverage");
 			}
-			elsif($page->field('create_record', 1))
+			else
 			{
-				return $STMTMGR_INSURANCE->getRowsAsHashList($page,STMTMGRFLAG_NONE, 'selUpdateInsSequence', $personId, $previousSequence);
+				unless($page->field('create_record') eq 1)
+				{
+					my $checkBox = $self->getField('create_record');
+					$checkBox->invalidate($page, "Check the 'Check Box' to Inactivate the Coverage");
+				}
+				if ($page->field('create_record') eq 1)
+				{
+					return $STMTMGR_INSURANCE->getRowsAsHashList($page,STMTMGRFLAG_NONE, 'selUpdateInsSequence', $personId, $previousSequence);
+				}
 			}
 		}
+	}
+	elsif ($command eq 'update' && $previousSequence < 4 && $sequence > 4 && $sequence != App::Universal::INSURANCE_INACTIVE)
+	{
+		return $STMTMGR_INSURANCE->getRowsAsHashList($page,STMTMGRFLAG_NONE, 'selUpdateInsSequence', $personId, $previousSequence);
 	}
 
 }
@@ -335,6 +347,7 @@ sub populateData_add
 			{
 				$page->field('bill_sequence', App::Universal::INSURANCE_INACTIVE);
 			}
+
 			else
 			{
 				$page->field('bill_sequence', $seq);
