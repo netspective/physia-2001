@@ -215,7 +215,7 @@ sub execute
 	saveAttribute($page, 'OfCatalog_Attribute', $internalCatalogId || $newId , 'Capitated Contract', 
 		App::Universal::ATTRTYPE_BOOLEAN, $STMTMGR_CATALOG, 'sel_Catalog_Attribute',
 		value_int => defined $page->field('capitated_contract') ? 1 : 0,
-	);
+	) if $command ne 'remove';
 
 	$page->param('_dialogreturnurl', "/org/$orgId/catalog") if $command ne 'add';
 	$self->handlePostExecute($page, $command, $flags);
