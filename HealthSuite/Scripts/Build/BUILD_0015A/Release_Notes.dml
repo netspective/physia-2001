@@ -34,6 +34,11 @@
 		<deliverable id="1143">
 			Report : Added  Facility/Site Constraint for Claim Status Report and 5 lastest EDI notes to Claim Status report
 		</deliverable>		
+
+		<deliverable id="219">
+			UI: Added early version of Financial Transaction query.  Only about half of the required fields have been 
+			entered so far.  Also fixed a bug in query that didn't allow you to go past the second page of results.
+		</deliverable>
 		
 		
 		
