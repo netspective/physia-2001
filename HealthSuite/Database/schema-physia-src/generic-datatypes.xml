@@ -126,6 +126,10 @@
 		<column name="result" lookupref="Lookup_Result_Type" descr="The type of result after a lookup (the value that should be used for the lookup -- the id or caption or abbreviation)"/>
 	</tabletype>
 
+	<tabletype name="Org_Lookup" type="Lookup">
+		<column name="org_internal_id" lookupref="Org.org_internal_id" descr="The organization that owns this item (NULL if owned globally)"/>
+	</tabletype>
+
 	<tabletype name="Type_Definition" type="Lookup">
 		<column name="remarks" type="text" size="2048" descr="Any special remarks, usage instructions etc."/>
 	</tabletype>
