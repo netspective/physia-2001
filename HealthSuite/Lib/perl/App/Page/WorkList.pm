@@ -53,11 +53,15 @@ sub prepare_view_default
 sub getChildResources
 {
 	my $self = shift;
+	my $resourceMap = shift;
+
 	my $children = {};
-	my $resourceMap = $self->property('resourceMap');
+	$resourceMap = $self->property('resourceMap') unless $resourceMap;
+
 	return $children unless ref($resourceMap) eq 'HASH';
 	foreach (keys %$resourceMap)
 	{
+		next if $_ =~ /^_/;
 		next unless ref($resourceMap->{$_}) eq 'HASH';
 		if (exists $resourceMap->{$_}->{_class})
 		{
@@ -182,7 +186,7 @@ sub getControlBarHtml
 		}
 		else
 		{
-			if (! $self->session('time1') || $self->session('time1') =~ /:/ || $self->session('time1') < 0) 
+			if (! $self->session('time1') || $self->session('time1') =~ /:/ || $self->session('time1') < 0)
 			{
 				$time1 = 30;
 				$self->session('time1', $time1);
@@ -190,7 +194,7 @@ sub getControlBarHtml
 				$time1 = $self->session('time1');
 			}
 
-			if (! $self->session('time2') || $self->session('time2') =~ /:/ || $self->session('time2') < 0) 
+			if (! $self->session('time2') || $self->session('time2') =~ /:/ || $self->session('time2') < 0)
 			{
 				$time2 = 120;
 				$self->session('time2', $time2);
@@ -202,7 +206,7 @@ sub getControlBarHtml
 		my $javascriptValidate;
 		$javascriptValidate = qq{ONBLUR="validateChange_Time(event)"}
 			if $self->param('showTimeSelect');
-		
+
 		$timeFieldsHtml = qq{
 			<SCRIPT>
 				function prefillDefaults(Form)
@@ -230,9 +234,9 @@ sub getControlBarHtml
 				setSelectedValue(document.dialog.showTimeSelect, '@{[$self->session('showTimeSelect')]}');
 			</script>
 
-			&nbsp;<input class='controlBar' name=time1 size=8 maxlength=8 value='$time1' title="$title1" 
+			&nbsp;<input class='controlBar' name=time1 size=8 maxlength=8 value='$time1' title="$title1"
 				$javascriptValidate>
-			&nbsp;<input class='controlBar' name=time2 size=8 maxlength=8 value='$time2' title="$title2" 
+			&nbsp;<input class='controlBar' name=time2 size=8 maxlength=8 value='$time2' title="$title2"
 				$javascriptValidate>
 
 			<INPUT TYPE=HIDDEN NAME="_f_action_change_controls" VALUE="1">
