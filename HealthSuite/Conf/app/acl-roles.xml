@@ -60,6 +60,7 @@
 			<allow permission="dlg/template/update" />
 		</permission>
 		<permission id="sde">
+			<allow permission="page/sde" />
 			<allow permission="page/sde/acl" />
 			<allow permission="page/sde/imagetags" />
 			<allow permission="page/sde/resources" />
