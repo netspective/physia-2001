@@ -57,6 +57,18 @@ $STMTMGR_RPT_CLAIM_STATUS = new App::Statements::Report::ClaimStatus(
 		},
 	},
 	
+	'sel_claim_detail' =>q
+	{
+		select 
+		i.invoice_id, ii.code,
+		iia.payer_id,iia.pay_date,
+		iia.pay_ref,decode(iia.adjustment_amount,NULL,0,iia.adjustment_amount)+decode(iia.plan_paid,NULL,0,iia.plan_paid),
+		nvl((select caption from payment_type pt where  pt.id = iia.pay_type ),
+		(select 'Insurance' from DUAL where iia.payer_type = 1))
+		
+		from invoice_item ii,invoice i ,Invoice_Item_Adjust iia
+		where ii.parent_id = i.invoice_id and ii.item_id = iia.parent_id (+) and i.invoice_id= ? 		
+	},
 );
 
 1;
