@@ -87,7 +87,7 @@ sub getComponentHtml
 	{
 		columnDefn =>
 			[
-				{colIdx => 0, head => 'Patient ID', hAlign=> 'left',dAlign => 'left',dataFmt=>"<A HREF = '/person/#0#/profile'>#0#</A>",},
+				{ head => 'Patient ID', hAlign=> 'left',dAlign => 'left',dataFmt=>"<A HREF = '/person/#0#/profile'>#8#</A>",},
 				{colIdx => 1, head => 'Invoice ID', hAlign=> 'left',url =>'/invoice/#1#/summary'},
 				{colIdx => 2, head => 'Event Description', dAlign => 'center'},							
 				{colIdx => 3, head => 'Balance' ,dAlign => 'center',dformat => 'currency', url=>'/person/#0#/account'},
@@ -218,6 +218,7 @@ sub getComponentHtml
 					TITLE='Close Account'>
 					<IMG SRC='/resources/icons/coll-close-account.gif' BORDER=0></A>
 			</nobr>}, 
+			$_->{simple_name},
 
 
 		);

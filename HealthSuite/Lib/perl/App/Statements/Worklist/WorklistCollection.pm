@@ -182,7 +182,8 @@ $STMTMGR_WORKLIST_COLLECTION = new App::Statements::Worklist::WorklistCollection
 					(SELECT MIN(iia.comments) FROM invoice_item_adjust iia WHERE parent_id =
 					  (SELECT MIN(item_id) FROM invoice_item ii WHERE ii.parent_id = i.invoice_id AND
 					   ii.item_type in (0,1,2) )
-					) as description
+					) as description,
+					p.simple_name
 					
 				FROM 	person p  ,invoice i 
 				WHERE	upper(substr(p.name_last,1,1)) between upper(:1) 
@@ -247,8 +248,9 @@ $STMTMGR_WORKLIST_COLLECTION = new App::Statements::Worklist::WorklistCollection
 					(SELECT MIN(iia.comments) FROM invoice_item_adjust iia WHERE parent_id =
 					  (SELECT MIN(item_id) FROM invoice_item ii WHERE ii.parent_id = i.invoice_id AND
 					   ii.item_type in (0,1,2) )
-					) as description				
-				FROM 	transaction t ,invoice i
+					) as description,
+					p.simple_name					
+				FROM 	transaction t ,invoice i, person p
 				WHERE 	t.trans_type = 9520
 				AND 	t.trans_status = 2
 				AND 	t.trans_subtype = 'Owner'
@@ -256,6 +258,7 @@ $STMTMGR_WORKLIST_COLLECTION = new App::Statements::Worklist::WorklistCollection
 				AND	t.trans_invoice_id = i.invoice_id	
 				and     t.trans_invoice_id is not null
 				AND	t.billing_facility_id = :7
+				AND	p.person = t.trans_owner_id
 				AND	ROWNUM<$COLLECTION_LIMIT
 		ORDER BY 1		
 	}, 
@@ -276,7 +279,8 @@ $STMTMGR_WORKLIST_COLLECTION = new App::Statements::Worklist::WorklistCollection
 					(SELECT MIN(iia.comments) FROM invoice_item_adjust iia WHERE parent_id =
 					  (SELECT MIN(item_id) FROM invoice_item ii WHERE ii.parent_id = i.invoice_id AND
 					   ii.item_type in (0,1,2) )
-					) as description
+					) as description,
+					p.simple_name
 				FROM 	person p  ,invoice i 
 				WHERE	upper(substr(p.name_last,1,1)) between upper(:1) 
 				AND	upper(:2)
@@ -365,8 +369,9 @@ $STMTMGR_WORKLIST_COLLECTION = new App::Statements::Worklist::WorklistCollection
 					(SELECT MIN(iia.comments) FROM invoice_item_adjust iia WHERE parent_id =
 					  (SELECT MIN(item_id) FROM invoice_item ii WHERE ii.parent_id = i.invoice_id AND
 					   ii.item_type in (0,1,2) )
-					) as description				
-				FROM 	transaction t ,invoice i
+					) as description,
+					p.simple_name
+				FROM 	transaction t ,invoice i, person p
 				WHERE 	t.trans_type = 9520
 				AND 	t.trans_status = 2
 				AND 	t.trans_subtype = 'Owner'
@@ -374,6 +379,7 @@ $STMTMGR_WORKLIST_COLLECTION = new App::Statements::Worklist::WorklistCollection
 				AND	t.trans_invoice_id = i.invoice_id	
 				and     t.trans_invoice_id is not null
 				AND	t.billing_facility_id = :7
+				AND	p.person_id = 	t.trans_owner_id
 				AND	ROWNUM<$COLLECTION_LIMIT
 		ORDER BY 1
 	},	
