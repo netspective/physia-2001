@@ -34,8 +34,9 @@ sub new
 	croak 'schema parameter required' unless $schema;
 
 	$self->addContent(
-		new CGI::Dialog::Field(caption => 'User Id', name => 'user_id', options => FLDFLAG_READONLY),
-		new CGI::Dialog::Field(caption => 'Batch Number', name => 'batch_id', options => FLDFLAG_REQUIRED),
+		new CGI::Dialog::Field(caption => 'User ID', name => 'user_id', options => FLDFLAG_READONLY),
+		new CGI::Dialog::Field(caption => 'Batch ID', name => 'batch_id', size => 12, options => FLDFLAG_REQUIRED),
+		new CGI::Dialog::Field(type => 'date', caption => 'Batch Date', name => 'batch_date', options => FLDFLAG_REQUIRED),
 		new CGI::Dialog::Field(type => 'select', selOptions => 'Insurance Payments:insurance;Personal Payments:personal', caption => 'Batch Type', name => 'batch_type'),
 
 	);
@@ -50,12 +51,6 @@ sub new
 	return $self;
 }
 
-#sub makeStateChanges
-#{
-#	my ($self, $page, $command, $dlgFlags) = @_;
-#	$self->SUPER::makeStateChanges($page, $command, $dlgFlags);
-#}
-
 sub populateData
 {
 	my ($self, $page, $command, $activeExecMode, $flags) = @_;
@@ -69,23 +64,19 @@ sub execute
 	my ($self, $page, $command, $flags) = @_;
 
 	my $batchId = $page->field('batch_id');
+	my $batchDate = $page->field('batch_date');
 	my $batchType = $page->field('batch_type');
 	my $sessOrg = $page->session('org_id');
 	if($batchType eq 'personal')
 	{
-		$page->param('_dialogreturnurl', "/org/$sessOrg/dlg-add-postpersonalpayment?_p_batch_id=$batchId");
+		$page->param('_dialogreturnurl', "/org/$sessOrg/dlg-add-postpersonalpayment?_p_batch_id=$batchId&_p_batch_date=$batchDate");
 	}
 	elsif($batchType eq 'insurance')
 	{
-		$page->param('_dialogreturnurl', "/org/$sessOrg/dlg-add-postinvoicepayment/insurance?_p_batch_id=$batchId");
+		$page->param('_dialogreturnurl', "/org/$sessOrg/dlg-add-postinvoicepayment?paidBy=insurance&_p_batch_id=$batchId&_p_batch_date=$batchDate");
 	}
 
 	$self->handlePostExecute($page, $command, $flags);
 }
-
-#sub customValidate
-#{
-#	my ($self, $page) = @_;
-#}
 
 1;
