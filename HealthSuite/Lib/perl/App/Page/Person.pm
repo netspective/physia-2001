@@ -17,6 +17,8 @@ use App::Dialog::Person;
 use App::Dialog::Person::Patient;
 use App::Dialog::Person::Physician;
 use App::Dialog::Person::Nurse;
+use App::Dialog::Adjustment;
+use App::Dialog::PostGeneralPayment;
 
 use App::Page::Search;
 
@@ -129,7 +131,7 @@ sub prepare_page_content_header
 						<OPTION value="/person/$personId/dlg-update-$category">Edit Registry</OPTION>
 						<OPTION value="/person/$personId/dlg-add-medication-prescribe">Prescribe Medication</OPTION>
 						<!-- <OPTION value="/person/$personId/dlg-add-">Create Note</OPTION> -->
-						<OPTION value="/person/$personId/account">Apply Payment</OPTION>
+						<OPTION value="/person/$personId/dialog/postpayment/personal">Apply Payment</OPTION>
 						<OPTION value="/person/$personId/dlg-remove-$category">Delete Record</OPTION>
 					</SELECT>
 					</FONT>
@@ -190,6 +192,33 @@ sub prepare_page_content_footer
 	$self->SUPER::prepare_page_content_footer(@_);
 	return 1;
 }
+
+#-----------------------------------------------------------------------------
+# DIALOG MANANGEMENT METHODS
+#-----------------------------------------------------------------------------
+
+sub prepare_dialog_postpayment
+{
+	my $self = shift;
+	my $personId = $self->param('person_id');
+
+	my $dialogCmd = $self->param('_pm_dialog_cmd') || 'add';
+	my ($payType, $invoiceId) = split(/,/, $dialogCmd);
+	$self->param('invoice_id', $invoiceId);
+	$self->param('payment', $payType);
+	#$self->addDebugStmt($payType);
+
+	my $cancelUrl = "/person/$personId/account";
+	my $dialog = new App::Dialog::PostGeneralPayment(schema => $self->getSchema(), cancelUrl => $cancelUrl);
+	$dialog->handle_page($self, $dialogCmd);
+
+	$self->addContent('<p>');
+	return $self->prepare_view_account();
+}
+
+#-----------------------------------------------------------------------------
+# VIEW-MANAGEMENT METHODS
+#-----------------------------------------------------------------------------
 
 sub prepare_view_update
 {
@@ -360,7 +389,7 @@ sub prepare_view_profile
 					</TABLE><BR>
 					#component.stp-person.hospitalizationSurgeriesTherapies#<BR>
 					#component.stp-person.activeProblems#<BR>
-					#component.stp-person.surgeryProcedures#<BR>										
+					#component.stp-person.surgeryProcedures#<BR>
 					#component.stp-person.authorization#<BR>
 						<TABLE CELLSPACING=0 BORDER=0 CELLPADDING=0 WIDTH=100%>
 							<TR VALIGN=TOP>
@@ -371,7 +400,7 @@ sub prepare_view_profile
 						</TABLE><BR>
 						#component.stp-person.affiliations#<BR>
 					#component.stp-person.associatedResources#</BR>
-					#component.stp-person.patientAppointments#</BR>					
+					#component.stp-person.patientAppointments#</BR>
 					#component.stp-person.benefits#</BR>
 					#component.stp-person.miscNotes#</BR>
 					</font>
@@ -410,7 +439,7 @@ sub prepare_view_chart
 					</TABLE><BR>
 					#component.stp-person.hospitalizationSurgeriesTherapies#<BR>
 					#component.stp-person.activeProblems#<BR>
-					#component.stp-person.surgeryProcedures#<BR>					
+					#component.stp-person.surgeryProcedures#<BR>
 					#component.stp-person.testsAndMeasurements#
 					</font>
 				</TD>
@@ -475,6 +504,22 @@ sub prepare_view_activity
 	return 1;
 }
 
+sub prepare_view_dialog
+{
+	my $self = shift;
+	my $dialog = $self->param('_pm_dialog');
+
+	if(my $method = $self->can("prepare_dialog_$dialog"))
+	{
+		return &{$method}($self);
+	}
+	else
+	{
+		$self->addError("Can't find prepare_dialog_$dialog method");
+	}
+	return 1;
+}
+
 sub handleARL
 {
 	my ($self, $arl, $params, $rsrc, $pathItems) = @_;
@@ -490,24 +535,33 @@ sub handleARL
 	unless($self->arlHasStdAction($rsrc, $pathItems, 1))
 	{
 		$self->param('_pm_view', $pathItems->[1]) if $pathItems->[1];
-		unless($pathItems->[1])
-		{
-			$self->redirect("/$arl/profile");
-			$self->send_http_header();
-			return 0;
-		}
 
-		if(scalar(@$pathItems) > 3)
+		if(defined $pathItems->[2] && $self->param('_pm_view') eq 'dialog')
 		{
-			$self->param('_panefile', $pathItems->[2]);
-			$self->param('_panepkg', $pathItems->[3]);
+			$self->param('_pm_dialog', $pathItems->[2]);
+			$self->param('_pm_dialog_cmd', $pathItems->[3]) if defined $pathItems->[3];
 		}
 		else
 		{
-			$self->param('_panefile', $pathItems->[2]);
-			$self->param('_panepkg', $pathItems->[2]);
-		};
-		$self->param('_panemode', 2);
+			unless($pathItems->[1])
+			{
+				$self->redirect("/$arl/profile");
+				$self->send_http_header();
+				return 0;
+			}
+
+			if(scalar(@$pathItems) > 3)
+			{
+				$self->param('_panefile', $pathItems->[2]);
+				$self->param('_panepkg', $pathItems->[3]);
+			}
+			else
+			{
+				$self->param('_panefile', $pathItems->[2]);
+				$self->param('_panepkg', $pathItems->[2]);
+			};
+			$self->param('_panemode', 2);
+		}
 	}
 
 	$self->printContents();
