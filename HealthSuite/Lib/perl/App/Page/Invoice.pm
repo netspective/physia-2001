@@ -13,6 +13,7 @@ use Date::Manip;
 use DBI::StatementManager;
 use App::Statements::Invoice;
 use App::Statements::Catalog;
+use App::Statements::Org;
 
 use App::Billing::Claims;
 use App::Billing::Input::DBI;
@@ -312,7 +313,7 @@ sub getProceduresHtml
 				<TD>&nbsp;</TD>
 				<TD ALIGN="Right"><FONT FACE="Arial,Helvetica" SIZE=2>$itemExtCost$unitCost</TD>
 				<TD>&nbsp;</TD>
-				<TD ALIGN="Right"><FONT FACE="Arial,Helvetica" SIZE=2 COLOR="DARKRED">@{[ $itemAdjustmentTotal ne '$0.00' ? $viewPaymentHtml : $itemAdjustmentTotal ]}</TD>
+				<TD ALIGN="Right"><FONT FACE="Arial,Helvetica" SIZE=2 COLOR="DARKRED">$viewPaymentHtml</TD>
 				<TD>&nbsp;</TD>
 				<TD ALIGN="Center">$emg</td>
 				<TD>&nbsp;</TD>
@@ -659,10 +660,12 @@ sub getItemsHtml
 
 		push(@rows, qq{
 			<TR>
-				<TD><FONT FACE="Arial,Helvetica" SIZE=3><B>$itemNum</B></TD>
+				<TD ALIGN="Center"><FONT FACE="Arial,Helvetica" SIZE=3><B>$itemNum</B></TD>
 				<TD ALIGN="Center"><FONT FACE="Arial,Helvetica" SIZE=2>$otherItem->{daysOrUnits}</TD>
 				<TD>&nbsp;</TD>
-				<TD><FONT FACE="Arial,Helvetica" SIZE=2>$otherItem->{caption}</TD>
+				<TD ALIGN="Center"><FONT FACE="Arial,Helvetica" SIZE=2>$otherItem->{cpt}</TD>
+				<TD>&nbsp;</TD>
+				<TD ALIGN="Left"><FONT FACE="Arial,Helvetica" SIZE=2>$otherItem->{caption}</TD>
 				<TD>&nbsp;</TD>
 				<TD ALIGN="Right"><FONT FACE="Arial,Helvetica" SIZE=2>$itemExtCost</TD>
 				<TD><FONT FACE="Arial,Helvetica" SIZE=2 COLOR="Green">&nbsp;</FONT></TD>
@@ -670,7 +673,7 @@ sub getItemsHtml
 				<TD ALIGN="Right"><FONT FACE="Arial,Helvetica" SIZE=2 COLOR="Darkred">$viewPaymentHtml</TD>
 			</TR>
 			$cmtRow
-			<TR><TD COLSPAN=17><IMG SRC='/resources/design/bar.gif' HEIGHT=1 WIDTH=100%></TD></TR>
+			<TR><TD COLSPAN=10><IMG SRC='/resources/design/bar.gif' HEIGHT=1 WIDTH=100%></TD></TR>
 		});
 	}
 
@@ -723,6 +726,8 @@ sub getItemsHtml
 							<TD ALIGN="Center"><FONT FACE="Arial,Helvetica" SIZE=2 COLOR=777777><B>#</B></TD>
 							<TD ALIGN="Center"><FONT FACE="Arial,Helvetica" SIZE=2 COLOR=777777><B>Qty</B></TD>
 							<TD>&nbsp;</TD>
+							<TD ALIGN="Center"><FONT FACE="Arial,Helvetica" SIZE=2 COLOR=777777><B>Code</B></TD>
+							<TD>&nbsp;</TD>
 							<TD ALIGN="Center"><FONT FACE="Arial,Helvetica" SIZE=2 COLOR=777777><B>Description</B></TD>
 							<TD>&nbsp;</TD>
 							<TD ALIGN="Center"><FONT FACE="Arial,Helvetica" SIZE=2 COLOR=777777><B>Charge</B></TD>
@@ -731,7 +736,7 @@ sub getItemsHtml
 						</TR>
 						@rows
 						<TR BGCOLOR=DDEEEE>
-							<TD COLSPAN=3><FONT FACE="Arial,Helvetica" SIZE=2 COLOR="Navy"><B>Balance:</B></FONT> <FONT FACE="Arial,Helvetica" SIZE=2 COLOR="$balColor"><B>$invoiceBalance</B></FONT></TD>
+							<TD COLSPAN=5><FONT FACE="Arial,Helvetica" SIZE=2 COLOR="Navy"><B>Balance:</B></FONT> <FONT FACE="Arial,Helvetica" SIZE=2 COLOR="$balColor"><B>$invoiceBalance</B></FONT></TD>
 							<!-- <TD><FONT FACE="Arial,Helvetica" SIZE=2 COLOR="$balColor"><B>$invoiceBalance</B></FONT></TD> -->
 							<TD ALIGN="Right"><FONT FACE="Arial,Helvetica" SIZE=2 COLOR="Darkred"><B>Totals:</B></TD>
 							<TD>&nbsp;</TD>
@@ -941,10 +946,11 @@ sub prepare_dialog_adjustment
 		foreach my $adj (@{$itemAdjs})
 		{
 			my $totalAdj = $adj->{adjustment_amount} + $adj->{plan_paid};
+			my $payerId = $adj->{payer_type} == 0 ? $adj->{payer_id} : $STMTMGR_ORG->getSingleValue($self, STMTMGRFLAG_NONE, 'selId', $adj->{payer_id});
 			push(@{$self->{page_content}}, qq{
 					<TR VALIGN=TOP>
 						<TD><FONT FACE="Arial,Helvetica" SIZE=2>$adj->{pay_date}</TD>
-						<TD><FONT FACE="Arial,Helvetica" SIZE=2>$adj->{payer_id}</TD>
+						<TD><FONT FACE="Arial,Helvetica" SIZE=2>$payerId</TD>
 						<TD><FONT FACE="Arial,Helvetica" SIZE=2>$adj->{adjustment_type}</TD>
 						<TD><FONT FACE="Arial,Helvetica" SIZE=2>$adj->{pay_type}</TD>
 						<TD><FONT FACE="Arial,Helvetica" SIZE=2>$adj->{pay_method}</TD>
@@ -1070,7 +1076,6 @@ sub prepare_view_summary
 	$self->addLocatorLinks(['Summary', "/invoice/$invoiceId/summary"]);
 
 	my $claim = $self->property('activeClaim');
-
 	my $patient = $self->getPersonHtml($claim->{careReceiver});
 	my $provider = $self->getPersonHtml($claim->{renderingProvider});
 	my $service = $self->getOrgHtml($claim->{renderingOrganization});
@@ -1085,16 +1090,25 @@ sub prepare_view_summary
 		push(@allDiags, $_->getDiagnosis());
 	}
 
-	my $selfPay = App::Universal::CLAIMTYPE_SELFPAY;	
+	#invoice statuses
+	my $created = App::Universal::INVOICESTATUS_CREATED;
 	my $onHold = App::Universal::INVOICESTATUS_ONHOLD;
+	my $pending = App::Universal::INVOICESTATUS_PENDING;
 	my $submitted = App::Universal::INVOICESTATUS_SUBMITTED;
 	my $transferred = App::Universal::INVOICESTATUS_TRANSFERRED;
 	my $rejectInternal = App::Universal::INVOICESTATUS_INTNLREJECT;
+	my $electronic = App::Universal::INVOICESTATUS_ETRANSFERRED;
+	my $paper = App::Universal::INVOICESTATUS_MTRANSFERRED;
 	my $rejectExternal = App::Universal::INVOICESTATUS_EXTNLREJECT;
 	my $awaitPayment = App::Universal::INVOICESTATUS_AWAITPAYMENT;
 	my $paymentApplied = App::Universal::INVOICESTATUS_PAYAPPLIED;
-	my $void = App::Universal::INVOICESTATUS_VOID;
+	my $appealed = App::Universal::INVOICESTATUS_APPEALED;
 	my $closed = App::Universal::INVOICESTATUS_CLOSED;
+	my $void = App::Universal::INVOICESTATUS_VOID;
+	#--------------------
+
+	my $selfPay = App::Universal::CLAIMTYPE_SELFPAY;
+	my $workComp = App::Universal::CLAIMTYPE_WORKERSCOMP;
 	my $hcfaInvoiceType = App::Universal::INVOICETYPE_HCFACLAIM;
 	my $genericInvoiceType = App::Universal::INVOICETYPE_SERVICE;
 
@@ -1106,16 +1120,17 @@ sub prepare_view_summary
 	{
 		if($invType == $hcfaInvoiceType)
 		{
+			my $submissionOrder = $self->property('submission')->{value_int};
 			$quickLinks = qq{
 					<TR>
-						@{[ $allDiags[0] ne '' && $invStatus < $submitted  ?
+						@{[ $allDiags[0] ne '' && $invStatus < $submitted && $submissionOrder == 0 ?
 						"<TD>
 							<FONT FACE='Arial,Helvetica' SIZE=2>
 							<a href='/invoice/$invoiceId/dialog/procedure/add'>Add Procedure </a>
 							</FONT>
 						</TD>" : '' ]}
 
-						@{[ $allDiags[0] eq '' && $invStatus < $submitted  ?
+						@{[ $allDiags[0] eq '' && $invStatus < $submitted && $submissionOrder == 0 ?
 						"<TD>
 							<FONT FACE='Arial,Helvetica' SIZE=2>
 							<a href='/invoice/$invoiceId/dialog/diagnoses/add'>Add Diagnosis Codes</a>
@@ -1129,12 +1144,21 @@ sub prepare_view_summary
 							</FONT>
 						</TD>" : '' ]}
 
-						@{[ $totalItems > 0 && ($invStatus == $rejectInternal || $invStatus == $rejectExternal) && $claimType != $selfPay ?
+						<!-- @{[ $totalItems > 0 && $claimType != $selfPay && 
+							($invStatus == $rejectInternal || $invStatus == $rejectExternal || $invStatus == $paymentApplied) ?
 						"<TD>
 							<FONT FACE='Arial,Helvetica' SIZE=2>
-							<a href='/invoice/$invoiceId/submit'>Resubmit Claim for Transfer</a>
+							<a href='/invoice/$invoiceId/submit?resubmit=1'>Resubmit Claim for Transfer</a>
 							</FONT>
 						</TD>" : '' ]}
+
+						@{[ $totalItems > 0 && $claimType != $selfPay && 
+							($invStatus == $rejectInternal || $invStatus == $rejectExternal || $invStatus == $paymentApplied) ?
+						"<TD>
+							<FONT FACE='Arial,Helvetica' SIZE=2>
+							<a href='/invoice/$invoiceId/submit?resubmit=2'>Submit Claim for Transfer to Next Payer</a>
+							</FONT>
+						</TD>" : '' ]} -->
 
 						@{[ $invStatus != $onHold && $invStatus < $transferred ?
 						"<TD>
@@ -1143,7 +1167,7 @@ sub prepare_view_summary
 							</FONT>
 						</TD>" : '' ]}
 
-						@{[ $claimType != $selfPay && ($invStatus == $awaitPayment || $invStatus == $paymentApplied) ?
+						@{[ $claimType != $selfPay && $invStatus > $electronic && $invStatus < $closed ?
 						"<TD>
 							<FONT FACE='Arial,Helvetica' SIZE=2>
 							<a href='/invoice/$invoiceId/dialog/postinvoicepayment?paidBy=insurance'>Apply Insurance Payment</a>
@@ -1353,6 +1377,7 @@ sub prepare_view_submit
 	my $self = shift;
 	my $invoiceId = $self->param('invoice_id');
 	my $claim = $self->property('activeClaim');
+	my $resubmitFlag = $self->param('resubmit');
 	my $patient = $claim->getCareReceiver();
 	my $patientId = $patient->getId();
 
@@ -1365,7 +1390,7 @@ sub prepare_view_submit
 		my $handler = \&{'App::Dialog::Procedure::execAction_submit'};
 		eval
 		{
-			&{$handler}($self, 'add', $invoiceId);
+			$invoiceId = &{$handler}($self, 'add', $invoiceId, $resubmitFlag);
 		};
 		$self->addError($@) if $@;
 
@@ -1667,6 +1692,9 @@ sub initialize
 
 	my $claim = $claimList->{claims}->[0];
 	$self->property('activeClaim', $claim);
+	#my $submitOrder = ;
+	#my $order = $submitOrder->{value_int};
+	$self->property('submission', $STMTMGR_INVOICE->getRowAsHash($self, STMTMGRFLAG_NONE, 'selInvoiceAttr', $invoiceId, 'Submission Order'));
 
 	$self->addLocatorLinks(
 			['Claims', '/search/claim'],
@@ -1709,27 +1737,45 @@ sub prepare_page_content_header
 	my $sessOrg = $self->session('org_id');
 	my ($colors, $fonts) = ($self->getThemeColors(), $self->getThemeFontTags());
 
+	#-------------------
+	#invoice statuses
 	my $created = App::Universal::INVOICESTATUS_CREATED;
 	my $onHold = App::Universal::INVOICESTATUS_ONHOLD;
 	my $pending = App::Universal::INVOICESTATUS_PENDING;
 	my $submitted = App::Universal::INVOICESTATUS_SUBMITTED;
 	my $transferred = App::Universal::INVOICESTATUS_TRANSFERRED;
 	my $rejectInternal = App::Universal::INVOICESTATUS_INTNLREJECT;
+	my $electronic = App::Universal::INVOICESTATUS_ETRANSFERRED;
+	my $paper = App::Universal::INVOICESTATUS_MTRANSFERRED;
 	my $rejectExternal = App::Universal::INVOICESTATUS_EXTNLREJECT;
 	my $awaitPayment = App::Universal::INVOICESTATUS_AWAITPAYMENT;
 	my $paymentApplied = App::Universal::INVOICESTATUS_PAYAPPLIED;
-	my $void = App::Universal::INVOICESTATUS_VOID;
+	my $appealed = App::Universal::INVOICESTATUS_APPEALED;
 	my $closed = App::Universal::INVOICESTATUS_CLOSED;
-	my $selfPay = App::Universal::CLAIMTYPE_SELFPAY;
+	my $void = App::Universal::INVOICESTATUS_VOID;
+
+	#claim types
+	my $selfPay = App::Universal::CLAIMTYPE_SELFPAY;	
 	my $workComp = App::Universal::CLAIMTYPE_WORKERSCOMP;
+	my $thirdParty = App::Universal::CLAIMTYPE_CLIENT;
+	
+	#invoice types
 	my $hcfaInvoiceType = App::Universal::INVOICETYPE_HCFACLAIM;
 	my $genericInvoiceType = App::Universal::INVOICETYPE_SERVICE;
+	#-------------------
 
 	my $claim = $self->property('activeClaim');
 	my $invType = $claim->getInvoiceType();
-	my $invStatus = $claim->getStatus();;
+	my $invStatus = $claim->getStatus();
 	my $claimType = $claim->getInvoiceSubtype();
 	my $totalItems = $claim->getTotalItems();
+	my $invoiceBalance = $claim->{balance};
+	my $submissionOrder = '';
+	if($invType == $hcfaInvoiceType)
+	{
+		$submissionOrder = $self->property('submission')->{value_int};
+	}
+
 
 	#check if any diag codes exist
 	my @allDiags = ();
@@ -1792,34 +1838,35 @@ sub prepare_page_content_header
 					<FONT FACE="Arial,Helvetica" SIZE=2>
 					<SELECT style="font-family: tahoma,arial,helvetica; font-size: 8pt" onchange="if(this.selectedIndex > 0) window.location.href = this.options[this.selectedIndex].value">
 						<OPTION>Choose Action</OPTION>
-						@{[ $allDiags[0] ne '' && $invStatus < $submitted && $invStatus != $void && $invType == $hcfaInvoiceType ? "<option value='/invoice/$invoiceId/dialog/procedure/add'>Add Procedure</option>" : '' ]}
-						@{[ $allDiags[0] eq '' && $invStatus < $submitted && $invStatus != $void && $invType == $hcfaInvoiceType ? "<option value='/invoice/$invoiceId/dialog/diagnoses/add'>Add Diagnoses</option>" : '' ]}
-						@{[ $allDiags[0] ne '' && $invStatus < $submitted && $invStatus != $void && $invType == $hcfaInvoiceType ? "<option value='/invoice/$invoiceId/dialog/diagnoses/update'>Update Diagnoses</option>" : '' ]}
-						
-						@{[ $claimType != $selfPay && ($invStatus == $awaitPayment || $invStatus == $paymentApplied) && $invType == $hcfaInvoiceType ? "<option value='/invoice/$invoiceId/dialog/postinvoicepayment?paidBy=insurance'>Post Insurance Payment</option>" : '' ]}
+						@{[ $allDiags[0] ne '' && $invStatus < $submitted && $invType == $hcfaInvoiceType ? "<option value='/invoice/$invoiceId/dialog/procedure/add'>Add Procedure</option>" : '' ]}
+						@{[ $allDiags[0] eq '' && $invStatus < $submitted && $invType == $hcfaInvoiceType ? "<option value='/invoice/$invoiceId/dialog/diagnoses/add'>Add Diagnoses</option>" : '' ]}
+						@{[ $allDiags[0] ne '' && $invStatus < $submitted && $invType == $hcfaInvoiceType ? "<option value='/invoice/$invoiceId/dialog/diagnoses/update'>Update Diagnoses</option>" : '' ]}
+
+						@{[ $claimType != $selfPay && $invStatus > $electronic && $invStatus < $closed && $invType == $hcfaInvoiceType ? "<option value='/invoice/$invoiceId/dialog/postinvoicepayment?paidBy=insurance'>Post Insurance Payment</option>" : '' ]}
 						<option value="/person/$clientId/dlg-add-postpersonalpayment">Post Personal Payment</option>
 						<option value="/person/$clientId/dlg-add-postrefund">Post Refund</option>
 						<option value="/person/$clientId/dlg-add-posttransfer">Post Transfer</option>
 						<option value="/person/$clientId/account">View All Claims for this Patient</option>
-						
-						@{[ $invType == $hcfaInvoiceType && $invStatus != $submitted && $invStatus != $void && $invStatus != $closed ? "<option value='/invoice/$invoiceId/dialog/claim/update'>Edit Claim</option>" : '' ]}
+
+						@{[ $invType == $hcfaInvoiceType && ($submissionOrder == 0 || $invStatus > $submitted) && $invStatus != $submitted && $invStatus != $appealed && $invStatus != $void && $invStatus != $closed ? "<option value='/invoice/$invoiceId/dialog/claim/update'>Edit Claim</option>" : '' ]}
 						@{[ $invType == $genericInvoiceType && $invStatus != $void && $invStatus != $closed ? "<option value='/invoice/$invoiceId/dlg-update-invoice'>Edit Invoice</option>" : '' ]}
 
-						@{[ $invStatus < $submitted && $invStatus != $void && $claimType != $selfPay && $totalItems > 0 && $invType == $hcfaInvoiceType ? "<option value='/invoice/$invoiceId/submit'>Submit Claim for Transfer</option>" : '' ]}
-						@{[ ($invStatus == $rejectInternal || $invStatus == $rejectExternal) && $invStatus != $void && $claimType != $selfPay && $totalItems > 0 && $invType == $hcfaInvoiceType ? "<option value='/invoice/$invoiceId/submit'>Resubmit Claim for Transfer</option>" : '' ]}
-						<!-- @{[ $invStatus != $pending && $invStatus < $submitted && $invStatus != $void && $totalItems > 0 && $invType == $hcfaInvoiceType ? "<option value='/invoice/$invoiceId/review'>Submit Claim for Review</option>" : '' ]} -->
-						@{[ $invStatus != $onHold && $invStatus < $transferred && $invStatus != $void ? "<option value='/invoice/$invoiceId/dialog/hold'>Place Claim On Hold</option>" : '' ]}
+						@{[ $invStatus < $submitted && ($claimType == $selfPay || $claimType == $thirdParty) && $totalItems > 0 ? "<option value='/invoice/$invoiceId/submit'>Submit for Billing</option>" : '' ]}
+						@{[ $invStatus < $submitted && $claimType != $selfPay && $totalItems > 0 && $invType == $hcfaInvoiceType ? "<option value='/invoice/$invoiceId/submit'>Submit Claim for Transfer</option>" : '' ]}
+						<!-- @{[ ($invStatus == $rejectInternal || $invStatus == $rejectExternal || $invStatus == $paymentApplied) && $claimType != $selfPay && $totalItems > 0 && $invType == $hcfaInvoiceType ? "<option value='/invoice/$invoiceId/submit?resubmit=1'>Resubmit Claim for Transfer to Current Payer</option>" : '' ]} -->
+						<!-- @{[ ($invStatus == $rejectInternal || $invStatus == $rejectExternal || $invStatus == $paymentApplied) && $claimType != $selfPay && $totalItems > 0 && $invType == $hcfaInvoiceType ? "<option value='/invoice/$invoiceId/submit?resubmit=2'>Submit Claim for Transfer to Next Payer</option>" : '' ]} -->
+						@{[ $invStatus == $appealed || ($invStatus != $onHold && $invStatus < $transferred) ? "<option value='/invoice/$invoiceId/dialog/hold'>Place Claim On Hold</option>" : '' ]}
 
-						@{[ $invStatus < $submitted && $invStatus != $void && $invType == $hcfaInvoiceType ? "<option value='/invoice/$invoiceId/dialog/claim/remove'>Void Claim</option>" : '' ]}
-						@{[ $invStatus < $submitted && $invStatus != $void && $invType == $genericInvoiceType ? "<option value='/invoice/$invoiceId/dlg-remove-invoice'>Void Invoice</option>" : '' ]}
+						@{[ $invStatus < $submitted && $invType == $hcfaInvoiceType ? "<option value='/invoice/$invoiceId/dialog/claim/remove'>Void Claim</option>" : '' ]}
+						@{[ $invStatus < $submitted && $invType == $genericInvoiceType ? "<option value='/invoice/$invoiceId/dlg-remove-invoice'>Void Invoice</option>" : '' ]}
 
-						@{[ $invStatus >= $submitted && $invStatus != $void && $invStatus != $closed && $invType == $hcfaInvoiceType ? "<option value='/invoice/$invoiceId/dialog/problem'>Report Problems with this Claim</option>" : '' ]}
+						<!-- @{[ $invStatus >= $submitted && $invStatus != $void && $invStatus != $closed && $invType == $hcfaInvoiceType ? "<option value='/invoice/$invoiceId/dialog/problem'>Report Problems with this Claim</option>" : '' ]} -->
 						@{[ $claimType == $selfPay || $invStatus >= $submitted ? qq{<option value='javascript:doActionPopup("/patientbill/$invoiceId")'>Print Patient Bill</option>} : '' ]}
 						<option value="/invoice/$invoiceId/summary">View Claim</option>
-						
-						@{[ $claimType == $workComp ? qq{<option value='/invoice/$invoiceId/dlg-$twcc61Command-twcc61'>\u$twcc61Command TWCC Form 61</option>} : '' ]}
-						@{[ $claimType == $workComp ? qq{<option value='/invoice/$invoiceId/dlg-$twcc64Command-twcc64'>\u$twcc64Command TWCC Form 64</option>} : '' ]}
-						@{[ $claimType == $workComp ? qq{<option value='/invoice/$invoiceId/dlg-$twcc69Command-twcc69'>\u$twcc69Command TWCC Form 69</option>} : '' ]}
+
+						@{[ $claimType == $workComp && $invStatus != $void && $invStatus != $closed ? qq{<option value='/invoice/$invoiceId/dlg-$twcc61Command-twcc61'>\u$twcc61Command TWCC Form 61</option>} : '' ]}
+						@{[ $claimType == $workComp && $invStatus != $void && $invStatus != $closed ? qq{<option value='/invoice/$invoiceId/dlg-$twcc64Command-twcc64'>\u$twcc64Command TWCC Form 64</option>} : '' ]}
+						@{[ $claimType == $workComp && $invStatus != $void && $invStatus != $closed ? qq{<option value='/invoice/$invoiceId/dlg-$twcc69Command-twcc69'>\u$twcc69Command TWCC Form 69</option>} : '' ]}
 					</SELECT>
 					</FONT>
 				<TD>
