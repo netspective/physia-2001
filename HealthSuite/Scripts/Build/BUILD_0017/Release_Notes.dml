@@ -382,6 +382,12 @@
 		<deliverable id="1663">
 			Report (aged pt recv) :  Corrected SQL to pull co-pay information and not multi count patient that have more then one role.  FIX : fixed detail report also
 		</deliverable>
+
+		<deliverable id="1664">
+			Fixed redirect problem when creating hospital claims. Next actions have been removed and redirect is now forced
+			to the patient's account.
+		</deliverable>
+
 		<deliverable id="1676">
 			Report (total recv) :  Corrected SQL to not multi count patient that have more then one role.  FIX : fixed detail report also
 		</deliverable>
