@@ -183,6 +183,8 @@ sub initialize
 		new CGI::Dialog::Field(type => 'bool',
 				style => 'check',
 				caption => 'Have you confirmed Personal Information/Insurance Coverage?',
+				preHtml => "<B><FONT COLOR=DARKRED>",
+				postHtml => "</FONT></B>",
 				name => 'confirmed_info',
 				options => FLDFLAG_REQUIRED),
 
@@ -230,25 +232,28 @@ sub makeStateChanges
 
 
 	#Billing Org Contact Information
-	my $billingOrg = $page->field('billing_facility_id');
-	my $billingContact = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selAttribute', $billingOrg, 'Contact Information');
-	if($billingOrg eq '' || $billingContact->{value_text} ne '')
+	if($command ne 'remove')
 	{
-		$self->updateFieldFlags('billing_contact', FLDFLAG_INVISIBLE, 1);
-		$self->updateFieldFlags('billing_phone', FLDFLAG_INVISIBLE, 1);
-	}
-	elsif($billingOrg ne '' && $billingContact->{value_text} eq '')
-	{
-		my $billContactField = $self->getField('billing_contact');
-		my $billPhoneField = $self->getField('billing_phone');
-
-		if($page->field('billing_contact') eq '')
+		my $billingOrg = $page->field('billing_facility_id');
+		my $billingContact = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selAttribute', $billingOrg, 'Contact Information');
+		if($billingOrg eq '' || $billingContact->{value_text} ne '')
 		{
-			$billContactField->invalidate($page, "Billing Facility '$billingOrg' does not have '$billContactField->{caption}' on file. Please provide one.");
+			$self->updateFieldFlags('billing_contact', FLDFLAG_INVISIBLE, 1);
+			$self->updateFieldFlags('billing_phone', FLDFLAG_INVISIBLE, 1);
 		}
-		if($page->field('billing_phone') eq '')
+		elsif($billingOrg ne '' && $billingContact->{value_text} eq '')
 		{
-			$billPhoneField->invalidate($page, "Billing Facility '$billingOrg' does not have '$billPhoneField->{caption}' on file. Please provide one.");
+			my $billContactField = $self->getField('billing_contact');
+			my $billPhoneField = $self->getField('billing_phone');
+
+			if($page->field('billing_contact') eq '')
+			{
+				$billContactField->invalidate($page, "Billing Facility '$billingOrg' does not have '$billContactField->{caption}' on file. Please provide one.");
+			}
+			if($page->field('billing_phone') eq '')
+			{
+				$billPhoneField->invalidate($page, "Billing Facility '$billingOrg' does not have '$billPhoneField->{caption}' on file. Please provide one.");
+			}
 		}
 	}
 }
