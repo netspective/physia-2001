@@ -691,6 +691,7 @@ sub voidInvoicePostSubmit
 			rel_diags => $item->{rel_diags} || undef,
 			data_text_a => $item->{data_text_a} || undef,
 			data_num_a => $item->{data_num_a} || undef,
+			data_num_b => $item->{data_num_b} || undef,
 			extended_cost => $extCost || undef,
 			_debug => 0
 		);
@@ -1861,6 +1862,7 @@ sub voidProcedureItem
 			service_end_date => $invItem->{service_end_date} || undef,
 			data_text_a => $invItem->{data_text_a} || undef,
 			data_num_a => $invItem->{data_num_a} || undef,
+			#data_num_b => $invItem->{data_num_b} || undef,
 			_debug => 0
 		);
 
