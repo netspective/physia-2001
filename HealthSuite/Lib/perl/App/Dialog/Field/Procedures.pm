@@ -74,6 +74,20 @@ sub isValid
 	my @defaultFeeSchedules = split(/\s*,\s*/, $page->param('_f_proc_default_catalog'));
 	my @diagCodes = split(/\s*,\s*/, $page->param('_f_proc_diags'));
 
+	#GET FEE SCHEDULE ASSOICATED WITH THE PROIVDER AND THE ORG
+	my @insFeeSchedules = ();
+	my $prov_fs =$STMTMGR_PERSON->getRowsAsHashList($page,STMTMGRFLAG_NONE, 'selAttributeByItemNameAndValueTypeAndParent',
+							$page->field('care_provider_id'),'Fee Schedules',0);	
+	foreach my $fs (@{$prov_fs})							
+	{
+		push(@insFeeSchedules, $fs->{value_int});
+	}
+	my $org_fs = $STMTMGR_ORG->getRowsAsHashList($page,STMTMGRFLAG_NONE,'selAttributeByItemNameAndValueTypeAndParent',
+							$page->field('service_facility_id'),'Fee Schedules',0);
+	foreach my $fs (@{$org_fs})							
+	{
+		push(@insFeeSchedules, $fs->{value_int});
+	}							
 
 	# GET FEE SCHEDULES FOR PRIMARY INSURANCE IF IT WAS SELECTED ----------------------------
 	my $payer = $page->field('payer');
@@ -94,12 +108,11 @@ sub isValid
 	my $getFeeSchedsForInsur = $STMTMGR_INSURANCE->getRowsAsHashList($page, STMTMGRFLAG_NONE, 
 		'selInsuranceAttr', $insurance->{parent_ins_id}, 'Fee Schedule');
 
-	my @insFeeSchedules = ();
+
 	foreach my $fs (@{$getFeeSchedsForInsur})
 	{
 		push(@insFeeSchedules, $fs->{value_text});
 	}
-
 
 	# ------------------------------------------------------------------------------------------------------------------------
 	#munir's old icd validation for checking if the same icd code is entered in twice
@@ -490,17 +503,23 @@ sub getHtml
 						{						
 							document.$dialogName._f_proc_all_catalogs.value = 
 							document.$dialogName._f_ins_ffs.value + "," +
+							document.$dialogName._f_prov_ffs.value + "," +
+							document.$dialogName._f_org_ffs.value + "," +
 							document.$dialogName._f_proc_default_catalog.value ;
 						}
 						else if (eval("document.$dialogName._f_payer") && document.$dialogName._f_payer.options[document.$dialogName._f_payer.selectedIndex].value.search(/Work Comp/)==0)
 						{							
 							document.$dialogName._f_proc_all_catalogs.value = 
 							document.$dialogName._f_work_ffs.value + "," +
+							document.$dialogName._f_prov_ffs.value + "," +
+							document.$dialogName._f_org_ffs.value + "," +
 							document.$dialogName._f_proc_default_catalog.value ;
 						}
 						else
 						{
-							document.$dialogName._f_proc_all_catalogs.value = 						
+							document.$dialogName._f_proc_all_catalogs.value = 	
+							document.$dialogName._f_prov_ffs.value + "," +
+							document.$dialogName._f_org_ffs.value + "," +
 							document.$dialogName._f_proc_default_catalog.value ;
 						}
 																	
