@@ -214,7 +214,7 @@ sub initialize
 		new CGI::Dialog::Field(caption => 'Billing Contact', name => 'billing_contact'),
 		new CGI::Dialog::Field(type=>'phone', caption => 'Billing Phone', name => 'billing_phone'),
 
-		new App::Dialog::Field::Person::ID(caption => 'Referring Physician ID', name => 'ref_id', types => ['Referring-Doctor']),
+		new App::Dialog::Field::Person::ID(caption => 'Referring Physician ID', name => 'ref_id', types => ['Referring-Doctor'], incSimpleName=>1),
 
 		new CGI::Dialog::MultiField(caption =>'Current/Similar Illness Dates', name => 'illness_dates',
 			fields => [
