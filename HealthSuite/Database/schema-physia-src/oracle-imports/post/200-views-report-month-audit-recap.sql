@@ -41,6 +41,7 @@ SELECT	invoice_id,
 	billing_id,
 	owner_org_id
 FROM	AUTO_INVOICE_CHRG
+WHERE 	NOT (invoice_status =15 AND parent_invoice_id is not null)
 
 --create or replace view invoice_charges as
 --SELECT	i.invoice_id,
