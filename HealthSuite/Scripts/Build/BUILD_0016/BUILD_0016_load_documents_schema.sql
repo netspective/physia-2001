@@ -1,21 +1,16 @@
 start tables/Document_Specification
-start tables-code/Document_Specification
 start data/Document_Specification
 
 start tables/Document_Event_Type
-start tables-code/Document_Event_Type
 start data/Document_Event_Type
 
 start tables/Document_Source_Type
-start tables-code/Document_Source_Type
 start data/Document_Source_Type
 
 start tables/Document_Association_Type
-start tables-code/Document_Association_Type
 start data/Document_Association_Type
 
 start tables/Document_Association_Status
-start tables-code/Document_Association_Status
 start data/Document_Association_Status
 
 start tables/Document
@@ -49,6 +44,5 @@ create index TRANS_PARENT_DOC_ID on Transaction (parent_doc_id) TABLESPACE TS_IN
 alter table Transaction_AUD add ( PARENT_DOC_ID NUMBER(16) );
 
 start tables-code/Transaction
-start tables-code/Transaction_Aud
 
 
