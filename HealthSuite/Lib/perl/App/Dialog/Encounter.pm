@@ -253,10 +253,6 @@ sub makeStateChanges
 	my $sessOrg = $page->session('org_id');
 	$self->getField('provider_fields')->{fields}->[0]->{fKeyStmtBindPageParams} = [$sessOrg, 'Physician'];
 	$self->getField('provider_fields')->{fields}->[1]->{fKeyStmtBindPageParams} = [$sessOrg, 'Physician'];
-	#$self->getField('org_fields')->{fields}->[0]->{sessOrg} = $sessOrg;
-	#$self->getField('org_fields')->{fields}->[1]->{sessOrg} = $sessOrg;
-	#$self->getField('org_fields')->{fields}->[2]->{sessOrg} = $sessOrg;
-
 
 
 
@@ -383,7 +379,6 @@ sub populateData
 		$STMTMGR_INVOICE->createFieldsFromSingleRow($page, STMTMGRFLAG_NONE, 'selInvoiceAttrIllness',$invoiceId);
 		$STMTMGR_INVOICE->createFieldsFromSingleRow($page, STMTMGRFLAG_NONE, 'selInvoiceAttrDisability',$invoiceId);
 		$STMTMGR_INVOICE->createFieldsFromSingleRow($page, STMTMGRFLAG_NONE, 'selInvoiceAttrHospitalization',$invoiceId);
-		#$STMTMGR_INVOICE->createFieldsFromSingleRow($page, STMTMGRFLAG_NONE, 'selInvoiceAttrPatientSign',$invoiceId);
 		$STMTMGR_INVOICE->createFieldsFromSingleRow($page, STMTMGRFLAG_NONE, 'selInvoiceAttrAssignment',$invoiceId);
 		$STMTMGR_INVOICE->createFieldsFromSingleRow($page, STMTMGRFLAG_NONE, 'selInvoiceAuthNumber',$invoiceId);
 		$STMTMGR_INVOICE->createFieldsFromSingleRow($page, STMTMGRFLAG_NONE, 'selInvoiceDeductible',$invoiceId);
@@ -784,33 +779,23 @@ sub handlePayers
 				if($singlePayer[0] eq 'Primary')
 				{
 					my $primIns = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInsuranceByBillSequence', $primary, $personId);
-					my $insFeeSchedules = $STMTMGR_INSURANCE->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'selInsuranceAttr', $primIns->{parent_ins_id}, 'Fee Schedule');
-					my @insFeeSchedules = ();
-					foreach my $fs (@{$insFeeSchedules})
-					{
-						push(@insFeeSchedules, $fs->{value_text});
-					}
-					$page->param('_f_proc_insurance_catalogs', @insFeeSchedules);
-					#$page->param('_f_proc_insurance_catalogs', 'test');
+
 					$page->field('claim_type', $primIns->{ins_type});
 					$page->field('primary_payer', $primIns->{product_name});
 				}
 				elsif($singlePayer[0] eq 'Secondary')
 				{
 					my $secIns = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInsuranceByBillSequence', $secondary, $personId);
-					#$page->field('claim_type', $secIns->{ins_type});
 					$page->field('secondary_payer', $secIns->{product_name});
 				}
 				elsif($singlePayer[0] eq 'Tertiary')
 				{
 					my $tertIns = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInsuranceByBillSequence', $tertiary, $personId);
-					#$page->field('claim_type', $tertIns->{ins_type});
 					$page->field('tertiary_payer', $tertIns->{product_name});
 				}
 				elsif($singlePayer[0] eq 'Quaternary')
 				{
 					my $quatIns = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInsuranceByBillSequence', $quaternary, $personId);
-					#$page->field('claim_type', $quatIns->{ins_type});
 					$page->field('quaternary_payer', $quatIns->{product_name});
 				}
 			}
@@ -822,13 +807,7 @@ sub handlePayers
 			{
 				my @primaryPlan = split('\)', $nonInsPayer[1]);
 				my $primIns = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInsuranceByBillSequence', $primary, $personId);
-				my $insFeeSchedules = $STMTMGR_INSURANCE->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'selInsuranceAttr', $primIns->{parent_ins_id}, 'Fee Schedule');
-				my @insFeeSchedules = ();
-				foreach my $fs (@{$insFeeSchedules})
-				{
-					push(@insFeeSchedules, $fs->{value_text});
-				}
-				$page->param('_f_proc_insurance_catalogs', @insFeeSchedules);
+
 				$page->field('claim_type', $primIns->{ins_type});
 				$page->field('primary_payer', $primIns->{product_name});
 			}
