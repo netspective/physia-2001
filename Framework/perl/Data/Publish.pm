@@ -6,6 +6,7 @@ use strict;
 use Exporter;
 use Number::Format;
 use CGI::Layout;
+use Date::Manip;
 use Storable qw(dclone);
 
 use vars qw(@ISA @EXPORT %BLOCK_PUBLICATION_STYLE %FORMELEM_STYLE);
@@ -23,7 +24,7 @@ use enum qw(BITMASK:PUBLCOLFLAG_ DONTWRAP DONTWRAPHEAD DONTWRAPBODY DONTWRAPTAIL
 	PUBLCOLFLAG_DONTWRAPHEAD
 	PUBLCOLFLAG_DONTWRAPBODY
 	PUBLCOLFLAG_DONTWRAPTAIL
-	
+
 
 	prepareStatementColumns
 	createHtmlFromStatement
@@ -41,7 +42,7 @@ use constant FMTTEMPLATE_CACHE_KEYNAME => '_tmplCache';
 	{
 		# this the "default" style so we don't override anything
 	},
-	
+
 	'panel.body' =>
 	{
 		#flags => PUBLFLAG_HIDEHEAD,
@@ -145,6 +146,37 @@ while(my ($style, $styleInfo) = each %BLOCK_PUBLICATION_STYLE)
 	}
 }
 
+
+
+sub fmt_stamp
+{
+	my $page = shift;
+	my $stamp = &ParseDate(shift);
+	my $stampFormat = $page->session('FORMAT_STAMP') || '%m/%d/%Y %r';
+	$stamp = Date_ConvTZ($stamp, 'GMT', $page->session('TZ') );
+	return &UnixDate($stamp, $stampFormat);
+}
+
+
+sub fmt_date
+{
+	my $page = shift;
+	my $date = &ParseDate(shift);
+	my $dateFormat = $page->session('FORMAT_DATE') || '%m/%d/%Y';
+	return &UnixDate($date, $dateFormat);
+}
+
+
+sub fmt_time
+{
+	my $page = shift;
+	my $time = &ParseDate(shift);
+	my $timeFormat = $page->session('FORMAT_TIME') || '%r';
+	$time = Date_ConvTZ($time, 'GMT', $page->session('TZ') );
+	return &UnixDate($time, $timeFormat);
+}
+
+
 #-----------------------------------------------------------------------------
 # The following functions/methods handle publishing of columnar (table/row)
 # data [like for reports, panels, etc]
@@ -247,9 +279,9 @@ sub prepare_HtmlBlockFmtTemplate
 
 	my ($headFontOpen, $headFontClose) = ($publDefn->{headFontOpen} || '<FONT FACE="Arial,Helvetica" SIZE=2 COLOR=NAVY>', $publDefn->{headFontClose} || '</FONT>');
 	my ($bodyFontOpen, $bodyFontClose) = ($publDefn->{bodyFontOpen} || '<FONT FACE="Verdana,Arial,Helvetica" SIZE=2>', $publDefn->{bodyFontClose} || '</FONT>');
-	my ($tailFontOpen, $tailFontClose) = ($publDefn->{tailFontOpen} || '<FONT FACE="Verdana,Arial,Helvetica" SIZE=2 COLOR=NAVY><B>', $publDefn->{tailFontClose} || '</B></FONT>');	
+	my ($tailFontOpen, $tailFontClose) = ($publDefn->{tailFontOpen} || '<FONT FACE="Verdana,Arial,Helvetica" SIZE=2 COLOR=NAVY><B>', $publDefn->{tailFontClose} || '</B></FONT>');
 	my ($subTotalFontOpen, $subTotalFontClose) = ($publDefn->{subTotalFontOpen} || '<FONT FACE="Verdana,Arial,Helvetica" SIZE=2 COLOR=NAVY><B>', $publDefn->{subTotalFontClose} || '</B></FONT>');
-	
+
 	my $columnDefn = $publDefn->{columnDefn};
 	my $publFlags = exists $publDefn->{flags} ? $publDefn->{flags} : 0;
 	my $outColsCount = (scalar(@$columnDefn) * 2) + 1; # because we create "spacer" columns, too
@@ -343,21 +375,21 @@ sub prepare_HtmlBlockFmtTemplate
 			}
 			if($tDataFmt)
 			{
-				$publFlags |= (PUBLFLAG_HASCALLBACKS | PUBLFLAG_HASTAILROW | PUBLFLAG_NEEDSTORAGE);				
+				$publFlags |= (PUBLFLAG_HASCALLBACKS | PUBLFLAG_HASTAILROW | PUBLFLAG_NEEDSTORAGE);
 				push(@storeCols, $colIdx) unless grep { $_ == $colIdx } @storeCols;
 				$tDataFmt=~ /(\d+)\,(\d+)/;
 				if($1 && $2)
 				{
-					push(@storeCols, $1) unless grep { $_ == $1 } @storeCols;				
-					push(@storeCols, $2) unless grep { $_ == $2 } @storeCols;									
+					push(@storeCols, $1) unless grep { $_ == $1 } @storeCols;
+					push(@storeCols, $2) unless grep { $_ == $2 } @storeCols;
 				};
-				
+
 			}
 			$tDataFmt ||= '&nbsp;';
 			$tDataFmt = "<NOBR>$tDataFmt</NOBR>" if $colOptions & (PUBLCOLFLAG_DONTWRAP | PUBLCOLFLAG_DONTWRAPTAIL);
 			$tCellFmt = "<TD ALIGN=$tAlign VALIGN=@{[$_->{tVAlign} || 'TOP']}>$tailFontOpen$tDataFmt$tailFontClose</TD>";
 		}
-		
+
 		#Sets up callbacks and cell format for subtotals
 		unless (defined $sCellFmt)
 		{
@@ -367,7 +399,7 @@ sub prepare_HtmlBlockFmtTemplate
 			if(my $summarize = $_->{summarize})
 			{
 				my $cbackName = $_->{dformat} ? "$summarize\_$_->{dformat}" : $summarize;
-				
+
 				#Sub total callbacks have a differant name
 				my $subCback=$cbackName."_sub_total";
 				$sDataFmt = "&{$subCback:$colIdx}";
@@ -380,8 +412,8 @@ sub prepare_HtmlBlockFmtTemplate
 				$sDataFmt =$groupBy;
 				$publFlags |= PUBLFLAG_HASSUBTOTAL;
 			}
-					
-			
+
+
 			$sDataFmt ||= '&nbsp;';
 			$sDataFmt = "<NOBR>$sDataFmt</NOBR>" if $colOptions & (PUBLCOLFLAG_DONTWRAP | PUBLCOLFLAG_DONTWRAPTAIL);
 			$sCellFmt = "<TD ALIGN=$sAlign VALIGN=@{[$_->{sVAlign} || 'TOP']}>$subTotalFontOpen$sDataFmt$subTotalFontClose</TD>";
@@ -560,13 +592,13 @@ sub prepare_HtmlBlockFmtTemplate
 		#
 		$bannerFmt =~ s/\#fmtdefn\.(\w+)\#/eval("\$$1")/ge;
 	}
-	
+
 	my $bodyRowAttr =
 		join ' ',
 			map {$_ . '="' . $publDefn->{bodyRowAttr}->{$_} . '"'}
 				keys %{$publDefn->{bodyRowAttr}}
 					if defined $publDefn->{bodyRowAttr};
-	
+
 	my ($headRowFmt, $bodyRowFmt, $tailRowFmt,$subTotalRowFmt) =
 	(
 		$publFlags & PUBLFLAG_HIDEHEAD ? '' : qq{
@@ -592,7 +624,7 @@ sub prepare_HtmlBlockFmtTemplate
 					$sSpacer @{[ join('', @subTotalCols) ]}
 				</TR>
 		},
-		
+
 	);
 
 	$publFlags |= PUBLFLAG_CHECKFORDATASEP if exists $publDefn->{separateDataColIdx};
@@ -797,43 +829,63 @@ sub createHtmlFromStatement
 				(
 					'fmt_currency' => sub { my $value = $rowRef->[$_[0]]; my $fmt = defined $value ? FORMATTER->format_price($value, 2) : ''; defined $value && $value < 0 ? "<FONT COLOR=RED>$fmt</FONT>" : $fmt },
 					'fmt_stripLeadingPath' => sub { my $value = $rowRef->[$_[0]]; $value =~ s!^.*/!!; $value },
+					'fmt_stamp' => sub
+					{
+						my $stamp = &ParseDate($rowRef->[$_[0]]);
+						my $stampFormat = $page->session('FORMAT_STAMP') || '%m/%d/%Y %r';
+						$stamp = Date_ConvTZ($stamp, 'GMT', $page->session('TZ') );
+						return &UnixDate($stamp, $stampFormat);
+					},
+					'fmt_date' => sub
+					{
+						my $date = &ParseDate($rowRef->[$_[0]]);
+						my $dateFormat = $page->session('FORMAT_DATE') || '%m/%d/%Y';
+						return &UnixDate($date, $dateFormat);
+					},
+					'fmt_time' => sub
+					{
+						my $time = &ParseDate($rowRef->[$_[0]]);
+						my $timeFormat = $page->session('FORMAT_TIME') || '%r';
+						$time = Date_ConvTZ($time, 'GMT', $page->session('TZ') );
+						return &UnixDate($time, $timeFormat);
+					},
 					'level_indent' => sub { my $level = $rowRef->[-1]; $level < 10 ? ($levIndentStr x $level) : '' },
 					'count' => sub { $rowNum },
 					'sum' => sub { my $store = $colValuesStorage[$_[0]]; my $sum = 0; grep { $sum += $_ } @{$store}; $sum; },
 					'sum_currency' => sub { my $store = $colValuesStorage[$_[0]]; my $sum = 0; grep { $sum += $_ } @{$store}; my $fmt = FORMATTER->format_price($sum, 2); $sum < 0 ? "<FONT COLOR=RED>$fmt</FONT>" : $fmt },
-					'avg' => sub 
-					{ 
-						my $store = $colValuesStorage[$_[0]]; 
-						my $sum = 0; 
-						grep { $sum += $_ } @{$store}; 
-						$sum > 0 ? ($sum / scalar(@{$store})) : 0; 
+					'avg' => sub
+					{
+						my $store = $colValuesStorage[$_[0]];
+						my $sum = 0;
+						grep { $sum += $_ } @{$store};
+						$sum > 0 ? ($sum / scalar(@{$store})) : 0;
 					},
-					'avg_currency' => sub 
-					{ 
-						my $store = $colValuesStorage[$_[0]]; 
-						my $sum = 0; 
-						grep { $sum += $_ } @{$store}; 
-						my $avg = scalar(@{$store}) > 0 ? ($sum / scalar(@{$store})) : 0; 
-						my $fmt = FORMATTER->format_price($avg, 2); 
-						$avg < 0 ? "<FONT COLOR=RED>$fmt</FONT>" : $fmt 
+					'avg_currency' => sub
+					{
+						my $store = $colValuesStorage[$_[0]];
+						my $sum = 0;
+						grep { $sum += $_ } @{$store};
+						my $avg = scalar(@{$store}) > 0 ? ($sum / scalar(@{$store})) : 0;
+						my $fmt = FORMATTER->format_price($avg, 2);
+						$avg < 0 ? "<FONT COLOR=RED>$fmt</FONT>" : $fmt
 					},
 					'sum_sub_total' => sub { my $store = $colSubStorage[$_[0]]; my $sum = 0; grep { $sum += $_ } @{$store}; $sum; },
 					'sum_currency_sub_total' => sub { my $store = $colSubStorage[$_[0]]; my $sum = 0; grep { $sum += $_ } @{$store}; my $fmt = FORMATTER->format_price($sum, 2); $sum < 0 ? "<FONT COLOR=RED>$fmt</FONT>" : $fmt },
-					'avg_sub_total' => sub 
-					{ 
-						my $store = $colSubStorage[$_[0]]; 
-						my $sum = 0; 
-						grep { $sum += $_ } @{$store}; 
-						scalar(@{$store}) > 0 ? ($sum / scalar(@{$store})) : 0; 
-					},
-					'avg_currency_sub_total' => sub 
+					'avg_sub_total' => sub
 					{
-						my $store = $colSubStorage[$_[0]]; 
-						my $sum = 0; grep { $sum += $_ } @{$store}; 
-						my $avg = scalar(@{$store}) > 0 ? ($sum / scalar(@{$store})) : 0; 
-						my $fmt = FORMATTER->format_price($avg, 2); 
-						$avg < 0 ? "<FONT COLOR=RED>$fmt</FONT>" : $fmt 
-					},					
+						my $store = $colSubStorage[$_[0]];
+						my $sum = 0;
+						grep { $sum += $_ } @{$store};
+						scalar(@{$store}) > 0 ? ($sum / scalar(@{$store})) : 0;
+					},
+					'avg_currency_sub_total' => sub
+					{
+						my $store = $colSubStorage[$_[0]];
+						my $sum = 0; grep { $sum += $_ } @{$store};
+						my $avg = scalar(@{$store}) > 0 ? ($sum / scalar(@{$store})) : 0;
+						my $fmt = FORMATTER->format_price($avg, 2);
+						$avg < 0 ? "<FONT COLOR=RED>$fmt</FONT>" : $fmt
+					},
 					'sum_percent' => sub
 					{
 						my @position = split (',',$_[0]);
@@ -845,12 +897,12 @@ sub createHtmlFromStatement
 						my $store_denominator =$colValuesStorage[$denominator];
 						grep {$sum_numerator+=$_}@{$store_numerator};
 						grep {$sum_denominator+=$_}@{$store_denominator};
-						$sum_denominator >0 ? sprintf "%3.2f" , (($sum_numerator / $sum_denominator) * 100) : '0.00';						
-					}										
-					
+						$sum_denominator >0 ? sprintf "%3.2f" , (($sum_numerator / $sum_denominator) * 100) : '0.00';
+					}
 
-						
-					
+
+
+
 				);
 			$callbacks{'call'} = sub { my $activeCol = shift; &{$colCallbacks[$activeCol]}($rowRef, $activeCol, $colValuesStorage[$activeCol]); };
 			$callbacks{'callifvaleq'} =	sub	{
@@ -904,32 +956,32 @@ sub createHtmlFromStatement
 					}
 					else
 					{
-					
-					
+
+
 						#Set up subtotal cur data
 						($groupByTextCur = $subTotalRowFmt)=~ s/\#([\-]?\d+)\#/$rowRef->[$1]/g;
 						$groupByTextPrev=$groupByTextCur unless defined $groupByTextPrev;
 						if ($groupByTextCur ne $groupByTextPrev)
-						{							
+						{
 							($outSubTotalRow = $subTotalRowFmt) =~ s/\&\{(\w+)\:([\-]?\d+(\,\d+)?)\}/exists $callbacks{$1} ? &{$callbacks{$1}}($2) : "Callback '$1' not found in \%callbacks"/ge;
 							my $subRow=$data;
-							$outSubTotalRow=~ s/\#([\-]?\d+)\#/$subRow->[$1]/g;	
+							$outSubTotalRow=~ s/\#([\-]?\d+)\#/$subRow->[$1]/g;
 							push(@outputRows,$outSubTotalRow);
 							$groupByTextPrev=$groupByTextCur;
 							@colSubStorage = ();
-								
+
 						}
-						@$data=@$rowRef;						
+						@$data=@$rowRef;
 						grep
 						{
 							push(@{$colSubStorage[$_]},$rowRef->[$_]);
-						} @colsToStore if $needStorage;					
-															
+						} @colsToStore if $needStorage;
+
 						grep
 						{
 							push(@{$colValuesStorage[$_]}, $rowRef->[$_]);
 						} @colsToStore if $needStorage;
-	
+
 						# find the default &{name:ddd} callbacks
 						($outRow = $bodyRowFmt) =~ s/\&\{(\w+)\:([\-]?\d+(\,\d+)?)\}/exists $callbacks{$1} ? &{$callbacks{$1}}($2) : "Callback '$1' not found in \%callbacks"/ge;
 						$outRow =~ s/\#([\-]?\d+)\#/$rowRef->[$1]/g;
@@ -940,17 +992,17 @@ sub createHtmlFromStatement
 				}
 				($outSubTotalRow = $subTotalRowFmt) =~ s/\&\{(\w+)\:([\-]?\d+(\,\d+)?)\}/exists $callbacks{$1} ? &{$callbacks{$1}}($2) : "Callback '$1' not found in \%callbacks"/ge;
 				my $subRow=$data;
-				$outSubTotalRow=~ s/\#([\-]?\d+)\#/$subRow->[$1]/g;	
+				$outSubTotalRow=~ s/\#([\-]?\d+)\#/$subRow->[$1]/g;
 				push(@outputRows,$outSubTotalRow);
 				if($publFlags & PUBLFLAG_HASTAILROW)
 				{
 					($outRow = $fmt->{tailRowFmt}) =~ s/\&\{(\w+)\:([\-]?\d+(\,\d+)?)\}/exists $callbacks{$1} ? &{$callbacks{$1}}($2) : "Callback '$1' not found in \%callbacks"/ge;
 					push(@outputRows, $outRow);
-				}				
+				}
 			}
 			else
 			{
-			
+
 				while($rowRef = $stmtHdl->fetch())
 				{
 					$rowNum++;
@@ -964,7 +1016,7 @@ sub createHtmlFromStatement
 						{
 							push(@{$colValuesStorage[$_]}, $rowRef->[$_]);
 						} @colsToStore if $needStorage;
-				
+
 						# find the default &{name:ddd} callbacks
 						($outRow = $bodyRowFmt) =~ s/\&\{(\w+)\:([\-]?\d+(\,\d+)?)\}/exists $callbacks{$1} ? &{$callbacks{$1}}($2) : "Callback '$1' not found in \%callbacks"/ge;
 						$outRow =~ s/\#([\-]?\d+)\#/$rowRef->[$1]/g;
@@ -1003,7 +1055,7 @@ sub createHtmlFromStatement
 			}
 			else
 			{
-				
+
 				while($rowRef = $stmtHdl->fetch())
 				{
 					$rowNum++;
@@ -1018,7 +1070,7 @@ sub createHtmlFromStatement
 		# don't end the output with a separator
 		pop(@outputRows) if $checkDataSep && $outputRows[$#outputRows] eq $dataSepStr;
 	};
-	
+
 	unless (defined $publParams->{maxRows} && $rowNum == $publParams->{maxRows})
 	{
 		$stmtHdl->finish();
@@ -1079,39 +1131,39 @@ sub createHtmlFromData
 					'count' => sub { $rowNum },
 					'sum' => sub { my $store = $colValuesStorage[$_[0]]; my $sum = 0; grep { $sum += $_ } @{$store}; $sum; },
 					'sum_currency' => sub { my $store = $colValuesStorage[$_[0]]; my $sum = 0; grep { $sum += $_ } @{$store}; my $fmt = FORMATTER->format_price($sum, 2); $sum < 0 ? "<FONT COLOR=RED>$fmt</FONT>" : $fmt },
-					'avg' => sub 
-					{ 
-						my $store = $colValuesStorage[$_[0]]; 
-						my $sum = 0; 
-						grep { $sum += $_ } @{$store}; 
-						scalar(@{$store}) > 0 ? ($sum / scalar(@{$store})) : 0; 
-					},
-					'avg_currency' => sub 
+					'avg' => sub
 					{
-						my $store = $colValuesStorage[$_[0]]; 
-						my $sum = 0; grep { $sum += $_ } @{$store}; 
-						my $avg = scalar(@{$store}) > 0 ? ($sum / scalar(@{$store})) : 0; 
-						my $fmt = FORMATTER->format_price($avg, 2); 
-						$avg < 0 ? "<FONT COLOR=RED>$fmt</FONT>" : $fmt 
+						my $store = $colValuesStorage[$_[0]];
+						my $sum = 0;
+						grep { $sum += $_ } @{$store};
+						scalar(@{$store}) > 0 ? ($sum / scalar(@{$store})) : 0;
 					},
-					
+					'avg_currency' => sub
+					{
+						my $store = $colValuesStorage[$_[0]];
+						my $sum = 0; grep { $sum += $_ } @{$store};
+						my $avg = scalar(@{$store}) > 0 ? ($sum / scalar(@{$store})) : 0;
+						my $fmt = FORMATTER->format_price($avg, 2);
+						$avg < 0 ? "<FONT COLOR=RED>$fmt</FONT>" : $fmt
+					},
+
 					'sum_sub_total' => sub { my $store = $colSubStorage[$_[0]]; my $sum = 0; grep { $sum += $_ } @{$store}; $sum; },
 					'sum_currency_sub_total' => sub { my $store = $colSubStorage[$_[0]]; my $sum = 0; grep { $sum += $_ } @{$store}; my $fmt = FORMATTER->format_price($sum, 2); $sum < 0 ? "<FONT COLOR=RED>$fmt</FONT>" : $fmt },
-					'avg_sub_total' => sub 
-					{ 
-						my $store = $colSubStorage[$_[0]]; 
-						my $sum = 0; 
-						grep { $sum += $_ } @{$store}; 
-						scalar(@{$store}) > 0 ? ($sum / scalar(@{$store})) : 0; 
-					},
-					'avg_currency_sub_total' => sub 
+					'avg_sub_total' => sub
 					{
-						my $store = $colSubStorage[$_[0]]; 
-						my $sum = 0; grep { $sum += $_ } @{$store}; 
-						my $avg = scalar(@{$store}) > 0 ? ($sum / scalar(@{$store})) : 0; 
-						my $fmt = FORMATTER->format_price($avg, 2); 
-						$avg < 0 ? "<FONT COLOR=RED>$fmt</FONT>" : $fmt 
-					},					
+						my $store = $colSubStorage[$_[0]];
+						my $sum = 0;
+						grep { $sum += $_ } @{$store};
+						scalar(@{$store}) > 0 ? ($sum / scalar(@{$store})) : 0;
+					},
+					'avg_currency_sub_total' => sub
+					{
+						my $store = $colSubStorage[$_[0]];
+						my $sum = 0; grep { $sum += $_ } @{$store};
+						my $avg = scalar(@{$store}) > 0 ? ($sum / scalar(@{$store})) : 0;
+						my $fmt = FORMATTER->format_price($avg, 2);
+						$avg < 0 ? "<FONT COLOR=RED>$fmt</FONT>" : $fmt
+					},
 					'sum_percent' => sub
 					{
 						my @position = split (',',$_[0]);
@@ -1123,9 +1175,9 @@ sub createHtmlFromData
 						my $store_denominator =$colValuesStorage[$denominator];
 						grep {$sum_numerator+=$_}@{$store_numerator};
 						grep {$sum_denominator+=$_}@{$store_denominator};
-						$sum_denominator >0 ? sprintf "%3.2f" , (($sum_numerator / $sum_denominator) * 100) : '0.00';						
-					}										
-					
+						$sum_denominator >0 ? sprintf "%3.2f" , (($sum_numerator / $sum_denominator) * 100) : '0.00';
+					}
+
 					#'avg' => sub { my $store = $colValuesStorage[$_[0]]; my $sum = 0; grep { $sum += $_ } @{$store}; $sum / scalar(@{$store}); },
 					#'avg_currency' => sub { my $store = $colValuesStorage[$_[0]]; my $sum = 0; grep { $sum += $_ } @{$store}; my $avg = $sum / scalar(@{$store}); my $fmt = FORMATTER->format_price($avg, 2); $avg < 0 ? "<FONT COLOR=RED>$fmt</FONT>" : $fmt },
 				);
@@ -1169,7 +1221,7 @@ sub createHtmlFromData
 			#Check if sub total are needed
 			#Move if/else outside of loops for performance
 			if ($publFlags & PUBLFLAG_HASSUBTOTAL)
-			{				
+			{
 				my $groupByTextPrev=undef;
 				my $groupByTextCur=undef;
 				my $data_row = 0;
@@ -1187,51 +1239,51 @@ sub createHtmlFromData
 					}
 					else
 					{
-						
+
 						#Set up subtotal cur data
 						($groupByTextCur = $subTotalRowFmt)=~ s/\#([\-]?\d+)\#/$rowRef->[$1]/g;
 						$groupByTextPrev=$groupByTextCur unless defined $groupByTextPrev;
-						
+
 						if ($groupByTextCur ne $groupByTextPrev)
-						{							
+						{
 							($outSubTotalRow = $subTotalRowFmt) =~ s/\&\{(\w+)\:([\-]?\d+(\,\d+)?)\}/exists $callbacks{$1} ? &{$callbacks{$1}}($2) : "Callback '$1' not found in \%callbacks"/ge;
 							my $subRow=$data->[$data_row];
-							$outSubTotalRow=~ s/\#([\-]?\d+)\#/$subRow->[$1]/g;	
+							$outSubTotalRow=~ s/\#([\-]?\d+)\#/$subRow->[$1]/g;
 							push(@outputRows,$outSubTotalRow);
 							$data_row = $rowNum;
 							$groupByTextPrev=$groupByTextCur;
 							@colSubStorage = ();
 						}
-						
+
 						grep
 						{
 							push(@{$colSubStorage[$_]},$rowRef->[$_]);
 						} @colsToStore if $needStorage;
-						
+
 						grep
 						{
 							push(@{$colValuesStorage[$_]}, $rowRef->[$_]);
 						} @colsToStore if $needStorage;
-	
+
 						# find the default &{name:ddd} callbacks
 						($outRow = $bodyRowFmt) =~ s/\&\{(\w+)\:([\-]?\d+(\,\d+)?)\}/exists $callbacks{$1} ? &{$callbacks{$1}}($2) : "Callback '$1' not found in \%callbacks"/ge;
 						$outRow =~ s/\#([\-]?\d+)\#/$rowRef->[$1]/g;
 						push(@outputRows, $outRow, $rowSepStr);
-						
+
 					}
 					last if defined $publParams->{maxRows} && $rowNum == $publParams->{maxRows};
 				}
-				
+
 				($outSubTotalRow = $subTotalRowFmt) =~ s/\&\{(\w+)\:([\-]?\d+(\,\d+)?)\}/exists $callbacks{$1} ? &{$callbacks{$1}}($2) : "Callback '$1' not found in \%callbacks"/ge;
 				my $subRow=$data->[$data_row];
-				$outSubTotalRow=~ s/\#([\-]?\d+)\#/$subRow->[$1]/g;	
+				$outSubTotalRow=~ s/\#([\-]?\d+)\#/$subRow->[$1]/g;
 				push(@outputRows,$outSubTotalRow);
 				if($publFlags & PUBLFLAG_HASTAILROW)
-				{					
+				{
 					($outRow = $fmt->{tailRowFmt}) =~ s/\&\{(\w+)\:([\-]?\d+(\,\d+)?)\}/exists $callbacks{$1} ? &{$callbacks{$1}}($2) : "Callback '$1' not found in \%callbacks"/ge;
 					push(@outputRows, $outRow);
 				}
-			}			
+			}
 			else
 			{
 				#
@@ -1251,7 +1303,7 @@ sub createHtmlFromData
 						{
 							push(@{$colValuesStorage[$_]}, $rowRef->[$_]);
 						} @colsToStore if $needStorage;
-	
+
 						# find the default &{name:ddd} callbacks
 						($outRow = $bodyRowFmt) =~ s/\&\{(\w+)\:([\-]?\d+(\,\d+)?)\}/exists $callbacks{$1} ? &{$callbacks{$1}}($2) : "Callback '$1'  not found in \%callbacks"/ge;
 						$outRow =~ s/\#([\-]?\d+)\#/$rowRef->[$1]/g;
@@ -1265,12 +1317,12 @@ sub createHtmlFromData
 					push(@outputRows, $outRow);
 				}
 			}
-						
-			
-			
-			
-			
-			
+
+
+
+
+
+
 		}
 		else
 		{
@@ -1399,7 +1451,7 @@ sub createTextFromData {
 	my ($rowIndex, $colIndex) = (0, 0);
 	my $format;
 	my $output;
-	
+
 	my $fillerChar = ($mtbDebug eq 'full' ? "x" : ($mtbDebug eq 'less' ? "." : " "));
 	my $fillerLine = ($mtbDebug eq 'full' ? "X\n" : ($mtbDebug eq 'less' ? ".\n" : "\n"));
 
@@ -1417,7 +1469,7 @@ sub createTextFromData {
 			data => $thisFieldDefn->{data} || "",
 #			startIdx => 0,
 		};
-	
+
 		$startIndex{$thisFieldDefn->{row}}{$thisFieldDefn->{col}} = 0;
 	}
 
@@ -1447,7 +1499,7 @@ sub createTextFromData {
 				# columns, help it along...
 				$format .= $fillerChar x ($currentCol - $colIndex);
 				$colIndex = $currentCol;
-				
+
 				# Fetch current field as a hash...
 				my $currentField = $newFieldDefn {$currentRow}{$currentCol};
 #				$output .= "newFieldDefn ref = ".ref ($newFieldDefn {$currentRow}{$currentCol})."\n";
@@ -1456,7 +1508,7 @@ sub createTextFromData {
 				my $formatChar;
 #				my $formatTestChar = uc($newFieldDefn{$currentRow}{$currentCol}{align});
 				my $formatTestChar = uc($currentField->{align});
-			
+
 				if ($formatTestChar eq 'LEFT') {
 					$formatChar = '<';
 				} elsif ($formatTestChar eq 'RIGHT') {
@@ -1464,7 +1516,7 @@ sub createTextFromData {
 				} else {
 					$formatChar = '|';
 				}
-		
+
 				$output .= "Format Char: $formatChar ($formatTestChar)\n" if ($mtbDebug eq 'full');
 				# Prepare the format string...
 				my $formatLength = $currentField->{width} - 1;
@@ -1483,13 +1535,13 @@ sub createTextFromData {
 #						$theField .= '*'.$currentField->{startIdx};
 #						push @theFields, $theField;
 #						$newFieldDefn {$currentRow}{$currentCol} = $currentField;
-						
+
 #						substr ($dataItem->[$currentField->{colIdx}], 0, $formatLength = "";
 #					} else {
 #						push @theFields, "";
 #					}
 				}
-	
+
 				# Update column index...
 				$colIndex = $colIndex + $formatLength;
 			}
@@ -1514,10 +1566,10 @@ sub createTextFromData {
 		$rowIndex = $maxRows;
 		$dataIndex ++;
 	}
-	
+
 	$output .= $fillerLine x ($maxRows - $rowIndex + 1);
 	$rowIndex = $maxRows;
-	
+
 #	print $output if ($mtbDebug);
 	return $output;
 }
