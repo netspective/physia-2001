@@ -10,12 +10,9 @@ use vars qw(@CHANGELOG);
 use vars qw(@ISA);
 use constant DATEFORMAT_USA => 1;
 @ISA = qw(App::Billing::Claim::Person);
-
 #
 #   -- This modlue contains all physician's data
 #   -- which is given in HCFA 1500 Form
-#
-
 sub new
 {
 	my ($type) = shift;
@@ -42,10 +39,9 @@ sub new
 	$self->{blueShieldId} = undef;
 	$self->{idIndicator} = undef;
 	$self->{providerId} = undef;
-    
+ 
 	return bless $self, $type;
 }
-
 
 sub setProviderId
 {
@@ -60,7 +56,6 @@ sub getProviderId
 	
 	return $self->{providerId};
 }
-
 
 sub setDocumentationType
 {
@@ -357,7 +352,6 @@ sub getPIN
 	return $self->{pin};
 }
 
-
 sub getName
 {
 	my ($self) = @_;
@@ -398,9 +392,7 @@ sub convertDateToMMDDYYYYFromCCYYMMDD
 	{
 		return "";
 	}
-
 }
-
 
 @CHANGELOG =
 ( 

@@ -32,7 +32,6 @@ sub new
 	$self->{studentStatus} = undef;
 	$self->{employmentStatus} = undef;
 	$self->{address} = undef;
-	$self->{ident} = undef;
 	$self->{status} = undef;
 	$self->{ssn} = undef;
 	$self->{type} = undef;
@@ -109,20 +108,6 @@ sub setStatus
 
 	$self->{status} = $temp->{uc($value)};
 }
-
-
-sub setIdent
-{
-	my ($self,$value) = @_;
-	$self->{ident} = $value;
-}
-
-sub getIdent
-{
-	my $self = shift;
-	return $self->{ident};
-}
-
 
 sub setDeathIndicator
 {

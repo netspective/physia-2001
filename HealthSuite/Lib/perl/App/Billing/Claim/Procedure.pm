@@ -39,8 +39,23 @@ sub new
 	$param{caption} = undef;	
 	$param{adjustments} = [];
 	$param{itemType} = undef;
+	$param{paymentDate} = undef;
+
 	
 	return bless \%param, $type;
+}
+
+
+sub setPaymentDate
+{
+	my ($self, $value) = @_;
+	$self->{paymentDate} = $value;
+}
+
+sub getPaymentDate
+{
+	my $self = shift;
+	return $self->{paymentDate};
 }
 
 sub setItemType
@@ -421,7 +436,7 @@ sub addAdjustments
 	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '01/18/2000', 'SSI', 'Billing Interface/Claim Procedure','reference property added which holds a reference number in invoice item'],
 	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '04/28/2000', 'SSI', 'Billing Interface/Claim Procedure','flags, caption properties added which holds flags, caption per invoice item'],
 	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '04/28/2000', 'SSI', 'Billing Interface/Claim Procedure','adjustments property added which holds a adjustments for each invoice item'],
-
+	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '05/06/2000', 'SSI', 'Billing Interface/Claim Procedure','payment date property added which holds a payment date for copay and adjustment items'],
 );
 
 1;

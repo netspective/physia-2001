@@ -56,12 +56,10 @@ use constant ASSOCIATION_EMPLOYMENT_EMP => '(220,221,222,223,224,225,226)';
 use constant ASSOCIATION_EMPLOYMENT_STUDENT => '(224)|(225)';
 use constant AUTHORIZATION_PATIENT => 370;
 use constant FACILITY_GROUP_NUMBER => 0;
-
 use constant PRIMARY => 0;
 use constant SECONDARY => 1;
 use constant TERTIARY => 2;
 use constant QUATERNARY => 3;
-
 #  Address constants
 use constant COLUMNINDEX_ADDRESSNAME => 0;
 use constant COLUMNINDEX_ADDRESS1 => 1;
@@ -415,11 +413,11 @@ sub assignPatientInsurance
 			}
 		}
 	}
-	$self->assignOtherInsuredInfo($claim, $invoiceId);
-	$self->assignOtherInsuredAddressInfo($claim, $invoiceId);
+	$self->assignInsuredInfo($claim, $invoiceId);
+	$self->assignInsuredAddressInfo($claim, $invoiceId);
 }
 
-sub assignOtherInsuredInfo
+sub assignInsuredInfo
 {
 	my ($self, $claim, $invoiceId) = @_;
 
@@ -496,7 +494,7 @@ sub assignOtherInsuredInfo
 	}
 }
 
-sub assignOtherInsuredAddressInfo
+sub assignInsuredAddressInfo
 {
 	my ($self, $claim, $invoiceId) = @_;
 
@@ -588,51 +586,58 @@ sub assignPaytoAndRendProviderInfo
 	my $colAttrnName = 2;
 	my $renderingProvider = $claim->getRenderingProvider();
 	my $payToProvider = $claim->getPayToProvider();
-	my $id = $renderingProvider->getId();
+	my @providers = ($renderingProvider, $payToProvider);
+	my $provider;
+	my $id;
 	my @row;
-	my $inputMap =
-		{
-			CERTIFICATION_LICENSE . 'Tax ID' => [ [$renderingProvider,  $renderingProvider, $payToProvider, $payToProvider], [\&App::Billing::Claim::Physician::setFederalTaxId, \&App::Billing::Claim::Physician::setTaxTypeId, \&App::Billing::Claim::Physician::setFederalTaxId, \&App::Billing::Claim::Physician::setTaxTypeId  ], [$colValText, $colValTextB, $colValText, $colValTextB]],
-			PHYSICIAN_SPECIALTY . 'Primary' => [ [$renderingProvider, $payToProvider], [\&App::Billing::Claim::Physician::setSpecialityId,\&App::Billing::Claim::Physician::setSpecialityId], [$colValTextB, $colValTextB]],
-			CERTIFICATION_LICENSE . 'UPIN' => [ [$renderingProvider, $payToProvider], [\&App::Billing::Claim::Physician::setPIN,\&App::Billing::Claim::Physician::setPIN], [$colValText, $colValText]],
-		};
-	# do the execute statement
-	my $queryStatment = "select value_text , value_textB, value_type || item_name  from person_attribute where parent_id = \'$id\' ";
-	my $sth = $self->{dbiCon}->prepare(qq {$queryStatment});
-
-	$sth->execute() or $self->{valMgr}->addError($self->getId(),100,"Unable to execute $queryStatment");
-	while(@row = $sth->fetchrow_array())
+	my $queryStatment;
+	my $sth;
+	foreach $provider(@providers)
 	{
-		if(my $attrInfo = $inputMap->{$row[$colAttrnName]})
-		{
-			my ($objInst, $method, $bindColumn) = @$attrInfo;
-			if ($objInst ne "")
+		$id = $provider->getId();
+		my $inputMap =
 			{
-				if (ref $method eq 'ARRAY')
+				CERTIFICATION_LICENSE . 'Tax ID' => [ [$provider, $provider], [\&App::Billing::Claim::Physician::setFederalTaxId, \&App::Billing::Claim::Physician::setTaxTypeId], [$colValText, $colValTextB]],
+				PHYSICIAN_SPECIALTY . 'Primary' => [ $provider,  \&App::Billing::Claim::Physician::setSpecialityId, $colValTextB],
+				CERTIFICATION_LICENSE . 'UPIN' => [ $provider, \&App::Billing::Claim::Physician::setPIN, $colValText],
+			};
+		# do the execute statement
+		$queryStatment = "select value_text , value_textB, value_type || item_name  from person_attribute where parent_id = \'$id\' ";
+		$sth = $self->{dbiCon}->prepare(qq {$queryStatment});
+		$sth->execute() or $self->{valMgr}->addError($self->getId(),100,"Unable to execute $queryStatment");
+		while(@row = $sth->fetchrow_array())
+		{
+			if(my $attrInfo = $inputMap->{$row[$colAttrnName]})
+			{
+				my ($objInst, $method, $bindColumn) = @$attrInfo;
+				if ($objInst ne "")
 				{
-					if (ref $objInst eq 'ARRAY')
+					if (ref $method eq 'ARRAY')
 					{
-						for my $methodNum (0..$#$method)
-						{
-							my $functionRef = $method->[$methodNum];
-							&$functionRef($objInst->[$methodNum], ($row[$bindColumn->[$methodNum]]));
-						}
-					}
-					else
+						if (ref $objInst eq 'ARRAY')
 						{
 							for my $methodNum (0..$#$method)
 							{
 								my $functionRef = $method->[$methodNum];
-								&$functionRef($objInst, ($row[$bindColumn->[$methodNum]]));
-							}
+								&$functionRef($objInst->[$methodNum], ($row[$bindColumn->[$methodNum]]));
+							}	
 						}
-				}
-				else
-					{
-						&$method($objInst, ($row[$bindColumn]));
+						else
+							{
+								for my $methodNum (0..$#$method)
+								{
+									my $functionRef = $method->[$methodNum];
+									&$functionRef($objInst, ($row[$bindColumn->[$methodNum]]));
+								}
+							}
 					}
-			  }
-		 }
+					else
+						{
+							&$method($objInst, ($row[$bindColumn]));
+						}
+				  }
+			 }
+		}
 	}
 	$queryStatment = "select value_textB from person_attribute,invoice where parent_id = invoice.client_id and item_name = \'Provider Assignment\' and invoice.invoice_id = $invoiceId and value_type = " . AUTHORIZATION_PATIENT;
 	$sth = $self->{dbiCon}->prepare(qq {$queryStatment});
@@ -1303,7 +1308,8 @@ sub assignInvoiceProperties
 	$patient->setAddress($patientAddress);
 	$payToProvider->setAddress($payToProviderAddress);
 	$renderingProvider->setAddress($renderingProviderAddress);
-	$self->setproperRenderingProvider($claim, $renderingProvider, $renderingOrganization);
+	$claim->setRenderingOrganization($renderingOrganization);
+	$claim->setRenderingProvider($renderingProvider);
 	$self->assignInvoiceAddresses($invoiceId, $claim,\@objects);
 	$self->payersRemainingProperties([$payer, $payer2, $payer3, $payer4], $invoiceId, $claim);
 
@@ -1396,8 +1402,8 @@ sub setproperRenderingProvider
 #	$renderingOrg->setName($renderingOrganization->getName);
 #	$renderingOrg->setSpecialityId($renderingProvider->getSpecialityId);
 #	$claim->setRenderingOrganization($renderingOrg);
-	$claim->setRenderingOrganization($renderingOrganization);
-	$claim->setRenderingProvider($renderingProvider);
+#	$claim->setRenderingOrganization($renderingOrganization);
+#	$claim->setRenderingProvider($renderingProvider);
 }
 
 sub setClaimProperties
@@ -1614,8 +1620,8 @@ sub populateItems
 
  	#$queryStatment = "select data_date_a, data_date_b, data_num_a, data_num_b, code, modifier, unit_cost, quantity, data_text_a, REL_DIAGS, data_text_c, DATA_TEXT_B , item_id, extended_cost, balance, total_adjust, item_type from invoice_item where parent_id = $invoiceId ";
 
- 	$queryStatment = "select to_char(nvl(service_begin_date, cr_stamp), \'dd-MON-yyyy\'), to_char(service_end_date, \'dd-MON-yyyy\'), hcfa_service_place, hcfa_service_type, code, modifier, unit_cost, quantity, emergency,
- 												REL_DIAGS, reference, COMMENTS , item_id, extended_cost, balance, total_adjust, item_type, flags, caption
+ 	$queryStatment = "select to_char(service_begin_date, \'dd-MON-yyyy\'), to_char(service_end_date, \'dd-MON-yyyy\'), hcfa_service_place, hcfa_service_type, code, modifier, unit_cost, quantity, emergency,
+ 												REL_DIAGS, reference, COMMENTS , item_id, extended_cost, balance, total_adjust, item_type, flags, caption, to_char(nvl(service_begin_date, cr_stamp), \'dd-MON-yyyy\')
  										from invoice_item
  										where parent_id = $invoiceId ";
 
@@ -1643,8 +1649,9 @@ sub populateItems
 		$procedureObject->setItemType($tempRow[16]);
 		$procedureObject->setFlags($tempRow[17]);
 		$procedureObject->setCaption($tempRow[18]);
-		$self->populateAdjustments($procedureObject, $tempRow[12]);
+		$procedureObject->setPaymentDate($tempRow[19]);
 
+		$self->populateAdjustments($procedureObject, $tempRow[12]);
 		$functionRef = $itemMap[$tempRow[16]];
 		if ($tempRow[16] == INVOICE_ITEM_LAB)
 		{
@@ -1830,7 +1837,6 @@ sub registerValidators
 	$validators->register(new App::Billing::Validate::HCFA::Medicare);
 	$validators->register(new App::Billing::Validate::HCFA::Other);
 	$validators->register(new App::Billing::Validate::HCFA::FECA);
-	$validators->register(new App::Billing::Validate::HCFA::HCFA1500);
 }
 
 sub getId
@@ -1888,6 +1894,8 @@ sub getId
 	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '04/28/2000', 'SSI','Billing Interface/Input DBI','rendering provider Id is set from value_textb of invoice_attribute with item_name provider/name'],
 	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '04/28/2000', 'SSI','Billing Interface/Input DBI','Patient ID is populated form invoice.client_id in both pre-submit and post-submit cases'],
 	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '05/05/2000', 'SSI','Billing Interface/Input DBI','GRP number is not populated in pre-submit'],
+	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '05/06/2000', 'SSI', 'Billing Interface/Input DBI','payment date property added which holds a payment date for copay and adjustment items'],
+
 );
 
 1;

@@ -20,7 +20,6 @@ sub new
 	my ($type) = shift;
 	my $self = new App::Billing::Claim::Person(@_);
 	
-	$self->{dbId} = undef;
 	$self->{relationshipToPatient} = undef;
 	$self->{policyGroupName} = undef;
 	$self->{policyGroupOrFECANo} = undef;
@@ -49,18 +48,6 @@ sub setBillSequence
 {
 	my ($self, $value) = @_;
 	$self->{billSequence} = $value;
-}
-
-sub getDbId
-{
-	my ($self) = @_;
-	return $self->{dbId};
-}
-
-sub setDbId
-{
-	my ($self, $value) = @_;
-	$self->{dbId} = $value;
 }
 
 sub getEffectiveDate
