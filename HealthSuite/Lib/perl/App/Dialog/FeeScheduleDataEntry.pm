@@ -38,7 +38,7 @@ sub new
 
 	$self->addContent(
                         new CGI::Dialog::Field(caption => 'Fee Schedules', size => 70, name => 'feeschedules',types => ['FeeScheduleEntry'],hints => 'Please provide a comma separated list of fee schedules.'),
-                        new CGI::Dialog::Field(caption => 'CPTs', name => 'listofcpts', size => 70, hints => 'Please provide a comma separated list of cpts or cpt ranges, example:xxxxx,xxxxx-xxxxx,xxxxx,xxxxx-xxxxx.'),
+                        new CGI::Dialog::Field(caption => 'CPTs', name => 'listofcpts', size => 70, hints => 'Please provide a comma separated list of cpts or cpt ranges, example:xxxxx,xxxxx-xxxxx,xxxxx,xxxxx-xxxxx.', findPopup => '/lookup/cpt'),
 
 	);
 	$self->addFooter(new CGI::Dialog::Buttons);
