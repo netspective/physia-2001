@@ -31,9 +31,9 @@ $STMTMGR_PERSON = new App::Statements::Person(
 			FROM	person_org_category poc, person_attribute pa
 			WHERE	poc.org_internal_id = :1
 			AND	UPPER(poc.category) = 'PHYSICIAN'
-			AND	pa.parent_id = poc.person_id			
+			AND	pa.parent_id = poc.person_id
 			AND	pa.item_name ='Fee Schedules'
-			AND	pa.item_type = 0			  	 
+			AND	pa.item_type = 0
 		},
 	'selPersonExists' => qq{
 		select person_id
@@ -125,7 +125,7 @@ $STMTMGR_PERSON = new App::Statements::Person(
 		where parent_id = ? and item_name = ? and value_type = ?
 		},
 	'selAttributeById' => qq{
-		select item_id, permissions, parent_id, item_type, item_name, value_type, value_text, value_textB, value_int, value_intB, value_float, value_floatB,
+		select item_id, permissions, parent_id, item_type, item_name, value_type, value_text, value_textB, name_sort, value_int, value_intB, value_float, value_floatB,
 			to_char(value_date, '$SQLSTMT_DEFAULTDATEFORMAT') as value_date, to_char(value_dateEnd, '$SQLSTMT_DEFAULTDATEFORMAT') as value_dateend,
 			to_char(value_dateA, '$SQLSTMT_DEFAULTDATEFORMAT') as value_dateA, to_char(value_dateB, '$SQLSTMT_DEFAULTDATEFORMAT') as value_dateb,
 			value_block, parent_org_id
@@ -355,13 +355,13 @@ $STMTMGR_PERSON = new App::Statements::Person(
 			where item_id = ?
 		},
 	'selAttributeByIdValueIntParent' =>qq{
-		SELECT	item_id 
+		SELECT	item_id
 		FROM	Person_Attribute
-		WHERE	parent_id = :1 
+		WHERE	parent_id = :1
 		AND	value_int = :2
-		AND	item_name = :3	
+		AND	item_name = :3
 		},
-			
+
 	'selPersonEmpIdAssociation' => qq{
 		select value_text as rel_id
 			from person_attribute
@@ -516,6 +516,13 @@ $STMTMGR_PERSON = new App::Statements::Person(
 		AND value_text = ?
 		AND item_name = 'Office Location'
 		},
+	'selAttrByItemNameParentNameSort' => qq{
+		SELECT *
+		FROM person_attribute
+		WHERE parent_id = ?
+		AND item_name = ?
+		AND name_sort = ?
+	},
 
 	# Registration and profile statements/definitions
 	#
