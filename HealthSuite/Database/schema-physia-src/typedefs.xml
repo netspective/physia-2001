@@ -516,6 +516,13 @@
 				<col name="remarks">Referral to a consulting care provider</col>
 			</row>
 			<row>
+				<col name="id">6030</col>
+				<col name="caption">Service Request Procedure</col>
+				<col name="group_name">Referral</col>
+				<col name="icon_img_summ">person.gif</col>
+				<col name="remarks">Service Request Procedure</col>
+			</row>
+			<row>
 				<col name="id">7000</col>
 				<col name="caption">Prescription</col>
 				<col name="group_name">Medication</col>
