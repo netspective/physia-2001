@@ -72,7 +72,8 @@ use constant MENU_APP_DEFAULT => [
 use constant MENU_APP_SUPPORT => [
 	['System Menu...', ''],
 	['Help', '/help'],
-	["Query", '/query'],
+	['Query', '/query'],
+	['Reports', '/report'],
 	['Logout', '/logout'],
 ];
 
