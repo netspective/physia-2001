@@ -85,7 +85,7 @@ sub execute
 	my $orgInternalId = $page->session('org_internal_id');
 	my $closeDate = $page->field('close_date');
 	my $closeMonth = UnixDate($closeDate, '%m/%Y');
-	
+		
 	my $today = UnixDate('today', $dateFormat);
 	my $fiscalMonth = '01';
 	my ($cMonth, $cDay, $cYear) = split('/', $today);
@@ -105,10 +105,10 @@ sub execute
 		'sel_orgDayStartingAR', $orgInternalId, $closeDate);
 
 	my $monthStartAR = $STMTMGR_REPORT_CLOSEDATE->getSingleValue($page, STMTMGRFLAG_NONE,
-		'sel_orgMonthStartingAR', $orgInternalId, $closeMonth, $closeDate);
+		'sel_orgMonthStartingAR', $orgInternalId, $closeMonth);
 		
 	my $yearStartAR = $STMTMGR_REPORT_CLOSEDATE->getSingleValue($page, STMTMGRFLAG_NONE,
-		'sel_orgYearStartingAR', $orgInternalId, $fiscalYearBeginDate, $closeDate);
+		'sel_orgYearStartingAR', $orgInternalId, $fiscalYearBeginDate);
 
 	my @data = (
 		['<b>STARTING A.R</b>', $dayStartAR || 0, $monthStartAR || 0, $yearStartAR || 0],
@@ -160,10 +160,10 @@ sub execute
 			'sel_docDayStartingAR', $orgInternalId, $closeDate, $doc);
 
 		my $monthStartAR = $STMTMGR_REPORT_CLOSEDATE->getSingleValue($page, STMTMGRFLAG_NONE,
-			'sel_docMonthStartingAR', $orgInternalId, $closeMonth, $closeDate, $doc);
+			'sel_docMonthStartingAR', $orgInternalId, $closeMonth, $doc);
 
 		my $yearStartAR = $STMTMGR_REPORT_CLOSEDATE->getSingleValue($page, STMTMGRFLAG_NONE,
-			'sel_docYearStartingAR', $orgInternalId, $fiscalYearBeginDate, $closeDate, $doc);
+			'sel_docYearStartingAR', $orgInternalId, $fiscalYearBeginDate, $doc);
 
 		my @data = (
 			['<b>STARTING A.R</b>', $dayStartAR || 0, $monthStartAR || 0, $yearStartAR || 0],

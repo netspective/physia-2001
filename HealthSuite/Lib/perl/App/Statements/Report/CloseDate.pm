@@ -90,8 +90,7 @@ $STMTMGR_REPORT_CLOSEDATE = new App::Statements::Report::CloseDate(
 		sqlStmt => qq{
 			select sum(balance) from Invoice 
 			where owner_id = :1
-				and invoice_date >= to_date(:2, '$monthFormat')
-				and invoice_date <  to_date(:3, '$SQLSTMT_DEFAULTDATEFORMAT')
+				and invoice_date < to_date(:2, '$monthFormat')
 		},
 	},
 		
@@ -99,8 +98,7 @@ $STMTMGR_REPORT_CLOSEDATE = new App::Statements::Report::CloseDate(
 		sqlStmt => qq{
 			select sum(balance) from Invoice 
 			where owner_id = :1
-				and invoice_date >= to_date(:2, '$SQLSTMT_DEFAULTDATEFORMAT')
-				and invoice_date <  to_date(:3, '$SQLSTMT_DEFAULTDATEFORMAT')
+				and invoice_date < to_date(:2, '$SQLSTMT_DEFAULTDATEFORMAT')
 		},
 	},
 
@@ -134,10 +132,9 @@ $STMTMGR_REPORT_CLOSEDATE = new App::Statements::Report::CloseDate(
 		sqlStmt => qq{
 			select sum(balance) from Transaction, Invoice 
 			where Invoice.owner_id = :1
-				and invoice_date >= to_date(:2, '$monthFormat')
-				and invoice_date <  to_date(:3, '$SQLSTMT_DEFAULTDATEFORMAT')
+				and invoice_date < to_date(:2, '$monthFormat')
 				and Transaction.trans_id = Invoice.main_transaction
-				and Transaction.provider_id = :4
+				and Transaction.provider_id = :3
 		},
 	},
 		
@@ -145,10 +142,9 @@ $STMTMGR_REPORT_CLOSEDATE = new App::Statements::Report::CloseDate(
 		sqlStmt => qq{
 			select sum(balance) from Transaction, Invoice 
 			where Invoice.owner_id = :1
-				and invoice_date >= to_date(:2, '$SQLSTMT_DEFAULTDATEFORMAT')
-				and invoice_date <  to_date(:3, '$SQLSTMT_DEFAULTDATEFORMAT')
+				and invoice_date < to_date(:2, '$SQLSTMT_DEFAULTDATEFORMAT')
 				and Transaction.trans_id = Invoice.main_transaction
-				and Transaction.provider_id = :4
+				and Transaction.provider_id = :3
 		},
 	},
 
