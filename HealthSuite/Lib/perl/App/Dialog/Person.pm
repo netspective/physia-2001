@@ -63,7 +63,7 @@ sub initialize
 						hints => "You may choose more than one 'Person Type'."
 				),
 
-		new App::Dialog::Field::Person::ID(caption => 'Doctor to bill for this provider', name => 'bill_provider'),
+		new App::Dialog::Field::Person::ID(caption => 'Doctor to bill for this provider', name => 'bill_provider', types => ['Physician']),
 
 		new CGI::Dialog::MultiField(caption =>'Job Title/Code', name => 'job_code',
 			fields => [
