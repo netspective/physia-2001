@@ -184,7 +184,7 @@ sub execute_remove
 			rel_diags => $item->{rel_diags} || undef,
 			data_text_a => $item->{data_text_a} || undef,
 			extended_cost => defined $extCost ? $extCost : undef,
-			balance => defined $itemBalance ? $itemBalance : undef,
+			#balance => defined $itemBalance ? $itemBalance : undef,
 			_debug => 0
 		);
 
@@ -197,22 +197,23 @@ sub execute_remove
 	}
 
 	#VOID CLAIM
-	my $invoiceStatus = App::Universal::INVOICESTATUS_VOID;
-	my $totalCost = 0;
-	my $updatedLineItems = $STMTMGR_INVOICE->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'selInvoiceItems', $invoiceId);
-	foreach my $item (@{$updatedLineItems})
-	{
-		$totalCost += $item->{extended_cost};
-	}
+	#my $totalCost = 0;
+	#my $updatedLineItems = $STMTMGR_INVOICE->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'selInvoiceItems', $invoiceId);
+	#foreach my $item (@{$updatedLineItems})
+	#{
+	#	$totalCost += $item->{extended_cost};
+	#}
 
-	my $invoiceInfo = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoice', $invoiceId);
-	my $balance = $totalCost + $invoiceInfo->{total_adjust};
+	#my $invoiceInfo = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoice', $invoiceId);
+	#my $balance = $totalCost + $invoiceInfo->{total_adjust};
+
+	my $invoiceStatus = App::Universal::INVOICESTATUS_VOID;
 	$page->schemaAction(
 		'Invoice', 'update',
 		invoice_id => $invoiceId || undef,
 		invoice_status => defined $invoiceStatus ? $invoiceStatus : undef,
-		total_cost => defined $totalCost ? $totalCost : undef,
-		balance => defined $balance ? $balance : undef,
+		#total_cost => defined $totalCost ? $totalCost : undef,
+		#balance => defined $balance ? $balance : undef,
 		_debug => 0
 	);
 	
