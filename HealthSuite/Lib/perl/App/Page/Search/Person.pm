@@ -55,7 +55,9 @@ sub getForm
 		};
 	}
 
-	return ('Lookup a person', qq{
+	return ('Lookup a' . ((grep {$_ eq substr($self->param('_pm_view'),0,1)} ('a','e','i','o','u')) ? 'n ' : ' ') .
+		$self->param('_pm_view'),
+		qq{
 		<CENTER>
 		<NOBR>
 		Find:
@@ -85,11 +87,16 @@ sub execute
 
 	# oracle likes '%' instead of wildcard '*'
 	my $appendStmtName = $expression =~ s/\*/%/g ? '_like' : '';
-	my $bindParams = $type eq 'anyname' ? [uc($expression) , uc($expression) , uc($expression) , uc($expression)] : [uc($expression) , uc($expression)];
-
+	my $bindParams = $type eq 'anyname' ? [uc($expression) , uc($expression)] : [uc($expression)];
+	my $category = "";
+	for ($self->param('_pm_view'))
+	{
+		/person/ and do {last};
+		$category = "_$_";
+	}
 	$self->addContent(
 		'<CENTER>',
-		$STMTMGR_PERSON_SEARCH->createHtml($self, STMTMGRFLAG_NONE, "sel_$type$appendStmtName", $bindParams,
+		$STMTMGR_PERSON_SEARCH->createHtml($self, STMTMGRFLAG_NONE, "sel_$type$appendStmtName$category", $bindParams,
 			#[
 			#	['ID', '<A HREF=\'javascript:chooseEntry("%0")\' STYLE="text-decoration:none">%0</A>'],
 			#	['Name'],
@@ -113,4 +120,5 @@ sub execute
 			'Search/Person',
 		'Changed the urls from create/... to org/.... '],
 );
+
 1;
