@@ -21,10 +21,6 @@
 			Added 'Schedule Follow-up Appointment' to next actions in checkout dialog.
 		</deliverable>
 
-		<deliverable id="613">
-			Added Claims Work List.
-		</deliverable>
-
 		<deliverable id="893">
 			Report (Invoice under Billing) :Removed diagnosis column. Corrected filter on service facility. 
 		</deliverable>
