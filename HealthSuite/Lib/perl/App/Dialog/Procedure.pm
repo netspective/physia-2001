@@ -243,8 +243,8 @@ sub storeFacilityInfo
 			parent_id => $invoiceId,
 			item_name => 'Service Provider/Facility/Billing',
 			value_type => defined $textValueType ? $textValueType : undef,
-			value_text => $billingFacilityName,
-			value_textB => $billFacilityId,
+			value_text => $billingFacilityName || undef,
+			value_textB => $billFacilityId || undef,
 			_debug => 0
 		);
 
@@ -252,11 +252,11 @@ sub storeFacilityInfo
 			'Invoice_Address', $command,
 			parent_id => $invoiceId,
 			address_name => 'Billing',
-			line1 => $billingFacilityAddr->{line1},
-			line2 => $billingFacilityAddr->{line2},
-			city => $billingFacilityAddr->{city},
-			state => $billingFacilityAddr->{state},
-			zip => $billingFacilityAddr->{zip},
+			line1 => $billingFacilityAddr->{line1} || undef,
+			line2 => $billingFacilityAddr->{line2} || undef,
+			city => $billingFacilityAddr->{city} || undef,
+			state => $billingFacilityAddr->{state} || undef,
+			zip => $billingFacilityAddr->{zip} || undef,
 			_debug => 0
 		);
 
@@ -270,8 +270,8 @@ sub storeFacilityInfo
 			parent_id => $invoiceId,
 			item_name => 'Service Provider/Facility/Service',
 			value_type => defined $textValueType ? $textValueType : undef,
-			value_text => $serviceFacilityName,
-			value_textB => $servFacilityId,
+			value_text => $serviceFacilityName || undef,
+			value_textB => $servFacilityId || undef,
 			_debug => 0
 		);
 
@@ -279,11 +279,11 @@ sub storeFacilityInfo
 			'Invoice_Address', $command,
 			parent_id => $invoiceId,
 			address_name => 'Service',
-			line1 => $serviceFacility->{line1},
-			line2 => $serviceFacility->{line2},
-			city => $serviceFacility->{city},
-			state => $serviceFacility->{state},
-			zip => $serviceFacility->{zip},
+			line1 => $serviceFacility->{line1} || undef,
+			line2 => $serviceFacility->{line2} || undef,
+			city => $serviceFacility->{city} || undef,
+			state => $serviceFacility->{state} || undef,
+			zip => $serviceFacility->{zip} || undef,
 			_debug => 0
 		);
 }
@@ -360,11 +360,11 @@ sub storePatientInfo
 			'Invoice_Address', $command,
 			parent_id => $invoiceId,
 			address_name => 'Patient',
-			line1 => $personAddr->{line1},
-			line2 => $personAddr->{line2},
-			city => $personAddr->{city},
-			state => $personAddr->{state},
-			zip => $personAddr->{zip},
+			line1 => $personAddr->{line1} || undef,
+			line2 => $personAddr->{line2} || undef,
+			city => $personAddr->{city} || undef,
+			state => $personAddr->{state} || undef,
+			zip => $personAddr->{zip} || undef,
 			_debug => 0
 		);
 
@@ -373,8 +373,8 @@ sub storePatientInfo
 			parent_id => $invoiceId,
 			item_name => 'Patient/Name',
 			value_type => defined $textValueType ? $textValueType : undef,
-			value_text => $personData->{complete_name},
-			value_textB => $clientId,
+			value_text => $personData->{complete_name} || undef,
+			value_textB => $clientId || undef,
 			_debug => 0
 		);
 
@@ -383,8 +383,8 @@ sub storePatientInfo
 			parent_id => $invoiceId,
 			item_name => 'Patient/Name/Last',
 			value_type => defined $textValueType ? $textValueType : undef,
-			value_text => $personData->{name_last},
-			value_textB => $clientId,
+			value_text => $personData->{name_last} || undef,
+			value_textB => $clientId || undef,
 			_debug => 0
 		);
 
@@ -393,8 +393,8 @@ sub storePatientInfo
 			parent_id => $invoiceId,
 			item_name => 'Patient/Name/First',
 			value_type => defined $textValueType ? $textValueType : undef,
-			value_text => $personData->{name_first},
-			value_textB => $clientId,
+			value_text => $personData->{name_first} || undef,
+			value_textB => $clientId || undef,
 			_debug => 0
 		);
 
@@ -403,8 +403,8 @@ sub storePatientInfo
 			parent_id => $invoiceId,
 			item_name => 'Patient/Name/Middle',
 			value_type => defined $textValueType ? $textValueType : undef,
-			value_text => $personData->{name_middle},
-			value_textB => $clientId,
+			value_text => $personData->{name_middle} || undef,
+			value_textB => $clientId || undef,
 			_debug => 0
 		) if $personData->{name_middle} ne '';
 
@@ -413,7 +413,7 @@ sub storePatientInfo
 			parent_id => $invoiceId,
 			item_name => 'Patient/Account Number',
 			value_type => defined $textValueType ? $textValueType : undef,
-			value_text => $personData->{person_ref},
+			value_text => $personData->{person_ref} || undef,
 			_debug => 0
 		);
 
@@ -422,7 +422,7 @@ sub storePatientInfo
 			parent_id => $invoiceId,
 			item_name => 'Patient/Contact/Home Phone',
 			value_type => defined $phoneValueType ? $phoneValueType : undef,
-			value_text => $personPhone,
+			value_text => $personPhone || undef,
 			_debug => 0
 		);
 
@@ -431,7 +431,7 @@ sub storePatientInfo
 			parent_id => $invoiceId,
 			item_name => 'Patient/Personal/Marital Status',
 			value_type => defined $textValueType ? $textValueType : undef,
-			value_text => $personData->{marstat_caption},
+			value_text => $personData->{marstat_caption} || undef,
 			_debug => 0
 		);
 
@@ -440,7 +440,7 @@ sub storePatientInfo
 			parent_id => $invoiceId,
 			item_name => 'Patient/Personal/Gender',
 			value_type => defined $textValueType ? $textValueType : undef,
-			value_text => $personData->{gender_caption},
+			value_text => $personData->{gender_caption} || undef,
 			_debug => 0
 		);
 
@@ -449,7 +449,7 @@ sub storePatientInfo
 			parent_id => $invoiceId,
 			item_name => 'Patient/Personal/DOB',
 			value_type => defined $dateValueType ? $dateValueType : undef,
-			value_date => $personData->{date_of_birth},
+			value_date => $personData->{date_of_birth} || undef,
 			_debug => 0
 		);
 }
@@ -484,7 +484,7 @@ sub storePatientEmployment
 					parent_id => $invoiceId,
 					item_name => 'Patient/Employment/Status',
 					value_type => defined $textValueType ? $textValueType : undef,
-					value_text => $status,
+					value_text => $status || undef,
 					_debug => 0
 				);
 		}
@@ -495,7 +495,7 @@ sub storePatientEmployment
 					parent_id => $invoiceId,
 					item_name => 'Patient/Student/Status',
 					value_type => defined $textValueType ? $textValueType : undef,
-					value_text => $status,
+					value_text => $status || undef,
 					_debug => 0
 				);
 		}
@@ -520,8 +520,8 @@ sub storeProviderInfo
 			parent_id => $invoiceId,
 			item_name => 'Provider/Name',
 			value_type => defined $textValueType ? $textValueType : undef,
-			value_text => $providerInfo->{complete_name},
-			value_textB => $providerId,
+			value_text => $providerInfo->{complete_name} || undef,
+			value_textB => $providerId || undef,
 			_debug => 0
 		);
 
@@ -530,8 +530,8 @@ sub storeProviderInfo
 			parent_id => $invoiceId,
 			item_name => 'Provider/Name/First',
 			value_type => defined $textValueType ? $textValueType : undef,
-			value_text => $providerInfo->{name_first},
-			value_textB => $providerId,
+			value_text => $providerInfo->{name_first} || undef,
+			value_textB => $providerId || undef,
 			_debug => 0
 		);
 
@@ -540,8 +540,8 @@ sub storeProviderInfo
 			parent_id => $invoiceId,
 			item_name => 'Provider/Name/Middle',
 			value_type => defined $textValueType ? $textValueType : undef,
-			value_text => $providerInfo->{name_middle},
-			value_textB => $providerId,
+			value_text => $providerInfo->{name_middle} || undef,
+			value_textB => $providerId || undef,
 			_debug => 0
 		) if $providerInfo->{name_middle} ne '';
 
@@ -550,8 +550,8 @@ sub storeProviderInfo
 			parent_id => $invoiceId,
 			item_name => 'Provider/Name/Last',
 			value_type => defined $textValueType ? $textValueType : undef,
-			value_text => $providerInfo->{name_last},
-			value_textB => $providerId,
+			value_text => $providerInfo->{name_last} || undef,
+			value_textB => $providerId || undef,
 			_debug => 0
 		);
 
@@ -560,7 +560,7 @@ sub storeProviderInfo
 			parent_id => $invoiceId,
 			item_name => 'Provider/UPIN',
 			value_type => defined $licenseValueType ? $licenseValueType : undef,
-			value_text => $providerUpin->{value_text},
+			value_text => $providerUpin->{value_text} || undef,
 			_debug => 0
 		);
 
@@ -569,8 +569,8 @@ sub storeProviderInfo
 			parent_id => $invoiceId,
 			item_name => 'Provider/Tax ID',
 			value_type => defined $licenseValueType ? $licenseValueType : undef,
-			value_text => $providerTaxId->{value_text},
-			value_textB => $providerTaxId->{value_textb},
+			value_text => $providerTaxId->{value_text} || undef,
+			value_textB => $providerTaxId->{value_textb} || undef,
 			_debug => 0
 		);
 
@@ -579,8 +579,8 @@ sub storeProviderInfo
 			parent_id => $invoiceId,
 			item_name => 'Provider/Specialty',
 			value_type => defined $textValueType ? $textValueType : undef,
-			value_text => $providerSpecialty->{value_text},
-			value_textB => $providerSpecialty->{value_textb},
+			value_text => $providerSpecialty->{value_text} || undef,
+			value_textB => $providerSpecialty->{value_textb} || undef,
 			_debug => 0
 		);
 }
@@ -632,8 +632,8 @@ sub storeInsuranceInfo
 					parent_id => $invoiceId,
 					item_name => 'Third-Party/Org/Name',
 					value_type => defined $textValueType ? $textValueType : undef,
-					value_text => $thirdPartyName,
-					value_textB => $thirdPartyId,
+					value_text => $thirdPartyName || undef,
+					value_textB => $thirdPartyId || undef,
 					_debug => 0
 				);
 		
@@ -642,7 +642,7 @@ sub storeInsuranceInfo
 					parent_id => $invoiceId,
 					item_name => 'Third-Party/Org/Phone',
 					value_type => defined $phoneValueType ? $phoneValueType : undef,
-					value_text => $thirdPartyPhone->{phone},
+					value_text => $thirdPartyPhone->{phone} || undef,
 					_debug => 0
 				);
 
@@ -650,11 +650,11 @@ sub storeInsuranceInfo
 					'Invoice_Address', $command,
 					parent_id => $invoiceId,
 					address_name => 'Third-Party',
-					line1 => $thirdPartyAddr->{line1},
-					line2 => $thirdPartyAddr->{line2},
-					city => $thirdPartyAddr->{city},
-					state => $thirdPartyAddr->{state},
-					zip => $thirdPartyAddr->{zip},
+					line1 => $thirdPartyAddr->{line1} || undef,
+					line2 => $thirdPartyAddr->{line2} || undef,
+					city => $thirdPartyAddr->{city} || undef,
+					state => $thirdPartyAddr->{state} || undef,
+					zip => $thirdPartyAddr->{zip} || undef,
 					_debug => 0
 				);
 		
@@ -676,8 +676,8 @@ sub storeInsuranceInfo
 					parent_id => $invoiceId,
 					item_name => "Insurance/$payerBillSeq/Name",
 					value_type => defined $textValueType ? $textValueType : undef,
-					value_text => $insOrgName,
-					value_textB => $insOrgId,
+					value_text => $insOrgName || undef,
+					value_textB => $insOrgId || undef,
 					_debug => 0
 				);
 
@@ -686,8 +686,8 @@ sub storeInsuranceInfo
 					parent_id => $invoiceId,
 					item_name => "Insurance/$payerBillSeq/Effective Dates",
 					value_type => defined $durationValueType ? $durationValueType : undef,
-					value_date => $personInsur->{coverage_begin_date},
-					value_dateEnd => $personInsur->{coverage_end_date},
+					value_date => $personInsur->{coverage_begin_date} || undef,
+					value_dateEnd => $personInsur->{coverage_end_date} || undef,
 					_debug => 0
 				);
 
@@ -706,8 +706,8 @@ sub storeInsuranceInfo
 					parent_id => $invoiceId,
 					item_name => "Insurance/$payerBillSeq/Group Number",
 					value_type => defined $textValueType ? $textValueType : undef,
-					value_text => $personInsur->{group_name} || $personInsur->{plan_name},
-					value_textB => $personInsur->{group_number} || $personInsur->{policy_number},
+					value_text => $personInsur->{group_name} || $personInsur->{plan_name} || undef,
+					value_textB => $personInsur->{group_number} || $personInsur->{policy_number} || undef,
 					_debug => 0
 				);
 
@@ -766,7 +766,7 @@ sub storeInsuranceInfo
 					parent_id => $invoiceId,
 					item_name => "Insurance/$payerBillSeq/Payment Source",
 					value_type => defined $textValueType ? $textValueType : undef,
-					value_text => $paySource,
+					value_text => $paySource || undef,
 					_debug => 0
 				);
 
@@ -817,7 +817,7 @@ sub storeInsuranceInfo
 					parent_id => $invoiceId,
 					item_name => "Insurance/$payerBillSeq/Phone",
 					value_type => defined $phoneValueType ? $phoneValueType : undef,
-					value_text => $insOrgPhone->{phone},
+					value_text => $insOrgPhone->{phone} || undef,
 					_debug => 0
 				);
 
@@ -825,11 +825,11 @@ sub storeInsuranceInfo
 					'Invoice_Address', $command,
 					parent_id => $invoiceId,
 					address_name => "$payerBillSeq Insurance",
-					line1 => $insOrgAddr->{line1},
-					line2 => $insOrgAddr->{line2},
-					city => $insOrgAddr->{city},
-					state => $insOrgAddr->{state},
-					zip => $insOrgAddr->{zip},
+					line1 => $insOrgAddr->{line1} || undef,
+					line2 => $insOrgAddr->{line2} || undef,
+					city => $insOrgAddr->{city} || undef,
+					state => $insOrgAddr->{state} || undef,
+					zip => $insOrgAddr->{zip} || undef,
 					_debug => 0
 				);
 
@@ -849,8 +849,8 @@ sub storeInsuranceInfo
 					parent_id => $invoiceId,
 					item_name => "Insurance/$payerBillSeq/Patient-Insured/Relationship",
 					value_type => defined $textValueType ? $textValueType : undef,
-					value_text => $relToCaption,
-					value_int => $relToCode,
+					value_text => $relToCaption || undef,
+					value_int => $relToCode || undef,
 					_debug => 0
 				);
 
@@ -863,8 +863,8 @@ sub storeInsuranceInfo
 					parent_id => $invoiceId,
 					item_name => "Insurance/$payerBillSeq/Insured/Name",
 					value_type => defined $textValueType ? $textValueType : undef,
-					value_text => $insuredData->{complete_name},
-					value_textB => $insuredData->{person_id},
+					value_text => $insuredData->{complete_name} || undef,
+					value_textB => $insuredData->{person_id} || undef,
 					_debug => 0
 				);
 
@@ -873,7 +873,7 @@ sub storeInsuranceInfo
 					parent_id => $invoiceId,
 					item_name => "Insurance/$payerBillSeq/Insured/Name/Last",
 					value_type => defined $textValueType ? $textValueType : undef,
-					value_text => $insuredData->{name_last},
+					value_text => $insuredData->{name_last} || undef,
 					_debug => 0
 				);
 
@@ -882,7 +882,7 @@ sub storeInsuranceInfo
 					parent_id => $invoiceId,
 					item_name => "Insurance/$payerBillSeq/Insured/Name/First",
 					value_type => defined $textValueType ? $textValueType : undef,
-					value_text => $insuredData->{name_first},
+					value_text => $insuredData->{name_first} || undef,
 					_debug => 0
 				);
 
@@ -891,7 +891,7 @@ sub storeInsuranceInfo
 					parent_id => $invoiceId,
 					item_name => "Insurance/$payerBillSeq/Insured/Name/Middle",
 					value_type => defined $textValueType ? $textValueType : undef,
-					value_text => $insuredData->{name_middle},
+					value_text => $insuredData->{name_middle} || undef,
 					_debug => 0
 				) if $insuredData->{name_middle} ne '';
 
@@ -900,7 +900,7 @@ sub storeInsuranceInfo
 					parent_id => $invoiceId,
 					item_name => "Insurance/$payerBillSeq/Insured/Personal/Marital Status",
 					value_type => defined $textValueType ? $textValueType : undef,
-					value_text => $insuredData->{marstat_caption},
+					value_text => $insuredData->{marstat_caption} || undef,
 					_debug => 0
 				);
 
@@ -909,7 +909,7 @@ sub storeInsuranceInfo
 					parent_id => $invoiceId,
 					item_name => "Insurance/$payerBillSeq/Insured/Personal/Gender",
 					value_type => defined $textValueType ? $textValueType : undef,
-					value_text => $insuredData->{gender_caption},
+					value_text => $insuredData->{gender_caption} || undef,
 					_debug => 0
 				);
 
@@ -918,7 +918,7 @@ sub storeInsuranceInfo
 					parent_id => $invoiceId,
 					item_name => "Insurance/$payerBillSeq/Insured/Personal/DOB",
 					value_type => defined $dateValueType ? $dateValueType : undef,
-					value_date => $insuredData->{date_of_birth},
+					value_date => $insuredData->{date_of_birth} || undef,
 					_debug => 0
 				);
 
@@ -927,7 +927,7 @@ sub storeInsuranceInfo
 					parent_id => $invoiceId,
 					item_name => "Insurance/$payerBillSeq/Insured/Personal/SSN",
 					value_type => defined $textValueType ? $textValueType : undef,
-					value_text => $insuredData->{ssn},
+					value_text => $insuredData->{ssn} || undef,
 					_debug => 0
 				);
 
@@ -943,7 +943,7 @@ sub storeInsuranceInfo
 					parent_id => $invoiceId,
 					item_name => "Insurance/$payerBillSeq/Insured/Contact/Home Phone",
 					value_type => defined $phoneValueType ? $phoneValueType : undef,
-					value_text => $insuredPhone,
+					value_text => $insuredPhone || undef,
 					_debug => 0
 				);
 
@@ -951,11 +951,11 @@ sub storeInsuranceInfo
 					'Invoice_Address', $command,
 					parent_id => $invoiceId,
 					address_name => "$payerBillSeq Insured",
-					line1 => $insuredAddr->{line1},
-					line2 => $insuredAddr->{line2},
-					city => $insuredAddr->{city},
-					state => $insuredAddr->{state},
-					zip => $insuredAddr->{zip},
+					line1 => $insuredAddr->{line1} || undef,
+					line2 => $insuredAddr->{line2} || undef,
+					city => $insuredAddr->{city} || undef,
+					state => $insuredAddr->{state} || undef,
+					zip => $insuredAddr->{zip} || undef,
 					_debug => 0
 				);
 
@@ -979,8 +979,8 @@ sub storeInsuranceInfo
 						parent_id => $invoiceId,
 						item_name => "Insurance/$payerBillSeq/Insured/$occupType/Name",
 						value_type => defined $textValueType ? $textValueType : undef,
-						value_text => $employerName,
-						value_textB => $empStatus,
+						value_text => $employerName || undef,
+						value_textB => $empStatus || undef,
 						_debug => 0
 					);
 			}
@@ -1025,17 +1025,17 @@ sub createActiveProbTrans
 		$page->schemaAction(
 				'Transaction', $command,
 				trans_owner_type => defined $personValueType ? $personValueType : undef,
-				trans_owner_id => $invoice->{client_id},
-				parent_trans_id => $mainTransData->{trans_id},
+				trans_owner_id => $invoice->{client_id} || undef,
+				parent_trans_id => $mainTransData->{trans_id} || undef,
 				trans_type => App::Universal::TRANSTYPEDIAG_ICD,
 				trans_status => defined $transStatActive ? $transStatActive : undef,
 				init_onset_date => $mainTransData->{init_onset_date} || undef,
 				curr_onset_date => $mainTransData->{curr_onset_date} || undef,
-				billing_facility_id => $mainTransData->{billing_facility_id},
-				service_facility_id => $mainTransData->{service_facility_id},
+				billing_facility_id => $mainTransData->{billing_facility_id} || undef,
+				service_facility_id => $mainTransData->{service_facility_id} || undef,
 				code => $icdCode || undef,
-				provider_id => $mainTransData->{provider_id},
-				care_provider_id => $mainTransData->{care_provider_id},
+				provider_id => $mainTransData->{provider_id} || undef,
+				care_provider_id => $mainTransData->{care_provider_id} || undef,
 				trans_begin_stamp => $todaysStamp || undef,
 				_debug => 0
 		);
@@ -1166,7 +1166,7 @@ sub execute
 			extended_cost => $extCost || undef,
 			balance => defined $balance ? $balance : undef,
 			emergency => defined $emg ? $emg : undef,
-			comments => $comments || '',
+			comments => $comments || undef,
 			#reference => $page->field('reference') || undef,
 			hcfa_service_place => $page->field('servplace') || undef,
 			hcfa_service_type => $page->field('servtype') || 'NULL',
@@ -1234,49 +1234,4 @@ sub execute
 	$self->handlePostExecute($page, $command, $flags);
 }
 
-#
-# change log is an array whose contents are arrays of
-# 0: one or more CHANGELOGFLAG_* values
-# 1: the date the change/update was made
-# 2: the person making the changes (usually initials)
-# 3: the category in which change should be shown (user-defined) - can have '/' for hierarchies
-# 4: any text notes about the actual change/action
-#
-use constant PROCEDURE_DIALOG => 'Dialog/Procedure';
-
-@CHANGELOG =
-(
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_NOTE, '12/27/1999', 'MAF',
-		PROCEDURE_DIALOG,
-		'Added submitter_id and submit_date to schema action (when updating invoice after submitting).'],
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_NOTE, '12/27/1999', 'MAF',
-		PROCEDURE_DIALOG,
-		'Fixed invoice statuses according to changes made to invoice_status table.'],
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_NOTE, '01/03/2000', 'MAF',
-		PROCEDURE_DIALOG,
-		'Added Pay Source, Insurance Type Code, Provider/UPIN invoice attributes.'],
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_NOTE, '01/05/2000', 'MAF',
-		PROCEDURE_DIALOG,
-		'Added HMO-PPO invoice attribute.'],
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_NOTE, '01/10/2000', 'MAF',
-		PROCEDURE_DIALOG,
-		"Removed 'execAction_x' functions for 'hold' and 'review'."],
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_NOTE, '01/13/2000', 'MAF',
-		PROCEDURE_DIALOG,
-		'Added Information Release attribute here (taken out from Create Claim).'],
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_NOTE, '01/14/2000', 'MAF',
-		PROCEDURE_DIALOG,
-		'Added increment tracking of cpt codes (see ref_cpt_usage table).'],
-	[	CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '01/14/1999', 'RK',
-		PROCEDURE_DIALOG,
-		'Added activityLog & nextAction_add to the sub new subroutine and added handlePostExecute in execute subroutine.'],
-	[	CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '01/17/1999', 'MAF',
-		PROCEDURE_DIALOG,
-		'Added a field to allow users to enter in a reference number per line item.'],
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_UPDATE, '01/24/1999', 'MAF',
-		PROCEDURE_DIALOG,
-		'Replaced magic numbers with constants.'],
-);
-
 1;
-
