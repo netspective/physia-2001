@@ -204,8 +204,6 @@ sub makeStateChanges
 	if(my $personId = $page->param('person_id'))
 	{
 		my $patientAge = $STMTMGR_PERSON->getSingleValue($page, STMTMGRFLAG_NONE, 'selPatientAge', $personId);
-		#$self->updateFieldFlags('insured_guarantor_ids', FLDFLAG_INVISIBLE, $patientAge < 21 ? 0 : 1);
-		#$self->updateFieldFlags('insured_id', FLDFLAG_INVISIBLE, $patientAge < 21 ? 1 : 0);
 		my $insuredId = $patientAge >= 21 ? $personId : undef;
 		$page->field('insured_id', $insuredId);
 	}
@@ -258,34 +256,34 @@ sub customValidate
 	}
 
 	my $previousSequence = $page->field('bill_seq_hidden');
+	my $nextSequence = $previousSequence + 1;
 
 	my $billCaption = $STMTMGR_INSURANCE->getSingleValue($page,STMTMGRFLAG_NONE,'selInsuranceBillCaption',$previousSequence);
+
 	my $sequence = $page->field('bill_sequence');
 
 	if ($sequence == App::Universal::INSURANCE_INACTIVE)
 	{
-		do
+
+		if ($STMTMGR_INSURANCE->recordExists($page,STMTMGRFLAG_NONE, 'selDoesInsSequenceExists', $personId, $nextSequence) && $nextSequence <=3)
 		{
-			$previousSequence ++;
+			my $insData = $STMTMGR_INSURANCE->getRowAsHash($page,STMTMGRFLAG_NONE, 'selInsuranceByBillSequence', $personId, $previousSequence);
+			my $insInternalId = $page->param('ins_internal_id');
+
 			$self->updateFieldFlags('create_record', FLDFLAG_INVISIBLE, 0);
 
 			if($STMTMGR_INSURANCE->recordExists($page,STMTMGRFLAG_NONE, 'selDoesInsSequenceExists', $personId, $previousSequence))
 			{
+				$STMTMGR_INSURANCE->execute($page,STMTMGRFLAG_NONE, 'selUpdateAndAddInsSeq', $insInternalId, $previousSequence);
 
-
-				my $createInsCoverageHref = "javascript:doActionPopup('/person-p/#param.person_id#/dlg-add-ins-coverage/?_f_bill_sequence=#field.bill_seq_hidden#');";
+				my $createInsCoverageHref = "'/person/#param.person_id#/dlg-add-ins-coverage/?_f_bill_sequence=#field.bill_seq_hidden#'";
 				$billSeq->invalidate($page, "Do u want to Create a New <a href=$createInsCoverageHref>'$billCaption Personal Insurance Coverage'</a>.<br> Or Click The Check Box To Inactivate this Coverage");
-				return $STMTMGR_INSURANCE->getRowsAsHashList($page,STMTMGRFLAG_NONE, 'selUpdateAndAddInsSeq', $personId, $previousSequence) if $page->field('create_record', 0);
 			}
 			elsif($page->field('create_record', 1))
 			{
 				return $STMTMGR_INSURANCE->getRowsAsHashList($page,STMTMGRFLAG_NONE, 'selUpdateInsSequence', $personId, $previousSequence);
 			}
-			#if($page->field('create_record') eq '')
-			#{
-			#	return $STMTMGR_INSURANCE->getRowsAsHashList($page,STMTMGRFLAG_NONE, 'selUpdateAndAddInsSeq', $personId, $previousSequence);
-			#}
-		}until $STMTMGR_INSURANCE->recordExists($page,STMTMGRFLAG_NONE, 'selDoesInsSequenceExists', $personId, $previousSequence) && $previousSequence <=3;
+		}
 	}
 
 }
@@ -320,24 +318,6 @@ sub populateData_add
 				$page->field('bill_sequence', $seq);
 			}
 		}
-
-
-		#my $billSequence = $STMTMGR_INSURANCE->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'selInsSequence', $personId);
-		#foreach my $existSequence(@{$billSequence})
-		#{
-
-		#	my $sequence = $existSequence->{'bill_sequence'};
-		#	if ($sequence < 4)
-		#	{
-		#		my $newSequence = $sequence + 1;
-		#		$page->field('bill_sequence', $newSequence);
-		#	}
-		#	else
-		#	{
-		#		$page->field('bill_sequence', App::Universal::INSURANCE_INACTIVE);
-		#	}
-		#}
-
 		my $productName = $page->field('product_name');
 		my $planName = $page->field('plan_name');
 		my $planType = App::Universal::RECORDTYPE_INSURANCEPLAN;
