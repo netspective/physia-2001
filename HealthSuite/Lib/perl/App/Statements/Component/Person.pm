@@ -923,7 +923,7 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 'person.careProviders' => {
 
 	sqlStmt => qq{
-			select	value_type, item_id, item_name, value_text, value_textb, parent_id
+			select	value_type, item_id, item_name, value_text, value_textb, parent_id, decode(value_int,1,'Primary Physician','')
 			from 	person_attribute
 			where 	parent_id = ?
 			and 	value_type = @{[ App::Universal::ATTRTYPE_PROVIDER ]}
@@ -931,7 +931,7 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 	sqlStmtBindParamDescr => ['Person ID for Attribute Table'],
 	publishDefn => {
 		columnDefn => [
-			{ head => 'CareProvider', dataFmt => '<A HREF = "/person/#3#/profile">#3#</A> (#2#) <A HREF ="/person/#5#/dlg-add-appointment?_f_resource_id=#3#&_f_attendee_id=#5#"> Sched Appointment</A>' },
+			{ head => 'CareProvider', dataFmt => '<A HREF = "/person/#3#/profile">#3#</A> (#2#, #6#) <A HREF ="/person/#5#/dlg-add-appointment?_f_resource_id=#3#&_f_attendee_id=#5#"> Sched Appointment</A>' },
 			#{ colIdx => 1, head => 'Provider', dataFmt => '&{fmt_stripLeadingPath:1}:' },
 			#{ colIdx => 2, head => 'Name', dataFmt => '#2#' },
 			#{ colIdx => 3, head => 'Phone', dataFmt => '#3#', options => PUBLCOLFLAG_DONTWRAP },
@@ -2305,7 +2305,7 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 		frame =>
 		{
 				heading => 'Diagnosis Summary',
-				-editUrl => '', 
+				-editUrl => '',
 		},
 	},
 	publishDefn_panelTransp =>
@@ -2315,9 +2315,9 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 		inherit => 'panel',
 		frame =>
 		{
-				-editUrl => '', 
+				-editUrl => '',
 		},
-		
+
 	},
 	publishComp_st => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.diagnosisSummary', [$personId]); },
   publishComp_stp => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.diagnosisSummary', [$personId], 'panel'); },
