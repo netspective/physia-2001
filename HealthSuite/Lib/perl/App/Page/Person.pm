@@ -614,6 +614,7 @@ sub prepare_view_associate
 				<TD>
 				<font size=1 face=arial>
 				#component.stp-person.attendance#<BR>
+				#component.stp-person.billinginfo#<BR>
 				#component.stp-person.certification#<BR>
 				#component.stp-person.affiliations#<BR>
 				#component.stp-person.benefits#<BR>
