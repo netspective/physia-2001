@@ -47,7 +47,7 @@ sub new
 		new CGI::Dialog::Field(name => 'data_text_c', caption => 'Procedures'),
 		new App::Dialog::Field::Person::ID(caption => 'Consulting Physician', name => 'consult_id', types => ['Physician']),
 		new CGI::Dialog::Field(type => 'memo', name => 'trans_substatus_reason', caption => 'Findings'),
-		new CGI::Dialog::Field(caption => 'Duration of Stay', name => 'data_text_b', size => 10),
+		new CGI::Dialog::Field(caption => 'Duration of Stay', name => 'data_num_a', size => 4, options => FLDFLAG_REQUIRED, defaultValue => '1', type => 'integer', maxLength => 4),
 	);
 	$self->{activityLog} =
 	{
@@ -96,7 +96,7 @@ sub execute
 			trans_status_reason => $page->field('trans_status_reason') || undef,
 			provider_id => $page->field('provider_id') || undef,
 			data_text_a => $page->field('data_text_a') || undef,
-			data_text_b => $page->field('data_text_b') || undef,
+			data_num_a => $page->field('data_num_a') || undef,
 			data_text_c => $page->field('data_text_c') || undef,
 			consult_id => $page->field('consult_id') || undef,
 			trans_substatus_reason => $page->field('trans_substatus_reason') || undef,
