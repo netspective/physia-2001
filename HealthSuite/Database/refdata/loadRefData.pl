@@ -100,7 +100,7 @@ sub importRVUInfo
 			  GLOBAL_SURGERY, PREOP_PERCENT,INTRAOP_PERCENT,POSTOP_PERCENT,MULTI_PROCEDURE,
 			  BILAT_SURGERY,  ASST_SURGERY,CO_SURGEONS, TEAM_SURGERY, PHY_SUPERVISE,
 			   BILL_MED_CODE ,  ENDO_BASE_CODE ,CONVERSION_FACT)
-			values ('$begin_yr','$end_yr',?,?,?,?,?,?,?,?,
+			values (to_date('$begin_yr', 'dd-MON-yy'), to_date('$end_yr', 'dd-MON-yy'),?,?,?,?,?,?,?,?,
 				?,?,?,?,?,?,?,?,?,?,
 				?,?,?,?,?,?,?,?,?,?,
 				?,?)",
@@ -149,7 +149,7 @@ sub importGPCIInfo
 			  COUNTY  ,     WORK ,
  			  PRACTICE_EXPENSE ,MAL_PRACTICE )
  			 values
- 			  ('$begin_yr','$end_yr'  ,?,?,?,?,?,?,?,?) ",
+ 			  (to_date('$begin_yr', 'dd-MON-yy'), to_date('$end_yr', 'dd-MON-yy'),?,?,?,?,?,?,?,?) ",
 			verifyCountStmt => "select count(*) from REF_GPCI",
 		);
 		$exporter->printErrors();
