@@ -64,6 +64,14 @@ sub new
 		),
 
 		new CGI::Dialog::Field(
+			name => 'totalReport',
+			type => 'bool',
+			style => 'check',
+			caption => 'Totals Report',
+			defaultValue => 0
+		),
+
+		new CGI::Dialog::Field(
 			name => 'printReport',
 			type => 'bool',
 			style => 'check',
@@ -119,6 +127,7 @@ sub execute
 	my $orgId = $page->field('ins_org_id');
 	my $providerId = $page->field('provider_id');
 	my $facilityId = $page->field('org_id');
+	my $totalReport = $page->field('totalReport');
 	my $hardCopy = $page->field('printReport');
 	# Get a printer device handle...
 	my $printerAvailable = 1;
@@ -133,9 +142,17 @@ sub execute
 	my $data;
 	my $html;
 
-	$data = $STMTMGR_REPORT_ACCOUNTING->getRowsAsArray($page, STMTMGRFLAG_NONE, 'sel_aged_insurance', $orgIntId, $page->session('org_internal_id'), $providerId, $facilityId, $page->field('service_begin_date'), $page->field('service_end_date'));
-	$html = $STMTMGR_REPORT_ACCOUNTING->createHtml($page, STMTMGRFLAG_NONE, 'sel_aged_insurance', [$orgIntId, $page->session('org_internal_id'), $providerId, $facilityId, $page->field('service_begin_date'), $page->field('service_end_date')]);
-
+	if($totalReport)
+	{
+		$data = $STMTMGR_REPORT_ACCOUNTING->getRowsAsArray($page, STMTMGRFLAG_NONE, 'sel_aged_insurance_total', $orgIntId, $page->session('org_internal_id'), $providerId, $facilityId, $page->field('service_begin_date'), $page->field('service_end_date'));
+		$html = $STMTMGR_REPORT_ACCOUNTING->createHtml($page, STMTMGRFLAG_NONE, 'sel_aged_insurance_total', [$orgIntId, $page->session('org_internal_id'), $providerId, $facilityId, $page->field('service_begin_date'), $page->field('service_end_date')]);
+	}
+	else
+	{
+		$data = $STMTMGR_REPORT_ACCOUNTING->getRowsAsArray($page, STMTMGRFLAG_NONE, 'sel_aged_insurance', $orgIntId, $page->session('org_internal_id'), $providerId, $facilityId, $page->field('service_begin_date'), $page->field('service_end_date'));
+		$html = $STMTMGR_REPORT_ACCOUNTING->createHtml($page, STMTMGRFLAG_NONE, 'sel_aged_insurance', [$orgIntId, $page->session('org_internal_id'), $providerId, $facilityId, $page->field('service_begin_date'), $page->field('service_end_date')]);
+	}
+	
 	my $textOutputFilename = createTextRowsFromData($page, STMTMGRFLAG_NONE, $data, $STMTMGR_REPORT_ACCOUNTING->{"_dpd_sel_aged_insurance"});
 
 	my $tempDir = $CONFDATA_SERVER->path_temp();
@@ -144,6 +161,7 @@ sub execute
 	{ Name => "Physician ID ", Value => $page->field('provider_id')},
 	{ Name => "Site Organization ID ", Value => $page->field('org_id')},
 	{ Name => "Start/End Service Date ", Value => $page->field('service_begin_date') . "  " . $page->field('service_end_date')},
+	{ Name=> "Totals Report ", Value => ($totalReport) ? 'Yes' : 'No' },
 	{ Name=> "Print Report ", Value => ($hardCopy) ? 'Yes' : 'No' },
 	{ Name=> "Printer ", Value => $printerDevice},
 	];

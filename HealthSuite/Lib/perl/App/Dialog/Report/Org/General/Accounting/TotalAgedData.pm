@@ -56,6 +56,14 @@ sub new
 			),
 
 		new CGI::Dialog::Field(
+			name => 'totalReport',
+			type => 'bool',
+			style => 'check',
+			caption => 'Totals Report',
+			defaultValue => 0
+		),
+
+		new CGI::Dialog::Field(
 			name => 'printReport',
 			type => 'bool',
 			style => 'check',
@@ -113,6 +121,7 @@ sub execute
 	my $personId = $page->field('person_id');
 	my $providerId = $page->field('provider_id');
 	my $facilityId = $page->field('org_id');
+	my $totalReport = $page->field('totalReport');
 	my $hardCopy = $page->field('printReport');
 	# Get a printer device handle...
 	my $printerAvailable = 1;
@@ -146,15 +155,41 @@ sub execute
 				],
 			};
 
+	my $pubTotal  = {
+			reportTitle => 'Total Aged Receivables',
+			columnDefn =>
+				[
+				{ colIdx => 0,dAlign=>'left',tAlign=>'left', , hAlign=>'left',head => 'Patients', dataFmt => '#0#',},
+				{ colIdx => 1, head => 'Total Invoices',tAlign=>'center', summarize=>'sum',dataFmt => '#1#',dAlign =>'center' },
+				{ colIdx => 2, head => '0 - 30',summarize=>'sum', dataFmt => '#2#', dformat => 'currency' },
+				{ colIdx => 3, head => '31 - 60', summarize=>'sum',dataFmt => '#3#', dformat => 'currency' },
+				{ colIdx => 4, head => '61 - 90', summarize=>'sum',dataFmt => '#4#', dformat => 'currency' },
+				{ colIdx => 5, head => '91 - 120',summarize=>'sum', dataFmt => '#5#', dformat => 'currency' },
+				{ colIdx => 6, head => '121 - 150',summarize=>'sum', dataFmt => '#6#', dformat => 'currency' },
+				{ colIdx => 7, head => '151+', summarize=>'sum',dataFmt => '#7#', dformat => 'currency' },
+				{ colIdx => 8, head => 'Total Balance', summarize=>'sum',dataFmt => '#8#', dformat => 'currency' },
+				{ colIdx => 9, head => 'Total Pending', summarize=>'sum',dataFmt => '#9#', dAlign => 'center', dformat => 'currency' },
+				{ colIdx => 10, head => 'Total Amount', summarize=>'sum',dataFmt => '#10#', dAlign => 'center', dformat => 'currency' },
+				],
+			};
 
+	if($totalReport)
+	{
+		$data = $STMTMGR_REPORT_ACCOUNTING->getRowsAsArray($page, STMTMGRFLAG_NONE, 'sel_aged_all_total',$personId, $page->session('org_internal_id'),
+		$providerId, $facilityId);
+		$html = createHtmlFromData($page, 0, $data, $pubTotal);
+		$textOutputFilename = createTextRowsFromData($page, 0,  $data, $pubTotal);
+	}
+	else
+	{
+		$data = $STMTMGR_REPORT_ACCOUNTING->getRowsAsArray($page, STMTMGRFLAG_NONE, 'sel_aged_all',$personId, $page->session('org_internal_id'),
+		$providerId, $facilityId);
+		$html = createHtmlFromData($page, 0, $data,$pub);
+		$textOutputFilename = createTextRowsFromData($page, 0,  $data, $pub);
+	}
 
-	$data = $STMTMGR_REPORT_ACCOUNTING->getRowsAsArray($page, STMTMGRFLAG_NONE, 'sel_aged_all',$personId, $page->session('org_internal_id'),
-	$providerId, $facilityId);
 	#$html = $STMTMGR_REPORT_ACCOUNTING->createHtml($page, STMTMGRFLAG_NONE, 'sel_aged_all',  [$personId, $page->session('org_internal_id'),
 	#$providerId, $facilityId]);
-	#
-	$html = createHtmlFromData($page, 0, $data,$pub);
-	$textOutputFilename = createTextRowsFromData($page, 0,  $data, $pub);
 	#
 	#my $textOutputFilename = createTextRowsFromData($page, STMTMGRFLAG_NONE, $data, $STMTMGR_REPORT_ACCOUNTING->{"_dpd_sel_aged_patient"});
 
@@ -163,6 +198,7 @@ sub execute
 	{ Name => "Patient ID ", Value => $personId},
 	{ Name => "Pyhsician ID ", Value => $providerId},
 	{ Name => "Site Organization ID ", Value => $facilityId},
+	{ Name=> "Totals Report ", Value => ($totalReport) ? 'Yes' : 'No' },
 	{ Name=> "Print Report ", Value => ($hardCopy) ? 'Yes' : 'No' },
 	{ Name=> "Printer ", Value => $printerDevice},
 	];
