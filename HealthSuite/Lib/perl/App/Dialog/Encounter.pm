@@ -830,13 +830,12 @@ sub voidInvoicePostSubmit
 		value_date => $todaysDate,
 	);
 
-	#add history item for original (submitted) copy
-	addHistoryItem($page, $invoiceId,
+	#add history item for original (submitted) copy and void it
+	addHistoryItem($page, $oldInvoiceId,
 		value_text => "Invoice <A HREF='/invoice/$invoiceId/summary'>$invoiceId</A> is a voided copy of this invoice",
 		value_date => $todaysDate,
 	);
 
-	#void original claim
 	$page->schemaAction(
 		'Invoice', 'update',
 		invoice_id => $oldInvoiceId || undef,
@@ -1442,16 +1441,17 @@ sub handleInvoiceAttrs
 			value_date => $todaysDate,
 		);
 
-		addHistoryItem($page, $invoiceId,
-			value_text => "Invoice <A HREF='/invoice/$invoiceId/summary'>$invoiceId</A> is a new copy of this invoice",
-			value_date => $todaysDate,
-		);
 
-		#update original claim - make it's parent_invoice the new invoice
+		#update original claim - make it's parent_invoice the new invoice and add history item
 		$page->schemaAction(
 			'Invoice', 'update',
 			invoice_id => $oldInvoiceId || undef,
 			parent_invoice_id => $invoiceId,
+		);
+
+		addHistoryItem($page, $oldInvoiceId,
+			value_text => "Invoice <A HREF='/invoice/$invoiceId/summary'>$invoiceId</A> is a new copy of this invoice",
+			value_date => $todaysDate,
 		);
 	}
 
