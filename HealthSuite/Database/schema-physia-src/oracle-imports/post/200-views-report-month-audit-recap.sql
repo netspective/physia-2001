@@ -40,7 +40,9 @@ SELECT	invoice_id,
 	payer_type,
 	payer_id,
 	billing_id,
-	owner_org_id
+	owner_org_id,
+	invoice_status,
+	invoice_date as real_invoice_date
 FROM	AUTO_INVOICE_CHRG
 WHERE 	NOT (invoice_status =15 AND parent_invoice_id is not null);
 
