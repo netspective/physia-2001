@@ -554,7 +554,7 @@ sub assignInsuredInfo
 	my $sth;
 	my $no = $claim->getBillSeq();
 	my $no1 = $claim->getClaimType();
-	my $orgInternalId
+	my $orgInternalId;
 
 	foreach $insured (@$insureds)
 	{
