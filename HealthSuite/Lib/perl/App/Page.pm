@@ -603,12 +603,13 @@ sub send_page_body
 		}
 		/ge;
 
-	#print @{$self->{page_content_header}} unless $flags & PAGEFLAG_ISFRAMEBODY;
-	#unless($flags & PAGEFLAG_ISFRAMEHEAD)
-	#{
-	#	print @{$self->{page_content}};
-	#	print @{$self->{page_content_footer}};
-	#}
+	$html = $self->component('sde-page-params-and-fields') . $html if $self->param('_debug_params');
+	$html = $self->component('sde-page-fields') . $html if $self->param('_debug_fields');
+	$html = $self->component('sde-page-session') . $html if $self->param('_debug_session');
+	$html = $self->component('sde-page-cookies') . $html if $self->param('_debug_cookies');
+	$html = $self->component('sde-page-env') . $html if $self->param('_debug_env');
+	$html = $self->component('sde-page-components') . $html if $self->param('_debug_comp');
+
 	print $self->getTextBoxHtml(heading => 'Errors', messages => $self->{page_errors}) if $self->haveErrors();
 	print $self->getTextBoxHtml(heading => 'Debugging Statements', messages => $self->{page_debug}) if @{$self->{page_debug}};
 	print $html;
@@ -979,13 +980,6 @@ sub printContents
 	$self->establishSession();
 	$self->initialize();
 	$self->prepare_page_body();
-
-	unshift(@{$self->{page_content_header}}, "#component.sde-page-fields#") if $self->param('_debug_fields');
-	unshift(@{$self->{page_content_header}}, "#component.sde-page-env#") if $self->param('_debug_env');
-	unshift(@{$self->{page_content_header}}, "#component.sde-page-components#") if $self->param('_debug_comp');
-	unshift(@{$self->{page_content_header}}, "#component.sde-page-cookies#") if $self->param('_debug_cookies');
-	unshift(@{$self->{page_content_header}}, "#component.sde-page-session#") if $self->param('_debug_session');
-	unshift(@{$self->{page_content_header}}, "#component.sde-page-params-and-fields#") if $self->param('_debug_params');
 
 	return unless $self->send_http_header();
 	return unless $self->send_page_header();
