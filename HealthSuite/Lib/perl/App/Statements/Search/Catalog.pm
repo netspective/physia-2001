@@ -79,8 +79,14 @@ my $STMTRPTDEFN_ORG =
 		actionRows =>
 		[
 			{
-				caption => "<a href='/org/#session.org_id#/dlg-add-catalog'>Add Fee Schedule</a>",
-				url => '/org/#session.org_id#/dlg-add-catalog'
+                                caption => qq{
+                                        <a href='/org/#session.org_id#/dlg-add-catalog'>Add Fee Schedule</a> |
+                                        <a href='/org/#session.org_id#/dlg-add-feescheduledataentry'>Add Fee Schedule Entries</a
+> 
+                                },
+
+				#caption => "<a href='/org/#session.org_id#/dlg-add-catalog'>Add Fee Schedule</a>",
+				#url => '/org/#session.org_id#/dlg-add-catalog'
 			},
 		],
 	},
