@@ -40,6 +40,10 @@
 			of the Physician dialog and the 'Certification' component.
 		</deliverable>
 
+		<deliverable id="1384">
+			Contract Compliance Report has been created under Report - Accounting.
+		</deliverable>
+
 		<deliverable id="1445">
 			In the main menu under Utilities / Functions, added links to Accounting, Billing, Scheduling .
 		</deliverable>
@@ -47,9 +51,17 @@
 		<deliverable id="1447">
 			Added activity logs to showup in the 'My Recent Activity (today)' component in the user's home page.
 		</deliverable>
-		
+
+		<deliverable id="1460">
+			The issue has already been resolved. Nothing has been done by ProSys to resolve this bug.
+		</deliverable>
+
 		<deliverable id="1501">
 			Fixed claim status changes.
+		</deliverable>
+
+		<deliverable id="1531">
+			Source of Payment = 'G' for all primary BCBS Payers is done in DBI.pm
 		</deliverable>
 
 		<deliverable id="1551">
@@ -74,6 +86,10 @@
 			Revised Print Schedule / Appointment Search Results display.
 		</deliverable>
 
+		<deliverable id="1586">
+			Invoice Line Item Comments are now being shown in HCFA 1500 box 19 and in NSF record HA0.
+		</deliverable>
+
 		<deliverable id="1613">
 			In the 'Misc Notes' component, it will show the User Id who has entered the Misc-Notes.
 		</deliverable>
@@ -91,14 +107,26 @@
 			displayed if we try to add a secondary one without adding a primary one.
 		</deliverable>
 		
+		<deliverable id="1641">
+			Comma is removed in box 17 of HCFA 1500, when there is no Referring Provider.
+		</deliverable>		
+
 		<deliverable id="1652">
 			Fixed handling of primary, secondary, tertiary claims (i.e. status changes, functions allowed based on status changes, 
 			reopening of claims and voiding of subsequent claims, etc.)
 		</deliverable>		
 
+		<deliverable id="1662">
+			Dialog Label 'Provider ID' is changed to 'Physician ID' in all reports.
+		</deliverable>		
+
 		<deliverable id="1697">
 			New transfer from legacy system writeoff type for personal payment dialog found on claim summary.
 		</deliverable>
+
+		<deliverable id="1712">
+			In Contract Catalog Fee Schedule, the details are now sorted by type and then code.
+		</deliverable>		
 
 		<deliverable id="1723">
 			When you select 'Prescribe Medication' from the 'On Select' list in the 'Lookup a Patient' page, it will 
@@ -109,6 +137,10 @@
 			Added practices to pay to org drop down in Add Invoice dialog.
 		</deliverable>
 
+		<deliverable id="1738">
+			Prepayment type of adjustments are now displayed in Account History Report.
+		</deliverable>		
+
 		<deliverable id="1744">
 			In the Claims WorkList, when you click the OrgID link, it will show up the Summmary page of that Org.
 		</deliverable>
@@ -117,6 +149,18 @@
 			Added activity log for claims notes.
 		</deliverable>
 		
+		<deliverable id="1752">
+			A component is created for Presonal Hyperlinks and Bookmarks and it is shown under Person Summary Page.
+		</deliverable>		
+
+		<deliverable id="1753">
+			The database snapshot is successfully imported at ProSys.
+		</deliverable>		
+
+		<deliverable id="1755">
+			A bold label of Active and Inactive is displayed in Certification component under Person Associate Page.
+		</deliverable>		
+
 		<deliverable id="1799">
 			In the 'Personal Insurance Coverage' dialog, it will inherit the parent Plan's or parent Product's remit_type.
 		</deliverable>
