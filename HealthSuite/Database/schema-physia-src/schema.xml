@@ -89,7 +89,7 @@
 		<column name="med_name" type="text" size="128" descr="The name of the medication (There should be a 'med_id' column which is a foreign key to a ref_medication table, but we don't have this table yet)"/>
 		<column name="dose" type="integer" descr="Dosage of the medication"/>
 		<column name="dose_units" type="text" size="32" descr="Units the dosage is measured in (mg, cc, etc...)"/>
-		<column name="sale_units " type="text" size="32" descr="Units the dosage is measured in (mg, cc, etc...)"/>
+		<column name="sale_units" type="text" size="32" descr="Units the quantity is measured in (mg, cc, etc...)"/>
 		<column name="route" type="text" size="32" descr="Route or method the medication is taken through"/>
 		<column name="frequency" type="text" size="32" descr="Frequency at which the medication should be taken"/>
 		<column name="prn" type="text" size="32" descr="Take as needed for (pain, nausea, etc...)"/>
