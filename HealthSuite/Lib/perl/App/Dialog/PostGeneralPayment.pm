@@ -36,8 +36,8 @@ sub new
 	$self->addContent(
 		new CGI::Dialog::MultiField(caption =>'Batch ID/Date', name => 'batch_fields',
 			fields => [
-				new CGI::Dialog::Field(caption => 'Batch ID', name => 'batch_id', size => 12),
-				new CGI::Dialog::Field(type => 'date', caption => 'Batch Date', name => 'batch_date'),
+				new CGI::Dialog::Field(caption => 'Batch ID', name => 'batch_id', size => 12, options => FLDFLAG_REQUIRED),
+				new CGI::Dialog::Field(type => 'date', caption => 'Batch Date', name => 'batch_date', options => FLDFLAG_REQUIRED),
 			]),
 
 		new App::Dialog::Field::Person::ID(caption => 'Patient/Person Id', name => 'payer_id', options => FLDFLAG_REQUIRED),
@@ -126,16 +126,16 @@ sub customValidate
 {
 	my ($self, $page) = @_;
 
-	my $batchIdField = $self->getField('batch_fields')->{fields}->[0];
-	my $batchDateField = $self->getField('batch_fields')->{fields}->[1];
-	unless($page->param('_p_batch_id') || $page->field('batch_id'))
-	{
-		$batchIdField->invalidate($page, "Please provide a '$batchIdField->{caption}'");
-	}
-	unless($page->param('_p_batch_date') || $page->field('batch_date'))
-	{
-		$batchDateField->invalidate($page, "Please provide a '$batchDateField->{caption}'");
-	}
+	#my $batchIdField = $self->getField('batch_fields')->{fields}->[0];
+	#my $batchDateField = $self->getField('batch_fields')->{fields}->[1];
+	#unless($page->param('_p_batch_id') || $page->field('batch_id'))
+	#{
+	#	$batchIdField->invalidate($page, "Please provide a '$batchIdField->{caption}'");
+	#}
+	#unless($page->param('_p_batch_date') || $page->field('batch_date'))
+	#{
+	#	$batchDateField->invalidate($page, "Please provide a '$batchDateField->{caption}'");
+	#}
 }
 
 sub execute

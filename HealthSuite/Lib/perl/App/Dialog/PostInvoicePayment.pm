@@ -39,8 +39,8 @@ sub new
 
 		new CGI::Dialog::MultiField(caption =>'Batch ID/Date', name => 'batch_fields',
 			fields => [
-				new CGI::Dialog::Field(caption => 'Batch ID', name => 'batch_id', size => 12),
-				new CGI::Dialog::Field(type => 'date', caption => 'Batch Date', name => 'batch_date'),
+				new CGI::Dialog::Field(caption => 'Batch ID', name => 'batch_id', size => 12, options => FLDFLAG_REQUIRED),
+				new CGI::Dialog::Field(type => 'date', caption => 'Batch Date', name => 'batch_date', options => FLDFLAG_REQUIRED),
 			]),
 
 
@@ -124,7 +124,7 @@ sub makeStateChanges
 
 	$page->param('_p_batch_id') ? $self->heading('Add Batch Insurance Payments') : $self->heading("Add \u$paidBy Payment");
 
-	if(! $invoiceId || $isInsurance && $invoiceInfo->{invoice_subtype} == App::Universal::CLAIMTYPE_SELFPAY)
+	if(! $invoiceId || ($isInsurance && $invoiceInfo->{invoice_subtype} == App::Universal::CLAIMTYPE_SELFPAY))
 	{
 		if($invoiceId)
 		{
@@ -194,19 +194,19 @@ sub customValidate
 {
 	my ($self, $page) = @_;
 
-	my $batchIdField = $self->getField('batch_fields')->{fields}->[0];
-	my $batchDateField = $self->getField('batch_fields')->{fields}->[1];
-	unless($page->param('_p_batch_id') || $page->field('batch_id'))
-	{
-		$batchIdField->invalidate($page, "Please provide a '$batchIdField->{caption}'");
-	}
-	unless($page->param('_p_batch_date') || $page->field('batch_date'))
-	{
-		$batchDateField->invalidate($page, "Please provide a '$batchDateField->{caption}'");
-	}
+	#my $batchIdField = $self->getField('batch_fields')->{fields}->[0];
+	#my $batchDateField = $self->getField('batch_fields')->{fields}->[1];
+	#unless($page->param('_p_batch_id') || $page->field('batch_id'))
+	#{
+	#	$batchIdField->invalidate($page, "Please provide a '$batchIdField->{caption}'");
+	#}
+	#unless($page->param('_p_batch_date') || $page->field('batch_date'))
+	#{
+	#	$batchDateField->invalidate($page, "Please provide a '$batchDateField->{caption}'");
+	#}
 
-	my $invoiceId = $page->param('invoice_id') || $page->field('sel_invoice_id');
-	my $invoiceInfo = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoice', $invoiceId);
+	#my $invoiceId = $page->param('invoice_id') || $page->field('sel_invoice_id');
+	#my $invoiceInfo = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoice', $invoiceId);
 	#if($page->param('paidBy') eq 'insurance' && $invoiceInfo->{invoice_subtype} == App::Universal::CLAIMTYPE_SELFPAY)
 	#{
 	
