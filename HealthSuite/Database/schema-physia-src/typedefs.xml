@@ -1036,6 +1036,11 @@
 				<col name="caption">Past File Deadline</col>
 				<col name="group_name">insurance</col>
 			</row>
+			<row>
+				<col name="id">8</col>
+				<col name="caption">Copay</col>
+				<col name="group_name">personal</col>
+			</row>
 		</data>
 	</table>
 
