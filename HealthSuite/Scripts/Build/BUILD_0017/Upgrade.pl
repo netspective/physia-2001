@@ -26,6 +26,7 @@ system(qq{
 
 runSQL('BUILD_0017_alter_schema.sql');
 runSQL('BUILD_0017_compile_invalid_and_disabled.sql');
+runSQL('populate_invoice_history.sql');
 
 ######## END UPGRADE SCRIPT #########
 
