@@ -2493,7 +2493,8 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 					(select (decode(a.value_int,5,'Unknown',1,'Primary',2,'Secondary',3,'Tertiary',4,'Quaternary'))
 					from person_attribute a where  a.value_type in (@{[ App::Universal::ATTRTYPE_SPECIALTY ]}) and a.item_id = b.item_id)value_int,
 					name_sort,
-					decode(sign(value_dateend - sysdate), -1, 'Inactive', 'Active')
+					decode(sign(value_dateend - sysdate), -1, 'Inactive', 'Active'),
+					%simpleDate:value_date%
 			from 	person_attribute b
 			where 	parent_id = ?
 			and 	value_type in (@{[ App::Universal::ATTRTYPE_LICENSE ]}, @{[ App::Universal::ATTRTYPE_STATE ]}, @{[ App::Universal::ATTRTYPE_ACCREDITATION ]}, @{[ App::Universal::ATTRTYPE_SPECIALTY ]}, @{[ App::Universal::ATTRTYPE_PROVIDER_NUMBER ]}, @{[App::Universal::ATTRTYPE_BOARD_CERTIFICATION]})
@@ -2506,12 +2507,12 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 					{
 						colIdx => 0,
 						dataFmt => {
-							"@{[ App::Universal::ATTRTYPE_LICENSE ]}" => '<b>#7#</b> #2# (#4# #5#): #3#, #6#',
-							"@{[ App::Universal::ATTRTYPE_PROVIDER_NUMBER ]}" => '<b>#7#</b> #2# (#4# #5#): #3#, #6#',
-							"@{[ App::Universal::ATTRTYPE_STATE ]}"  => '<b>#7#</b> #2# (#4# #5#): #3#',
-							"@{[ App::Universal::ATTRTYPE_ACCREDITATION ]}"  => '<b>#7#</b> #2# (#4# #5#)',
-							"@{[ App::Universal::ATTRTYPE_BOARD_CERTIFICATION ]}"  => '<b>#7#</b> #2# (#4# #5#)',
-							"@{[ App::Universal::ATTRTYPE_SPECIALTY ]}" => '<b>#7#</b> #2# (#4# #5#)'
+							"@{[ App::Universal::ATTRTYPE_LICENSE ]}" => '<b>#7#</b> #2# (#8# - #4# #5#): #3#, #6#',
+							"@{[ App::Universal::ATTRTYPE_PROVIDER_NUMBER ]}" => '<b>#7#</b> #2# (#8# - #4# #5#): #3#, #6#',
+							"@{[ App::Universal::ATTRTYPE_STATE ]}"  => '<b>#7#</b> #2# (#8# - #4# #5#): #3#',
+							"@{[ App::Universal::ATTRTYPE_ACCREDITATION ]}"  => '<b>#7#</b> #2# (#8# - #4# #5#)',
+							"@{[ App::Universal::ATTRTYPE_BOARD_CERTIFICATION ]}"  => '<b>#7#</b> #2# (#8# - #4# #5#)',
+							"@{[ App::Universal::ATTRTYPE_SPECIALTY ]}" => '<b>#7#</b> #2# (#8# - #4# #5#)'
 						},
 					},
 		],

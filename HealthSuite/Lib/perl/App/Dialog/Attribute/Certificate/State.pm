@@ -45,6 +45,7 @@ sub initialize
 					selAttrNameStmtName => 'selAttributeByItemNameAndValueTypeAndParent'),
 
 			new CGI::Dialog::Field(caption => 'Number',  name => 'value_text', options => FLDFLAG_REQUIRED),
+			new CGI::Dialog::Field(type => 'date', caption => 'Effective Date', name => 'value_date', futureOnly => 0, defaultValue => ''),
 			new CGI::Dialog::Field(type => 'date', caption => 'Expiration Date', name => 'value_dateend', options => FLDFLAG_REQUIRED),
 	);
 

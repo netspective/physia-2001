@@ -43,6 +43,7 @@ sub customValidate
 	my $command = $self->getActiveCommand($page);
 	my $pId = $self->getField('value_text');
 	my $sName = $self->getField('value_int');
+	my $effectiveDate = $self->getField('value_date');
 	my $licenseNum = $self->getField('value_dateend');
 	my $itemId = $page->param('item_id');
 	my $sequence = $page->field('value_int');
@@ -54,6 +55,12 @@ sub customValidate
 	my $specialtyValType = App::Universal::ATTRTYPE_SPECIALTY;
 	my $valueType = $self->{valueType};
 	my $sequenceExists = $STMTMGR_PERSON->getRowAsHash($page,STMTMGRFLAG_NONE, 'selSpecialtySequence', $personId, $sequence) if $sequence ne "&SEQUENCE_SPECIALTY_UNKNOWN";
+
+
+	if (ParseDate($page->field('value_date')) > ParseDate($page->field('value_dateend')))
+	{
+		$effectiveDate->invalidate($page, "Effective Date must be less than or equal to Expiration Date");
+	}
 
 	if ($valueType eq $specialtyValType  && ($sequenceExists->{'value_int'} eq $sequence) && ($itemId ne $sequenceExists->{'item_id'}) && $sequence >=SEQUENCE_SPECIALTY_PRIMARY && $sequence <=SEQUENCE_SPECIALTY_QUATERNARY)
 	{
@@ -168,6 +175,7 @@ sub execute
 		item_name => $itemName,
 		value_type => $valueType || undef,
 		value_text => $page->field('value_text') || undef,
+		value_date => $page->field('value_date') ||undef,
 		value_dateEnd => $page->field('value_dateend') ||undef,
 		value_textB => $valueTextB || undef,
 		name_sort  => $facilityId || undef,
