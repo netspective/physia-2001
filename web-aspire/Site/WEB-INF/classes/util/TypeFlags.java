@@ -3,6 +3,7 @@ package util;
 import java.util.Vector;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.StringTokenizer;
 
 
 public class TypeFlags {
@@ -47,7 +48,31 @@ public class TypeFlags {
 		return (1 << index);
 	}
 
+	public int getMaxFlagValue () {
+		int returnValue = 0;
+
+		for (int i = 0; i < choices.size(); i ++)
+			returnValue += (1 << i);
+
+		return returnValue;
+	}
+
 	public int getNumChoices () { return choices.size(); }
+
+	public int translateStringToFlagValue (String flaggedChoices) {
+		return translateStringToFlagValue (flaggedChoices, ",");
+	}
+
+    public int translateStringToFlagValue (String flaggedChoices, String delimiter) {
+		StringTokenizer st = new StringTokenizer (flaggedChoices, delimiter);
+
+		int flags = 0;
+
+		while (st.hasMoreTokens())
+			flags += getFlagValue(st.nextToken().trim());
+
+		return flags;
+	}
 
 	public int translateStringsToFlagValue (String[] flaggedChoices) {
 		int flagValue = 0;
@@ -79,6 +104,34 @@ public class TypeFlags {
 		for (int i = 0; i < flagList.size(); i ++) {
 			returnValue[i] = (String) flagList.get(i);
 		}
+
+		return returnValue;
+	}
+
+	public String translateFlagValueToSqlSet (int flagValue) {
+		int currentFlagValue = flagValue;
+		List flagList = new ArrayList();
+
+		for (int i = choices.size(); i >= 0; i --) {
+			int thisFlagValue = (1 << i);
+
+			if (currentFlagValue >= thisFlagValue) {
+				currentFlagValue -= thisFlagValue;
+				flagList.add((String) choices.get(i));
+			}
+		}
+
+		String returnValue = "( ";
+
+		for (int i = 0; i < flagList.size(); i ++) {
+			if (returnValue.equals("( ")) {
+				returnValue += "'" + (String) flagList.get(i) + "'";
+			} else {
+				returnValue += ", '" + (String) flagList.get(i) + "'";
+			}
+		}
+
+		returnValue += " )";
 
 		return returnValue;
 	}
