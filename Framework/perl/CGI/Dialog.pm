@@ -466,7 +466,7 @@ sub readChoicesStmt
 			push(@{$choices}, $choiceStruct);
 		}
 	};
-	$self->invalidate($@) if $@;
+	$self->invalidate($page, $@) if $@;
 	return $choices;
 }
 
@@ -510,7 +510,7 @@ sub readChoices
 			}
 		}
 	};
-	$self->invalidate($@) if $@;
+	$self->invalidate($page, $@) if $@;
 	return $choices;
 }
 
@@ -1411,7 +1411,7 @@ sub XAP_tag_handler
 	delete $xap->{_parser_activeDialogId};
 	delete $xap->{_parser_activeDialog};
 
-	$xap->addComponent(XAP::COMPTYPE_UI_OBJECT, $attrs->{id}, $pkgId, $scopeId, $dialog);
+	$xap->addComponent(1, $attrs->{id}, $pkgId, $scopeId, $dialog);
 }
 
 sub XAP_handleElementDialogSection
@@ -2099,6 +2099,9 @@ sub getHtml
 	my $execModeFieldName = $page->fieldPName(FIELDNAME_EXECMODE);
 	push(@dlgHouskeepingHiddens, "<input type='hidden' name='$execModeFieldName' value='$newExecMode'>");
 
+	my $formAction = "/" . $page->param('arl');
+	$formAction =~ s/\?.*$//;
+
 	return qq{
 	<center>
 	<table border=0 bgcolor=$self->{headColor} cellspacing=2 cellpadding=0>
@@ -2119,7 +2122,7 @@ sub getHtml
 		<SCRIPT>
 		$fieldsInfoJS
 		</SCRIPT>
-		<form name="$self->{formName}" $self->{formAttrs} method="post" onSubmit="return validateOnSubmit(this)">
+		<form name="$self->{formName}" action="$formAction" $self->{formAttrs} method="post" onSubmit="return validateOnSubmit(this)">
 			@dlgHouskeepingHiddens
 			$html
 		</form>
