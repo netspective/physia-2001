@@ -53,6 +53,7 @@ sub initialize
 		new CGI::Dialog::Field(type => 'hidden', name => 'pay_to_org_addr_item_id'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'claim_filing_item_id'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'fee_schedules_item_id'),
+		new CGI::Dialog::Field(type => 'hidden', name => 'batch_item_id'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'event_id'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'insuranceIsSet'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'eventFieldsAreSet'),
@@ -72,6 +73,12 @@ sub initialize
 		new CGI::Dialog::Field(type => 'hidden', name => 'claim_type'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'dupCheckin_returnUrl'),
 
+		new CGI::Dialog::MultiField(caption => 'Batch ID/Date', name => 'batch_fields', readOnlyWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
+			fields => [
+				new CGI::Dialog::Field(caption => 'Batch ID', name => 'batch_id', options => FLDFLAG_REQUIRED,
+						readOnlyWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE, size => 12),
+				new CGI::Dialog::Field(type => 'date', caption => 'Batch Date', name => 'batch_date', options => FLDFLAG_REQUIRED, readOnlyWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE),
+			]),
 
 
 		new App::Dialog::Field::Person::ID(caption => 'Patient ID', name => 'attendee_id', options => FLDFLAG_REQUIRED,
@@ -330,7 +337,7 @@ sub populateData
 	{
 		$page->field('checkin_stamp', $page->getTimeStamp());
 		$page->field('checkout_stamp', $page->getTimeStamp());
-		$page->field('event_id', $eventId);
+		#$page->field('event_id', $eventId);
 		$STMTMGR_SCHEDULING->createFieldsFromSingleRow($page, STMTMGRFLAG_NONE, 'selEncountersCheckIn/Out', $eventId);
 		my $careProvider = $page->field('care_provider_id');
 		$page->field('provider_id', $careProvider); 	#default billing 'provider_id' to the 'care_provider_id'
@@ -390,6 +397,11 @@ sub populateData
 		$STMTMGR_INVOICE->createFieldsFromSingleRow($page, STMTMGRFLAG_NONE, 'selInvoiceAttrAssignment',$invoiceId);
 		$STMTMGR_INVOICE->createFieldsFromSingleRow($page, STMTMGRFLAG_NONE, 'selInvoiceAuthNumber',$invoiceId);
 		$STMTMGR_INVOICE->createFieldsFromSingleRow($page, STMTMGRFLAG_NONE, 'selInvoiceDeductible',$invoiceId);
+
+		my $batchInfo = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoiceAttr', $invoiceId, 'Invoice/Creation/Batch ID');
+		$page->field('batch_item_id', $batchInfo->{item_id});
+		$page->field('batch_id', $batchInfo->{value_text});
+		$page->field('batch_date', $batchInfo->{value_date});
 
 		my $feeSchedules = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoiceAttr', $invoiceId, 'Fee Schedules');
 		$page->field('fee_schedules_item_id', $feeSchedules->{item_id});
@@ -880,12 +892,13 @@ sub addTransactionAndInvoice
 	my $billingFacility = $page->field('billing_facility_id');
 	my $confirmedInfo = $page->field('confirmed_info') eq 'Yes' ? 1 : 0;
 	my $relTo = $page->field('accident') == $condRelToFakeNone ? '' : $page->field('accident');
+	
 	my $transId = $page->schemaAction(
 		'Transaction', $command,
 		trans_id => $editTransId || undef,
 		trans_type => $page->field('trans_type'),
 		trans_status => defined $transStatus ? $transStatus : undef,
-		parent_event_id => $page->field('event_id') || undef,
+		parent_event_id => $page->param('event_id') || undef,
 		caption => $page->field('subject') || undef,
 		service_facility_id => $page->field('service_facility_id') || undef,
 		billing_facility_id => $billingFacility || undef,
@@ -1234,6 +1247,17 @@ sub handleInvoiceAttrs
 	);
 
 	$page->schemaAction(
+			'Invoice_Attribute', 'add',
+			item_id => $page->field('batch_item_id') || undef,
+			parent_id => $invoiceId || undef,
+			item_name => 'Invoice/Creation/Batch ID',
+			value_type => defined $textValueType ? $textValueType : undef,
+			value_text => $page->field('batch_id') || undef,
+			value_date => $page->field('batch_date') || undef,
+			_debug => 0
+	);
+
+	$page->schemaAction(
 			'Invoice_Address', $command,
 			item_id => $page->field('pay_to_org_addr_item_id') || undef,
 			parent_id => $invoiceId,
@@ -1244,7 +1268,7 @@ sub handleInvoiceAttrs
 			state => $payToFacilityAddr->{state},
 			zip => $payToFacilityAddr->{zip},
 			_debug => 0
-		);
+	);
 
 	my $invoiceFlags = $page->field('invoice_flags');
 	if($invoiceFlags & $attrDataFlag)
