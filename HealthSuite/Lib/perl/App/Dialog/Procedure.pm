@@ -239,9 +239,12 @@ sub hmoCapWriteoff
 	my $todaysDate = UnixDate('today', $page->defaultUnixDateFormat());
 	my $writeoffCode = App::Universal::ADJUSTWRITEOFF_CONTRACTAGREEMENT;
 	my $totalAdjForItems = 0;
-	my $procItems = $STMTMGR_INVOICE->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'selInvoiceProcedureItems', $invoiceId, App::Universal::INVOICEITEMTYPE_SERVICE, App::Universal::INVOICEITEMTYPE_LAB);
+	#my $procItems = $STMTMGR_INVOICE->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'selInvoiceProcedureItems', $invoiceId, App::Universal::INVOICEITEMTYPE_SERVICE, App::Universal::INVOICEITEMTYPE_LAB);
+	my $procItems = $STMTMGR_INVOICE->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'selInvoiceItems', $invoiceId);
 	foreach my $proc (@{$procItems})
 	{
+		next if $proc->{item_type} == App::Universal::INVOICEITEMTYPE_ADJUST || $proc->{item_type} == App::Universal::INVOICEITEMTYPE_COPAY || $proc->{item_type} == App::Universal::INVOICEITEMTYPE_DEDUCTIBLE;
+	
 		my $writeoffAmt = $proc->{balance};
 		my $netAdjust = 0 - $writeoffAmt;
 		my $itemId = $proc->{item_id};
