@@ -317,6 +317,10 @@
 		<deliverable id="1633">
 			 Fixed editing problem with referring physician id in claim dialog.
 		</deliverable>
+		
+		<deliverable id="1635">
+			Fixed a problem when replying to all on messages which have no one in the CC field
+		</deliverable>
 
 		<deliverable id="1637">
 			 Fixed My Associated Resources in Patients component by correcting the dialog it calls and the query to display data.
