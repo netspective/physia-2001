@@ -443,8 +443,7 @@ sub execute_add
 			value_type => App::Universal::ATTRTYPE_STATE,
 			value_text => $page->field('license1') || undef,
 			value_textB => $state1 || undef,
-			value_dateEnd => $page->field('state_exp_date1') || undef,
-			value_int => 1,
+			value_dateEnd => $page->field('state1_exp_date') || undef,
 			_debug => 0
 	) if $state1 ne '' && $page->field('license1') ne '';
 
@@ -457,8 +456,7 @@ sub execute_add
 			value_type => App::Universal::ATTRTYPE_STATE,
 			value_text => $page->field('license2') || undef,
 			value_textB => $state2 || undef,
-			value_dateEnd => $page->field('state_exp_date2') || undef,
-			value_int => 2,
+			value_dateEnd => $page->field('state2_exp_date') || undef,
 			_debug => 0
 	) if $state2 ne '' && $page->field('license2') ne '';
 
@@ -470,8 +468,7 @@ sub execute_add
 			value_type => App::Universal::ATTRTYPE_STATE,
 			value_text => $page->field('license3') || undef,
 			value_textB => $state3 || undef,
-			value_dateEnd => $page->field('state_exp_date3') || undef,
-			value_int => 3,
+			value_dateEnd => $page->field('state3_exp_date') || undef,
 			_debug => 0
 	) if $state3 ne '' && $page->field('license3') ne '';
 
