@@ -125,7 +125,8 @@ sub getProviderId
 	$ids[CHAMPUS]= $self->getChampusId();
 	$ids[RAILROAD]= $self->getRailroadId();
 	$ids[EPSDT]= $self->getEPSDT();
-	my @payerCodes =(MEDICARE, MEDICAID, BCBS, CHAMPUS, RAILROAD, EPSDT);
+	$ids[WORKERSCOMP]= $self->getWorkersComp();
+	my @payerCodes =(MEDICARE, MEDICAID, BCBS, CHAMPUS, RAILROAD, EPSDT, WORKERSCOMP);
 	my $tempInsType = $self->{insType};
 	my $temp = ((grep{$_ eq $tempInsType} @payerCodes) ? $ids[$self->{insType}] : $self->{pin});
 	return $temp;
@@ -353,7 +354,8 @@ sub getPIN
 	$ids[CHAMPUS]= $self->getChampusId();
 	$ids[RAILROAD]= $self->getRailroadId();
 	$ids[EPSDT]= $self->getEPSDT();
-	my @payerCodes =(MEDICARE, MEDICAID, BCBS, CHAMPUS, RAILROAD, EPSDT);
+	$ids[WORKERSCOMP]= $self->getWorkersComp();
+	my @payerCodes =(MEDICARE, MEDICAID, BCBS, CHAMPUS, RAILROAD, EPSDT, WORKERSCOMP);
 	my $tempInsType = $self->{insType};
 	my $temp = ((grep{$_ eq $tempInsType} @payerCodes) ? $ids[$self->{insType}] : $self->{pin});
 	return $temp;

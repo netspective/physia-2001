@@ -37,6 +37,8 @@ sub new
 	$self->{taxId} = undef;
 	$self->{taxTypeId} = undef;
 	$self->{insType} = undef;
+	$self->{railroad} = undef;
+	$self->{internalId} = undef;
 
 	return bless $self, $type;
 }
@@ -58,6 +60,30 @@ sub getInsType
 {
 	my $self = shift;
 	return $self->{insType};
+}
+
+sub setInternalId
+{
+	my ($self, $value) = @_;
+	$self->{internalId} = $value;
+}
+
+sub getInternalId
+{
+	my $self = shift;
+	return $self->{internalId};
+}
+
+sub setRailroadId
+{
+	my ($self, $value) = @_;
+	$self->{railroad} = $value;
+}
+
+sub getRailroadId
+{
+	my $self = shift;
+	return $self->{railroad};
 }
 
 sub setTaxTypeId
@@ -200,7 +226,9 @@ sub getGRP
 	$ids[MEDICARE]= $self->getMedicareId();
 	$ids[MEDICAID]= $self->getMedicaidId();
 	$ids[BCBS]= $self->getBCBSId();
-	my @payerCodes =(MEDICARE, MEDICAID, BCBS);
+	$ids[RAILROAD] = $self->getRailroadId();
+	$ids[WORKERSCOMP] = $self->getWorkersComp();
+	my @payerCodes =(MEDICARE, MEDICAID, BCBS, RAILROAD, WORKERSCOMP);
 	my $tempInsType = $self->{insType};
 	my $temp = ((grep{$_ eq $tempInsType} @payerCodes) ? $ids[$self->{insType}] : $self->{grp});
 	return $temp;
