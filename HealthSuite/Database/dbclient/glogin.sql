@@ -1,5 +1,5 @@
 --
---  $Header: /home/engineer/cvs2git/physia/HealthSuite/Database/dbclient/glogin.sql,v 1.2 2000-05-23 14:53:15 alex_hillman Exp $
+--  $Header: /home/engineer/cvs2git/physia/HealthSuite/Database/dbclient/glogin.sql,v 1.3 2000-06-02 22:18:36 alex_hillman Exp $
 --  Copyright (c) Oracle Corporation 1988, 1994, 1995.  All Rights Reserved.
 --
 --  SQL*Plus Global Login startup file.
@@ -34,12 +34,28 @@ set pagesize 24
 
 set termout off
 define user_prompt=''
-column value new_value user_prompt
 
-select 'SQL:'||username||':'||substr(global_name,1,instr(global_name,'.')-1) value
-from user_users,global_name;
+variable sql_prompt varchar2(50)
 
-set sqlprompt "&user_prompt>"
+declare
+ v_count number;
+ v_sql_prompt varchar2(50);
+begin
+ select count(*) into v_count from all_synonyms where synonym_name = 'GET_SQLPROMPT_F';
+ :sql_prompt := 'SQL->';
+ if v_count > 0 then
+  execute immediate 'select rtrim(get_sqlprompt_f) from dual' into v_sql_prompt;
+  :sql_prompt := v_sql_prompt;
+ end if;
+end;
+/
+
+column x new_value user_prompt
+
+select :sql_prompt x from dual;
+
+set sqlprompt "&user_prompt"
+
 set termout on
 
 SET SERVEROUTPUT ON SIZE 1000000
