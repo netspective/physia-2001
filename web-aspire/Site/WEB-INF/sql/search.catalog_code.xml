@@ -1,0 +1,85 @@
+<?xml version="1.0"?>
+
+<xaf>
+	<sql-statements package="search.catalog_code">
+		<statement name="id">
+			App::Statements::Search::Code
+		</statement>
+
+		<statement name="sel_detail_icd">
+			
+			SELECT icd, name, replace(descr, '''', '`') as descr, DECODE(sex, 'M','MALE', 'F','FEMALE') AS sex,
+			DECODE(age, 'N','NEWBORN', 'P','PEDIATRIC', 'M','MATERNAL', 'A','ADULT') AS age,
+			non_specific_code, major_diag_category, comorbidity_complication,
+			medicare_secondary_payer, manifestation_code, questionable_admission,
+			unacceptable_primary_wo, unacceptable_principal, unacceptable_procedure,
+			non_specific_procedure, non_covered_procedure, cpts_allowed
+			FROM ref_icd
+			WHERE
+			icd = ?
+			AND rownum &lt; 250
+
+		</statement>
+
+		<statement name="sel_icd_code">
+			
+			SELECT icd, name, replace(descr, '''', '`') as descr, DECODE(sex, 'M','MALE', 'F','FEMALE') AS sex,
+			DECODE(age, 'N','NEWBORN', 'P','PEDIATRIC', 'M','MATERNAL', 'A','ADULT') AS age,
+			non_specific_code, major_diag_category, comorbidity_complication,
+			medicare_secondary_payer, manifestation_code, questionable_admission,
+			unacceptable_primary_wo, unacceptable_principal, unacceptable_procedure,
+			non_specific_procedure, non_covered_procedure, cpts_allowed
+			FROM ref_icd
+			WHERE
+			icd = ?
+			AND rownum &lt; 250
+
+		</statement>
+
+		<statement name="sel_icd_code_like">
+			
+			SELECT icd, name, replace(descr, '''', '`') as descr, DECODE(sex, 'M','MALE', 'F','FEMALE') AS sex,
+			DECODE(age, 'N','NEWBORN', 'P','PEDIATRIC', 'M','MATERNAL', 'A','ADULT') AS age,
+			non_specific_code, major_diag_category, comorbidity_complication,
+			medicare_secondary_payer, manifestation_code, questionable_admission,
+			unacceptable_primary_wo, unacceptable_principal, unacceptable_procedure,
+			non_specific_procedure, non_covered_procedure, cpts_allowed
+			FROM ref_icd
+			WHERE
+			icd like ?
+			AND rownum &lt; 250
+
+		</statement>
+
+		<statement name="sel_icd_description">
+			
+			SELECT icd, name, replace(descr, '''', '`') as descr, DECODE(sex, 'M','MALE', 'F','FEMALE') AS sex,
+			DECODE(age, 'N','NEWBORN', 'P','PEDIATRIC', 'M','MATERNAL', 'A','ADULT') AS age,
+			non_specific_code, major_diag_category, comorbidity_complication,
+			medicare_secondary_payer, manifestation_code, questionable_admission,
+			unacceptable_primary_wo, unacceptable_principal, unacceptable_procedure,
+			non_specific_procedure, non_covered_procedure, cpts_allowed
+			FROM ref_icd
+			WHERE
+			descr = ?
+			AND rownum &lt; 250
+
+		</statement>
+
+		<statement name="sel_icd_description_like">
+			
+			SELECT icd, name, replace(descr, '''', '`') as descr, DECODE(sex, 'M','MALE', 'F','FEMALE') AS sex,
+			DECODE(age, 'N','NEWBORN', 'P','PEDIATRIC', 'M','MATERNAL', 'A','ADULT') AS age,
+			non_specific_code, major_diag_category, comorbidity_complication,
+			medicare_secondary_payer, manifestation_code, questionable_admission,
+			unacceptable_primary_wo, unacceptable_principal, unacceptable_procedure,
+			non_specific_procedure, non_covered_procedure, cpts_allowed
+			FROM ref_icd
+			WHERE
+			descr like ?
+			AND rownum &lt; 250
+
+		</statement>
+
+	</sql-statements>
+</xaf>

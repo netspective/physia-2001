@@ -1,0 +1,92 @@
+<?xml version="1.0"?>
+
+<xaf>
+	<sql-statements package="report.prescription">
+		<statement name="id">
+			App::Statements::Report::Prescription
+		</statement>
+
+		<statement name="orgAddressInfo">
+			
+			select line1, line2, city, state, zip, country
+			from org_address
+			where parent_id = :1
+			and address_name = 'Mailing'
+			
+		</statement>
+
+		<statement name="orgContactInfo">
+			
+			select value_text phone
+			from org_attribute
+			where parent_id = :1
+			and item_name = 'Primary'
+			and value_type = 10
+			
+		</statement>
+
+		<statement name="orgInfo">
+			
+			select org_id, name_primary, tax_id
+			from org
+			where org_internal_id = :1
+			
+		</statement>
+
+		<statement name="personAddressInfo">
+			
+			select line1, line2, city, state, zip, country
+			from person_address
+			where parent_id = :1
+			and address_name = 'Home'
+			
+		</statement>
+
+		<statement name="personContactInfo">
+			
+			select value_text phone
+			from person_attribute
+			where parent_id = :1
+			and item_name = 'Home'
+			and value_type = 10
+			
+		</statement>
+
+		<statement name="personInfo">
+			
+			select
+			name_last,
+			name_middle,
+			name_first,
+			person_id,
+			to_char(date_of_birth, 'DD-MON-YYYY') dob,
+			gender,
+			marital_status,
+			ssn,
+			simple_name
+			from person
+			where person_id = :1
+			
+		</statement>
+
+		<statement name="physicianDEA">
+			
+			select value_text dea
+			from person_attribute
+			where parent_id = :1
+			and item_name = 'DEA'
+			and value_type = 500
+			
+		</statement>
+
+		<statement name="selPrescriptionByID">
+			
+			select *
+			from person_medication
+			where permed_id = :1
+			and cr_org_internal_id = :2
+			
+		</statement>
+
+	</sql-statements>
+</xaf>

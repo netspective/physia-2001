@@ -1,0 +1,59 @@
+<?xml version="1.0"?>
+
+<xaf>
+	<dialogs package="attr_association">
+		<dialog name="assoc_contact_family" heading="$Command Family Contact">
+			<field.separator heading="Link to Existing Person Record" name="exists_heading"/>
+			<field.text caption="Person ID"  hint="Please provide an existing Person ID. A link will be created between the patient and contact." max-length="16" name="rel_id" size="16"/>
+			<field.separator heading="Or Provide A Contact Name" name="notexists_heading"/>
+			<field.text caption="Full Name"  hint="Please provide the full name of the contact if a record does not exist for him/her. A link will not be created between the patient and contact." name="rel_name"/>
+			<field.separator heading="Contact Information" name="contact_heading"/>
+			<field.composite caption="*" required="yes" hint="Select an existing relationship type or select 'Other' and fill in the 'Other' field" name="relation">
+				<field.select caption="Relationship" required="yes" name="rel_type" choices="query:person.selRelationship"/>
+				<!--  -->
+				<field.text caption="Other"  name="other_rel_type"/>
+			</field.composite>
+			<field.phone caption="Phone Number"  max-length="1024" name="phone_number"/>
+			<field.date caption="Begin Date" name="begin_date" size="12"/>
+
+		</dialog>
+
+		<dialog name="assoc_employment" heading="$Command Employment">
+			<field.text caption="Employer ID"  max-length="16" name="rel_id" size="16"/>
+			<field.select caption="Employment Status"  name="value_type" choices="query:person.selEmpStatus"/>
+			<!--  -->
+			<field.text caption="Occupation"  name="rel_type"/>
+			<field.phone caption="Phone Number"  max-length="1024" name="phone_number"/>
+			<field.composite caption="*"  name="dates">
+				<field.date caption="Begin" name="begin_date" size="12"/>
+				<field.date caption="End Date" name="end_date" size="12"/>
+			</field.composite>
+
+		</dialog>
+
+		<dialog name="assoc_contact_emergency" heading="$Command Emergency Contact">
+			<field.separator heading="Link to Existing Person Record" name="exists_heading"/>
+			<field.text caption="Person ID"  hint="Please provide an existing Person ID. A link will be created between the patient and contact." max-length="16" name="rel_id" size="16"/>
+			<field.separator heading="Or Provide A Contact Name" name="notexists_heading"/>
+			<field.text caption="Full Name"  hint="Please provide the full name of the contact if a record does not exist for him/her. A link will not be created between the patient and contact." name="rel_name"/>
+			<field.separator heading="Contact Information" name="contact_heading"/>
+			<field.composite caption="*" required="yes" hint="Select an existing relationship type or select 'Other' and fill in the 'Other' field" name="relation">
+				<field.select caption="Relationship" required="yes" name="rel_type" choices="query:person.selRelationship"/>
+				<!--  -->
+				<field.text caption="Other"  name="other_rel_type"/>
+			</field.composite>
+			<field.phone caption="Phone Number"  max-length="1024" name="phone_number"/>
+			<field.date caption="Begin Date" name="begin_date" size="12"/>
+
+		</dialog>
+
+		<dialog name="assoc_provider" heading="$Command Care Provider">
+			<field.text caption="Physician/Provider ID" required="yes" hint="Please provide an existing Person ID." max-length="16" name="value_text" size="16"/>
+			<field.boolean caption="Is Primary Physician?"  hint="Please check the check-box if the Physician is Primary Physician " name="value_int" style="check"/>
+			<field.select caption="Specialty"  name="value_textb" choices="query:person.selMedicalSpeciality"/>
+			<!--  -->
+
+		</dialog>
+
+	</dialogs>
+</xaf>

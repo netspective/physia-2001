@@ -1,0 +1,118 @@
+<?xml version="1.0"?>
+
+<xaf>
+	<sql-statements package="search.cpt_code">
+		<statement name="id">
+			App::Statements::Search::Code
+		</statement>
+
+		<statement name="sel_cpt_code">
+			
+			SELECT cpt, name, replace(description, '''', '`') as description, comprehensive_compound_cpts,
+			mutual_exclusive_cpts, DECODE(sex, 'M','MALE', 'F','FEMALE') AS sex, unlisted, questionable,
+			asc_, non_rep, non_cov
+			FROM ref_cpt
+			WHERE
+			cpt = ?
+			AND rownum &lt; 250
+
+		</statement>
+
+		<statement name="sel_cpt_code_like">
+			
+			SELECT cpt, name, replace(description, '''', '`') as description, comprehensive_compound_cpts,
+			mutual_exclusive_cpts, DECODE(sex, 'M','MALE', 'F','FEMALE') AS sex, unlisted, questionable,
+			asc_, non_rep, non_cov
+			FROM ref_cpt
+			WHERE
+			cpt like ?
+			AND rownum &lt; 250
+
+		</statement>
+
+		<statement name="sel_cpt_description">
+			
+			SELECT cpt, name, replace(description, '''', '`') as description, comprehensive_compound_cpts,
+			mutual_exclusive_cpts, DECODE(sex, 'M','MALE', 'F','FEMALE') AS sex, unlisted, questionable,
+			asc_, non_rep, non_cov
+			FROM ref_cpt
+			WHERE
+			upper(description) = ?
+			AND rownum &lt; 250
+
+		</statement>
+
+		<statement name="sel_cpt_description_like">
+			
+			SELECT cpt, name, replace(description, '''', '`') as description, comprehensive_compound_cpts,
+			mutual_exclusive_cpts, DECODE(sex, 'M','MALE', 'F','FEMALE') AS sex, unlisted, questionable,
+			asc_, non_rep, non_cov
+			FROM ref_cpt
+			WHERE
+			upper(description) like ?
+			AND rownum &lt; 250
+
+		</statement>
+
+		<statement name="sel_cpt_name">
+			
+			SELECT cpt, name, replace(description, '''', '`') as description, comprehensive_compound_cpts,
+			mutual_exclusive_cpts, DECODE(sex, 'M','MALE', 'F','FEMALE') AS sex, unlisted, questionable,
+			asc_, non_rep, non_cov
+			FROM ref_cpt
+			WHERE
+			upper(name) = ?
+			AND rownum &lt; 250
+
+		</statement>
+
+		<statement name="sel_cpt_name_like">
+			
+			SELECT cpt, name, replace(description, '''', '`') as description, comprehensive_compound_cpts,
+			mutual_exclusive_cpts, DECODE(sex, 'M','MALE', 'F','FEMALE') AS sex, unlisted, questionable,
+			asc_, non_rep, non_cov
+			FROM ref_cpt
+			WHERE
+			upper(name) like ?
+			AND rownum &lt; 250
+
+		</statement>
+
+		<statement name="sel_cpt_nameordescr">
+			
+			SELECT cpt, name, replace(description, '''', '`') as description, comprehensive_compound_cpts,
+			mutual_exclusive_cpts, DECODE(sex, 'M','MALE', 'F','FEMALE') AS sex, unlisted, questionable,
+			asc_, non_rep, non_cov
+			FROM ref_cpt
+			WHERE
+			upper(name) = ? or upper(description) = ?
+			AND rownum &lt; 250
+
+		</statement>
+
+		<statement name="sel_cpt_nameordescr_like">
+			
+			SELECT cpt, name, replace(description, '''', '`') as description, comprehensive_compound_cpts,
+			mutual_exclusive_cpts, DECODE(sex, 'M','MALE', 'F','FEMALE') AS sex, unlisted, questionable,
+			asc_, non_rep, non_cov
+			FROM ref_cpt
+			WHERE
+			upper(name) like ? or upper(description) like ?
+			AND rownum &lt; 250
+
+		</statement>
+
+		<statement name="sel_detail_cpt">
+			
+			SELECT cpt, name, replace(description, '''', '`') as description, comprehensive_compound_cpts,
+			mutual_exclusive_cpts, DECODE(sex, 'M','MALE', 'F','FEMALE') AS sex, unlisted, questionable,
+			asc_, non_rep, non_cov
+			FROM ref_cpt
+			WHERE
+			cpt = ?
+			AND rownum &lt; 250
+
+		</statement>
+
+	</sql-statements>
+</xaf>

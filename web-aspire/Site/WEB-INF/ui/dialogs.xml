@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+
+<xaf>
+	<include file="app.xml"/>
+	<include file="admin.xml"/>
+	<include file="association.xml"/>
+	<include file="attr.xml"/>
+	<include file="attr_associated_resource.xml"/>
+	<include file="attr_association.xml"/>
+	<include file="attr_authorization.xml"/>
+	<include file="attr_certificate.xml"/>
+	<include file="attr_directive.xml"/>
+	<include file="catalog.xml"/>
+	<include file="eligibility.xml"/>
+	<include file="encounter.xml"/>
+	<include file="insurance_plan.xml"/>
+	<include file="invoice_worklist.xml"/>
+	<include file="invoice_worklist_claims.xml"/>
+	<include file="invoice_worklist_collection.xml"/>
+	<include file="message.xml"/>
+	<include file="person.xml"/>
+	<include file="referral_ppms_worklist.xml"/>
+	<include file="transaction.xml"/>
+	<include file="transaction_referral_work_flow.xml"/>
+	<include file="verify.xml"/>
+	<include file="worklist_setup.xml"/>
+</xaf>

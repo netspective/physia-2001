@@ -1,0 +1,497 @@
+<?xml version="1.0"?>
+
+<xaf>
+	<sql-statements package="org">
+		<statement name="id">
+			App::Statements::Org
+		</statement>
+
+		<statement name="selAddresses">
+			
+			select parent_id, address_name, complete_addr_html,item_id
+			from org_address where parent_id = ?
+			order by address_name
+			
+		</statement>
+
+		<statement name="selAlerts">
+			
+			select trans_type, trans_id, caption, detail, to_char(trans_begin_stamp, 'MM/DD/YYYY') as trans_begin_stamp,
+			trans_end_stamp, trans_subtype
+			from transaction
+			where
+			(
+			(trans_owner_type = 1 and trans_owner_id = ?)
+			)
+			and
+			(
+			trans_type between 8000 and 8999
+			)
+			and
+			(
+			trans_status = 2
+			)
+			order by trans_begin_stamp desc
+			
+		</statement>
+
+		<statement name="selAttribute">
+			
+			select * from org_attribute
+			where parent_id = ? and item_name = ?
+			
+		</statement>
+
+		<statement name="selAttributeById">
+			
+			select org_attribute.*, to_char(value_date, 'MM/DD/YYYY') as value_date 
+			from org_attribute
+			where item_id = ?
+			
+		</statement>
+
+		<statement name="selAttributeByIdValueIntParent">
+			
+			SELECT	item_id
+			FROM	Org_Attribute
+			WHERE	parent_id = :1
+			AND	value_int = :2
+			AND	item_name = :3
+			
+		</statement>
+
+		<statement name="selAttributeByItemNameAndValueTypeAndParent">
+			
+			select * from org_attribute
+			where parent_id = ? and item_name = ? and value_type = ?
+			
+		</statement>
+
+		<statement name="selAttributeByValueType">
+			
+			select * from org_attribute
+			where parent_id = ? and value_type = ?
+			
+		</statement>
+
+		<statement name="selAttributeItemDateByItemNameAndValueTypeAndParent">
+			
+			SELECT 	item_id,to_char(value_date,'MM/DD/YYYY') as value_date,o.org_id
+			FROM 	org_attribute oa,org o
+			WHERE	oa.parent_id = ? and oa.item_name = ? and oa.value_type = ?
+			AND	o.org_internal_id = oa.parent_id
+			
+		</statement>
+
+		<statement name="selCategory">
+			
+			select category
+			from org
+			where org_internal_id = ?
+			
+		</statement>
+
+		<statement name="selChildFacilityOrgs">
+			
+			SELECT
+			org_id
+			FROM 	org
+			WHERE 	owner_org_id = ?
+			AND category IN ('Practice','Clinic','Facility/Site','Diagnostic Service','Department','Hospital','Therapeutical Services')
+			
+		</statement>
+
+		<statement name="selCloseDateChildParentOrgIds">
+			
+			SELECT	o.org_internal_id
+			FROM	org o,Org_Category oc
+			WHERE	o.owner_org_id = :1
+			AND	( ( (o.parent_org_id = :2 OR o.owner_org_id = :2) AND :3 = 1) OR o.org_internal_id = :2 )
+			AND	oc.parent_id = o.org_internal_id
+			AND	UPPER(LTRIM(RTRIM(oc.member_name))) IN ('PRACTICE', 'CLINIC','FACILITY/SITE','DIAGNOSTIC SERVICES', 'DEPARTMENT', 'HOSPITAL', 'THERAPEUTIC SERVICES')
+			
+		</statement>
+
+		<statement name="selComponentSuperbillsByCatalogId">
+			
+			select	oc.internal_catalog_id, oc.catalog_id, oc.caption, oc.description
+			from	Offering_Catalog oc
+			where	oc.internal_catalog_id = ?
+			and	oc.org_internal_id = ?
+			order by internal_catalog_id
+			
+		</statement>
+
+		<statement name="selComponentSuperbillsByOrgIntId">
+			
+			select	oc.internal_catalog_id, oc.catalog_id, oc.caption, oc.description
+			from	Offering_Catalog oc
+			where	oc.catalog_type = 4
+			and	oc.org_internal_id = ?
+			order by internal_catalog_id
+			
+		</statement>
+
+		<statement name="selContactMethods">
+			
+			select * from org_attribute
+			where parent_id = ?
+			and value_type in (10, 15, 20, 40, 50)
+			order by name_sort, item_name
+			
+		</statement>
+
+		<statement name="selDepartments">
+			
+			select *
+			from org org, org_category ocat
+			where org.parent_org_id = ?
+			and ocat.member_name = 'Department' and ocat.parent_id = org.org_internal_id
+			
+		</statement>
+
+		<statement name="selFindOrgWithMemberId">
+			
+			SELECT parent_id
+			FROM	org_category
+			WHERE	parent_id = :1
+			AND	member_name = :2
+			
+		</statement>
+
+		<statement name="selHealthRule">
+			
+			select *
+			from hlth_maint_rule
+			where rule_id = ?
+			
+		</statement>
+
+		<statement name="selId">
+			
+			select org_id
+			from org
+			where org_internal_id = ?
+			
+		</statement>
+
+		<statement name="selMemberNames">
+			
+			select member_name
+			from org_category
+			where parent_id = ?
+			
+		</statement>
+
+		<statement name="selOrg">
+			
+			select *
+			from org
+			where owner_org_id = ? AND
+			org_id = ?
+			
+		</statement>
+
+		<statement name="selOrgAddressByAddrName">
+			
+			select *
+			from org_address
+			where parent_id = ?
+			and address_name = ?
+			
+		</statement>
+
+		<statement name="selOrgAddressById">
+			
+			select *
+			from org_address
+			where item_id = ?
+			
+		</statement>
+
+		<statement name="selOrgCategory">
+			
+			select member_name
+			from Org_Category
+			where parent_id = ?
+			
+		</statement>
+
+		<statement name="selOrgCategoryRegistry">
+			
+			select distinct o.*, decode(t.group_name, 'other', 'main', t.group_name) as group_name
+			from org o, org_category cat, org_type t
+			where
+			cat.parent_id = o.org_internal_id and
+			cat.member_name = t.caption and
+			cat.member_name = (
+			select caption from org_type
+			where id = (
+			select min(id)
+			from org_type, org_category
+			where parent_id = o.org_internal_id and caption = member_name
+			)
+			) and
+			org_internal_id = ?
+			
+		</statement>
+
+		<statement name="selOrgEligibilityInput">
+			
+			select *
+			from org_eligibility_input
+			where org_internal_id = ?
+			order by field_order
+			
+		</statement>
+
+		<statement name="selOrgIDByOrgType">
+			
+			select distinct o.org_id,o.org_internal_id
+			FROM	org o , org_category oc
+			WHERE 	o.org_internal_id = oc.parent_id
+			AND	o.owner_org_id = :1
+			AND	oc.member_name = :2
+			
+		</statement>
+
+		<statement name="selOrgId">
+			
+			select org_internal_id
+			from org
+			where owner_org_id = ? AND
+			org_id = ?
+			
+		</statement>
+
+		<statement name="selOrgServiceFFSByInternalId">
+			
+			SELECT 	distinct org_internal_id,oa.value_int
+			FROM	Org_Category oc, Org o,Org_Attribute oa
+			WHERE o.owner_org_id = :1
+			AND	oc.parent_id = o.org_internal_id
+			AND	UPPER(LTRIM(RTRIM(oc.member_name))) IN ('CLINIC','HOSPITAL','FACILITY/SITE','PRACTICE')
+			AND	oa.item_name ='Fee Schedules'
+			AND	oa.value_type =0
+			AND	oa.parent_id = o.org_internal_id
+			
+		</statement>
+
+		<statement name="selOrgSimpleNameById">
+			
+			select name_primary
+			from org
+			where org_internal_id = ?
+			
+		</statement>
+
+		<statement name="selOwnerOrg">
+			
+			select *
+			from org
+			where parent_org_id IS NULL AND
+			org_id = ?
+			
+		</statement>
+
+		<statement name="selOwnerOrgId">
+			
+			select org_internal_id
+			from org
+			where parent_org_id IS NULL AND
+			org_id = ?
+			
+		</statement>
+
+		<statement name="selPersonBillingInfo">
+			
+			select	pa.value_type, pa.item_id, pa.value_text, pa.value_textb, pa.value_int, decode(to_char(pa.value_date, 'YYYY'), to_char(sysdate, 'YYYY'), to_char(pa.value_date, 'Mon DD'), to_char(pa.value_date, 'MM/DD/YY')),
+			decode(pa.value_int,0,'Unknown',1,'Per Se',2,'ThinNET','Other'),
+			decode(pa.value_textb,'1','Active','Inactive')
+			from	Person_Attribute pa, Org o, Person_Org_Category poc
+			where	o.org_id = ?
+			and	pa.parent_id = poc.person_id
+			and	poc.org_internal_id = o.org_internal_id
+			and	pa.value_type = 960
+			order by pa.value_int
+			
+		</statement>
+
+		<statement name="selPersonBillingInfoByOrgIntId">
+			
+			select	pa.value_type, pa.item_id, pa.value_text, pa.value_textb, pa.value_int, decode(to_char(pa.value_date, 'YYYY'), to_char(sysdate, 'YYYY'), to_char(pa.value_date, 'Mon DD'), to_char(pa.value_date, 'MM/DD/YY')),
+			decode(pa.value_int,0,'Unknown',1,'Per Se',2,'ThinNET','Other'),
+			decode(pa.value_textb,'1','Active','Inactive')
+			from	Person_Attribute pa, Org o, Person_Org_Category poc
+			where	o.org_internal_id = ?
+			and	pa.parent_id = poc.person_id
+			and	poc.org_internal_id = o.org_internal_id
+			and	pa.value_type = 960
+			order by pa.value_int
+			
+		</statement>
+
+		<statement name="selPersonCategory">
+			
+			select org_internal_id
+			from Org
+			where
+			(
+			owner_org_id in (select org_internal_id from Person_Org_Category where person_id = ?) or
+			parent_org_id in (select org_internal_id from Person_Org_Category where person_id = ?)
+			)
+			and org_internal_id = ?
+			
+		</statement>
+
+		<statement name="selReferralDetail">
+			
+			SELECT
+			id,
+			caption
+			FROM Referral_Service_Detail
+			
+		</statement>
+
+		<statement name="selReferralFollowup">
+			
+			SELECT
+			id,
+			caption
+			FROM Referral_Followup_Status
+			
+		</statement>
+
+		<statement name="selReferralPayor">
+			
+			SELECT
+			id,
+			caption
+			FROM Referral_Payor
+			
+		</statement>
+
+		<statement name="selReferralResult">
+			
+			SELECT
+			id,
+			caption
+			FROM Referral_Result
+			
+		</statement>
+
+		<statement name="selReferralService">
+			
+			SELECT
+			id,
+			caption
+			FROM Referral_Service_Type
+			
+		</statement>
+
+		<statement name="selReferralSource">
+			
+			SELECT
+			id,
+			caption
+			FROM Referral_Source_Type
+			
+		</statement>
+
+		<statement name="selReferralUnitType">
+			
+			SELECT
+			id,
+			caption
+			FROM Referral_Unit_Type
+			
+		</statement>
+
+		<statement name="selRegistry">
+			
+			select *
+			from org
+			where org_internal_id = ?
+			
+		</statement>
+
+		<statement name="selSuperbillInfoByCatalogID">
+			
+			select	entry_id, parent_entry_id, entry_type, code, name, cost_type, data_text, data_num, data_date
+			from	Offering_Catalog_Entry
+			where	catalog_id = ?
+			order by entry_id
+			
+		</statement>
+
+		<statement name="selSuperbillsByCatalogId">
+			
+			select	oc.internal_catalog_id
+			from	Offering_Catalog oc
+			where	oc.catalog_id = ?
+			and	oc.org_internal_id = ?
+			order by catalog_id
+			
+		</statement>
+
+		<statement name="selSuperbillsByOrgIntId">
+			
+			select	*
+			from	Offering_Catalog oc
+			where	oc.catalog_type = 4
+			and	oc.org_internal_id = ?
+			order by internal_catalog_id
+			
+		</statement>
+
+		<statement name="selTaxId">
+			
+			select tax_id
+			from org
+			where org_internal_id = ?
+			
+		</statement>
+
+		<statement name="selTimeMetric">
+			
+			select id, caption
+			from Time_Metric
+			
+		</statement>
+
+		<statement name="selUpdateOwnerOrgId">
+			
+			update org
+			set owner_org_id = ?
+			where org_internal_id = ?
+			
+		</statement>
+
+		<statement name="selValueDateByItemNameAndValueTypeAndParent">
+			
+			SELECT to_char(value_date,'MM/DD/YYYY') as value_date
+			FROM org_attribute
+			WHERE parent_id = :1 and item_name = :2 and value_type = :3
+			
+		</statement>
+
+		<statement name="sel_ActiveOrgBillingIds">
+			
+			select * from org_attribute
+			where parent_id = :1
+			and value_type = 960
+			and value_intb = 1
+			
+		</statement>
+
+		<statement name="sel_ActivePersonBillingIds">
+			
+			select * from person_attribute
+			where parent_id = :1
+			and value_type = 960
+			and value_intb = 1
+			
+		</statement>
+
+	</sql-statements>
+</xaf>

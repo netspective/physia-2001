@@ -1,0 +1,115 @@
+<?xml version="1.0"?>
+
+<xaf>
+	<sql-statements package="report.contract_compliance">
+		<statement name="id">
+			App::Statements::Report::ContractCompliance
+		</statement>
+
+		<statement name="selCompliantInvoicesByCode">
+			
+			select distinct
+			to_char(ii.service_begin_date, 'MM/DD/YYYY') service_date,
+			to_char(iia.pay_date, 'MM/DD/YYYY') payment_date,
+			ins.product_name,
+			i.invoice_id,
+			ii.code,
+			iia.plan_allow,
+			iia.plan_paid
+			from
+			invoice i,
+			invoice_item ii,
+			invoice_item_adjust iia,
+			invoice_billing ib,
+			insurance ins,
+			invoice_attribute ia
+			where i.invoice_id = ii.parent_id
+			and ii.item_id = iia.parent_id
+			and iia.plan_allow &lt;&gt; iia.plan_paid
+			and i.billing_id = ib.bill_id
+			and ib.bill_ins_id = ins.ins_internal_id
+			and i.invoice_subtype not in ( 0 , 7 )
+			and i.invoice_id = ia.parent_id
+			and ia.item_name = 'Invoice/Creation/Batch ID'
+			and i.owner_id = :1
+			and (ii.service_begin_date &gt;= to_date(:2, 'MM/DD/YYYY') or :2 is null)
+			and (ii.service_end_date &lt;= to_date(:3, 'MM/DD/YYYY') or :3 is null)
+			and (ia.value_text &gt;= :4 or :4 is null)
+			and (ia.value_text &lt;= :5 or :5 is null)
+			and (ins.product_name = :6 or :6 is null)
+			order by code
+
+		</statement>
+
+		<statement name="selCompliantInvoicesByProductName">
+			
+			select distinct
+			to_char(ii.service_begin_date, 'MM/DD/YYYY') service_date,
+			to_char(iia.pay_date, 'MM/DD/YYYY') payment_date,
+			ins.product_name,
+			i.invoice_id,
+			ii.code,
+			iia.plan_allow,
+			iia.plan_paid
+			from
+			invoice i,
+			invoice_item ii,
+			invoice_item_adjust iia,
+			invoice_billing ib,
+			insurance ins,
+			invoice_attribute ia
+			where i.invoice_id = ii.parent_id
+			and ii.item_id = iia.parent_id
+			and iia.plan_allow &lt;&gt; iia.plan_paid
+			and i.billing_id = ib.bill_id
+			and ib.bill_ins_id = ins.ins_internal_id
+			and i.invoice_subtype not in ( 0 , 7 )
+			and i.invoice_id = ia.parent_id
+			and ia.item_name = 'Invoice/Creation/Batch ID'
+			and i.owner_id = :1
+			and (ii.service_begin_date &gt;= to_date(:2, 'MM/DD/YYYY') or :2 is null)
+			and (ii.service_end_date &lt;= to_date(:3, 'MM/DD/YYYY') or :3 is null)
+			and (ia.value_text &gt;= :4 or :4 is null)
+			and (ia.value_text &lt;= :5 or :5 is null)
+			and (ins.product_name = :6 or :6 is null)
+			order by product_name
+
+		</statement>
+
+		<statement name="selCompliantInvoicesByServiceDate">
+			
+			select distinct
+			to_char(ii.service_begin_date, 'MM/DD/YYYY') service_date,
+			to_char(iia.pay_date, 'MM/DD/YYYY') payment_date,
+			ins.product_name,
+			i.invoice_id,
+			ii.code,
+			iia.plan_allow,
+			iia.plan_paid
+			from
+			invoice i,
+			invoice_item ii,
+			invoice_item_adjust iia,
+			invoice_billing ib,
+			insurance ins,
+			invoice_attribute ia
+			where i.invoice_id = ii.parent_id
+			and ii.item_id = iia.parent_id
+			and iia.plan_allow &lt;&gt; iia.plan_paid
+			and i.billing_id = ib.bill_id
+			and ib.bill_ins_id = ins.ins_internal_id
+			and i.invoice_subtype not in ( 0 , 7 )
+			and i.invoice_id = ia.parent_id
+			and ia.item_name = 'Invoice/Creation/Batch ID'
+			and i.owner_id = :1
+			and (ii.service_begin_date &gt;= to_date(:2, 'MM/DD/YYYY') or :2 is null)
+			and (ii.service_end_date &lt;= to_date(:3, 'MM/DD/YYYY') or :3 is null)
+			and (ia.value_text &gt;= :4 or :4 is null)
+			and (ia.value_text &lt;= :5 or :5 is null)
+			and (ins.product_name = :6 or :6 is null)
+			order by service_date
+
+		</statement>
+
+	</sql-statements>
+</xaf>

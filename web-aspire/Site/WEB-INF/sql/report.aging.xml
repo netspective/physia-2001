@@ -1,0 +1,376 @@
+<?xml version="1.0"?>
+
+<xaf>
+	<sql-statements package="report.aging">
+		<statement name="id">
+			App::Statements::Report::Aging
+		</statement>
+
+		<statement name="sel_detail_aged_ins">
+			
+			SELECT
+			i.invoice_id,
+			i.total_items,
+			TO_CHAR(MIN(iit.service_begin_date), 'MM/DD/YYYY') AS service_begin_date,
+			ist.caption as invoice_status,
+			ib.bill_to_id,
+			i.total_cost,
+			i.total_adjust,
+			i.balance,
+			i.client_id,
+			ib.bill_to_id,
+			o.org_id,
+			ib.bill_party_type,
+			i.invoice_status as status_id,
+			i.parent_invoice_id,
+			to_char(i.invoice_date, 'MM/DD/YYYY') as invoice_date
+			FROM invoice i, invoice_status ist, invoice_billing ib, invoice_item iit, org o, transaction t
+			WHERE
+			ib.bill_to_id = :1
+			AND iit.parent_id (+) = i.invoice_id
+			AND ib.bill_id (+) = i.billing_id
+			AND ist.id = i.invoice_status
+			AND to_char(o.org_internal_id (+)) = ib.bill_to_id
+			AND NOT (i.invoice_status = 15 AND i.parent_invoice_id is not NULL)
+			AND i.main_transaction = t.trans_id
+			GROUP BY
+			i.invoice_id,
+			i.total_items,
+			ist.caption,
+			i.total_cost,
+			i.total_adjust,
+			i.balance,
+			i.client_id,
+			ib.bill_to_id,
+			o.org_id,
+			ib.bill_party_type,
+			i.invoice_status,
+			i.parent_invoice_id,
+			i.invoice_date
+			ORDER BY i.invoice_id desc
+
+		</statement>
+
+		<statement name="sel_detail_aged_ins_org">
+			
+			SELECT
+			i.invoice_id,
+			i.total_items,
+			TO_CHAR(MIN(iit.service_begin_date), 'MM/DD/YYYY') AS service_begin_date,
+			ist.caption as invoice_status,
+			ib.bill_to_id,
+			i.total_cost,
+			i.total_adjust,
+			i.balance,
+			i.client_id,
+			ib.bill_to_id,
+			o.org_id,
+			ib.bill_party_type,
+			i.invoice_status as status_id,
+			i.parent_invoice_id,
+			to_char(i.invoice_date, 'MM/DD/YYYY') as invoice_date
+			FROM invoice i, invoice_status ist, invoice_billing ib, invoice_item iit, org o, transaction t
+			WHERE
+			ib.bill_to_id = :1
+			AND iit.parent_id (+) = i.invoice_id
+			AND ib.bill_id (+) = i.billing_id
+			AND ist.id = i.invoice_status
+			AND to_char(o.org_internal_id (+)) = ib.bill_to_id
+			AND NOT (i.invoice_status = 15 AND i.parent_invoice_id is not NULL)
+			AND i.main_transaction = t.trans_id
+			and t.service_facility_id = :2
+			GROUP BY
+			i.invoice_id,
+			i.total_items,
+			ist.caption,
+			i.total_cost,
+			i.total_adjust,
+			i.balance,
+			i.client_id,
+			ib.bill_to_id,
+			o.org_id,
+			ib.bill_party_type,
+			i.invoice_status,
+			i.parent_invoice_id,
+			i.invoice_date
+			ORDER BY i.invoice_id desc
+
+		</statement>
+
+		<statement name="sel_detail_aged_ins_prov">
+			
+			SELECT
+			i.invoice_id,
+			i.total_items,
+			TO_CHAR(MIN(iit.service_begin_date), 'MM/DD/YYYY') AS service_begin_date,
+			ist.caption as invoice_status,
+			ib.bill_to_id,
+			i.total_cost,
+			i.total_adjust,
+			i.balance,
+			i.client_id,
+			ib.bill_to_id,
+			o.org_id,
+			ib.bill_party_type,
+			i.invoice_status as status_id,
+			i.parent_invoice_id,
+			to_char(i.invoice_date, 'MM/DD/YYYY') as invoice_date
+			FROM invoice i, invoice_status ist, invoice_billing ib, invoice_item iit, org o, transaction t
+			WHERE
+			ib.bill_to_id = :1
+			AND iit.parent_id (+) = i.invoice_id
+			AND ib.bill_id (+) = i.billing_id
+			AND ist.id = i.invoice_status
+			AND to_char(o.org_internal_id (+)) = ib.bill_to_id
+			AND NOT (i.invoice_status = 15 AND i.parent_invoice_id is not NULL)
+			AND i.main_transaction = t.trans_id
+			and t.care_provider_id = :2
+			GROUP BY
+			i.invoice_id,
+			i.total_items,
+			ist.caption,
+			i.total_cost,
+			i.total_adjust,
+			i.balance,
+			i.client_id,
+			ib.bill_to_id,
+			o.org_id,
+			ib.bill_party_type,
+			i.invoice_status,
+			i.parent_invoice_id,
+			i.invoice_date
+			ORDER BY i.invoice_id desc
+
+		</statement>
+
+		<statement name="sel_detail_aged_ins_prov_org">
+			
+			SELECT
+			i.invoice_id,
+			i.total_items,
+			TO_CHAR(MIN(iit.service_begin_date), 'MM/DD/YYYY') AS service_begin_date,
+			ist.caption as invoice_status,
+			ib.bill_to_id,
+			i.total_cost,
+			i.total_adjust,
+			i.balance,
+			i.client_id,
+			ib.bill_to_id,
+			o.org_id,
+			ib.bill_party_type,
+			i.invoice_status as status_id,
+			i.parent_invoice_id,
+			to_char(i.invoice_date, 'MM/DD/YYYY') as invoice_date
+			FROM invoice i, invoice_status ist, invoice_billing ib, invoice_item iit, org o, transaction t
+			WHERE
+			ib.bill_to_id = :1
+			AND iit.parent_id (+) = i.invoice_id
+			AND ib.bill_id (+) = i.billing_id
+			AND ist.id = i.invoice_status
+			AND to_char(o.org_internal_id (+)) = ib.bill_to_id
+			AND NOT (i.invoice_status = 15 AND i.parent_invoice_id is not NULL)
+			AND i.main_transaction = t.trans_id
+			and t.care_provider_id = :2 and t.service_facility_id = :3
+			GROUP BY
+			i.invoice_id,
+			i.total_items,
+			ist.caption,
+			i.total_cost,
+			i.total_adjust,
+			i.balance,
+			i.client_id,
+			ib.bill_to_id,
+			o.org_id,
+			ib.bill_party_type,
+			i.invoice_status,
+			i.parent_invoice_id,
+			i.invoice_date
+			ORDER BY i.invoice_id desc
+
+		</statement>
+
+		<statement name="sel_detail_aged_patient">
+			
+			SELECT
+			i.invoice_id,
+			i.total_items,
+			TO_CHAR(MIN(iit.service_begin_date), 'MM/DD/YYYY') AS service_begin_date,
+			ist.caption as invoice_status,
+			ib.bill_to_id,
+			i.total_cost,
+			i.total_adjust,
+			i.balance,
+			i.client_id,
+			ib.bill_to_id,
+			o.org_id,
+			ib.bill_party_type,
+			i.invoice_status as status_id,
+			i.parent_invoice_id,
+			to_char(i.invoice_date, 'MM/DD/YYYY') as invoice_date
+			FROM invoice i, invoice_status ist, invoice_billing ib, invoice_item iit, org o, transaction t
+			WHERE
+			upper(client_id) = :1 and (owner_type = 1 and owner_id = :2)
+			AND iit.parent_id (+) = i.invoice_id
+			AND ib.bill_id (+) = i.billing_id
+			AND ist.id = i.invoice_status
+			AND to_char(o.org_internal_id (+)) = ib.bill_to_id
+			AND NOT (i.invoice_status = 15 AND i.parent_invoice_id is not NULL)
+			AND i.main_transaction = t.trans_id
+			GROUP BY
+			i.invoice_id,
+			i.total_items,
+			ist.caption,
+			i.total_cost,
+			i.total_adjust,
+			i.balance,
+			i.client_id,
+			ib.bill_to_id,
+			o.org_id,
+			ib.bill_party_type,
+			i.invoice_status,
+			i.parent_invoice_id,
+			i.invoice_date
+			ORDER BY i.invoice_id desc
+
+		</statement>
+
+		<statement name="sel_detail_aged_patient_org">
+			
+			SELECT
+			i.invoice_id,
+			i.total_items,
+			TO_CHAR(MIN(iit.service_begin_date), 'MM/DD/YYYY') AS service_begin_date,
+			ist.caption as invoice_status,
+			ib.bill_to_id,
+			i.total_cost,
+			i.total_adjust,
+			i.balance,
+			i.client_id,
+			ib.bill_to_id,
+			o.org_id,
+			ib.bill_party_type,
+			i.invoice_status as status_id,
+			i.parent_invoice_id,
+			to_char(i.invoice_date, 'MM/DD/YYYY') as invoice_date
+			FROM invoice i, invoice_status ist, invoice_billing ib, invoice_item iit, org o, transaction t
+			WHERE
+			upper(client_id) = :1 and (owner_type = 1 and owner_id = :2)
+			AND iit.parent_id (+) = i.invoice_id
+			AND ib.bill_id (+) = i.billing_id
+			AND ist.id = i.invoice_status
+			AND to_char(o.org_internal_id (+)) = ib.bill_to_id
+			AND NOT (i.invoice_status = 15 AND i.parent_invoice_id is not NULL)
+			AND i.main_transaction = t.trans_id
+			and t.service_facility_id = :3
+			GROUP BY
+			i.invoice_id,
+			i.total_items,
+			ist.caption,
+			i.total_cost,
+			i.total_adjust,
+			i.balance,
+			i.client_id,
+			ib.bill_to_id,
+			o.org_id,
+			ib.bill_party_type,
+			i.invoice_status,
+			i.parent_invoice_id,
+			i.invoice_date
+			ORDER BY i.invoice_id desc
+
+		</statement>
+
+		<statement name="sel_detail_aged_patient_prov">
+			
+			SELECT
+			i.invoice_id,
+			i.total_items,
+			TO_CHAR(MIN(iit.service_begin_date), 'MM/DD/YYYY') AS service_begin_date,
+			ist.caption as invoice_status,
+			ib.bill_to_id,
+			i.total_cost,
+			i.total_adjust,
+			i.balance,
+			i.client_id,
+			ib.bill_to_id,
+			o.org_id,
+			ib.bill_party_type,
+			i.invoice_status as status_id,
+			i.parent_invoice_id,
+			to_char(i.invoice_date, 'MM/DD/YYYY') as invoice_date
+			FROM invoice i, invoice_status ist, invoice_billing ib, invoice_item iit, org o, transaction t
+			WHERE
+			upper(client_id) = :1 and (owner_type = 1 and owner_id = :2)
+			AND iit.parent_id (+) = i.invoice_id
+			AND ib.bill_id (+) = i.billing_id
+			AND ist.id = i.invoice_status
+			AND to_char(o.org_internal_id (+)) = ib.bill_to_id
+			AND NOT (i.invoice_status = 15 AND i.parent_invoice_id is not NULL)
+			AND i.main_transaction = t.trans_id
+			and t.care_provider_id = :3
+			GROUP BY
+			i.invoice_id,
+			i.total_items,
+			ist.caption,
+			i.total_cost,
+			i.total_adjust,
+			i.balance,
+			i.client_id,
+			ib.bill_to_id,
+			o.org_id,
+			ib.bill_party_type,
+			i.invoice_status,
+			i.parent_invoice_id,
+			i.invoice_date
+			ORDER BY i.invoice_id desc
+
+		</statement>
+
+		<statement name="sel_detail_aged_patient_prov_org">
+			
+			SELECT
+			i.invoice_id,
+			i.total_items,
+			TO_CHAR(MIN(iit.service_begin_date), 'MM/DD/YYYY') AS service_begin_date,
+			ist.caption as invoice_status,
+			ib.bill_to_id,
+			i.total_cost,
+			i.total_adjust,
+			i.balance,
+			i.client_id,
+			ib.bill_to_id,
+			o.org_id,
+			ib.bill_party_type,
+			i.invoice_status as status_id,
+			i.parent_invoice_id,
+			to_char(i.invoice_date, 'MM/DD/YYYY') as invoice_date
+			FROM invoice i, invoice_status ist, invoice_billing ib, invoice_item iit, org o, transaction t
+			WHERE
+			upper(client_id) = :1 and (owner_type = 1 and owner_id = :2)
+			AND iit.parent_id (+) = i.invoice_id
+			AND ib.bill_id (+) = i.billing_id
+			AND ist.id = i.invoice_status
+			AND to_char(o.org_internal_id (+)) = ib.bill_to_id
+			AND NOT (i.invoice_status = 15 AND i.parent_invoice_id is not NULL)
+			AND i.main_transaction = t.trans_id
+			and t.care_provider_id = :3 and t.service_facility_id = :4
+			GROUP BY
+			i.invoice_id,
+			i.total_items,
+			ist.caption,
+			i.total_cost,
+			i.total_adjust,
+			i.balance,
+			i.client_id,
+			ib.bill_to_id,
+			o.org_id,
+			ib.bill_party_type,
+			i.invoice_status,
+			i.parent_invoice_id,
+			i.invoice_date
+			ORDER BY i.invoice_id desc
+
+		</statement>
+
+	</sql-statements>
+</xaf>

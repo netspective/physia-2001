@@ -1,0 +1,327 @@
+<?xml version="1.0"?>
+
+<xaf>
+	<dialogs package="encounter">
+		<dialog name="checkout" heading="checkout">
+			<field.text hidden="yes" name="batch_item_id" caption="batch_item_id"/>
+			<field.text hidden="yes" name="condition_item_id" caption="condition_item_id"/>
+			<field.text hidden="yes" name="prior_auth_item_id" caption="prior_auth_item_id"/>
+			<field.text hidden="yes" name="resub_number_item_id" caption="resub_number_item_id"/>
+			<field.text hidden="yes" name="deduct_item_id" caption="deduct_item_id"/>
+			<field.text hidden="yes" name="assignment_item_id" caption="assignment_item_id"/>
+			<field.text hidden="yes" name="accept_assignment" caption="accept_assignment"/>
+			<field.text hidden="yes" name="illness_item_id" caption="illness_item_id"/>
+			<field.text hidden="yes" name="disability_item_id" caption="disability_item_id"/>
+			<field.text hidden="yes" name="hospital_item_id" caption="hospital_item_id"/>
+			<field.text hidden="yes" name="cntrl_num_item_id" caption="cntrl_num_item_id"/>
+			<field.text hidden="yes" name="bill_contact_item_id" caption="bill_contact_item_id"/>
+			<field.text hidden="yes" name="claim_filing_item_id" caption="claim_filing_item_id"/>
+			<field.text hidden="yes" name="fee_schedules_item_id" caption="fee_schedules_item_id"/>
+			<field.text hidden="yes" name="payer_selected_item_id" caption="payer_selected_item_id"/>
+			<field.text hidden="yes" name="trans_id" caption="trans_id"/>
+			<field.text hidden="yes" name="trans_begin_stamp" caption="trans_begin_stamp"/>
+			<field.text hidden="yes" name="parent_event_id" caption="parent_event_id"/>
+			<field.text hidden="yes" name="insuranceIsSet" caption="insuranceIsSet"/>
+			<field.text hidden="yes" name="eventFieldsAreSet" caption="eventFieldsAreSet"/>
+			<field.text hidden="yes" name="hospFieldsAreSet" caption="hospFieldsAreSet"/>
+			<field.text hidden="yes" name="invoiceFieldsAreSet" caption="invoiceFieldsAreSet"/>
+			<field.text hidden="yes" name="invoice_flags" caption="invoice_flags"/>
+			<field.text hidden="yes" name="invoice_date" caption="invoice_date"/>
+			<field.text hidden="yes" name="old_invoice_id" caption="old_invoice_id"/>
+			<field.text hidden="yes" name="old_person_id" caption="old_person_id"/>
+			<field.text hidden="yes" name="claim_type" caption="claim_type"/>
+			<field.text hidden="yes" name="current_status" caption="current_status"/>
+			<field.text hidden="yes" name="submission_order" caption="submission_order"/>
+			<field.text hidden="yes" name="provider_pair" caption="provider_pair"/>
+			<field.text hidden="yes" name="copay_amt" caption="copay_amt"/>
+			<field.text hidden="yes" name="dupCheckin_returnUrl" caption="dupCheckin_returnUrl"/>
+			<field.text hidden="yes" name="ins_ffs" caption="ins_ffs"/>
+			<field.text hidden="yes" name="work_ffs" caption="work_ffs"/>
+			<field.text hidden="yes" name="org_ffs" caption="org_ffs"/>
+			<field.text hidden="yes" name="prov_ffs" caption="prov_ffs"/>
+			<field.composite caption="Batch ID Date" required="yes" name="batch_fields">
+				<field.text caption="Batch ID" required="yes" name="batch_id" size="12"/>
+				<field.date caption="Batch Date" name="batch_date" size="12"/>
+			</field.composite>
+			<field.text caption="Patient ID" required="yes" max-length="16" name="attendee_id" size="16"/>
+			<field.datetime caption="Appointment Time" name="start_time" size="20"/>
+			<field.datetime caption="Check-in Time" name="checkin_stamp" size="20"/>
+			<field.datetime caption="Check-out Time" name="checkout_stamp" size="20"/>
+			<field.select caption="Type of Visit" required="yes" name="trans_type"/>
+			<!--  -->
+			<field.text caption="Appointment Type" read-only="yes" name="appt_type"/>
+			<field.text caption="Reason for Visit" required="yes" name="subject"/>
+			<field.memo caption="Symptoms" name="remarks" size="24"/>
+			<field.select caption="Accident?"  name="accident" choices="query:invoice.selAccidentDropDown"/>
+			<!--  -->
+			<field.text caption="Place of Auto Accident (State)"  max-length="2" name="accident_state" size="2"/>
+			<field.select caption="Primary Payer"  name="payer" choices="No Options"/>
+			<!--  -->
+			<field.composite caption="Payer for Today ID/Type"  name="other_payer_fields">
+				<field.text caption="Payer for Today ID"  name="other_payer_id"/>
+				<field.select caption="Payer for Today Type"  name="other_payer_type" choices="Person=person;Organization=org"/>
+				<!--  -->
+			</field.composite>
+			<field.currency caption="Deductible Balance"  max-length="1024" name="deduct_balance" size="10"/>
+			<field.text caption="Contact Phone for Primary Insurance" read-only="yes" name="primary_ins_phone"/>
+			<field.composite caption="Provider Service/Billing"  name="provider_fields">
+				<field.select caption="Service Provider" required="yes" name="care_provider_id" choices="query:person.selPersonBySessionOrgAndCategory"/>
+				<!--  -->
+				<field.select caption="Billing Provider" required="yes" name="provider_id" choices="query:person.selPersonBySessionOrgAndCategory"/>
+				<!--  -->
+			</field.composite>
+			<field.composite caption="Org Service/Billing"  hint="Service Org is the org in which services were rendered.&lt;br&gt; 						Billing org is the org in which the billing should be tracked." name="org_fields">
+				<field.select caption="Service Facility" required="yes" name="service_facility_id" choices="query:dialog.stmt7"/>
+				<!--  numPackages="0" pkgList="" stmtNum="7" -->
+				<field.select caption="Billing Org" required="yes" name="billing_facility_id" choices="query:dialog.stmt8"/>
+				<!--  numPackages="0" pkgList="" stmtNum="8" -->
+			</field.composite>
+			<field.composite caption="Hospital/Billing Facility"  hint="Hospital is the org in which services were rendered.&lt;br&gt; 						Billing org is the org in which the billing should be tracked." name="hosp_org_fields">
+				<field.select caption="Hospital" required="yes" name="hospital_id" choices="query:dialog.stmt9"/>
+				<!--  numPackages="0" pkgList="" stmtNum="9" -->
+				<field.select caption="Billing Org" required="yes" name="billing_facility_id" choices="query:dialog.stmt10"/>
+				<!--  numPackages="0" pkgList="" stmtNum="10" -->
+			</field.composite>
+			<field.text caption="Billing Contact"  name="billing_contact"/>
+			<field.phone caption="Billing Phone"  max-length="1024" name="billing_phone"/>
+			<field.text caption="Referring Physician ID"  max-length="16" name="ref_id" size="16"/>
+			<field.composite caption="Current/Similar Illness Dates"  name="illness_dates">
+				<field.date caption="illness_end_date" name="illness_end_date" size="12"/>
+				<field.date caption="illness_begin_date" name="illness_begin_date" size="12"/>
+			</field.composite>
+			<field.composite caption="Begin/End Disability Dates"  name="disability_dates">
+				<field.date caption="disability_begin_date" name="disability_begin_date" size="12"/>
+				<field.date caption="disability_end_date" name="disability_end_date" size="12"/>
+			</field.composite>
+			<field.composite caption="Admission/Discharge Hospitalization Dates"  name="hosp_dates">
+				<field.date caption="hospitalization_begin_date" name="hospitalization_begin_date" size="12"/>
+				<field.date caption="hospitalization_end_date" name="hospitalization_end_date" size="12"/>
+			</field.composite>
+			<field.text caption="Prior Authorization Number"  name="prior_auth"/>
+			<field.composite caption="Medicaid Resubmission Code/Original Ref. No."  name="medicaid_fields">
+				<field.text caption="Medicaid Resubmission Code"  name="resub_number"/>
+				<field.text caption="Original Reference No."  name="orig_ref"/>
+			</field.composite>
+			<field.boolean caption="Have you confirmed Personal Information/Insurance Coverage?" required="yes" name="confirmed_info"/>
+			<field.memo caption="Place Claim(s) On Hold" name="on_hold" size="24"/>
+			<field.separator heading="Procedure Entry" name="procedures_heading"/>
+			<!-- Unimplemented field type=procedures -->
+
+		</dialog>
+
+		<dialog name="claim" heading="claim">
+			<field.text hidden="yes" name="batch_item_id" caption="batch_item_id"/>
+			<field.text hidden="yes" name="condition_item_id" caption="condition_item_id"/>
+			<field.text hidden="yes" name="prior_auth_item_id" caption="prior_auth_item_id"/>
+			<field.text hidden="yes" name="resub_number_item_id" caption="resub_number_item_id"/>
+			<field.text hidden="yes" name="deduct_item_id" caption="deduct_item_id"/>
+			<field.text hidden="yes" name="assignment_item_id" caption="assignment_item_id"/>
+			<field.text hidden="yes" name="accept_assignment" caption="accept_assignment"/>
+			<field.text hidden="yes" name="illness_item_id" caption="illness_item_id"/>
+			<field.text hidden="yes" name="disability_item_id" caption="disability_item_id"/>
+			<field.text hidden="yes" name="hospital_item_id" caption="hospital_item_id"/>
+			<field.text hidden="yes" name="cntrl_num_item_id" caption="cntrl_num_item_id"/>
+			<field.text hidden="yes" name="bill_contact_item_id" caption="bill_contact_item_id"/>
+			<field.text hidden="yes" name="claim_filing_item_id" caption="claim_filing_item_id"/>
+			<field.text hidden="yes" name="fee_schedules_item_id" caption="fee_schedules_item_id"/>
+			<field.text hidden="yes" name="payer_selected_item_id" caption="payer_selected_item_id"/>
+			<field.text hidden="yes" name="trans_id" caption="trans_id"/>
+			<field.text hidden="yes" name="trans_begin_stamp" caption="trans_begin_stamp"/>
+			<field.text hidden="yes" name="parent_event_id" caption="parent_event_id"/>
+			<field.text hidden="yes" name="insuranceIsSet" caption="insuranceIsSet"/>
+			<field.text hidden="yes" name="eventFieldsAreSet" caption="eventFieldsAreSet"/>
+			<field.text hidden="yes" name="hospFieldsAreSet" caption="hospFieldsAreSet"/>
+			<field.text hidden="yes" name="invoiceFieldsAreSet" caption="invoiceFieldsAreSet"/>
+			<field.text hidden="yes" name="invoice_flags" caption="invoice_flags"/>
+			<field.text hidden="yes" name="invoice_date" caption="invoice_date"/>
+			<field.text hidden="yes" name="old_invoice_id" caption="old_invoice_id"/>
+			<field.text hidden="yes" name="old_person_id" caption="old_person_id"/>
+			<field.text hidden="yes" name="claim_type" caption="claim_type"/>
+			<field.text hidden="yes" name="current_status" caption="current_status"/>
+			<field.text hidden="yes" name="submission_order" caption="submission_order"/>
+			<field.text hidden="yes" name="provider_pair" caption="provider_pair"/>
+			<field.text hidden="yes" name="copay_amt" caption="copay_amt"/>
+			<field.text hidden="yes" name="dupCheckin_returnUrl" caption="dupCheckin_returnUrl"/>
+			<field.text hidden="yes" name="ins_ffs" caption="ins_ffs"/>
+			<field.text hidden="yes" name="work_ffs" caption="work_ffs"/>
+			<field.text hidden="yes" name="org_ffs" caption="org_ffs"/>
+			<field.text hidden="yes" name="prov_ffs" caption="prov_ffs"/>
+			<field.composite caption="Batch ID Date" required="yes" name="batch_fields">
+				<field.text caption="Batch ID" required="yes" name="batch_id" size="12"/>
+				<field.date caption="Batch Date" name="batch_date" size="12"/>
+			</field.composite>
+			<field.text caption="Patient ID" required="yes" max-length="16" name="attendee_id" size="16"/>
+			<field.datetime caption="Appointment Time" name="start_time" size="20"/>
+			<field.datetime caption="Check-in Time" name="checkin_stamp" size="20"/>
+			<field.datetime caption="Check-out Time" name="checkout_stamp" size="20"/>
+			<field.select caption="Type of Visit" required="yes" name="trans_type"/>
+			<!--  -->
+			<field.text caption="Appointment Type" read-only="yes" name="appt_type"/>
+			<field.text caption="Reason for Visit" required="yes" name="subject"/>
+			<field.memo caption="Symptoms" name="remarks" size="24"/>
+			<field.select caption="Accident?"  name="accident" choices="query:invoice.selAccidentDropDown"/>
+			<!--  -->
+			<field.text caption="Place of Auto Accident (State)"  max-length="2" name="accident_state" size="2"/>
+			<field.select caption="Primary Payer"  name="payer" choices="No Options"/>
+			<!--  -->
+			<field.composite caption="Payer for Today ID/Type"  name="other_payer_fields">
+				<field.text caption="Payer for Today ID"  name="other_payer_id"/>
+				<field.select caption="Payer for Today Type"  name="other_payer_type" choices="Person=person;Organization=org"/>
+				<!--  -->
+			</field.composite>
+			<field.currency caption="Deductible Balance"  max-length="1024" name="deduct_balance" size="10"/>
+			<field.text caption="Contact Phone for Primary Insurance" read-only="yes" name="primary_ins_phone"/>
+			<field.composite caption="Provider Service/Billing"  name="provider_fields">
+				<field.select caption="Service Provider" required="yes" name="care_provider_id" choices="query:person.selPersonBySessionOrgAndCategory"/>
+				<!--  -->
+				<field.select caption="Billing Provider" required="yes" name="provider_id" choices="query:person.selPersonBySessionOrgAndCategory"/>
+				<!--  -->
+			</field.composite>
+			<field.composite caption="Org Service/Billing"  hint="Service Org is the org in which services were rendered.&lt;br&gt; 						Billing org is the org in which the billing should be tracked." name="org_fields">
+				<field.select caption="Service Facility" required="yes" name="service_facility_id" choices="query:dialog.stmt11"/>
+				<!--  numPackages="0" pkgList="" stmtNum="11" -->
+				<field.select caption="Billing Org" required="yes" name="billing_facility_id" choices="query:dialog.stmt12"/>
+				<!--  numPackages="0" pkgList="" stmtNum="12" -->
+			</field.composite>
+			<field.composite caption="Hospital/Billing Facility"  hint="Hospital is the org in which services were rendered.&lt;br&gt; 						Billing org is the org in which the billing should be tracked." name="hosp_org_fields">
+				<field.select caption="Hospital" required="yes" name="hospital_id" choices="query:dialog.stmt13"/>
+				<!--  numPackages="0" pkgList="" stmtNum="13" -->
+				<field.select caption="Billing Org" required="yes" name="billing_facility_id" choices="query:dialog.stmt14"/>
+				<!--  numPackages="0" pkgList="" stmtNum="14" -->
+			</field.composite>
+			<field.text caption="Billing Contact"  name="billing_contact"/>
+			<field.phone caption="Billing Phone"  max-length="1024" name="billing_phone"/>
+			<field.text caption="Referring Physician ID"  max-length="16" name="ref_id" size="16"/>
+			<field.composite caption="Current/Similar Illness Dates"  name="illness_dates">
+				<field.date caption="illness_end_date" name="illness_end_date" size="12"/>
+				<field.date caption="illness_begin_date" name="illness_begin_date" size="12"/>
+			</field.composite>
+			<field.composite caption="Begin/End Disability Dates"  name="disability_dates">
+				<field.date caption="disability_begin_date" name="disability_begin_date" size="12"/>
+				<field.date caption="disability_end_date" name="disability_end_date" size="12"/>
+			</field.composite>
+			<field.composite caption="Admission/Discharge Hospitalization Dates"  name="hosp_dates">
+				<field.date caption="hospitalization_begin_date" name="hospitalization_begin_date" size="12"/>
+				<field.date caption="hospitalization_end_date" name="hospitalization_end_date" size="12"/>
+			</field.composite>
+			<field.text caption="Prior Authorization Number"  name="prior_auth"/>
+			<field.composite caption="Medicaid Resubmission Code/Original Ref. No."  name="medicaid_fields">
+				<field.text caption="Medicaid Resubmission Code"  name="resub_number"/>
+				<field.text caption="Original Reference No."  name="orig_ref"/>
+			</field.composite>
+			<field.boolean caption="Have you confirmed Personal Information/Insurance Coverage?" required="yes" name="confirmed_info"/>
+			<field.memo caption="Place Claim(s) On Hold" name="on_hold" size="24"/>
+			<field.separator heading="Procedure Entry" name="procedures_heading"/>
+			<!-- Unimplemented field type=procedures -->
+
+		</dialog>
+
+		<dialog name="checkin" heading="checkin">
+			<field.text hidden="yes" name="batch_item_id" caption="batch_item_id"/>
+			<field.text hidden="yes" name="condition_item_id" caption="condition_item_id"/>
+			<field.text hidden="yes" name="prior_auth_item_id" caption="prior_auth_item_id"/>
+			<field.text hidden="yes" name="resub_number_item_id" caption="resub_number_item_id"/>
+			<field.text hidden="yes" name="deduct_item_id" caption="deduct_item_id"/>
+			<field.text hidden="yes" name="assignment_item_id" caption="assignment_item_id"/>
+			<field.text hidden="yes" name="accept_assignment" caption="accept_assignment"/>
+			<field.text hidden="yes" name="illness_item_id" caption="illness_item_id"/>
+			<field.text hidden="yes" name="disability_item_id" caption="disability_item_id"/>
+			<field.text hidden="yes" name="hospital_item_id" caption="hospital_item_id"/>
+			<field.text hidden="yes" name="cntrl_num_item_id" caption="cntrl_num_item_id"/>
+			<field.text hidden="yes" name="bill_contact_item_id" caption="bill_contact_item_id"/>
+			<field.text hidden="yes" name="claim_filing_item_id" caption="claim_filing_item_id"/>
+			<field.text hidden="yes" name="fee_schedules_item_id" caption="fee_schedules_item_id"/>
+			<field.text hidden="yes" name="payer_selected_item_id" caption="payer_selected_item_id"/>
+			<field.text hidden="yes" name="trans_id" caption="trans_id"/>
+			<field.text hidden="yes" name="trans_begin_stamp" caption="trans_begin_stamp"/>
+			<field.text hidden="yes" name="parent_event_id" caption="parent_event_id"/>
+			<field.text hidden="yes" name="insuranceIsSet" caption="insuranceIsSet"/>
+			<field.text hidden="yes" name="eventFieldsAreSet" caption="eventFieldsAreSet"/>
+			<field.text hidden="yes" name="hospFieldsAreSet" caption="hospFieldsAreSet"/>
+			<field.text hidden="yes" name="invoiceFieldsAreSet" caption="invoiceFieldsAreSet"/>
+			<field.text hidden="yes" name="invoice_flags" caption="invoice_flags"/>
+			<field.text hidden="yes" name="invoice_date" caption="invoice_date"/>
+			<field.text hidden="yes" name="old_invoice_id" caption="old_invoice_id"/>
+			<field.text hidden="yes" name="old_person_id" caption="old_person_id"/>
+			<field.text hidden="yes" name="claim_type" caption="claim_type"/>
+			<field.text hidden="yes" name="current_status" caption="current_status"/>
+			<field.text hidden="yes" name="submission_order" caption="submission_order"/>
+			<field.text hidden="yes" name="provider_pair" caption="provider_pair"/>
+			<field.text hidden="yes" name="copay_amt" caption="copay_amt"/>
+			<field.text hidden="yes" name="dupCheckin_returnUrl" caption="dupCheckin_returnUrl"/>
+			<field.text hidden="yes" name="ins_ffs" caption="ins_ffs"/>
+			<field.text hidden="yes" name="work_ffs" caption="work_ffs"/>
+			<field.text hidden="yes" name="org_ffs" caption="org_ffs"/>
+			<field.text hidden="yes" name="prov_ffs" caption="prov_ffs"/>
+			<field.composite caption="Batch ID Date" required="yes" name="batch_fields">
+				<field.text caption="Batch ID" required="yes" name="batch_id" size="12"/>
+				<field.date caption="Batch Date" name="batch_date" size="12"/>
+			</field.composite>
+			<field.text caption="Patient ID" required="yes" max-length="16" name="attendee_id" size="16"/>
+			<field.datetime caption="Appointment Time" name="start_time" size="20"/>
+			<field.datetime caption="Check-in Time" name="checkin_stamp" size="20"/>
+			<field.datetime caption="Check-out Time" name="checkout_stamp" size="20"/>
+			<field.select caption="Type of Visit" required="yes" name="trans_type"/>
+			<!--  -->
+			<field.text caption="Appointment Type" read-only="yes" name="appt_type"/>
+			<field.text caption="Reason for Visit" required="yes" name="subject"/>
+			<field.memo caption="Symptoms" name="remarks" size="24"/>
+			<field.select caption="Accident?"  name="accident" choices="query:invoice.selAccidentDropDown"/>
+			<!--  -->
+			<field.text caption="Place of Auto Accident (State)"  max-length="2" name="accident_state" size="2"/>
+			<field.select caption="Primary Payer"  name="payer" choices="No Options"/>
+			<!--  -->
+			<field.composite caption="Payer for Today ID/Type"  name="other_payer_fields">
+				<field.text caption="Payer for Today ID"  name="other_payer_id"/>
+				<field.select caption="Payer for Today Type"  name="other_payer_type" choices="Person=person;Organization=org"/>
+				<!--  -->
+			</field.composite>
+			<field.currency caption="Deductible Balance"  max-length="1024" name="deduct_balance" size="10"/>
+			<field.text caption="Contact Phone for Primary Insurance" read-only="yes" name="primary_ins_phone"/>
+			<field.composite caption="Provider Service/Billing"  name="provider_fields">
+				<field.select caption="Service Provider" required="yes" name="care_provider_id" choices="query:person.selPersonBySessionOrgAndCategory"/>
+				<!--  -->
+				<field.select caption="Billing Provider" required="yes" name="provider_id" choices="query:person.selPersonBySessionOrgAndCategory"/>
+				<!--  -->
+			</field.composite>
+			<field.composite caption="Org Service/Billing"  hint="Service Org is the org in which services were rendered.&lt;br&gt; 						Billing org is the org in which the billing should be tracked." name="org_fields">
+				<field.select caption="Service Facility" required="yes" name="service_facility_id" choices="query:dialog.stmt15"/>
+				<!--  numPackages="0" pkgList="" stmtNum="15" -->
+				<field.select caption="Billing Org" required="yes" name="billing_facility_id" choices="query:dialog.stmt16"/>
+				<!--  numPackages="0" pkgList="" stmtNum="16" -->
+			</field.composite>
+			<field.composite caption="Hospital/Billing Facility"  hint="Hospital is the org in which services were rendered.&lt;br&gt; 						Billing org is the org in which the billing should be tracked." name="hosp_org_fields">
+				<field.select caption="Hospital" required="yes" name="hospital_id" choices="query:dialog.stmt17"/>
+				<!--  numPackages="0" pkgList="" stmtNum="17" -->
+				<field.select caption="Billing Org" required="yes" name="billing_facility_id" choices="query:dialog.stmt18"/>
+				<!--  numPackages="0" pkgList="" stmtNum="18" -->
+			</field.composite>
+			<field.text caption="Billing Contact"  name="billing_contact"/>
+			<field.phone caption="Billing Phone"  max-length="1024" name="billing_phone"/>
+			<field.text caption="Referring Physician ID"  max-length="16" name="ref_id" size="16"/>
+			<field.composite caption="Current/Similar Illness Dates"  name="illness_dates">
+				<field.date caption="illness_end_date" name="illness_end_date" size="12"/>
+				<field.date caption="illness_begin_date" name="illness_begin_date" size="12"/>
+			</field.composite>
+			<field.composite caption="Begin/End Disability Dates"  name="disability_dates">
+				<field.date caption="disability_begin_date" name="disability_begin_date" size="12"/>
+				<field.date caption="disability_end_date" name="disability_end_date" size="12"/>
+			</field.composite>
+			<field.composite caption="Admission/Discharge Hospitalization Dates"  name="hosp_dates">
+				<field.date caption="hospitalization_begin_date" name="hospitalization_begin_date" size="12"/>
+				<field.date caption="hospitalization_end_date" name="hospitalization_end_date" size="12"/>
+			</field.composite>
+			<field.text caption="Prior Authorization Number"  name="prior_auth"/>
+			<field.composite caption="Medicaid Resubmission Code/Original Ref. No."  name="medicaid_fields">
+				<field.text caption="Medicaid Resubmission Code"  name="resub_number"/>
+				<field.text caption="Original Reference No."  name="orig_ref"/>
+			</field.composite>
+			<field.boolean caption="Have you confirmed Personal Information/Insurance Coverage?" required="yes" name="confirmed_info"/>
+			<field.memo caption="Place Claim(s) On Hold" name="on_hold" size="24"/>
+			<field.separator heading="Procedure Entry" name="procedures_heading"/>
+			<!-- Unimplemented field type=procedures -->
+
+		</dialog>
+
+	</dialogs>
+</xaf>

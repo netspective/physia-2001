@@ -1,0 +1,210 @@
+<?xml version="1.0"?>
+
+<xaf>
+	<sql-statements package="dialog">
+		<statement name="stmt0">
+ 
+			select distinct org_internal_id, name_primary 
+			from Org_Category, Org 
+			where Org.owner_org_id = ? 
+			and Org_Category.parent_id = Org.org_internal_id 
+			and ltrim(rtrim(upper(Org_Category.member_name))) in ('PRACTICE') 
+			order by name_primary
+		</statement>
+		<statement name="stmt1">
+ 
+			select distinct org_internal_id, name_primary 
+			from Org_Category, Org 
+			where Org.owner_org_id = ? 
+			and Org_Category.parent_id = Org.org_internal_id 
+			and ltrim(rtrim(upper(Org_Category.member_name))) in ('CLINIC','HOSPITAL','FACILITY/SITE','PRACTICE') 
+			order by name_primary
+		</statement>
+		<statement name="stmt10">
+ 
+			select distinct org_internal_id, name_primary 
+			from Org_Category, Org 
+			where Org.owner_org_id = ? 
+			and Org_Category.parent_id = Org.org_internal_id 
+			and ltrim(rtrim(upper(Org_Category.member_name))) in ('PRACTICE') 
+			order by name_primary
+		</statement>
+		<statement name="stmt11">
+ 
+			select distinct org_internal_id, name_primary 
+			from Org_Category, Org 
+			where Org.owner_org_id = ? 
+			and Org_Category.parent_id = Org.org_internal_id 
+			and ltrim(rtrim(upper(Org_Category.member_name))) in ('PRACTICE', 'CLINIC','FACILITY/SITE','DIAGNOSTIC SERVICES', 'DEPARTMENT', 'HOSPITAL', 'THERAPEUTIC SERVICES') 
+			order by name_primary
+		</statement>
+		<statement name="stmt12">
+ 
+			select distinct org_internal_id, name_primary 
+			from Org_Category, Org 
+			where Org.owner_org_id = ? 
+			and Org_Category.parent_id = Org.org_internal_id 
+			and ltrim(rtrim(upper(Org_Category.member_name))) in ('PRACTICE') 
+			order by name_primary
+		</statement>
+		<statement name="stmt13">
+ 
+			select distinct org_internal_id, name_primary 
+			from Org_Category, Org 
+			where Org.owner_org_id = ? 
+			and Org_Category.parent_id = Org.org_internal_id 
+			and ltrim(rtrim(upper(Org_Category.member_name))) in ('HOSPITAL') 
+			order by name_primary
+		</statement>
+		<statement name="stmt14">
+ 
+			select distinct org_internal_id, name_primary 
+			from Org_Category, Org 
+			where Org.owner_org_id = ? 
+			and Org_Category.parent_id = Org.org_internal_id 
+			and ltrim(rtrim(upper(Org_Category.member_name))) in ('PRACTICE') 
+			order by name_primary
+		</statement>
+		<statement name="stmt15">
+ 
+			select distinct org_internal_id, name_primary 
+			from Org_Category, Org 
+			where Org.owner_org_id = ? 
+			and Org_Category.parent_id = Org.org_internal_id 
+			and ltrim(rtrim(upper(Org_Category.member_name))) in ('PRACTICE', 'CLINIC','FACILITY/SITE','DIAGNOSTIC SERVICES', 'DEPARTMENT', 'HOSPITAL', 'THERAPEUTIC SERVICES') 
+			order by name_primary
+		</statement>
+		<statement name="stmt16">
+ 
+			select distinct org_internal_id, name_primary 
+			from Org_Category, Org 
+			where Org.owner_org_id = ? 
+			and Org_Category.parent_id = Org.org_internal_id 
+			and ltrim(rtrim(upper(Org_Category.member_name))) in ('PRACTICE') 
+			order by name_primary
+		</statement>
+		<statement name="stmt17">
+ 
+			select distinct org_internal_id, name_primary 
+			from Org_Category, Org 
+			where Org.owner_org_id = ? 
+			and Org_Category.parent_id = Org.org_internal_id 
+			and ltrim(rtrim(upper(Org_Category.member_name))) in ('HOSPITAL') 
+			order by name_primary
+		</statement>
+		<statement name="stmt18">
+ 
+			select distinct org_internal_id, name_primary 
+			from Org_Category, Org 
+			where Org.owner_org_id = ? 
+			and Org_Category.parent_id = Org.org_internal_id 
+			and ltrim(rtrim(upper(Org_Category.member_name))) in ('PRACTICE') 
+			order by name_primary
+		</statement>
+		<statement name="stmt19">
+ 
+			select distinct org_internal_id, name_primary 
+			from Org_Category, Org 
+			where Org.owner_org_id = ? 
+			and Org_Category.parent_id = Org.org_internal_id 
+			and ltrim(rtrim(upper(Org_Category.member_name))) in ('HOSPITAL') 
+			order by name_primary
+		</statement>
+		<statement name="stmt2">
+ 
+			select distinct org_internal_id, name_primary 
+			from Org_Category, Org 
+			where Org.owner_org_id = ? 
+			and Org_Category.parent_id = Org.org_internal_id 
+			and ltrim(rtrim(upper(Org_Category.member_name))) in ('CLINIC','HOSPITAL','FACILITY/SITE','PRACTICE') 
+			order by name_primary
+		</statement>
+		<statement name="stmt20">
+ 
+			select distinct org_internal_id, name_primary 
+			from Org_Category, Org 
+			where Org.owner_org_id = ? 
+			and Org_Category.parent_id = Org.org_internal_id 
+			and ltrim(rtrim(upper(Org_Category.member_name))) in ('CLINIC','HOSPITAL','FACILITY/SITE','PRACTICE') 
+			order by name_primary
+		</statement>
+		<statement name="stmt21">
+ 
+			select distinct org_internal_id, name_primary 
+			from Org_Category, Org 
+			where Org.owner_org_id = ? 
+			and Org_Category.parent_id = Org.org_internal_id 
+			and ltrim(rtrim(upper(Org_Category.member_name))) in ('CLINIC','HOSPITAL','FACILITY/SITE','PRACTICE') 
+			order by name_primary
+		</statement>
+		<statement name="stmt22">
+ 
+			select distinct org_internal_id, name_primary 
+			from Org_Category, Org 
+			where Org.owner_org_id = ? 
+			and Org_Category.parent_id = Org.org_internal_id 
+			and ltrim(rtrim(upper(Org_Category.member_name))) in ('CLINIC','HOSPITAL','FACILITY/SITE','PRACTICE') 
+			order by name_primary
+		</statement>
+		<statement name="stmt3">
+ 
+			select distinct org_internal_id, name_primary 
+			from Org_Category, Org 
+			where Org.owner_org_id = ? 
+			and Org_Category.parent_id = Org.org_internal_id 
+			and ltrim(rtrim(upper(Org_Category.member_name))) in ('PRACTICE', 'CLINIC', 'FACILITY/SITE') 
+			order by name_primary
+		</statement>
+		<statement name="stmt4">
+ 
+			select distinct org_internal_id, name_primary 
+			from Org_Category, Org 
+			where Org.owner_org_id = ? 
+			and Org_Category.parent_id = Org.org_internal_id 
+			and ltrim(rtrim(upper(Org_Category.member_name))) in ('CLINIC','HOSPITAL','FACILITY/SITE','PRACTICE') 
+			order by name_primary
+		</statement>
+		<statement name="stmt5">
+ 
+			select distinct org_internal_id, name_primary 
+			from Org_Category, Org 
+			where Org.owner_org_id = ? 
+			and Org_Category.parent_id = Org.org_internal_id 
+			and ltrim(rtrim(upper(Org_Category.member_name))) in ('PRACTICE', 'CLINIC','FACILITY/SITE') 
+			order by name_primary
+		</statement>
+		<statement name="stmt6">
+ 
+			select distinct serv_category,name 
+			from REF_SERVICE_CATEGORY 
+			order by name
+		</statement>
+		<statement name="stmt7">
+ 
+			select distinct org_internal_id, name_primary 
+			from Org_Category, Org 
+			where Org.owner_org_id = ? 
+			and Org_Category.parent_id = Org.org_internal_id 
+			and ltrim(rtrim(upper(Org_Category.member_name))) in ('PRACTICE', 'CLINIC','FACILITY/SITE','DIAGNOSTIC SERVICES', 'DEPARTMENT', 'HOSPITAL', 'THERAPEUTIC SERVICES') 
+			order by name_primary
+		</statement>
+		<statement name="stmt8">
+ 
+			select distinct org_internal_id, name_primary 
+			from Org_Category, Org 
+			where Org.owner_org_id = ? 
+			and Org_Category.parent_id = Org.org_internal_id 
+			and ltrim(rtrim(upper(Org_Category.member_name))) in ('PRACTICE') 
+			order by name_primary
+		</statement>
+		<statement name="stmt9">
+ 
+			select distinct org_internal_id, name_primary 
+			from Org_Category, Org 
+			where Org.owner_org_id = ? 
+			and Org_Category.parent_id = Org.org_internal_id 
+			and ltrim(rtrim(upper(Org_Category.member_name))) in ('HOSPITAL') 
+			order by name_primary
+		</statement>
+	</sql-statements>
+</xaf>

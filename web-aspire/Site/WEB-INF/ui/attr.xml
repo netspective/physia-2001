@@ -1,0 +1,253 @@
+<?xml version="1.0"?>
+
+<xaf>
+	<dialogs package="attr">
+		<dialog name="contact_orginternet" heading="$Command URL">
+			<field.text  name="attr_name"/>
+			<field.text required="yes" name="value_text"/>
+
+		</dialog>
+
+		<dialog name="employment_salinfo" heading="$Command Salary Information">
+			<field.text  name="attr_name"/>
+			<field.text required="yes" name="value_text"/>
+
+		</dialog>
+
+		<dialog name="person_billing_event" heading="$Command Person Billing Event">
+			<field.integer caption="Billing Cycle" required="yes" hint="Day of Month (1..28)" max-length="2" name="value_int" size="2"/>
+			<field.composite caption="Name From"  name="name_from">
+				<field.text caption="value_text" uppercase="yes" max-length="1" name="value_text" size="1"/>
+				<field.text caption="to " uppercase="yes" max-length="1" name="value_textb" size="1"/>
+			</field.composite>
+			<field.composite caption="Balance is"  name="balance_criteria">
+				<field.select caption="value_intb"  name="value_intb" choices="Greater Than=1;Less Than=-1"/>
+				<!--  -->
+				<field.currency caption="value_float"  max-length="1024" name="value_float" size="10"/>
+			</field.composite>
+
+		</dialog>
+
+		<dialog name="billinginfo" heading="$Command Electronic Billing Information">
+			<field.text caption="Physician ID" required="yes" max-length="16" name="person_id" size="16"/>
+			<field.text caption="Organization ID" required="yes" max-length="16" name="org_id" size="16"/>
+			<field.select caption="Clearing House"  name="billing_id_type" choices="Per-Se=0; THINet=2; Other=3"/>
+			<!--  -->
+			<field.text caption="Billing ID" required="yes" name="billing_id" size="16"/>
+			<field.date caption="Effective Date" max-length="10" name="billing_effective_date" size="10"/>
+			<field.boolean caption="Process Live Claims"  name="billing_active" style="check"/>
+
+		</dialog>
+
+		<dialog name="credential" heading="$Command Credentils">
+			<field.select caption="ID Caption" required="yes" name="value_textb" choices=";Employer#;State#;Medicaid#;Workers Comp#;BCBS#;Medicare#;CLIA#;Railroad Medicare#"/>
+			<!--  -->
+			<field.text caption="ID Number" required="yes" name="value_text"/>
+
+		</dialog>
+
+		<dialog name="misc_notes" heading="$Command Misc Notes">
+			<field.memo caption="Misc Notes" name="value_text" size="24"/>
+			<field.date caption="Date" name="value_date" size="12"/>
+
+		</dialog>
+
+		<dialog name="address_org" heading="$Command Address">
+			<field.text caption="Name"  name="address_name"/>
+			<field.composite caption="Address" required="yes" name="text_field">
+				<field.text caption="Address (Line 1)"  max-length="128" name="line1" size="36"/>
+				<field.text caption="Address (Line 2)"  max-length="128" name="line2" size="36"/>
+				<field.text caption="City"  max-length="64" name="city" size="16"/>
+				<field.text caption="State"  max-length="2" name="state" size="2"/>
+				<field.text caption="Zip"  name="zip"/>
+			</field.composite>
+
+		</dialog>
+
+		<dialog name="allergy_intolerance" heading="$Command Medication Intolerance">
+			<field.text required="yes" name="attr_name"/>
+			<field.select caption="Reaction(s)"  name="reactions" style="multicheck"/>
+			<!--  -->
+			<field.text caption="Other Reactions"  hint="You may choose more than one reaction." name="other_rxns"/>
+			<field.memo caption="Comments" name="comments" size="24"/>
+
+		</dialog>
+
+		<dialog name="contact_orgfax" heading="$Command Fax">
+			<field.text  name="attr_name"/>
+			<field.text required="yes" name="value_text"/>
+
+		</dialog>
+
+		<dialog name="contact_orgbilling" heading="$Command Billing Contact">
+			<field.text  name="attr_name"/>
+			<field.text required="yes" name="value_text"/>
+
+		</dialog>
+
+		<dialog name="attendance" heading="$Command Attendance">
+			<field.text caption="Property Name" required="yes" name="value_textb"/>
+			<field.text caption="Property Value" required="yes" name="value_text"/>
+
+		</dialog>
+
+		<dialog name="org_notes" heading="$Command Org Notes">
+			<field.text caption="caption" required="yes" name="value_text"/>
+			<field.memo caption="Detail" name="value_textb" size="24"/>
+			<field.date caption="Begin Date" name="value_date" size="12"/>
+			<field.date caption="End Date" name="value_dateb" size="12"/>
+
+		</dialog>
+
+		<dialog name="person_additional" heading="$Command Additional Data">
+			<field.text  name="attr_name"/>
+			<field.text required="yes" name="value_text"/>
+
+		</dialog>
+
+		<dialog name="contact_personpager" heading="$Command Pager">
+			<field.text  name="attr_name"/>
+			<field.text required="yes" name="value_text"/>
+
+		</dialog>
+
+		<dialog name="address_person" heading="$Command Address">
+			<field.text caption="Name"  name="address_name"/>
+			<field.composite caption="Address" required="yes" name="text_field">
+				<field.text caption="Address (Line 1)"  max-length="128" name="line1" size="36"/>
+				<field.text caption="Address (Line 2)"  max-length="128" name="line2" size="36"/>
+				<field.text caption="City"  max-length="64" name="city" size="16"/>
+				<field.text caption="State"  max-length="2" name="state" size="2"/>
+				<field.text caption="Zip"  name="zip"/>
+			</field.composite>
+
+		</dialog>
+
+		<dialog name="contact_orgphone" heading="$Command Telephone">
+			<field.text  name="attr_name"/>
+			<field.text required="yes" name="value_text"/>
+
+		</dialog>
+
+		<dialog name="benefit_other" heading="$Command Other Benefit">
+			<field.text caption="Caption" required="yes" name="attr_name"/>
+			<field.text caption="Value" required="yes" name="value_text"/>
+
+		</dialog>
+
+		<dialog name="contact_orgemail" heading="$Command E-mail">
+			<field.text  name="attr_name"/>
+			<field.text required="yes" name="value_text"/>
+
+		</dialog>
+
+		<dialog name="benefit_retirement" heading="$Command Retirement Benefit">
+			<field.text caption="Caption" required="yes" name="attr_name"/>
+			<field.text caption="Value" required="yes" name="value_text"/>
+
+		</dialog>
+
+		<dialog name="preventivecare" heading="$Command Measure">
+			<field.text hidden="yes" name="cpt_name" caption="cpt_name"/>
+			<field.text caption="Problem" required="yes" name="attr_name"/>
+			<field.text caption="Measure" required="yes" name="value_text"/>
+			<field.composite caption="Measure Frequency/Number Of Times"  name="text_field">
+				<field.select caption="Frequency"  name="frequency" choices=" = 0;Weekly=1;Monthly=2;Annually=3"/>
+				<!--  -->
+				<field.text caption="Measure"  name="measure" size="3"/>
+			</field.composite>
+			<field.date caption="Last Performed" name="value_date" size="12"/>
+			<field.date caption="Due" name="value_dateend" size="12"/>
+
+		</dialog>
+
+		<dialog name="allergy_medication" heading="$Command Medication Allergy">
+			<field.text required="yes" name="attr_name"/>
+			<field.select caption="Reaction(s)"  name="reactions" style="multicheck"/>
+			<!--  -->
+			<field.text caption="Other Reactions"  hint="You may choose more than one reaction." name="other_rxns"/>
+			<field.memo caption="Comments" name="comments" size="24"/>
+
+		</dialog>
+
+		<dialog name="allergy_environmental" heading="$Command Environmental Allergy">
+			<field.text required="yes" name="attr_name"/>
+			<field.select caption="Reaction(s)"  name="reactions" style="multicheck"/>
+			<!--  -->
+			<field.text caption="Other Reactions"  hint="You may choose more than one reaction." name="other_rxns"/>
+			<field.memo caption="Comments" name="comments" size="24"/>
+
+		</dialog>
+
+		<dialog name="contact_personfax" heading="$Command Fax">
+			<field.text  name="attr_name"/>
+			<field.text required="yes" name="value_text"/>
+
+		</dialog>
+
+		<dialog name="contact_personphone" heading="$Command Telephone">
+			<field.text  name="attr_name"/>
+			<field.text required="yes" name="value_text"/>
+
+		</dialog>
+
+		<dialog name="claim_notes" heading="$Command Claim Notes">
+			<field.text caption="Invoice ID" read-only="yes" name="invoice_id"/>
+			<field.memo caption="Notes" name="value_text" size="24"/>
+			<field.date caption="Date" name="value_date" size="12"/>
+
+		</dialog>
+
+		<dialog name="benefit_insurance" heading="$Command Insurance Benefit">
+			<field.text caption="Caption" required="yes" name="attr_name"/>
+			<field.text caption="Value" required="yes" name="value_text"/>
+
+		</dialog>
+
+		<dialog name="blood_type" heading="$Command Blood Type">
+			<field.select caption="Blood Type"  name="value_text"/>
+			<!--  -->
+
+		</dialog>
+
+		<dialog name="contact_personemail" heading="$Command E-mail">
+			<field.text  name="attr_name"/>
+			<field.text required="yes" name="value_text"/>
+
+		</dialog>
+
+		<dialog name="org_billing_event" heading="$Command Org Billing Event">
+			<field.integer caption="Billing Cycle" required="yes" hint="Day of Month (1..28)" max-length="2" name="value_int" size="2"/>
+			<field.composite caption="Name From"  name="name_from">
+				<field.text caption="value_text" uppercase="yes" max-length="1" name="value_text" size="1"/>
+				<field.text caption="to " uppercase="yes" max-length="1" name="value_textb" size="1"/>
+			</field.composite>
+			<field.composite caption="Balance is"  name="balance_criteria">
+				<field.select caption="value_intb"  name="value_intb" choices="Greater Than=1;Less Than=-1"/>
+				<!--  -->
+				<field.currency caption="value_float"  max-length="1024" name="value_float" size="10"/>
+			</field.composite>
+
+		</dialog>
+
+		<dialog name="contact_personinternet" heading="$Command URL">
+			<field.text  name="attr_name"/>
+			<field.text required="yes" name="value_text"/>
+
+		</dialog>
+
+		<dialog name="employment_empinfo" heading="$Command Employment Information">
+			<field.text  name="attr_name"/>
+			<field.text required="yes" name="value_text"/>
+
+		</dialog>
+
+		<dialog name="office_location" heading="$Command Office Location">
+			<field.text caption="Location Org ID" required="yes" max-length="16" name="value_text" size="16"/>
+			<field.text caption="Office/Room/Suite#"  name="value_textb" size="7"/>
+			<field.boolean caption="Default"  name="value_int" style="check"/>
+
+		</dialog>
+
+	</dialogs>
+</xaf>

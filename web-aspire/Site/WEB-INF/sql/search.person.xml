@@ -1,0 +1,6186 @@
+<?xml version="1.0"?>
+
+<xaf>
+	<sql-statements package="search.person">
+		<statement name="id">
+			App::Statements::Search::Person
+		</statement>
+
+		<statement name="sel_account">
+			
+			SELECT *
+			FROM (
+			SELECT
+			per.person_id,
+			per.name_last,
+			per.name_first,
+			per.ssn,
+			TO_CHAR(per.date_of_birth, 'MM/DD/YYYY') as dob,
+			hphone.value_text AS home_phone,
+			account.value_text as account,
+			chart.value_text as chart,
+			cat.category,
+			initcap(per.simple_name) AS name,
+			(select 1 from dual
+			where exists (select 'x' from transaction t
+			where t.trans_owner_id = per.person_id
+			and t.trans_status = 2
+			and t.trans_type = 8026
+			)
+			) as appt_alert,
+			decode(per.gender, 1, 'M', 2, 'F', '') as gender
+			FROM
+			person per,
+			person_org_category cat,
+			person_attribute hphone,
+			person_attribute account,
+			person_attribute chart
+			WHERE
+			per.person_id = cat.person_id(+) AND
+			(per.person_id = hphone.parent_id(+) AND hphone.value_type(+) = 10 AND hphone.item_name(+) = 'Home') AND
+			(per.person_id = account.parent_id(+) AND account.value_type(+) = 0 AND account.item_name(+) = 'Patient/Account Number') AND
+			(per.person_id = chart.parent_id(+) AND chart.value_type(+) = 0 AND chart.item_name(+) = 'Patient/Chart Number') AND
+			cat.org_internal_id = ? AND
+			upper(account.value_text) = ?
+			ORDER BY upper(per.name_last), upper(per.name_first)
+			)
+			WHERE rownum &lt;= 250
+			
+		</statement>
+
+		<statement name="sel_account_associate">
+			
+			SELECT *
+			FROM (
+			SELECT
+			per.person_id,
+			per.name_last,
+			per.name_first,
+			per.ssn,
+			TO_CHAR(per.date_of_birth, 'MM/DD/YYYY') as dob,
+			hphone.value_text AS home_phone,
+			account.value_text as account,
+			chart.value_text as chart,
+			cat.category,
+			initcap(per.simple_name) AS name,
+			(select 1 from dual
+			where exists (select 'x' from transaction t
+			where t.trans_owner_id = per.person_id
+			and t.trans_status = 2
+			and t.trans_type = 8026
+			)
+			) as appt_alert,
+			decode(per.gender, 1, 'M', 2, 'F', '') as gender
+			FROM
+			person per,
+			person_org_category cat,
+			person_attribute hphone,
+			person_attribute account,
+			person_attribute chart
+			WHERE
+			per.person_id = cat.person_id(+) AND
+			(per.person_id = hphone.parent_id(+) AND hphone.value_type(+) = 10 AND hphone.item_name(+) = 'Home') AND
+			(per.person_id = account.parent_id(+) AND account.value_type(+) = 0 AND account.item_name(+) = 'Patient/Account Number') AND
+			(per.person_id = chart.parent_id(+) AND chart.value_type(+) = 0 AND chart.item_name(+) = 'Patient/Chart Number') AND
+			cat.org_internal_id = ? AND
+			upper(account.value_text) = ?
+			and cat.category in ('Physician', 'Nurse', 'Staff')
+			ORDER BY upper(per.name_last), upper(per.name_first)
+			)
+			WHERE rownum &lt;= 250
+			
+		</statement>
+
+		<statement name="sel_account_insured-Person">
+			
+			SELECT *
+			FROM (
+			SELECT
+			per.person_id,
+			per.name_last,
+			per.name_first,
+			per.ssn,
+			TO_CHAR(per.date_of_birth, 'MM/DD/YYYY') as dob,
+			hphone.value_text AS home_phone,
+			account.value_text as account,
+			chart.value_text as chart,
+			cat.category,
+			initcap(per.simple_name) AS name,
+			(select 1 from dual
+			where exists (select 'x' from transaction t
+			where t.trans_owner_id = per.person_id
+			and t.trans_status = 2
+			and t.trans_type = 8026
+			)
+			) as appt_alert,
+			decode(per.gender, 1, 'M', 2, 'F', '') as gender
+			FROM
+			person per,
+			person_org_category cat,
+			person_attribute hphone,
+			person_attribute account,
+			person_attribute chart
+			WHERE
+			per.person_id = cat.person_id(+) AND
+			(per.person_id = hphone.parent_id(+) AND hphone.value_type(+) = 10 AND hphone.item_name(+) = 'Home') AND
+			(per.person_id = account.parent_id(+) AND account.value_type(+) = 0 AND account.item_name(+) = 'Patient/Account Number') AND
+			(per.person_id = chart.parent_id(+) AND chart.value_type(+) = 0 AND chart.item_name(+) = 'Patient/Chart Number') AND
+			cat.org_internal_id = ? AND
+			upper(account.value_text) = ?
+			and cat.category = 'Insured-Person'
+			ORDER BY upper(per.name_last), upper(per.name_first)
+			)
+			WHERE rownum &lt;= 250
+			
+		</statement>
+
+		<statement name="sel_account_like">
+			
+			SELECT *
+			FROM (
+			SELECT
+			per.person_id,
+			per.name_last,
+			per.name_first,
+			per.ssn,
+			TO_CHAR(per.date_of_birth, 'MM/DD/YYYY') as dob,
+			hphone.value_text AS home_phone,
+			account.value_text as account,
+			chart.value_text as chart,
+			cat.category,
+			initcap(per.simple_name) AS name,
+			(select 1 from dual
+			where exists (select 'x' from transaction t
+			where t.trans_owner_id = per.person_id
+			and t.trans_status = 2
+			and t.trans_type = 8026
+			)
+			) as appt_alert,
+			decode(per.gender, 1, 'M', 2, 'F', '') as gender
+			FROM
+			person per,
+			person_org_category cat,
+			person_attribute hphone,
+			person_attribute account,
+			person_attribute chart
+			WHERE
+			per.person_id = cat.person_id(+) AND
+			(per.person_id = hphone.parent_id(+) AND hphone.value_type(+) = 10 AND hphone.item_name(+) = 'Home') AND
+			(per.person_id = account.parent_id(+) AND account.value_type(+) = 0 AND account.item_name(+) = 'Patient/Account Number') AND
+			(per.person_id = chart.parent_id(+) AND chart.value_type(+) = 0 AND chart.item_name(+) = 'Patient/Chart Number') AND
+			cat.org_internal_id = ? AND
+			upper(account.value_text) like ?
+			ORDER BY upper(per.name_last), upper(per.name_first)
+			)
+			WHERE rownum &lt;= 250
+			
+		</statement>
+
+		<statement name="sel_account_like_associate">
+			
+			SELECT *
+			FROM (
+			SELECT
+			per.person_id,
+			per.name_last,
+			per.name_first,
+			per.ssn,
+			TO_CHAR(per.date_of_birth, 'MM/DD/YYYY') as dob,
+			hphone.value_text AS home_phone,
+			account.value_text as account,
+			chart.value_text as chart,
+			cat.category,
+			initcap(per.simple_name) AS name,
+			(select 1 from dual
+			where exists (select 'x' from transaction t
+			where t.trans_owner_id = per.person_id
+			and t.trans_status = 2
+			and t.trans_type = 8026
+			)
+			) as appt_alert,
+			decode(per.gender, 1, 'M', 2, 'F', '') as gender
+			FROM
+			person per,
+			person_org_category cat,
+			person_attribute hphone,
+			person_attribute account,
+			person_attribute chart
+			WHERE
+			per.person_id = cat.person_id(+) AND
+			(per.person_id = hphone.parent_id(+) AND hphone.value_type(+) = 10 AND hphone.item_name(+) = 'Home') AND
+			(per.person_id = account.parent_id(+) AND account.value_type(+) = 0 AND account.item_name(+) = 'Patient/Account Number') AND
+			(per.person_id = chart.parent_id(+) AND chart.value_type(+) = 0 AND chart.item_name(+) = 'Patient/Chart Number') AND
+			cat.org_internal_id = ? AND
+			upper(account.value_text) like ?
+			and cat.category in ('Physician', 'Nurse', 'Staff')
+			ORDER BY upper(per.name_last), upper(per.name_first)
+			)
+			WHERE rownum &lt;= 250
+			
+		</statement>
+
+		<statement name="sel_account_like_insured-Person">
+			
+			SELECT *
+			FROM (
+			SELECT
+			per.person_id,
+			per.name_last,
+			per.name_first,
+			per.ssn,
+			TO_CHAR(per.date_of_birth, 'MM/DD/YYYY') as dob,
+			hphone.value_text AS home_phone,
+			account.value_text as account,
+			chart.value_text as chart,
+			cat.category,
+			initcap(per.simple_name) AS name,
+			(select 1 from dual
+			where exists (select 'x' from transaction t
+			where t.trans_owner_id = per.person_id
+			and t.trans_status = 2
+			and t.trans_type = 8026
+			)
+			) as appt_alert,
+			decode(per.gender, 1, 'M', 2, 'F', '') as gender
+			FROM
+			person per,
+			person_org_category cat,
+			person_attribute hphone,
+			person_attribute account,
+			person_attribute chart
+			WHERE
+			per.person_id = cat.person_id(+) AND
+			(per.person_id = hphone.parent_id(+) AND hphone.value_type(+) = 10 AND hphone.item_name(+) = 'Home') AND
+			(per.person_id = account.parent_id(+) AND account.value_type(+) = 0 AND account.item_name(+) = 'Patient/Account Number') AND
+			(per.person_id = chart.parent_id(+) AND chart.value_type(+) = 0 AND chart.item_name(+) = 'Patient/Chart Number') AND
+			cat.org_internal_id = ? AND
+			upper(account.value_text) like ?
+			and cat.category = 'Insured-Person'
+			ORDER BY upper(per.name_last), upper(per.name_first)
+			)
+			WHERE rownum &lt;= 250
+			
+		</statement>
+
+		<statement name="sel_account_like_nurse">
+			
+			SELECT *
+			FROM (
+			SELECT
+			per.person_id,
+			per.name_last,
+			per.name_first,
+			per.ssn,
+			TO_CHAR(per.date_of_birth, 'MM/DD/YYYY') as dob,
+			hphone.value_text AS home_phone,
+			account.value_text as account,
+			chart.value_text as chart,
+			cat.category,
+			initcap(per.simple_name) AS name,
+			(select 1 from dual
+			where exists (select 'x' from transaction t
+			where t.trans_owner_id = per.person_id
+			and t.trans_status = 2
+			and t.trans_type = 8026
+			)
+			) as appt_alert,
+			decode(per.gender, 1, 'M', 2, 'F', '') as gender
+			FROM
+			person per,
+			person_org_category cat,
+			person_attribute hphone,
+			person_attribute account,
+			person_attribute chart
+			WHERE
+			per.person_id = cat.person_id(+) AND
+			(per.person_id = hphone.parent_id(+) AND hphone.value_type(+) = 10 AND hphone.item_name(+) = 'Home') AND
+			(per.person_id = account.parent_id(+) AND account.value_type(+) = 0 AND account.item_name(+) = 'Patient/Account Number') AND
+			(per.person_id = chart.parent_id(+) AND chart.value_type(+) = 0 AND chart.item_name(+) = 'Patient/Chart Number') AND
+			cat.org_internal_id = ? AND
+			upper(account.value_text) like ?
+			and cat.category = 'Nurse'
+			ORDER BY upper(per.name_last), upper(per.name_first)
+			)
+			WHERE rownum &lt;= 250
+			
+		</statement>
+
+		<statement name="sel_account_like_patient">
+			
+			SELECT *
+			FROM (
+			SELECT
+			per.person_id,
+			per.name_last,
+			per.name_first,
+			per.ssn,
+			TO_CHAR(per.date_of_birth, 'MM/DD/YYYY') as dob,
+			hphone.value_text AS home_phone,
+			account.value_text as account,
+			chart.value_text as chart,
+			cat.category,
+			initcap(per.simple_name) AS name,
+			(select 1 from dual
+			where exists (select 'x' from transaction t
+			where t.trans_owner_id = per.person_id
+			and t.trans_status = 2
+			and t.trans_type = 8026
+			)
+			) as appt_alert,
+			decode(per.gender, 1, 'M', 2, 'F', '') as gender
+			FROM
+			person per,
+			person_org_category cat,
+			person_attribute hphone,
+			person_attribute account,
+			person_attribute chart
+			WHERE
+			per.person_id = cat.person_id(+) AND
+			(per.person_id = hphone.parent_id(+) AND hphone.value_type(+) = 10 AND hphone.item_name(+) = 'Home') AND
+			(per.person_id = account.parent_id(+) AND account.value_type(+) = 0 AND account.item_name(+) = 'Patient/Account Number') AND
+			(per.person_id = chart.parent_id(+) AND chart.value_type(+) = 0 AND chart.item_name(+) = 'Patient/Chart Number') AND
+			cat.org_internal_id = ? AND
+			upper(account.value_text) like ?
+			and cat.category = 'Patient'
+			ORDER BY upper(per.name_last), upper(per.name_first)
+			)
+			WHERE rownum &lt;= 250
+			
+		</statement>
+
+		<statement name="sel_account_like_physician">
+			
+			SELECT *
+			FROM (
+			SELECT
+			per.person_id,
+			per.name_last,
+			per.name_first,
+			per.ssn,
+			TO_CHAR(per.date_of_birth, 'MM/DD/YYYY') as dob,
+			hphone.value_text AS home_phone,
+			account.value_text as account,
+			chart.value_text as chart,
+			cat.category,
+			initcap(per.simple_name) AS name,
+			(select 1 from dual
+			where exists (select 'x' from transaction t
+			where t.trans_owner_id = per.person_id
+			and t.trans_status = 2
+			and t.trans_type = 8026
+			)
+			) as appt_alert,
+			decode(per.gender, 1, 'M', 2, 'F', '') as gender
+			FROM
+			person per,
+			person_org_category cat,
+			person_attribute hphone,
+			person_attribute account,
+			person_attribute chart
+			WHERE
+			per.person_id = cat.person_id(+) AND
+			(per.person_id = hphone.parent_id(+) AND hphone.value_type(+) = 10 AND hphone.item_name(+) = 'Home') AND
+			(per.person_id = account.parent_id(+) AND account.value_type(+) = 0 AND account.item_name(+) = 'Patient/Account Number') AND
+			(per.person_id = chart.parent_id(+) AND chart.value_type(+) = 0 AND chart.item_name(+) = 'Patient/Chart Number') AND
+			cat.org_internal_id = ? AND
+			upper(account.value_text) like ?
+			and cat.category = 'Physician'
+			ORDER BY upper(per.name_last), upper(per.name_first)
+			)
+			WHERE rownum &lt;= 250
+			
+		</statement>
+
+		<statement name="sel_account_like_physician-ref">
+			
+			SELECT *
+			FROM (
+			SELECT
+			per.person_id,
+			per.name_last,
+			per.name_first,
+			per.ssn,
+			TO_CHAR(per.date_of_birth, 'MM/DD/YYYY') as dob,
+			hphone.value_text AS home_phone,
+			account.value_text as account,
+			chart.value_text as chart,
+			cat.category,
+			initcap(per.simple_name) AS name,
+			(select 1 from dual
+			where exists (select 'x' from transaction t
+			where t.trans_owner_id = per.person_id
+			and t.trans_status = 2
+			and t.trans_type = 8026
+			)
+			) as appt_alert,
+			decode(per.gender, 1, 'M', 2, 'F', '') as gender
+			FROM
+			person per,
+			person_org_category cat,
+			person_attribute hphone,
+			person_attribute account,
+			person_attribute chart
+			WHERE
+			per.person_id = cat.person_id(+) AND
+			(per.person_id = hphone.parent_id(+) AND hphone.value_type(+) = 10 AND hphone.item_name(+) = 'Home') AND
+			(per.person_id = account.parent_id(+) AND account.value_type(+) = 0 AND account.item_name(+) = 'Patient/Account Number') AND
+			(per.person_id = chart.parent_id(+) AND chart.value_type(+) = 0 AND chart.item_name(+) = 'Patient/Chart Number') AND
+			cat.org_internal_id = ? AND
+			upper(account.value_text) like ?
+			and cat.category in ('Physician', 'Referring-Doctor')
+			ORDER BY upper(per.name_last), upper(per.name_first)
+			)
+			WHERE rownum &lt;= 250
+			
+		</statement>
+
+		<statement name="sel_account_like_referring-Doctor">
+			
+			SELECT *
+			FROM (
+			SELECT
+			per.person_id,
+			per.name_last,
+			per.name_first,
+			per.ssn,
+			TO_CHAR(per.date_of_birth, 'MM/DD/YYYY') as dob,
+			hphone.value_text AS home_phone,
+			account.value_text as account,
+			chart.value_text as chart,
+			cat.category,
+			initcap(per.simple_name) AS name,
+			(select 1 from dual
+			where exists (select 'x' from transaction t
+			where t.trans_owner_id = per.person_id
+			and t.trans_status = 2
+			and t.trans_type = 8026
+			)
+			) as appt_alert,
+			decode(per.gender, 1, 'M', 2, 'F', '') as gender
+			FROM
+			person per,
+			person_org_category cat,
+			person_attribute hphone,
+			person_attribute account,
+			person_attribute chart
+			WHERE
+			per.person_id = cat.person_id(+) AND
+			(per.person_id = hphone.parent_id(+) AND hphone.value_type(+) = 10 AND hphone.item_name(+) = 'Home') AND
+			(per.person_id = account.parent_id(+) AND account.value_type(+) = 0 AND account.item_name(+) = 'Patient/Account Number') AND
+			(per.person_id = chart.parent_id(+) AND chart.value_type(+) = 0 AND chart.item_name(+) = 'Patient/Chart Number') AND
+			cat.org_internal_id = ? AND
+			upper(account.value_text) like ?
+			and cat.category = 'Referring-Doctor'
+			ORDER BY upper(per.name_last), upper(per.name_first)
+			)
+			WHERE rownum &lt;= 250
+			
+		</statement>
+
+		<statement name="sel_account_like_staff">
+			
+			SELECT *
+			FROM (
+			SELECT
+			per.person_id,
+			per.name_last,
+			per.name_first,
+			per.ssn,
+			TO_CHAR(per.date_of_birth, 'MM/DD/YYYY') as dob,
+			hphone.value_text AS home_phone,
+			account.value_text as account,
+			chart.value_text as chart,
+			cat.category,
+			initcap(per.simple_name) AS name,
+			(select 1 from dual
+			where exists (select 'x' from transaction t
+			where t.trans_owner_id = per.person_id
+			and t.trans_status = 2
+			and t.trans_type = 8026
+			)
+			) as appt_alert,
+			decode(per.gender, 1, 'M', 2, 'F', '') as gender
+			FROM
+			person per,
+			person_org_category cat,
+			person_attribute hphone,
+			person_attribute account,
+			person_attribute chart
+			WHERE
+			per.person_id = cat.person_id(+) AND
+			(per.person_id = hphone.parent_id(+) AND hphone.value_type(+) = 10 AND hphone.item_name(+) = 'Home') AND
+			(per.person_id = account.parent_id(+) AND account.value_type(+) = 0 AND account.item_name(+) = 'Patient/Account Number') AND
+			(per.person_id = chart.parent_id(+) AND chart.value_type(+) = 0 AND chart.item_name(+) = 'Patient/Chart Number') AND
+			cat.org_internal_id = ? AND
+			upper(account.value_text) like ?
+			and cat.category = 'Staff'
+			ORDER BY upper(per.name_last), upper(per.name_first)
+			)
+			WHERE rownum &lt;= 250
+			
+		</statement>
+
+		<statement name="sel_account_nurse">
+			
+			SELECT *
+			FROM (
+			SELECT
+			per.person_id,
+			per.name_last,
+			per.name_first,
+			per.ssn,
+			TO_CHAR(per.date_of_birth, 'MM/DD/YYYY') as dob,
+			hphone.value_text AS home_phone,
+			account.value_text as account,
+			chart.value_text as chart,
+			cat.category,
+			initcap(per.simple_name) AS name,
+			(select 1 from dual
+			where exists (select 'x' from transaction t
+			where t.trans_owner_id = per.person_id
+			and t.trans_status = 2
+			and t.trans_type = 8026
+			)
+			) as appt_alert,
+			decode(per.gender, 1, 'M', 2, 'F', '') as gender
+			FROM
+			person per,
+			person_org_category cat,
+			person_attribute hphone,
+			person_attribute account,
+			person_attribute chart
+			WHERE
+			per.person_id = cat.person_id(+) AND
+			(per.person_id = hphone.parent_id(+) AND hphone.value_type(+) = 10 AND hphone.item_name(+) = 'Home') AND
+			(per.person_id = account.parent_id(+) AND account.value_type(+) = 0 AND account.item_name(+) = 'Patient/Account Number') AND
+			(per.person_id = chart.parent_id(+) AND chart.value_type(+) = 0 AND chart.item_name(+) = 'Patient/Chart Number') AND
+			cat.org_internal_id = ? AND
+			upper(account.value_text) = ?
+			and cat.category = 'Nurse'
+			ORDER BY upper(per.name_last), upper(per.name_first)
+			)
+			WHERE rownum &lt;= 250
+			
+		</statement>
+
+		<statement name="sel_account_patient">
+			
+			SELECT *
+			FROM (
+			SELECT
+			per.person_id,
+			per.name_last,
+			per.name_first,
+			per.ssn,
+			TO_CHAR(per.date_of_birth, 'MM/DD/YYYY') as dob,
+			hphone.value_text AS home_phone,
+			account.value_text as account,
+			chart.value_text as chart,
+			cat.category,
+			initcap(per.simple_name) AS name,
+			(select 1 from dual
+			where exists (select 'x' from transaction t
+			where t.trans_owner_id = per.person_id
+			and t.trans_status = 2
+			and t.trans_type = 8026
+			)
+			) as appt_alert,
+			decode(per.gender, 1, 'M', 2, 'F', '') as gender
+			FROM
+			person per,
+			person_org_category cat,
+			person_attribute hphone,
+			person_attribute account,
+			person_attribute chart
+			WHERE
+			per.person_id = cat.person_id(+) AND
+			(per.person_id = hphone.parent_id(+) AND hphone.value_type(+) = 10 AND hphone.item_name(+) = 'Home') AND
+			(per.person_id = account.parent_id(+) AND account.value_type(+) = 0 AND account.item_name(+) = 'Patient/Account Number') AND
+			(per.person_id = chart.parent_id(+) AND chart.value_type(+) = 0 AND chart.item_name(+) = 'Patient/Chart Number') AND
+			cat.org_internal_id = ? AND
+			upper(account.value_text) = ?
+			and cat.category = 'Patient'
+			ORDER BY upper(per.name_last), upper(per.name_first)
+			)
+			WHERE rownum &lt;= 250
+			
+		</statement>
+
+		<statement name="sel_account_physician">
+			
+			SELECT *
+			FROM (
+			SELECT
+			per.person_id,
+			per.name_last,
+			per.name_first,
+			per.ssn,
+			TO_CHAR(per.date_of_birth, 'MM/DD/YYYY') as dob,
+			hphone.value_text AS home_phone,
+			account.value_text as account,
+			chart.value_text as chart,
+			cat.category,
+			initcap(per.simple_name) AS name,
+			(select 1 from dual
+			where exists (select 'x' from transaction t
+			where t.trans_owner_id = per.person_id
+			and t.trans_status = 2
+			and t.trans_type = 8026
+			)
+			) as appt_alert,
+			decode(per.gender, 1, 'M', 2, 'F', '') as gender
+			FROM
+			person per,
+			person_org_category cat,
+			person_attribute hphone,
+			person_attribute account,
+			person_attribute chart
+			WHERE
+			per.person_id = cat.person_id(+) AND
+			(per.person_id = hphone.parent_id(+) AND hphone.value_type(+) = 10 AND hphone.item_name(+) = 'Home') AND
+			(per.person_id = account.parent_id(+) AND account.value_type(+) = 0 AND account.item_name(+) = 'Patient/Account Number') AND
+			(per.person_id = chart.parent_id(+) AND chart.value_type(+) = 0 AND chart.item_name(+) = 'Patient/Chart Number') AND
+			cat.org_internal_id = ? AND
+			upper(account.value_text) = ?
+			and cat.category = 'Physician'
+			ORDER BY upper(per.name_last), upper(per.name_first)
+			)
+			WHERE rownum &lt;= 250
+			
+		</statement>
+
+		<statement name="sel_account_physician-ref">
+			
+			SELECT *
+			FROM (
+			SELECT
+			per.person_id,
+			per.name_last,
+			per.name_first,
+			per.ssn,
+			TO_CHAR(per.date_of_birth, 'MM/DD/YYYY') as dob,
+			hphone.value_text AS home_phone,
+			account.value_text as account,
+			chart.value_text as chart,
+			cat.category,
+			initcap(per.simple_name) AS name,
+			(select 1 from dual
+			where exists (select 'x' from transaction t
+			where t.trans_owner_id = per.person_id
+			and t.trans_status = 2
+			and t.trans_type = 8026
+			)
+			) as appt_alert,
+			decode(per.gender, 1, 'M', 2, 'F', '') as gender
+			FROM
+			person per,
+			person_org_category cat,
+			person_attribute hphone,
+			person_attribute account,
+			person_attribute chart
+			WHERE
+			per.person_id = cat.person_id(+) AND
+			(per.person_id = hphone.parent_id(+) AND hphone.value_type(+) = 10 AND hphone.item_name(+) = 'Home') AND
+			(per.person_id = account.parent_id(+) AND account.value_type(+) = 0 AND account.item_name(+) = 'Patient/Account Number') AND
+			(per.person_id = chart.parent_id(+) AND chart.value_type(+) = 0 AND chart.item_name(+) = 'Patient/Chart Number') AND
+			cat.org_internal_id = ? AND
+			upper(account.value_text) = ?
+			and cat.category in ('Physician', 'Referring-Doctor')
+			ORDER BY upper(per.name_last), upper(per.name_first)
+			)
+			WHERE rownum &lt;= 250
+			
+		</statement>
+
+		<statement name="sel_account_referring-Doctor">
+			
+			SELECT *
+			FROM (
+			SELECT
+			per.person_id,
+			per.name_last,
+			per.name_first,
+			per.ssn,
+			TO_CHAR(per.date_of_birth, 'MM/DD/YYYY') as dob,
+			hphone.value_text AS home_phone,
+			account.value_text as account,
+			chart.value_text as chart,
+			cat.category,
+			initcap(per.simple_name) AS name,
+			(select 1 from dual
+			where exists (select 'x' from transaction t
+			where t.trans_owner_id = per.person_id
+			and t.trans_status = 2
+			and t.trans_type = 8026
+			)
+			) as appt_alert,
+			decode(per.gender, 1, 'M', 2, 'F', '') as gender
+			FROM
+			person per,
+			person_org_category cat,
+			person_attribute hphone,
+			person_attribute account,
+			person_attribute chart
+			WHERE
+			per.person_id = cat.person_id(+) AND
+			(per.person_id = hphone.parent_id(+) AND hphone.value_type(+) = 10 AND hphone.item_name(+) = 'Home') AND
+			(per.person_id = account.parent_id(+) AND account.value_type(+) = 0 AND account.item_name(+) = 'Patient/Account Number') AND
+			(per.person_id = chart.parent_id(+) AND chart.value_type(+) = 0 AND chart.item_name(+) = 'Patient/Chart Number') AND
+			cat.org_internal_id = ? AND
+			upper(account.value_text) = ?
+			and cat.category = 'Referring-Doctor'
+			ORDER BY upper(per.name_last), upper(per.name_first)
+			)
+			WHERE rownum &lt;= 250
+			
+		</statement>
+
+		<statement name="sel_account_staff">
+			
+			SELECT *
+			FROM (
+			SELECT
+			per.person_id,
+			per.name_last,
+			per.name_first,
+			per.ssn,
+			TO_CHAR(per.date_of_birth, 'MM/DD/YYYY') as dob,
+			hphone.value_text AS home_phone,
+			account.value_text as account,
+			chart.value_text as chart,
+			cat.category,
+			initcap(per.simple_name) AS name,
+			(select 1 from dual
+			where exists (select 'x' from transaction t
+			where t.trans_owner_id = per.person_id
+			and t.trans_status = 2
+			and t.trans_type = 8026
+			)
+			) as appt_alert,
+			decode(per.gender, 1, 'M', 2, 'F', '') as gender
+			FROM
+			person per,
+			person_org_category cat,
+			person_attribute hphone,
+			person_attribute account,
+			person_attribute chart
+			WHERE
+			per.person_id = cat.person_id(+) AND
+			(per.person_id = hphone.parent_id(+) AND hphone.value_type(+) = 10 AND hphone.item_name(+) = 'Home') AND
+			(per.person_id = account.parent_id(+) AND account.value_type(+) = 0 AND account.item_name(+) = 'Patient/Account Number') AND
+			(per.person_id = chart.parent_id(+) AND chart.value_type(+) = 0 AND chart.item_name(+) = 'Patient/Chart Number') AND
+			cat.org_internal_id = ? AND
+			upper(account.value_text) = ?
+			and cat.category = 'Staff'
+			ORDER BY upper(per.name_last), upper(per.name_first)
+			)
+			WHERE rownum &lt;= 250
+			
+		</statement>
+
+		<statement name="sel_anyname">
+			
+			SELECT *
+			FROM (
+			SELECT
+			per.person_id,
+			per.name_last,
+			per.name_first,
+			per.ssn,
+			TO_CHAR(per.date_of_birth, 'MM/DD/YYYY') as dob,
+			hphone.value_text AS home_phone,
+			account.value_text as account,
+			chart.value_text as chart,
+			cat.category,
+			initcap(per.simple_name) AS name,
+			(select 1 from dual
+			where exists (select 'x' from transaction t
+			where t.trans_owner_id = per.person_id
+			and t.trans_status = 2
+			and t.trans_type = 8026
+			)
+			) as appt_alert,
+			decode(per.gender, 1, 'M', 2, 'F', '') as gender
+			FROM
+			person per,
+			person_org_category cat,
+			person_attribute hphone,
+			person_attribute account,
+			person_attribute chart
+			WHERE
+			per.person_id = cat.person_id(+) AND
+			(per.person_id = hphone.parent_id(+) AND hphone.value_type(+) = 10 AND hphone.item_name(+) = 'Home') AND
+			(per.person_id = account.parent_id(+) AND account.value_type(+) = 0 AND account.item_name(+) = 'Patient/Account Number') AND
+			(per.person_id = chart.parent_id(+) AND chart.value_type(+) = 0 AND chart.item_name(+) = 'Patient/Chart Number') AND
+			cat.org_internal_id = ? AND
+			(upper(per.name_last) = ? or upper(per.name_first) = ?)
+			ORDER BY upper(per.name_last), upper(per.name_first)
+			)
+			WHERE rownum &lt;= 250
+			
+		</statement>
+
+		<statement name="sel_anyname_associate">
+			
+			SELECT *
+			FROM (
+			SELECT
+			per.person_id,
+			per.name_last,
+			per.name_first,
+			per.ssn,
+			TO_CHAR(per.date_of_birth, 'MM/DD/YYYY') as dob,
+			hphone.value_text AS home_phone,
+			account.value_text as account,
+			chart.value_text as chart,
+			cat.category,
+			initcap(per.simple_name) AS name,
+			(select 1 from dual
+			where exists (select 'x' from transaction t
+			where t.trans_owner_id = per.person_id
+			and t.trans_status = 2
+			and t.trans_type = 8026
+			)
+			) as appt_alert,
+			decode(per.gender, 1, 'M', 2, 'F', '') as gender
+			FROM
+			person per,
+			person_org_category cat,
+			person_attribute hphone,
+			person_attribute account,
+			person_attribute chart
+			WHERE
+			per.person_id = cat.person_id(+) AND
+			(per.person_id = hphone.parent_id(+) AND hphone.value_type(+) = 10 AND hphone.item_name(+) = 'Home') AND
+			(per.person_id = account.parent_id(+) AND account.value_type(+) = 0 AND account.item_name(+) = 'Patient/Account Number') AND
+			(per.person_id = chart.parent_id(+) AND chart.value_type(+) = 0 AND chart.item_name(+) = 'Patient/Chart Number') AND
+			cat.org_internal_id = ? AND
+			(upper(per.name_last) = ? or upper(per.name_first) = ?)
+			and cat.category in ('Physician', 'Nurse', 'Staff')
+			ORDER BY upper(per.name_last), upper(per.name_first)
+			)
+			WHERE rownum &lt;= 250
+			
+		</statement>
+
+		<statement name="sel_anyname_insured-Person">
+			
+			SELECT *
+			FROM (
+			SELECT
+			per.person_id,
+			per.name_last,
+			per.name_first,
+			per.ssn,
+			TO_CHAR(per.date_of_birth, 'MM/DD/YYYY') as dob,
+			hphone.value_text AS home_phone,
+			account.value_text as account,
+			chart.value_text as chart,
+			cat.category,
+			initcap(per.simple_name) AS name,
+			(select 1 from dual
+			where exists (select 'x' from transaction t
+			where t.trans_owner_id = per.person_id
+			and t.trans_status = 2
+			and t.trans_type = 8026
+			)
+			) as appt_alert,
+			decode(per.gender, 1, 'M', 2, 'F', '') as gender
+			FROM
+			person per,
+			person_org_category cat,
+			person_attribute hphone,
+			person_attribute account,
+			person_attribute chart
+			WHERE
+			per.person_id = cat.person_id(+) AND
+			(per.person_id = hphone.parent_id(+) AND hphone.value_type(+) = 10 AND hphone.item_name(+) = 'Home') AND
+			(per.person_id = account.parent_id(+) AND account.value_type(+) = 0 AND account.item_name(+) = 'Patient/Account Number') AND
+			(per.person_id = chart.parent_id(+) AND chart.value_type(+) = 0 AND chart.item_name(+) = 'Patient/Chart Number') AND
+			cat.org_internal_id = ? AND
+			(upper(per.name_last) = ? or upper(per.name_first) = ?)
+			and cat.category = 'Insured-Person'
+			ORDER BY upper(per.name_last), upper(per.name_first)
+			)
+			WHERE rownum &lt;= 250
+			
+		</statement>
+
+		<statement name="sel_anyname_like">
+			
+			SELECT *
+			FROM (
+			SELECT
+			per.person_id,
+			per.name_last,
+			per.name_first,
+			per.ssn,
+			TO_CHAR(per.date_of_birth, 'MM/DD/YYYY') as dob,
+			hphone.value_text AS home_phone,
+			account.value_text as account,
+			chart.value_text as chart,
+			cat.category,
+			initcap(per.simple_name) AS name,
+			(select 1 from dual
+			where exists (select 'x' from transaction t
+			where t.trans_owner_id = per.person_id
+			and t.trans_status = 2
+			and t.trans_type = 8026
+			)
+			) as appt_alert,
+			decode(per.gender, 1, 'M', 2, 'F', '') as gender
+			FROM
+			person per,
+			person_org_category cat,
+			person_attribute hphone,
+			person_attribute account,
+			person_attribute chart
+			WHERE
+			per.person_id = cat.person_id(+) AND
+			(per.person_id = hphone.parent_id(+) AND hphone.value_type(+) = 10 AND hphone.item_name(+) = 'Home') AND
+			(per.person_id = account.parent_id(+) AND account.value_type(+) = 0 AND account.item_name(+) = 'Patient/Account Number') AND
+			(per.person_id = chart.parent_id(+) AND chart.value_type(+) = 0 AND chart.item_name(+) = 'Patient/Chart Number') AND
+			cat.org_internal_id = ? AND
+			(upper(per.name_last) like ? or upper(per.name_first) like ? )
+			ORDER BY upper(per.name_last), upper(per.name_first)
+			)
+			WHERE rownum &lt;= 250
+			
+		</statement>
+
+		<statement name="sel_anyname_like_associate">
+			
+			SELECT *
+			FROM (
+			SELECT
+			per.person_id,
+			per.name_last,
+			per.name_first,
+			per.ssn,
+			TO_CHAR(per.date_of_birth, 'MM/DD/YYYY') as dob,
+			hphone.value_text AS home_phone,
+			account.value_text as account,
+			chart.value_text as chart,
+			cat.category,
+			initcap(per.simple_name) AS name,
+			(select 1 from dual
+			where exists (select 'x' from transaction t
+			where t.trans_owner_id = per.person_id
+			and t.trans_status = 2
+			and t.trans_type = 8026
+			)
+			) as appt_alert,
+			decode(per.gender, 1, 'M', 2, 'F', '') as gender
+			FROM
+			person per,
+			person_org_category cat,
+			person_attribute hphone,
+			person_attribute account,
+			person_attribute chart
+			WHERE
+			per.person_id = cat.person_id(+) AND
+			(per.person_id = hphone.parent_id(+) AND hphone.value_type(+) = 10 AND hphone.item_name(+) = 'Home') AND
+			(per.person_id = account.parent_id(+) AND account.value_type(+) = 0 AND account.item_name(+) = 'Patient/Account Number') AND
+			(per.person_id = chart.parent_id(+) AND chart.value_type(+) = 0 AND chart.item_name(+) = 'Patient/Chart Number') AND
+			cat.org_internal_id = ? AND
+			(upper(per.name_last) like ? or upper(per.name_first) like ? )
+			and cat.category in ('Physician', 'Nurse', 'Staff')
+			ORDER BY upper(per.name_last), upper(per.name_first)
+			)
+			WHERE rownum &lt;= 250
+			
+		</statement>
+
+		<statement name="sel_anyname_like_insured-Person">
+			
+			SELECT *
+			FROM (
+			SELECT
+			per.person_id,
+			per.name_last,
+			per.name_first,
+			per.ssn,
+			TO_CHAR(per.date_of_birth, 'MM/DD/YYYY') as dob,
+			hphone.value_text AS home_phone,
+			account.value_text as account,
+			chart.value_text as chart,
+			cat.category,
+			initcap(per.simple_name) AS name,
+			(select 1 from dual
+			where exists (select 'x' from transaction t
+			where t.trans_owner_id = per.person_id
+			and t.trans_status = 2
+			and t.trans_type = 8026
+			)
+			) as appt_alert,
+			decode(per.gender, 1, 'M', 2, 'F', '') as gender
+			FROM
+			person per,
+			person_org_category cat,
+			person_attribute hphone,
+			person_attribute account,
+			person_attribute chart
+			WHERE
+			per.person_id = cat.person_id(+) AND
+			(per.person_id = hphone.parent_id(+) AND hphone.value_type(+) = 10 AND hphone.item_name(+) = 'Home') AND
+			(per.person_id = account.parent_id(+) AND account.value_type(+) = 0 AND account.item_name(+) = 'Patient/Account Number') AND
+			(per.person_id = chart.parent_id(+) AND chart.value_type(+) = 0 AND chart.item_name(+) = 'Patient/Chart Number') AND
+			cat.org_internal_id = ? AND
+			(upper(per.name_last) like ? or upper(per.name_first) like ? )
+			and cat.category = 'Insured-Person'
+			ORDER BY upper(per.name_last), upper(per.name_first)
+			)
+			WHERE rownum &lt;= 250
+			
+		</statement>
+
+		<statement name="sel_anyname_like_nurse">
+			
+			SELECT *
+			FROM (
+			SELECT
+			per.person_id,
+			per.name_last,
+			per.name_first,
+			per.ssn,
+			TO_CHAR(per.date_of_birth, 'MM/DD/YYYY') as dob,
+			hphone.value_text AS home_phone,
+			account.value_text as account,
+			chart.value_text as chart,
+			cat.category,
+			initcap(per.simple_name) AS name,
+			(select 1 from dual
+			where exists (select 'x' from transaction t
+			where t.trans_owner_id = per.person_id
+			and t.trans_status = 2
+			and t.trans_type = 8026
+			)
+			) as appt_alert,
+			decode(per.gender, 1, 'M', 2, 'F', '') as gender
+			FROM
+			person per,
+			person_org_category cat,
+			person_attribute hphone,
+			person_attribute account,
+			person_attribute chart
+			WHERE
+			per.person_id = cat.person_id(+) AND
+			(per.person_id = hphone.parent_id(+) AND hphone.value_type(+) = 10 AND hphone.item_name(+) = 'Home') AND
+			(per.person_id = account.parent_id(+) AND account.value_type(+) = 0 AND account.item_name(+) = 'Patient/Account Number') AND
+			(per.person_id = chart.parent_id(+) AND chart.value_type(+) = 0 AND chart.item_name(+) = 'Patient/Chart Number') AND
+			cat.org_internal_id = ? AND
+			(upper(per.name_last) like ? or upper(per.name_first) like ? )
+			and cat.category = 'Nurse'
+			ORDER BY upper(per.name_last), upper(per.name_first)
+			)
+			WHERE rownum &lt;= 250
+			
+		</statement>
+
+		<statement name="sel_anyname_like_patient">
+			
+			SELECT *
+			FROM (
+			SELECT
+			per.person_id,
+			per.name_last,
+			per.name_first,
+			per.ssn,
+			TO_CHAR(per.date_of_birth, 'MM/DD/YYYY') as dob,
+			hphone.value_text AS home_phone,
+			account.value_text as account,
+			chart.value_text as chart,
+			cat.category,
+			initcap(per.simple_name) AS name,
+			(select 1 from dual
+			where exists (select 'x' from transaction t
+			where t.trans_owner_id = per.person_id
+			and t.trans_status = 2
+			and t.trans_type = 8026
+			)
+			) as appt_alert,
+			decode(per.gender, 1, 'M', 2, 'F', '') as gender
+			FROM
+			person per,
+			person_org_category cat,
+			person_attribute hphone,
+			person_attribute account,
+			person_attribute chart
+			WHERE
+			per.person_id = cat.person_id(+) AND
+			(per.person_id = hphone.parent_id(+) AND hphone.value_type(+) = 10 AND hphone.item_name(+) = 'Home') AND
+			(per.person_id = account.parent_id(+) AND account.value_type(+) = 0 AND account.item_name(+) = 'Patient/Account Number') AND
+			(per.person_id = chart.parent_id(+) AND chart.value_type(+) = 0 AND chart.item_name(+) = 'Patient/Chart Number') AND
+			cat.org_internal_id = ? AND
+			(upper(per.name_last) like ? or upper(per.name_first) like ? )
+			and cat.category = 'Patient'
+			ORDER BY upper(per.name_last), upper(per.name_first)
+			)
+			WHERE rownum &lt;= 250
+			
+		</statement>
+
+		<statement name="sel_anyname_like_physician">
+			
+			SELECT *
+			FROM (
+			SELECT
+			per.person_id,
+			per.name_last,
+			per.name_first,
+			per.ssn,
+			TO_CHAR(per.date_of_birth, 'MM/DD/YYYY') as dob,
+			hphone.value_text AS home_phone,
+			account.value_text as account,
+			chart.value_text as chart,
+			cat.category,
+			initcap(per.simple_name) AS name,
+			(select 1 from dual
+			where exists (select 'x' from transaction t
+			where t.trans_owner_id = per.person_id
+			and t.trans_status = 2
+			and t.trans_type = 8026
+			)
+			) as appt_alert,
+			decode(per.gender, 1, 'M', 2, 'F', '') as gender
+			FROM
+			person per,
+			person_org_category cat,
+			person_attribute hphone,
+			person_attribute account,
+			person_attribute chart
+			WHERE
+			per.person_id = cat.person_id(+) AND
+			(per.person_id = hphone.parent_id(+) AND hphone.value_type(+) = 10 AND hphone.item_name(+) = 'Home') AND
+			(per.person_id = account.parent_id(+) AND account.value_type(+) = 0 AND account.item_name(+) = 'Patient/Account Number') AND
+			(per.person_id = chart.parent_id(+) AND chart.value_type(+) = 0 AND chart.item_name(+) = 'Patient/Chart Number') AND
+			cat.org_internal_id = ? AND
+			(upper(per.name_last) like ? or upper(per.name_first) like ? )
+			and cat.category = 'Physician'
+			ORDER BY upper(per.name_last), upper(per.name_first)
+			)
+			WHERE rownum &lt;= 250
+			
+		</statement>
+
+		<statement name="sel_anyname_like_physician-ref">
+			
+			SELECT *
+			FROM (
+			SELECT
+			per.person_id,
+			per.name_last,
+			per.name_first,
+			per.ssn,
+			TO_CHAR(per.date_of_birth, 'MM/DD/YYYY') as dob,
+			hphone.value_text AS home_phone,
+			account.value_text as account,
+			chart.value_text as chart,
+			cat.category,
+			initcap(per.simple_name) AS name,
+			(select 1 from dual
+			where exists (select 'x' from transaction t
+			where t.trans_owner_id = per.person_id
+			and t.trans_status = 2
+			and t.trans_type = 8026
+			)
+			) as appt_alert,
+			decode(per.gender, 1, 'M', 2, 'F', '') as gender
+			FROM
+			person per,
+			person_org_category cat,
+			person_attribute hphone,
+			person_attribute account,
+			person_attribute chart
+			WHERE
+			per.person_id = cat.person_id(+) AND
+			(per.person_id = hphone.parent_id(+) AND hphone.value_type(+) = 10 AND hphone.item_name(+) = 'Home') AND
+			(per.person_id = account.parent_id(+) AND account.value_type(+) = 0 AND account.item_name(+) = 'Patient/Account Number') AND
+			(per.person_id = chart.parent_id(+) AND chart.value_type(+) = 0 AND chart.item_name(+) = 'Patient/Chart Number') AND
+			cat.org_internal_id = ? AND
+			(upper(per.name_last) like ? or upper(per.name_first) like ? )
+			and cat.category in ('Physician', 'Referring-Doctor')
+			ORDER BY upper(per.name_last), upper(per.name_first)
+			)
+			WHERE rownum &lt;= 250
+			
+		</statement>
+
+		<statement name="sel_anyname_like_referring-Doctor">
+			
+			SELECT *
+			FROM (
+			SELECT
+			per.person_id,
+			per.name_last,
+			per.name_first,
+			per.ssn,
+			TO_CHAR(per.date_of_birth, 'MM/DD/YYYY') as dob,
+			hphone.value_text AS home_phone,
+			account.value_text as account,
+			chart.value_text as chart,
+			cat.category,
+			initcap(per.simple_name) AS name,
+			(select 1 from dual
+			where exists (select 'x' from transaction t
+			where t.trans_owner_id = per.person_id
+			and t.trans_status = 2
+			and t.trans_type = 8026
+			)
+			) as appt_alert,
+			decode(per.gender, 1, 'M', 2, 'F', '') as gender
+			FROM
+			person per,
+			person_org_category cat,
+			person_attribute hphone,
+			person_attribute account,
+			person_attribute chart
+			WHERE
+			per.person_id = cat.person_id(+) AND
+			(per.person_id = hphone.parent_id(+) AND hphone.value_type(+) = 10 AND hphone.item_name(+) = 'Home') AND
+			(per.person_id = account.parent_id(+) AND account.value_type(+) = 0 AND account.item_name(+) = 'Patient/Account Number') AND
+			(per.person_id = chart.parent_id(+) AND chart.value_type(+) = 0 AND chart.item_name(+) = 'Patient/Chart Number') AND
+			cat.org_internal_id = ? AND
+			(upper(per.name_last) like ? or upper(per.name_first) like ? )
+			and cat.category = 'Referring-Doctor'
+			ORDER BY upper(per.name_last), upper(per.name_first)
+			)
+			WHERE rownum &lt;= 250
+			
+		</statement>
+
+		<statement name="sel_anyname_like_staff">
+			
+			SELECT *
+			FROM (
+			SELECT
+			per.person_id,
+			per.name_last,
+			per.name_first,
+			per.ssn,
+			TO_CHAR(per.date_of_birth, 'MM/DD/YYYY') as dob,
+			hphone.value_text AS home_phone,
+			account.value_text as account,
+			chart.value_text as chart,
+			cat.category,
+			initcap(per.simple_name) AS name,
+			(select 1 from dual
+			where exists (select 'x' from transaction t
+			where t.trans_owner_id = per.person_id
+			and t.trans_status = 2
+			and t.trans_type = 8026
+			)
+			) as appt_alert,
+			decode(per.gender, 1, 'M', 2, 'F', '') as gender
+			FROM
+			person per,
+			person_org_category cat,
+			person_attribute hphone,
+			person_attribute account,
+			person_attribute chart
+			WHERE
+			per.person_id = cat.person_id(+) AND
+			(per.person_id = hphone.parent_id(+) AND hphone.value_type(+) = 10 AND hphone.item_name(+) = 'Home') AND
+			(per.person_id = account.parent_id(+) AND account.value_type(+) = 0 AND account.item_name(+) = 'Patient/Account Number') AND
+			(per.person_id = chart.parent_id(+) AND chart.value_type(+) = 0 AND chart.item_name(+) = 'Patient/Chart Number') AND
+			cat.org_internal_id = ? AND
+			(upper(per.name_last) like ? or upper(per.name_first) like ? )
+			and cat.category = 'Staff'
+			ORDER BY upper(per.name_last), upper(per.name_first)
+			)
+			WHERE rownum &lt;= 250
+			
+		</statement>
+
+		<statement name="sel_anyname_nurse">
+			
+			SELECT *
+			FROM (
+			SELECT
+			per.person_id,
+			per.name_last,
+			per.name_first,
+			per.ssn,
+			TO_CHAR(per.date_of_birth, 'MM/DD/YYYY') as dob,
+			hphone.value_text AS home_phone,
+			account.value_text as account,
+			chart.value_text as chart,
+			cat.category,
+			initcap(per.simple_name) AS name,
+			(select 1 from dual
+			where exists (select 'x' from transaction t
+			where t.trans_owner_id = per.person_id
+			and t.trans_status = 2
+			and t.trans_type = 8026
+			)
+			) as appt_alert,
+			decode(per.gender, 1, 'M', 2, 'F', '') as gender
+			FROM
+			person per,
+			person_org_category cat,
+			person_attribute hphone,
+			person_attribute account,
+			person_attribute chart
+			WHERE
+			per.person_id = cat.person_id(+) AND
+			(per.person_id = hphone.parent_id(+) AND hphone.value_type(+) = 10 AND hphone.item_name(+) = 'Home') AND
+			(per.person_id = account.parent_id(+) AND account.value_type(+) = 0 AND account.item_name(+) = 'Patient/Account Number') AND
+			(per.person_id = chart.parent_id(+) AND chart.value_type(+) = 0 AND chart.item_name(+) = 'Patient/Chart Number') AND
+			cat.org_internal_id = ? AND
+			(upper(per.name_last) = ? or upper(per.name_first) = ?)
+			and cat.category = 'Nurse'
+			ORDER BY upper(per.name_last), upper(per.name_first)
+			)
+			WHERE rownum &lt;= 250
+			
+		</statement>
+
+		<statement name="sel_anyname_patient">
+			
+			SELECT *
+			FROM (
+			SELECT
+			per.person_id,
+			per.name_last,
+			per.name_first,
+			per.ssn,
+			TO_CHAR(per.date_of_birth, 'MM/DD/YYYY') as dob,
+			hphone.value_text AS home_phone,
+			account.value_text as account,
+			chart.value_text as chart,
+			cat.category,
+			initcap(per.simple_name) AS name,
+			(select 1 from dual
+			where exists (select 'x' from transaction t
+			where t.trans_owner_id = per.person_id
+			and t.trans_status = 2
+			and t.trans_type = 8026
+			)
+			) as appt_alert,
+			decode(per.gender, 1, 'M', 2, 'F', '') as gender
+			FROM
+			person per,
+			person_org_category cat,
+			person_attribute hphone,
+			person_attribute account,
+			person_attribute chart
+			WHERE
+			per.person_id = cat.person_id(+) AND
+			(per.person_id = hphone.parent_id(+) AND hphone.value_type(+) = 10 AND hphone.item_name(+) = 'Home') AND
+			(per.person_id = account.parent_id(+) AND account.value_type(+) = 0 AND account.item_name(+) = 'Patient/Account Number') AND
+			(per.person_id = chart.parent_id(+) AND chart.value_type(+) = 0 AND chart.item_name(+) = 'Patient/Chart Number') AND
+			cat.org_internal_id = ? AND
+			(upper(per.name_last) = ? or upper(per.name_first) = ?)
+			and cat.category = 'Patient'
+			ORDER BY upper(per.name_last), upper(per.name_first)
+			)
+			WHERE rownum &lt;= 250
+			
+		</statement>
+
+		<statement name="sel_anyname_physician">
+			
+			SELECT *
+			FROM (
+			SELECT
+			per.person_id,
+			per.name_last,
+			per.name_first,
+			per.ssn,
+			TO_CHAR(per.date_of_birth, 'MM/DD/YYYY') as dob,
+			hphone.value_text AS home_phone,
+			account.value_text as account,
+			chart.value_text as chart,
+			cat.category,
+			initcap(per.simple_name) AS name,
+			(select 1 from dual
+			where exists (select 'x' from transaction t
+			where t.trans_owner_id = per.person_id
+			and t.trans_status = 2
+			and t.trans_type = 8026
+			)
+			) as appt_alert,
+			decode(per.gender, 1, 'M', 2, 'F', '') as gender
+			FROM
+			person per,
+			person_org_category cat,
+			person_attribute hphone,
+			person_attribute account,
+			person_attribute chart
+			WHERE
+			per.person_id = cat.person_id(+) AND
+			(per.person_id = hphone.parent_id(+) AND hphone.value_type(+) = 10 AND hphone.item_name(+) = 'Home') AND
+			(per.person_id = account.parent_id(+) AND account.value_type(+) = 0 AND account.item_name(+) = 'Patient/Account Number') AND
+			(per.person_id = chart.parent_id(+) AND chart.value_type(+) = 0 AND chart.item_name(+) = 'Patient/Chart Number') AND
+			cat.org_internal_id = ? AND
+			(upper(per.name_last) = ? or upper(per.name_first) = ?)
+			and cat.category = 'Physician'
+			ORDER BY upper(per.name_last), upper(per.name_first)
+			)
+			WHERE rownum &lt;= 250
+			
+		</statement>
+
+		<statement name="sel_anyname_physician-ref">
+			
+			SELECT *
+			FROM (
+			SELECT
+			per.person_id,
+			per.name_last,
+			per.name_first,
+			per.ssn,
+			TO_CHAR(per.date_of_birth, 'MM/DD/YYYY') as dob,
+			hphone.value_text AS home_phone,
+			account.value_text as account,
+			chart.value_text as chart,
+			cat.category,
+			initcap(per.simple_name) AS name,
+			(select 1 from dual
+			where exists (select 'x' from transaction t
+			where t.trans_owner_id = per.person_id
+			and t.trans_status = 2
+			and t.trans_type = 8026
+			)
+			) as appt_alert,
+			decode(per.gender, 1, 'M', 2, 'F', '') as gender
+			FROM
+			person per,
+			person_org_category cat,
+			person_attribute hphone,
+			person_attribute account,
+			person_attribute chart
+			WHERE
+			per.person_id = cat.person_id(+) AND
+			(per.person_id = hphone.parent_id(+) AND hphone.value_type(+) = 10 AND hphone.item_name(+) = 'Home') AND
+			(per.person_id = account.parent_id(+) AND account.value_type(+) = 0 AND account.item_name(+) = 'Patient/Account Number') AND
+			(per.person_id = chart.parent_id(+) AND chart.value_type(+) = 0 AND chart.item_name(+) = 'Patient/Chart Number') AND
+			cat.org_internal_id = ? AND
+			(upper(per.name_last) = ? or upper(per.name_first) = ?)
+			and cat.category in ('Physician', 'Referring-Doctor')
+			ORDER BY upper(per.name_last), upper(per.name_first)
+			)
+			WHERE rownum &lt;= 250
+			
+		</statement>
+
+		<statement name="sel_anyname_referring-Doctor">
+			
+			SELECT *
+			FROM (
+			SELECT
+			per.person_id,
+			per.name_last,
+			per.name_first,
+			per.ssn,
+			TO_CHAR(per.date_of_birth, 'MM/DD/YYYY') as dob,
+			hphone.value_text AS home_phone,
+			account.value_text as account,
+			chart.value_text as chart,
+			cat.category,
+			initcap(per.simple_name) AS name,
+			(select 1 from dual
+			where exists (select 'x' from transaction t
+			where t.trans_owner_id = per.person_id
+			and t.trans_status = 2
+			and t.trans_type = 8026
+			)
+			) as appt_alert,
+			decode(per.gender, 1, 'M', 2, 'F', '') as gender
+			FROM
+			person per,
+			person_org_category cat,
+			person_attribute hphone,
+			person_attribute account,
+			person_attribute chart
+			WHERE
+			per.person_id = cat.person_id(+) AND
+			(per.person_id = hphone.parent_id(+) AND hphone.value_type(+) = 10 AND hphone.item_name(+) = 'Home') AND
+			(per.person_id = account.parent_id(+) AND account.value_type(+) = 0 AND account.item_name(+) = 'Patient/Account Number') AND
+			(per.person_id = chart.parent_id(+) AND chart.value_type(+) = 0 AND chart.item_name(+) = 'Patient/Chart Number') AND
+			cat.org_internal_id = ? AND
+			(upper(per.name_last) = ? or upper(per.name_first) = ?)
+			and cat.category = 'Referring-Doctor'
+			ORDER BY upper(per.name_last), upper(per.name_first)
+			)
+			WHERE rownum &lt;= 250
+			
+		</statement>
+
+		<statement name="sel_anyname_staff">
+			
+			SELECT *
+			FROM (
+			SELECT
+			per.person_id,
+			per.name_last,
+			per.name_first,
+			per.ssn,
+			TO_CHAR(per.date_of_birth, 'MM/DD/YYYY') as dob,
+			hphone.value_text AS home_phone,
+			account.value_text as account,
+			chart.value_text as chart,
+			cat.category,
+			initcap(per.simple_name) AS name,
+			(select 1 from dual
+			where exists (select 'x' from transaction t
+			where t.trans_owner_id = per.person_id
+			and t.trans_status = 2
+			and t.trans_type = 8026
+			)
+			) as appt_alert,
+			decode(per.gender, 1, 'M', 2, 'F', '') as gender
+			FROM
+			person per,
+			person_org_category cat,
+			person_attribute hphone,
+			person_attribute account,
+			person_attribute chart
+			WHERE
+			per.person_id = cat.person_id(+) AND
+			(per.person_id = hphone.parent_id(+) AND hphone.value_type(+) = 10 AND hphone.item_name(+) = 'Home') AND
+			(per.person_id = account.parent_id(+) AND account.value_type(+) = 0 AND account.item_name(+) = 'Patient/Account Number') AND
+			(per.person_id = chart.parent_id(+) AND chart.value_type(+) = 0 AND chart.item_name(+) = 'Patient/Chart Number') AND
+			cat.org_internal_id = ? AND
+			(upper(per.name_last) = ? or upper(per.name_first) = ?)
+			and cat.category = 'Staff'
+			ORDER BY upper(per.name_last), upper(per.name_first)
+			)
+			WHERE rownum &lt;= 250
+			
+		</statement>
+
+		<statement name="sel_chart">
+			
+			SELECT *
+			FROM (
+			SELECT
+			per.person_id,
+			per.name_last,
+			per.name_first,
+			per.ssn,
+			TO_CHAR(per.date_of_birth, 'MM/DD/YYYY') as dob,
+			hphone.value_text AS home_phone,
+			account.value_text as account,
+			chart.value_text as chart,
+			cat.category,
+			initcap(per.simple_name) AS name,
+			(select 1 from dual
+			where exists (select 'x' from transaction t
+			where t.trans_owner_id = per.person_id
+			and t.trans_status = 2
+			and t.trans_type = 8026
+			)
+			) as appt_alert,
+			decode(per.gender, 1, 'M', 2, 'F', '') as gender
+			FROM
+			person per,
+			person_org_category cat,
+			person_attribute hphone,
+			person_attribute account,
+			person_attribute chart
+			WHERE
+			per.person_id = cat.person_id(+) AND
+			(per.person_id = hphone.parent_id(+) AND hphone.value_type(+) = 10 AND hphone.item_name(+) = 'Home') AND
+			(per.person_id = account.parent_id(+) AND account.value_type(+) = 0 AND account.item_name(+) = 'Patient/Account Number') AND
+			(per.person_id = chart.parent_id(+) AND chart.value_type(+) = 0 AND chart.item_name(+) = 'Patient/Chart Number') AND
+			cat.org_internal_id = ? AND
+			upper(chart.value_text) = ?
+			ORDER BY upper(per.name_last), upper(per.name_first)
+			)
+			WHERE rownum &lt;= 250
+			
+		</statement>
+
+		<statement name="sel_chart_associate">
+			
+			SELECT *
+			FROM (
+			SELECT
+			per.person_id,
+			per.name_last,
+			per.name_first,
+			per.ssn,
+			TO_CHAR(per.date_of_birth, 'MM/DD/YYYY') as dob,
+			hphone.value_text AS home_phone,
+			account.value_text as account,
+			chart.value_text as chart,
+			cat.category,
+			initcap(per.simple_name) AS name,
+			(select 1 from dual
+			where exists (select 'x' from transaction t
+			where t.trans_owner_id = per.person_id
+			and t.trans_status = 2
+			and t.trans_type = 8026
+			)
+			) as appt_alert,
+			decode(per.gender, 1, 'M', 2, 'F', '') as gender
+			FROM
+			person per,
+			person_org_category cat,
+			person_attribute hphone,
+			person_attribute account,
+			person_attribute chart
+			WHERE
+			per.person_id = cat.person_id(+) AND
+			(per.person_id = hphone.parent_id(+) AND hphone.value_type(+) = 10 AND hphone.item_name(+) = 'Home') AND
+			(per.person_id = account.parent_id(+) AND account.value_type(+) = 0 AND account.item_name(+) = 'Patient/Account Number') AND
+			(per.person_id = chart.parent_id(+) AND chart.value_type(+) = 0 AND chart.item_name(+) = 'Patient/Chart Number') AND
+			cat.org_internal_id = ? AND
+			upper(chart.value_text) = ?
+			and cat.category in ('Physician', 'Nurse', 'Staff')
+			ORDER BY upper(per.name_last), upper(per.name_first)
+			)
+			WHERE rownum &lt;= 250
+			
+		</statement>
+
+		<statement name="sel_chart_insured-Person">
+			
+			SELECT *
+			FROM (
+			SELECT
+			per.person_id,
+			per.name_last,
+			per.name_first,
+			per.ssn,
+			TO_CHAR(per.date_of_birth, 'MM/DD/YYYY') as dob,
+			hphone.value_text AS home_phone,
+			account.value_text as account,
+			chart.value_text as chart,
+			cat.category,
+			initcap(per.simple_name) AS name,
+			(select 1 from dual
+			where exists (select 'x' from transaction t
+			where t.trans_owner_id = per.person_id
+			and t.trans_status = 2
+			and t.trans_type = 8026
+			)
+			) as appt_alert,
+			decode(per.gender, 1, 'M', 2, 'F', '') as gender
+			FROM
+			person per,
+			person_org_category cat,
+			person_attribute hphone,
+			person_attribute account,
+			person_attribute chart
+			WHERE
+			per.person_id = cat.person_id(+) AND
+			(per.person_id = hphone.parent_id(+) AND hphone.value_type(+) = 10 AND hphone.item_name(+) = 'Home') AND
+			(per.person_id = account.parent_id(+) AND account.value_type(+) = 0 AND account.item_name(+) = 'Patient/Account Number') AND
+			(per.person_id = chart.parent_id(+) AND chart.value_type(+) = 0 AND chart.item_name(+) = 'Patient/Chart Number') AND
+			cat.org_internal_id = ? AND
+			upper(chart.value_text) = ?
+			and cat.category = 'Insured-Person'
+			ORDER BY upper(per.name_last), upper(per.name_first)
+			)
+			WHERE rownum &lt;= 250
+			
+		</statement>
+
+		<statement name="sel_chart_like">
+			
+			SELECT *
+			FROM (
+			SELECT
+			per.person_id,
+			per.name_last,
+			per.name_first,
+			per.ssn,
+			TO_CHAR(per.date_of_birth, 'MM/DD/YYYY') as dob,
+			hphone.value_text AS home_phone,
+			account.value_text as account,
+			chart.value_text as chart,
+			cat.category,
+			initcap(per.simple_name) AS name,
+			(select 1 from dual
+			where exists (select 'x' from transaction t
+			where t.trans_owner_id = per.person_id
+			and t.trans_status = 2
+			and t.trans_type = 8026
+			)
+			) as appt_alert,
+			decode(per.gender, 1, 'M', 2, 'F', '') as gender
+			FROM
+			person per,
+			person_org_category cat,
+			person_attribute hphone,
+			person_attribute account,
+			person_attribute chart
+			WHERE
+			per.person_id = cat.person_id(+) AND
+			(per.person_id = hphone.parent_id(+) AND hphone.value_type(+) = 10 AND hphone.item_name(+) = 'Home') AND
+			(per.person_id = account.parent_id(+) AND account.value_type(+) = 0 AND account.item_name(+) = 'Patient/Account Number') AND
+			(per.person_id = chart.parent_id(+) AND chart.value_type(+) = 0 AND chart.item_name(+) = 'Patient/Chart Number') AND
+			cat.org_internal_id = ? AND
+			upper(chart.value_text) like ?
+			ORDER BY upper(per.name_last), upper(per.name_first)
+			)
+			WHERE rownum &lt;= 250
+			
+		</statement>
+
+		<statement name="sel_chart_like_associate">
+			
+			SELECT *
+			FROM (
+			SELECT
+			per.person_id,
+			per.name_last,
+			per.name_first,
+			per.ssn,
+			TO_CHAR(per.date_of_birth, 'MM/DD/YYYY') as dob,
+			hphone.value_text AS home_phone,
+			account.value_text as account,
+			chart.value_text as chart,
+			cat.category,
+			initcap(per.simple_name) AS name,
+			(select 1 from dual
+			where exists (select 'x' from transaction t
+			where t.trans_owner_id = per.person_id
+			and t.trans_status = 2
+			and t.trans_type = 8026
+			)
+			) as appt_alert,
+			decode(per.gender, 1, 'M', 2, 'F', '') as gender
+			FROM
+			person per,
+			person_org_category cat,
+			person_attribute hphone,
+			person_attribute account,
+			person_attribute chart
+			WHERE
+			per.person_id = cat.person_id(+) AND
+			(per.person_id = hphone.parent_id(+) AND hphone.value_type(+) = 10 AND hphone.item_name(+) = 'Home') AND
+			(per.person_id = account.parent_id(+) AND account.value_type(+) = 0 AND account.item_name(+) = 'Patient/Account Number') AND
+			(per.person_id = chart.parent_id(+) AND chart.value_type(+) = 0 AND chart.item_name(+) = 'Patient/Chart Number') AND
+			cat.org_internal_id = ? AND
+			upper(chart.value_text) like ?
+			and cat.category in ('Physician', 'Nurse', 'Staff')
+			ORDER BY upper(per.name_last), upper(per.name_first)
+			)
+			WHERE rownum &lt;= 250
+			
+		</statement>
+
+		<statement name="sel_chart_like_insured-Person">
+			
+			SELECT *
+			FROM (
+			SELECT
+			per.person_id,
+			per.name_last,
+			per.name_first,
+			per.ssn,
+			TO_CHAR(per.date_of_birth, 'MM/DD/YYYY') as dob,
+			hphone.value_text AS home_phone,
+			account.value_text as account,
+			chart.value_text as chart,
+			cat.category,
+			initcap(per.simple_name) AS name,
+			(select 1 from dual
+			where exists (select 'x' from transaction t
+			where t.trans_owner_id = per.person_id
+			and t.trans_status = 2
+			and t.trans_type = 8026
+			)
+			) as appt_alert,
+			decode(per.gender, 1, 'M', 2, 'F', '') as gender
+			FROM
+			person per,
+			person_org_category cat,
+			person_attribute hphone,
+			person_attribute account,
+			person_attribute chart
+			WHERE
+			per.person_id = cat.person_id(+) AND
+			(per.person_id = hphone.parent_id(+) AND hphone.value_type(+) = 10 AND hphone.item_name(+) = 'Home') AND
+			(per.person_id = account.parent_id(+) AND account.value_type(+) = 0 AND account.item_name(+) = 'Patient/Account Number') AND
+			(per.person_id = chart.parent_id(+) AND chart.value_type(+) = 0 AND chart.item_name(+) = 'Patient/Chart Number') AND
+			cat.org_internal_id = ? AND
+			upper(chart.value_text) like ?
+			and cat.category = 'Insured-Person'
+			ORDER BY upper(per.name_last), upper(per.name_first)
+			)
+			WHERE rownum &lt;= 250
+			
+		</statement>
+
+		<statement name="sel_chart_like_nurse">
+			
+			SELECT *
+			FROM (
+			SELECT
+			per.person_id,
+			per.name_last,
+			per.name_first,
+			per.ssn,
+			TO_CHAR(per.date_of_birth, 'MM/DD/YYYY') as dob,
+			hphone.value_text AS home_phone,
+			account.value_text as account,
+			chart.value_text as chart,
+			cat.category,
+			initcap(per.simple_name) AS name,
+			(select 1 from dual
+			where exists (select 'x' from transaction t
+			where t.trans_owner_id = per.person_id
+			and t.trans_status = 2
+			and t.trans_type = 8026
+			)
+			) as appt_alert,
+			decode(per.gender, 1, 'M', 2, 'F', '') as gender
+			FROM
+			person per,
+			person_org_category cat,
+			person_attribute hphone,
+			person_attribute account,
+			person_attribute chart
+			WHERE
+			per.person_id = cat.person_id(+) AND
+			(per.person_id = hphone.parent_id(+) AND hphone.value_type(+) = 10 AND hphone.item_name(+) = 'Home') AND
+			(per.person_id = account.parent_id(+) AND account.value_type(+) = 0 AND account.item_name(+) = 'Patient/Account Number') AND
+			(per.person_id = chart.parent_id(+) AND chart.value_type(+) = 0 AND chart.item_name(+) = 'Patient/Chart Number') AND
+			cat.org_internal_id = ? AND
+			upper(chart.value_text) like ?
+			and cat.category = 'Nurse'
+			ORDER BY upper(per.name_last), upper(per.name_first)
+			)
+			WHERE rownum &lt;= 250
+			
+		</statement>
+
+		<statement name="sel_chart_like_patient">
+			
+			SELECT *
+			FROM (
+			SELECT
+			per.person_id,
+			per.name_last,
+			per.name_first,
+			per.ssn,
+			TO_CHAR(per.date_of_birth, 'MM/DD/YYYY') as dob,
+			hphone.value_text AS home_phone,
+			account.value_text as account,
+			chart.value_text as chart,
+			cat.category,
+			initcap(per.simple_name) AS name,
+			(select 1 from dual
+			where exists (select 'x' from transaction t
+			where t.trans_owner_id = per.person_id
+			and t.trans_status = 2
+			and t.trans_type = 8026
+			)
+			) as appt_alert,
+			decode(per.gender, 1, 'M', 2, 'F', '') as gender
+			FROM
+			person per,
+			person_org_category cat,
+			person_attribute hphone,
+			person_attribute account,
+			person_attribute chart
+			WHERE
+			per.person_id = cat.person_id(+) AND
+			(per.person_id = hphone.parent_id(+) AND hphone.value_type(+) = 10 AND hphone.item_name(+) = 'Home') AND
+			(per.person_id = account.parent_id(+) AND account.value_type(+) = 0 AND account.item_name(+) = 'Patient/Account Number') AND
+			(per.person_id = chart.parent_id(+) AND chart.value_type(+) = 0 AND chart.item_name(+) = 'Patient/Chart Number') AND
+			cat.org_internal_id = ? AND
+			upper(chart.value_text) like ?
+			and cat.category = 'Patient'
+			ORDER BY upper(per.name_last), upper(per.name_first)
+			)
+			WHERE rownum &lt;= 250
+			
+		</statement>
+
+		<statement name="sel_chart_like_physician">
+			
+			SELECT *
+			FROM (
+			SELECT
+			per.person_id,
+			per.name_last,
+			per.name_first,
+			per.ssn,
+			TO_CHAR(per.date_of_birth, 'MM/DD/YYYY') as dob,
+			hphone.value_text AS home_phone,
+			account.value_text as account,
+			chart.value_text as chart,
+			cat.category,
+			initcap(per.simple_name) AS name,
+			(select 1 from dual
+			where exists (select 'x' from transaction t
+			where t.trans_owner_id = per.person_id
+			and t.trans_status = 2
+			and t.trans_type = 8026
+			)
+			) as appt_alert,
+			decode(per.gender, 1, 'M', 2, 'F', '') as gender
+			FROM
+			person per,
+			person_org_category cat,
+			person_attribute hphone,
+			person_attribute account,
+			person_attribute chart
+			WHERE
+			per.person_id = cat.person_id(+) AND
+			(per.person_id = hphone.parent_id(+) AND hphone.value_type(+) = 10 AND hphone.item_name(+) = 'Home') AND
+			(per.person_id = account.parent_id(+) AND account.value_type(+) = 0 AND account.item_name(+) = 'Patient/Account Number') AND
+			(per.person_id = chart.parent_id(+) AND chart.value_type(+) = 0 AND chart.item_name(+) = 'Patient/Chart Number') AND
+			cat.org_internal_id = ? AND
+			upper(chart.value_text) like ?
+			and cat.category = 'Physician'
+			ORDER BY upper(per.name_last), upper(per.name_first)
+			)
+			WHERE rownum &lt;= 250
+			
+		</statement>
+
+		<statement name="sel_chart_like_physician-ref">
+			
+			SELECT *
+			FROM (
+			SELECT
+			per.person_id,
+			per.name_last,
+			per.name_first,
+			per.ssn,
+			TO_CHAR(per.date_of_birth, 'MM/DD/YYYY') as dob,
+			hphone.value_text AS home_phone,
+			account.value_text as account,
+			chart.value_text as chart,
+			cat.category,
+			initcap(per.simple_name) AS name,
+			(select 1 from dual
+			where exists (select 'x' from transaction t
+			where t.trans_owner_id = per.person_id
+			and t.trans_status = 2
+			and t.trans_type = 8026
+			)
+			) as appt_alert,
+			decode(per.gender, 1, 'M', 2, 'F', '') as gender
+			FROM
+			person per,
+			person_org_category cat,
+			person_attribute hphone,
+			person_attribute account,
+			person_attribute chart
+			WHERE
+			per.person_id = cat.person_id(+) AND
+			(per.person_id = hphone.parent_id(+) AND hphone.value_type(+) = 10 AND hphone.item_name(+) = 'Home') AND
+			(per.person_id = account.parent_id(+) AND account.value_type(+) = 0 AND account.item_name(+) = 'Patient/Account Number') AND
+			(per.person_id = chart.parent_id(+) AND chart.value_type(+) = 0 AND chart.item_name(+) = 'Patient/Chart Number') AND
+			cat.org_internal_id = ? AND
+			upper(chart.value_text) like ?
+			and cat.category in ('Physician', 'Referring-Doctor')
+			ORDER BY upper(per.name_last), upper(per.name_first)
+			)
+			WHERE rownum &lt;= 250
+			
+		</statement>
+
+		<statement name="sel_chart_like_referring-Doctor">
+			
+			SELECT *
+			FROM (
+			SELECT
+			per.person_id,
+			per.name_last,
+			per.name_first,
+			per.ssn,
+			TO_CHAR(per.date_of_birth, 'MM/DD/YYYY') as dob,
+			hphone.value_text AS home_phone,
+			account.value_text as account,
+			chart.value_text as chart,
+			cat.category,
+			initcap(per.simple_name) AS name,
+			(select 1 from dual
+			where exists (select 'x' from transaction t
+			where t.trans_owner_id = per.person_id
+			and t.trans_status = 2
+			and t.trans_type = 8026
+			)
+			) as appt_alert,
+			decode(per.gender, 1, 'M', 2, 'F', '') as gender
+			FROM
+			person per,
+			person_org_category cat,
+			person_attribute hphone,
+			person_attribute account,
+			person_attribute chart
+			WHERE
+			per.person_id = cat.person_id(+) AND
+			(per.person_id = hphone.parent_id(+) AND hphone.value_type(+) = 10 AND hphone.item_name(+) = 'Home') AND
+			(per.person_id = account.parent_id(+) AND account.value_type(+) = 0 AND account.item_name(+) = 'Patient/Account Number') AND
+			(per.person_id = chart.parent_id(+) AND chart.value_type(+) = 0 AND chart.item_name(+) = 'Patient/Chart Number') AND
+			cat.org_internal_id = ? AND
+			upper(chart.value_text) like ?
+			and cat.category = 'Referring-Doctor'
+			ORDER BY upper(per.name_last), upper(per.name_first)
+			)
+			WHERE rownum &lt;= 250
+			
+		</statement>
+
+		<statement name="sel_chart_like_staff">
+			
+			SELECT *
+			FROM (
+			SELECT
+			per.person_id,
+			per.name_last,
+			per.name_first,
+			per.ssn,
+			TO_CHAR(per.date_of_birth, 'MM/DD/YYYY') as dob,
+			hphone.value_text AS home_phone,
+			account.value_text as account,
+			chart.value_text as chart,
+			cat.category,
+			initcap(per.simple_name) AS name,
+			(select 1 from dual
+			where exists (select 'x' from transaction t
+			where t.trans_owner_id = per.person_id
+			and t.trans_status = 2
+			and t.trans_type = 8026
+			)
+			) as appt_alert,
+			decode(per.gender, 1, 'M', 2, 'F', '') as gender
+			FROM
+			person per,
+			person_org_category cat,
+			person_attribute hphone,
+			person_attribute account,
+			person_attribute chart
+			WHERE
+			per.person_id = cat.person_id(+) AND
+			(per.person_id = hphone.parent_id(+) AND hphone.value_type(+) = 10 AND hphone.item_name(+) = 'Home') AND
+			(per.person_id = account.parent_id(+) AND account.value_type(+) = 0 AND account.item_name(+) = 'Patient/Account Number') AND
+			(per.person_id = chart.parent_id(+) AND chart.value_type(+) = 0 AND chart.item_name(+) = 'Patient/Chart Number') AND
+			cat.org_internal_id = ? AND
+			upper(chart.value_text) like ?
+			and cat.category = 'Staff'
+			ORDER BY upper(per.name_last), upper(per.name_first)
+			)
+			WHERE rownum &lt;= 250
+			
+		</statement>
+
+		<statement name="sel_chart_nurse">
+			
+			SELECT *
+			FROM (
+			SELECT
+			per.person_id,
+			per.name_last,
+			per.name_first,
+			per.ssn,
+			TO_CHAR(per.date_of_birth, 'MM/DD/YYYY') as dob,
+			hphone.value_text AS home_phone,
+			account.value_text as account,
+			chart.value_text as chart,
+			cat.category,
+			initcap(per.simple_name) AS name,
+			(select 1 from dual
+			where exists (select 'x' from transaction t
+			where t.trans_owner_id = per.person_id
+			and t.trans_status = 2
+			and t.trans_type = 8026
+			)
+			) as appt_alert,
+			decode(per.gender, 1, 'M', 2, 'F', '') as gender
+			FROM
+			person per,
+			person_org_category cat,
+			person_attribute hphone,
+			person_attribute account,
+			person_attribute chart
+			WHERE
+			per.person_id = cat.person_id(+) AND
+			(per.person_id = hphone.parent_id(+) AND hphone.value_type(+) = 10 AND hphone.item_name(+) = 'Home') AND
+			(per.person_id = account.parent_id(+) AND account.value_type(+) = 0 AND account.item_name(+) = 'Patient/Account Number') AND
+			(per.person_id = chart.parent_id(+) AND chart.value_type(+) = 0 AND chart.item_name(+) = 'Patient/Chart Number') AND
+			cat.org_internal_id = ? AND
+			upper(chart.value_text) = ?
+			and cat.category = 'Nurse'
+			ORDER BY upper(per.name_last), upper(per.name_first)
+			)
+			WHERE rownum &lt;= 250
+			
+		</statement>
+
+		<statement name="sel_chart_patient">
+			
+			SELECT *
+			FROM (
+			SELECT
+			per.person_id,
+			per.name_last,
+			per.name_first,
+			per.ssn,
+			TO_CHAR(per.date_of_birth, 'MM/DD/YYYY') as dob,
+			hphone.value_text AS home_phone,
+			account.value_text as account,
+			chart.value_text as chart,
+			cat.category,
+			initcap(per.simple_name) AS name,
+			(select 1 from dual
+			where exists (select 'x' from transaction t
+			where t.trans_owner_id = per.person_id
+			and t.trans_status = 2
+			and t.trans_type = 8026
+			)
+			) as appt_alert,
+			decode(per.gender, 1, 'M', 2, 'F', '') as gender
+			FROM
+			person per,
+			person_org_category cat,
+			person_attribute hphone,
+			person_attribute account,
+			person_attribute chart
+			WHERE
+			per.person_id = cat.person_id(+) AND
+			(per.person_id = hphone.parent_id(+) AND hphone.value_type(+) = 10 AND hphone.item_name(+) = 'Home') AND
+			(per.person_id = account.parent_id(+) AND account.value_type(+) = 0 AND account.item_name(+) = 'Patient/Account Number') AND
+			(per.person_id = chart.parent_id(+) AND chart.value_type(+) = 0 AND chart.item_name(+) = 'Patient/Chart Number') AND
+			cat.org_internal_id = ? AND
+			upper(chart.value_text) = ?
+			and cat.category = 'Patient'
+			ORDER BY upper(per.name_last), upper(per.name_first)
+			)
+			WHERE rownum &lt;= 250
+			
+		</statement>
+
+		<statement name="sel_chart_physician">
+			
+			SELECT *
+			FROM (
+			SELECT
+			per.person_id,
+			per.name_last,
+			per.name_first,
+			per.ssn,
+			TO_CHAR(per.date_of_birth, 'MM/DD/YYYY') as dob,
+			hphone.value_text AS home_phone,
+			account.value_text as account,
+			chart.value_text as chart,
+			cat.category,
+			initcap(per.simple_name) AS name,
+			(select 1 from dual
+			where exists (select 'x' from transaction t
+			where t.trans_owner_id = per.person_id
+			and t.trans_status = 2
+			and t.trans_type = 8026
+			)
+			) as appt_alert,
+			decode(per.gender, 1, 'M', 2, 'F', '') as gender
+			FROM
+			person per,
+			person_org_category cat,
+			person_attribute hphone,
+			person_attribute account,
+			person_attribute chart
+			WHERE
+			per.person_id = cat.person_id(+) AND
+			(per.person_id = hphone.parent_id(+) AND hphone.value_type(+) = 10 AND hphone.item_name(+) = 'Home') AND
+			(per.person_id = account.parent_id(+) AND account.value_type(+) = 0 AND account.item_name(+) = 'Patient/Account Number') AND
+			(per.person_id = chart.parent_id(+) AND chart.value_type(+) = 0 AND chart.item_name(+) = 'Patient/Chart Number') AND
+			cat.org_internal_id = ? AND
+			upper(chart.value_text) = ?
+			and cat.category = 'Physician'
+			ORDER BY upper(per.name_last), upper(per.name_first)
+			)
+			WHERE rownum &lt;= 250
+			
+		</statement>
+
+		<statement name="sel_chart_physician-ref">
+			
+			SELECT *
+			FROM (
+			SELECT
+			per.person_id,
+			per.name_last,
+			per.name_first,
+			per.ssn,
+			TO_CHAR(per.date_of_birth, 'MM/DD/YYYY') as dob,
+			hphone.value_text AS home_phone,
+			account.value_text as account,
+			chart.value_text as chart,
+			cat.category,
+			initcap(per.simple_name) AS name,
+			(select 1 from dual
+			where exists (select 'x' from transaction t
+			where t.trans_owner_id = per.person_id
+			and t.trans_status = 2
+			and t.trans_type = 8026
+			)
+			) as appt_alert,
+			decode(per.gender, 1, 'M', 2, 'F', '') as gender
+			FROM
+			person per,
+			person_org_category cat,
+			person_attribute hphone,
+			person_attribute account,
+			person_attribute chart
+			WHERE
+			per.person_id = cat.person_id(+) AND
+			(per.person_id = hphone.parent_id(+) AND hphone.value_type(+) = 10 AND hphone.item_name(+) = 'Home') AND
+			(per.person_id = account.parent_id(+) AND account.value_type(+) = 0 AND account.item_name(+) = 'Patient/Account Number') AND
+			(per.person_id = chart.parent_id(+) AND chart.value_type(+) = 0 AND chart.item_name(+) = 'Patient/Chart Number') AND
+			cat.org_internal_id = ? AND
+			upper(chart.value_text) = ?
+			and cat.category in ('Physician', 'Referring-Doctor')
+			ORDER BY upper(per.name_last), upper(per.name_first)
+			)
+			WHERE rownum &lt;= 250
+			
+		</statement>
+
+		<statement name="sel_chart_referring-Doctor">
+			
+			SELECT *
+			FROM (
+			SELECT
+			per.person_id,
+			per.name_last,
+			per.name_first,
+			per.ssn,
+			TO_CHAR(per.date_of_birth, 'MM/DD/YYYY') as dob,
+			hphone.value_text AS home_phone,
+			account.value_text as account,
+			chart.value_text as chart,
+			cat.category,
+			initcap(per.simple_name) AS name,
+			(select 1 from dual
+			where exists (select 'x' from transaction t
+			where t.trans_owner_id = per.person_id
+			and t.trans_status = 2
+			and t.trans_type = 8026
+			)
+			) as appt_alert,
+			decode(per.gender, 1, 'M', 2, 'F', '') as gender
+			FROM
+			person per,
+			person_org_category cat,
+			person_attribute hphone,
+			person_attribute account,
+			person_attribute chart
+			WHERE
+			per.person_id = cat.person_id(+) AND
+			(per.person_id = hphone.parent_id(+) AND hphone.value_type(+) = 10 AND hphone.item_name(+) = 'Home') AND
+			(per.person_id = account.parent_id(+) AND account.value_type(+) = 0 AND account.item_name(+) = 'Patient/Account Number') AND
+			(per.person_id = chart.parent_id(+) AND chart.value_type(+) = 0 AND chart.item_name(+) = 'Patient/Chart Number') AND
+			cat.org_internal_id = ? AND
+			upper(chart.value_text) = ?
+			and cat.category = 'Referring-Doctor'
+			ORDER BY upper(per.name_last), upper(per.name_first)
+			)
+			WHERE rownum &lt;= 250
+			
+		</statement>
+
+		<statement name="sel_chart_staff">
+			
+			SELECT *
+			FROM (
+			SELECT
+			per.person_id,
+			per.name_last,
+			per.name_first,
+			per.ssn,
+			TO_CHAR(per.date_of_birth, 'MM/DD/YYYY') as dob,
+			hphone.value_text AS home_phone,
+			account.value_text as account,
+			chart.value_text as chart,
+			cat.category,
+			initcap(per.simple_name) AS name,
+			(select 1 from dual
+			where exists (select 'x' from transaction t
+			where t.trans_owner_id = per.person_id
+			and t.trans_status = 2
+			and t.trans_type = 8026
+			)
+			) as appt_alert,
+			decode(per.gender, 1, 'M', 2, 'F', '') as gender
+			FROM
+			person per,
+			person_org_category cat,
+			person_attribute hphone,
+			person_attribute account,
+			person_attribute chart
+			WHERE
+			per.person_id = cat.person_id(+) AND
+			(per.person_id = hphone.parent_id(+) AND hphone.value_type(+) = 10 AND hphone.item_name(+) = 'Home') AND
+			(per.person_id = account.parent_id(+) AND account.value_type(+) = 0 AND account.item_name(+) = 'Patient/Account Number') AND
+			(per.person_id = chart.parent_id(+) AND chart.value_type(+) = 0 AND chart.item_name(+) = 'Patient/Chart Number') AND
+			cat.org_internal_id = ? AND
+			upper(chart.value_text) = ?
+			and cat.category = 'Staff'
+			ORDER BY upper(per.name_last), upper(per.name_first)
+			)
+			WHERE rownum &lt;= 250
+			
+		</statement>
+
+		<statement name="sel_dob">
+			
+			SELECT *
+			FROM (
+			SELECT
+			per.person_id,
+			per.name_last,
+			per.name_first,
+			per.ssn,
+			TO_CHAR(per.date_of_birth, 'MM/DD/YYYY') as dob,
+			hphone.value_text AS home_phone,
+			account.value_text as account,
+			chart.value_text as chart,
+			cat.category,
+			initcap(per.simple_name) AS name,
+			(select 1 from dual
+			where exists (select 'x' from transaction t
+			where t.trans_owner_id = per.person_id
+			and t.trans_status = 2
+			and t.trans_type = 8026
+			)
+			) as appt_alert,
+			decode(per.gender, 1, 'M', 2, 'F', '') as gender
+			FROM
+			person per,
+			person_org_category cat,
+			person_attribute hphone,
+			person_attribute account,
+			person_attribute chart
+			WHERE
+			per.person_id = cat.person_id(+) AND
+			(per.person_id = hphone.parent_id(+) AND hphone.value_type(+) = 10 AND hphone.item_name(+) = 'Home') AND
+			(per.person_id = account.parent_id(+) AND account.value_type(+) = 0 AND account.item_name(+) = 'Patient/Account Number') AND
+			(per.person_id = chart.parent_id(+) AND chart.value_type(+) = 0 AND chart.item_name(+) = 'Patient/Chart Number') AND
+			cat.org_internal_id = ? AND
+			per.date_of_birth = to_date(?, 'MM/DD/YYYY')
+			ORDER BY upper(per.name_last), upper(per.name_first)
+			)
+			WHERE rownum &lt;= 250
+			
+		</statement>
+
+		<statement name="sel_dob_associate">
+			
+			SELECT *
+			FROM (
+			SELECT
+			per.person_id,
+			per.name_last,
+			per.name_first,
+			per.ssn,
+			TO_CHAR(per.date_of_birth, 'MM/DD/YYYY') as dob,
+			hphone.value_text AS home_phone,
+			account.value_text as account,
+			chart.value_text as chart,
+			cat.category,
+			initcap(per.simple_name) AS name,
+			(select 1 from dual
+			where exists (select 'x' from transaction t
+			where t.trans_owner_id = per.person_id
+			and t.trans_status = 2
+			and t.trans_type = 8026
+			)
+			) as appt_alert,
+			decode(per.gender, 1, 'M', 2, 'F', '') as gender
+			FROM
+			person per,
+			person_org_category cat,
+			person_attribute hphone,
+			person_attribute account,
+			person_attribute chart
+			WHERE
+			per.person_id = cat.person_id(+) AND
+			(per.person_id = hphone.parent_id(+) AND hphone.value_type(+) = 10 AND hphone.item_name(+) = 'Home') AND
+			(per.person_id = account.parent_id(+) AND account.value_type(+) = 0 AND account.item_name(+) = 'Patient/Account Number') AND
+			(per.person_id = chart.parent_id(+) AND chart.value_type(+) = 0 AND chart.item_name(+) = 'Patient/Chart Number') AND
+			cat.org_internal_id = ? AND
+			per.date_of_birth = to_date(?, 'MM/DD/YYYY')
+			and cat.category in ('Physician', 'Nurse', 'Staff')
+			ORDER BY upper(per.name_last), upper(per.name_first)
+			)
+			WHERE rownum &lt;= 250
+			
+		</statement>
+
+		<statement name="sel_dob_insured-Person">
+			
+			SELECT *
+			FROM (
+			SELECT
+			per.person_id,
+			per.name_last,
+			per.name_first,
+			per.ssn,
+			TO_CHAR(per.date_of_birth, 'MM/DD/YYYY') as dob,
+			hphone.value_text AS home_phone,
+			account.value_text as account,
+			chart.value_text as chart,
+			cat.category,
+			initcap(per.simple_name) AS name,
+			(select 1 from dual
+			where exists (select 'x' from transaction t
+			where t.trans_owner_id = per.person_id
+			and t.trans_status = 2
+			and t.trans_type = 8026
+			)
+			) as appt_alert,
+			decode(per.gender, 1, 'M', 2, 'F', '') as gender
+			FROM
+			person per,
+			person_org_category cat,
+			person_attribute hphone,
+			person_attribute account,
+			person_attribute chart
+			WHERE
+			per.person_id = cat.person_id(+) AND
+			(per.person_id = hphone.parent_id(+) AND hphone.value_type(+) = 10 AND hphone.item_name(+) = 'Home') AND
+			(per.person_id = account.parent_id(+) AND account.value_type(+) = 0 AND account.item_name(+) = 'Patient/Account Number') AND
+			(per.person_id = chart.parent_id(+) AND chart.value_type(+) = 0 AND chart.item_name(+) = 'Patient/Chart Number') AND
+			cat.org_internal_id = ? AND
+			per.date_of_birth = to_date(?, 'MM/DD/YYYY')
+			and cat.category = 'Insured-Person'
+			ORDER BY upper(per.name_last), upper(per.name_first)
+			)
+			WHERE rownum &lt;= 250
+			
+		</statement>
+
+		<statement name="sel_dob_like">
+			
+			SELECT *
+			FROM (
+			SELECT
+			per.person_id,
+			per.name_last,
+			per.name_first,
+			per.ssn,
+			TO_CHAR(per.date_of_birth, 'MM/DD/YYYY') as dob,
+			hphone.value_text AS home_phone,
+			account.value_text as account,
+			chart.value_text as chart,
+			cat.category,
+			initcap(per.simple_name) AS name,
+			(select 1 from dual
+			where exists (select 'x' from transaction t
+			where t.trans_owner_id = per.person_id
+			and t.trans_status = 2
+			and t.trans_type = 8026
+			)
+			) as appt_alert,
+			decode(per.gender, 1, 'M', 2, 'F', '') as gender
+			FROM
+			person per,
+			person_org_category cat,
+			person_attribute hphone,
+			person_attribute account,
+			person_attribute chart
+			WHERE
+			per.person_id = cat.person_id(+) AND
+			(per.person_id = hphone.parent_id(+) AND hphone.value_type(+) = 10 AND hphone.item_name(+) = 'Home') AND
+			(per.person_id = account.parent_id(+) AND account.value_type(+) = 0 AND account.item_name(+) = 'Patient/Account Number') AND
+			(per.person_id = chart.parent_id(+) AND chart.value_type(+) = 0 AND chart.item_name(+) = 'Patient/Chart Number') AND
+			cat.org_internal_id = ? AND
+			to_char(per.date_of_birth, 'MM/DD/YYYY') like ?
+			ORDER BY upper(per.name_last), upper(per.name_first)
+			)
+			WHERE rownum &lt;= 250
+			
+		</statement>
+
+		<statement name="sel_dob_like_associate">
+			
+			SELECT *
+			FROM (
+			SELECT
+			per.person_id,
+			per.name_last,
+			per.name_first,
+			per.ssn,
+			TO_CHAR(per.date_of_birth, 'MM/DD/YYYY') as dob,
+			hphone.value_text AS home_phone,
+			account.value_text as account,
+			chart.value_text as chart,
+			cat.category,
+			initcap(per.simple_name) AS name,
+			(select 1 from dual
+			where exists (select 'x' from transaction t
+			where t.trans_owner_id = per.person_id
+			and t.trans_status = 2
+			and t.trans_type = 8026
+			)
+			) as appt_alert,
+			decode(per.gender, 1, 'M', 2, 'F', '') as gender
+			FROM
+			person per,
+			person_org_category cat,
+			person_attribute hphone,
+			person_attribute account,
+			person_attribute chart
+			WHERE
+			per.person_id = cat.person_id(+) AND
+			(per.person_id = hphone.parent_id(+) AND hphone.value_type(+) = 10 AND hphone.item_name(+) = 'Home') AND
+			(per.person_id = account.parent_id(+) AND account.value_type(+) = 0 AND account.item_name(+) = 'Patient/Account Number') AND
+			(per.person_id = chart.parent_id(+) AND chart.value_type(+) = 0 AND chart.item_name(+) = 'Patient/Chart Number') AND
+			cat.org_internal_id = ? AND
+			to_char(per.date_of_birth, 'MM/DD/YYYY') like ?
+			and cat.category in ('Physician', 'Nurse', 'Staff')
+			ORDER BY upper(per.name_last), upper(per.name_first)
+			)
+			WHERE rownum &lt;= 250
+			
+		</statement>
+
+		<statement name="sel_dob_like_insured-Person">
+			
+			SELECT *
+			FROM (
+			SELECT
+			per.person_id,
+			per.name_last,
+			per.name_first,
+			per.ssn,
+			TO_CHAR(per.date_of_birth, 'MM/DD/YYYY') as dob,
+			hphone.value_text AS home_phone,
+			account.value_text as account,
+			chart.value_text as chart,
+			cat.category,
+			initcap(per.simple_name) AS name,
+			(select 1 from dual
+			where exists (select 'x' from transaction t
+			where t.trans_owner_id = per.person_id
+			and t.trans_status = 2
+			and t.trans_type = 8026
+			)
+			) as appt_alert,
+			decode(per.gender, 1, 'M', 2, 'F', '') as gender
+			FROM
+			person per,
+			person_org_category cat,
+			person_attribute hphone,
+			person_attribute account,
+			person_attribute chart
+			WHERE
+			per.person_id = cat.person_id(+) AND
+			(per.person_id = hphone.parent_id(+) AND hphone.value_type(+) = 10 AND hphone.item_name(+) = 'Home') AND
+			(per.person_id = account.parent_id(+) AND account.value_type(+) = 0 AND account.item_name(+) = 'Patient/Account Number') AND
+			(per.person_id = chart.parent_id(+) AND chart.value_type(+) = 0 AND chart.item_name(+) = 'Patient/Chart Number') AND
+			cat.org_internal_id = ? AND
+			to_char(per.date_of_birth, 'MM/DD/YYYY') like ?
+			and cat.category = 'Insured-Person'
+			ORDER BY upper(per.name_last), upper(per.name_first)
+			)
+			WHERE rownum &lt;= 250
+			
+		</statement>
+
+		<statement name="sel_dob_like_nurse">
+			
+			SELECT *
+			FROM (
+			SELECT
+			per.person_id,
+			per.name_last,
+			per.name_first,
+			per.ssn,
+			TO_CHAR(per.date_of_birth, 'MM/DD/YYYY') as dob,
+			hphone.value_text AS home_phone,
+			account.value_text as account,
+			chart.value_text as chart,
+			cat.category,
+			initcap(per.simple_name) AS name,
+			(select 1 from dual
+			where exists (select 'x' from transaction t
+			where t.trans_owner_id = per.person_id
+			and t.trans_status = 2
+			and t.trans_type = 8026
+			)
+			) as appt_alert,
+			decode(per.gender, 1, 'M', 2, 'F', '') as gender
+			FROM
+			person per,
+			person_org_category cat,
+			person_attribute hphone,
+			person_attribute account,
+			person_attribute chart
+			WHERE
+			per.person_id = cat.person_id(+) AND
+			(per.person_id = hphone.parent_id(+) AND hphone.value_type(+) = 10 AND hphone.item_name(+) = 'Home') AND
+			(per.person_id = account.parent_id(+) AND account.value_type(+) = 0 AND account.item_name(+) = 'Patient/Account Number') AND
+			(per.person_id = chart.parent_id(+) AND chart.value_type(+) = 0 AND chart.item_name(+) = 'Patient/Chart Number') AND
+			cat.org_internal_id = ? AND
+			to_char(per.date_of_birth, 'MM/DD/YYYY') like ?
+			and cat.category = 'Nurse'
+			ORDER BY upper(per.name_last), upper(per.name_first)
+			)
+			WHERE rownum &lt;= 250
+			
+		</statement>
+
+		<statement name="sel_dob_like_patient">
+			
+			SELECT *
+			FROM (
+			SELECT
+			per.person_id,
+			per.name_last,
+			per.name_first,
+			per.ssn,
+			TO_CHAR(per.date_of_birth, 'MM/DD/YYYY') as dob,
+			hphone.value_text AS home_phone,
+			account.value_text as account,
+			chart.value_text as chart,
+			cat.category,
+			initcap(per.simple_name) AS name,
+			(select 1 from dual
+			where exists (select 'x' from transaction t
+			where t.trans_owner_id = per.person_id
+			and t.trans_status = 2
+			and t.trans_type = 8026
+			)
+			) as appt_alert,
+			decode(per.gender, 1, 'M', 2, 'F', '') as gender
+			FROM
+			person per,
+			person_org_category cat,
+			person_attribute hphone,
+			person_attribute account,
+			person_attribute chart
+			WHERE
+			per.person_id = cat.person_id(+) AND
+			(per.person_id = hphone.parent_id(+) AND hphone.value_type(+) = 10 AND hphone.item_name(+) = 'Home') AND
+			(per.person_id = account.parent_id(+) AND account.value_type(+) = 0 AND account.item_name(+) = 'Patient/Account Number') AND
+			(per.person_id = chart.parent_id(+) AND chart.value_type(+) = 0 AND chart.item_name(+) = 'Patient/Chart Number') AND
+			cat.org_internal_id = ? AND
+			to_char(per.date_of_birth, 'MM/DD/YYYY') like ?
+			and cat.category = 'Patient'
+			ORDER BY upper(per.name_last), upper(per.name_first)
+			)
+			WHERE rownum &lt;= 250
+			
+		</statement>
+
+		<statement name="sel_dob_like_physician">
+			
+			SELECT *
+			FROM (
+			SELECT
+			per.person_id,
+			per.name_last,
+			per.name_first,
+			per.ssn,
+			TO_CHAR(per.date_of_birth, 'MM/DD/YYYY') as dob,
+			hphone.value_text AS home_phone,
+			account.value_text as account,
+			chart.value_text as chart,
+			cat.category,
+			initcap(per.simple_name) AS name,
+			(select 1 from dual
+			where exists (select 'x' from transaction t
+			where t.trans_owner_id = per.person_id
+			and t.trans_status = 2
+			and t.trans_type = 8026
+			)
+			) as appt_alert,
+			decode(per.gender, 1, 'M', 2, 'F', '') as gender
+			FROM
+			person per,
+			person_org_category cat,
+			person_attribute hphone,
+			person_attribute account,
+			person_attribute chart
+			WHERE
+			per.person_id = cat.person_id(+) AND
+			(per.person_id = hphone.parent_id(+) AND hphone.value_type(+) = 10 AND hphone.item_name(+) = 'Home') AND
+			(per.person_id = account.parent_id(+) AND account.value_type(+) = 0 AND account.item_name(+) = 'Patient/Account Number') AND
+			(per.person_id = chart.parent_id(+) AND chart.value_type(+) = 0 AND chart.item_name(+) = 'Patient/Chart Number') AND
+			cat.org_internal_id = ? AND
+			to_char(per.date_of_birth, 'MM/DD/YYYY') like ?
+			and cat.category = 'Physician'
+			ORDER BY upper(per.name_last), upper(per.name_first)
+			)
+			WHERE rownum &lt;= 250
+			
+		</statement>
+
+		<statement name="sel_dob_like_physician-ref">
+			
+			SELECT *
+			FROM (
+			SELECT
+			per.person_id,
+			per.name_last,
+			per.name_first,
+			per.ssn,
+			TO_CHAR(per.date_of_birth, 'MM/DD/YYYY') as dob,
+			hphone.value_text AS home_phone,
+			account.value_text as account,
+			chart.value_text as chart,
+			cat.category,
+			initcap(per.simple_name) AS name,
+			(select 1 from dual
+			where exists (select 'x' from transaction t
+			where t.trans_owner_id = per.person_id
+			and t.trans_status = 2
+			and t.trans_type = 8026
+			)
+			) as appt_alert,
+			decode(per.gender, 1, 'M', 2, 'F', '') as gender
+			FROM
+			person per,
+			person_org_category cat,
+			person_attribute hphone,
+			person_attribute account,
+			person_attribute chart
+			WHERE
+			per.person_id = cat.person_id(+) AND
+			(per.person_id = hphone.parent_id(+) AND hphone.value_type(+) = 10 AND hphone.item_name(+) = 'Home') AND
+			(per.person_id = account.parent_id(+) AND account.value_type(+) = 0 AND account.item_name(+) = 'Patient/Account Number') AND
+			(per.person_id = chart.parent_id(+) AND chart.value_type(+) = 0 AND chart.item_name(+) = 'Patient/Chart Number') AND
+			cat.org_internal_id = ? AND
+			to_char(per.date_of_birth, 'MM/DD/YYYY') like ?
+			and cat.category in ('Physician', 'Referring-Doctor')
+			ORDER BY upper(per.name_last), upper(per.name_first)
+			)
+			WHERE rownum &lt;= 250
+			
+		</statement>
+
+		<statement name="sel_dob_like_referring-Doctor">
+			
+			SELECT *
+			FROM (
+			SELECT
+			per.person_id,
+			per.name_last,
+			per.name_first,
+			per.ssn,
+			TO_CHAR(per.date_of_birth, 'MM/DD/YYYY') as dob,
+			hphone.value_text AS home_phone,
+			account.value_text as account,
+			chart.value_text as chart,
+			cat.category,
+			initcap(per.simple_name) AS name,
+			(select 1 from dual
+			where exists (select 'x' from transaction t
+			where t.trans_owner_id = per.person_id
+			and t.trans_status = 2
+			and t.trans_type = 8026
+			)
+			) as appt_alert,
+			decode(per.gender, 1, 'M', 2, 'F', '') as gender
+			FROM
+			person per,
+			person_org_category cat,
+			person_attribute hphone,
+			person_attribute account,
+			person_attribute chart
+			WHERE
+			per.person_id = cat.person_id(+) AND
+			(per.person_id = hphone.parent_id(+) AND hphone.value_type(+) = 10 AND hphone.item_name(+) = 'Home') AND
+			(per.person_id = account.parent_id(+) AND account.value_type(+) = 0 AND account.item_name(+) = 'Patient/Account Number') AND
+			(per.person_id = chart.parent_id(+) AND chart.value_type(+) = 0 AND chart.item_name(+) = 'Patient/Chart Number') AND
+			cat.org_internal_id = ? AND
+			to_char(per.date_of_birth, 'MM/DD/YYYY') like ?
+			and cat.category = 'Referring-Doctor'
+			ORDER BY upper(per.name_last), upper(per.name_first)
+			)
+			WHERE rownum &lt;= 250
+			
+		</statement>
+
+		<statement name="sel_dob_like_staff">
+			
+			SELECT *
+			FROM (
+			SELECT
+			per.person_id,
+			per.name_last,
+			per.name_first,
+			per.ssn,
+			TO_CHAR(per.date_of_birth, 'MM/DD/YYYY') as dob,
+			hphone.value_text AS home_phone,
+			account.value_text as account,
+			chart.value_text as chart,
+			cat.category,
+			initcap(per.simple_name) AS name,
+			(select 1 from dual
+			where exists (select 'x' from transaction t
+			where t.trans_owner_id = per.person_id
+			and t.trans_status = 2
+			and t.trans_type = 8026
+			)
+			) as appt_alert,
+			decode(per.gender, 1, 'M', 2, 'F', '') as gender
+			FROM
+			person per,
+			person_org_category cat,
+			person_attribute hphone,
+			person_attribute account,
+			person_attribute chart
+			WHERE
+			per.person_id = cat.person_id(+) AND
+			(per.person_id = hphone.parent_id(+) AND hphone.value_type(+) = 10 AND hphone.item_name(+) = 'Home') AND
+			(per.person_id = account.parent_id(+) AND account.value_type(+) = 0 AND account.item_name(+) = 'Patient/Account Number') AND
+			(per.person_id = chart.parent_id(+) AND chart.value_type(+) = 0 AND chart.item_name(+) = 'Patient/Chart Number') AND
+			cat.org_internal_id = ? AND
+			to_char(per.date_of_birth, 'MM/DD/YYYY') like ?
+			and cat.category = 'Staff'
+			ORDER BY upper(per.name_last), upper(per.name_first)
+			)
+			WHERE rownum &lt;= 250
+			
+		</statement>
+
+		<statement name="sel_dob_nurse">
+			
+			SELECT *
+			FROM (
+			SELECT
+			per.person_id,
+			per.name_last,
+			per.name_first,
+			per.ssn,
+			TO_CHAR(per.date_of_birth, 'MM/DD/YYYY') as dob,
+			hphone.value_text AS home_phone,
+			account.value_text as account,
+			chart.value_text as chart,
+			cat.category,
+			initcap(per.simple_name) AS name,
+			(select 1 from dual
+			where exists (select 'x' from transaction t
+			where t.trans_owner_id = per.person_id
+			and t.trans_status = 2
+			and t.trans_type = 8026
+			)
+			) as appt_alert,
+			decode(per.gender, 1, 'M', 2, 'F', '') as gender
+			FROM
+			person per,
+			person_org_category cat,
+			person_attribute hphone,
+			person_attribute account,
+			person_attribute chart
+			WHERE
+			per.person_id = cat.person_id(+) AND
+			(per.person_id = hphone.parent_id(+) AND hphone.value_type(+) = 10 AND hphone.item_name(+) = 'Home') AND
+			(per.person_id = account.parent_id(+) AND account.value_type(+) = 0 AND account.item_name(+) = 'Patient/Account Number') AND
+			(per.person_id = chart.parent_id(+) AND chart.value_type(+) = 0 AND chart.item_name(+) = 'Patient/Chart Number') AND
+			cat.org_internal_id = ? AND
+			per.date_of_birth = to_date(?, 'MM/DD/YYYY')
+			and cat.category = 'Nurse'
+			ORDER BY upper(per.name_last), upper(per.name_first)
+			)
+			WHERE rownum &lt;= 250
+			
+		</statement>
+
+		<statement name="sel_dob_patient">
+			
+			SELECT *
+			FROM (
+			SELECT
+			per.person_id,
+			per.name_last,
+			per.name_first,
+			per.ssn,
+			TO_CHAR(per.date_of_birth, 'MM/DD/YYYY') as dob,
+			hphone.value_text AS home_phone,
+			account.value_text as account,
+			chart.value_text as chart,
+			cat.category,
+			initcap(per.simple_name) AS name,
+			(select 1 from dual
+			where exists (select 'x' from transaction t
+			where t.trans_owner_id = per.person_id
+			and t.trans_status = 2
+			and t.trans_type = 8026
+			)
+			) as appt_alert,
+			decode(per.gender, 1, 'M', 2, 'F', '') as gender
+			FROM
+			person per,
+			person_org_category cat,
+			person_attribute hphone,
+			person_attribute account,
+			person_attribute chart
+			WHERE
+			per.person_id = cat.person_id(+) AND
+			(per.person_id = hphone.parent_id(+) AND hphone.value_type(+) = 10 AND hphone.item_name(+) = 'Home') AND
+			(per.person_id = account.parent_id(+) AND account.value_type(+) = 0 AND account.item_name(+) = 'Patient/Account Number') AND
+			(per.person_id = chart.parent_id(+) AND chart.value_type(+) = 0 AND chart.item_name(+) = 'Patient/Chart Number') AND
+			cat.org_internal_id = ? AND
+			per.date_of_birth = to_date(?, 'MM/DD/YYYY')
+			and cat.category = 'Patient'
+			ORDER BY upper(per.name_last), upper(per.name_first)
+			)
+			WHERE rownum &lt;= 250
+			
+		</statement>
+
+		<statement name="sel_dob_physician">
+			
+			SELECT *
+			FROM (
+			SELECT
+			per.person_id,
+			per.name_last,
+			per.name_first,
+			per.ssn,
+			TO_CHAR(per.date_of_birth, 'MM/DD/YYYY') as dob,
+			hphone.value_text AS home_phone,
+			account.value_text as account,
+			chart.value_text as chart,
+			cat.category,
+			initcap(per.simple_name) AS name,
+			(select 1 from dual
+			where exists (select 'x' from transaction t
+			where t.trans_owner_id = per.person_id
+			and t.trans_status = 2
+			and t.trans_type = 8026
+			)
+			) as appt_alert,
+			decode(per.gender, 1, 'M', 2, 'F', '') as gender
+			FROM
+			person per,
+			person_org_category cat,
+			person_attribute hphone,
+			person_attribute account,
+			person_attribute chart
+			WHERE
+			per.person_id = cat.person_id(+) AND
+			(per.person_id = hphone.parent_id(+) AND hphone.value_type(+) = 10 AND hphone.item_name(+) = 'Home') AND
+			(per.person_id = account.parent_id(+) AND account.value_type(+) = 0 AND account.item_name(+) = 'Patient/Account Number') AND
+			(per.person_id = chart.parent_id(+) AND chart.value_type(+) = 0 AND chart.item_name(+) = 'Patient/Chart Number') AND
+			cat.org_internal_id = ? AND
+			per.date_of_birth = to_date(?, 'MM/DD/YYYY')
+			and cat.category = 'Physician'
+			ORDER BY upper(per.name_last), upper(per.name_first)
+			)
+			WHERE rownum &lt;= 250
+			
+		</statement>
+
+		<statement name="sel_dob_physician-ref">
+			
+			SELECT *
+			FROM (
+			SELECT
+			per.person_id,
+			per.name_last,
+			per.name_first,
+			per.ssn,
+			TO_CHAR(per.date_of_birth, 'MM/DD/YYYY') as dob,
+			hphone.value_text AS home_phone,
+			account.value_text as account,
+			chart.value_text as chart,
+			cat.category,
+			initcap(per.simple_name) AS name,
+			(select 1 from dual
+			where exists (select 'x' from transaction t
+			where t.trans_owner_id = per.person_id
+			and t.trans_status = 2
+			and t.trans_type = 8026
+			)
+			) as appt_alert,
+			decode(per.gender, 1, 'M', 2, 'F', '') as gender
+			FROM
+			person per,
+			person_org_category cat,
+			person_attribute hphone,
+			person_attribute account,
+			person_attribute chart
+			WHERE
+			per.person_id = cat.person_id(+) AND
+			(per.person_id = hphone.parent_id(+) AND hphone.value_type(+) = 10 AND hphone.item_name(+) = 'Home') AND
+			(per.person_id = account.parent_id(+) AND account.value_type(+) = 0 AND account.item_name(+) = 'Patient/Account Number') AND
+			(per.person_id = chart.parent_id(+) AND chart.value_type(+) = 0 AND chart.item_name(+) = 'Patient/Chart Number') AND
+			cat.org_internal_id = ? AND
+			per.date_of_birth = to_date(?, 'MM/DD/YYYY')
+			and cat.category in ('Physician', 'Referring-Doctor')
+			ORDER BY upper(per.name_last), upper(per.name_first)
+			)
+			WHERE rownum &lt;= 250
+			
+		</statement>
+
+		<statement name="sel_dob_referring-Doctor">
+			
+			SELECT *
+			FROM (
+			SELECT
+			per.person_id,
+			per.name_last,
+			per.name_first,
+			per.ssn,
+			TO_CHAR(per.date_of_birth, 'MM/DD/YYYY') as dob,
+			hphone.value_text AS home_phone,
+			account.value_text as account,
+			chart.value_text as chart,
+			cat.category,
+			initcap(per.simple_name) AS name,
+			(select 1 from dual
+			where exists (select 'x' from transaction t
+			where t.trans_owner_id = per.person_id
+			and t.trans_status = 2
+			and t.trans_type = 8026
+			)
+			) as appt_alert,
+			decode(per.gender, 1, 'M', 2, 'F', '') as gender
+			FROM
+			person per,
+			person_org_category cat,
+			person_attribute hphone,
+			person_attribute account,
+			person_attribute chart
+			WHERE
+			per.person_id = cat.person_id(+) AND
+			(per.person_id = hphone.parent_id(+) AND hphone.value_type(+) = 10 AND hphone.item_name(+) = 'Home') AND
+			(per.person_id = account.parent_id(+) AND account.value_type(+) = 0 AND account.item_name(+) = 'Patient/Account Number') AND
+			(per.person_id = chart.parent_id(+) AND chart.value_type(+) = 0 AND chart.item_name(+) = 'Patient/Chart Number') AND
+			cat.org_internal_id = ? AND
+			per.date_of_birth = to_date(?, 'MM/DD/YYYY')
+			and cat.category = 'Referring-Doctor'
+			ORDER BY upper(per.name_last), upper(per.name_first)
+			)
+			WHERE rownum &lt;= 250
+			
+		</statement>
+
+		<statement name="sel_dob_staff">
+			
+			SELECT *
+			FROM (
+			SELECT
+			per.person_id,
+			per.name_last,
+			per.name_first,
+			per.ssn,
+			TO_CHAR(per.date_of_birth, 'MM/DD/YYYY') as dob,
+			hphone.value_text AS home_phone,
+			account.value_text as account,
+			chart.value_text as chart,
+			cat.category,
+			initcap(per.simple_name) AS name,
+			(select 1 from dual
+			where exists (select 'x' from transaction t
+			where t.trans_owner_id = per.person_id
+			and t.trans_status = 2
+			and t.trans_type = 8026
+			)
+			) as appt_alert,
+			decode(per.gender, 1, 'M', 2, 'F', '') as gender
+			FROM
+			person per,
+			person_org_category cat,
+			person_attribute hphone,
+			person_attribute account,
+			person_attribute chart
+			WHERE
+			per.person_id = cat.person_id(+) AND
+			(per.person_id = hphone.parent_id(+) AND hphone.value_type(+) = 10 AND hphone.item_name(+) = 'Home') AND
+			(per.person_id = account.parent_id(+) AND account.value_type(+) = 0 AND account.item_name(+) = 'Patient/Account Number') AND
+			(per.person_id = chart.parent_id(+) AND chart.value_type(+) = 0 AND chart.item_name(+) = 'Patient/Chart Number') AND
+			cat.org_internal_id = ? AND
+			per.date_of_birth = to_date(?, 'MM/DD/YYYY')
+			and cat.category = 'Staff'
+			ORDER BY upper(per.name_last), upper(per.name_first)
+			)
+			WHERE rownum &lt;= 250
+			
+		</statement>
+
+		<statement name="sel_id">
+			
+			SELECT *
+			FROM (
+			SELECT
+			per.person_id,
+			per.name_last,
+			per.name_first,
+			per.ssn,
+			TO_CHAR(per.date_of_birth, 'MM/DD/YYYY') as dob,
+			hphone.value_text AS home_phone,
+			account.value_text as account,
+			chart.value_text as chart,
+			cat.category,
+			initcap(per.simple_name) AS name,
+			(select 1 from dual
+			where exists (select 'x' from transaction t
+			where t.trans_owner_id = per.person_id
+			and t.trans_status = 2
+			and t.trans_type = 8026
+			)
+			) as appt_alert,
+			decode(per.gender, 1, 'M', 2, 'F', '') as gender
+			FROM
+			person per,
+			person_org_category cat,
+			person_attribute hphone,
+			person_attribute account,
+			person_attribute chart
+			WHERE
+			per.person_id = cat.person_id(+) AND
+			(per.person_id = hphone.parent_id(+) AND hphone.value_type(+) = 10 AND hphone.item_name(+) = 'Home') AND
+			(per.person_id = account.parent_id(+) AND account.value_type(+) = 0 AND account.item_name(+) = 'Patient/Account Number') AND
+			(per.person_id = chart.parent_id(+) AND chart.value_type(+) = 0 AND chart.item_name(+) = 'Patient/Chart Number') AND
+			cat.org_internal_id = ? AND
+			per.person_id = ?
+			order by per.person_id
+			)
+			WHERE rownum &lt;= 250
+			
+		</statement>
+
+		<statement name="sel_id_associate">
+			
+			SELECT *
+			FROM (
+			SELECT
+			per.person_id,
+			per.name_last,
+			per.name_first,
+			per.ssn,
+			TO_CHAR(per.date_of_birth, 'MM/DD/YYYY') as dob,
+			hphone.value_text AS home_phone,
+			account.value_text as account,
+			chart.value_text as chart,
+			cat.category,
+			initcap(per.simple_name) AS name,
+			(select 1 from dual
+			where exists (select 'x' from transaction t
+			where t.trans_owner_id = per.person_id
+			and t.trans_status = 2
+			and t.trans_type = 8026
+			)
+			) as appt_alert,
+			decode(per.gender, 1, 'M', 2, 'F', '') as gender
+			FROM
+			person per,
+			person_org_category cat,
+			person_attribute hphone,
+			person_attribute account,
+			person_attribute chart
+			WHERE
+			per.person_id = cat.person_id(+) AND
+			(per.person_id = hphone.parent_id(+) AND hphone.value_type(+) = 10 AND hphone.item_name(+) = 'Home') AND
+			(per.person_id = account.parent_id(+) AND account.value_type(+) = 0 AND account.item_name(+) = 'Patient/Account Number') AND
+			(per.person_id = chart.parent_id(+) AND chart.value_type(+) = 0 AND chart.item_name(+) = 'Patient/Chart Number') AND
+			cat.org_internal_id = ? AND
+			per.person_id = ?
+			and cat.category in ('Physician', 'Nurse', 'Staff')
+			order by per.person_id
+			)
+			WHERE rownum &lt;= 250
+			
+		</statement>
+
+		<statement name="sel_id_insured-Person">
+			
+			SELECT *
+			FROM (
+			SELECT
+			per.person_id,
+			per.name_last,
+			per.name_first,
+			per.ssn,
+			TO_CHAR(per.date_of_birth, 'MM/DD/YYYY') as dob,
+			hphone.value_text AS home_phone,
+			account.value_text as account,
+			chart.value_text as chart,
+			cat.category,
+			initcap(per.simple_name) AS name,
+			(select 1 from dual
+			where exists (select 'x' from transaction t
+			where t.trans_owner_id = per.person_id
+			and t.trans_status = 2
+			and t.trans_type = 8026
+			)
+			) as appt_alert,
+			decode(per.gender, 1, 'M', 2, 'F', '') as gender
+			FROM
+			person per,
+			person_org_category cat,
+			person_attribute hphone,
+			person_attribute account,
+			person_attribute chart
+			WHERE
+			per.person_id = cat.person_id(+) AND
+			(per.person_id = hphone.parent_id(+) AND hphone.value_type(+) = 10 AND hphone.item_name(+) = 'Home') AND
+			(per.person_id = account.parent_id(+) AND account.value_type(+) = 0 AND account.item_name(+) = 'Patient/Account Number') AND
+			(per.person_id = chart.parent_id(+) AND chart.value_type(+) = 0 AND chart.item_name(+) = 'Patient/Chart Number') AND
+			cat.org_internal_id = ? AND
+			per.person_id = ?
+			and cat.category = 'Insured-Person'
+			order by per.person_id
+			)
+			WHERE rownum &lt;= 250
+			
+		</statement>
+
+		<statement name="sel_id_like">
+			
+			SELECT *
+			FROM (
+			SELECT
+			per.person_id,
+			per.name_last,
+			per.name_first,
+			per.ssn,
+			TO_CHAR(per.date_of_birth, 'MM/DD/YYYY') as dob,
+			hphone.value_text AS home_phone,
+			account.value_text as account,
+			chart.value_text as chart,
+			cat.category,
+			initcap(per.simple_name) AS name,
+			(select 1 from dual
+			where exists (select 'x' from transaction t
+			where t.trans_owner_id = per.person_id
+			and t.trans_status = 2
+			and t.trans_type = 8026
+			)
+			) as appt_alert,
+			decode(per.gender, 1, 'M', 2, 'F', '') as gender
+			FROM
+			person per,
+			person_org_category cat,
+			person_attribute hphone,
+			person_attribute account,
+			person_attribute chart
+			WHERE
+			per.person_id = cat.person_id(+) AND
+			(per.person_id = hphone.parent_id(+) AND hphone.value_type(+) = 10 AND hphone.item_name(+) = 'Home') AND
+			(per.person_id = account.parent_id(+) AND account.value_type(+) = 0 AND account.item_name(+) = 'Patient/Account Number') AND
+			(per.person_id = chart.parent_id(+) AND chart.value_type(+) = 0 AND chart.item_name(+) = 'Patient/Chart Number') AND
+			cat.org_internal_id = ? AND
+			per.person_id like ?
+			order by per.person_id
+			)
+			WHERE rownum &lt;= 250
+			
+		</statement>
+
+		<statement name="sel_id_like_associate">
+			
+			SELECT *
+			FROM (
+			SELECT
+			per.person_id,
+			per.name_last,
+			per.name_first,
+			per.ssn,
+			TO_CHAR(per.date_of_birth, 'MM/DD/YYYY') as dob,
+			hphone.value_text AS home_phone,
+			account.value_text as account,
+			chart.value_text as chart,
+			cat.category,
+			initcap(per.simple_name) AS name,
+			(select 1 from dual
+			where exists (select 'x' from transaction t
+			where t.trans_owner_id = per.person_id
+			and t.trans_status = 2
+			and t.trans_type = 8026
+			)
+			) as appt_alert,
+			decode(per.gender, 1, 'M', 2, 'F', '') as gender
+			FROM
+			person per,
+			person_org_category cat,
+			person_attribute hphone,
+			person_attribute account,
+			person_attribute chart
+			WHERE
+			per.person_id = cat.person_id(+) AND
+			(per.person_id = hphone.parent_id(+) AND hphone.value_type(+) = 10 AND hphone.item_name(+) = 'Home') AND
+			(per.person_id = account.parent_id(+) AND account.value_type(+) = 0 AND account.item_name(+) = 'Patient/Account Number') AND
+			(per.person_id = chart.parent_id(+) AND chart.value_type(+) = 0 AND chart.item_name(+) = 'Patient/Chart Number') AND
+			cat.org_internal_id = ? AND
+			per.person_id like ?
+			and cat.category in ('Physician', 'Nurse', 'Staff')
+			order by per.person_id
+			)
+			WHERE rownum &lt;= 250
+			
+		</statement>
+
+		<statement name="sel_id_like_insured-Person">
+			
+			SELECT *
+			FROM (
+			SELECT
+			per.person_id,
+			per.name_last,
+			per.name_first,
+			per.ssn,
+			TO_CHAR(per.date_of_birth, 'MM/DD/YYYY') as dob,
+			hphone.value_text AS home_phone,
+			account.value_text as account,
+			chart.value_text as chart,
+			cat.category,
+			initcap(per.simple_name) AS name,
+			(select 1 from dual
+			where exists (select 'x' from transaction t
+			where t.trans_owner_id = per.person_id
+			and t.trans_status = 2
+			and t.trans_type = 8026
+			)
+			) as appt_alert,
+			decode(per.gender, 1, 'M', 2, 'F', '') as gender
+			FROM
+			person per,
+			person_org_category cat,
+			person_attribute hphone,
+			person_attribute account,
+			person_attribute chart
+			WHERE
+			per.person_id = cat.person_id(+) AND
+			(per.person_id = hphone.parent_id(+) AND hphone.value_type(+) = 10 AND hphone.item_name(+) = 'Home') AND
+			(per.person_id = account.parent_id(+) AND account.value_type(+) = 0 AND account.item_name(+) = 'Patient/Account Number') AND
+			(per.person_id = chart.parent_id(+) AND chart.value_type(+) = 0 AND chart.item_name(+) = 'Patient/Chart Number') AND
+			cat.org_internal_id = ? AND
+			per.person_id like ?
+			and cat.category = 'Insured-Person'
+			order by per.person_id
+			)
+			WHERE rownum &lt;= 250
+			
+		</statement>
+
+		<statement name="sel_id_like_nurse">
+			
+			SELECT *
+			FROM (
+			SELECT
+			per.person_id,
+			per.name_last,
+			per.name_first,
+			per.ssn,
+			TO_CHAR(per.date_of_birth, 'MM/DD/YYYY') as dob,
+			hphone.value_text AS home_phone,
+			account.value_text as account,
+			chart.value_text as chart,
+			cat.category,
+			initcap(per.simple_name) AS name,
+			(select 1 from dual
+			where exists (select 'x' from transaction t
+			where t.trans_owner_id = per.person_id
+			and t.trans_status = 2
+			and t.trans_type = 8026
+			)
+			) as appt_alert,
+			decode(per.gender, 1, 'M', 2, 'F', '') as gender
+			FROM
+			person per,
+			person_org_category cat,
+			person_attribute hphone,
+			person_attribute account,
+			person_attribute chart
+			WHERE
+			per.person_id = cat.person_id(+) AND
+			(per.person_id = hphone.parent_id(+) AND hphone.value_type(+) = 10 AND hphone.item_name(+) = 'Home') AND
+			(per.person_id = account.parent_id(+) AND account.value_type(+) = 0 AND account.item_name(+) = 'Patient/Account Number') AND
+			(per.person_id = chart.parent_id(+) AND chart.value_type(+) = 0 AND chart.item_name(+) = 'Patient/Chart Number') AND
+			cat.org_internal_id = ? AND
+			per.person_id like ?
+			and cat.category = 'Nurse'
+			order by per.person_id
+			)
+			WHERE rownum &lt;= 250
+			
+		</statement>
+
+		<statement name="sel_id_like_patient">
+			
+			SELECT *
+			FROM (
+			SELECT
+			per.person_id,
+			per.name_last,
+			per.name_first,
+			per.ssn,
+			TO_CHAR(per.date_of_birth, 'MM/DD/YYYY') as dob,
+			hphone.value_text AS home_phone,
+			account.value_text as account,
+			chart.value_text as chart,
+			cat.category,
+			initcap(per.simple_name) AS name,
+			(select 1 from dual
+			where exists (select 'x' from transaction t
+			where t.trans_owner_id = per.person_id
+			and t.trans_status = 2
+			and t.trans_type = 8026
+			)
+			) as appt_alert,
+			decode(per.gender, 1, 'M', 2, 'F', '') as gender
+			FROM
+			person per,
+			person_org_category cat,
+			person_attribute hphone,
+			person_attribute account,
+			person_attribute chart
+			WHERE
+			per.person_id = cat.person_id(+) AND
+			(per.person_id = hphone.parent_id(+) AND hphone.value_type(+) = 10 AND hphone.item_name(+) = 'Home') AND
+			(per.person_id = account.parent_id(+) AND account.value_type(+) = 0 AND account.item_name(+) = 'Patient/Account Number') AND
+			(per.person_id = chart.parent_id(+) AND chart.value_type(+) = 0 AND chart.item_name(+) = 'Patient/Chart Number') AND
+			cat.org_internal_id = ? AND
+			per.person_id like ?
+			and cat.category = 'Patient'
+			order by per.person_id
+			)
+			WHERE rownum &lt;= 250
+			
+		</statement>
+
+		<statement name="sel_id_like_physician">
+			
+			SELECT *
+			FROM (
+			SELECT
+			per.person_id,
+			per.name_last,
+			per.name_first,
+			per.ssn,
+			TO_CHAR(per.date_of_birth, 'MM/DD/YYYY') as dob,
+			hphone.value_text AS home_phone,
+			account.value_text as account,
+			chart.value_text as chart,
+			cat.category,
+			initcap(per.simple_name) AS name,
+			(select 1 from dual
+			where exists (select 'x' from transaction t
+			where t.trans_owner_id = per.person_id
+			and t.trans_status = 2
+			and t.trans_type = 8026
+			)
+			) as appt_alert,
+			decode(per.gender, 1, 'M', 2, 'F', '') as gender
+			FROM
+			person per,
+			person_org_category cat,
+			person_attribute hphone,
+			person_attribute account,
+			person_attribute chart
+			WHERE
+			per.person_id = cat.person_id(+) AND
+			(per.person_id = hphone.parent_id(+) AND hphone.value_type(+) = 10 AND hphone.item_name(+) = 'Home') AND
+			(per.person_id = account.parent_id(+) AND account.value_type(+) = 0 AND account.item_name(+) = 'Patient/Account Number') AND
+			(per.person_id = chart.parent_id(+) AND chart.value_type(+) = 0 AND chart.item_name(+) = 'Patient/Chart Number') AND
+			cat.org_internal_id = ? AND
+			per.person_id like ?
+			and cat.category = 'Physician'
+			order by per.person_id
+			)
+			WHERE rownum &lt;= 250
+			
+		</statement>
+
+		<statement name="sel_id_like_physician-ref">
+			
+			SELECT *
+			FROM (
+			SELECT
+			per.person_id,
+			per.name_last,
+			per.name_first,
+			per.ssn,
+			TO_CHAR(per.date_of_birth, 'MM/DD/YYYY') as dob,
+			hphone.value_text AS home_phone,
+			account.value_text as account,
+			chart.value_text as chart,
+			cat.category,
+			initcap(per.simple_name) AS name,
+			(select 1 from dual
+			where exists (select 'x' from transaction t
+			where t.trans_owner_id = per.person_id
+			and t.trans_status = 2
+			and t.trans_type = 8026
+			)
+			) as appt_alert,
+			decode(per.gender, 1, 'M', 2, 'F', '') as gender
+			FROM
+			person per,
+			person_org_category cat,
+			person_attribute hphone,
+			person_attribute account,
+			person_attribute chart
+			WHERE
+			per.person_id = cat.person_id(+) AND
+			(per.person_id = hphone.parent_id(+) AND hphone.value_type(+) = 10 AND hphone.item_name(+) = 'Home') AND
+			(per.person_id = account.parent_id(+) AND account.value_type(+) = 0 AND account.item_name(+) = 'Patient/Account Number') AND
+			(per.person_id = chart.parent_id(+) AND chart.value_type(+) = 0 AND chart.item_name(+) = 'Patient/Chart Number') AND
+			cat.org_internal_id = ? AND
+			per.person_id like ?
+			and cat.category in ('Physician', 'Referring-Doctor')
+			order by per.person_id
+			)
+			WHERE rownum &lt;= 250
+			
+		</statement>
+
+		<statement name="sel_id_like_referring-Doctor">
+			
+			SELECT *
+			FROM (
+			SELECT
+			per.person_id,
+			per.name_last,
+			per.name_first,
+			per.ssn,
+			TO_CHAR(per.date_of_birth, 'MM/DD/YYYY') as dob,
+			hphone.value_text AS home_phone,
+			account.value_text as account,
+			chart.value_text as chart,
+			cat.category,
+			initcap(per.simple_name) AS name,
+			(select 1 from dual
+			where exists (select 'x' from transaction t
+			where t.trans_owner_id = per.person_id
+			and t.trans_status = 2
+			and t.trans_type = 8026
+			)
+			) as appt_alert,
+			decode(per.gender, 1, 'M', 2, 'F', '') as gender
+			FROM
+			person per,
+			person_org_category cat,
+			person_attribute hphone,
+			person_attribute account,
+			person_attribute chart
+			WHERE
+			per.person_id = cat.person_id(+) AND
+			(per.person_id = hphone.parent_id(+) AND hphone.value_type(+) = 10 AND hphone.item_name(+) = 'Home') AND
+			(per.person_id = account.parent_id(+) AND account.value_type(+) = 0 AND account.item_name(+) = 'Patient/Account Number') AND
+			(per.person_id = chart.parent_id(+) AND chart.value_type(+) = 0 AND chart.item_name(+) = 'Patient/Chart Number') AND
+			cat.org_internal_id = ? AND
+			per.person_id like ?
+			and cat.category = 'Referring-Doctor'
+			order by per.person_id
+			)
+			WHERE rownum &lt;= 250
+			
+		</statement>
+
+		<statement name="sel_id_like_staff">
+			
+			SELECT *
+			FROM (
+			SELECT
+			per.person_id,
+			per.name_last,
+			per.name_first,
+			per.ssn,
+			TO_CHAR(per.date_of_birth, 'MM/DD/YYYY') as dob,
+			hphone.value_text AS home_phone,
+			account.value_text as account,
+			chart.value_text as chart,
+			cat.category,
+			initcap(per.simple_name) AS name,
+			(select 1 from dual
+			where exists (select 'x' from transaction t
+			where t.trans_owner_id = per.person_id
+			and t.trans_status = 2
+			and t.trans_type = 8026
+			)
+			) as appt_alert,
+			decode(per.gender, 1, 'M', 2, 'F', '') as gender
+			FROM
+			person per,
+			person_org_category cat,
+			person_attribute hphone,
+			person_attribute account,
+			person_attribute chart
+			WHERE
+			per.person_id = cat.person_id(+) AND
+			(per.person_id = hphone.parent_id(+) AND hphone.value_type(+) = 10 AND hphone.item_name(+) = 'Home') AND
+			(per.person_id = account.parent_id(+) AND account.value_type(+) = 0 AND account.item_name(+) = 'Patient/Account Number') AND
+			(per.person_id = chart.parent_id(+) AND chart.value_type(+) = 0 AND chart.item_name(+) = 'Patient/Chart Number') AND
+			cat.org_internal_id = ? AND
+			per.person_id like ?
+			and cat.category = 'Staff'
+			order by per.person_id
+			)
+			WHERE rownum &lt;= 250
+			
+		</statement>
+
+		<statement name="sel_id_nurse">
+			
+			SELECT *
+			FROM (
+			SELECT
+			per.person_id,
+			per.name_last,
+			per.name_first,
+			per.ssn,
+			TO_CHAR(per.date_of_birth, 'MM/DD/YYYY') as dob,
+			hphone.value_text AS home_phone,
+			account.value_text as account,
+			chart.value_text as chart,
+			cat.category,
+			initcap(per.simple_name) AS name,
+			(select 1 from dual
+			where exists (select 'x' from transaction t
+			where t.trans_owner_id = per.person_id
+			and t.trans_status = 2
+			and t.trans_type = 8026
+			)
+			) as appt_alert,
+			decode(per.gender, 1, 'M', 2, 'F', '') as gender
+			FROM
+			person per,
+			person_org_category cat,
+			person_attribute hphone,
+			person_attribute account,
+			person_attribute chart
+			WHERE
+			per.person_id = cat.person_id(+) AND
+			(per.person_id = hphone.parent_id(+) AND hphone.value_type(+) = 10 AND hphone.item_name(+) = 'Home') AND
+			(per.person_id = account.parent_id(+) AND account.value_type(+) = 0 AND account.item_name(+) = 'Patient/Account Number') AND
+			(per.person_id = chart.parent_id(+) AND chart.value_type(+) = 0 AND chart.item_name(+) = 'Patient/Chart Number') AND
+			cat.org_internal_id = ? AND
+			per.person_id = ?
+			and cat.category = 'Nurse'
+			order by per.person_id
+			)
+			WHERE rownum &lt;= 250
+			
+		</statement>
+
+		<statement name="sel_id_patient">
+			
+			SELECT *
+			FROM (
+			SELECT
+			per.person_id,
+			per.name_last,
+			per.name_first,
+			per.ssn,
+			TO_CHAR(per.date_of_birth, 'MM/DD/YYYY') as dob,
+			hphone.value_text AS home_phone,
+			account.value_text as account,
+			chart.value_text as chart,
+			cat.category,
+			initcap(per.simple_name) AS name,
+			(select 1 from dual
+			where exists (select 'x' from transaction t
+			where t.trans_owner_id = per.person_id
+			and t.trans_status = 2
+			and t.trans_type = 8026
+			)
+			) as appt_alert,
+			decode(per.gender, 1, 'M', 2, 'F', '') as gender
+			FROM
+			person per,
+			person_org_category cat,
+			person_attribute hphone,
+			person_attribute account,
+			person_attribute chart
+			WHERE
+			per.person_id = cat.person_id(+) AND
+			(per.person_id = hphone.parent_id(+) AND hphone.value_type(+) = 10 AND hphone.item_name(+) = 'Home') AND
+			(per.person_id = account.parent_id(+) AND account.value_type(+) = 0 AND account.item_name(+) = 'Patient/Account Number') AND
+			(per.person_id = chart.parent_id(+) AND chart.value_type(+) = 0 AND chart.item_name(+) = 'Patient/Chart Number') AND
+			cat.org_internal_id = ? AND
+			per.person_id = ?
+			and cat.category = 'Patient'
+			order by per.person_id
+			)
+			WHERE rownum &lt;= 250
+			
+		</statement>
+
+		<statement name="sel_id_physician">
+			
+			SELECT *
+			FROM (
+			SELECT
+			per.person_id,
+			per.name_last,
+			per.name_first,
+			per.ssn,
+			TO_CHAR(per.date_of_birth, 'MM/DD/YYYY') as dob,
+			hphone.value_text AS home_phone,
+			account.value_text as account,
+			chart.value_text as chart,
+			cat.category,
+			initcap(per.simple_name) AS name,
+			(select 1 from dual
+			where exists (select 'x' from transaction t
+			where t.trans_owner_id = per.person_id
+			and t.trans_status = 2
+			and t.trans_type = 8026
+			)
+			) as appt_alert,
+			decode(per.gender, 1, 'M', 2, 'F', '') as gender
+			FROM
+			person per,
+			person_org_category cat,
+			person_attribute hphone,
+			person_attribute account,
+			person_attribute chart
+			WHERE
+			per.person_id = cat.person_id(+) AND
+			(per.person_id = hphone.parent_id(+) AND hphone.value_type(+) = 10 AND hphone.item_name(+) = 'Home') AND
+			(per.person_id = account.parent_id(+) AND account.value_type(+) = 0 AND account.item_name(+) = 'Patient/Account Number') AND
+			(per.person_id = chart.parent_id(+) AND chart.value_type(+) = 0 AND chart.item_name(+) = 'Patient/Chart Number') AND
+			cat.org_internal_id = ? AND
+			per.person_id = ?
+			and cat.category = 'Physician'
+			order by per.person_id
+			)
+			WHERE rownum &lt;= 250
+			
+		</statement>
+
+		<statement name="sel_id_physician-ref">
+			
+			SELECT *
+			FROM (
+			SELECT
+			per.person_id,
+			per.name_last,
+			per.name_first,
+			per.ssn,
+			TO_CHAR(per.date_of_birth, 'MM/DD/YYYY') as dob,
+			hphone.value_text AS home_phone,
+			account.value_text as account,
+			chart.value_text as chart,
+			cat.category,
+			initcap(per.simple_name) AS name,
+			(select 1 from dual
+			where exists (select 'x' from transaction t
+			where t.trans_owner_id = per.person_id
+			and t.trans_status = 2
+			and t.trans_type = 8026
+			)
+			) as appt_alert,
+			decode(per.gender, 1, 'M', 2, 'F', '') as gender
+			FROM
+			person per,
+			person_org_category cat,
+			person_attribute hphone,
+			person_attribute account,
+			person_attribute chart
+			WHERE
+			per.person_id = cat.person_id(+) AND
+			(per.person_id = hphone.parent_id(+) AND hphone.value_type(+) = 10 AND hphone.item_name(+) = 'Home') AND
+			(per.person_id = account.parent_id(+) AND account.value_type(+) = 0 AND account.item_name(+) = 'Patient/Account Number') AND
+			(per.person_id = chart.parent_id(+) AND chart.value_type(+) = 0 AND chart.item_name(+) = 'Patient/Chart Number') AND
+			cat.org_internal_id = ? AND
+			per.person_id = ?
+			and cat.category in ('Physician', 'Referring-Doctor')
+			order by per.person_id
+			)
+			WHERE rownum &lt;= 250
+			
+		</statement>
+
+		<statement name="sel_id_referring-Doctor">
+			
+			SELECT *
+			FROM (
+			SELECT
+			per.person_id,
+			per.name_last,
+			per.name_first,
+			per.ssn,
+			TO_CHAR(per.date_of_birth, 'MM/DD/YYYY') as dob,
+			hphone.value_text AS home_phone,
+			account.value_text as account,
+			chart.value_text as chart,
+			cat.category,
+			initcap(per.simple_name) AS name,
+			(select 1 from dual
+			where exists (select 'x' from transaction t
+			where t.trans_owner_id = per.person_id
+			and t.trans_status = 2
+			and t.trans_type = 8026
+			)
+			) as appt_alert,
+			decode(per.gender, 1, 'M', 2, 'F', '') as gender
+			FROM
+			person per,
+			person_org_category cat,
+			person_attribute hphone,
+			person_attribute account,
+			person_attribute chart
+			WHERE
+			per.person_id = cat.person_id(+) AND
+			(per.person_id = hphone.parent_id(+) AND hphone.value_type(+) = 10 AND hphone.item_name(+) = 'Home') AND
+			(per.person_id = account.parent_id(+) AND account.value_type(+) = 0 AND account.item_name(+) = 'Patient/Account Number') AND
+			(per.person_id = chart.parent_id(+) AND chart.value_type(+) = 0 AND chart.item_name(+) = 'Patient/Chart Number') AND
+			cat.org_internal_id = ? AND
+			per.person_id = ?
+			and cat.category = 'Referring-Doctor'
+			order by per.person_id
+			)
+			WHERE rownum &lt;= 250
+			
+		</statement>
+
+		<statement name="sel_id_staff">
+			
+			SELECT *
+			FROM (
+			SELECT
+			per.person_id,
+			per.name_last,
+			per.name_first,
+			per.ssn,
+			TO_CHAR(per.date_of_birth, 'MM/DD/YYYY') as dob,
+			hphone.value_text AS home_phone,
+			account.value_text as account,
+			chart.value_text as chart,
+			cat.category,
+			initcap(per.simple_name) AS name,
+			(select 1 from dual
+			where exists (select 'x' from transaction t
+			where t.trans_owner_id = per.person_id
+			and t.trans_status = 2
+			and t.trans_type = 8026
+			)
+			) as appt_alert,
+			decode(per.gender, 1, 'M', 2, 'F', '') as gender
+			FROM
+			person per,
+			person_org_category cat,
+			person_attribute hphone,
+			person_attribute account,
+			person_attribute chart
+			WHERE
+			per.person_id = cat.person_id(+) AND
+			(per.person_id = hphone.parent_id(+) AND hphone.value_type(+) = 10 AND hphone.item_name(+) = 'Home') AND
+			(per.person_id = account.parent_id(+) AND account.value_type(+) = 0 AND account.item_name(+) = 'Patient/Account Number') AND
+			(per.person_id = chart.parent_id(+) AND chart.value_type(+) = 0 AND chart.item_name(+) = 'Patient/Chart Number') AND
+			cat.org_internal_id = ? AND
+			per.person_id = ?
+			and cat.category = 'Staff'
+			order by per.person_id
+			)
+			WHERE rownum &lt;= 250
+			
+		</statement>
+
+		<statement name="sel_lastname">
+			
+			SELECT *
+			FROM (
+			SELECT
+			per.person_id,
+			per.name_last,
+			per.name_first,
+			per.ssn,
+			TO_CHAR(per.date_of_birth, 'MM/DD/YYYY') as dob,
+			hphone.value_text AS home_phone,
+			account.value_text as account,
+			chart.value_text as chart,
+			cat.category,
+			initcap(per.simple_name) AS name,
+			(select 1 from dual
+			where exists (select 'x' from transaction t
+			where t.trans_owner_id = per.person_id
+			and t.trans_status = 2
+			and t.trans_type = 8026
+			)
+			) as appt_alert,
+			decode(per.gender, 1, 'M', 2, 'F', '') as gender
+			FROM
+			person per,
+			person_org_category cat,
+			person_attribute hphone,
+			person_attribute account,
+			person_attribute chart
+			WHERE
+			per.person_id = cat.person_id(+) AND
+			(per.person_id = hphone.parent_id(+) AND hphone.value_type(+) = 10 AND hphone.item_name(+) = 'Home') AND
+			(per.person_id = account.parent_id(+) AND account.value_type(+) = 0 AND account.item_name(+) = 'Patient/Account Number') AND
+			(per.person_id = chart.parent_id(+) AND chart.value_type(+) = 0 AND chart.item_name(+) = 'Patient/Chart Number') AND
+			cat.org_internal_id = ? AND
+			upper(per.name_last) = ?
+			ORDER BY upper(per.name_last), upper(per.name_first)
+			)
+			WHERE rownum &lt;= 250
+			
+		</statement>
+
+		<statement name="sel_lastname_associate">
+			
+			SELECT *
+			FROM (
+			SELECT
+			per.person_id,
+			per.name_last,
+			per.name_first,
+			per.ssn,
+			TO_CHAR(per.date_of_birth, 'MM/DD/YYYY') as dob,
+			hphone.value_text AS home_phone,
+			account.value_text as account,
+			chart.value_text as chart,
+			cat.category,
+			initcap(per.simple_name) AS name,
+			(select 1 from dual
+			where exists (select 'x' from transaction t
+			where t.trans_owner_id = per.person_id
+			and t.trans_status = 2
+			and t.trans_type = 8026
+			)
+			) as appt_alert,
+			decode(per.gender, 1, 'M', 2, 'F', '') as gender
+			FROM
+			person per,
+			person_org_category cat,
+			person_attribute hphone,
+			person_attribute account,
+			person_attribute chart
+			WHERE
+			per.person_id = cat.person_id(+) AND
+			(per.person_id = hphone.parent_id(+) AND hphone.value_type(+) = 10 AND hphone.item_name(+) = 'Home') AND
+			(per.person_id = account.parent_id(+) AND account.value_type(+) = 0 AND account.item_name(+) = 'Patient/Account Number') AND
+			(per.person_id = chart.parent_id(+) AND chart.value_type(+) = 0 AND chart.item_name(+) = 'Patient/Chart Number') AND
+			cat.org_internal_id = ? AND
+			upper(per.name_last) = ?
+			and cat.category in ('Physician', 'Nurse', 'Staff')
+			ORDER BY upper(per.name_last), upper(per.name_first)
+			)
+			WHERE rownum &lt;= 250
+			
+		</statement>
+
+		<statement name="sel_lastname_insured-Person">
+			
+			SELECT *
+			FROM (
+			SELECT
+			per.person_id,
+			per.name_last,
+			per.name_first,
+			per.ssn,
+			TO_CHAR(per.date_of_birth, 'MM/DD/YYYY') as dob,
+			hphone.value_text AS home_phone,
+			account.value_text as account,
+			chart.value_text as chart,
+			cat.category,
+			initcap(per.simple_name) AS name,
+			(select 1 from dual
+			where exists (select 'x' from transaction t
+			where t.trans_owner_id = per.person_id
+			and t.trans_status = 2
+			and t.trans_type = 8026
+			)
+			) as appt_alert,
+			decode(per.gender, 1, 'M', 2, 'F', '') as gender
+			FROM
+			person per,
+			person_org_category cat,
+			person_attribute hphone,
+			person_attribute account,
+			person_attribute chart
+			WHERE
+			per.person_id = cat.person_id(+) AND
+			(per.person_id = hphone.parent_id(+) AND hphone.value_type(+) = 10 AND hphone.item_name(+) = 'Home') AND
+			(per.person_id = account.parent_id(+) AND account.value_type(+) = 0 AND account.item_name(+) = 'Patient/Account Number') AND
+			(per.person_id = chart.parent_id(+) AND chart.value_type(+) = 0 AND chart.item_name(+) = 'Patient/Chart Number') AND
+			cat.org_internal_id = ? AND
+			upper(per.name_last) = ?
+			and cat.category = 'Insured-Person'
+			ORDER BY upper(per.name_last), upper(per.name_first)
+			)
+			WHERE rownum &lt;= 250
+			
+		</statement>
+
+		<statement name="sel_lastname_like">
+			
+			SELECT *
+			FROM (
+			SELECT
+			per.person_id,
+			per.name_last,
+			per.name_first,
+			per.ssn,
+			TO_CHAR(per.date_of_birth, 'MM/DD/YYYY') as dob,
+			hphone.value_text AS home_phone,
+			account.value_text as account,
+			chart.value_text as chart,
+			cat.category,
+			initcap(per.simple_name) AS name,
+			(select 1 from dual
+			where exists (select 'x' from transaction t
+			where t.trans_owner_id = per.person_id
+			and t.trans_status = 2
+			and t.trans_type = 8026
+			)
+			) as appt_alert,
+			decode(per.gender, 1, 'M', 2, 'F', '') as gender
+			FROM
+			person per,
+			person_org_category cat,
+			person_attribute hphone,
+			person_attribute account,
+			person_attribute chart
+			WHERE
+			per.person_id = cat.person_id(+) AND
+			(per.person_id = hphone.parent_id(+) AND hphone.value_type(+) = 10 AND hphone.item_name(+) = 'Home') AND
+			(per.person_id = account.parent_id(+) AND account.value_type(+) = 0 AND account.item_name(+) = 'Patient/Account Number') AND
+			(per.person_id = chart.parent_id(+) AND chart.value_type(+) = 0 AND chart.item_name(+) = 'Patient/Chart Number') AND
+			cat.org_internal_id = ? AND
+			upper(per.name_last) like ? 
+			ORDER BY upper(per.name_last), upper(per.name_first)
+			)
+			WHERE rownum &lt;= 250
+			
+		</statement>
+
+		<statement name="sel_lastname_like_associate">
+			
+			SELECT *
+			FROM (
+			SELECT
+			per.person_id,
+			per.name_last,
+			per.name_first,
+			per.ssn,
+			TO_CHAR(per.date_of_birth, 'MM/DD/YYYY') as dob,
+			hphone.value_text AS home_phone,
+			account.value_text as account,
+			chart.value_text as chart,
+			cat.category,
+			initcap(per.simple_name) AS name,
+			(select 1 from dual
+			where exists (select 'x' from transaction t
+			where t.trans_owner_id = per.person_id
+			and t.trans_status = 2
+			and t.trans_type = 8026
+			)
+			) as appt_alert,
+			decode(per.gender, 1, 'M', 2, 'F', '') as gender
+			FROM
+			person per,
+			person_org_category cat,
+			person_attribute hphone,
+			person_attribute account,
+			person_attribute chart
+			WHERE
+			per.person_id = cat.person_id(+) AND
+			(per.person_id = hphone.parent_id(+) AND hphone.value_type(+) = 10 AND hphone.item_name(+) = 'Home') AND
+			(per.person_id = account.parent_id(+) AND account.value_type(+) = 0 AND account.item_name(+) = 'Patient/Account Number') AND
+			(per.person_id = chart.parent_id(+) AND chart.value_type(+) = 0 AND chart.item_name(+) = 'Patient/Chart Number') AND
+			cat.org_internal_id = ? AND
+			upper(per.name_last) like ? 
+			and cat.category in ('Physician', 'Nurse', 'Staff')
+			ORDER BY upper(per.name_last), upper(per.name_first)
+			)
+			WHERE rownum &lt;= 250
+			
+		</statement>
+
+		<statement name="sel_lastname_like_insured-Person">
+			
+			SELECT *
+			FROM (
+			SELECT
+			per.person_id,
+			per.name_last,
+			per.name_first,
+			per.ssn,
+			TO_CHAR(per.date_of_birth, 'MM/DD/YYYY') as dob,
+			hphone.value_text AS home_phone,
+			account.value_text as account,
+			chart.value_text as chart,
+			cat.category,
+			initcap(per.simple_name) AS name,
+			(select 1 from dual
+			where exists (select 'x' from transaction t
+			where t.trans_owner_id = per.person_id
+			and t.trans_status = 2
+			and t.trans_type = 8026
+			)
+			) as appt_alert,
+			decode(per.gender, 1, 'M', 2, 'F', '') as gender
+			FROM
+			person per,
+			person_org_category cat,
+			person_attribute hphone,
+			person_attribute account,
+			person_attribute chart
+			WHERE
+			per.person_id = cat.person_id(+) AND
+			(per.person_id = hphone.parent_id(+) AND hphone.value_type(+) = 10 AND hphone.item_name(+) = 'Home') AND
+			(per.person_id = account.parent_id(+) AND account.value_type(+) = 0 AND account.item_name(+) = 'Patient/Account Number') AND
+			(per.person_id = chart.parent_id(+) AND chart.value_type(+) = 0 AND chart.item_name(+) = 'Patient/Chart Number') AND
+			cat.org_internal_id = ? AND
+			upper(per.name_last) like ? 
+			and cat.category = 'Insured-Person'
+			ORDER BY upper(per.name_last), upper(per.name_first)
+			)
+			WHERE rownum &lt;= 250
+			
+		</statement>
+
+		<statement name="sel_lastname_like_nurse">
+			
+			SELECT *
+			FROM (
+			SELECT
+			per.person_id,
+			per.name_last,
+			per.name_first,
+			per.ssn,
+			TO_CHAR(per.date_of_birth, 'MM/DD/YYYY') as dob,
+			hphone.value_text AS home_phone,
+			account.value_text as account,
+			chart.value_text as chart,
+			cat.category,
+			initcap(per.simple_name) AS name,
+			(select 1 from dual
+			where exists (select 'x' from transaction t
+			where t.trans_owner_id = per.person_id
+			and t.trans_status = 2
+			and t.trans_type = 8026
+			)
+			) as appt_alert,
+			decode(per.gender, 1, 'M', 2, 'F', '') as gender
+			FROM
+			person per,
+			person_org_category cat,
+			person_attribute hphone,
+			person_attribute account,
+			person_attribute chart
+			WHERE
+			per.person_id = cat.person_id(+) AND
+			(per.person_id = hphone.parent_id(+) AND hphone.value_type(+) = 10 AND hphone.item_name(+) = 'Home') AND
+			(per.person_id = account.parent_id(+) AND account.value_type(+) = 0 AND account.item_name(+) = 'Patient/Account Number') AND
+			(per.person_id = chart.parent_id(+) AND chart.value_type(+) = 0 AND chart.item_name(+) = 'Patient/Chart Number') AND
+			cat.org_internal_id = ? AND
+			upper(per.name_last) like ? 
+			and cat.category = 'Nurse'
+			ORDER BY upper(per.name_last), upper(per.name_first)
+			)
+			WHERE rownum &lt;= 250
+			
+		</statement>
+
+		<statement name="sel_lastname_like_patient">
+			
+			SELECT *
+			FROM (
+			SELECT
+			per.person_id,
+			per.name_last,
+			per.name_first,
+			per.ssn,
+			TO_CHAR(per.date_of_birth, 'MM/DD/YYYY') as dob,
+			hphone.value_text AS home_phone,
+			account.value_text as account,
+			chart.value_text as chart,
+			cat.category,
+			initcap(per.simple_name) AS name,
+			(select 1 from dual
+			where exists (select 'x' from transaction t
+			where t.trans_owner_id = per.person_id
+			and t.trans_status = 2
+			and t.trans_type = 8026
+			)
+			) as appt_alert,
+			decode(per.gender, 1, 'M', 2, 'F', '') as gender
+			FROM
+			person per,
+			person_org_category cat,
+			person_attribute hphone,
+			person_attribute account,
+			person_attribute chart
+			WHERE
+			per.person_id = cat.person_id(+) AND
+			(per.person_id = hphone.parent_id(+) AND hphone.value_type(+) = 10 AND hphone.item_name(+) = 'Home') AND
+			(per.person_id = account.parent_id(+) AND account.value_type(+) = 0 AND account.item_name(+) = 'Patient/Account Number') AND
+			(per.person_id = chart.parent_id(+) AND chart.value_type(+) = 0 AND chart.item_name(+) = 'Patient/Chart Number') AND
+			cat.org_internal_id = ? AND
+			upper(per.name_last) like ? 
+			and cat.category = 'Patient'
+			ORDER BY upper(per.name_last), upper(per.name_first)
+			)
+			WHERE rownum &lt;= 250
+			
+		</statement>
+
+		<statement name="sel_lastname_like_physician">
+			
+			SELECT *
+			FROM (
+			SELECT
+			per.person_id,
+			per.name_last,
+			per.name_first,
+			per.ssn,
+			TO_CHAR(per.date_of_birth, 'MM/DD/YYYY') as dob,
+			hphone.value_text AS home_phone,
+			account.value_text as account,
+			chart.value_text as chart,
+			cat.category,
+			initcap(per.simple_name) AS name,
+			(select 1 from dual
+			where exists (select 'x' from transaction t
+			where t.trans_owner_id = per.person_id
+			and t.trans_status = 2
+			and t.trans_type = 8026
+			)
+			) as appt_alert,
+			decode(per.gender, 1, 'M', 2, 'F', '') as gender
+			FROM
+			person per,
+			person_org_category cat,
+			person_attribute hphone,
+			person_attribute account,
+			person_attribute chart
+			WHERE
+			per.person_id = cat.person_id(+) AND
+			(per.person_id = hphone.parent_id(+) AND hphone.value_type(+) = 10 AND hphone.item_name(+) = 'Home') AND
+			(per.person_id = account.parent_id(+) AND account.value_type(+) = 0 AND account.item_name(+) = 'Patient/Account Number') AND
+			(per.person_id = chart.parent_id(+) AND chart.value_type(+) = 0 AND chart.item_name(+) = 'Patient/Chart Number') AND
+			cat.org_internal_id = ? AND
+			upper(per.name_last) like ? 
+			and cat.category = 'Physician'
+			ORDER BY upper(per.name_last), upper(per.name_first)
+			)
+			WHERE rownum &lt;= 250
+			
+		</statement>
+
+		<statement name="sel_lastname_like_physician-ref">
+			
+			SELECT *
+			FROM (
+			SELECT
+			per.person_id,
+			per.name_last,
+			per.name_first,
+			per.ssn,
+			TO_CHAR(per.date_of_birth, 'MM/DD/YYYY') as dob,
+			hphone.value_text AS home_phone,
+			account.value_text as account,
+			chart.value_text as chart,
+			cat.category,
+			initcap(per.simple_name) AS name,
+			(select 1 from dual
+			where exists (select 'x' from transaction t
+			where t.trans_owner_id = per.person_id
+			and t.trans_status = 2
+			and t.trans_type = 8026
+			)
+			) as appt_alert,
+			decode(per.gender, 1, 'M', 2, 'F', '') as gender
+			FROM
+			person per,
+			person_org_category cat,
+			person_attribute hphone,
+			person_attribute account,
+			person_attribute chart
+			WHERE
+			per.person_id = cat.person_id(+) AND
+			(per.person_id = hphone.parent_id(+) AND hphone.value_type(+) = 10 AND hphone.item_name(+) = 'Home') AND
+			(per.person_id = account.parent_id(+) AND account.value_type(+) = 0 AND account.item_name(+) = 'Patient/Account Number') AND
+			(per.person_id = chart.parent_id(+) AND chart.value_type(+) = 0 AND chart.item_name(+) = 'Patient/Chart Number') AND
+			cat.org_internal_id = ? AND
+			upper(per.name_last) like ? 
+			and cat.category in ('Physician', 'Referring-Doctor')
+			ORDER BY upper(per.name_last), upper(per.name_first)
+			)
+			WHERE rownum &lt;= 250
+			
+		</statement>
+
+		<statement name="sel_lastname_like_referring-Doctor">
+			
+			SELECT *
+			FROM (
+			SELECT
+			per.person_id,
+			per.name_last,
+			per.name_first,
+			per.ssn,
+			TO_CHAR(per.date_of_birth, 'MM/DD/YYYY') as dob,
+			hphone.value_text AS home_phone,
+			account.value_text as account,
+			chart.value_text as chart,
+			cat.category,
+			initcap(per.simple_name) AS name,
+			(select 1 from dual
+			where exists (select 'x' from transaction t
+			where t.trans_owner_id = per.person_id
+			and t.trans_status = 2
+			and t.trans_type = 8026
+			)
+			) as appt_alert,
+			decode(per.gender, 1, 'M', 2, 'F', '') as gender
+			FROM
+			person per,
+			person_org_category cat,
+			person_attribute hphone,
+			person_attribute account,
+			person_attribute chart
+			WHERE
+			per.person_id = cat.person_id(+) AND
+			(per.person_id = hphone.parent_id(+) AND hphone.value_type(+) = 10 AND hphone.item_name(+) = 'Home') AND
+			(per.person_id = account.parent_id(+) AND account.value_type(+) = 0 AND account.item_name(+) = 'Patient/Account Number') AND
+			(per.person_id = chart.parent_id(+) AND chart.value_type(+) = 0 AND chart.item_name(+) = 'Patient/Chart Number') AND
+			cat.org_internal_id = ? AND
+			upper(per.name_last) like ? 
+			and cat.category = 'Referring-Doctor'
+			ORDER BY upper(per.name_last), upper(per.name_first)
+			)
+			WHERE rownum &lt;= 250
+			
+		</statement>
+
+		<statement name="sel_lastname_like_staff">
+			
+			SELECT *
+			FROM (
+			SELECT
+			per.person_id,
+			per.name_last,
+			per.name_first,
+			per.ssn,
+			TO_CHAR(per.date_of_birth, 'MM/DD/YYYY') as dob,
+			hphone.value_text AS home_phone,
+			account.value_text as account,
+			chart.value_text as chart,
+			cat.category,
+			initcap(per.simple_name) AS name,
+			(select 1 from dual
+			where exists (select 'x' from transaction t
+			where t.trans_owner_id = per.person_id
+			and t.trans_status = 2
+			and t.trans_type = 8026
+			)
+			) as appt_alert,
+			decode(per.gender, 1, 'M', 2, 'F', '') as gender
+			FROM
+			person per,
+			person_org_category cat,
+			person_attribute hphone,
+			person_attribute account,
+			person_attribute chart
+			WHERE
+			per.person_id = cat.person_id(+) AND
+			(per.person_id = hphone.parent_id(+) AND hphone.value_type(+) = 10 AND hphone.item_name(+) = 'Home') AND
+			(per.person_id = account.parent_id(+) AND account.value_type(+) = 0 AND account.item_name(+) = 'Patient/Account Number') AND
+			(per.person_id = chart.parent_id(+) AND chart.value_type(+) = 0 AND chart.item_name(+) = 'Patient/Chart Number') AND
+			cat.org_internal_id = ? AND
+			upper(per.name_last) like ? 
+			and cat.category = 'Staff'
+			ORDER BY upper(per.name_last), upper(per.name_first)
+			)
+			WHERE rownum &lt;= 250
+			
+		</statement>
+
+		<statement name="sel_lastname_nurse">
+			
+			SELECT *
+			FROM (
+			SELECT
+			per.person_id,
+			per.name_last,
+			per.name_first,
+			per.ssn,
+			TO_CHAR(per.date_of_birth, 'MM/DD/YYYY') as dob,
+			hphone.value_text AS home_phone,
+			account.value_text as account,
+			chart.value_text as chart,
+			cat.category,
+			initcap(per.simple_name) AS name,
+			(select 1 from dual
+			where exists (select 'x' from transaction t
+			where t.trans_owner_id = per.person_id
+			and t.trans_status = 2
+			and t.trans_type = 8026
+			)
+			) as appt_alert,
+			decode(per.gender, 1, 'M', 2, 'F', '') as gender
+			FROM
+			person per,
+			person_org_category cat,
+			person_attribute hphone,
+			person_attribute account,
+			person_attribute chart
+			WHERE
+			per.person_id = cat.person_id(+) AND
+			(per.person_id = hphone.parent_id(+) AND hphone.value_type(+) = 10 AND hphone.item_name(+) = 'Home') AND
+			(per.person_id = account.parent_id(+) AND account.value_type(+) = 0 AND account.item_name(+) = 'Patient/Account Number') AND
+			(per.person_id = chart.parent_id(+) AND chart.value_type(+) = 0 AND chart.item_name(+) = 'Patient/Chart Number') AND
+			cat.org_internal_id = ? AND
+			upper(per.name_last) = ?
+			and cat.category = 'Nurse'
+			ORDER BY upper(per.name_last), upper(per.name_first)
+			)
+			WHERE rownum &lt;= 250
+			
+		</statement>
+
+		<statement name="sel_lastname_patient">
+			
+			SELECT *
+			FROM (
+			SELECT
+			per.person_id,
+			per.name_last,
+			per.name_first,
+			per.ssn,
+			TO_CHAR(per.date_of_birth, 'MM/DD/YYYY') as dob,
+			hphone.value_text AS home_phone,
+			account.value_text as account,
+			chart.value_text as chart,
+			cat.category,
+			initcap(per.simple_name) AS name,
+			(select 1 from dual
+			where exists (select 'x' from transaction t
+			where t.trans_owner_id = per.person_id
+			and t.trans_status = 2
+			and t.trans_type = 8026
+			)
+			) as appt_alert,
+			decode(per.gender, 1, 'M', 2, 'F', '') as gender
+			FROM
+			person per,
+			person_org_category cat,
+			person_attribute hphone,
+			person_attribute account,
+			person_attribute chart
+			WHERE
+			per.person_id = cat.person_id(+) AND
+			(per.person_id = hphone.parent_id(+) AND hphone.value_type(+) = 10 AND hphone.item_name(+) = 'Home') AND
+			(per.person_id = account.parent_id(+) AND account.value_type(+) = 0 AND account.item_name(+) = 'Patient/Account Number') AND
+			(per.person_id = chart.parent_id(+) AND chart.value_type(+) = 0 AND chart.item_name(+) = 'Patient/Chart Number') AND
+			cat.org_internal_id = ? AND
+			upper(per.name_last) = ?
+			and cat.category = 'Patient'
+			ORDER BY upper(per.name_last), upper(per.name_first)
+			)
+			WHERE rownum &lt;= 250
+			
+		</statement>
+
+		<statement name="sel_lastname_physician">
+			
+			SELECT *
+			FROM (
+			SELECT
+			per.person_id,
+			per.name_last,
+			per.name_first,
+			per.ssn,
+			TO_CHAR(per.date_of_birth, 'MM/DD/YYYY') as dob,
+			hphone.value_text AS home_phone,
+			account.value_text as account,
+			chart.value_text as chart,
+			cat.category,
+			initcap(per.simple_name) AS name,
+			(select 1 from dual
+			where exists (select 'x' from transaction t
+			where t.trans_owner_id = per.person_id
+			and t.trans_status = 2
+			and t.trans_type = 8026
+			)
+			) as appt_alert,
+			decode(per.gender, 1, 'M', 2, 'F', '') as gender
+			FROM
+			person per,
+			person_org_category cat,
+			person_attribute hphone,
+			person_attribute account,
+			person_attribute chart
+			WHERE
+			per.person_id = cat.person_id(+) AND
+			(per.person_id = hphone.parent_id(+) AND hphone.value_type(+) = 10 AND hphone.item_name(+) = 'Home') AND
+			(per.person_id = account.parent_id(+) AND account.value_type(+) = 0 AND account.item_name(+) = 'Patient/Account Number') AND
+			(per.person_id = chart.parent_id(+) AND chart.value_type(+) = 0 AND chart.item_name(+) = 'Patient/Chart Number') AND
+			cat.org_internal_id = ? AND
+			upper(per.name_last) = ?
+			and cat.category = 'Physician'
+			ORDER BY upper(per.name_last), upper(per.name_first)
+			)
+			WHERE rownum &lt;= 250
+			
+		</statement>
+
+		<statement name="sel_lastname_physician-ref">
+			
+			SELECT *
+			FROM (
+			SELECT
+			per.person_id,
+			per.name_last,
+			per.name_first,
+			per.ssn,
+			TO_CHAR(per.date_of_birth, 'MM/DD/YYYY') as dob,
+			hphone.value_text AS home_phone,
+			account.value_text as account,
+			chart.value_text as chart,
+			cat.category,
+			initcap(per.simple_name) AS name,
+			(select 1 from dual
+			where exists (select 'x' from transaction t
+			where t.trans_owner_id = per.person_id
+			and t.trans_status = 2
+			and t.trans_type = 8026
+			)
+			) as appt_alert,
+			decode(per.gender, 1, 'M', 2, 'F', '') as gender
+			FROM
+			person per,
+			person_org_category cat,
+			person_attribute hphone,
+			person_attribute account,
+			person_attribute chart
+			WHERE
+			per.person_id = cat.person_id(+) AND
+			(per.person_id = hphone.parent_id(+) AND hphone.value_type(+) = 10 AND hphone.item_name(+) = 'Home') AND
+			(per.person_id = account.parent_id(+) AND account.value_type(+) = 0 AND account.item_name(+) = 'Patient/Account Number') AND
+			(per.person_id = chart.parent_id(+) AND chart.value_type(+) = 0 AND chart.item_name(+) = 'Patient/Chart Number') AND
+			cat.org_internal_id = ? AND
+			upper(per.name_last) = ?
+			and cat.category in ('Physician', 'Referring-Doctor')
+			ORDER BY upper(per.name_last), upper(per.name_first)
+			)
+			WHERE rownum &lt;= 250
+			
+		</statement>
+
+		<statement name="sel_lastname_referring-Doctor">
+			
+			SELECT *
+			FROM (
+			SELECT
+			per.person_id,
+			per.name_last,
+			per.name_first,
+			per.ssn,
+			TO_CHAR(per.date_of_birth, 'MM/DD/YYYY') as dob,
+			hphone.value_text AS home_phone,
+			account.value_text as account,
+			chart.value_text as chart,
+			cat.category,
+			initcap(per.simple_name) AS name,
+			(select 1 from dual
+			where exists (select 'x' from transaction t
+			where t.trans_owner_id = per.person_id
+			and t.trans_status = 2
+			and t.trans_type = 8026
+			)
+			) as appt_alert,
+			decode(per.gender, 1, 'M', 2, 'F', '') as gender
+			FROM
+			person per,
+			person_org_category cat,
+			person_attribute hphone,
+			person_attribute account,
+			person_attribute chart
+			WHERE
+			per.person_id = cat.person_id(+) AND
+			(per.person_id = hphone.parent_id(+) AND hphone.value_type(+) = 10 AND hphone.item_name(+) = 'Home') AND
+			(per.person_id = account.parent_id(+) AND account.value_type(+) = 0 AND account.item_name(+) = 'Patient/Account Number') AND
+			(per.person_id = chart.parent_id(+) AND chart.value_type(+) = 0 AND chart.item_name(+) = 'Patient/Chart Number') AND
+			cat.org_internal_id = ? AND
+			upper(per.name_last) = ?
+			and cat.category = 'Referring-Doctor'
+			ORDER BY upper(per.name_last), upper(per.name_first)
+			)
+			WHERE rownum &lt;= 250
+			
+		</statement>
+
+		<statement name="sel_lastname_staff">
+			
+			SELECT *
+			FROM (
+			SELECT
+			per.person_id,
+			per.name_last,
+			per.name_first,
+			per.ssn,
+			TO_CHAR(per.date_of_birth, 'MM/DD/YYYY') as dob,
+			hphone.value_text AS home_phone,
+			account.value_text as account,
+			chart.value_text as chart,
+			cat.category,
+			initcap(per.simple_name) AS name,
+			(select 1 from dual
+			where exists (select 'x' from transaction t
+			where t.trans_owner_id = per.person_id
+			and t.trans_status = 2
+			and t.trans_type = 8026
+			)
+			) as appt_alert,
+			decode(per.gender, 1, 'M', 2, 'F', '') as gender
+			FROM
+			person per,
+			person_org_category cat,
+			person_attribute hphone,
+			person_attribute account,
+			person_attribute chart
+			WHERE
+			per.person_id = cat.person_id(+) AND
+			(per.person_id = hphone.parent_id(+) AND hphone.value_type(+) = 10 AND hphone.item_name(+) = 'Home') AND
+			(per.person_id = account.parent_id(+) AND account.value_type(+) = 0 AND account.item_name(+) = 'Patient/Account Number') AND
+			(per.person_id = chart.parent_id(+) AND chart.value_type(+) = 0 AND chart.item_name(+) = 'Patient/Chart Number') AND
+			cat.org_internal_id = ? AND
+			upper(per.name_last) = ?
+			and cat.category = 'Staff'
+			ORDER BY upper(per.name_last), upper(per.name_first)
+			)
+			WHERE rownum &lt;= 250
+			
+		</statement>
+
+		<statement name="sel_phone">
+			
+			SELECT *
+			FROM (
+			SELECT
+			per.person_id,
+			per.name_last,
+			per.name_first,
+			per.ssn,
+			TO_CHAR(per.date_of_birth, 'MM/DD/YYYY') as dob,
+			hphone.value_text AS home_phone,
+			account.value_text as account,
+			chart.value_text as chart,
+			cat.category,
+			initcap(per.simple_name) AS name,
+			(select 1 from dual
+			where exists (select 'x' from transaction t
+			where t.trans_owner_id = per.person_id
+			and t.trans_status = 2
+			and t.trans_type = 8026
+			)
+			) as appt_alert,
+			decode(per.gender, 1, 'M', 2, 'F', '') as gender
+			FROM
+			person per,
+			person_org_category cat,
+			person_attribute hphone,
+			person_attribute account,
+			person_attribute chart
+			WHERE
+			per.person_id = cat.person_id(+) AND
+			(per.person_id = hphone.parent_id(+) AND hphone.value_type(+) = 10 AND hphone.item_name(+) = 'Home') AND
+			(per.person_id = account.parent_id(+) AND account.value_type(+) = 0 AND account.item_name(+) = 'Patient/Account Number') AND
+			(per.person_id = chart.parent_id(+) AND chart.value_type(+) = 0 AND chart.item_name(+) = 'Patient/Chart Number') AND
+			cat.org_internal_id = ? AND
+			hphone.value_text = ?
+			ORDER BY upper(per.name_last), upper(per.name_first)
+			)
+			WHERE rownum &lt;= 250
+			
+		</statement>
+
+		<statement name="sel_phone_associate">
+			
+			SELECT *
+			FROM (
+			SELECT
+			per.person_id,
+			per.name_last,
+			per.name_first,
+			per.ssn,
+			TO_CHAR(per.date_of_birth, 'MM/DD/YYYY') as dob,
+			hphone.value_text AS home_phone,
+			account.value_text as account,
+			chart.value_text as chart,
+			cat.category,
+			initcap(per.simple_name) AS name,
+			(select 1 from dual
+			where exists (select 'x' from transaction t
+			where t.trans_owner_id = per.person_id
+			and t.trans_status = 2
+			and t.trans_type = 8026
+			)
+			) as appt_alert,
+			decode(per.gender, 1, 'M', 2, 'F', '') as gender
+			FROM
+			person per,
+			person_org_category cat,
+			person_attribute hphone,
+			person_attribute account,
+			person_attribute chart
+			WHERE
+			per.person_id = cat.person_id(+) AND
+			(per.person_id = hphone.parent_id(+) AND hphone.value_type(+) = 10 AND hphone.item_name(+) = 'Home') AND
+			(per.person_id = account.parent_id(+) AND account.value_type(+) = 0 AND account.item_name(+) = 'Patient/Account Number') AND
+			(per.person_id = chart.parent_id(+) AND chart.value_type(+) = 0 AND chart.item_name(+) = 'Patient/Chart Number') AND
+			cat.org_internal_id = ? AND
+			hphone.value_text = ?
+			and cat.category in ('Physician', 'Nurse', 'Staff')
+			ORDER BY upper(per.name_last), upper(per.name_first)
+			)
+			WHERE rownum &lt;= 250
+			
+		</statement>
+
+		<statement name="sel_phone_insured-Person">
+			
+			SELECT *
+			FROM (
+			SELECT
+			per.person_id,
+			per.name_last,
+			per.name_first,
+			per.ssn,
+			TO_CHAR(per.date_of_birth, 'MM/DD/YYYY') as dob,
+			hphone.value_text AS home_phone,
+			account.value_text as account,
+			chart.value_text as chart,
+			cat.category,
+			initcap(per.simple_name) AS name,
+			(select 1 from dual
+			where exists (select 'x' from transaction t
+			where t.trans_owner_id = per.person_id
+			and t.trans_status = 2
+			and t.trans_type = 8026
+			)
+			) as appt_alert,
+			decode(per.gender, 1, 'M', 2, 'F', '') as gender
+			FROM
+			person per,
+			person_org_category cat,
+			person_attribute hphone,
+			person_attribute account,
+			person_attribute chart
+			WHERE
+			per.person_id = cat.person_id(+) AND
+			(per.person_id = hphone.parent_id(+) AND hphone.value_type(+) = 10 AND hphone.item_name(+) = 'Home') AND
+			(per.person_id = account.parent_id(+) AND account.value_type(+) = 0 AND account.item_name(+) = 'Patient/Account Number') AND
+			(per.person_id = chart.parent_id(+) AND chart.value_type(+) = 0 AND chart.item_name(+) = 'Patient/Chart Number') AND
+			cat.org_internal_id = ? AND
+			hphone.value_text = ?
+			and cat.category = 'Insured-Person'
+			ORDER BY upper(per.name_last), upper(per.name_first)
+			)
+			WHERE rownum &lt;= 250
+			
+		</statement>
+
+		<statement name="sel_phone_like">
+			
+			SELECT *
+			FROM (
+			SELECT
+			per.person_id,
+			per.name_last,
+			per.name_first,
+			per.ssn,
+			TO_CHAR(per.date_of_birth, 'MM/DD/YYYY') as dob,
+			hphone.value_text AS home_phone,
+			account.value_text as account,
+			chart.value_text as chart,
+			cat.category,
+			initcap(per.simple_name) AS name,
+			(select 1 from dual
+			where exists (select 'x' from transaction t
+			where t.trans_owner_id = per.person_id
+			and t.trans_status = 2
+			and t.trans_type = 8026
+			)
+			) as appt_alert,
+			decode(per.gender, 1, 'M', 2, 'F', '') as gender
+			FROM
+			person per,
+			person_org_category cat,
+			person_attribute hphone,
+			person_attribute account,
+			person_attribute chart
+			WHERE
+			per.person_id = cat.person_id(+) AND
+			(per.person_id = hphone.parent_id(+) AND hphone.value_type(+) = 10 AND hphone.item_name(+) = 'Home') AND
+			(per.person_id = account.parent_id(+) AND account.value_type(+) = 0 AND account.item_name(+) = 'Patient/Account Number') AND
+			(per.person_id = chart.parent_id(+) AND chart.value_type(+) = 0 AND chart.item_name(+) = 'Patient/Chart Number') AND
+			cat.org_internal_id = ? AND
+			hphone.value_text like ?
+			ORDER BY upper(per.name_last), upper(per.name_first)
+			)
+			WHERE rownum &lt;= 250
+			
+		</statement>
+
+		<statement name="sel_phone_like_associate">
+			
+			SELECT *
+			FROM (
+			SELECT
+			per.person_id,
+			per.name_last,
+			per.name_first,
+			per.ssn,
+			TO_CHAR(per.date_of_birth, 'MM/DD/YYYY') as dob,
+			hphone.value_text AS home_phone,
+			account.value_text as account,
+			chart.value_text as chart,
+			cat.category,
+			initcap(per.simple_name) AS name,
+			(select 1 from dual
+			where exists (select 'x' from transaction t
+			where t.trans_owner_id = per.person_id
+			and t.trans_status = 2
+			and t.trans_type = 8026
+			)
+			) as appt_alert,
+			decode(per.gender, 1, 'M', 2, 'F', '') as gender
+			FROM
+			person per,
+			person_org_category cat,
+			person_attribute hphone,
+			person_attribute account,
+			person_attribute chart
+			WHERE
+			per.person_id = cat.person_id(+) AND
+			(per.person_id = hphone.parent_id(+) AND hphone.value_type(+) = 10 AND hphone.item_name(+) = 'Home') AND
+			(per.person_id = account.parent_id(+) AND account.value_type(+) = 0 AND account.item_name(+) = 'Patient/Account Number') AND
+			(per.person_id = chart.parent_id(+) AND chart.value_type(+) = 0 AND chart.item_name(+) = 'Patient/Chart Number') AND
+			cat.org_internal_id = ? AND
+			hphone.value_text like ?
+			and cat.category in ('Physician', 'Nurse', 'Staff')
+			ORDER BY upper(per.name_last), upper(per.name_first)
+			)
+			WHERE rownum &lt;= 250
+			
+		</statement>
+
+		<statement name="sel_phone_like_insured-Person">
+			
+			SELECT *
+			FROM (
+			SELECT
+			per.person_id,
+			per.name_last,
+			per.name_first,
+			per.ssn,
+			TO_CHAR(per.date_of_birth, 'MM/DD/YYYY') as dob,
+			hphone.value_text AS home_phone,
+			account.value_text as account,
+			chart.value_text as chart,
+			cat.category,
+			initcap(per.simple_name) AS name,
+			(select 1 from dual
+			where exists (select 'x' from transaction t
+			where t.trans_owner_id = per.person_id
+			and t.trans_status = 2
+			and t.trans_type = 8026
+			)
+			) as appt_alert,
+			decode(per.gender, 1, 'M', 2, 'F', '') as gender
+			FROM
+			person per,
+			person_org_category cat,
+			person_attribute hphone,
+			person_attribute account,
+			person_attribute chart
+			WHERE
+			per.person_id = cat.person_id(+) AND
+			(per.person_id = hphone.parent_id(+) AND hphone.value_type(+) = 10 AND hphone.item_name(+) = 'Home') AND
+			(per.person_id = account.parent_id(+) AND account.value_type(+) = 0 AND account.item_name(+) = 'Patient/Account Number') AND
+			(per.person_id = chart.parent_id(+) AND chart.value_type(+) = 0 AND chart.item_name(+) = 'Patient/Chart Number') AND
+			cat.org_internal_id = ? AND
+			hphone.value_text like ?
+			and cat.category = 'Insured-Person'
+			ORDER BY upper(per.name_last), upper(per.name_first)
+			)
+			WHERE rownum &lt;= 250
+			
+		</statement>
+
+		<statement name="sel_phone_like_nurse">
+			
+			SELECT *
+			FROM (
+			SELECT
+			per.person_id,
+			per.name_last,
+			per.name_first,
+			per.ssn,
+			TO_CHAR(per.date_of_birth, 'MM/DD/YYYY') as dob,
+			hphone.value_text AS home_phone,
+			account.value_text as account,
+			chart.value_text as chart,
+			cat.category,
+			initcap(per.simple_name) AS name,
+			(select 1 from dual
+			where exists (select 'x' from transaction t
+			where t.trans_owner_id = per.person_id
+			and t.trans_status = 2
+			and t.trans_type = 8026
+			)
+			) as appt_alert,
+			decode(per.gender, 1, 'M', 2, 'F', '') as gender
+			FROM
+			person per,
+			person_org_category cat,
+			person_attribute hphone,
+			person_attribute account,
+			person_attribute chart
+			WHERE
+			per.person_id = cat.person_id(+) AND
+			(per.person_id = hphone.parent_id(+) AND hphone.value_type(+) = 10 AND hphone.item_name(+) = 'Home') AND
+			(per.person_id = account.parent_id(+) AND account.value_type(+) = 0 AND account.item_name(+) = 'Patient/Account Number') AND
+			(per.person_id = chart.parent_id(+) AND chart.value_type(+) = 0 AND chart.item_name(+) = 'Patient/Chart Number') AND
+			cat.org_internal_id = ? AND
+			hphone.value_text like ?
+			and cat.category = 'Nurse'
+			ORDER BY upper(per.name_last), upper(per.name_first)
+			)
+			WHERE rownum &lt;= 250
+			
+		</statement>
+
+		<statement name="sel_phone_like_patient">
+			
+			SELECT *
+			FROM (
+			SELECT
+			per.person_id,
+			per.name_last,
+			per.name_first,
+			per.ssn,
+			TO_CHAR(per.date_of_birth, 'MM/DD/YYYY') as dob,
+			hphone.value_text AS home_phone,
+			account.value_text as account,
+			chart.value_text as chart,
+			cat.category,
+			initcap(per.simple_name) AS name,
+			(select 1 from dual
+			where exists (select 'x' from transaction t
+			where t.trans_owner_id = per.person_id
+			and t.trans_status = 2
+			and t.trans_type = 8026
+			)
+			) as appt_alert,
+			decode(per.gender, 1, 'M', 2, 'F', '') as gender
+			FROM
+			person per,
+			person_org_category cat,
+			person_attribute hphone,
+			person_attribute account,
+			person_attribute chart
+			WHERE
+			per.person_id = cat.person_id(+) AND
+			(per.person_id = hphone.parent_id(+) AND hphone.value_type(+) = 10 AND hphone.item_name(+) = 'Home') AND
+			(per.person_id = account.parent_id(+) AND account.value_type(+) = 0 AND account.item_name(+) = 'Patient/Account Number') AND
+			(per.person_id = chart.parent_id(+) AND chart.value_type(+) = 0 AND chart.item_name(+) = 'Patient/Chart Number') AND
+			cat.org_internal_id = ? AND
+			hphone.value_text like ?
+			and cat.category = 'Patient'
+			ORDER BY upper(per.name_last), upper(per.name_first)
+			)
+			WHERE rownum &lt;= 250
+			
+		</statement>
+
+		<statement name="sel_phone_like_physician">
+			
+			SELECT *
+			FROM (
+			SELECT
+			per.person_id,
+			per.name_last,
+			per.name_first,
+			per.ssn,
+			TO_CHAR(per.date_of_birth, 'MM/DD/YYYY') as dob,
+			hphone.value_text AS home_phone,
+			account.value_text as account,
+			chart.value_text as chart,
+			cat.category,
+			initcap(per.simple_name) AS name,
+			(select 1 from dual
+			where exists (select 'x' from transaction t
+			where t.trans_owner_id = per.person_id
+			and t.trans_status = 2
+			and t.trans_type = 8026
+			)
+			) as appt_alert,
+			decode(per.gender, 1, 'M', 2, 'F', '') as gender
+			FROM
+			person per,
+			person_org_category cat,
+			person_attribute hphone,
+			person_attribute account,
+			person_attribute chart
+			WHERE
+			per.person_id = cat.person_id(+) AND
+			(per.person_id = hphone.parent_id(+) AND hphone.value_type(+) = 10 AND hphone.item_name(+) = 'Home') AND
+			(per.person_id = account.parent_id(+) AND account.value_type(+) = 0 AND account.item_name(+) = 'Patient/Account Number') AND
+			(per.person_id = chart.parent_id(+) AND chart.value_type(+) = 0 AND chart.item_name(+) = 'Patient/Chart Number') AND
+			cat.org_internal_id = ? AND
+			hphone.value_text like ?
+			and cat.category = 'Physician'
+			ORDER BY upper(per.name_last), upper(per.name_first)
+			)
+			WHERE rownum &lt;= 250
+			
+		</statement>
+
+		<statement name="sel_phone_like_physician-ref">
+			
+			SELECT *
+			FROM (
+			SELECT
+			per.person_id,
+			per.name_last,
+			per.name_first,
+			per.ssn,
+			TO_CHAR(per.date_of_birth, 'MM/DD/YYYY') as dob,
+			hphone.value_text AS home_phone,
+			account.value_text as account,
+			chart.value_text as chart,
+			cat.category,
+			initcap(per.simple_name) AS name,
+			(select 1 from dual
+			where exists (select 'x' from transaction t
+			where t.trans_owner_id = per.person_id
+			and t.trans_status = 2
+			and t.trans_type = 8026
+			)
+			) as appt_alert,
+			decode(per.gender, 1, 'M', 2, 'F', '') as gender
+			FROM
+			person per,
+			person_org_category cat,
+			person_attribute hphone,
+			person_attribute account,
+			person_attribute chart
+			WHERE
+			per.person_id = cat.person_id(+) AND
+			(per.person_id = hphone.parent_id(+) AND hphone.value_type(+) = 10 AND hphone.item_name(+) = 'Home') AND
+			(per.person_id = account.parent_id(+) AND account.value_type(+) = 0 AND account.item_name(+) = 'Patient/Account Number') AND
+			(per.person_id = chart.parent_id(+) AND chart.value_type(+) = 0 AND chart.item_name(+) = 'Patient/Chart Number') AND
+			cat.org_internal_id = ? AND
+			hphone.value_text like ?
+			and cat.category in ('Physician', 'Referring-Doctor')
+			ORDER BY upper(per.name_last), upper(per.name_first)
+			)
+			WHERE rownum &lt;= 250
+			
+		</statement>
+
+		<statement name="sel_phone_like_referring-Doctor">
+			
+			SELECT *
+			FROM (
+			SELECT
+			per.person_id,
+			per.name_last,
+			per.name_first,
+			per.ssn,
+			TO_CHAR(per.date_of_birth, 'MM/DD/YYYY') as dob,
+			hphone.value_text AS home_phone,
+			account.value_text as account,
+			chart.value_text as chart,
+			cat.category,
+			initcap(per.simple_name) AS name,
+			(select 1 from dual
+			where exists (select 'x' from transaction t
+			where t.trans_owner_id = per.person_id
+			and t.trans_status = 2
+			and t.trans_type = 8026
+			)
+			) as appt_alert,
+			decode(per.gender, 1, 'M', 2, 'F', '') as gender
+			FROM
+			person per,
+			person_org_category cat,
+			person_attribute hphone,
+			person_attribute account,
+			person_attribute chart
+			WHERE
+			per.person_id = cat.person_id(+) AND
+			(per.person_id = hphone.parent_id(+) AND hphone.value_type(+) = 10 AND hphone.item_name(+) = 'Home') AND
+			(per.person_id = account.parent_id(+) AND account.value_type(+) = 0 AND account.item_name(+) = 'Patient/Account Number') AND
+			(per.person_id = chart.parent_id(+) AND chart.value_type(+) = 0 AND chart.item_name(+) = 'Patient/Chart Number') AND
+			cat.org_internal_id = ? AND
+			hphone.value_text like ?
+			and cat.category = 'Referring-Doctor'
+			ORDER BY upper(per.name_last), upper(per.name_first)
+			)
+			WHERE rownum &lt;= 250
+			
+		</statement>
+
+		<statement name="sel_phone_like_staff">
+			
+			SELECT *
+			FROM (
+			SELECT
+			per.person_id,
+			per.name_last,
+			per.name_first,
+			per.ssn,
+			TO_CHAR(per.date_of_birth, 'MM/DD/YYYY') as dob,
+			hphone.value_text AS home_phone,
+			account.value_text as account,
+			chart.value_text as chart,
+			cat.category,
+			initcap(per.simple_name) AS name,
+			(select 1 from dual
+			where exists (select 'x' from transaction t
+			where t.trans_owner_id = per.person_id
+			and t.trans_status = 2
+			and t.trans_type = 8026
+			)
+			) as appt_alert,
+			decode(per.gender, 1, 'M', 2, 'F', '') as gender
+			FROM
+			person per,
+			person_org_category cat,
+			person_attribute hphone,
+			person_attribute account,
+			person_attribute chart
+			WHERE
+			per.person_id = cat.person_id(+) AND
+			(per.person_id = hphone.parent_id(+) AND hphone.value_type(+) = 10 AND hphone.item_name(+) = 'Home') AND
+			(per.person_id = account.parent_id(+) AND account.value_type(+) = 0 AND account.item_name(+) = 'Patient/Account Number') AND
+			(per.person_id = chart.parent_id(+) AND chart.value_type(+) = 0 AND chart.item_name(+) = 'Patient/Chart Number') AND
+			cat.org_internal_id = ? AND
+			hphone.value_text like ?
+			and cat.category = 'Staff'
+			ORDER BY upper(per.name_last), upper(per.name_first)
+			)
+			WHERE rownum &lt;= 250
+			
+		</statement>
+
+		<statement name="sel_phone_nurse">
+			
+			SELECT *
+			FROM (
+			SELECT
+			per.person_id,
+			per.name_last,
+			per.name_first,
+			per.ssn,
+			TO_CHAR(per.date_of_birth, 'MM/DD/YYYY') as dob,
+			hphone.value_text AS home_phone,
+			account.value_text as account,
+			chart.value_text as chart,
+			cat.category,
+			initcap(per.simple_name) AS name,
+			(select 1 from dual
+			where exists (select 'x' from transaction t
+			where t.trans_owner_id = per.person_id
+			and t.trans_status = 2
+			and t.trans_type = 8026
+			)
+			) as appt_alert,
+			decode(per.gender, 1, 'M', 2, 'F', '') as gender
+			FROM
+			person per,
+			person_org_category cat,
+			person_attribute hphone,
+			person_attribute account,
+			person_attribute chart
+			WHERE
+			per.person_id = cat.person_id(+) AND
+			(per.person_id = hphone.parent_id(+) AND hphone.value_type(+) = 10 AND hphone.item_name(+) = 'Home') AND
+			(per.person_id = account.parent_id(+) AND account.value_type(+) = 0 AND account.item_name(+) = 'Patient/Account Number') AND
+			(per.person_id = chart.parent_id(+) AND chart.value_type(+) = 0 AND chart.item_name(+) = 'Patient/Chart Number') AND
+			cat.org_internal_id = ? AND
+			hphone.value_text = ?
+			and cat.category = 'Nurse'
+			ORDER BY upper(per.name_last), upper(per.name_first)
+			)
+			WHERE rownum &lt;= 250
+			
+		</statement>
+
+		<statement name="sel_phone_patient">
+			
+			SELECT *
+			FROM (
+			SELECT
+			per.person_id,
+			per.name_last,
+			per.name_first,
+			per.ssn,
+			TO_CHAR(per.date_of_birth, 'MM/DD/YYYY') as dob,
+			hphone.value_text AS home_phone,
+			account.value_text as account,
+			chart.value_text as chart,
+			cat.category,
+			initcap(per.simple_name) AS name,
+			(select 1 from dual
+			where exists (select 'x' from transaction t
+			where t.trans_owner_id = per.person_id
+			and t.trans_status = 2
+			and t.trans_type = 8026
+			)
+			) as appt_alert,
+			decode(per.gender, 1, 'M', 2, 'F', '') as gender
+			FROM
+			person per,
+			person_org_category cat,
+			person_attribute hphone,
+			person_attribute account,
+			person_attribute chart
+			WHERE
+			per.person_id = cat.person_id(+) AND
+			(per.person_id = hphone.parent_id(+) AND hphone.value_type(+) = 10 AND hphone.item_name(+) = 'Home') AND
+			(per.person_id = account.parent_id(+) AND account.value_type(+) = 0 AND account.item_name(+) = 'Patient/Account Number') AND
+			(per.person_id = chart.parent_id(+) AND chart.value_type(+) = 0 AND chart.item_name(+) = 'Patient/Chart Number') AND
+			cat.org_internal_id = ? AND
+			hphone.value_text = ?
+			and cat.category = 'Patient'
+			ORDER BY upper(per.name_last), upper(per.name_first)
+			)
+			WHERE rownum &lt;= 250
+			
+		</statement>
+
+		<statement name="sel_phone_physician">
+			
+			SELECT *
+			FROM (
+			SELECT
+			per.person_id,
+			per.name_last,
+			per.name_first,
+			per.ssn,
+			TO_CHAR(per.date_of_birth, 'MM/DD/YYYY') as dob,
+			hphone.value_text AS home_phone,
+			account.value_text as account,
+			chart.value_text as chart,
+			cat.category,
+			initcap(per.simple_name) AS name,
+			(select 1 from dual
+			where exists (select 'x' from transaction t
+			where t.trans_owner_id = per.person_id
+			and t.trans_status = 2
+			and t.trans_type = 8026
+			)
+			) as appt_alert,
+			decode(per.gender, 1, 'M', 2, 'F', '') as gender
+			FROM
+			person per,
+			person_org_category cat,
+			person_attribute hphone,
+			person_attribute account,
+			person_attribute chart
+			WHERE
+			per.person_id = cat.person_id(+) AND
+			(per.person_id = hphone.parent_id(+) AND hphone.value_type(+) = 10 AND hphone.item_name(+) = 'Home') AND
+			(per.person_id = account.parent_id(+) AND account.value_type(+) = 0 AND account.item_name(+) = 'Patient/Account Number') AND
+			(per.person_id = chart.parent_id(+) AND chart.value_type(+) = 0 AND chart.item_name(+) = 'Patient/Chart Number') AND
+			cat.org_internal_id = ? AND
+			hphone.value_text = ?
+			and cat.category = 'Physician'
+			ORDER BY upper(per.name_last), upper(per.name_first)
+			)
+			WHERE rownum &lt;= 250
+			
+		</statement>
+
+		<statement name="sel_phone_physician-ref">
+			
+			SELECT *
+			FROM (
+			SELECT
+			per.person_id,
+			per.name_last,
+			per.name_first,
+			per.ssn,
+			TO_CHAR(per.date_of_birth, 'MM/DD/YYYY') as dob,
+			hphone.value_text AS home_phone,
+			account.value_text as account,
+			chart.value_text as chart,
+			cat.category,
+			initcap(per.simple_name) AS name,
+			(select 1 from dual
+			where exists (select 'x' from transaction t
+			where t.trans_owner_id = per.person_id
+			and t.trans_status = 2
+			and t.trans_type = 8026
+			)
+			) as appt_alert,
+			decode(per.gender, 1, 'M', 2, 'F', '') as gender
+			FROM
+			person per,
+			person_org_category cat,
+			person_attribute hphone,
+			person_attribute account,
+			person_attribute chart
+			WHERE
+			per.person_id = cat.person_id(+) AND
+			(per.person_id = hphone.parent_id(+) AND hphone.value_type(+) = 10 AND hphone.item_name(+) = 'Home') AND
+			(per.person_id = account.parent_id(+) AND account.value_type(+) = 0 AND account.item_name(+) = 'Patient/Account Number') AND
+			(per.person_id = chart.parent_id(+) AND chart.value_type(+) = 0 AND chart.item_name(+) = 'Patient/Chart Number') AND
+			cat.org_internal_id = ? AND
+			hphone.value_text = ?
+			and cat.category in ('Physician', 'Referring-Doctor')
+			ORDER BY upper(per.name_last), upper(per.name_first)
+			)
+			WHERE rownum &lt;= 250
+			
+		</statement>
+
+		<statement name="sel_phone_referring-Doctor">
+			
+			SELECT *
+			FROM (
+			SELECT
+			per.person_id,
+			per.name_last,
+			per.name_first,
+			per.ssn,
+			TO_CHAR(per.date_of_birth, 'MM/DD/YYYY') as dob,
+			hphone.value_text AS home_phone,
+			account.value_text as account,
+			chart.value_text as chart,
+			cat.category,
+			initcap(per.simple_name) AS name,
+			(select 1 from dual
+			where exists (select 'x' from transaction t
+			where t.trans_owner_id = per.person_id
+			and t.trans_status = 2
+			and t.trans_type = 8026
+			)
+			) as appt_alert,
+			decode(per.gender, 1, 'M', 2, 'F', '') as gender
+			FROM
+			person per,
+			person_org_category cat,
+			person_attribute hphone,
+			person_attribute account,
+			person_attribute chart
+			WHERE
+			per.person_id = cat.person_id(+) AND
+			(per.person_id = hphone.parent_id(+) AND hphone.value_type(+) = 10 AND hphone.item_name(+) = 'Home') AND
+			(per.person_id = account.parent_id(+) AND account.value_type(+) = 0 AND account.item_name(+) = 'Patient/Account Number') AND
+			(per.person_id = chart.parent_id(+) AND chart.value_type(+) = 0 AND chart.item_name(+) = 'Patient/Chart Number') AND
+			cat.org_internal_id = ? AND
+			hphone.value_text = ?
+			and cat.category = 'Referring-Doctor'
+			ORDER BY upper(per.name_last), upper(per.name_first)
+			)
+			WHERE rownum &lt;= 250
+			
+		</statement>
+
+		<statement name="sel_phone_staff">
+			
+			SELECT *
+			FROM (
+			SELECT
+			per.person_id,
+			per.name_last,
+			per.name_first,
+			per.ssn,
+			TO_CHAR(per.date_of_birth, 'MM/DD/YYYY') as dob,
+			hphone.value_text AS home_phone,
+			account.value_text as account,
+			chart.value_text as chart,
+			cat.category,
+			initcap(per.simple_name) AS name,
+			(select 1 from dual
+			where exists (select 'x' from transaction t
+			where t.trans_owner_id = per.person_id
+			and t.trans_status = 2
+			and t.trans_type = 8026
+			)
+			) as appt_alert,
+			decode(per.gender, 1, 'M', 2, 'F', '') as gender
+			FROM
+			person per,
+			person_org_category cat,
+			person_attribute hphone,
+			person_attribute account,
+			person_attribute chart
+			WHERE
+			per.person_id = cat.person_id(+) AND
+			(per.person_id = hphone.parent_id(+) AND hphone.value_type(+) = 10 AND hphone.item_name(+) = 'Home') AND
+			(per.person_id = account.parent_id(+) AND account.value_type(+) = 0 AND account.item_name(+) = 'Patient/Account Number') AND
+			(per.person_id = chart.parent_id(+) AND chart.value_type(+) = 0 AND chart.item_name(+) = 'Patient/Chart Number') AND
+			cat.org_internal_id = ? AND
+			hphone.value_text = ?
+			and cat.category = 'Staff'
+			ORDER BY upper(per.name_last), upper(per.name_first)
+			)
+			WHERE rownum &lt;= 250
+			
+		</statement>
+
+		<statement name="sel_ssn">
+			
+			SELECT *
+			FROM (
+			SELECT
+			per.person_id,
+			per.name_last,
+			per.name_first,
+			per.ssn,
+			TO_CHAR(per.date_of_birth, 'MM/DD/YYYY') as dob,
+			hphone.value_text AS home_phone,
+			account.value_text as account,
+			chart.value_text as chart,
+			cat.category,
+			initcap(per.simple_name) AS name,
+			(select 1 from dual
+			where exists (select 'x' from transaction t
+			where t.trans_owner_id = per.person_id
+			and t.trans_status = 2
+			and t.trans_type = 8026
+			)
+			) as appt_alert,
+			decode(per.gender, 1, 'M', 2, 'F', '') as gender
+			FROM
+			person per,
+			person_org_category cat,
+			person_attribute hphone,
+			person_attribute account,
+			person_attribute chart
+			WHERE
+			per.person_id = cat.person_id(+) AND
+			(per.person_id = hphone.parent_id(+) AND hphone.value_type(+) = 10 AND hphone.item_name(+) = 'Home') AND
+			(per.person_id = account.parent_id(+) AND account.value_type(+) = 0 AND account.item_name(+) = 'Patient/Account Number') AND
+			(per.person_id = chart.parent_id(+) AND chart.value_type(+) = 0 AND chart.item_name(+) = 'Patient/Chart Number') AND
+			cat.org_internal_id = ? AND
+			per.ssn = ?
+			ORDER BY upper(per.name_last), upper(per.name_first)
+			)
+			WHERE rownum &lt;= 250
+			
+		</statement>
+
+		<statement name="sel_ssn_associate">
+			
+			SELECT *
+			FROM (
+			SELECT
+			per.person_id,
+			per.name_last,
+			per.name_first,
+			per.ssn,
+			TO_CHAR(per.date_of_birth, 'MM/DD/YYYY') as dob,
+			hphone.value_text AS home_phone,
+			account.value_text as account,
+			chart.value_text as chart,
+			cat.category,
+			initcap(per.simple_name) AS name,
+			(select 1 from dual
+			where exists (select 'x' from transaction t
+			where t.trans_owner_id = per.person_id
+			and t.trans_status = 2
+			and t.trans_type = 8026
+			)
+			) as appt_alert,
+			decode(per.gender, 1, 'M', 2, 'F', '') as gender
+			FROM
+			person per,
+			person_org_category cat,
+			person_attribute hphone,
+			person_attribute account,
+			person_attribute chart
+			WHERE
+			per.person_id = cat.person_id(+) AND
+			(per.person_id = hphone.parent_id(+) AND hphone.value_type(+) = 10 AND hphone.item_name(+) = 'Home') AND
+			(per.person_id = account.parent_id(+) AND account.value_type(+) = 0 AND account.item_name(+) = 'Patient/Account Number') AND
+			(per.person_id = chart.parent_id(+) AND chart.value_type(+) = 0 AND chart.item_name(+) = 'Patient/Chart Number') AND
+			cat.org_internal_id = ? AND
+			per.ssn = ?
+			and cat.category in ('Physician', 'Nurse', 'Staff')
+			ORDER BY upper(per.name_last), upper(per.name_first)
+			)
+			WHERE rownum &lt;= 250
+			
+		</statement>
+
+		<statement name="sel_ssn_insured-Person">
+			
+			SELECT *
+			FROM (
+			SELECT
+			per.person_id,
+			per.name_last,
+			per.name_first,
+			per.ssn,
+			TO_CHAR(per.date_of_birth, 'MM/DD/YYYY') as dob,
+			hphone.value_text AS home_phone,
+			account.value_text as account,
+			chart.value_text as chart,
+			cat.category,
+			initcap(per.simple_name) AS name,
+			(select 1 from dual
+			where exists (select 'x' from transaction t
+			where t.trans_owner_id = per.person_id
+			and t.trans_status = 2
+			and t.trans_type = 8026
+			)
+			) as appt_alert,
+			decode(per.gender, 1, 'M', 2, 'F', '') as gender
+			FROM
+			person per,
+			person_org_category cat,
+			person_attribute hphone,
+			person_attribute account,
+			person_attribute chart
+			WHERE
+			per.person_id = cat.person_id(+) AND
+			(per.person_id = hphone.parent_id(+) AND hphone.value_type(+) = 10 AND hphone.item_name(+) = 'Home') AND
+			(per.person_id = account.parent_id(+) AND account.value_type(+) = 0 AND account.item_name(+) = 'Patient/Account Number') AND
+			(per.person_id = chart.parent_id(+) AND chart.value_type(+) = 0 AND chart.item_name(+) = 'Patient/Chart Number') AND
+			cat.org_internal_id = ? AND
+			per.ssn = ?
+			and cat.category = 'Insured-Person'
+			ORDER BY upper(per.name_last), upper(per.name_first)
+			)
+			WHERE rownum &lt;= 250
+			
+		</statement>
+
+		<statement name="sel_ssn_like">
+			
+			SELECT *
+			FROM (
+			SELECT
+			per.person_id,
+			per.name_last,
+			per.name_first,
+			per.ssn,
+			TO_CHAR(per.date_of_birth, 'MM/DD/YYYY') as dob,
+			hphone.value_text AS home_phone,
+			account.value_text as account,
+			chart.value_text as chart,
+			cat.category,
+			initcap(per.simple_name) AS name,
+			(select 1 from dual
+			where exists (select 'x' from transaction t
+			where t.trans_owner_id = per.person_id
+			and t.trans_status = 2
+			and t.trans_type = 8026
+			)
+			) as appt_alert,
+			decode(per.gender, 1, 'M', 2, 'F', '') as gender
+			FROM
+			person per,
+			person_org_category cat,
+			person_attribute hphone,
+			person_attribute account,
+			person_attribute chart
+			WHERE
+			per.person_id = cat.person_id(+) AND
+			(per.person_id = hphone.parent_id(+) AND hphone.value_type(+) = 10 AND hphone.item_name(+) = 'Home') AND
+			(per.person_id = account.parent_id(+) AND account.value_type(+) = 0 AND account.item_name(+) = 'Patient/Account Number') AND
+			(per.person_id = chart.parent_id(+) AND chart.value_type(+) = 0 AND chart.item_name(+) = 'Patient/Chart Number') AND
+			cat.org_internal_id = ? AND
+			per.ssn like ?
+			ORDER BY upper(per.name_last), upper(per.name_first)
+			)
+			WHERE rownum &lt;= 250
+			
+		</statement>
+
+		<statement name="sel_ssn_like_associate">
+			
+			SELECT *
+			FROM (
+			SELECT
+			per.person_id,
+			per.name_last,
+			per.name_first,
+			per.ssn,
+			TO_CHAR(per.date_of_birth, 'MM/DD/YYYY') as dob,
+			hphone.value_text AS home_phone,
+			account.value_text as account,
+			chart.value_text as chart,
+			cat.category,
+			initcap(per.simple_name) AS name,
+			(select 1 from dual
+			where exists (select 'x' from transaction t
+			where t.trans_owner_id = per.person_id
+			and t.trans_status = 2
+			and t.trans_type = 8026
+			)
+			) as appt_alert,
+			decode(per.gender, 1, 'M', 2, 'F', '') as gender
+			FROM
+			person per,
+			person_org_category cat,
+			person_attribute hphone,
+			person_attribute account,
+			person_attribute chart
+			WHERE
+			per.person_id = cat.person_id(+) AND
+			(per.person_id = hphone.parent_id(+) AND hphone.value_type(+) = 10 AND hphone.item_name(+) = 'Home') AND
+			(per.person_id = account.parent_id(+) AND account.value_type(+) = 0 AND account.item_name(+) = 'Patient/Account Number') AND
+			(per.person_id = chart.parent_id(+) AND chart.value_type(+) = 0 AND chart.item_name(+) = 'Patient/Chart Number') AND
+			cat.org_internal_id = ? AND
+			per.ssn like ?
+			and cat.category in ('Physician', 'Nurse', 'Staff')
+			ORDER BY upper(per.name_last), upper(per.name_first)
+			)
+			WHERE rownum &lt;= 250
+			
+		</statement>
+
+		<statement name="sel_ssn_like_insured-Person">
+			
+			SELECT *
+			FROM (
+			SELECT
+			per.person_id,
+			per.name_last,
+			per.name_first,
+			per.ssn,
+			TO_CHAR(per.date_of_birth, 'MM/DD/YYYY') as dob,
+			hphone.value_text AS home_phone,
+			account.value_text as account,
+			chart.value_text as chart,
+			cat.category,
+			initcap(per.simple_name) AS name,
+			(select 1 from dual
+			where exists (select 'x' from transaction t
+			where t.trans_owner_id = per.person_id
+			and t.trans_status = 2
+			and t.trans_type = 8026
+			)
+			) as appt_alert,
+			decode(per.gender, 1, 'M', 2, 'F', '') as gender
+			FROM
+			person per,
+			person_org_category cat,
+			person_attribute hphone,
+			person_attribute account,
+			person_attribute chart
+			WHERE
+			per.person_id = cat.person_id(+) AND
+			(per.person_id = hphone.parent_id(+) AND hphone.value_type(+) = 10 AND hphone.item_name(+) = 'Home') AND
+			(per.person_id = account.parent_id(+) AND account.value_type(+) = 0 AND account.item_name(+) = 'Patient/Account Number') AND
+			(per.person_id = chart.parent_id(+) AND chart.value_type(+) = 0 AND chart.item_name(+) = 'Patient/Chart Number') AND
+			cat.org_internal_id = ? AND
+			per.ssn like ?
+			and cat.category = 'Insured-Person'
+			ORDER BY upper(per.name_last), upper(per.name_first)
+			)
+			WHERE rownum &lt;= 250
+			
+		</statement>
+
+		<statement name="sel_ssn_like_nurse">
+			
+			SELECT *
+			FROM (
+			SELECT
+			per.person_id,
+			per.name_last,
+			per.name_first,
+			per.ssn,
+			TO_CHAR(per.date_of_birth, 'MM/DD/YYYY') as dob,
+			hphone.value_text AS home_phone,
+			account.value_text as account,
+			chart.value_text as chart,
+			cat.category,
+			initcap(per.simple_name) AS name,
+			(select 1 from dual
+			where exists (select 'x' from transaction t
+			where t.trans_owner_id = per.person_id
+			and t.trans_status = 2
+			and t.trans_type = 8026
+			)
+			) as appt_alert,
+			decode(per.gender, 1, 'M', 2, 'F', '') as gender
+			FROM
+			person per,
+			person_org_category cat,
+			person_attribute hphone,
+			person_attribute account,
+			person_attribute chart
+			WHERE
+			per.person_id = cat.person_id(+) AND
+			(per.person_id = hphone.parent_id(+) AND hphone.value_type(+) = 10 AND hphone.item_name(+) = 'Home') AND
+			(per.person_id = account.parent_id(+) AND account.value_type(+) = 0 AND account.item_name(+) = 'Patient/Account Number') AND
+			(per.person_id = chart.parent_id(+) AND chart.value_type(+) = 0 AND chart.item_name(+) = 'Patient/Chart Number') AND
+			cat.org_internal_id = ? AND
+			per.ssn like ?
+			and cat.category = 'Nurse'
+			ORDER BY upper(per.name_last), upper(per.name_first)
+			)
+			WHERE rownum &lt;= 250
+			
+		</statement>
+
+		<statement name="sel_ssn_like_patient">
+			
+			SELECT *
+			FROM (
+			SELECT
+			per.person_id,
+			per.name_last,
+			per.name_first,
+			per.ssn,
+			TO_CHAR(per.date_of_birth, 'MM/DD/YYYY') as dob,
+			hphone.value_text AS home_phone,
+			account.value_text as account,
+			chart.value_text as chart,
+			cat.category,
+			initcap(per.simple_name) AS name,
+			(select 1 from dual
+			where exists (select 'x' from transaction t
+			where t.trans_owner_id = per.person_id
+			and t.trans_status = 2
+			and t.trans_type = 8026
+			)
+			) as appt_alert,
+			decode(per.gender, 1, 'M', 2, 'F', '') as gender
+			FROM
+			person per,
+			person_org_category cat,
+			person_attribute hphone,
+			person_attribute account,
+			person_attribute chart
+			WHERE
+			per.person_id = cat.person_id(+) AND
+			(per.person_id = hphone.parent_id(+) AND hphone.value_type(+) = 10 AND hphone.item_name(+) = 'Home') AND
+			(per.person_id = account.parent_id(+) AND account.value_type(+) = 0 AND account.item_name(+) = 'Patient/Account Number') AND
+			(per.person_id = chart.parent_id(+) AND chart.value_type(+) = 0 AND chart.item_name(+) = 'Patient/Chart Number') AND
+			cat.org_internal_id = ? AND
+			per.ssn like ?
+			and cat.category = 'Patient'
+			ORDER BY upper(per.name_last), upper(per.name_first)
+			)
+			WHERE rownum &lt;= 250
+			
+		</statement>
+
+		<statement name="sel_ssn_like_physician">
+			
+			SELECT *
+			FROM (
+			SELECT
+			per.person_id,
+			per.name_last,
+			per.name_first,
+			per.ssn,
+			TO_CHAR(per.date_of_birth, 'MM/DD/YYYY') as dob,
+			hphone.value_text AS home_phone,
+			account.value_text as account,
+			chart.value_text as chart,
+			cat.category,
+			initcap(per.simple_name) AS name,
+			(select 1 from dual
+			where exists (select 'x' from transaction t
+			where t.trans_owner_id = per.person_id
+			and t.trans_status = 2
+			and t.trans_type = 8026
+			)
+			) as appt_alert,
+			decode(per.gender, 1, 'M', 2, 'F', '') as gender
+			FROM
+			person per,
+			person_org_category cat,
+			person_attribute hphone,
+			person_attribute account,
+			person_attribute chart
+			WHERE
+			per.person_id = cat.person_id(+) AND
+			(per.person_id = hphone.parent_id(+) AND hphone.value_type(+) = 10 AND hphone.item_name(+) = 'Home') AND
+			(per.person_id = account.parent_id(+) AND account.value_type(+) = 0 AND account.item_name(+) = 'Patient/Account Number') AND
+			(per.person_id = chart.parent_id(+) AND chart.value_type(+) = 0 AND chart.item_name(+) = 'Patient/Chart Number') AND
+			cat.org_internal_id = ? AND
+			per.ssn like ?
+			and cat.category = 'Physician'
+			ORDER BY upper(per.name_last), upper(per.name_first)
+			)
+			WHERE rownum &lt;= 250
+			
+		</statement>
+
+		<statement name="sel_ssn_like_physician-ref">
+			
+			SELECT *
+			FROM (
+			SELECT
+			per.person_id,
+			per.name_last,
+			per.name_first,
+			per.ssn,
+			TO_CHAR(per.date_of_birth, 'MM/DD/YYYY') as dob,
+			hphone.value_text AS home_phone,
+			account.value_text as account,
+			chart.value_text as chart,
+			cat.category,
+			initcap(per.simple_name) AS name,
+			(select 1 from dual
+			where exists (select 'x' from transaction t
+			where t.trans_owner_id = per.person_id
+			and t.trans_status = 2
+			and t.trans_type = 8026
+			)
+			) as appt_alert,
+			decode(per.gender, 1, 'M', 2, 'F', '') as gender
+			FROM
+			person per,
+			person_org_category cat,
+			person_attribute hphone,
+			person_attribute account,
+			person_attribute chart
+			WHERE
+			per.person_id = cat.person_id(+) AND
+			(per.person_id = hphone.parent_id(+) AND hphone.value_type(+) = 10 AND hphone.item_name(+) = 'Home') AND
+			(per.person_id = account.parent_id(+) AND account.value_type(+) = 0 AND account.item_name(+) = 'Patient/Account Number') AND
+			(per.person_id = chart.parent_id(+) AND chart.value_type(+) = 0 AND chart.item_name(+) = 'Patient/Chart Number') AND
+			cat.org_internal_id = ? AND
+			per.ssn like ?
+			and cat.category in ('Physician', 'Referring-Doctor')
+			ORDER BY upper(per.name_last), upper(per.name_first)
+			)
+			WHERE rownum &lt;= 250
+			
+		</statement>
+
+		<statement name="sel_ssn_like_referring-Doctor">
+			
+			SELECT *
+			FROM (
+			SELECT
+			per.person_id,
+			per.name_last,
+			per.name_first,
+			per.ssn,
+			TO_CHAR(per.date_of_birth, 'MM/DD/YYYY') as dob,
+			hphone.value_text AS home_phone,
+			account.value_text as account,
+			chart.value_text as chart,
+			cat.category,
+			initcap(per.simple_name) AS name,
+			(select 1 from dual
+			where exists (select 'x' from transaction t
+			where t.trans_owner_id = per.person_id
+			and t.trans_status = 2
+			and t.trans_type = 8026
+			)
+			) as appt_alert,
+			decode(per.gender, 1, 'M', 2, 'F', '') as gender
+			FROM
+			person per,
+			person_org_category cat,
+			person_attribute hphone,
+			person_attribute account,
+			person_attribute chart
+			WHERE
+			per.person_id = cat.person_id(+) AND
+			(per.person_id = hphone.parent_id(+) AND hphone.value_type(+) = 10 AND hphone.item_name(+) = 'Home') AND
+			(per.person_id = account.parent_id(+) AND account.value_type(+) = 0 AND account.item_name(+) = 'Patient/Account Number') AND
+			(per.person_id = chart.parent_id(+) AND chart.value_type(+) = 0 AND chart.item_name(+) = 'Patient/Chart Number') AND
+			cat.org_internal_id = ? AND
+			per.ssn like ?
+			and cat.category = 'Referring-Doctor'
+			ORDER BY upper(per.name_last), upper(per.name_first)
+			)
+			WHERE rownum &lt;= 250
+			
+		</statement>
+
+		<statement name="sel_ssn_like_staff">
+			
+			SELECT *
+			FROM (
+			SELECT
+			per.person_id,
+			per.name_last,
+			per.name_first,
+			per.ssn,
+			TO_CHAR(per.date_of_birth, 'MM/DD/YYYY') as dob,
+			hphone.value_text AS home_phone,
+			account.value_text as account,
+			chart.value_text as chart,
+			cat.category,
+			initcap(per.simple_name) AS name,
+			(select 1 from dual
+			where exists (select 'x' from transaction t
+			where t.trans_owner_id = per.person_id
+			and t.trans_status = 2
+			and t.trans_type = 8026
+			)
+			) as appt_alert,
+			decode(per.gender, 1, 'M', 2, 'F', '') as gender
+			FROM
+			person per,
+			person_org_category cat,
+			person_attribute hphone,
+			person_attribute account,
+			person_attribute chart
+			WHERE
+			per.person_id = cat.person_id(+) AND
+			(per.person_id = hphone.parent_id(+) AND hphone.value_type(+) = 10 AND hphone.item_name(+) = 'Home') AND
+			(per.person_id = account.parent_id(+) AND account.value_type(+) = 0 AND account.item_name(+) = 'Patient/Account Number') AND
+			(per.person_id = chart.parent_id(+) AND chart.value_type(+) = 0 AND chart.item_name(+) = 'Patient/Chart Number') AND
+			cat.org_internal_id = ? AND
+			per.ssn like ?
+			and cat.category = 'Staff'
+			ORDER BY upper(per.name_last), upper(per.name_first)
+			)
+			WHERE rownum &lt;= 250
+			
+		</statement>
+
+		<statement name="sel_ssn_nurse">
+			
+			SELECT *
+			FROM (
+			SELECT
+			per.person_id,
+			per.name_last,
+			per.name_first,
+			per.ssn,
+			TO_CHAR(per.date_of_birth, 'MM/DD/YYYY') as dob,
+			hphone.value_text AS home_phone,
+			account.value_text as account,
+			chart.value_text as chart,
+			cat.category,
+			initcap(per.simple_name) AS name,
+			(select 1 from dual
+			where exists (select 'x' from transaction t
+			where t.trans_owner_id = per.person_id
+			and t.trans_status = 2
+			and t.trans_type = 8026
+			)
+			) as appt_alert,
+			decode(per.gender, 1, 'M', 2, 'F', '') as gender
+			FROM
+			person per,
+			person_org_category cat,
+			person_attribute hphone,
+			person_attribute account,
+			person_attribute chart
+			WHERE
+			per.person_id = cat.person_id(+) AND
+			(per.person_id = hphone.parent_id(+) AND hphone.value_type(+) = 10 AND hphone.item_name(+) = 'Home') AND
+			(per.person_id = account.parent_id(+) AND account.value_type(+) = 0 AND account.item_name(+) = 'Patient/Account Number') AND
+			(per.person_id = chart.parent_id(+) AND chart.value_type(+) = 0 AND chart.item_name(+) = 'Patient/Chart Number') AND
+			cat.org_internal_id = ? AND
+			per.ssn = ?
+			and cat.category = 'Nurse'
+			ORDER BY upper(per.name_last), upper(per.name_first)
+			)
+			WHERE rownum &lt;= 250
+			
+		</statement>
+
+		<statement name="sel_ssn_patient">
+			
+			SELECT *
+			FROM (
+			SELECT
+			per.person_id,
+			per.name_last,
+			per.name_first,
+			per.ssn,
+			TO_CHAR(per.date_of_birth, 'MM/DD/YYYY') as dob,
+			hphone.value_text AS home_phone,
+			account.value_text as account,
+			chart.value_text as chart,
+			cat.category,
+			initcap(per.simple_name) AS name,
+			(select 1 from dual
+			where exists (select 'x' from transaction t
+			where t.trans_owner_id = per.person_id
+			and t.trans_status = 2
+			and t.trans_type = 8026
+			)
+			) as appt_alert,
+			decode(per.gender, 1, 'M', 2, 'F', '') as gender
+			FROM
+			person per,
+			person_org_category cat,
+			person_attribute hphone,
+			person_attribute account,
+			person_attribute chart
+			WHERE
+			per.person_id = cat.person_id(+) AND
+			(per.person_id = hphone.parent_id(+) AND hphone.value_type(+) = 10 AND hphone.item_name(+) = 'Home') AND
+			(per.person_id = account.parent_id(+) AND account.value_type(+) = 0 AND account.item_name(+) = 'Patient/Account Number') AND
+			(per.person_id = chart.parent_id(+) AND chart.value_type(+) = 0 AND chart.item_name(+) = 'Patient/Chart Number') AND
+			cat.org_internal_id = ? AND
+			per.ssn = ?
+			and cat.category = 'Patient'
+			ORDER BY upper(per.name_last), upper(per.name_first)
+			)
+			WHERE rownum &lt;= 250
+			
+		</statement>
+
+		<statement name="sel_ssn_physician">
+			
+			SELECT *
+			FROM (
+			SELECT
+			per.person_id,
+			per.name_last,
+			per.name_first,
+			per.ssn,
+			TO_CHAR(per.date_of_birth, 'MM/DD/YYYY') as dob,
+			hphone.value_text AS home_phone,
+			account.value_text as account,
+			chart.value_text as chart,
+			cat.category,
+			initcap(per.simple_name) AS name,
+			(select 1 from dual
+			where exists (select 'x' from transaction t
+			where t.trans_owner_id = per.person_id
+			and t.trans_status = 2
+			and t.trans_type = 8026
+			)
+			) as appt_alert,
+			decode(per.gender, 1, 'M', 2, 'F', '') as gender
+			FROM
+			person per,
+			person_org_category cat,
+			person_attribute hphone,
+			person_attribute account,
+			person_attribute chart
+			WHERE
+			per.person_id = cat.person_id(+) AND
+			(per.person_id = hphone.parent_id(+) AND hphone.value_type(+) = 10 AND hphone.item_name(+) = 'Home') AND
+			(per.person_id = account.parent_id(+) AND account.value_type(+) = 0 AND account.item_name(+) = 'Patient/Account Number') AND
+			(per.person_id = chart.parent_id(+) AND chart.value_type(+) = 0 AND chart.item_name(+) = 'Patient/Chart Number') AND
+			cat.org_internal_id = ? AND
+			per.ssn = ?
+			and cat.category = 'Physician'
+			ORDER BY upper(per.name_last), upper(per.name_first)
+			)
+			WHERE rownum &lt;= 250
+			
+		</statement>
+
+		<statement name="sel_ssn_physician-ref">
+			
+			SELECT *
+			FROM (
+			SELECT
+			per.person_id,
+			per.name_last,
+			per.name_first,
+			per.ssn,
+			TO_CHAR(per.date_of_birth, 'MM/DD/YYYY') as dob,
+			hphone.value_text AS home_phone,
+			account.value_text as account,
+			chart.value_text as chart,
+			cat.category,
+			initcap(per.simple_name) AS name,
+			(select 1 from dual
+			where exists (select 'x' from transaction t
+			where t.trans_owner_id = per.person_id
+			and t.trans_status = 2
+			and t.trans_type = 8026
+			)
+			) as appt_alert,
+			decode(per.gender, 1, 'M', 2, 'F', '') as gender
+			FROM
+			person per,
+			person_org_category cat,
+			person_attribute hphone,
+			person_attribute account,
+			person_attribute chart
+			WHERE
+			per.person_id = cat.person_id(+) AND
+			(per.person_id = hphone.parent_id(+) AND hphone.value_type(+) = 10 AND hphone.item_name(+) = 'Home') AND
+			(per.person_id = account.parent_id(+) AND account.value_type(+) = 0 AND account.item_name(+) = 'Patient/Account Number') AND
+			(per.person_id = chart.parent_id(+) AND chart.value_type(+) = 0 AND chart.item_name(+) = 'Patient/Chart Number') AND
+			cat.org_internal_id = ? AND
+			per.ssn = ?
+			and cat.category in ('Physician', 'Referring-Doctor')
+			ORDER BY upper(per.name_last), upper(per.name_first)
+			)
+			WHERE rownum &lt;= 250
+			
+		</statement>
+
+		<statement name="sel_ssn_referring-Doctor">
+			
+			SELECT *
+			FROM (
+			SELECT
+			per.person_id,
+			per.name_last,
+			per.name_first,
+			per.ssn,
+			TO_CHAR(per.date_of_birth, 'MM/DD/YYYY') as dob,
+			hphone.value_text AS home_phone,
+			account.value_text as account,
+			chart.value_text as chart,
+			cat.category,
+			initcap(per.simple_name) AS name,
+			(select 1 from dual
+			where exists (select 'x' from transaction t
+			where t.trans_owner_id = per.person_id
+			and t.trans_status = 2
+			and t.trans_type = 8026
+			)
+			) as appt_alert,
+			decode(per.gender, 1, 'M', 2, 'F', '') as gender
+			FROM
+			person per,
+			person_org_category cat,
+			person_attribute hphone,
+			person_attribute account,
+			person_attribute chart
+			WHERE
+			per.person_id = cat.person_id(+) AND
+			(per.person_id = hphone.parent_id(+) AND hphone.value_type(+) = 10 AND hphone.item_name(+) = 'Home') AND
+			(per.person_id = account.parent_id(+) AND account.value_type(+) = 0 AND account.item_name(+) = 'Patient/Account Number') AND
+			(per.person_id = chart.parent_id(+) AND chart.value_type(+) = 0 AND chart.item_name(+) = 'Patient/Chart Number') AND
+			cat.org_internal_id = ? AND
+			per.ssn = ?
+			and cat.category = 'Referring-Doctor'
+			ORDER BY upper(per.name_last), upper(per.name_first)
+			)
+			WHERE rownum &lt;= 250
+			
+		</statement>
+
+		<statement name="sel_ssn_staff">
+			
+			SELECT *
+			FROM (
+			SELECT
+			per.person_id,
+			per.name_last,
+			per.name_first,
+			per.ssn,
+			TO_CHAR(per.date_of_birth, 'MM/DD/YYYY') as dob,
+			hphone.value_text AS home_phone,
+			account.value_text as account,
+			chart.value_text as chart,
+			cat.category,
+			initcap(per.simple_name) AS name,
+			(select 1 from dual
+			where exists (select 'x' from transaction t
+			where t.trans_owner_id = per.person_id
+			and t.trans_status = 2
+			and t.trans_type = 8026
+			)
+			) as appt_alert,
+			decode(per.gender, 1, 'M', 2, 'F', '') as gender
+			FROM
+			person per,
+			person_org_category cat,
+			person_attribute hphone,
+			person_attribute account,
+			person_attribute chart
+			WHERE
+			per.person_id = cat.person_id(+) AND
+			(per.person_id = hphone.parent_id(+) AND hphone.value_type(+) = 10 AND hphone.item_name(+) = 'Home') AND
+			(per.person_id = account.parent_id(+) AND account.value_type(+) = 0 AND account.item_name(+) = 'Patient/Account Number') AND
+			(per.person_id = chart.parent_id(+) AND chart.value_type(+) = 0 AND chart.item_name(+) = 'Patient/Chart Number') AND
+			cat.org_internal_id = ? AND
+			per.ssn = ?
+			and cat.category = 'Staff'
+			ORDER BY upper(per.name_last), upper(per.name_first)
+			)
+			WHERE rownum &lt;= 250
+			
+		</statement>
+
+	</sql-statements>
+</xaf>

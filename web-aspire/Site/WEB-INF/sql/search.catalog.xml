@@ -1,0 +1,807 @@
+<?xml version="1.0"?>
+
+<xaf>
+	<sql-statements package="search.catalog">
+		<statement name="id">
+			App::Statements::Search::Catalog
+		</statement>
+
+		<statement name="sel__name_catalogs_all">
+			
+			SELECT *
+			FROM (
+			SELECT
+			oc.catalog_id,
+			count(oce.entry_id) entries_count,
+			oc.caption,
+			oc.description,
+			oc.parent_catalog_id,
+			oc.internal_catalog_id,
+			'Add',
+			DECODE(oc_a.value_int, 1, '(Capitated)', null) AS capitated
+			FROM
+			ofcatalog_Attribute oc_a,
+			offering_catalog oc,
+			offering_catalog_entry oce
+			WHERE
+			oce.catalog_id (+) = oc.internal_catalog_id
+			AND oc_a.parent_id (+) = oc.internal_catalog_id
+			AND oc.catalog_type = 0
+			AND (oc.org_internal_id IS NULL OR oc.org_internal_id = :1)
+			GROUP BY
+			oc.catalog_id,
+			oc.internal_catalog_id,
+			oc.caption,
+			oc.description,
+			oc.parent_catalog_id ,
+			oc_a.value_int
+			ORDER BY
+			oc.catalog_id
+			)
+			WHERE rownum &lt;= 250
+
+		</statement>
+
+		<statement name="sel_catalog_description">
+			
+			SELECT *
+			FROM (
+			SELECT
+			oc.catalog_id,
+			count(oce.entry_id) entries_count,
+			oc.caption,
+			oc.description,
+			oc.parent_catalog_id,
+			oc.internal_catalog_id,
+			'Add',
+			DECODE(oc_a.value_int, 1, '(Capitated)', null) AS capitated
+			FROM
+			ofcatalog_Attribute oc_a,
+			offering_catalog oc,
+			offering_catalog_entry oce
+			WHERE
+			oce.catalog_id (+) = oc.internal_catalog_id
+			AND oc_a.parent_id (+) = oc.internal_catalog_id
+			AND oc.catalog_type = 0
+			AND (oc.org_internal_id IS NULL OR oc.org_internal_id = :1)
+			AND UPPER(oc.description) = :2
+			GROUP BY
+			oc.catalog_id,
+			oc.internal_catalog_id,
+			oc.caption,
+			oc.description,
+			oc.parent_catalog_id ,
+			oc_a.value_int
+			ORDER BY
+			oc.catalog_id
+			)
+			WHERE rownum &lt;= 250
+
+		</statement>
+
+		<statement name="sel_catalog_description_like">
+			
+			SELECT *
+			FROM (
+			SELECT
+			oc.catalog_id,
+			count(oce.entry_id) entries_count,
+			oc.caption,
+			oc.description,
+			oc.parent_catalog_id,
+			oc.internal_catalog_id,
+			'Add',
+			DECODE(oc_a.value_int, 1, '(Capitated)', null) AS capitated
+			FROM
+			ofcatalog_Attribute oc_a,
+			offering_catalog oc,
+			offering_catalog_entry oce
+			WHERE
+			oce.catalog_id (+) = oc.internal_catalog_id
+			AND oc_a.parent_id (+) = oc.internal_catalog_id
+			AND oc.catalog_type = 0
+			AND (oc.org_internal_id IS NULL OR oc.org_internal_id = :1)
+			AND UPPER(oc.description) LIKE :2
+			GROUP BY
+			oc.catalog_id,
+			oc.internal_catalog_id,
+			oc.caption,
+			oc.description,
+			oc.parent_catalog_id ,
+			oc_a.value_int
+			ORDER BY
+			oc.catalog_id
+			)
+			WHERE rownum &lt;= 250
+
+		</statement>
+
+		<statement name="sel_catalog_detail">
+			
+			SELECT
+			entry_id AS ID,
+			catalog_entry_type.caption AS Type,
+			code AS code,
+			modifier AS modifier,
+			description AS description,
+			unit_cost AS price,
+			default_units AS uoh,
+			'Add',
+			parent_entry_id,
+			name,
+			DECODE(flags, 0, null, 1, '(FFS)')
+			FROM
+			catalog_entry_type,
+			offering_catalog_entry
+			WHERE
+			catalog_id = ?
+			AND	offering_catalog_entry.entry_type = catalog_entry_type.id
+			ORDER BY
+			entry_type,
+			code,
+			modifier
+
+		</statement>
+
+		<statement name="sel_catalog_detail_org">
+			
+			SELECT
+			entry_id AS ID,
+			catalog_entry_type.caption AS Type,
+			code AS code,
+			modifier AS modifier,
+			description AS description,
+			unit_cost AS price,
+			default_units AS uoh,
+			'Add',
+			parent_entry_id,
+			name,
+			DECODE(flags, 0, null, 1, '(FFS)')
+			FROM
+			catalog_entry_type,
+			offering_catalog_entry
+			WHERE
+			catalog_id = ?
+			AND	offering_catalog_entry.entry_type = catalog_entry_type.id
+			ORDER BY
+			entry_type,
+			code,
+			modifier
+
+		</statement>
+
+		<statement name="sel_catalog_detailname">
+			
+			SELECT
+			oce.entry_id AS id,
+			catalog_entry_type.caption AS type,
+			oce.code AS code,
+			oce.modifier AS modifier,
+			oce.description AS description,
+			oce.unit_cost AS price,
+			oce.default_units AS uoh,
+			'Add',
+			oce.parent_entry_id,
+			oce.name,
+			decode(oce.flags, 0, null, 1, '(FFS)')
+			FROM
+			catalog_entry_type,
+			offering_catalog_entry oce,
+			offering_catalog oc
+			WHERE
+			oc.org_internal_id = :1
+			AND oc.catalog_id = :2
+			AND oce.catalog_id = oc.internal_catalog_id
+			AND	oce.entry_type = catalog_entry_type.id
+			ORDER BY entry_type, code, modifier
+
+		</statement>
+
+		<statement name="sel_catalog_id">
+			
+			SELECT *
+			FROM (
+			SELECT
+			oc.catalog_id,
+			count(oce.entry_id) entries_count,
+			oc.caption,
+			oc.description,
+			oc.parent_catalog_id,
+			oc.internal_catalog_id,
+			'Add',
+			DECODE(oc_a.value_int, 1, '(Capitated)', null) AS capitated
+			FROM
+			ofcatalog_Attribute oc_a,
+			offering_catalog oc,
+			offering_catalog_entry oce
+			WHERE
+			oce.catalog_id (+) = oc.internal_catalog_id
+			AND oc_a.parent_id (+) = oc.internal_catalog_id
+			AND oc.catalog_type = 0
+			AND (oc.org_internal_id IS NULL OR oc.org_internal_id = :1)
+			AND UPPER(oc.catalog_id) = :2
+			GROUP BY
+			oc.catalog_id,
+			oc.internal_catalog_id,
+			oc.caption,
+			oc.description,
+			oc.parent_catalog_id ,
+			oc_a.value_int
+			ORDER BY
+			oc.catalog_id
+			)
+			WHERE rownum &lt;= 250
+
+		</statement>
+
+		<statement name="sel_catalog_id_like">
+			
+			SELECT *
+			FROM (
+			SELECT
+			oc.catalog_id,
+			count(oce.entry_id) entries_count,
+			oc.caption,
+			oc.description,
+			oc.parent_catalog_id,
+			oc.internal_catalog_id,
+			'Add',
+			DECODE(oc_a.value_int, 1, '(Capitated)', null) AS capitated
+			FROM
+			ofcatalog_Attribute oc_a,
+			offering_catalog oc,
+			offering_catalog_entry oce
+			WHERE
+			oce.catalog_id (+) = oc.internal_catalog_id
+			AND oc_a.parent_id (+) = oc.internal_catalog_id
+			AND oc.catalog_type = 0
+			AND (oc.org_internal_id IS NULL OR oc.org_internal_id = :1)
+			AND UPPER(oc.catalog_id) LIKE :2
+			GROUP BY
+			oc.catalog_id,
+			oc.internal_catalog_id,
+			oc.caption,
+			oc.description,
+			oc.parent_catalog_id ,
+			oc_a.value_int
+			ORDER BY
+			oc.catalog_id
+			)
+			WHERE rownum &lt;= 250
+
+		</statement>
+
+		<statement name="sel_catalog_items_all">
+			
+			SELECT
+			entry_id AS id,
+			code,
+			unit_cost AS price
+			FROM offering_catalog_entry
+			WHERE catalog_id = ?
+			ORDER BY
+			entry_type,
+			status,
+			name,
+			code
+			
+		</statement>
+
+		<statement name="sel_catalog_name">
+			
+			SELECT *
+			FROM (
+			SELECT
+			oc.catalog_id,
+			count(oce.entry_id) entries_count,
+			oc.caption,
+			oc.description,
+			oc.parent_catalog_id,
+			oc.internal_catalog_id,
+			'Add',
+			DECODE(oc_a.value_int, 1, '(Capitated)', null) AS capitated
+			FROM
+			ofcatalog_Attribute oc_a,
+			offering_catalog oc,
+			offering_catalog_entry oce
+			WHERE
+			oce.catalog_id (+) = oc.internal_catalog_id
+			AND oc_a.parent_id (+) = oc.internal_catalog_id
+			AND oc.catalog_type = 0
+			AND (oc.org_internal_id IS NULL OR oc.org_internal_id = :1)
+			AND UPPER(oc.caption) = :2
+			GROUP BY
+			oc.catalog_id,
+			oc.internal_catalog_id,
+			oc.caption,
+			oc.description,
+			oc.parent_catalog_id ,
+			oc_a.value_int
+			ORDER BY
+			oc.catalog_id
+			)
+			WHERE rownum &lt;= 250
+
+		</statement>
+
+		<statement name="sel_catalog_name_like">
+			
+			SELECT *
+			FROM (
+			SELECT
+			oc.catalog_id,
+			count(oce.entry_id) entries_count,
+			oc.caption,
+			oc.description,
+			oc.parent_catalog_id,
+			oc.internal_catalog_id,
+			'Add',
+			DECODE(oc_a.value_int, 1, '(Capitated)', null) AS capitated
+			FROM
+			ofcatalog_Attribute oc_a,
+			offering_catalog oc,
+			offering_catalog_entry oce
+			WHERE
+			oce.catalog_id (+) = oc.internal_catalog_id
+			AND oc_a.parent_id (+) = oc.internal_catalog_id
+			AND oc.catalog_type = 0
+			AND (oc.org_internal_id IS NULL OR oc.org_internal_id = :1)
+			AND UPPER(oc.caption) LIKE :2
+			GROUP BY
+			oc.catalog_id,
+			oc.internal_catalog_id,
+			oc.caption,
+			oc.description,
+			oc.parent_catalog_id ,
+			oc_a.value_int
+			ORDER BY
+			oc.catalog_id
+			)
+			WHERE rownum &lt;= 250
+
+		</statement>
+
+		<statement name="sel_catalog_nameordescr">
+			
+			SELECT *
+			FROM (
+			SELECT
+			oc.catalog_id,
+			count(oce.entry_id) entries_count,
+			oc.caption,
+			oc.description,
+			oc.parent_catalog_id,
+			oc.internal_catalog_id,
+			'Add',
+			DECODE(oc_a.value_int, 1, '(Capitated)', null) AS capitated
+			FROM
+			ofcatalog_Attribute oc_a,
+			offering_catalog oc,
+			offering_catalog_entry oce
+			WHERE
+			oce.catalog_id (+) = oc.internal_catalog_id
+			AND oc_a.parent_id (+) = oc.internal_catalog_id
+			AND oc.catalog_type = 0
+			AND (oc.org_internal_id IS NULL OR oc.org_internal_id = :1)
+			AND (UPPER(oc.caption) = :2 OR UPPER(oc.description) = :2)
+			GROUP BY
+			oc.catalog_id,
+			oc.internal_catalog_id,
+			oc.caption,
+			oc.description,
+			oc.parent_catalog_id ,
+			oc_a.value_int
+			ORDER BY
+			oc.catalog_id
+			)
+			WHERE rownum &lt;= 250
+
+		</statement>
+
+		<statement name="sel_catalog_nameordescr_like">
+			
+			SELECT *
+			FROM (
+			SELECT
+			oc.catalog_id,
+			count(oce.entry_id) entries_count,
+			oc.caption,
+			oc.description,
+			oc.parent_catalog_id,
+			oc.internal_catalog_id,
+			'Add',
+			DECODE(oc_a.value_int, 1, '(Capitated)', null) AS capitated
+			FROM
+			ofcatalog_Attribute oc_a,
+			offering_catalog oc,
+			offering_catalog_entry oce
+			WHERE
+			oce.catalog_id (+) = oc.internal_catalog_id
+			AND oc_a.parent_id (+) = oc.internal_catalog_id
+			AND oc.catalog_type = 0
+			AND (oc.org_internal_id IS NULL OR oc.org_internal_id = :1)
+			AND (UPPER(oc.caption) LIKE :2 OR UPPER(oc.description) LIKE :2)
+			GROUP BY
+			oc.catalog_id,
+			oc.internal_catalog_id,
+			oc.caption,
+			oc.description,
+			oc.parent_catalog_id ,
+			oc_a.value_int
+			ORDER BY
+			oc.catalog_id
+			)
+			WHERE rownum &lt;= 250
+
+		</statement>
+
+		<statement name="sel_catalogs_all">
+			
+			SELECT *
+			FROM (
+			SELECT
+			oc.catalog_id,
+			count(oce.entry_id) entries_count,
+			oc.caption,
+			oc.description,
+			oc.parent_catalog_id,
+			oc.internal_catalog_id,
+			'Add',
+			DECODE(oc_a.value_int, 1, '(Capitated)', null) AS capitated
+			FROM
+			ofcatalog_Attribute oc_a,
+			offering_catalog oc,
+			offering_catalog_entry oce
+			WHERE
+			oce.catalog_id (+) = oc.internal_catalog_id
+			AND oc_a.parent_id (+) = oc.internal_catalog_id
+			AND oc.catalog_type = 0
+			AND (oc.org_internal_id IS NULL OR oc.org_internal_id = :1)
+			GROUP BY
+			oc.catalog_id,
+			oc.internal_catalog_id,
+			oc.caption,
+			oc.description,
+			oc.parent_catalog_id ,
+			oc_a.value_int
+			ORDER BY
+			oc.catalog_id
+			)
+			WHERE rownum &lt;= 250
+
+		</statement>
+
+		<statement name="sel_catalogs_all_org">
+			
+			SELECT *
+			FROM (
+			SELECT
+			oc.catalog_id,
+			count(oce.entry_id) entries_count,
+			oc.caption,
+			oc.description,
+			oc.parent_catalog_id,
+			oc.internal_catalog_id,
+			'Add',
+			DECODE(oc_a.value_int, 1, '(Capitated)', null) AS capitated
+			FROM
+			ofcatalog_Attribute oc_a,
+			offering_catalog oc,
+			offering_catalog_entry oce
+			WHERE
+			oce.catalog_id (+) = oc.internal_catalog_id
+			AND oc_a.parent_id (+) = oc.internal_catalog_id
+			AND oc.catalog_type = 0
+			AND (oc.org_internal_id IS NULL OR oc.org_internal_id = :1)
+			GROUP BY
+			oc.catalog_id,
+			oc.internal_catalog_id,
+			oc.caption,
+			oc.description,
+			oc.parent_catalog_id ,
+			oc_a.value_int
+			ORDER BY
+			oc.catalog_id
+			)
+			WHERE rownum &lt;= 250
+
+		</statement>
+
+		<statement name="sel_name_catalog_description">
+			
+			SELECT *
+			FROM (
+			SELECT
+			oc.catalog_id,
+			count(oce.entry_id) entries_count,
+			oc.caption,
+			oc.description,
+			oc.parent_catalog_id,
+			oc.internal_catalog_id,
+			'Add',
+			DECODE(oc_a.value_int, 1, '(Capitated)', null) AS capitated
+			FROM
+			ofcatalog_Attribute oc_a,
+			offering_catalog oc,
+			offering_catalog_entry oce
+			WHERE
+			oce.catalog_id (+) = oc.internal_catalog_id
+			AND oc_a.parent_id (+) = oc.internal_catalog_id
+			AND oc.catalog_type = 0
+			AND (oc.org_internal_id IS NULL OR oc.org_internal_id = :1)
+			AND UPPER(oc.description) = :2
+			GROUP BY
+			oc.catalog_id,
+			oc.internal_catalog_id,
+			oc.caption,
+			oc.description,
+			oc.parent_catalog_id ,
+			oc_a.value_int
+			ORDER BY
+			oc.catalog_id
+			)
+			WHERE rownum &lt;= 250
+
+		</statement>
+
+		<statement name="sel_name_catalog_description_like">
+			
+			SELECT *
+			FROM (
+			SELECT
+			oc.catalog_id,
+			count(oce.entry_id) entries_count,
+			oc.caption,
+			oc.description,
+			oc.parent_catalog_id,
+			oc.internal_catalog_id,
+			'Add',
+			DECODE(oc_a.value_int, 1, '(Capitated)', null) AS capitated
+			FROM
+			ofcatalog_Attribute oc_a,
+			offering_catalog oc,
+			offering_catalog_entry oce
+			WHERE
+			oce.catalog_id (+) = oc.internal_catalog_id
+			AND oc_a.parent_id (+) = oc.internal_catalog_id
+			AND oc.catalog_type = 0
+			AND (oc.org_internal_id IS NULL OR oc.org_internal_id = :1)
+			AND UPPER(oc.description) LIKE :2
+			GROUP BY
+			oc.catalog_id,
+			oc.internal_catalog_id,
+			oc.caption,
+			oc.description,
+			oc.parent_catalog_id ,
+			oc_a.value_int
+			ORDER BY
+			oc.catalog_id
+			)
+			WHERE rownum &lt;= 250
+
+		</statement>
+
+		<statement name="sel_name_catalog_id">
+			
+			SELECT *
+			FROM (
+			SELECT
+			oc.catalog_id,
+			count(oce.entry_id) entries_count,
+			oc.caption,
+			oc.description,
+			oc.parent_catalog_id,
+			oc.internal_catalog_id,
+			'Add',
+			DECODE(oc_a.value_int, 1, '(Capitated)', null) AS capitated
+			FROM
+			ofcatalog_Attribute oc_a,
+			offering_catalog oc,
+			offering_catalog_entry oce
+			WHERE
+			oce.catalog_id (+) = oc.internal_catalog_id
+			AND oc_a.parent_id (+) = oc.internal_catalog_id
+			AND oc.catalog_type = 0
+			AND (oc.org_internal_id IS NULL OR oc.org_internal_id = :1)
+			AND UPPER(oc.catalog_id) = :2
+			GROUP BY
+			oc.catalog_id,
+			oc.internal_catalog_id,
+			oc.caption,
+			oc.description,
+			oc.parent_catalog_id ,
+			oc_a.value_int
+			ORDER BY
+			oc.catalog_id
+			)
+			WHERE rownum &lt;= 250
+
+		</statement>
+
+		<statement name="sel_name_catalog_id_like">
+			
+			SELECT *
+			FROM (
+			SELECT
+			oc.catalog_id,
+			count(oce.entry_id) entries_count,
+			oc.caption,
+			oc.description,
+			oc.parent_catalog_id,
+			oc.internal_catalog_id,
+			'Add',
+			DECODE(oc_a.value_int, 1, '(Capitated)', null) AS capitated
+			FROM
+			ofcatalog_Attribute oc_a,
+			offering_catalog oc,
+			offering_catalog_entry oce
+			WHERE
+			oce.catalog_id (+) = oc.internal_catalog_id
+			AND oc_a.parent_id (+) = oc.internal_catalog_id
+			AND oc.catalog_type = 0
+			AND (oc.org_internal_id IS NULL OR oc.org_internal_id = :1)
+			AND UPPER(oc.catalog_id) LIKE :2
+			GROUP BY
+			oc.catalog_id,
+			oc.internal_catalog_id,
+			oc.caption,
+			oc.description,
+			oc.parent_catalog_id ,
+			oc_a.value_int
+			ORDER BY
+			oc.catalog_id
+			)
+			WHERE rownum &lt;= 250
+
+		</statement>
+
+		<statement name="sel_name_catalog_name">
+			
+			SELECT *
+			FROM (
+			SELECT
+			oc.catalog_id,
+			count(oce.entry_id) entries_count,
+			oc.caption,
+			oc.description,
+			oc.parent_catalog_id,
+			oc.internal_catalog_id,
+			'Add',
+			DECODE(oc_a.value_int, 1, '(Capitated)', null) AS capitated
+			FROM
+			ofcatalog_Attribute oc_a,
+			offering_catalog oc,
+			offering_catalog_entry oce
+			WHERE
+			oce.catalog_id (+) = oc.internal_catalog_id
+			AND oc_a.parent_id (+) = oc.internal_catalog_id
+			AND oc.catalog_type = 0
+			AND (oc.org_internal_id IS NULL OR oc.org_internal_id = :1)
+			AND UPPER(oc.caption) = :2
+			GROUP BY
+			oc.catalog_id,
+			oc.internal_catalog_id,
+			oc.caption,
+			oc.description,
+			oc.parent_catalog_id ,
+			oc_a.value_int
+			ORDER BY
+			oc.catalog_id
+			)
+			WHERE rownum &lt;= 250
+
+		</statement>
+
+		<statement name="sel_name_catalog_name_like">
+			
+			SELECT *
+			FROM (
+			SELECT
+			oc.catalog_id,
+			count(oce.entry_id) entries_count,
+			oc.caption,
+			oc.description,
+			oc.parent_catalog_id,
+			oc.internal_catalog_id,
+			'Add',
+			DECODE(oc_a.value_int, 1, '(Capitated)', null) AS capitated
+			FROM
+			ofcatalog_Attribute oc_a,
+			offering_catalog oc,
+			offering_catalog_entry oce
+			WHERE
+			oce.catalog_id (+) = oc.internal_catalog_id
+			AND oc_a.parent_id (+) = oc.internal_catalog_id
+			AND oc.catalog_type = 0
+			AND (oc.org_internal_id IS NULL OR oc.org_internal_id = :1)
+			AND UPPER(oc.caption) LIKE :2
+			GROUP BY
+			oc.catalog_id,
+			oc.internal_catalog_id,
+			oc.caption,
+			oc.description,
+			oc.parent_catalog_id ,
+			oc_a.value_int
+			ORDER BY
+			oc.catalog_id
+			)
+			WHERE rownum &lt;= 250
+
+		</statement>
+
+		<statement name="sel_name_catalog_nameordescr">
+			
+			SELECT *
+			FROM (
+			SELECT
+			oc.catalog_id,
+			count(oce.entry_id) entries_count,
+			oc.caption,
+			oc.description,
+			oc.parent_catalog_id,
+			oc.internal_catalog_id,
+			'Add',
+			DECODE(oc_a.value_int, 1, '(Capitated)', null) AS capitated
+			FROM
+			ofcatalog_Attribute oc_a,
+			offering_catalog oc,
+			offering_catalog_entry oce
+			WHERE
+			oce.catalog_id (+) = oc.internal_catalog_id
+			AND oc_a.parent_id (+) = oc.internal_catalog_id
+			AND oc.catalog_type = 0
+			AND (oc.org_internal_id IS NULL OR oc.org_internal_id = :1)
+			AND (UPPER(oc.caption) = :2 OR UPPER(oc.description) = :2)
+			GROUP BY
+			oc.catalog_id,
+			oc.internal_catalog_id,
+			oc.caption,
+			oc.description,
+			oc.parent_catalog_id ,
+			oc_a.value_int
+			ORDER BY
+			oc.catalog_id
+			)
+			WHERE rownum &lt;= 250
+
+		</statement>
+
+		<statement name="sel_name_catalog_nameordescr_like">
+			
+			SELECT *
+			FROM (
+			SELECT
+			oc.catalog_id,
+			count(oce.entry_id) entries_count,
+			oc.caption,
+			oc.description,
+			oc.parent_catalog_id,
+			oc.internal_catalog_id,
+			'Add',
+			DECODE(oc_a.value_int, 1, '(Capitated)', null) AS capitated
+			FROM
+			ofcatalog_Attribute oc_a,
+			offering_catalog oc,
+			offering_catalog_entry oce
+			WHERE
+			oce.catalog_id (+) = oc.internal_catalog_id
+			AND oc_a.parent_id (+) = oc.internal_catalog_id
+			AND oc.catalog_type = 0
+			AND (oc.org_internal_id IS NULL OR oc.org_internal_id = :1)
+			AND (UPPER(oc.caption) LIKE :2 OR UPPER(oc.description) LIKE :2)
+			GROUP BY
+			oc.catalog_id,
+			oc.internal_catalog_id,
+			oc.caption,
+			oc.description,
+			oc.parent_catalog_id ,
+			oc_a.value_int
+			ORDER BY
+			oc.catalog_id
+			)
+			WHERE rownum &lt;= 250
+
+		</statement>
+
+	</sql-statements>
+</xaf>

@@ -1,0 +1,217 @@
+<?xml version="1.0"?>
+
+<xaf>
+	<sql-statements package="report.billing">
+		<statement name="id">
+			App::Statements::Report::Billing
+		</statement>
+
+		<statement name="sel_detailProcedures">
+			
+			select Invoice_Item.code as procedure, Invoice_Item.modifier, invoice_id, invoice_date,
+			client_id, provider_id, simple_name
+			from Transaction, Invoice_Item, Invoice, Person, org
+			where Invoice_Item.code is NOT NULL
+			and Transaction.service_facility_id = ?
+			and Invoice.owner_type = 1
+			and Invoice.invoice_date between to_date(? || ' 12:00 AM', 'MM/DD/YYYY HH12:MI AM')
+			and to_date(? || ' 11:59 PM', 'MM/DD/YYYY HH12:MI AM')
+			and Invoice_Item.parent_id = Invoice.invoice_id
+			and Invoice_Item.code = ?
+			and Transaction.trans_id = Invoice.main_transaction
+			and Invoice.client_id = Person.person_id
+			and org.org_internal_id = Transaction.service_facility_id
+			and org.owner_org_id = ?				
+			
+		</statement>
+
+		<statement name="sel_detail_insurance">
+			
+			select (SELECT org_id from org where org_internal_id = Insurance.ins_org_id) as payer, invoice.invoice_id, invoice_date, client_id, 
+			(SELECT org_id FROM org where to_char(org_internal_id) = bill_to_id) as bill_to_id,
+			provider_id, Transaction_Status.caption as status, nvl(total_cost,0), nvl(total_adjust,0), simple_name
+			from Insurance, Transaction_Status, Transaction, Invoice, Person, invoice_billing ib ,org
+			where Transaction.service_facility_id = ?
+			and Invoice.invoice_date between to_date(? || ' 12:00 AM', 'MM/DD/YYYY HH12:MI AM')
+			and to_date(? || ' 11:59 PM', 'MM/DD/YYYY HH12:MI AM')
+			and Transaction.trans_id = Invoice.main_transaction
+			and Transaction_Status.id = Transaction.trans_status
+			and Insurance.ins_internal_id = ib.bill_ins_id
+			and invoice.billing_id = ib.bill_id
+			and Insurance.ins_org_id = ?
+			and Invoice.client_id = Person.person_id
+			and org.org_internal_id = Insurance.ins_org_id 
+			and org.owner_org_id = ?
+			
+		</statement>
+
+		<statement name="sel_detail_payers">
+			
+			select Claim_Type.caption as payer, invoice_id, invoice_date, client_id,
+			provider_id, Transaction_Status.caption as status, total_cost, total_adjust, simple_name
+			from Claim_Type, Transaction_Status, Transaction, Invoice, Person ,org o
+			where Transaction.service_facility_id= ?				
+			and Invoice.invoice_date between to_date(? || ' 12:00 AM', 'MM/DD/YYYY HH12:MI AM')
+			and to_date(? || ' 11:59 PM', 'MM/DD/YYYY HH12:MI AM')
+			and Transaction.trans_id = Invoice.main_transaction
+			and Claim_Type.id = Transaction.bill_type
+			and Claim_Type.caption = ?
+			and Transaction_Status.id = Transaction.trans_status
+			and client_id = person.person_id
+			and o.owner_org_id = ?
+			and o.org_internal_id = Transaction.service_facility_id
+			
+		</statement>
+
+		<statement name="sel_detailearnings_insurance">
+			
+			select org.org_id as payer, invoice.invoice_id, invoice.invoice_date, invoice.client_id, 						
+			t.provider_id, Transaction_Status.caption as status, nvl(sum(total_cost),0), nvl(sum(Invoice_Item_Adjust.plan_paid),0)	,
+			p.simple_name
+			from Invoice_Item_Adjust, Invoice_Item, Invoice, Transaction t,Transaction_Status,org, person p
+			where Invoice.invoice_date between to_date(:1 || ' 12:00 AM', 'MM/DD/YYYY HH12:MI AM')
+			and to_date(:2 || ' 11:59 PM', 'MM/DD/YYYY HH12:MI AM')
+			and t.trans_id = Invoice.main_transaction
+			and t.service_facility_id = :3
+			and Invoice_Item.parent_id = Invoice.invoice_id
+			and Invoice_Item_Adjust.parent_id = Invoice_Item.item_id
+			and Invoice_Item_Adjust.payer_id = :4
+			and Transaction_Status.id = t.trans_status
+			and org.org_internal_id = :4
+			and p.person_id (+) = invoice.client_id
+			and org.owner_org_id = :5
+			group by org.org_id , invoice.invoice_id, invoice.invoice_date, invoice.client_id, 						
+			t.provider_id, Transaction_Status.caption ,p.simple_name
+			
+		</statement>
+
+		<statement name="sel_detailearnings_person">
+			
+			select Invoice_Item_Adjust.payer_id as payer, invoice.invoice_id, invoice.invoice_date, invoice.client_id, 						
+			t.provider_id, Transaction_Status.caption as status, nvl(sum(total_cost),0), nvl(sum(Invoice_Item_Adjust.adjustment_amount),0),				
+			p.simple_name
+			from Invoice_Item_Adjust, Invoice_Item, Invoice, Transaction t,Transaction_Status, person p ,org
+			where Invoice.invoice_date between to_date(? || ' 12:00 AM', 'MM/DD/YYYY HH12:MI AM')
+			and to_date(? || ' 11:59 PM', 'MM/DD/YYYY HH12:MI AM')
+			and t.trans_id = Invoice.main_transaction
+			and t.service_facility_id = ?
+			and Invoice_Item.parent_id = Invoice.invoice_id
+			and Invoice_Item_Adjust.parent_id = Invoice_Item.item_id
+			and Invoice_Item_Adjust.payer_id = ?
+			and Transaction_Status.id = t.trans_status
+			and person_id = invoice.client_id
+			and org.org_internal_id = t.service_facility_id
+			and org.owner_org_id = ?
+			group by Invoice_Item_Adjust.payer_id , invoice.invoice_id, invoice.invoice_date, invoice.client_id, 						
+			t.provider_id, Transaction_Status.caption , p.simple_name
+			
+		</statement>
+
+		<statement name="sel_diagsFromInvoice_Item">
+			
+			select rel_diags as Diagnosis
+			from Invoice_Item, Invoice
+			where rel_diags is NOT NULL
+			and Invoice.invoice_date between to_date(? || ' 12:00 AM', 'MM/DD/YYYY HH12:MI AM')
+			and to_date(? || ' 11:59 PM', 'MM/DD/YYYY HH12:MI AM')
+			and Invoice.owner_id = ?
+			and Invoice.owner_type = 1
+			and Invoice_Item.parent_id = Invoice.invoice_id
+			
+		</statement>
+
+		<statement name="sel_earningsByInsurance">
+			
+			select Insurance.ins_org_id as insurance, sum(total_cost) as earning
+			from Insurance, Invoice
+			where bill_to_type = 1
+			and Insurance.ins_internal_id = Invoice.ins_id
+			group by Insurance.ins_org_id
+			
+		</statement>
+
+		<statement name="sel_earningsFromItem_Adjust">
+			
+			--select payer_id as payer, sum(plan_paid) as earning
+			select org_id as payer, sum(plan_paid) as earning ,2, null	
+			from Invoice_Item_Adjust, Invoice_Item, Invoice, org o,Transaction t
+			where Invoice.invoice_date between to_date(? || ' 12:00 AM', 'MM/DD/YYYY HH12:MI AM')
+			and to_date(? || ' 11:59 PM', 'MM/DD/YYYY HH12:MI AM')
+			and t.trans_id = Invoice.main_transaction
+			and t.service_facility_id = ?
+			and Invoice_Item.parent_id = Invoice.invoice_id
+			and Invoice_Item_Adjust.parent_id = Invoice_Item.item_id
+			and Invoice_Item_Adjust.payer_type = 1
+			and o.org_internal_id = payer_id
+			and o.owner_org_id = ?
+			and plan_paid &gt; 0
+			group by org_id
+			UNION
+			select payer_id as payer_id, sum(adjustment_amount) as earning,1,
+			p.simple_name 
+			from Invoice_Item_Adjust, Invoice_Item, Invoice,Transaction t,org,
+			person p
+			where Invoice.invoice_date between to_date(? || ' 12:00 AM', 'MM/DD/YYYY HH12:MI AM')
+			and to_date(? || ' 11:59 PM', 'MM/DD/YYYY HH12:MI AM')
+			and t.trans_id = Invoice.main_transaction
+			and t.service_facility_id = ?
+			and Invoice_Item.parent_id = Invoice.invoice_id
+			and Invoice_Item_Adjust.parent_id = Invoice_Item.item_id
+			and Invoice_Item_Adjust.payer_type = 0
+			and t.service_facility_id = org.org_internal_id
+			and org.owner_org_id = ?				
+			and p.person_id=payer_id
+			group by payer_id,p.simple_name
+			
+		</statement>
+
+		<statement name="sel_payers">
+			
+			select Claim_Type.caption as payer, count(Claim_Type.id) as count
+			from Transaction, Claim_Type, Invoice, org
+			where Transaction.service_facility_id = ?				
+			and Invoice.invoice_date between to_date(? || ' 12:00 AM', 'MM/DD/YYYY HH12:MI AM')
+			and to_date(? || ' 11:59 PM', 'MM/DD/YYYY HH12:MI AM')
+			and Transaction.trans_id = Invoice.main_transaction
+			and Claim_Type.id = Transaction.bill_type
+			and org.org_internal_id = Transaction.service_facility_id
+			and org.owner_org_id = ?
+			group by Claim_Type.caption
+			
+		</statement>
+
+		<statement name="sel_payersByInsurance">
+			
+			select org.org_id as insurance, count(Insurance.ins_org_id) as count, Insurance.ins_org_id
+			from Insurance, Invoice, Transaction t, invoice_billing ib,org
+			where t.trans_id = Invoice.main_transaction
+			and t.service_facility_id = ?
+			and Invoice.invoice_date between to_date(? || ' 12:00 AM', 'MM/DD/YYYY HH12:MI AM')
+			and to_date(? || ' 11:59 PM', 'MM/DD/YYYY HH12:MI AM')
+			and invoice.billing_id = ib.bill_id
+			and Insurance.ins_internal_id = ib.bill_ins_id
+			and org.org_internal_id = Insurance.ins_org_id
+			and org.owner_org_id = ?			
+			group by org.org_id,Insurance.ins_org_id
+			
+		</statement>
+
+		<statement name="sel_proceduresFromInvoice_Item">
+			
+			select Invoice_Item.code as procedure, count(Invoice_Item.code) as count
+			from Invoice_Item, Invoice,transaction t,org 
+			where Invoice_Item.code is NOT NULL
+			and Invoice.invoice_date between to_date(? || ' 12:00 AM', 'MM/DD/YYYY HH12:MI AM')
+			and to_date(? || ' 11:59 PM', 'MM/DD/YYYY HH12:MI AM')
+			and t.trans_id = Invoice.main_transaction
+			and t.service_facility_id = ?
+			--and Invoice.owner_type = 1
+			and Invoice_Item.parent_id = Invoice.invoice_id
+			and org.org_internal_id = t.service_facility_id
+			and org.owner_org_id = ?
+			group by Invoice_Item.code
+			
+		</statement>
+
+	</sql-statements>
+</xaf>

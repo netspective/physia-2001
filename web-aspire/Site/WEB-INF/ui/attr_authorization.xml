@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+
+<xaf>
+	<dialogs package="attr_authorization">
+		<dialog name="auth_patientsign" heading="$Command Patient Signature Authorization">
+			<field.select caption="Patient Signature"  name="value_textb" choices="query:person.selPatientSign"/>
+			<!--  -->
+			<field.date caption="Date" name="value_date" size="12"/>
+
+		</dialog>
+
+		<dialog name="auth_providerassign" heading="$Command Provider Assignment Indicator">
+			<field.select caption="Provider Assignment"  name="value_textb" choices="query:person.selProviderAssign"/>
+			<!--  -->
+			<field.date caption="Date" name="value_date" size="12"/>
+
+		</dialog>
+
+		<dialog name="auth_inforelease" heading="$Command Information Release Indicator">
+			<field.boolean caption="Patient has authorized release of medical information"  name="value_int" style="check"/>
+			<field.date caption="Date" name="value_date" size="12"/>
+
+		</dialog>
+
+	</dialogs>
+</xaf>

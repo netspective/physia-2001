@@ -1,0 +1,1402 @@
+<?xml version="1.0"?>
+
+<xaf>
+	<sql-statements package="search.org_dir">
+		<statement name="id">
+			App::Statements::Search::OrgDirectory
+		</statement>
+
+		<statement name="sel_city_like">
+			
+			SELECT *
+			FROM (
+			SELECT
+			DISTINCT o.org_id,
+			o.name_primary,
+			o.category,
+			a.city,
+			a.state,
+			a.zip,
+			o.tax_id,
+			DECODE(t.group_name, 'other', 'main', t.group_name),
+			a.line1, pa.value_text as value_text,
+			(NVL(
+			(
+			SELECT	 cc.internal_catalog_id
+			FROM		offering_catalog cc
+			WHERE 	upper(cc.catalog_id) = upper((o.org_id)||'_Fee_Schedule')
+			AND cc.org_internal_id = o.parent_org_id
+			),
+			(SELECT 		ca.internal_catalog_id
+			FROM		offering_catalog ca, org gg
+			WHERE 	upper(ca.catalog_id) = upper((gg.org_id)||'_Fee_Schedule')
+			AND gg.org_internal_id = o.parent_org_id
+			)
+			)
+			)AS internal_catalog_id,
+			(NVL(
+			(
+			SELECT catalog_id
+			FROM offering_catalog cc
+			WHERE 	upper(cc.catalog_id) = upper((o.org_id)||'_Fee_Schedule')
+			AND cc.org_internal_id = o.parent_org_id
+			),
+			(SELECT (g.org_id)||'_Fee_Schedule' FROM
+			org g where g.org_internal_id = o.parent_org_id
+			)
+			)
+			)AS catalog_id,
+			(
+			SELECT tt.value_text
+			FROM org_attribute tt
+			WHERE tt.parent_id = o.org_internal_id
+			AND tt.item_name = 'Negotiated Contract Type'
+			AND tt.value_type = 0
+			)AS type,
+			po.org_id AS parent_org
+			FROM
+			org o,
+			org po,
+			org_category cat,
+			org_type t,
+			org_address a,
+			org_attribute pa
+			WHERE
+			cat.parent_id = o.org_internal_id
+			AND a.parent_id = o.org_internal_id
+			AND a.address_name = 'Street'
+			AND	cat.member_name = t.caption
+			AND	cat.member_name = (
+			SELECT caption
+			FROM org_type ot
+			WHERE ot.id = (
+			SELECT MIN(og.id)
+			FROM
+			org_type og,
+			org_category oe
+			WHERE
+			oe.parent_id = o.org_internal_id
+			AND og.caption = oe.member_name
+			)
+			)
+			AND pa.parent_id = o.org_internal_id
+			AND pa.item_name = 'Primary'
+			AND 	 pa.value_type = 10
+			AND 	 po.org_internal_id = o.parent_org_id
+			AND	 UPPER(a.state) = ? AND UPPER(a.city) LIKE ? AND a.zip = ?
+			AND (
+			o.owner_org_id = ?
+			)
+			ORDER BY o.org_id
+			)
+			WHERE rownum &lt;= 250
+
+		</statement>
+
+		<statement name="sel_cityzip_like">
+			
+			SELECT *
+			FROM (
+			SELECT
+			DISTINCT o.org_id,
+			o.name_primary,
+			o.category,
+			a.city,
+			a.state,
+			a.zip,
+			o.tax_id,
+			DECODE(t.group_name, 'other', 'main', t.group_name),
+			a.line1, pa.value_text as value_text,
+			(NVL(
+			(
+			SELECT	 cc.internal_catalog_id
+			FROM		offering_catalog cc
+			WHERE 	upper(cc.catalog_id) = upper((o.org_id)||'_Fee_Schedule')
+			AND cc.org_internal_id = o.parent_org_id
+			),
+			(SELECT 		ca.internal_catalog_id
+			FROM		offering_catalog ca, org gg
+			WHERE 	upper(ca.catalog_id) = upper((gg.org_id)||'_Fee_Schedule')
+			AND gg.org_internal_id = o.parent_org_id
+			)
+			)
+			)AS internal_catalog_id,
+			(NVL(
+			(
+			SELECT catalog_id
+			FROM offering_catalog cc
+			WHERE 	upper(cc.catalog_id) = upper((o.org_id)||'_Fee_Schedule')
+			AND cc.org_internal_id = o.parent_org_id
+			),
+			(SELECT (g.org_id)||'_Fee_Schedule' FROM
+			org g where g.org_internal_id = o.parent_org_id
+			)
+			)
+			)AS catalog_id,
+			(
+			SELECT tt.value_text
+			FROM org_attribute tt
+			WHERE tt.parent_id = o.org_internal_id
+			AND tt.item_name = 'Negotiated Contract Type'
+			AND tt.value_type = 0
+			)AS type,
+			po.org_id AS parent_org
+			FROM
+			org o,
+			org po,
+			org_category cat,
+			org_type t,
+			org_address a,
+			org_attribute pa
+			WHERE
+			cat.parent_id = o.org_internal_id
+			AND a.parent_id = o.org_internal_id
+			AND a.address_name = 'Street'
+			AND	cat.member_name = t.caption
+			AND	cat.member_name = (
+			SELECT caption
+			FROM org_type ot
+			WHERE ot.id = (
+			SELECT MIN(og.id)
+			FROM
+			org_type og,
+			org_category oe
+			WHERE
+			oe.parent_id = o.org_internal_id
+			AND og.caption = oe.member_name
+			)
+			)
+			AND pa.parent_id = o.org_internal_id
+			AND pa.item_name = 'Primary'
+			AND 	 pa.value_type = 10
+			AND 	 po.org_internal_id = o.parent_org_id
+			AND	 UPPER(a.state) = ? AND UPPER(a.city) LIKE ? AND a.zip LIKE ?
+			AND (
+			o.owner_org_id = ?
+			)
+			ORDER BY o.org_id
+			)
+			WHERE rownum &lt;= 250
+
+		</statement>
+
+		<statement name="sel_provider">
+			
+			SELECT *
+			FROM (
+			SELECT
+			DISTINCT o.org_id,
+			o.name_primary,
+			o.category,
+			a.city,
+			a.state,
+			a.zip,
+			o.tax_id,
+			DECODE(t.group_name, 'other', 'main', t.group_name),
+			a.line1, pa.value_text as value_text,
+			(NVL(
+			(
+			SELECT	 cc.internal_catalog_id
+			FROM		offering_catalog cc
+			WHERE 	upper(cc.catalog_id) = upper((o.org_id)||'_Fee_Schedule')
+			AND cc.org_internal_id = o.parent_org_id
+			),
+			(SELECT 		ca.internal_catalog_id
+			FROM		offering_catalog ca, org gg
+			WHERE 	upper(ca.catalog_id) = upper((gg.org_id)||'_Fee_Schedule')
+			AND gg.org_internal_id = o.parent_org_id
+			)
+			)
+			)AS internal_catalog_id,
+			(NVL(
+			(
+			SELECT catalog_id
+			FROM offering_catalog cc
+			WHERE 	upper(cc.catalog_id) = upper((o.org_id)||'_Fee_Schedule')
+			AND cc.org_internal_id = o.parent_org_id
+			),
+			(SELECT (g.org_id)||'_Fee_Schedule' FROM
+			org g where g.org_internal_id = o.parent_org_id
+			)
+			)
+			)AS catalog_id,
+			(
+			SELECT tt.value_text
+			FROM org_attribute tt
+			WHERE tt.parent_id = o.org_internal_id
+			AND tt.item_name = 'Negotiated Contract Type'
+			AND tt.value_type = 0
+			)AS type,
+			po.org_id AS parent_org
+			FROM
+			org o,
+			org po,
+			org_category cat,
+			org_type t,
+			org_address a,
+			org_attribute pa
+			WHERE
+			cat.parent_id = o.org_internal_id
+			AND a.parent_id = o.org_internal_id
+			AND a.address_name = 'Street'
+			AND	cat.member_name = t.caption
+			AND	cat.member_name = (
+			SELECT caption
+			FROM org_type ot
+			WHERE ot.id = (
+			SELECT MIN(og.id)
+			FROM
+			org_type og,
+			org_category oe
+			WHERE
+			oe.parent_id = o.org_internal_id
+			AND og.caption = oe.member_name
+			)
+			)
+			AND pa.parent_id = o.org_internal_id
+			AND pa.item_name = 'Primary'
+			AND 	 pa.value_type = 10
+			AND 	 po.org_internal_id = o.parent_org_id
+			AND	UPPER(o.org_id) = ?
+			AND (
+			o.owner_org_id = ?
+			)
+			ORDER BY o.org_id
+			)
+			WHERE rownum &lt;= 250
+
+		</statement>
+
+		<statement name="sel_provider_like">
+			
+			SELECT *
+			FROM (
+			SELECT
+			DISTINCT o.org_id,
+			o.name_primary,
+			o.category,
+			a.city,
+			a.state,
+			a.zip,
+			o.tax_id,
+			DECODE(t.group_name, 'other', 'main', t.group_name),
+			a.line1, pa.value_text as value_text,
+			(NVL(
+			(
+			SELECT	 cc.internal_catalog_id
+			FROM		offering_catalog cc
+			WHERE 	upper(cc.catalog_id) = upper((o.org_id)||'_Fee_Schedule')
+			AND cc.org_internal_id = o.parent_org_id
+			),
+			(SELECT 		ca.internal_catalog_id
+			FROM		offering_catalog ca, org gg
+			WHERE 	upper(ca.catalog_id) = upper((gg.org_id)||'_Fee_Schedule')
+			AND gg.org_internal_id = o.parent_org_id
+			)
+			)
+			)AS internal_catalog_id,
+			(NVL(
+			(
+			SELECT catalog_id
+			FROM offering_catalog cc
+			WHERE 	upper(cc.catalog_id) = upper((o.org_id)||'_Fee_Schedule')
+			AND cc.org_internal_id = o.parent_org_id
+			),
+			(SELECT (g.org_id)||'_Fee_Schedule' FROM
+			org g where g.org_internal_id = o.parent_org_id
+			)
+			)
+			)AS catalog_id,
+			(
+			SELECT tt.value_text
+			FROM org_attribute tt
+			WHERE tt.parent_id = o.org_internal_id
+			AND tt.item_name = 'Negotiated Contract Type'
+			AND tt.value_type = 0
+			)AS type,
+			po.org_id AS parent_org
+			FROM
+			org o,
+			org po,
+			org_category cat,
+			org_type t,
+			org_address a,
+			org_attribute pa
+			WHERE
+			cat.parent_id = o.org_internal_id
+			AND a.parent_id = o.org_internal_id
+			AND a.address_name = 'Street'
+			AND	cat.member_name = t.caption
+			AND	cat.member_name = (
+			SELECT caption
+			FROM org_type ot
+			WHERE ot.id = (
+			SELECT MIN(og.id)
+			FROM
+			org_type og,
+			org_category oe
+			WHERE
+			oe.parent_id = o.org_internal_id
+			AND og.caption = oe.member_name
+			)
+			)
+			AND pa.parent_id = o.org_internal_id
+			AND pa.item_name = 'Primary'
+			AND 	 pa.value_type = 10
+			AND 	 po.org_internal_id = o.parent_org_id
+			AND	UPPER(o.org_id) LIKE ?
+			AND (
+			o.owner_org_id = ?
+			)
+			ORDER BY o.org_id
+			)
+			WHERE rownum &lt;= 250
+
+		</statement>
+
+		<statement name="sel_providername">
+			
+			SELECT *
+			FROM (
+			SELECT
+			DISTINCT o.org_id,
+			o.name_primary,
+			o.category,
+			a.city,
+			a.state,
+			a.zip,
+			o.tax_id,
+			DECODE(t.group_name, 'other', 'main', t.group_name),
+			a.line1, pa.value_text as value_text,
+			(NVL(
+			(
+			SELECT	 cc.internal_catalog_id
+			FROM		offering_catalog cc
+			WHERE 	upper(cc.catalog_id) = upper((o.org_id)||'_Fee_Schedule')
+			AND cc.org_internal_id = o.parent_org_id
+			),
+			(SELECT 		ca.internal_catalog_id
+			FROM		offering_catalog ca, org gg
+			WHERE 	upper(ca.catalog_id) = upper((gg.org_id)||'_Fee_Schedule')
+			AND gg.org_internal_id = o.parent_org_id
+			)
+			)
+			)AS internal_catalog_id,
+			(NVL(
+			(
+			SELECT catalog_id
+			FROM offering_catalog cc
+			WHERE 	upper(cc.catalog_id) = upper((o.org_id)||'_Fee_Schedule')
+			AND cc.org_internal_id = o.parent_org_id
+			),
+			(SELECT (g.org_id)||'_Fee_Schedule' FROM
+			org g where g.org_internal_id = o.parent_org_id
+			)
+			)
+			)AS catalog_id,
+			(
+			SELECT tt.value_text
+			FROM org_attribute tt
+			WHERE tt.parent_id = o.org_internal_id
+			AND tt.item_name = 'Negotiated Contract Type'
+			AND tt.value_type = 0
+			)AS type,
+			po.org_id AS parent_org
+			FROM
+			org o,
+			org po,
+			org_category cat,
+			org_type t,
+			org_address a,
+			org_attribute pa
+			WHERE
+			cat.parent_id = o.org_internal_id
+			AND a.parent_id = o.org_internal_id
+			AND a.address_name = 'Street'
+			AND	cat.member_name = t.caption
+			AND	cat.member_name = (
+			SELECT caption
+			FROM org_type ot
+			WHERE ot.id = (
+			SELECT MIN(og.id)
+			FROM
+			org_type og,
+			org_category oe
+			WHERE
+			oe.parent_id = o.org_internal_id
+			AND og.caption = oe.member_name
+			)
+			)
+			AND pa.parent_id = o.org_internal_id
+			AND pa.item_name = 'Primary'
+			AND 	 pa.value_type = 10
+			AND 	 po.org_internal_id = o.parent_org_id
+			AND	UPPER(o.name_primary) = ?
+			AND (
+			o.owner_org_id = ?
+			)
+			ORDER BY o.org_id
+			)
+			WHERE rownum &lt;= 250
+
+		</statement>
+
+		<statement name="sel_providername_like">
+			
+			SELECT *
+			FROM (
+			SELECT
+			DISTINCT o.org_id,
+			o.name_primary,
+			o.category,
+			a.city,
+			a.state,
+			a.zip,
+			o.tax_id,
+			DECODE(t.group_name, 'other', 'main', t.group_name),
+			a.line1, pa.value_text as value_text,
+			(NVL(
+			(
+			SELECT	 cc.internal_catalog_id
+			FROM		offering_catalog cc
+			WHERE 	upper(cc.catalog_id) = upper((o.org_id)||'_Fee_Schedule')
+			AND cc.org_internal_id = o.parent_org_id
+			),
+			(SELECT 		ca.internal_catalog_id
+			FROM		offering_catalog ca, org gg
+			WHERE 	upper(ca.catalog_id) = upper((gg.org_id)||'_Fee_Schedule')
+			AND gg.org_internal_id = o.parent_org_id
+			)
+			)
+			)AS internal_catalog_id,
+			(NVL(
+			(
+			SELECT catalog_id
+			FROM offering_catalog cc
+			WHERE 	upper(cc.catalog_id) = upper((o.org_id)||'_Fee_Schedule')
+			AND cc.org_internal_id = o.parent_org_id
+			),
+			(SELECT (g.org_id)||'_Fee_Schedule' FROM
+			org g where g.org_internal_id = o.parent_org_id
+			)
+			)
+			)AS catalog_id,
+			(
+			SELECT tt.value_text
+			FROM org_attribute tt
+			WHERE tt.parent_id = o.org_internal_id
+			AND tt.item_name = 'Negotiated Contract Type'
+			AND tt.value_type = 0
+			)AS type,
+			po.org_id AS parent_org
+			FROM
+			org o,
+			org po,
+			org_category cat,
+			org_type t,
+			org_address a,
+			org_attribute pa
+			WHERE
+			cat.parent_id = o.org_internal_id
+			AND a.parent_id = o.org_internal_id
+			AND a.address_name = 'Street'
+			AND	cat.member_name = t.caption
+			AND	cat.member_name = (
+			SELECT caption
+			FROM org_type ot
+			WHERE ot.id = (
+			SELECT MIN(og.id)
+			FROM
+			org_type og,
+			org_category oe
+			WHERE
+			oe.parent_id = o.org_internal_id
+			AND og.caption = oe.member_name
+			)
+			)
+			AND pa.parent_id = o.org_internal_id
+			AND pa.item_name = 'Primary'
+			AND 	 pa.value_type = 10
+			AND 	 po.org_internal_id = o.parent_org_id
+			AND	UPPER(o.name_primary) LIKE ?
+			AND (
+			o.owner_org_id = ?
+			)
+			ORDER BY o.org_id
+			)
+			WHERE rownum &lt;= 250
+
+		</statement>
+
+		<statement name="sel_state_like">
+			
+			SELECT *
+			FROM (
+			SELECT
+			DISTINCT o.org_id,
+			o.name_primary,
+			o.category,
+			a.city,
+			a.state,
+			a.zip,
+			o.tax_id,
+			DECODE(t.group_name, 'other', 'main', t.group_name),
+			a.line1, pa.value_text as value_text,
+			(NVL(
+			(
+			SELECT	 cc.internal_catalog_id
+			FROM		offering_catalog cc
+			WHERE 	upper(cc.catalog_id) = upper((o.org_id)||'_Fee_Schedule')
+			AND cc.org_internal_id = o.parent_org_id
+			),
+			(SELECT 		ca.internal_catalog_id
+			FROM		offering_catalog ca, org gg
+			WHERE 	upper(ca.catalog_id) = upper((gg.org_id)||'_Fee_Schedule')
+			AND gg.org_internal_id = o.parent_org_id
+			)
+			)
+			)AS internal_catalog_id,
+			(NVL(
+			(
+			SELECT catalog_id
+			FROM offering_catalog cc
+			WHERE 	upper(cc.catalog_id) = upper((o.org_id)||'_Fee_Schedule')
+			AND cc.org_internal_id = o.parent_org_id
+			),
+			(SELECT (g.org_id)||'_Fee_Schedule' FROM
+			org g where g.org_internal_id = o.parent_org_id
+			)
+			)
+			)AS catalog_id,
+			(
+			SELECT tt.value_text
+			FROM org_attribute tt
+			WHERE tt.parent_id = o.org_internal_id
+			AND tt.item_name = 'Negotiated Contract Type'
+			AND tt.value_type = 0
+			)AS type,
+			po.org_id AS parent_org
+			FROM
+			org o,
+			org po,
+			org_category cat,
+			org_type t,
+			org_address a,
+			org_attribute pa
+			WHERE
+			cat.parent_id = o.org_internal_id
+			AND a.parent_id = o.org_internal_id
+			AND a.address_name = 'Street'
+			AND	cat.member_name = t.caption
+			AND	cat.member_name = (
+			SELECT caption
+			FROM org_type ot
+			WHERE ot.id = (
+			SELECT MIN(og.id)
+			FROM
+			org_type og,
+			org_category oe
+			WHERE
+			oe.parent_id = o.org_internal_id
+			AND og.caption = oe.member_name
+			)
+			)
+			AND pa.parent_id = o.org_internal_id
+			AND pa.item_name = 'Primary'
+			AND 	 pa.value_type = 10
+			AND 	 po.org_internal_id = o.parent_org_id
+			AND	 UPPER(a.state) LIKE ? AND UPPER(a.city) = ? AND a.zip = ?
+			AND (
+			o.owner_org_id = ?
+			)
+			ORDER BY o.org_id
+			)
+			WHERE rownum &lt;= 250
+
+		</statement>
+
+		<statement name="sel_statecity_like">
+			
+			SELECT *
+			FROM (
+			SELECT
+			DISTINCT o.org_id,
+			o.name_primary,
+			o.category,
+			a.city,
+			a.state,
+			a.zip,
+			o.tax_id,
+			DECODE(t.group_name, 'other', 'main', t.group_name),
+			a.line1, pa.value_text as value_text,
+			(NVL(
+			(
+			SELECT	 cc.internal_catalog_id
+			FROM		offering_catalog cc
+			WHERE 	upper(cc.catalog_id) = upper((o.org_id)||'_Fee_Schedule')
+			AND cc.org_internal_id = o.parent_org_id
+			),
+			(SELECT 		ca.internal_catalog_id
+			FROM		offering_catalog ca, org gg
+			WHERE 	upper(ca.catalog_id) = upper((gg.org_id)||'_Fee_Schedule')
+			AND gg.org_internal_id = o.parent_org_id
+			)
+			)
+			)AS internal_catalog_id,
+			(NVL(
+			(
+			SELECT catalog_id
+			FROM offering_catalog cc
+			WHERE 	upper(cc.catalog_id) = upper((o.org_id)||'_Fee_Schedule')
+			AND cc.org_internal_id = o.parent_org_id
+			),
+			(SELECT (g.org_id)||'_Fee_Schedule' FROM
+			org g where g.org_internal_id = o.parent_org_id
+			)
+			)
+			)AS catalog_id,
+			(
+			SELECT tt.value_text
+			FROM org_attribute tt
+			WHERE tt.parent_id = o.org_internal_id
+			AND tt.item_name = 'Negotiated Contract Type'
+			AND tt.value_type = 0
+			)AS type,
+			po.org_id AS parent_org
+			FROM
+			org o,
+			org po,
+			org_category cat,
+			org_type t,
+			org_address a,
+			org_attribute pa
+			WHERE
+			cat.parent_id = o.org_internal_id
+			AND a.parent_id = o.org_internal_id
+			AND a.address_name = 'Street'
+			AND	cat.member_name = t.caption
+			AND	cat.member_name = (
+			SELECT caption
+			FROM org_type ot
+			WHERE ot.id = (
+			SELECT MIN(og.id)
+			FROM
+			org_type og,
+			org_category oe
+			WHERE
+			oe.parent_id = o.org_internal_id
+			AND og.caption = oe.member_name
+			)
+			)
+			AND pa.parent_id = o.org_internal_id
+			AND pa.item_name = 'Primary'
+			AND 	 pa.value_type = 10
+			AND 	 po.org_internal_id = o.parent_org_id
+			AND	 UPPER(a.state) LIKE ? AND UPPER(a.city) LIKE ? AND a.zip = ?
+			AND (
+			o.owner_org_id = ?
+			)
+			ORDER BY o.org_id
+			)
+			WHERE rownum &lt;= 250
+
+		</statement>
+
+		<statement name="sel_statecityzip">
+			
+			SELECT *
+			FROM (
+			SELECT
+			DISTINCT o.org_id,
+			o.name_primary,
+			o.category,
+			a.city,
+			a.state,
+			a.zip,
+			o.tax_id,
+			DECODE(t.group_name, 'other', 'main', t.group_name),
+			a.line1, pa.value_text as value_text,
+			(NVL(
+			(
+			SELECT	 cc.internal_catalog_id
+			FROM		offering_catalog cc
+			WHERE 	upper(cc.catalog_id) = upper((o.org_id)||'_Fee_Schedule')
+			AND cc.org_internal_id = o.parent_org_id
+			),
+			(SELECT 		ca.internal_catalog_id
+			FROM		offering_catalog ca, org gg
+			WHERE 	upper(ca.catalog_id) = upper((gg.org_id)||'_Fee_Schedule')
+			AND gg.org_internal_id = o.parent_org_id
+			)
+			)
+			)AS internal_catalog_id,
+			(NVL(
+			(
+			SELECT catalog_id
+			FROM offering_catalog cc
+			WHERE 	upper(cc.catalog_id) = upper((o.org_id)||'_Fee_Schedule')
+			AND cc.org_internal_id = o.parent_org_id
+			),
+			(SELECT (g.org_id)||'_Fee_Schedule' FROM
+			org g where g.org_internal_id = o.parent_org_id
+			)
+			)
+			)AS catalog_id,
+			(
+			SELECT tt.value_text
+			FROM org_attribute tt
+			WHERE tt.parent_id = o.org_internal_id
+			AND tt.item_name = 'Negotiated Contract Type'
+			AND tt.value_type = 0
+			)AS type,
+			po.org_id AS parent_org
+			FROM
+			org o,
+			org po,
+			org_category cat,
+			org_type t,
+			org_address a,
+			org_attribute pa
+			WHERE
+			cat.parent_id = o.org_internal_id
+			AND a.parent_id = o.org_internal_id
+			AND a.address_name = 'Street'
+			AND	cat.member_name = t.caption
+			AND	cat.member_name = (
+			SELECT caption
+			FROM org_type ot
+			WHERE ot.id = (
+			SELECT MIN(og.id)
+			FROM
+			org_type og,
+			org_category oe
+			WHERE
+			oe.parent_id = o.org_internal_id
+			AND og.caption = oe.member_name
+			)
+			)
+			AND pa.parent_id = o.org_internal_id
+			AND pa.item_name = 'Primary'
+			AND 	 pa.value_type = 10
+			AND 	 po.org_internal_id = o.parent_org_id
+			AND	 UPPER(a.state) = ? AND UPPER(a.city) = ? AND a.zip = ?
+			AND (
+			o.owner_org_id = ?
+			)
+			ORDER BY o.org_id
+			)
+			WHERE rownum &lt;= 250
+
+		</statement>
+
+		<statement name="sel_statecityzip_like">
+			
+			SELECT *
+			FROM (
+			SELECT
+			DISTINCT o.org_id,
+			o.name_primary,
+			o.category,
+			a.city,
+			a.state,
+			a.zip,
+			o.tax_id,
+			DECODE(t.group_name, 'other', 'main', t.group_name),
+			a.line1, pa.value_text as value_text,
+			(NVL(
+			(
+			SELECT	 cc.internal_catalog_id
+			FROM		offering_catalog cc
+			WHERE 	upper(cc.catalog_id) = upper((o.org_id)||'_Fee_Schedule')
+			AND cc.org_internal_id = o.parent_org_id
+			),
+			(SELECT 		ca.internal_catalog_id
+			FROM		offering_catalog ca, org gg
+			WHERE 	upper(ca.catalog_id) = upper((gg.org_id)||'_Fee_Schedule')
+			AND gg.org_internal_id = o.parent_org_id
+			)
+			)
+			)AS internal_catalog_id,
+			(NVL(
+			(
+			SELECT catalog_id
+			FROM offering_catalog cc
+			WHERE 	upper(cc.catalog_id) = upper((o.org_id)||'_Fee_Schedule')
+			AND cc.org_internal_id = o.parent_org_id
+			),
+			(SELECT (g.org_id)||'_Fee_Schedule' FROM
+			org g where g.org_internal_id = o.parent_org_id
+			)
+			)
+			)AS catalog_id,
+			(
+			SELECT tt.value_text
+			FROM org_attribute tt
+			WHERE tt.parent_id = o.org_internal_id
+			AND tt.item_name = 'Negotiated Contract Type'
+			AND tt.value_type = 0
+			)AS type,
+			po.org_id AS parent_org
+			FROM
+			org o,
+			org po,
+			org_category cat,
+			org_type t,
+			org_address a,
+			org_attribute pa
+			WHERE
+			cat.parent_id = o.org_internal_id
+			AND a.parent_id = o.org_internal_id
+			AND a.address_name = 'Street'
+			AND	cat.member_name = t.caption
+			AND	cat.member_name = (
+			SELECT caption
+			FROM org_type ot
+			WHERE ot.id = (
+			SELECT MIN(og.id)
+			FROM
+			org_type og,
+			org_category oe
+			WHERE
+			oe.parent_id = o.org_internal_id
+			AND og.caption = oe.member_name
+			)
+			)
+			AND pa.parent_id = o.org_internal_id
+			AND pa.item_name = 'Primary'
+			AND 	 pa.value_type = 10
+			AND 	 po.org_internal_id = o.parent_org_id
+			AND	 UPPER(a.state) LIKE ? AND UPPER(a.city) LIKE ? AND a.zip LIKE ?
+			AND (
+			o.owner_org_id = ?
+			)
+			ORDER BY o.org_id
+			)
+			WHERE rownum &lt;= 250
+
+		</statement>
+
+		<statement name="sel_statezip_like">
+			
+			SELECT *
+			FROM (
+			SELECT
+			DISTINCT o.org_id,
+			o.name_primary,
+			o.category,
+			a.city,
+			a.state,
+			a.zip,
+			o.tax_id,
+			DECODE(t.group_name, 'other', 'main', t.group_name),
+			a.line1, pa.value_text as value_text,
+			(NVL(
+			(
+			SELECT	 cc.internal_catalog_id
+			FROM		offering_catalog cc
+			WHERE 	upper(cc.catalog_id) = upper((o.org_id)||'_Fee_Schedule')
+			AND cc.org_internal_id = o.parent_org_id
+			),
+			(SELECT 		ca.internal_catalog_id
+			FROM		offering_catalog ca, org gg
+			WHERE 	upper(ca.catalog_id) = upper((gg.org_id)||'_Fee_Schedule')
+			AND gg.org_internal_id = o.parent_org_id
+			)
+			)
+			)AS internal_catalog_id,
+			(NVL(
+			(
+			SELECT catalog_id
+			FROM offering_catalog cc
+			WHERE 	upper(cc.catalog_id) = upper((o.org_id)||'_Fee_Schedule')
+			AND cc.org_internal_id = o.parent_org_id
+			),
+			(SELECT (g.org_id)||'_Fee_Schedule' FROM
+			org g where g.org_internal_id = o.parent_org_id
+			)
+			)
+			)AS catalog_id,
+			(
+			SELECT tt.value_text
+			FROM org_attribute tt
+			WHERE tt.parent_id = o.org_internal_id
+			AND tt.item_name = 'Negotiated Contract Type'
+			AND tt.value_type = 0
+			)AS type,
+			po.org_id AS parent_org
+			FROM
+			org o,
+			org po,
+			org_category cat,
+			org_type t,
+			org_address a,
+			org_attribute pa
+			WHERE
+			cat.parent_id = o.org_internal_id
+			AND a.parent_id = o.org_internal_id
+			AND a.address_name = 'Street'
+			AND	cat.member_name = t.caption
+			AND	cat.member_name = (
+			SELECT caption
+			FROM org_type ot
+			WHERE ot.id = (
+			SELECT MIN(og.id)
+			FROM
+			org_type og,
+			org_category oe
+			WHERE
+			oe.parent_id = o.org_internal_id
+			AND og.caption = oe.member_name
+			)
+			)
+			AND pa.parent_id = o.org_internal_id
+			AND pa.item_name = 'Primary'
+			AND 	 pa.value_type = 10
+			AND 	 po.org_internal_id = o.parent_org_id
+			AND	 UPPER(a.state) LIKE ? AND UPPER(a.city) = ? AND a.zip LIKE ?
+			AND (
+			o.owner_org_id = ?
+			)
+			ORDER BY o.org_id
+			)
+			WHERE rownum &lt;= 250
+
+		</statement>
+
+		<statement name="sel_taxid">
+			
+			SELECT *
+			FROM (
+			SELECT
+			DISTINCT o.org_id,
+			o.name_primary,
+			o.category,
+			a.city,
+			a.state,
+			a.zip,
+			o.tax_id,
+			DECODE(t.group_name, 'other', 'main', t.group_name),
+			a.line1, pa.value_text as value_text,
+			(NVL(
+			(
+			SELECT	 cc.internal_catalog_id
+			FROM		offering_catalog cc
+			WHERE 	upper(cc.catalog_id) = upper((o.org_id)||'_Fee_Schedule')
+			AND cc.org_internal_id = o.parent_org_id
+			),
+			(SELECT 		ca.internal_catalog_id
+			FROM		offering_catalog ca, org gg
+			WHERE 	upper(ca.catalog_id) = upper((gg.org_id)||'_Fee_Schedule')
+			AND gg.org_internal_id = o.parent_org_id
+			)
+			)
+			)AS internal_catalog_id,
+			(NVL(
+			(
+			SELECT catalog_id
+			FROM offering_catalog cc
+			WHERE 	upper(cc.catalog_id) = upper((o.org_id)||'_Fee_Schedule')
+			AND cc.org_internal_id = o.parent_org_id
+			),
+			(SELECT (g.org_id)||'_Fee_Schedule' FROM
+			org g where g.org_internal_id = o.parent_org_id
+			)
+			)
+			)AS catalog_id,
+			(
+			SELECT tt.value_text
+			FROM org_attribute tt
+			WHERE tt.parent_id = o.org_internal_id
+			AND tt.item_name = 'Negotiated Contract Type'
+			AND tt.value_type = 0
+			)AS type,
+			po.org_id AS parent_org
+			FROM
+			org o,
+			org po,
+			org_category cat,
+			org_type t,
+			org_address a,
+			org_attribute pa
+			WHERE
+			cat.parent_id = o.org_internal_id
+			AND a.parent_id = o.org_internal_id
+			AND a.address_name = 'Street'
+			AND	cat.member_name = t.caption
+			AND	cat.member_name = (
+			SELECT caption
+			FROM org_type ot
+			WHERE ot.id = (
+			SELECT MIN(og.id)
+			FROM
+			org_type og,
+			org_category oe
+			WHERE
+			oe.parent_id = o.org_internal_id
+			AND og.caption = oe.member_name
+			)
+			)
+			AND pa.parent_id = o.org_internal_id
+			AND pa.item_name = 'Primary'
+			AND 	 pa.value_type = 10
+			AND 	 po.org_internal_id = o.parent_org_id
+			AND	 UPPER(o.tax_id) = ?
+			AND (
+			o.owner_org_id = ?
+			)
+			ORDER BY o.org_id
+			)
+			WHERE rownum &lt;= 250
+
+		</statement>
+
+		<statement name="sel_taxid_like">
+			
+			SELECT *
+			FROM (
+			SELECT
+			DISTINCT o.org_id,
+			o.name_primary,
+			o.category,
+			a.city,
+			a.state,
+			a.zip,
+			o.tax_id,
+			DECODE(t.group_name, 'other', 'main', t.group_name),
+			a.line1, pa.value_text as value_text,
+			(NVL(
+			(
+			SELECT	 cc.internal_catalog_id
+			FROM		offering_catalog cc
+			WHERE 	upper(cc.catalog_id) = upper((o.org_id)||'_Fee_Schedule')
+			AND cc.org_internal_id = o.parent_org_id
+			),
+			(SELECT 		ca.internal_catalog_id
+			FROM		offering_catalog ca, org gg
+			WHERE 	upper(ca.catalog_id) = upper((gg.org_id)||'_Fee_Schedule')
+			AND gg.org_internal_id = o.parent_org_id
+			)
+			)
+			)AS internal_catalog_id,
+			(NVL(
+			(
+			SELECT catalog_id
+			FROM offering_catalog cc
+			WHERE 	upper(cc.catalog_id) = upper((o.org_id)||'_Fee_Schedule')
+			AND cc.org_internal_id = o.parent_org_id
+			),
+			(SELECT (g.org_id)||'_Fee_Schedule' FROM
+			org g where g.org_internal_id = o.parent_org_id
+			)
+			)
+			)AS catalog_id,
+			(
+			SELECT tt.value_text
+			FROM org_attribute tt
+			WHERE tt.parent_id = o.org_internal_id
+			AND tt.item_name = 'Negotiated Contract Type'
+			AND tt.value_type = 0
+			)AS type,
+			po.org_id AS parent_org
+			FROM
+			org o,
+			org po,
+			org_category cat,
+			org_type t,
+			org_address a,
+			org_attribute pa
+			WHERE
+			cat.parent_id = o.org_internal_id
+			AND a.parent_id = o.org_internal_id
+			AND a.address_name = 'Street'
+			AND	cat.member_name = t.caption
+			AND	cat.member_name = (
+			SELECT caption
+			FROM org_type ot
+			WHERE ot.id = (
+			SELECT MIN(og.id)
+			FROM
+			org_type og,
+			org_category oe
+			WHERE
+			oe.parent_id = o.org_internal_id
+			AND og.caption = oe.member_name
+			)
+			)
+			AND pa.parent_id = o.org_internal_id
+			AND pa.item_name = 'Primary'
+			AND 	 pa.value_type = 10
+			AND 	 po.org_internal_id = o.parent_org_id
+			AND	 UPPER(o.tax_id) LIKE ?
+			AND (
+			o.owner_org_id = ?
+			)
+			ORDER BY o.org_id
+			)
+			WHERE rownum &lt;= 250
+
+		</statement>
+
+		<statement name="sel_vendor">
+			
+			SELECT *
+			FROM (
+			SELECT
+			DISTINCT o.org_id,
+			o.name_primary,
+			o.category,
+			a.city,
+			a.state,
+			a.zip,
+			o.tax_id,
+			DECODE(t.group_name, 'other', 'main', t.group_name),
+			a.line1, pa.value_text as value_text,
+			(NVL(
+			(
+			SELECT	 cc.internal_catalog_id
+			FROM		offering_catalog cc
+			WHERE 	upper(cc.catalog_id) = upper((o.org_id)||'_Fee_Schedule')
+			AND cc.org_internal_id = o.parent_org_id
+			),
+			(SELECT 		ca.internal_catalog_id
+			FROM		offering_catalog ca, org gg
+			WHERE 	upper(ca.catalog_id) = upper((gg.org_id)||'_Fee_Schedule')
+			AND gg.org_internal_id = o.parent_org_id
+			)
+			)
+			)AS internal_catalog_id,
+			(NVL(
+			(
+			SELECT catalog_id
+			FROM offering_catalog cc
+			WHERE 	upper(cc.catalog_id) = upper((o.org_id)||'_Fee_Schedule')
+			AND cc.org_internal_id = o.parent_org_id
+			),
+			(SELECT (g.org_id)||'_Fee_Schedule' FROM
+			org g where g.org_internal_id = o.parent_org_id
+			)
+			)
+			)AS catalog_id,
+			(
+			SELECT tt.value_text
+			FROM org_attribute tt
+			WHERE tt.parent_id = o.org_internal_id
+			AND tt.item_name = 'Negotiated Contract Type'
+			AND tt.value_type = 0
+			)AS type,
+			po.org_id AS parent_org
+			FROM
+			org o,
+			org po,
+			org_category cat,
+			org_type t,
+			org_address a,
+			org_attribute pa
+			WHERE
+			cat.parent_id = o.org_internal_id
+			AND a.parent_id = o.org_internal_id
+			AND a.address_name = 'Street'
+			AND	cat.member_name = t.caption
+			AND	cat.member_name = (
+			SELECT caption
+			FROM org_type ot
+			WHERE ot.id = (
+			SELECT MIN(og.id)
+			FROM
+			org_type og,
+			org_category oe
+			WHERE
+			oe.parent_id = o.org_internal_id
+			AND og.caption = oe.member_name
+			)
+			)
+			AND pa.parent_id = o.org_internal_id
+			AND pa.item_name = 'Primary'
+			AND 	 pa.value_type = 10
+			AND 	 po.org_internal_id = o.parent_org_id
+			AND	UPPER(o.org_id) = ? AND cat.member_name IN ('main_dir_entry', 'location_dir_entry')
+			AND (
+			o.owner_org_id = ?
+			)
+			ORDER BY o.org_id
+			)
+			WHERE rownum &lt;= 250
+
+		</statement>
+
+		<statement name="sel_vendor_like">
+			
+			SELECT *
+			FROM (
+			SELECT
+			DISTINCT o.org_id,
+			o.name_primary,
+			o.category,
+			a.city,
+			a.state,
+			a.zip,
+			o.tax_id,
+			DECODE(t.group_name, 'other', 'main', t.group_name),
+			a.line1, pa.value_text as value_text,
+			(NVL(
+			(
+			SELECT	 cc.internal_catalog_id
+			FROM		offering_catalog cc
+			WHERE 	upper(cc.catalog_id) = upper((o.org_id)||'_Fee_Schedule')
+			AND cc.org_internal_id = o.parent_org_id
+			),
+			(SELECT 		ca.internal_catalog_id
+			FROM		offering_catalog ca, org gg
+			WHERE 	upper(ca.catalog_id) = upper((gg.org_id)||'_Fee_Schedule')
+			AND gg.org_internal_id = o.parent_org_id
+			)
+			)
+			)AS internal_catalog_id,
+			(NVL(
+			(
+			SELECT catalog_id
+			FROM offering_catalog cc
+			WHERE 	upper(cc.catalog_id) = upper((o.org_id)||'_Fee_Schedule')
+			AND cc.org_internal_id = o.parent_org_id
+			),
+			(SELECT (g.org_id)||'_Fee_Schedule' FROM
+			org g where g.org_internal_id = o.parent_org_id
+			)
+			)
+			)AS catalog_id,
+			(
+			SELECT tt.value_text
+			FROM org_attribute tt
+			WHERE tt.parent_id = o.org_internal_id
+			AND tt.item_name = 'Negotiated Contract Type'
+			AND tt.value_type = 0
+			)AS type,
+			po.org_id AS parent_org
+			FROM
+			org o,
+			org po,
+			org_category cat,
+			org_type t,
+			org_address a,
+			org_attribute pa
+			WHERE
+			cat.parent_id = o.org_internal_id
+			AND a.parent_id = o.org_internal_id
+			AND a.address_name = 'Street'
+			AND	cat.member_name = t.caption
+			AND	cat.member_name = (
+			SELECT caption
+			FROM org_type ot
+			WHERE ot.id = (
+			SELECT MIN(og.id)
+			FROM
+			org_type og,
+			org_category oe
+			WHERE
+			oe.parent_id = o.org_internal_id
+			AND og.caption = oe.member_name
+			)
+			)
+			AND pa.parent_id = o.org_internal_id
+			AND pa.item_name = 'Primary'
+			AND 	 pa.value_type = 10
+			AND 	 po.org_internal_id = o.parent_org_id
+			AND	UPPER(o.org_id) LIKE ? AND cat.member_name IN ('main_dir_entry', 'location_dir_entry')
+			AND (
+			o.owner_org_id = ?
+			)
+			ORDER BY o.org_id
+			)
+			WHERE rownum &lt;= 250
+
+		</statement>
+
+		<statement name="sel_zip_like">
+			
+			SELECT *
+			FROM (
+			SELECT
+			DISTINCT o.org_id,
+			o.name_primary,
+			o.category,
+			a.city,
+			a.state,
+			a.zip,
+			o.tax_id,
+			DECODE(t.group_name, 'other', 'main', t.group_name),
+			a.line1, pa.value_text as value_text,
+			(NVL(
+			(
+			SELECT	 cc.internal_catalog_id
+			FROM		offering_catalog cc
+			WHERE 	upper(cc.catalog_id) = upper((o.org_id)||'_Fee_Schedule')
+			AND cc.org_internal_id = o.parent_org_id
+			),
+			(SELECT 		ca.internal_catalog_id
+			FROM		offering_catalog ca, org gg
+			WHERE 	upper(ca.catalog_id) = upper((gg.org_id)||'_Fee_Schedule')
+			AND gg.org_internal_id = o.parent_org_id
+			)
+			)
+			)AS internal_catalog_id,
+			(NVL(
+			(
+			SELECT catalog_id
+			FROM offering_catalog cc
+			WHERE 	upper(cc.catalog_id) = upper((o.org_id)||'_Fee_Schedule')
+			AND cc.org_internal_id = o.parent_org_id
+			),
+			(SELECT (g.org_id)||'_Fee_Schedule' FROM
+			org g where g.org_internal_id = o.parent_org_id
+			)
+			)
+			)AS catalog_id,
+			(
+			SELECT tt.value_text
+			FROM org_attribute tt
+			WHERE tt.parent_id = o.org_internal_id
+			AND tt.item_name = 'Negotiated Contract Type'
+			AND tt.value_type = 0
+			)AS type,
+			po.org_id AS parent_org
+			FROM
+			org o,
+			org po,
+			org_category cat,
+			org_type t,
+			org_address a,
+			org_attribute pa
+			WHERE
+			cat.parent_id = o.org_internal_id
+			AND a.parent_id = o.org_internal_id
+			AND a.address_name = 'Street'
+			AND	cat.member_name = t.caption
+			AND	cat.member_name = (
+			SELECT caption
+			FROM org_type ot
+			WHERE ot.id = (
+			SELECT MIN(og.id)
+			FROM
+			org_type og,
+			org_category oe
+			WHERE
+			oe.parent_id = o.org_internal_id
+			AND og.caption = oe.member_name
+			)
+			)
+			AND pa.parent_id = o.org_internal_id
+			AND pa.item_name = 'Primary'
+			AND 	 pa.value_type = 10
+			AND 	 po.org_internal_id = o.parent_org_id
+			AND	 UPPER(a.state) = ? AND UPPER(a.city) = ? AND a.zip LIKE ?
+			AND (
+			o.owner_org_id = ?
+			)
+			ORDER BY o.org_id
+			)
+			WHERE rownum &lt;= 250
+
+		</statement>
+
+	</sql-statements>
+</xaf>

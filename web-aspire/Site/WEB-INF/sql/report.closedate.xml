@@ -1,0 +1,188 @@
+<?xml version="1.0"?>
+
+<xaf>
+	<sql-statements package="report.closedate">
+		<statement name="id">
+			App::Statements::Report::CloseDate
+		</statement>
+
+		<statement name="sel_docDayStartingAR">
+			
+			select sum(balance) from Transaction, Invoice
+			where Invoice.owner_id = :1
+			and invoice_date &lt; to_date(:2, 'MM/DD/YYYY')
+			and NOT (invoice_status = 15 and parent_invoice_id is NOT NULL)
+			and Transaction.trans_id = Invoice.main_transaction
+			and Transaction.provider_id = :3
+			
+		</statement>
+
+		<statement name="sel_docMonthStartingAR">
+			
+			select sum(balance) from Transaction, Invoice 
+			where Invoice.owner_id = :1
+			and invoice_date &lt; to_date(:2, 'mm/yyyy')
+			and NOT (invoice_status = 15 and parent_invoice_id is NOT NULL)
+			and Transaction.trans_id = Invoice.main_transaction
+			and Transaction.provider_id = :3
+			
+		</statement>
+
+		<statement name="sel_docTotalsForDate">
+			
+			SELECT sum(total_charges) as total_charges,
+			sum(person_pay) as person_pay,
+			sum(insurance_pay) as insurance_pay,
+			sum(person_write_off) as courtesy_adj,
+			sum(insurance_write_off) as contractual_adj,
+			sum(misc_charges) as misc_charges,
+			sum(refund) as refund
+			FROM Invoice_Charges
+			WHERE owner_org_id = :1
+			and real_invoice_date &gt;= to_date(:2, 'MM/DD/YYYY')
+			and real_invoice_date &lt; to_date(:2, 'MM/DD/YYYY') +1
+			and provider = :3
+
+		</statement>
+
+		<statement name="sel_docTotalsForMonth">
+			
+			SELECT sum(total_charges) as total_charges,
+			sum(person_pay) as person_pay,
+			sum(insurance_pay) as insurance_pay,
+			sum(person_write_off) as courtesy_adj,
+			sum(insurance_write_off) as contractual_adj,
+			sum(misc_charges) as misc_charges,
+			sum(refund) as refund
+			FROM Invoice_Charges
+			WHERE owner_org_id = :1
+			and real_invoice_date &gt;= to_date(:2, 'mm/yyyy')
+			and real_invoice_date &lt; to_date(:3, 'MM/DD/YYYY') + 1
+			and provider = :4		
+
+		</statement>
+
+		<statement name="sel_docTotalsForYear">
+			
+			SELECT sum(total_charges) as total_charges,
+			sum(person_pay) as person_pay,
+			sum(insurance_pay) as insurance_pay,
+			sum(person_write_off) as courtesy_adj,
+			sum(insurance_write_off) as contractual_adj,
+			sum(misc_charges) as misc_charges,
+			sum(refund) as refund
+			FROM Invoice_Charges
+			WHERE owner_org_id = :1
+			and real_invoice_date &gt;= to_date(:2, 'MM/DD/YYYY')
+			and real_invoice_date &lt; to_date(:3, 'MM/DD/YYYY') + 1
+			and provider = :4
+
+		</statement>
+
+		<statement name="sel_docYearStartingAR">
+			
+			select sum(balance) from Transaction, Invoice 
+			where Invoice.owner_id = :1
+			and invoice_date &lt; to_date(:2, 'MM/DD/YYYY')
+			and NOT (invoice_status = 15 and parent_invoice_id is NOT NULL)
+			and Transaction.trans_id = Invoice.main_transaction
+			and Transaction.provider_id = :3
+			
+		</statement>
+
+		<statement name="sel_lastCloseDate">
+			
+			select to_char(value_date, 'MM/DD/YYYY') as last_close_date 
+			from Org_Attribute
+			where parent_id = :1
+			and value_type = 150
+			and item_name = 'Retire Batch Date'
+			
+		</statement>
+
+		<statement name="sel_orgDayStartingAR">
+			
+			select sum(balance) from Invoice
+			where owner_id = :1
+			and invoice_date &lt; to_date(:2, 'MM/DD/YYYY')
+			and NOT (invoice_status = 15 and parent_invoice_id is NOT NULL)
+			
+		</statement>
+
+		<statement name="sel_orgMonthStartingAR">
+			
+			select sum(balance) from Invoice 
+			where owner_id = :1
+			and invoice_date &lt; to_date(:2, 'mm/yyyy')
+			and NOT (invoice_status = 15 and parent_invoice_id is NOT NULL)
+			
+		</statement>
+
+		<statement name="sel_orgTotalsForDate">
+			
+			SELECT sum(total_charges) as total_charges,
+			sum(person_pay) as person_pay,
+			sum(insurance_pay) as insurance_pay,
+			sum(person_write_off) as courtesy_adj,
+			sum(insurance_write_off) as contractual_adj,
+			sum(misc_charges) as misc_charges,
+			sum(refund) as refund
+			FROM Invoice_Charges
+			WHERE owner_org_id = :1
+			and real_invoice_date &gt;= to_date(:2, 'MM/DD/YYYY')
+			and real_invoice_date &lt; to_date(:2, 'MM/DD/YYYY') +1
+			
+		</statement>
+
+		<statement name="sel_orgTotalsForMonth">
+			
+			SELECT sum(total_charges) as total_charges,
+			sum(person_pay) as person_pay,
+			sum(insurance_pay) as insurance_pay,
+			sum(person_write_off) as courtesy_adj,
+			sum(insurance_write_off) as contractual_adj,
+			sum(misc_charges) as misc_charges,
+			sum(refund) as refund
+			FROM Invoice_Charges
+			WHERE owner_org_id = :1
+			and real_invoice_date &gt;= to_date(:2, 'mm/yyyy')
+			and real_invoice_date &lt; to_date(:3, 'MM/DD/YYYY') + 1
+			
+		</statement>
+
+		<statement name="sel_orgTotalsForYear">
+			
+			SELECT sum(total_charges) as total_charges,
+			sum(person_pay) as person_pay,
+			sum(insurance_pay) as insurance_pay,
+			sum(person_write_off) as courtesy_adj,
+			sum(insurance_write_off) as contractual_adj,
+			sum(misc_charges) as misc_charges,
+			sum(refund) as refund
+			FROM Invoice_Charges
+			WHERE owner_org_id = :1
+			and real_invoice_date &gt;= to_date(:2, 'MM/DD/YYYY')
+			and real_invoice_date &lt; to_date(:3, 'MM/DD/YYYY') + 1
+			
+		</statement>
+
+		<statement name="sel_orgYearStartingAR">
+			
+			select sum(balance) from Invoice 
+			where owner_id = :1
+			and invoice_date &lt; to_date(:2, 'MM/DD/YYYY')
+			and NOT (invoice_status = 15 and parent_invoice_id is NOT NULL)
+			
+		</statement>
+
+		<statement name="sel_providerList">
+			
+			select distinct provider from Invoice_Charges
+			where owner_org_id = :1
+			and invoice_date &gt;= to_date(:2, 'MM/DD/YYYY')
+			and invoice_date &lt; add_months(to_date(:2, 'MM/DD/YYYY'), 12)
+			
+		</statement>
+
+	</sql-statements>
+</xaf>

@@ -1,0 +1,478 @@
+<?xml version="1.0"?>
+
+<xaf>
+	<sql-statements package="billing_statement">
+		<statement name="id">
+			App::Statements::BillingStatement
+		</statement>
+
+		<statement name="sel_BillingIds">
+			
+			select org.org_internal_id, org.org_id, org_attribute.value_text as billing_id,
+			org_attribute.value_int as nsf_type, null as provider_id
+			from org_attribute, org
+			where org.parent_org_id is null
+			and org.org_internal_id != 1
+			and org_attribute.parent_id = org.org_internal_id
+			and org_attribute.value_type = 960
+			and org_attribute.item_name = 'Organization Default Clearing House ID'
+			and org_attribute.value_intb = 1
+			UNION
+			select person_org_category.org_internal_id, org.org_id, person_attribute.value_text
+			as billing_id, person_attribute.value_int as nsf_type, person_id as provider_id
+			from org, person_org_category, person_attribute
+			where person_attribute.value_type = 960
+			and person_attribute.item_name = 'Physician Clearing House ID'
+			and person_attribute.value_intb = 1
+			and person_org_category.person_id = person_attribute.parent_id
+			and person_org_category.category = 'Physician'
+			and org.org_internal_id = person_org_category.org_internal_id
+			
+		</statement>
+
+		<statement name="sel_aging">
+			
+			SELECT nvl(sum(balance), 0)
+			FROM Invoice_Billing, Invoice
+			WHERE client_id = :1
+			and invoice_date &gt; trunc(sysdate) - :2
+			and invoice_date &lt;= trunc(sysdate) - :3
+			and invoice_status &gt; 3
+			and invoice_status != 15
+			and invoice_status != 16
+			and invoice_subtype in (0, 7)
+			and bill_id = billing_id
+			and bill_to_id = :4
+			
+		</statement>
+
+		<statement name="sel_billingPhone">
+			
+			select value_text
+			from Org_Attribute
+			where parent_id = :1
+			and value_type = 25
+			
+		</statement>
+
+		<statement name="sel_daysBillingEvents">
+			
+			SELECT item_id, parent_id, value_int AS day, value_text AS name_begin, value_textb AS name_end,
+			value_intb AS balance_condition, value_float AS balance_criteria
+			FROM org_attribute
+			WHERE parent_id = :1
+			AND value_int = :2
+			AND value_type = 650
+			
+		</statement>
+
+		<statement name="sel_internalStatementId">
+			
+			select int_statement_id from statement where statement_id = :1
+			
+		</statement>
+
+		<statement name="sel_last4Statements">
+			
+			select * from
+			(
+			select patient_id, to_char(transmission_stamp, 'MM/DD/YYYY')
+			as transmission_date, transmission_status.caption as status, to_char(ack_stamp,
+			'MM/DD/YYYY') as ack_date, int_statement_id, ext_statement_id,
+			amount_due, inv_ids as claim_ids
+			from transmission_status, statement
+			where billto_id = :1
+			and payto_id = :2
+			and patient_id = :3
+			and transmission_status.id (+) = statement.transmission_status
+			order by statement_id desc
+			)
+			where rownum &lt; 5
+			
+		</statement>
+
+		<statement name="sel_orgAddress">
+			
+			SELECT initcap(name_primary) as name_primary, line1, line2, city, state, 
+			replace(zip, '-', null) as zip
+			FROM Org_Address, Org
+			WHERE org_internal_id = :1
+			and Org_Address.parent_id = Org.org_internal_id
+			
+		</statement>
+
+		<statement name="sel_orgAddressByName">
+			
+			SELECT initcap(name_primary) as name_primary, line1, line2, city, state, 
+			replace(zip, '-', null) as zip
+			FROM org_address, org
+			WHERE org_internal_id = :1
+			AND org_address.parent_id = org.org_internal_id
+			AND org_address.address_name = :2
+			
+		</statement>
+
+		<statement name="sel_outstandingInvoices">
+			
+			select Invoice.invoice_id, Invoice.invoice_id || ' - ' || to_char(invoice_date, 'MM/DD/YYYY')
+			|| ' - $' || to_char(Invoice.balance, '99999.99') as caption
+			from Invoice_Billing, Invoice
+			where Invoice.owner_id = :2
+			and Invoice.balance &gt; 0
+			and Invoice.invoice_status &gt; 3
+			and Invoice.invoice_status != 15
+			and Invoice.invoice_status != 16
+			and Invoice.invoice_subtype in (0, 7)
+			and Invoice_Billing.bill_id = Invoice.billing_id
+			and Invoice_Billing.bill_party_type &lt; 2
+			and Invoice_Billing.bill_to_id = :1
+			order by invoice_id desc
+			
+		</statement>
+
+		<statement name="sel_paymentHistory">
+			
+SELECT * FROM (
+			select to_char(value_stamp - :3, 'MM/DD/YYYY'),
+			value_float, value_text
+			from payment_history h, payment_plan p
+			where p.person_id = :1
+			and p.owner_org_id = :2
+			and h.parent_id = p.plan_id
+			order by value_stamp desc
+			) WHERE ROWNUM &lt; 11
+			
+		</statement>
+
+		<statement name="sel_paymentPlan">
+			
+			SELECT payment_cycle, payment_min, to_char(first_due, 'MM/DD/YYYY')
+			as first_due, to_char(next_due, 'MM/DD/YYYY') as next_due,
+			to_char(lastpay_date, 'MM/DD/YYYY' ) as lastpay_date, lastpay_amount,
+			balance, billing_org_id, inv_ids, plan_id, person_id
+			FROM Payment_Plan
+			WHERE person_id = :1
+			and owner_org_id = :2
+			
+		</statement>
+
+		<statement name="sel_personAddress">
+			
+			SELECT initcap(complete_name) as complete_name, line1, line2, city, State, 
+			replace(zip, '-', null) as zip, initcap(simple_name) as simple_name
+			FROM Person_Address, Person
+			WHERE person_id = ?
+			and Person_Address.parent_id = Person.person_id
+			
+		</statement>
+
+		<statement name="sel_statementClaims_perOrg">
+			
+			SELECT i.invoice_id, ib.bill_to_id, t.billing_facility_id, t.provider_id, t.care_provider_id,
+			i.client_id, i.total_cost, i.total_adjust, i.balance,
+			to_char(i.invoice_date, 'MM/DD/YYYY') as invoice_date, ib.bill_party_type,
+			(select nvl(sum(net_adjust), 0)
+			from Invoice_Item_Adjust
+			where parent_id in (select item_id from Invoice_Item where parent_id = i.invoice_id)
+			and adjustment_type = 0
+			and payer_type != 0
+			) as insurance_receipts,
+			(select nvl(sum(net_adjust), 0)
+			from Invoice_Item_Adjust
+			where parent_id in (select item_id from Invoice_Item where parent_id = i.invoice_id)
+			and adjustment_type = 0
+			and payer_type = 0
+			) as patient_receipts,
+			p.complete_name AS patient_name,
+			p.name_last AS patient_name_last,
+			'claim' as statement_type,
+			o.org_id as billing_org_id
+			FROM Org o, Transaction t, Invoice_Billing ib, Invoice i, Person p
+			WHERE
+			p.person_id = i.client_id
+			AND i.owner_id = :1
+			AND i.invoice_status &gt; 3
+			AND i.invoice_status != 15
+			AND i.invoice_status != 16
+			AND i.balance &gt; 0
+			AND i.invoice_subtype in (0, 7)
+			AND ib.bill_id = i.billing_id
+			AND ib.bill_party_type != 3
+			AND ib.bill_to_id IS NOT NULL
+			AND t.trans_id = i.main_transaction
+			AND not exists (select 'x' from person_attribute pa
+			where pa.parent_id = t.provider_id
+			and pa.value_type = 960
+			and pa.value_intb = 1
+			)
+			AND not exists(select 'x' from Statement s
+			where s.transmission_stamp &gt; trunc(sysdate) -14
+			and s.payto_id = t.billing_facility_id
+			and s.billto_id = ib.bill_to_id
+			and s.patient_id = i.client_id
+			)
+			AND not exists(select 'x' from Payment_Plan_Inv_Ids ppii
+			where ppii.member_name = i.invoice_id
+			)
+			AND o.org_internal_id = t.billing_facility_id
+			UNION
+			SELECT plan_id * (-1) as invoice_id, pp.person_id as bill_to_id, pp.billing_org_id as
+			billing_facility_id, 'Payment Plan' as provider_id, NULL as care_provider_id,
+			pp.person_id as client_id, pp.payment_min as total_cost, 0 as total_adjust, pp.balance,
+			to_char(pp.first_due, 'MM/DD/YYYY') as invoice_date, 0 as bill_party_type,
+			0 as insurance_receipts,
+			(select nvl(sum(value_float), 0) from Payment_History where parent_id = pp.plan_id)
+			as patient_receipts,
+			p.complete_name as patient_name, p.name_last as patient_name_last,
+			'payplan' as statement_type,
+			o.org_id as billing_org_id
+			FROM Org o, Person p, Payment_Plan pp
+			WHERE pp.next_due &gt; sysdate
+			and pp.owner_org_id = :1
+			and pp.balance &gt; 0
+			and p.person_id = pp.person_id
+			and (pp.laststmt_date is NULL or
+			(pp.laststmt_date is NOT NULL and pp.laststmt_date &lt; trunc(sysdate) -14)
+			)
+			and o.org_internal_id = pp.billing_org_id
+
+		</statement>
+
+		<statement name="sel_statementClaims_perOrg_perProvider">
+			
+			SELECT i.invoice_id, ib.bill_to_id, t.billing_facility_id, t.provider_id, t.care_provider_id,
+			i.client_id, i.total_cost, i.total_adjust, i.balance,
+			to_char(i.invoice_date, 'MM/DD/YYYY') as invoice_date, ib.bill_party_type,
+			(select nvl(sum(net_adjust), 0)
+			from Invoice_Item_Adjust
+			where parent_id in (select item_id from Invoice_Item where parent_id = i.invoice_id)
+			and adjustment_type = 0
+			and payer_type != 0
+			) as insurance_receipts,
+			(select nvl(sum(net_adjust), 0)
+			from Invoice_Item_Adjust
+			where parent_id in (select item_id from Invoice_Item where parent_id = i.invoice_id)
+			and adjustment_type = 0
+			and payer_type = 0
+			) as patient_receipts,
+			p.complete_name AS patient_name,
+			p.name_last AS patient_name_last,
+			'claim' as statement_type,
+			o.org_id as billing_org_id
+			FROM Org o, Transaction t, Invoice_Billing ib, Invoice i, Person p
+			WHERE
+			p.person_id = i.client_id
+			AND i.owner_id = :1
+			AND i.invoice_status &gt; 3
+			AND i.invoice_status != 15
+			AND i.invoice_status != 16
+			AND i.balance &gt; 0
+			AND i.invoice_subtype in (0, 7)
+			AND ib.bill_id = i.billing_id
+			AND ib.bill_party_type != 3
+			AND ib.bill_to_id IS NOT NULL
+			AND t.trans_id = i.main_transaction
+			AND t.provider_id = :2
+			AND not exists(select 'x' from Statement s
+			where s.transmission_stamp &gt; trunc(sysdate) -14
+			and s.payto_id = t.billing_facility_id
+			and s.billto_id = ib.bill_to_id
+			and s.patient_id = i.client_id
+			)
+			AND not exists(select 'x' from Payment_Plan_Inv_Ids ppii
+			where ppii.member_name = i.invoice_id
+			)
+			AND o.org_internal_id = t.billing_facility_id
+			UNION
+			SELECT plan_id * (-1) as invoice_id, pp.person_id as bill_to_id, pp.billing_org_id as
+			billing_facility_id, 'Payment Plan' as provider_id, NULL as care_provider_id,
+			pp.person_id as client_id, pp.payment_min as total_cost, 0 as total_adjust, pp.balance,
+			to_char(pp.first_due, 'MM/DD/YYYY') as invoice_date, 0 as bill_party_type,
+			0 as insurance_receipts,
+			(select nvl(sum(value_float), 0) from Payment_History where parent_id = pp.plan_id)
+			as patient_receipts,
+			p.complete_name as patient_name, p.name_last as patient_name_last,
+			'payplan' as statement_type,
+			o.org_id as billing_org_id
+			FROM Org o, Person p, Payment_Plan pp
+			WHERE pp.next_due &gt; sysdate
+			and pp.owner_org_id = :1
+			and pp.balance &gt; 0
+			and p.person_id = pp.person_id
+			and (pp.laststmt_date is NULL or
+			(pp.laststmt_date is NOT NULL and pp.laststmt_date &lt; trunc(sysdate) -14)
+			)
+			and o.org_internal_id = pp.billing_org_id
+
+		</statement>
+
+		<statement name="sel_submittedClaims_perOrg">
+			
+			select invoice_id
+			from Transaction t, Invoice i
+			where i.invoice_status in (
+			4,
+			14
+			)
+			and i.owner_id = ?
+			and i.invoice_subtype != 0
+			and i.invoice_subtype != 7
+			and i.balance &gt; 0
+			and t.trans_id = i.main_transaction
+			and not exists (select 'x' from person_attribute pa
+			where pa.parent_id = t.provider_id
+			and pa.value_type = 960
+			and pa.item_name = 'Physician Clearing House ID'
+			and pa.value_intb = 1)
+			order by i.invoice_id
+			
+		</statement>
+
+		<statement name="sel_submittedClaims_perOrg_perProvider">
+			
+			select invoice_id
+			from Transaction t, Invoice i
+			where i.invoice_status in (
+			4,
+			14
+			)
+			and i.owner_id = :1
+			and i.invoice_subtype != 0
+			and i.invoice_subtype != 7
+			and i.balance &gt; 0
+			and t.trans_id = i.main_transaction
+			and t.provider_id = :2
+			order by i.invoice_id
+			
+		</statement>
+
+		<statement name="sel_testStatements_Org">
+			
+			SELECT i.invoice_id, ib.bill_to_id, t.billing_facility_id, t.provider_id, t.care_provider_id,
+			i.client_id, i.total_cost, i.total_adjust, i.balance,
+			to_char(i.invoice_date, 'MM/DD/YYYY') as invoice_date, ib.bill_party_type,
+			(select nvl(sum(net_adjust), 0)
+			from Invoice_Item_Adjust
+			where parent_id in (select item_id from Invoice_Item where parent_id = i.invoice_id)
+			and adjustment_type = 0
+			and payer_type != 0
+			) as insurance_receipts,
+			(select nvl(sum(net_adjust), 0)
+			from Invoice_Item_Adjust
+			where parent_id in (select item_id from Invoice_Item where parent_id = i.invoice_id)
+			and adjustment_type = 0
+			and payer_type = 0
+			) as patient_receipts,
+			p.complete_name AS patient_name,
+			p.name_last AS patient_name_last,
+			'claim' as statement_type,
+			o.org_id as billing_org_id
+			FROM Org o, Transaction t, Invoice_Billing ib, Invoice i, Person p
+			WHERE
+			p.person_id = i.client_id
+			AND i.owner_id = :1
+			AND i.invoice_status &gt; 3
+			AND i.invoice_status != 15
+			AND i.invoice_status != 16
+			AND i.balance &gt; 0
+			AND i.invoice_subtype in (0, 7)
+			AND ib.bill_id = i.billing_id
+			AND ib.bill_party_type != 3
+			AND ib.bill_to_id IS NOT NULL
+			AND t.trans_id = i.main_transaction
+			AND not exists (select 'x' from person_attribute pa
+			where pa.parent_id = t.provider_id
+			and pa.value_type = 960
+			and pa.value_intb = 1
+			)
+			AND not exists(select 'x' from Payment_Plan_Inv_Ids ppii
+			where ppii.member_name = i.invoice_id
+			)
+			AND o.org_internal_id = t.billing_facility_id
+			UNION
+			SELECT plan_id * (-1) as invoice_id, pp.person_id as bill_to_id, pp.billing_org_id as
+			billing_facility_id, 'Payment Plan' as provider_id, NULL as care_provider_id,
+			pp.person_id as client_id, pp.payment_min as total_cost, 0 as total_adjust, pp.balance,
+			to_char(pp.first_due, 'MM/DD/YYYY') as invoice_date, 0 as bill_party_type,
+			0 as insurance_receipts,
+			(select nvl(sum(value_float), 0) from Payment_History where parent_id = pp.plan_id)
+			as patient_receipts,
+			p.complete_name as patient_name, p.name_last as patient_name_last,
+			'payplan' as statement_type,
+			o.org_id as billing_org_id
+			FROM Org o, Person p, Payment_Plan pp
+			WHERE pp.next_due &gt; sysdate
+			and pp.owner_org_id = :1
+			and pp.balance &gt; 0
+			and p.person_id = pp.person_id
+			and (pp.laststmt_date is NULL or
+			(pp.laststmt_date is NOT NULL and pp.laststmt_date &lt; trunc(sysdate) -14)
+			)
+			and o.org_internal_id = pp.billing_org_id
+
+		</statement>
+
+		<statement name="sel_testStatements_Provider">
+			
+			SELECT i.invoice_id, ib.bill_to_id, t.billing_facility_id, t.provider_id, t.care_provider_id,
+			i.client_id, i.total_cost, i.total_adjust, i.balance,
+			to_char(i.invoice_date, 'MM/DD/YYYY') as invoice_date, ib.bill_party_type,
+			(select nvl(sum(net_adjust), 0)
+			from Invoice_Item_Adjust
+			where parent_id in (select item_id from Invoice_Item where parent_id = i.invoice_id)
+			and adjustment_type = 0
+			and payer_type != 0
+			) as insurance_receipts,
+			(select nvl(sum(net_adjust), 0)
+			from Invoice_Item_Adjust
+			where parent_id in (select item_id from Invoice_Item where parent_id = i.invoice_id)
+			and adjustment_type = 0
+			and payer_type = 0
+			) as patient_receipts,
+			p.complete_name AS patient_name,
+			p.name_last AS patient_name_last,
+			'claim' as statement_type,
+			o.org_id as billing_org_id
+			FROM Org o, Transaction t, Invoice_Billing ib, Invoice i, Person p
+			WHERE
+			p.person_id = i.client_id
+			AND i.owner_id = :1
+			AND i.invoice_status &gt; 3
+			AND i.invoice_status != 15
+			AND i.invoice_status != 16
+			AND i.balance &gt; 0
+			AND i.invoice_subtype in (0, 7)
+			AND ib.bill_id = i.billing_id
+			AND ib.bill_party_type != 3
+			AND ib.bill_to_id IS NOT NULL
+			AND t.trans_id = i.main_transaction
+			AND t.provider_id = :2
+			AND not exists(select 'x' from Payment_Plan_Inv_Ids ppii
+			where ppii.member_name = i.invoice_id
+			)
+			AND o.org_internal_id = t.billing_facility_id
+			UNION
+			SELECT plan_id * (-1) as invoice_id, pp.person_id as bill_to_id, pp.billing_org_id as
+			billing_facility_id, 'Payment Plan' as provider_id, NULL as care_provider_id,
+			pp.person_id as client_id, pp.payment_min as total_cost, 0 as total_adjust, pp.balance,
+			to_char(pp.first_due, 'MM/DD/YYYY') as invoice_date, 0 as bill_party_type,
+			0 as insurance_receipts,
+			(select nvl(sum(value_float), 0) from Payment_History where parent_id = pp.plan_id)
+			as patient_receipts,
+			p.complete_name as patient_name, p.name_last as patient_name_last,
+			'payplan' as statement_type,
+			o.org_id as billing_org_id
+			FROM Org o, Person p, Payment_Plan pp
+			WHERE pp.next_due &gt; sysdate
+			and pp.owner_org_id = :1
+			and pp.balance &gt; 0
+			and p.person_id = pp.person_id
+			and (pp.laststmt_date is NULL or
+			(pp.laststmt_date is NOT NULL and pp.laststmt_date &lt; trunc(sysdate) -14)
+			)
+			and o.org_internal_id = pp.billing_org_id
+
+		</statement>
+
+	</sql-statements>
+</xaf>

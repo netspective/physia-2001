@@ -1,0 +1,68 @@
+<?xml version="1.0"?>
+
+<xaf>
+	<sql-statements package="device">
+		<statement name="id">
+			App::Statements::Device
+		</statement>
+
+		<statement name="sel_device_assoc">
+			
+			select device_name
+			from device_specification, device_association
+			where device_specification.device_id = device_association.device_id
+			and device_specification.device_type = ?
+			and device_association.org_internal_id = ?
+			and device_association.document_type = ?
+			and device_association.person_id = ?
+			
+		</statement>
+
+		<statement name="sel_doctype_default_device_assoc">
+			
+			select device_name
+			from device_specification, device_association
+			where device_specification.device_id = device_association.device_id
+			and device_specification.device_type = ?
+			and device_association.org_internal_id = ?
+			and device_association.document_type = ?
+			and device_association.person_id is NULL
+			
+		</statement>
+
+		<statement name="sel_org_default_device_assoc">
+			
+			select device_name
+			from device_specification, device_association
+			where device_specification.device_id = device_association.device_id
+			and device_specification.device_type = ?
+			and device_association.org_internal_id = ?
+			and device_association.document_type is NULL
+			and device_association.person_id is NULL
+			
+		</statement>
+
+		<statement name="sel_org_devices">
+			
+			select distinct device_name
+			from device_specification, device_association
+			where device_association.device_id = device_specification.device_id
+			and device_specification.device_type = 0
+			and device_association.org_internal_id = 1
+			
+		</statement>
+
+		<statement name="sel_person_default_device_assoc">
+			
+			select device_name
+			from device_specification, device_association
+			where device_specification.device_id = device_association.device_id
+			and device_specification.device_type = ?
+			and device_association.org_internal_id = ?
+			and device_association.document_type is NULL
+			and device_association.person_id = ?
+			
+		</statement>
+
+	</sql-statements>
+</xaf>

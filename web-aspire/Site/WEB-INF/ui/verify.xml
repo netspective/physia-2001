@@ -1,0 +1,65 @@
+<?xml version="1.0"?>
+
+<xaf>
+	<dialogs package="verify">
+		<dialog name="insurance_records" heading="insurance_records">
+			<field.text hidden="yes" name="event_id" caption="event_id"/>
+			<field.text caption="Patient ID" read-only="yes" max-length="16" name="person_id" size="25"/>
+			<field.date caption="Effective Date" max-length="10" name="effective_begin_date" size="10"/>
+			<field.composite caption="*"  name="text_field">
+				<field.currency caption="Deductible"  name="deductible" size="10"/>
+				<field.currency caption="Met To-Date"  name="deductible_met" size="10"/>
+			</field.composite>
+			<field.boolean caption="Referral Required"  name="referral_required" style="check"/>
+			<field.currency caption="Office Visit Copay"  name="ovcopay" size="10"/>
+			<field.composite caption="*"  name="text_field">
+				<field.currency caption="Lab"  name="labcopay" size="10"/>
+				<field.currency caption="X-Ray Copay"  name="xraycopay" size="10"/>
+			</field.composite>
+			<field.boolean caption="Separate Co-pay for Lab/X-Ray"  name="sep_copay_xray" style="check"/>
+			<field.text caption="Lab"  name="lab" size="40"/>
+			<field.text caption="PCP ID"  max-length="16" name="provider_id" size="25"/>
+			<field.text caption="Coverage Required"  name="coverage_req" size="40"/>
+			<field.text caption="Coverage On the Following"  name="coverage_on" size="40"/>
+			<field.boolean caption="Referral or Pre-Cert on Out Patient"  name="referral_or_precert" style="check"/>
+			<field.phone caption="Pre-Cert Phone"  max-length="1024" name="precert_phone" size="20"/>
+			<field.text caption="Annual Physical Exam / WW"  name="annual_pe_ww" size="40"/>
+			<field.text caption="GYN Exam"  name="gyn_exam" size="40"/>
+			<field.text caption="Thin Prep Pap Test (88142)"  name="thin_prep_pap" size="40"/>
+			<field.text caption="Depo Inj for Contraception"  name="depo_inj" size="40"/>
+			<field.text caption="IUD"  name="iud" size="40"/>
+			<field.text caption="Tubal Ligament"  name="tubal_lig" size="40"/>
+			<field.text caption="Surgery"  name="surgery" size="40"/>
+			<field.text caption="Flex-Sigmoidoscopy"  name="flex_sig" size="40"/>
+			<field.text caption="Output XRays/Procs"  name="output_xray" size="40"/>
+			<field.text caption="Mammograms"  name="mammogram" size="40"/>
+			<field.text caption="Amniocenteses"  name="amniocenteses" size="40"/>
+			<field.text caption="Pelvic Ultrasound"  name="pelvic_ultrasound" size="40"/>
+			<field.text caption="Fertility Testing"  name="fertility_test" size="40"/>
+			<field.text caption="Circumcisions"  name="circumcision" size="40"/>
+			<field.text caption="Ins Rep Name"  name="ins_rep_name" size="40"/>
+			<field.text caption="Verified By" required="yes" max-length="16" name="ins_verified_by" size="20"/>
+			<field.date caption="Verify Date" max-length="10" name="ins_verify_date" size="10"/>
+			<field.select caption="Verification" required="yes" name="verification" choices="Complete=2, Partial=1" style="radio"/>
+			<!--  -->
+
+		</dialog>
+
+		<dialog name="medical" heading="medical">
+			<field.text hidden="yes" name="event_id" caption="event_id"/>
+			<field.text caption="Patient ID" read-only="yes" max-length="16" name="person_id" size="25"/>
+			<field.text caption="Verified By" required="yes" max-length="16" name="med_verified_by" size="20"/>
+			<field.date caption="Verify Date" max-length="10" name="med_verify_date" size="10"/>
+
+		</dialog>
+
+		<dialog name="personal_records" heading="personal_records">
+			<field.text hidden="yes" name="event_id" caption="event_id"/>
+			<field.text caption="Patient ID" read-only="yes" max-length="16" name="person_id" size="25"/>
+			<field.text caption="Verified By" required="yes" max-length="16" name="per_verified_by" size="20"/>
+			<field.date caption="Verify Date" max-length="10" name="per_verify_date" size="10"/>
+
+		</dialog>
+
+	</dialogs>
+</xaf>

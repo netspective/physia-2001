@@ -1,0 +1,129 @@
+<?xml version="1.0"?>
+
+<xaf>
+	<sql-statements package="report.physcian_license">
+		<statement name="id">
+			App::Statements::Report::PhysicianLicense
+		</statement>
+
+		<statement name="sel_physician_license">
+			
+			SELECT
+			p.person_id,
+			poc.category,
+			p.simple_name,
+			pa.name_sort facility_id,
+			pa.item_name license_name,
+			pa.value_text license_number,
+			pa.value_dateend expiry_date
+			FROM
+			person p, person_attribute pa, person_org_category poc
+			WHERE
+			p.person_id = poc.person_id
+			and poc.org_internal_id = :1
+			and p.person_id = pa.parent_id
+			and pa.value_type in (
+			500,
+			510,
+			520,
+			540,
+			550,
+			560
+			)
+			and pa.item_name not in ('Nurse/Title', 'RN', 'Driver/License', 'Employee')
+			order by name_last, name_first, pa.name_sort, pa.item_name
+			
+		</statement>
+
+		<statement name="sel_physician_license_exp">
+			
+			SELECT
+			p.person_id,
+			poc.category,
+			p.simple_name,
+			pa.name_sort facility_id,
+			pa.item_name license_name,
+			pa.value_text license_number,
+			pa.value_dateend expiry_date
+			FROM
+			person p, person_attribute pa, person_org_category poc
+			WHERE
+			p.person_id = poc.person_id
+			and poc.org_internal_id = :1
+			and p.person_id = pa.parent_id
+			and pa.value_type in (
+			500,
+			510,
+			520,
+			540,
+			550,
+			560
+			)
+			and pa.item_name not in ('Nurse/Title', 'RN', 'Driver/License', 'Employee')
+			and to_char(pa.value_dateend, 'mm/yyyy') = :2
+			order by name_last, name_first, pa.name_sort, pa.item_name
+			
+		</statement>
+
+		<statement name="sel_physician_license_prov">
+			
+			SELECT
+			p.person_id,
+			poc.category,
+			p.simple_name,
+			pa.name_sort facility_id,
+			pa.item_name license_name,
+			pa.value_text license_number,
+			pa.value_dateend expiry_date
+			FROM
+			person p, person_attribute pa, person_org_category poc
+			WHERE
+			p.person_id = poc.person_id
+			and poc.org_internal_id = :1
+			and p.person_id = pa.parent_id
+			and pa.value_type in (
+			500,
+			510,
+			520,
+			540,
+			550,
+			560
+			)
+			and pa.item_name not in ('Nurse/Title', 'RN', 'Driver/License', 'Employee')
+			and p.person_id = :2
+			order by name_last, name_first, pa.name_sort, pa.item_name
+			
+		</statement>
+
+		<statement name="sel_physician_license_prov_exp">
+			
+			SELECT
+			p.person_id,
+			poc.category,
+			p.simple_name,
+			pa.name_sort facility_id,
+			pa.item_name license_name,
+			pa.value_text license_number,
+			pa.value_dateend expiry_date
+			FROM
+			person p, person_attribute pa, person_org_category poc
+			WHERE
+			p.person_id = poc.person_id
+			and poc.org_internal_id = :1
+			and p.person_id = pa.parent_id
+			and pa.value_type in (
+			500,
+			510,
+			520,
+			540,
+			550,
+			560
+			)
+			and pa.item_name not in ('Nurse/Title', 'RN', 'Driver/License', 'Employee')
+			and p.person_id = :2 and to_char(pa.value_dateend, 'mm/yyyy') = :3 
+			order by name_last, name_first, pa.name_sort, pa.item_name
+			
+		</statement>
+
+	</sql-statements>
+</xaf>

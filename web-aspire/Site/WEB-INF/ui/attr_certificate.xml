@@ -1,0 +1,66 @@
+<?xml version="1.0"?>
+
+<xaf>
+	<dialogs package="attr_certificate">
+		<dialog name="certificate_specialty" heading="$Command Specialty">
+			<field.select caption="Specialty"  name="value_text" choices="query:person.selMedicalSpeciality"/>
+			<!--  -->
+			<field.select caption="Specialty Sequence"  name="value_int" choices="Unknown=5;Primary=1;Secondary=2;Tertiary=3;Quaternary=4"/>
+			<!--  -->
+
+		</dialog>
+
+		<dialog name="certificate_accreditation" heading="$Command Accreditation">
+			<field.text caption="Accreditation" required="yes" name="value_text"/>
+			<field.date caption="Effective Date" name="value_date" size="12"/>
+			<field.date caption="Expiration Date" name="value_dateend" size="12"/>
+
+		</dialog>
+
+		<dialog name="certificate_board" heading="$Command Board Certification">
+			<field.text caption="Board Certification Name" required="yes" name="value_text"/>
+			<field.date caption="Effective Date" name="value_date" size="12"/>
+			<field.date caption="Expiration Date" name="value_dateend" size="12"/>
+
+		</dialog>
+
+		<dialog name="affiliation" heading="$Command Affiliation">
+			<field.text caption="Affiliation" required="yes" name="value_text"/>
+			<field.date caption="Date" name="value_dateend" size="12"/>
+
+		</dialog>
+
+		<dialog name="certificate_license" heading="$Command License">
+			<field.select caption="License" required="yes" name="value_textb" choices="DEA;DPS;IRS"/>
+			<!--  -->
+			<field.text caption="Number" required="yes" name="value_text"/>
+			<field.date caption="Effective Date" name="value_date" size="12"/>
+			<field.date caption="Expiration Date" name="value_dateend" size="12"/>
+			<field.select caption="Facility ID" prepend-blank="yes" name="name_sort" choices="query:org.selChildFacilityOrgs"/>
+			<!--  -->
+			<field.boolean caption="License Required"  name="value_int" style="check"/>
+
+		</dialog>
+
+		<dialog name="certificate_provider_number" heading="$Command Provider Number">
+			<field.select caption="Name" required="yes" name="value_textb" choices="BCBS;Memorial Sisters Charity;EPSDT;Medicaid;Medicare;UPIN;Tax ID;Railroad Medicare;Champus;WC#;National Provider Identification"/>
+			<!--  -->
+			<field.text caption="Number" required="yes" name="value_text"/>
+			<field.date caption="Effective Date" name="value_date" size="12"/>
+			<field.date caption="Expiration Date" name="value_dateend" size="12"/>
+			<field.select caption="Facility ID" prepend-blank="yes" name="name_sort" choices="query:org.selChildFacilityOrgs"/>
+			<!--  -->
+			<field.boolean caption="Required"  name="value_int" style="check"/>
+
+		</dialog>
+
+		<dialog name="certificate_state" heading="$Command State License">
+			<field.text caption="State" required="yes" max-length="2" name="value_textb" size="2"/>
+			<field.text caption="Number" required="yes" name="value_text"/>
+			<field.date caption="Effective Date" name="value_date" size="12"/>
+			<field.date caption="Expiration Date" name="value_dateend" size="12"/>
+
+		</dialog>
+
+	</dialogs>
+</xaf>

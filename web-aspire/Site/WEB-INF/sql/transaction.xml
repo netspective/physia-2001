@@ -1,0 +1,543 @@
+<?xml version="1.0"?>
+
+<xaf>
+	<sql-statements package="transaction">
+		<statement name="id">
+			App::Statements::Transaction
+		</statement>
+
+		<statement name="sel4MiscProcedureById">
+			
+			select t.caption as name ,t.detail as description ,t.code as proc_code,ta.value_text as cpt_code ,
+			ta.item_id as item_id , ta.value_textB as modifier
+			FROM transaction t, trans_attribute ta
+			WHERE t.trans_id = :1
+			and trans_status=2
+			and ta.parent_id (+) = t.trans_id
+			and rownum &lt;5
+			order by ta.item_id asc
+			
+		</statement>
+
+		<statement name="selByDataTextB">
+			
+			select *
+			from transaction
+			where data_text_b = ?
+			and trans_owner_id = ?
+			
+		</statement>
+
+		<statement name="selByParentIdItemName">
+			
+			SELECT *
+			FROM trans_attribute
+			WHERE parent_id = ?
+			AND item_name = ?
+			
+		</statement>
+
+		<statement name="selByParentTransId">
+			
+			select *
+			from transaction
+			where parent_trans_id = ?
+			
+		</statement>
+
+		<statement name="selByTransId">
+			
+			select *
+			from transaction
+			where trans_id = ?
+			
+		</statement>
+
+		<statement name="selClaimNumByParentId">
+			
+			SELECT value_int
+			FROM trans_attribute
+			WHERE parent_id = ?
+			
+		</statement>
+
+		<statement name="selCondition">
+			
+			select caption
+			from trans_related_to
+			where id = ?
+			
+		</statement>
+
+		<statement name="selDataByTransTypeAndCaption">
+			
+			SELECT trans_id
+			FROM 	transaction
+			WHERE 	trans_owner_id = ?
+			AND 	trans_type = 8020
+			AND	caption = 'Deceased Patient'
+			
+		</statement>
+
+		<statement name="selFollowupByChildTransId">
+			
+			SELECT 	rfs.caption
+			FROM 	REFERRAL_FOLLOWUP_STATUS rfs, transaction t
+			WHERE 	t.parent_trans_id = :1
+			AND	t.trans_status_reason = rfs.id
+			
+		</statement>
+
+		<statement name="selIntakeClient">
+			
+			SELECT
+			id,
+			caption
+			FROM intake_client
+			ORDER BY caption
+			
+		</statement>
+
+		<statement name="selIntakeDetail">
+			
+			SELECT
+			id,
+			caption
+			FROM 	intake_detail
+			ORDER BY caption
+			
+		</statement>
+
+		<statement name="selIntakeService">
+			
+			SELECT
+			id,
+			caption
+			FROM 	intake_service
+			ORDER BY caption
+			
+		</statement>
+
+		<statement name="selMeasurementCount">
+			
+			select count(*) from transaction
+			where trans_type between 12000 and 12999 and trans_owner_id = ? and data_text_b = ?
+			
+		</statement>
+
+		<statement name="selMiscProcedureByCode">
+			
+			select distinct code
+			FROM transaction
+			WHERE code = :1
+			and trans_type = 4000
+			and trans_subtype = 'Misc Procedure Code'
+			and trans_status = 2
+			
+		</statement>
+
+		<statement name="selMiscProcedureById">
+			
+			select t.caption as name ,t.detail as description ,t.code as proc_code,
+			ta.value_text as cpt_code1,ta.item_id as item_id1, ta.value_textB modifier1,
+			ta.value_int as nextId, t.trans_id as trans_id
+			from Transaction t, trans_attribute ta
+			where trans_status = 2
+			and ta.parent_id = t.trans_id
+			and ta.item_id = :1
+			
+		</statement>
+
+		<statement name="selMiscProcedureByTransId">
+			
+			select code
+			FROM transaction t
+			WHERE trans_id = :1
+			
+		</statement>
+
+		<statement name="selMiscProcedureNameById">
+			
+			select t.caption as name ,t.detail as description ,t.code as proc_code
+			from transaction t
+			where trans_status = 2
+			and t.trans_id = :1
+			
+		</statement>
+
+		<statement name="selMyAndAssociatedInPatients">
+			
+			select trans_owner_id, trans_id,trans_type,trans_begin_stamp, related_data, caption, trans_status_reason, provider_id, data_text_a, data_text_b, data_text_c,
+			consult_id, detail, complete_name
+			from transaction, person
+			where trans_type between 11000 and 11999
+			and
+			(	provider_id = ? or
+			provider_id in (select value_text from person_attribute where parent_id = ? and parent_org_id = ? and item_name = 'Association/Resource/Physician')
+			)
+			and trans_status = 2
+			and person_id = trans_owner_id
+			
+		</statement>
+
+		<statement name="selNextProcedureSeq">
+			
+			select max(value_int)+1
+			FROM trans_attribute ta where ta.parent_id = ?
+			and trans_stauts = 2
+			
+		</statement>
+
+		<statement name="selPersonEncounterChildren">
+			
+			select trans_id, trans_type, transaction.caption, transaction.code, transaction.modifier, trans_owner_id,
+			pkg_entity.GetEntityDisplay(INITIATOR_TYPE, INITIATOR_ID) as initiator,
+			pkg_entity.GetEntityDisplay(RECEIVER_TYPE, RECEIVER_ID) as receiver,
+			pkg_entity.GetEntityDisplay(0, PROVIDER_ID) as provider,
+			pkg_entity.GetEntityDisplay(0, CARE_PROVIDER_ID) as care_provider,
+			pkg_entity.GetEntityDisplay(1, SERVICE_FACILITY_ID) as service_facility,
+			TRANS_BEGIN_STAMP, to_char(TRANS_BEGIN_STAMP, 'MM/DD/YYYY') as TRANS_BEGIN_STAMP_FORMAT,
+			TRANS_END_STAMP, tt.caption as type_name, GROUP_NAME, ICON_IMG_SUMM, invoice_id,
+			ref_cpt.name as cpt_caption, ref_icd.description as icd_caption
+			from transaction, transaction_type tt, invoice,
+			offering_catalog_entry ref_cpt, offering_catalog_entry ref_icd
+			where PARENT_TRANS_ID = ?
+			and	TRANS_TYPE = ID
+			and TRANS_OWNER_TYPE = 0 and TRANS_OWNER_ID = ?
+			and trans_id = invoice.main_transaction (+)
+			and transaction.code = ref_cpt.code (+)
+			and transaction.code = ref_icd.code (+)
+			order by TRANS_BEGIN_STAMP DESC, GROUP_NAME, tt.CAPTION
+			
+		</statement>
+
+		<statement name="selPersonEncounters">
+			
+			select trans_id, trans_type, transaction.caption, transaction.code, transaction.modifier, trans_owner_id,transaction.data_text_a,transaction.data_text_b,
+			pkg_entity.GetEntityDisplay(INITIATOR_TYPE, INITIATOR_ID) as initiator,
+			pkg_entity.GetEntityDisplay(RECEIVER_TYPE, RECEIVER_ID) as receiver,
+			pkg_entity.GetEntityDisplay(0, PROVIDER_ID) as provider,
+			pkg_entity.GetEntityDisplay(0, CARE_PROVIDER_ID) as care_provider,
+			pkg_entity.GetEntityDisplay(1, SERVICE_FACILITY_ID) as service_facility,
+			TRANS_BEGIN_STAMP, to_char(TRANS_BEGIN_STAMP, 'MM/DD/YYYY') as TRANS_BEGIN_STAMP_FORMAT,
+			TRANS_END_STAMP, tt.caption as type_name, GROUP_NAME, ICON_IMG_SUMM, invoice_id,
+			ref_cpt.name as cpt_caption, ref_icd.description as icd_caption
+			from transaction, transaction_type tt, invoice,
+			offering_catalog_entry ref_cpt, offering_catalog_entry ref_icd
+			where PARENT_TRANS_ID is null
+			and	TRANS_TYPE = ID
+			and TRANS_OWNER_TYPE = 0 and TRANS_OWNER_ID = ?
+			and trans_id = invoice.main_transaction (+)
+			and transaction.code = ref_cpt.code (+)
+			and transaction.code = ref_icd.code (+)
+			order by TRANS_BEGIN_STAMP DESC, GROUP_NAME, tt.CAPTION
+			
+		</statement>
+
+		<statement name="selPersonHospitalization">
+			
+			select trans_id,trans_type,trans_begin_stamp, related_data, caption, trans_status_reason, provider_id, data_text_a, data_text_b, data_text_c,
+			consult_id, detail
+			from transaction
+			where trans_type between 11000 and 11999
+			and trans_owner_id = ? and trans_status = ?
+			
+		</statement>
+
+		<statement name="selPersonMeasurements">
+			
+			select trans_id,trans_type,cr_stamp,trans_begin_stamp,data_text_a,data_text_b
+			from transaction t
+			where trans_begin_stamp =
+			(select max(trans_begin_stamp)
+			from transaction tt
+			where t.data_text_b = tt.data_text_b and tt.trans_type between 12000 and 12999 and tt.trans_owner_id = ?
+			group by tt.data_text_b)
+			
+		</statement>
+
+		<statement name="selReferralFollowStatus">
+			
+			SELECT
+			id,
+			caption
+			FROM 	referral_followup_status
+			ORDER BY caption
+			
+		</statement>
+
+		<statement name="selReferralProcedureData">
+			
+			SELECT 	trans_id, trans_owner_type, trans_owner_id, parent_event_id, parent_trans_id,
+			trans_type, trans_subtype, trans_status, caption, detail, code, billing_facility_id,
+			service_facility_id, provider_id, care_provider_id, consult_id, initiator_id,
+			receiver_type, receiver_id, processor_id, trans_seq, bill_type, related_to,
+			data_text_a, data_text_b, data_text_c, data_num_a, data_num_b, data_num_c,
+			to_char(data_date_a, 'MM/DD/YYYY HH12:MI AM') AS data_date_a,
+			to_char(data_date_b, 'MM/DD/YYYY HH12:MI AM') AS data_date_b,
+			trans_status_reason, related_data, caption, trans_substatus_reason,
+			modifier,unit_cost,quantity,
+			to_char(trans_begin_stamp, 'MM/DD/YYYY HH12:MI AM') AS trans_begin_stamp,
+			to_char(trans_end_stamp, 'MM/DD/YYYY HH12:MI AM') AS trans_end_stamp
+			FROM 	transaction t
+			WHERE	t.parent_trans_id = :1
+			AND	t.trans_type = 6010
+			ORDER BY trans_id asc
+			
+		</statement>
+
+		<statement name="selReferralResult">
+			
+			SELECT
+			id,
+			caption
+			FROM 	referral_result
+			ORDER BY caption
+			
+		</statement>
+
+		<statement name="selReferralServiceDesc">
+			
+			SELECT
+			id,
+			caption
+			FROM 	referral_service_descr
+			ORDER BY caption
+			
+		</statement>
+
+		<statement name="selReferralServiceType">
+			
+			SELECT name
+			FROM ref_service_category
+			WHERE serv_category = ?
+			
+		</statement>
+
+		<statement name="selReferralSourceType">
+			
+			SELECT
+			id,
+			caption
+			FROM 	referral_source_type
+			ORDER BY caption
+			
+		</statement>
+
+		<statement name="selReferralType">
+			
+			SELECT
+			distinct serv_category,name
+			FROM ref_service_category
+			ORDER BY name
+			
+		</statement>
+
+		<statement name="selReferralUnitType">
+			
+			SELECT
+			id,
+			caption
+			FROM 	referral_unit_type
+			ORDER BY caption
+			
+		</statement>
+
+		<statement name="selRemoveChildReferralAttr">
+			
+			DELETE
+			FROM trans_attribute
+			WHERE parent_id = ?
+			
+		</statement>
+
+		<statement name="selRemoveChildReferrals">
+			
+			DELETE
+			FROM transaction
+			WHERE parent_trans_id = ?
+			AND trans_type = 6010
+			
+		</statement>
+
+		<statement name="selServiceProcedureData">
+			
+			SELECT 	trans_id, trans_owner_type, trans_owner_id, parent_event_id, parent_trans_id,
+			trans_type, trans_subtype, trans_status, caption, detail, code, billing_facility_id,
+			service_facility_id, provider_id, care_provider_id, consult_id, initiator_id,
+			receiver_type, receiver_id, processor_id, trans_seq, bill_type, related_to,
+			data_text_a, data_text_b, data_text_c, data_num_a, data_num_b, data_num_c,
+			to_char(data_date_a, 'MM/DD/YYYY HH12:MI AM') AS data_date_a,
+			to_char(data_date_b, 'MM/DD/YYYY HH12:MI AM') AS data_date_b,
+			trans_status_reason, related_data, caption, trans_substatus_reason,
+			modifier,unit_cost,quantity,trans_expire_reason
+			FROM 	transaction t
+			WHERE	t.parent_trans_id = :1
+			AND	t.trans_type = 6030
+			ORDER BY trans_id asc
+			
+		</statement>
+
+		<statement name="selServiceProcedureDataByTransId">
+			
+			SELECT 	trans_id, trans_owner_type, trans_owner_id, parent_event_id, parent_trans_id,
+			trans_type, trans_subtype, trans_status, caption, detail, code, billing_facility_id,
+			service_facility_id, provider_id, care_provider_id, consult_id, initiator_id,
+			receiver_type, receiver_id, processor_id, trans_seq, bill_type, related_to,
+			data_text_a, data_text_b, data_text_c, data_num_a, data_num_b, data_num_c,
+			to_char(data_date_a, 'MM/DD/YYYY HH12:MI AM') AS data_date_a,
+			to_char(data_date_b, 'MM/DD/YYYY HH12:MI AM') AS data_date_b,
+			trans_status_reason, related_data, caption, trans_substatus_reason,
+			modifier,unit_cost,quantity, trans_expire_reason
+			FROM 	transaction t
+			WHERE	t.trans_id = :1
+			AND	t.trans_type = 6030
+			ORDER BY trans_id asc
+			
+		</statement>
+
+		<statement name="selServiceRequestData">
+			
+			SELECT *
+			FROM transaction t
+			WHERE trans_id = (
+			SELECT MAX(trans_id)
+			FROM transaction tt
+			WHERE tt.trans_type = 6000
+			AND tt.consult_id = ?
+			)
+			
+		</statement>
+
+		<statement name="selServiceSourceTypeByTransId">
+			
+			SELECT
+			r.caption
+			FROM 	referral_source_type r, transaction t
+			WHERE t.trans_id = ?
+			AND t.caption= r.id
+			
+		</statement>
+
+		<statement name="selTestsEncounter">
+			
+			select trans_id, trans_type, data_text_a, data_text_b, trans_begin_stamp
+			from transaction
+			where trans_type between 12000 and 12999 and trans_owner_id = ?
+			
+		</statement>
+
+		<statement name="selTransAddressByName">
+			
+			SELECT *
+			FROM trans_address
+			WHERE parent_id = ?
+			AND address_name = ?
+			
+		</statement>
+
+		<statement name="selTransAndICDNameByTransId">
+			
+			select code, curr_onset_date, trans_id, trans_type, r.name as icdname
+			from transaction, ref_icd r
+			where trans_id = ?
+			and r.icd = code
+			
+		</statement>
+
+		<statement name="selTransCreateClaim">
+			
+			select trans_id, trans_type, caption as subject, provider_id, care_provider_id, parent_event_id, to_char(trans_begin_stamp, 'MM/DD/YYYY HH12:MI AM') as trans_begin_stamp,
+			service_facility_id, billing_facility_id, bill_type, data_text_a as ref_id, data_text_b as comments
+			from transaction
+			where trans_id = ?
+			
+		</statement>
+
+		<statement name="selTransId">
+			
+			select trans_id
+			from transaction
+			where parent_event_id = ?
+			
+		</statement>
+
+		<statement name="selTransaction">
+			
+			select provider_id, rel.caption as related_to,
+			data_text_a as ref_id, billing_facility_id, service_facility_id
+			from transaction, trans_related_to rel
+			where trans_id = ?
+			and transaction.related_to = rel.id
+			
+		</statement>
+
+		<statement name="selTransactionByData_num_a">
+			
+			select * from transaction
+			where data_num_a = ?
+			
+		</statement>
+
+		<statement name="selTransactionById">
+			
+			select trans_id, trans_owner_type, trans_owner_id, parent_event_id, parent_trans_id,
+			trans_type, trans_subtype, trans_status, caption, detail, code, billing_facility_id,
+			service_facility_id, provider_id, care_provider_id, consult_id, initiator_id,
+			receiver_type, receiver_id, processor_id, trans_seq, bill_type, related_to,
+			data_text_a, data_text_b, data_text_c, data_num_a, data_num_b, data_num_c,
+			to_char(trans_begin_stamp, 'MM/DD/YYYY HH12:MI AM') AS trans_begin_stamp,
+			to_char(trans_end_stamp, 'MM/DD/YYYY HH12:MI AM') AS trans_end_stamp,
+			to_char(init_onset_date, 'MM/DD/YYYY') AS init_onset_date,
+			to_char(curr_onset_date, 'MM/DD/YYYY') AS curr_onset_date,
+			trans_status_reason, related_data, caption, trans_substatus_reason, auth_ref
+			from Transaction
+			where trans_id = ?
+			
+		</statement>
+
+		<statement name="selTransactionByUserAndData_num_a">
+			
+			SELECT *
+			FROM transaction
+			WHERE data_num_a = ?
+			AND trans_owner_id = ?
+			
+		</statement>
+
+		<statement name="selUpdateReferralStatus">
+			
+			UPDATE transaction
+			SET trans_substatus_reason = 'Assigned'
+			WHERE trans_id = ?
+			AND trans_substatus_reason = 'Unassigned'
+			
+		</statement>
+
+		<statement name="selUpdateTransByParentId">
+			
+			UPDATE transaction
+			SET auth_ref = ?,
+			consult_id = ?
+			WHERE parent_trans_id = ?
+			
+		</statement>
+
+		<statement name="selUpdateTransStatus">
+			
+			update transaction
+			set trans_status = 3
+			where parent_trans_id = ?
+			
+		</statement>
+
+		<statement name="selVisitType">
+			
+			select id, caption
+			from transaction_type
+			where id&gt;=2040 and id&lt;3000
+			
+		</statement>
+
+	</sql-statements>
+</xaf>

@@ -1,0 +1,765 @@
+<?xml version="1.0"?>
+
+<xaf>
+	<dialogs package="person">
+		<dialog name="physician" heading="$Command Physician/Provider">
+			<field.text caption="Physician/Provider ID"  hint="To use the ID autosuggestion feature, leave this field blank" max-length="16" name="person_id" size="16"/>
+			<field.text hidden="yes" name="acct_item_id" caption="acct_item_id"/>
+			<field.text hidden="yes" name="chart_item_id" caption="chart_item_id"/>
+			<field.text hidden="yes" name="resp_item_id" caption="resp_item_id"/>
+			<field.text hidden="yes" name="job_item_id" caption="job_item_id"/>
+			<field.text hidden="yes" name="driver_license_item_id" caption="driver_license_item_id"/>
+			<field.text hidden="yes" name="nurse_emp_item_id" caption="nurse_emp_item_id"/>
+			<field.text hidden="yes" name="assoc_phy_item_id" caption="assoc_phy_item_id"/>
+			<field.text hidden="yes" name="bill_provider_item_id" caption="bill_provider_item_id"/>
+			<field.text hidden="yes" name="inactive_patient_item_id" caption="inactive_patient_item_id"/>
+			<field.text hidden="yes" name="language_item_id" caption="language_item_id"/>
+			<field.text hidden="yes" name="ethnicity_item_id" caption="ethnicity_item_id"/>
+			<field.select caption="Person Title/Job Code"  name="nurse_title" choices="LVN/LPN;RN;OTHER" style="multicheck"/>
+			<!--  -->
+			<field.select caption="Person Type"  name="physician_type" choices="Physician;Physician Extender (direct billing);Other Clinical Service Provider (direct billing);Other Clinical Services Provider (alternate billing)" style="multicheck"/>
+			<!--  -->
+			<field.text caption="Doctor to bill for this provider"  max-length="16" name="bill_provider" size="16"/>
+			<field.composite caption="Job Title/Code"  name="job_code">
+				<field.text caption="Job Title"  name="job_title"/>
+				<field.text caption="Code"  name="job_code"/>
+			</field.composite>
+			<field.composite caption="Account/Chart Number"  name="acct_chart_num">
+				<field.text caption="Account Number"  name="acct_number"/>
+				<field.text caption="Chart Number"  name="chart_number"/>
+			</field.composite>
+			<field.separator heading="Profile Information" name="gen_info_heading"/>
+			<field.composite caption="*"  name="person_id">
+				<field.text caption="Last Name" required="yes" name="name_last" size="16"/>
+				<field.text caption="First Name" required="yes" name="name_first" size="12"/>
+				<field.text caption="Middle Name"  name="name_middle" size="8"/>
+				<field.text caption="Suffix"  name="name_suffix" size="16"/>
+			</field.composite>
+			<field.boolean caption="Add record"  name="create_record" style="check"/>
+			<field.composite caption="*"  name="ssndatemf">
+				<field.ssn caption="Social Security"  max-length="1024" name="ssn" size="11"/>
+				<field.date caption="Date of Birth" name="date_of_birth" size="12"/>
+			</field.composite>
+			<field.composite caption="*"  name="text_field">
+				<field.select caption="Gender" required="yes" prepend-blank="yes" name="gender" choices="Male=1;Female=2"/>
+				<!--  -->
+				<field.select caption="Marital Status"  name="marital_status"/>
+				<!--  -->
+			</field.composite>
+			<field.select caption="Blood Type"  name="blood_type"/>
+			<!--  -->
+			<field.select caption="Ethnicity"  name="ethnicity" style="multicheck"/>
+			<!--  -->
+			<field.text caption="Other Ethnicity"  name="other_ethnicity"/>
+			<field.select caption="Language Spoken"  name="language" choices="English;Spanish;French;German;Italian;Chinese;Japanese;Korean;Vietnamese;Other" style="multicheck"/>
+			<!--  -->
+			<field.text caption="Other Language"  name="other_language"/>
+			<field.text caption="Responsible Party"  max-length="16" name="party_name" size="16"/>
+			<field.composite caption="Relationship To Responsible Party/Other Relationship Name" required="yes" hint="Select an existing relationship type or select 'Other' and fill in the 'Other' field" name="relation">
+				<field.select caption="Relationship" required="yes" name="rel_type" choices="query:person.selRelationship"/>
+				<!--  -->
+				<field.text caption="Other"  name="other_rel_type"/>
+			</field.composite>
+			<field.composite caption="Driver's License Number/State"  name="license_num_state">
+				<field.text caption="License Number"  name="license_number"/>
+				<field.text caption="State"  max-length="2" name="license_state" size="2"/>
+			</field.composite>
+			<field.memo caption="Misc Notes" name="misc_notes" size="24"/>
+			<field.separator heading="Contact Methods" name="contact_methods_heading"/>
+			<field.composite caption="*"  name="home_work_phone">
+				<field.phone caption="Home Phone"  max-length="1024" name="home_phone"/>
+				<field.phone caption="Work Phone"  max-length="1024" name="work_phone"/>
+			</field.composite>
+			<field.composite caption="Cell Phone/Pager"  name="home_pager_phone">
+				<field.phone caption="Cell Phone"  max-length="1024" name="cell_phone"/>
+				<field.phone caption="Primary Pager"  max-length="1024" name="primary_pager"/>
+			</field.composite>
+			<field.phone caption="Alternate"  max-length="1024" name="alternate_phone"/>
+			<field.composite caption="Home Address" required="yes" name="address">
+				<field.text caption="Address (Line 1)"  max-length="128" name="addr_line1" size="36"/>
+				<field.text caption="Address (Line 2)"  max-length="128" name="addr_line2" size="36"/>
+				<field.text caption="City"  max-length="64" name="addr_city" size="16"/>
+				<field.text caption="State"  max-length="2" name="addr_state" size="2"/>
+				<field.text caption="Zip"  name="addr_zip"/>
+			</field.composite>
+			<field.email caption="Email"  max-length="1024" name="email"/>
+			<field.text hidden="yes" name="phy_type_item_id" caption="phy_type_item_id"/>
+			<field.separator heading="License ID Numbers" name="id_numbers_section"/>
+			<field.composite caption="*"  name="id_numbers">
+				<field.select caption="License" prepend-blank="yes" name="id_name_1" choices="DEA;DPS;IRS"/>
+				<!--  -->
+				<field.text caption="Number"  name="id_num_1"/>
+				<field.date caption="Exp Date" name="id_exp_date_1" size="12"/>
+				<field.select caption="Facility ID" prepend-blank="yes" name="id_facility_1" choices="query:org.selChildFacilityOrgs"/>
+				<!--  -->
+				<field.select caption="License" prepend-blank="yes" name="id_name_2" choices="DEA;DPS;IRS"/>
+				<!--  -->
+				<field.text caption="Number"  name="id_num_2"/>
+				<field.date caption="Exp Date" name="id_exp_date_2" size="12"/>
+				<field.select caption="Facility ID" prepend-blank="yes" name="id_facility_2" choices="query:org.selChildFacilityOrgs"/>
+				<!--  -->
+				<field.select caption="License" prepend-blank="yes" name="id_name_3" choices="DEA;DPS;IRS"/>
+				<!--  -->
+				<field.text caption="Number"  name="id_num_3"/>
+				<field.date caption="Exp Date" name="id_exp_date_3" size="12"/>
+				<field.select caption="Facility ID" prepend-blank="yes" name="id_facility_3" choices="query:org.selChildFacilityOrgs"/>
+				<!--  -->
+				<field.select caption="License" prepend-blank="yes" name="id_name_4" choices="DEA;DPS;IRS"/>
+				<!--  -->
+				<field.text caption="Number"  name="id_num_4"/>
+				<field.date caption="Exp Date" name="id_exp_date_4" size="12"/>
+				<field.select caption="Facility ID" prepend-blank="yes" name="id_facility_4" choices="query:org.selChildFacilityOrgs"/>
+				<!--  -->
+				<field.select caption="License" prepend-blank="yes" name="id_name_5" choices="DEA;DPS;IRS"/>
+				<!--  -->
+				<field.text caption="Number"  name="id_num_5"/>
+				<field.date caption="Exp Date" name="id_exp_date_5" size="12"/>
+				<field.select caption="Facility ID" prepend-blank="yes" name="id_facility_5" choices="query:org.selChildFacilityOrgs"/>
+				<!--  -->
+				<field.select caption="License" prepend-blank="yes" name="id_name_6" choices="DEA;DPS;IRS"/>
+				<!--  -->
+				<field.text caption="Number"  name="id_num_6"/>
+				<field.date caption="Exp Date" name="id_exp_date_6" size="12"/>
+				<field.select caption="Facility ID" prepend-blank="yes" name="id_facility_6" choices="query:org.selChildFacilityOrgs"/>
+				<!--  -->
+				<field.select caption="License" prepend-blank="yes" name="id_name_7" choices="DEA;DPS;IRS"/>
+				<!--  -->
+				<field.text caption="Number"  name="id_num_7"/>
+				<field.date caption="Exp Date" name="id_exp_date_7" size="12"/>
+				<field.select caption="Facility ID" prepend-blank="yes" name="id_facility_7" choices="query:org.selChildFacilityOrgs"/>
+				<!--  -->
+				<field.select caption="License" prepend-blank="yes" name="id_name_8" choices="DEA;DPS;IRS"/>
+				<!--  -->
+				<field.text caption="Number"  name="id_num_8"/>
+				<field.date caption="Exp Date" name="id_exp_date_8" size="12"/>
+				<field.select caption="Facility ID" prepend-blank="yes" name="id_facility_8" choices="query:org.selChildFacilityOrgs"/>
+				<!--  -->
+				<field.select caption="License" prepend-blank="yes" name="id_name_9" choices="DEA;DPS;IRS"/>
+				<!--  -->
+				<field.text caption="Number"  name="id_num_9"/>
+				<field.date caption="Exp Date" name="id_exp_date_9" size="12"/>
+				<field.select caption="Facility ID" prepend-blank="yes" name="id_facility_9" choices="query:org.selChildFacilityOrgs"/>
+				<!--  -->
+				<field.select caption="License" prepend-blank="yes" name="id_name_10" choices="DEA;DPS;IRS"/>
+				<!--  -->
+				<field.text caption="Number"  name="id_num_10"/>
+				<field.date caption="Exp Date" name="id_exp_date_10" size="12"/>
+				<field.select caption="Facility ID" prepend-blank="yes" name="id_facility_10" choices="query:org.selChildFacilityOrgs"/>
+				<!--  -->
+				<field.select caption="License" prepend-blank="yes" name="id_name_11" choices="DEA;DPS;IRS"/>
+				<!--  -->
+				<field.text caption="Number"  name="id_num_11"/>
+				<field.date caption="Exp Date" name="id_exp_date_11" size="12"/>
+				<field.select caption="Facility ID" prepend-blank="yes" name="id_facility_11" choices="query:org.selChildFacilityOrgs"/>
+				<!--  -->
+				<field.select caption="License" prepend-blank="yes" name="id_name_12" choices="DEA;DPS;IRS"/>
+				<!--  -->
+				<field.text caption="Number"  name="id_num_12"/>
+				<field.date caption="Exp Date" name="id_exp_date_12" size="12"/>
+				<field.select caption="Facility ID" prepend-blank="yes" name="id_facility_12" choices="query:org.selChildFacilityOrgs"/>
+				<!--  -->
+				<field.select caption="License" prepend-blank="yes" name="id_name_13" choices="DEA;DPS;IRS"/>
+				<!--  -->
+				<field.text caption="Number"  name="id_num_13"/>
+				<field.date caption="Exp Date" name="id_exp_date_13" size="12"/>
+				<field.select caption="Facility ID" prepend-blank="yes" name="id_facility_13" choices="query:org.selChildFacilityOrgs"/>
+				<!--  -->
+				<field.select caption="License" prepend-blank="yes" name="id_name_14" choices="DEA;DPS;IRS"/>
+				<!--  -->
+				<field.text caption="Number"  name="id_num_14"/>
+				<field.date caption="Exp Date" name="id_exp_date_14" size="12"/>
+				<field.select caption="Facility ID" prepend-blank="yes" name="id_facility_14" choices="query:org.selChildFacilityOrgs"/>
+				<!--  -->
+				<field.select caption="License" prepend-blank="yes" name="id_name_15" choices="DEA;DPS;IRS"/>
+				<!--  -->
+				<field.text caption="Number"  name="id_num_15"/>
+				<field.date caption="Exp Date" name="id_exp_date_15" size="12"/>
+				<field.select caption="Facility ID" prepend-blank="yes" name="id_facility_15" choices="query:org.selChildFacilityOrgs"/>
+				<!--  -->
+				<field.select caption="License" prepend-blank="yes" name="id_name_16" choices="DEA;DPS;IRS"/>
+				<!--  -->
+				<field.text caption="Number"  name="id_num_16"/>
+				<field.date caption="Exp Date" name="id_exp_date_16" size="12"/>
+				<field.select caption="Facility ID" prepend-blank="yes" name="id_facility_16" choices="query:org.selChildFacilityOrgs"/>
+				<!--  -->
+				<field.select caption="License" prepend-blank="yes" name="id_name_17" choices="DEA;DPS;IRS"/>
+				<!--  -->
+				<field.text caption="Number"  name="id_num_17"/>
+				<field.date caption="Exp Date" name="id_exp_date_17" size="12"/>
+				<field.select caption="Facility ID" prepend-blank="yes" name="id_facility_17" choices="query:org.selChildFacilityOrgs"/>
+				<!--  -->
+				<field.select caption="License" prepend-blank="yes" name="id_name_18" choices="DEA;DPS;IRS"/>
+				<!--  -->
+				<field.text caption="Number"  name="id_num_18"/>
+				<field.date caption="Exp Date" name="id_exp_date_18" size="12"/>
+				<field.select caption="Facility ID" prepend-blank="yes" name="id_facility_18" choices="query:org.selChildFacilityOrgs"/>
+				<!--  -->
+				<field.select caption="License" prepend-blank="yes" name="id_name_19" choices="DEA;DPS;IRS"/>
+				<!--  -->
+				<field.text caption="Number"  name="id_num_19"/>
+				<field.date caption="Exp Date" name="id_exp_date_19" size="12"/>
+				<field.select caption="Facility ID" prepend-blank="yes" name="id_facility_19" choices="query:org.selChildFacilityOrgs"/>
+				<!--  -->
+				<field.select caption="License" prepend-blank="yes" name="id_name_20" choices="DEA;DPS;IRS"/>
+				<!--  -->
+				<field.text caption="Number"  name="id_num_20"/>
+				<field.date caption="Exp Date" name="id_exp_date_20" size="12"/>
+				<field.select caption="Facility ID" prepend-blank="yes" name="id_facility_20" choices="query:org.selChildFacilityOrgs"/>
+				<!--  -->
+				<field.select caption="License" prepend-blank="yes" name="id_name_21" choices="DEA;DPS;IRS"/>
+				<!--  -->
+				<field.text caption="Number"  name="id_num_21"/>
+				<field.date caption="Exp Date" name="id_exp_date_21" size="12"/>
+				<field.select caption="Facility ID" prepend-blank="yes" name="id_facility_21" choices="query:org.selChildFacilityOrgs"/>
+				<!--  -->
+				<field.select caption="License" prepend-blank="yes" name="id_name_22" choices="DEA;DPS;IRS"/>
+				<!--  -->
+				<field.text caption="Number"  name="id_num_22"/>
+				<field.date caption="Exp Date" name="id_exp_date_22" size="12"/>
+				<field.select caption="Facility ID" prepend-blank="yes" name="id_facility_22" choices="query:org.selChildFacilityOrgs"/>
+				<!--  -->
+				<field.select caption="License" prepend-blank="yes" name="id_name_23" choices="DEA;DPS;IRS"/>
+				<!--  -->
+				<field.text caption="Number"  name="id_num_23"/>
+				<field.date caption="Exp Date" name="id_exp_date_23" size="12"/>
+				<field.select caption="Facility ID" prepend-blank="yes" name="id_facility_23" choices="query:org.selChildFacilityOrgs"/>
+				<!--  -->
+				<field.select caption="License" prepend-blank="yes" name="id_name_24" choices="DEA;DPS;IRS"/>
+				<!--  -->
+				<field.text caption="Number"  name="id_num_24"/>
+				<field.date caption="Exp Date" name="id_exp_date_24" size="12"/>
+				<field.select caption="Facility ID" prepend-blank="yes" name="id_facility_24" choices="query:org.selChildFacilityOrgs"/>
+				<!--  -->
+				<field.select caption="License" prepend-blank="yes" name="id_name_25" choices="DEA;DPS;IRS"/>
+				<!--  -->
+				<field.text caption="Number"  name="id_num_25"/>
+				<field.date caption="Exp Date" name="id_exp_date_25" size="12"/>
+				<field.select caption="Facility ID" prepend-blank="yes" name="id_facility_25" choices="query:org.selChildFacilityOrgs"/>
+				<!--  -->
+			</field.composite>
+			<field.separator heading="Provider Numbers" name="provider_id_numbers_section"/>
+			<field.composite caption="*"  name="prov_id_numbers">
+				<field.select caption="License" prepend-blank="yes" name="prov_id_name_1" choices="BCBS;Memorial Sisters Charity;EPSDT;Medicaid;Medicare;UPIN;Tax ID;Railroad Medicare;Champus;WC#;National Provider Identification"/>
+				<!--  -->
+				<field.text caption="Number"  name="prov_id_num_1"/>
+				<field.date caption="Exp Date" name="prov_id_exp_date_1" size="12"/>
+				<field.select caption="Facility ID" prepend-blank="yes" name="prov_id_facility_1" choices="query:org.selChildFacilityOrgs"/>
+				<!--  -->
+				<field.select caption="License" prepend-blank="yes" name="prov_id_name_2" choices="BCBS;Memorial Sisters Charity;EPSDT;Medicaid;Medicare;UPIN;Tax ID;Railroad Medicare;Champus;WC#;National Provider Identification"/>
+				<!--  -->
+				<field.text caption="Number"  name="prov_id_num_2"/>
+				<field.date caption="Exp Date" name="prov_id_exp_date_2" size="12"/>
+				<field.select caption="Facility ID" prepend-blank="yes" name="prov_id_facility_2" choices="query:org.selChildFacilityOrgs"/>
+				<!--  -->
+				<field.select caption="License" prepend-blank="yes" name="prov_id_name_3" choices="BCBS;Memorial Sisters Charity;EPSDT;Medicaid;Medicare;UPIN;Tax ID;Railroad Medicare;Champus;WC#;National Provider Identification"/>
+				<!--  -->
+				<field.text caption="Number"  name="prov_id_num_3"/>
+				<field.date caption="Exp Date" name="prov_id_exp_date_3" size="12"/>
+				<field.select caption="Facility ID" prepend-blank="yes" name="prov_id_facility_3" choices="query:org.selChildFacilityOrgs"/>
+				<!--  -->
+				<field.select caption="License" prepend-blank="yes" name="prov_id_name_4" choices="BCBS;Memorial Sisters Charity;EPSDT;Medicaid;Medicare;UPIN;Tax ID;Railroad Medicare;Champus;WC#;National Provider Identification"/>
+				<!--  -->
+				<field.text caption="Number"  name="prov_id_num_4"/>
+				<field.date caption="Exp Date" name="prov_id_exp_date_4" size="12"/>
+				<field.select caption="Facility ID" prepend-blank="yes" name="prov_id_facility_4" choices="query:org.selChildFacilityOrgs"/>
+				<!--  -->
+				<field.select caption="License" prepend-blank="yes" name="prov_id_name_5" choices="BCBS;Memorial Sisters Charity;EPSDT;Medicaid;Medicare;UPIN;Tax ID;Railroad Medicare;Champus;WC#;National Provider Identification"/>
+				<!--  -->
+				<field.text caption="Number"  name="prov_id_num_5"/>
+				<field.date caption="Exp Date" name="prov_id_exp_date_5" size="12"/>
+				<field.select caption="Facility ID" prepend-blank="yes" name="prov_id_facility_5" choices="query:org.selChildFacilityOrgs"/>
+				<!--  -->
+				<field.select caption="License" prepend-blank="yes" name="prov_id_name_6" choices="BCBS;Memorial Sisters Charity;EPSDT;Medicaid;Medicare;UPIN;Tax ID;Railroad Medicare;Champus;WC#;National Provider Identification"/>
+				<!--  -->
+				<field.text caption="Number"  name="prov_id_num_6"/>
+				<field.date caption="Exp Date" name="prov_id_exp_date_6" size="12"/>
+				<field.select caption="Facility ID" prepend-blank="yes" name="prov_id_facility_6" choices="query:org.selChildFacilityOrgs"/>
+				<!--  -->
+				<field.select caption="License" prepend-blank="yes" name="prov_id_name_7" choices="BCBS;Memorial Sisters Charity;EPSDT;Medicaid;Medicare;UPIN;Tax ID;Railroad Medicare;Champus;WC#;National Provider Identification"/>
+				<!--  -->
+				<field.text caption="Number"  name="prov_id_num_7"/>
+				<field.date caption="Exp Date" name="prov_id_exp_date_7" size="12"/>
+				<field.select caption="Facility ID" prepend-blank="yes" name="prov_id_facility_7" choices="query:org.selChildFacilityOrgs"/>
+				<!--  -->
+				<field.select caption="License" prepend-blank="yes" name="prov_id_name_8" choices="BCBS;Memorial Sisters Charity;EPSDT;Medicaid;Medicare;UPIN;Tax ID;Railroad Medicare;Champus;WC#;National Provider Identification"/>
+				<!--  -->
+				<field.text caption="Number"  name="prov_id_num_8"/>
+				<field.date caption="Exp Date" name="prov_id_exp_date_8" size="12"/>
+				<field.select caption="Facility ID" prepend-blank="yes" name="prov_id_facility_8" choices="query:org.selChildFacilityOrgs"/>
+				<!--  -->
+				<field.select caption="License" prepend-blank="yes" name="prov_id_name_9" choices="BCBS;Memorial Sisters Charity;EPSDT;Medicaid;Medicare;UPIN;Tax ID;Railroad Medicare;Champus;WC#;National Provider Identification"/>
+				<!--  -->
+				<field.text caption="Number"  name="prov_id_num_9"/>
+				<field.date caption="Exp Date" name="prov_id_exp_date_9" size="12"/>
+				<field.select caption="Facility ID" prepend-blank="yes" name="prov_id_facility_9" choices="query:org.selChildFacilityOrgs"/>
+				<!--  -->
+				<field.select caption="License" prepend-blank="yes" name="prov_id_name_10" choices="BCBS;Memorial Sisters Charity;EPSDT;Medicaid;Medicare;UPIN;Tax ID;Railroad Medicare;Champus;WC#;National Provider Identification"/>
+				<!--  -->
+				<field.text caption="Number"  name="prov_id_num_10"/>
+				<field.date caption="Exp Date" name="prov_id_exp_date_10" size="12"/>
+				<field.select caption="Facility ID" prepend-blank="yes" name="prov_id_facility_10" choices="query:org.selChildFacilityOrgs"/>
+				<!--  -->
+				<field.select caption="License" prepend-blank="yes" name="prov_id_name_11" choices="BCBS;Memorial Sisters Charity;EPSDT;Medicaid;Medicare;UPIN;Tax ID;Railroad Medicare;Champus;WC#;National Provider Identification"/>
+				<!--  -->
+				<field.text caption="Number"  name="prov_id_num_11"/>
+				<field.date caption="Exp Date" name="prov_id_exp_date_11" size="12"/>
+				<field.select caption="Facility ID" prepend-blank="yes" name="prov_id_facility_11" choices="query:org.selChildFacilityOrgs"/>
+				<!--  -->
+				<field.select caption="License" prepend-blank="yes" name="prov_id_name_12" choices="BCBS;Memorial Sisters Charity;EPSDT;Medicaid;Medicare;UPIN;Tax ID;Railroad Medicare;Champus;WC#;National Provider Identification"/>
+				<!--  -->
+				<field.text caption="Number"  name="prov_id_num_12"/>
+				<field.date caption="Exp Date" name="prov_id_exp_date_12" size="12"/>
+				<field.select caption="Facility ID" prepend-blank="yes" name="prov_id_facility_12" choices="query:org.selChildFacilityOrgs"/>
+				<!--  -->
+				<field.select caption="License" prepend-blank="yes" name="prov_id_name_13" choices="BCBS;Memorial Sisters Charity;EPSDT;Medicaid;Medicare;UPIN;Tax ID;Railroad Medicare;Champus;WC#;National Provider Identification"/>
+				<!--  -->
+				<field.text caption="Number"  name="prov_id_num_13"/>
+				<field.date caption="Exp Date" name="prov_id_exp_date_13" size="12"/>
+				<field.select caption="Facility ID" prepend-blank="yes" name="prov_id_facility_13" choices="query:org.selChildFacilityOrgs"/>
+				<!--  -->
+				<field.select caption="License" prepend-blank="yes" name="prov_id_name_14" choices="BCBS;Memorial Sisters Charity;EPSDT;Medicaid;Medicare;UPIN;Tax ID;Railroad Medicare;Champus;WC#;National Provider Identification"/>
+				<!--  -->
+				<field.text caption="Number"  name="prov_id_num_14"/>
+				<field.date caption="Exp Date" name="prov_id_exp_date_14" size="12"/>
+				<field.select caption="Facility ID" prepend-blank="yes" name="prov_id_facility_14" choices="query:org.selChildFacilityOrgs"/>
+				<!--  -->
+				<field.select caption="License" prepend-blank="yes" name="prov_id_name_15" choices="BCBS;Memorial Sisters Charity;EPSDT;Medicaid;Medicare;UPIN;Tax ID;Railroad Medicare;Champus;WC#;National Provider Identification"/>
+				<!--  -->
+				<field.text caption="Number"  name="prov_id_num_15"/>
+				<field.date caption="Exp Date" name="prov_id_exp_date_15" size="12"/>
+				<field.select caption="Facility ID" prepend-blank="yes" name="prov_id_facility_15" choices="query:org.selChildFacilityOrgs"/>
+				<!--  -->
+				<field.select caption="License" prepend-blank="yes" name="prov_id_name_16" choices="BCBS;Memorial Sisters Charity;EPSDT;Medicaid;Medicare;UPIN;Tax ID;Railroad Medicare;Champus;WC#;National Provider Identification"/>
+				<!--  -->
+				<field.text caption="Number"  name="prov_id_num_16"/>
+				<field.date caption="Exp Date" name="prov_id_exp_date_16" size="12"/>
+				<field.select caption="Facility ID" prepend-blank="yes" name="prov_id_facility_16" choices="query:org.selChildFacilityOrgs"/>
+				<!--  -->
+				<field.select caption="License" prepend-blank="yes" name="prov_id_name_17" choices="BCBS;Memorial Sisters Charity;EPSDT;Medicaid;Medicare;UPIN;Tax ID;Railroad Medicare;Champus;WC#;National Provider Identification"/>
+				<!--  -->
+				<field.text caption="Number"  name="prov_id_num_17"/>
+				<field.date caption="Exp Date" name="prov_id_exp_date_17" size="12"/>
+				<field.select caption="Facility ID" prepend-blank="yes" name="prov_id_facility_17" choices="query:org.selChildFacilityOrgs"/>
+				<!--  -->
+				<field.select caption="License" prepend-blank="yes" name="prov_id_name_18" choices="BCBS;Memorial Sisters Charity;EPSDT;Medicaid;Medicare;UPIN;Tax ID;Railroad Medicare;Champus;WC#;National Provider Identification"/>
+				<!--  -->
+				<field.text caption="Number"  name="prov_id_num_18"/>
+				<field.date caption="Exp Date" name="prov_id_exp_date_18" size="12"/>
+				<field.select caption="Facility ID" prepend-blank="yes" name="prov_id_facility_18" choices="query:org.selChildFacilityOrgs"/>
+				<!--  -->
+				<field.select caption="License" prepend-blank="yes" name="prov_id_name_19" choices="BCBS;Memorial Sisters Charity;EPSDT;Medicaid;Medicare;UPIN;Tax ID;Railroad Medicare;Champus;WC#;National Provider Identification"/>
+				<!--  -->
+				<field.text caption="Number"  name="prov_id_num_19"/>
+				<field.date caption="Exp Date" name="prov_id_exp_date_19" size="12"/>
+				<field.select caption="Facility ID" prepend-blank="yes" name="prov_id_facility_19" choices="query:org.selChildFacilityOrgs"/>
+				<!--  -->
+				<field.select caption="License" prepend-blank="yes" name="prov_id_name_20" choices="BCBS;Memorial Sisters Charity;EPSDT;Medicaid;Medicare;UPIN;Tax ID;Railroad Medicare;Champus;WC#;National Provider Identification"/>
+				<!--  -->
+				<field.text caption="Number"  name="prov_id_num_20"/>
+				<field.date caption="Exp Date" name="prov_id_exp_date_20" size="12"/>
+				<field.select caption="Facility ID" prepend-blank="yes" name="prov_id_facility_20" choices="query:org.selChildFacilityOrgs"/>
+				<!--  -->
+				<field.select caption="License" prepend-blank="yes" name="prov_id_name_21" choices="BCBS;Memorial Sisters Charity;EPSDT;Medicaid;Medicare;UPIN;Tax ID;Railroad Medicare;Champus;WC#;National Provider Identification"/>
+				<!--  -->
+				<field.text caption="Number"  name="prov_id_num_21"/>
+				<field.date caption="Exp Date" name="prov_id_exp_date_21" size="12"/>
+				<field.select caption="Facility ID" prepend-blank="yes" name="prov_id_facility_21" choices="query:org.selChildFacilityOrgs"/>
+				<!--  -->
+				<field.select caption="License" prepend-blank="yes" name="prov_id_name_22" choices="BCBS;Memorial Sisters Charity;EPSDT;Medicaid;Medicare;UPIN;Tax ID;Railroad Medicare;Champus;WC#;National Provider Identification"/>
+				<!--  -->
+				<field.text caption="Number"  name="prov_id_num_22"/>
+				<field.date caption="Exp Date" name="prov_id_exp_date_22" size="12"/>
+				<field.select caption="Facility ID" prepend-blank="yes" name="prov_id_facility_22" choices="query:org.selChildFacilityOrgs"/>
+				<!--  -->
+				<field.select caption="License" prepend-blank="yes" name="prov_id_name_23" choices="BCBS;Memorial Sisters Charity;EPSDT;Medicaid;Medicare;UPIN;Tax ID;Railroad Medicare;Champus;WC#;National Provider Identification"/>
+				<!--  -->
+				<field.text caption="Number"  name="prov_id_num_23"/>
+				<field.date caption="Exp Date" name="prov_id_exp_date_23" size="12"/>
+				<field.select caption="Facility ID" prepend-blank="yes" name="prov_id_facility_23" choices="query:org.selChildFacilityOrgs"/>
+				<!--  -->
+				<field.select caption="License" prepend-blank="yes" name="prov_id_name_24" choices="BCBS;Memorial Sisters Charity;EPSDT;Medicaid;Medicare;UPIN;Tax ID;Railroad Medicare;Champus;WC#;National Provider Identification"/>
+				<!--  -->
+				<field.text caption="Number"  name="prov_id_num_24"/>
+				<field.date caption="Exp Date" name="prov_id_exp_date_24" size="12"/>
+				<field.select caption="Facility ID" prepend-blank="yes" name="prov_id_facility_24" choices="query:org.selChildFacilityOrgs"/>
+				<!--  -->
+				<field.select caption="License" prepend-blank="yes" name="prov_id_name_25" choices="BCBS;Memorial Sisters Charity;EPSDT;Medicaid;Medicare;UPIN;Tax ID;Railroad Medicare;Champus;WC#;National Provider Identification"/>
+				<!--  -->
+				<field.text caption="Number"  name="prov_id_num_25"/>
+				<field.date caption="Exp Date" name="prov_id_exp_date_25" size="12"/>
+				<field.select caption="Facility ID" prepend-blank="yes" name="prov_id_facility_25" choices="query:org.selChildFacilityOrgs"/>
+				<!--  -->
+			</field.composite>
+			<field.date caption="Effective Date" max-length="10" name="billing_effective_date" size="10"/>
+			<field.separator heading="Certification/Accreditations" name="cert_for_physician"/>
+			<field.composite caption="1. Specialty/Sequence"  name="specialty1">
+				<field.select caption="1. Specialty" prepend-blank="yes" name="specialty_code" choices="query:person.selMedicalSpeciality"/>
+				<!--  -->
+				<field.select caption="Specialty Sequence"  name="value_int1" choices="Unknown=5;Primary=1;Secondary=2;Tertiary=3;Quaternary=4"/>
+				<!--  -->
+			</field.composite>
+			<field.composite caption="2. Specialty/Sequence"  name="specialty2">
+				<field.select caption="2. Specialty" prepend-blank="yes" name="specialty2_code" choices="query:person.selMedicalSpeciality"/>
+				<!--  -->
+				<field.select caption="Specialty Sequence"  name="value_int2" choices="Unknown=5;Primary=1;Secondary=2;Tertiary=3;Quaternary=4"/>
+				<!--  -->
+			</field.composite>
+			<field.composite caption="3. Specialty/Sequence"  name="specialty3">
+				<field.select caption="3. Specialty" prepend-blank="yes" name="specialty3_code" choices="query:person.selMedicalSpeciality"/>
+				<!--  -->
+				<field.select caption="Specialty Sequence"  name="value_int3" choices="Unknown=5;Primary=1;Secondary=2;Tertiary=3;Quaternary=4"/>
+				<!--  -->
+			</field.composite>
+			<field.composite caption="Affiliation/Exp Date"  name="text_field">
+				<field.text caption="Affiliation"  name="affiliation"/>
+				<field.date caption="Date" name="value_dateend" size="12"/>
+			</field.composite>
+			<field.composite caption="Board Certification Name/Exp Date"  name="text_field">
+				<field.text caption="Board Certification Name"  name="board_certification"/>
+				<field.date caption="Date" name="board_dateend" size="12"/>
+			</field.composite>
+			<field.composite caption="1. State/License/Exp Date"  name="text_field">
+				<field.text caption="State"  max-length="2" name="state1" size="2"/>
+				<field.text caption="License"  name="license1"/>
+				<field.date caption="Date of Expiration" name="state1_exp_date" size="12"/>
+			</field.composite>
+			<field.composite caption="2. State/License/Exp Date"  name="text_field">
+				<field.text caption="State"  max-length="2" name="state2" size="2"/>
+				<field.text caption="License"  name="license2"/>
+				<field.date caption="Date of Expiration" name="state2_exp_date" size="12"/>
+			</field.composite>
+			<field.composite caption="3. State/License/Exp Date"  name="text_field">
+				<field.text caption="State"  max-length="2" name="state3" size="2"/>
+				<field.text caption="License"  name="license3"/>
+				<field.date caption="Date of Expiration" name="state3_exp_date" size="12"/>
+			</field.composite>
+			<field.boolean caption="Delete record?"  name="delete_record" style="check"/>
+
+		</dialog>
+
+		<dialog name="nurse" heading="$Command Nurse">
+			<field.text caption="Nurse ID"  hint="To use the ID autosuggestion feature, leave this field blank" max-length="16" name="person_id" size="16"/>
+			<field.text hidden="yes" name="acct_item_id" caption="acct_item_id"/>
+			<field.text hidden="yes" name="chart_item_id" caption="chart_item_id"/>
+			<field.text hidden="yes" name="resp_item_id" caption="resp_item_id"/>
+			<field.text hidden="yes" name="job_item_id" caption="job_item_id"/>
+			<field.text hidden="yes" name="driver_license_item_id" caption="driver_license_item_id"/>
+			<field.text hidden="yes" name="nurse_emp_item_id" caption="nurse_emp_item_id"/>
+			<field.text hidden="yes" name="assoc_phy_item_id" caption="assoc_phy_item_id"/>
+			<field.text hidden="yes" name="bill_provider_item_id" caption="bill_provider_item_id"/>
+			<field.text hidden="yes" name="inactive_patient_item_id" caption="inactive_patient_item_id"/>
+			<field.text hidden="yes" name="language_item_id" caption="language_item_id"/>
+			<field.text hidden="yes" name="ethnicity_item_id" caption="ethnicity_item_id"/>
+			<field.select caption="Person Title/Job Code"  name="nurse_title" choices="LVN/LPN;RN;OTHER" style="multicheck"/>
+			<!--  -->
+			<field.select caption="Person Type"  name="physician_type" choices="Physician;Physician Extender (direct billing);Other Clinical Service Provider (direct billing);Other Clinical Services Provider (alternate billing)" style="multicheck"/>
+			<!--  -->
+			<field.text caption="Doctor to bill for this provider"  max-length="16" name="bill_provider" size="16"/>
+			<field.composite caption="Job Title/Code"  name="job_code">
+				<field.text caption="Job Title"  name="job_title"/>
+				<field.text caption="Code"  name="job_code"/>
+			</field.composite>
+			<field.composite caption="Account/Chart Number"  name="acct_chart_num">
+				<field.text caption="Account Number"  name="acct_number"/>
+				<field.text caption="Chart Number"  name="chart_number"/>
+			</field.composite>
+			<field.separator heading="Profile Information" name="gen_info_heading"/>
+			<field.composite caption="*"  name="person_id">
+				<field.text caption="Last Name" required="yes" name="name_last" size="16"/>
+				<field.text caption="First Name" required="yes" name="name_first" size="12"/>
+				<field.text caption="Middle Name"  name="name_middle" size="8"/>
+				<field.text caption="Suffix"  name="name_suffix" size="16"/>
+			</field.composite>
+			<field.boolean caption="Add record"  name="create_record" style="check"/>
+			<field.composite caption="*"  name="ssndatemf">
+				<field.ssn caption="Social Security"  max-length="1024" name="ssn" size="11"/>
+				<field.date caption="Date of Birth" name="date_of_birth" size="12"/>
+			</field.composite>
+			<field.composite caption="*"  name="text_field">
+				<field.select caption="Gender" required="yes" prepend-blank="yes" name="gender" choices="Male=1;Female=2"/>
+				<!--  -->
+				<field.select caption="Marital Status"  name="marital_status"/>
+				<!--  -->
+			</field.composite>
+			<field.select caption="Blood Type"  name="blood_type"/>
+			<!--  -->
+			<field.select caption="Ethnicity"  name="ethnicity" style="multicheck"/>
+			<!--  -->
+			<field.text caption="Other Ethnicity"  name="other_ethnicity"/>
+			<field.select caption="Language Spoken"  name="language" choices="English;Spanish;French;German;Italian;Chinese;Japanese;Korean;Vietnamese;Other" style="multicheck"/>
+			<!--  -->
+			<field.text caption="Other Language"  name="other_language"/>
+			<field.text caption="Responsible Party"  max-length="16" name="party_name" size="16"/>
+			<field.composite caption="Relationship To Responsible Party/Other Relationship Name" required="yes" hint="Select an existing relationship type or select 'Other' and fill in the 'Other' field" name="relation">
+				<field.select caption="Relationship" required="yes" name="rel_type" choices="query:person.selRelationship"/>
+				<!--  -->
+				<field.text caption="Other"  name="other_rel_type"/>
+			</field.composite>
+			<field.composite caption="Driver's License Number/State"  name="license_num_state">
+				<field.text caption="License Number"  name="license_number"/>
+				<field.text caption="State"  max-length="2" name="license_state" size="2"/>
+			</field.composite>
+			<field.memo caption="Misc Notes" name="misc_notes" size="24"/>
+			<field.separator heading="Contact Methods" name="contact_methods_heading"/>
+			<field.composite caption="*"  name="home_work_phone">
+				<field.phone caption="Home Phone"  max-length="1024" name="home_phone"/>
+				<field.phone caption="Work Phone"  max-length="1024" name="work_phone"/>
+			</field.composite>
+			<field.composite caption="Cell Phone/Pager"  name="home_pager_phone">
+				<field.phone caption="Cell Phone"  max-length="1024" name="cell_phone"/>
+				<field.phone caption="Primary Pager"  max-length="1024" name="primary_pager"/>
+			</field.composite>
+			<field.phone caption="Alternate"  max-length="1024" name="alternate_phone"/>
+			<field.composite caption="Home Address" required="yes" name="address">
+				<field.text caption="Address (Line 1)"  max-length="128" name="addr_line1" size="36"/>
+				<field.text caption="Address (Line 2)"  max-length="128" name="addr_line2" size="36"/>
+				<field.text caption="City"  max-length="64" name="addr_city" size="16"/>
+				<field.text caption="State"  max-length="2" name="addr_state" size="2"/>
+				<field.text caption="Zip"  name="addr_zip"/>
+			</field.composite>
+			<field.email caption="Email"  max-length="1024" name="email"/>
+			<field.text hidden="yes" name="nurse_title_item_id" caption="nurse_title_item_id"/>
+			<field.separator heading="Certification" name="cert_for_nurse"/>
+			<field.composite caption="*"  hint="'Exp Date' and 'License Required' should be entered if there is a 'Nursing License'." name="nurse_license">
+				<field.text caption="Nursing License"  name="rn_number"/>
+				<field.date caption="Exp Date" name="rn_number_exp_date" size="12"/>
+				<field.boolean caption="License Required"  name="check_license" style="check"/>
+			</field.composite>
+			<field.composite caption="*"  name="licens_num_date1">
+				<field.text caption="License Certification"  name="license1"/>
+				<field.text caption="Number"  name="license_num1"/>
+				<field.date caption="Exp Date" name="license1_exp_date" size="12"/>
+			</field.composite>
+			<field.composite caption="*"  name="licens_num_date2">
+				<field.text caption="License Certification"  name="license2"/>
+				<field.text caption="Number"  name="license_num2"/>
+				<field.date caption="Exp Date" name="license2_exp_date" size="12"/>
+			</field.composite>
+			<field.composite caption="*"  name="licens_num_date3">
+				<field.text caption="License Certification"  name="license3"/>
+				<field.text caption="Number"  name="license_num3"/>
+				<field.date caption="Exp Date" name="license3_exp_date" size="12"/>
+			</field.composite>
+			<field.composite caption="*"  name="empid_date">
+				<field.text caption="Employee ID"  name="emp_id"/>
+				<field.date caption="Exp Date" name="emp_exp_date" size="12"/>
+			</field.composite>
+			<field.select caption="Associated Physicians"  name="physician_list" choices="query:person.selResourceAssociations" size="5" style="multicheck"/>
+			<!--  -->
+			<field.boolean caption="Delete record?"  name="delete_record" style="check"/>
+
+		</dialog>
+
+		<dialog name="staff" heading="$Command Staff Member">
+			<field.text caption="Staff ID"  hint="To use the ID autosuggestion feature, leave this field blank" max-length="16" name="person_id" size="16"/>
+			<field.text hidden="yes" name="acct_item_id" caption="acct_item_id"/>
+			<field.text hidden="yes" name="chart_item_id" caption="chart_item_id"/>
+			<field.text hidden="yes" name="resp_item_id" caption="resp_item_id"/>
+			<field.text hidden="yes" name="job_item_id" caption="job_item_id"/>
+			<field.text hidden="yes" name="driver_license_item_id" caption="driver_license_item_id"/>
+			<field.text hidden="yes" name="nurse_emp_item_id" caption="nurse_emp_item_id"/>
+			<field.text hidden="yes" name="assoc_phy_item_id" caption="assoc_phy_item_id"/>
+			<field.text hidden="yes" name="bill_provider_item_id" caption="bill_provider_item_id"/>
+			<field.text hidden="yes" name="inactive_patient_item_id" caption="inactive_patient_item_id"/>
+			<field.text hidden="yes" name="language_item_id" caption="language_item_id"/>
+			<field.text hidden="yes" name="ethnicity_item_id" caption="ethnicity_item_id"/>
+			<field.select caption="Person Title/Job Code"  name="nurse_title" choices="LVN/LPN;RN;OTHER" style="multicheck"/>
+			<!--  -->
+			<field.select caption="Person Type"  name="physician_type" choices="Physician;Physician Extender (direct billing);Other Clinical Service Provider (direct billing);Other Clinical Services Provider (alternate billing)" style="multicheck"/>
+			<!--  -->
+			<field.text caption="Doctor to bill for this provider"  max-length="16" name="bill_provider" size="16"/>
+			<field.composite caption="Job Title/Code"  name="job_code">
+				<field.text caption="Job Title"  name="job_title"/>
+				<field.text caption="Code"  name="job_code"/>
+			</field.composite>
+			<field.composite caption="Account/Chart Number"  name="acct_chart_num">
+				<field.text caption="Account Number"  name="acct_number"/>
+				<field.text caption="Chart Number"  name="chart_number"/>
+			</field.composite>
+			<field.separator heading="Profile Information" name="gen_info_heading"/>
+			<field.composite caption="*"  name="person_id">
+				<field.text caption="Last Name" required="yes" name="name_last" size="16"/>
+				<field.text caption="First Name" required="yes" name="name_first" size="12"/>
+				<field.text caption="Middle Name"  name="name_middle" size="8"/>
+				<field.text caption="Suffix"  name="name_suffix" size="16"/>
+			</field.composite>
+			<field.boolean caption="Add record"  name="create_record" style="check"/>
+			<field.composite caption="*"  name="ssndatemf">
+				<field.ssn caption="Social Security"  max-length="1024" name="ssn" size="11"/>
+				<field.date caption="Date of Birth" name="date_of_birth" size="12"/>
+			</field.composite>
+			<field.composite caption="*"  name="text_field">
+				<field.select caption="Gender" required="yes" prepend-blank="yes" name="gender" choices="Male=1;Female=2"/>
+				<!--  -->
+				<field.select caption="Marital Status"  name="marital_status"/>
+				<!--  -->
+			</field.composite>
+			<field.select caption="Blood Type"  name="blood_type"/>
+			<!--  -->
+			<field.select caption="Ethnicity"  name="ethnicity" style="multicheck"/>
+			<!--  -->
+			<field.text caption="Other Ethnicity"  name="other_ethnicity"/>
+			<field.select caption="Language Spoken"  name="language" choices="English;Spanish;French;German;Italian;Chinese;Japanese;Korean;Vietnamese;Other" style="multicheck"/>
+			<!--  -->
+			<field.text caption="Other Language"  name="other_language"/>
+			<field.text caption="Responsible Party"  max-length="16" name="party_name" size="16"/>
+			<field.composite caption="Relationship To Responsible Party/Other Relationship Name" required="yes" hint="Select an existing relationship type or select 'Other' and fill in the 'Other' field" name="relation">
+				<field.select caption="Relationship" required="yes" name="rel_type" choices="query:person.selRelationship"/>
+				<!--  -->
+				<field.text caption="Other"  name="other_rel_type"/>
+			</field.composite>
+			<field.composite caption="Driver's License Number/State"  name="license_num_state">
+				<field.text caption="License Number"  name="license_number"/>
+				<field.text caption="State"  max-length="2" name="license_state" size="2"/>
+			</field.composite>
+			<field.memo caption="Misc Notes" name="misc_notes" size="24"/>
+			<field.separator heading="Contact Methods" name="contact_methods_heading"/>
+			<field.composite caption="*"  name="home_work_phone">
+				<field.phone caption="Home Phone"  max-length="1024" name="home_phone"/>
+				<field.phone caption="Work Phone"  max-length="1024" name="work_phone"/>
+			</field.composite>
+			<field.composite caption="Cell Phone/Pager"  name="home_pager_phone">
+				<field.phone caption="Cell Phone"  max-length="1024" name="cell_phone"/>
+				<field.phone caption="Primary Pager"  max-length="1024" name="primary_pager"/>
+			</field.composite>
+			<field.phone caption="Alternate"  max-length="1024" name="alternate_phone"/>
+			<field.composite caption="Home Address" required="yes" name="address">
+				<field.text caption="Address (Line 1)"  max-length="128" name="addr_line1" size="36"/>
+				<field.text caption="Address (Line 2)"  max-length="128" name="addr_line2" size="36"/>
+				<field.text caption="City"  max-length="64" name="addr_city" size="16"/>
+				<field.text caption="State"  max-length="2" name="addr_state" size="2"/>
+				<field.text caption="Zip"  name="addr_zip"/>
+			</field.composite>
+			<field.email caption="Email"  max-length="1024" name="email"/>
+			<field.composite caption="Employee ID/Exp Date"  name="text_field">
+				<field.text caption="Employee ID"  name="emp_id"/>
+				<field.date caption="Date of Expiration" name="emp_exp_date" size="12"/>
+			</field.composite>
+			<field.composite caption="Certification/Number/Exp Date"  name="text_field">
+				<field.text caption="Certification1"  name="cert1"/>
+				<field.text caption="Certification Number1"  name="cert_num1"/>
+				<field.date caption="Date of Expiration" name="cert1_exp_date" size="12"/>
+			</field.composite>
+			<field.composite caption="Certification/Number/Exp Date"  name="text_field">
+				<field.text caption="Certification2"  name="cert2"/>
+				<field.text caption="Certification Number2"  name="cert_num2"/>
+				<field.date caption="Date of Expiration" name="cert2_exp_date" size="12"/>
+			</field.composite>
+			<field.composite caption="Certification/Number/Exp Date"  name="text_field">
+				<field.text caption="Certification3"  name="cert3"/>
+				<field.text caption="Certification Number3"  name="cert_num3"/>
+				<field.date caption="Date of Expiration" name="cert3_exp_date" size="12"/>
+			</field.composite>
+			<field.composite caption="Certification/Number/Exp Date"  name="text_field">
+				<field.text caption="Certification4"  name="cert4"/>
+				<field.text caption="Certification Number4"  name="cert_num4"/>
+				<field.date caption="Date of Expiration" name="cert4_exp_date" size="12"/>
+			</field.composite>
+			<field.boolean caption="Delete record?"  name="delete_record" style="check"/>
+
+		</dialog>
+
+		<dialog name="patient" heading="$Command Patient/Person">
+			<field.text hidden="yes" name="resp_self" caption="resp_self"/>
+			<field.text caption="Patient/Person ID"  hint="To use the ID autosuggestion feature, leave this field blank" max-length="16" name="person_id" size="16"/>
+			<field.text hidden="yes" name="acct_item_id" caption="acct_item_id"/>
+			<field.text hidden="yes" name="chart_item_id" caption="chart_item_id"/>
+			<field.text hidden="yes" name="resp_item_id" caption="resp_item_id"/>
+			<field.text hidden="yes" name="job_item_id" caption="job_item_id"/>
+			<field.text hidden="yes" name="driver_license_item_id" caption="driver_license_item_id"/>
+			<field.text hidden="yes" name="nurse_emp_item_id" caption="nurse_emp_item_id"/>
+			<field.text hidden="yes" name="assoc_phy_item_id" caption="assoc_phy_item_id"/>
+			<field.text hidden="yes" name="bill_provider_item_id" caption="bill_provider_item_id"/>
+			<field.text hidden="yes" name="inactive_patient_item_id" caption="inactive_patient_item_id"/>
+			<field.text hidden="yes" name="language_item_id" caption="language_item_id"/>
+			<field.text hidden="yes" name="ethnicity_item_id" caption="ethnicity_item_id"/>
+			<field.select caption="Person Title/Job Code"  name="nurse_title" choices="LVN/LPN;RN;OTHER" style="multicheck"/>
+			<!--  -->
+			<field.select caption="Person Type"  name="physician_type" choices="Physician;Physician Extender (direct billing);Other Clinical Service Provider (direct billing);Other Clinical Services Provider (alternate billing)" style="multicheck"/>
+			<!--  -->
+			<field.text caption="Doctor to bill for this provider"  max-length="16" name="bill_provider" size="16"/>
+			<field.composite caption="Job Title/Code"  name="job_code">
+				<field.text caption="Job Title"  name="job_title"/>
+				<field.text caption="Code"  name="job_code"/>
+			</field.composite>
+			<field.composite caption="Account/Chart Number"  name="acct_chart_num">
+				<field.text caption="Account Number"  name="acct_number"/>
+				<field.text caption="Chart Number"  name="chart_number"/>
+			</field.composite>
+			<field.separator heading="Profile Information" name="gen_info_heading"/>
+			<field.composite caption="*"  name="person_id">
+				<field.text caption="Last Name" required="yes" name="name_last" size="16"/>
+				<field.text caption="First Name" required="yes" name="name_first" size="12"/>
+				<field.text caption="Middle Name"  name="name_middle" size="8"/>
+				<field.text caption="Suffix"  name="name_suffix" size="16"/>
+			</field.composite>
+			<field.boolean caption="Add record"  name="create_record" style="check"/>
+			<field.composite caption="*"  name="ssndatemf">
+				<field.ssn caption="Social Security"  max-length="1024" name="ssn" size="11"/>
+				<field.date caption="Date of Birth" name="date_of_birth" size="12"/>
+			</field.composite>
+			<field.composite caption="*"  name="text_field">
+				<field.select caption="Gender" required="yes" prepend-blank="yes" name="gender" choices="Male=1;Female=2"/>
+				<!--  -->
+				<field.select caption="Marital Status"  name="marital_status"/>
+				<!--  -->
+			</field.composite>
+			<field.select caption="Blood Type"  name="blood_type"/>
+			<!--  -->
+			<field.select caption="Ethnicity"  name="ethnicity" style="multicheck"/>
+			<!--  -->
+			<field.text caption="Other Ethnicity"  name="other_ethnicity"/>
+			<field.select caption="Language Spoken"  name="language" choices="English;Spanish;French;German;Italian;Chinese;Japanese;Korean;Vietnamese;Other" style="multicheck"/>
+			<!--  -->
+			<field.text caption="Other Language"  name="other_language"/>
+			<field.text caption="Responsible Party"  max-length="16" name="party_name" size="16"/>
+			<field.composite caption="Relationship To Responsible Party/Other Relationship Name" required="yes" hint="Select an existing relationship type or select 'Other' and fill in the 'Other' field" name="relation">
+				<field.select caption="Relationship" required="yes" name="rel_type" choices="query:person.selRelationship"/>
+				<!--  -->
+				<field.text caption="Other"  name="other_rel_type"/>
+			</field.composite>
+			<field.composite caption="Driver's License Number/State"  name="license_num_state">
+				<field.text caption="License Number"  name="license_number"/>
+				<field.text caption="State"  max-length="2" name="license_state" size="2"/>
+			</field.composite>
+			<field.memo caption="Misc Notes" name="misc_notes" size="24"/>
+			<field.separator heading="Contact Methods" name="contact_methods_heading"/>
+			<field.composite caption="*"  name="home_work_phone">
+				<field.phone caption="Home Phone"  max-length="1024" name="home_phone"/>
+				<field.phone caption="Work Phone"  max-length="1024" name="work_phone"/>
+			</field.composite>
+			<field.composite caption="Cell Phone/Pager"  name="home_pager_phone">
+				<field.phone caption="Cell Phone"  max-length="1024" name="cell_phone"/>
+				<field.phone caption="Primary Pager"  max-length="1024" name="primary_pager"/>
+			</field.composite>
+			<field.phone caption="Alternate"  max-length="1024" name="alternate_phone"/>
+			<field.composite caption="Home Address" required="yes" name="address">
+				<field.text caption="Address (Line 1)"  max-length="128" name="addr_line1" size="36"/>
+				<field.text caption="Address (Line 2)"  max-length="128" name="addr_line2" size="36"/>
+				<field.text caption="City"  max-length="64" name="addr_city" size="16"/>
+				<field.text caption="State"  max-length="2" name="addr_state" size="2"/>
+				<field.text caption="Zip"  name="addr_zip"/>
+			</field.composite>
+			<field.email caption="Email"  max-length="1024" name="email"/>
+			<field.separator heading="Employment" name="occup_heading"/>
+			<field.text caption="Employer ID"  max-length="16" name="rel_id" size="16"/>
+			<field.select caption="Employment Status"  name="value_type" choices="query:person.selEmpStatus"/>
+			<!--  -->
+			<field.text caption="Occupation"  name="occupation"/>
+			<field.phone caption="Phone Number"  max-length="1024" name="phone_number"/>
+			<field.boolean caption="Delete record?"  name="delete_record" style="check"/>
+			<field.composite caption="*"  name="text_field">
+				<field.boolean caption="Patient is deceased?"  name="inactivate_record" style="check"/>
+				<field.date caption="Date" name="inactivate_date" size="12"/>
+			</field.composite>
+			<field.separator heading="Care Provider" name="text_field"/>
+			<field.composite caption="*"  name="care_specialty">
+				<field.text caption="Care Provider ID"  max-length="16" name="care_provider" size="16"/>
+				<field.select caption="Specialty" prepend-blank="yes" name="specialty" choices="query:person.selMedicalSpeciality"/>
+				<!--  -->
+			</field.composite>
+
+		</dialog>
+
+	</dialogs>
+</xaf>

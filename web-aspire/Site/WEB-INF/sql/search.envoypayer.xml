@@ -1,0 +1,58 @@
+<?xml version="1.0"?>
+
+<xaf>
+	<sql-statements package="search.envoypayer">
+		<statement name="id">
+			App::Statements::Search::EnvoyPayer
+		</statement>
+
+		<statement name="sel_id">
+			
+			SELECT
+			id,
+			name
+			FROM ref_envoy_payer
+			WHERE
+			id = ?
+			AND rownum &lt;= 250
+
+		</statement>
+
+		<statement name="sel_id_like">
+			
+			SELECT
+			id,
+			name
+			FROM ref_envoy_payer
+			WHERE
+			id LIKE ?
+			AND rownum &lt;= 250
+
+		</statement>
+
+		<statement name="sel_name">
+			
+			SELECT
+			id,
+			name
+			FROM ref_envoy_payer
+			WHERE
+			UPPER(name) = ?
+			AND rownum &lt;= 250
+
+		</statement>
+
+		<statement name="sel_name_like">
+			
+			SELECT
+			id,
+			name
+			FROM ref_envoy_payer
+			WHERE
+			UPPER(name) LIKE ?
+			AND rownum &lt;= 250
+
+		</statement>
+
+	</sql-statements>
+</xaf>

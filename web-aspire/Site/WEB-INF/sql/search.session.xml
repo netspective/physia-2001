@@ -1,0 +1,52 @@
+<?xml version="1.0"?>
+
+<xaf>
+	<sql-statements package="search.session">
+		<statement name="id">
+			App::Statements::Search::Session
+		</statement>
+
+		<statement name="sel_status_person">
+			
+			SELECT
+			p.person_id,
+			p.short_sortable_name,
+			TO_CHAR(ps.first_access, 'MM/DD/YYYY HH12:MI AM') as first_access,
+			TO_CHAR(ps.last_access, 'MM/DD/YYYY HH12:MI AM') as last_access,
+			ps.remote_host,
+			ps.remote_addr
+			FROM
+			person_session ps,
+			person p
+			WHERE
+			(ps.status between ? AND ?)
+			AND p.person_id = ps.person_id
+			AND	ps.person_id = ? 
+			AND ps.org_internal_id = ?
+			AND rownum &lt;= 250
+
+		</statement>
+
+		<statement name="sel_status_person_like">
+			
+			SELECT
+			p.person_id,
+			p.short_sortable_name,
+			TO_CHAR(ps.first_access, 'MM/DD/YYYY HH12:MI AM') as first_access,
+			TO_CHAR(ps.last_access, 'MM/DD/YYYY HH12:MI AM') as last_access,
+			ps.remote_host,
+			ps.remote_addr
+			FROM
+			person_session ps,
+			person p
+			WHERE
+			(ps.status between ? AND ?)
+			AND p.person_id = ps.person_id
+			AND	ps.person_id LIKE ? 
+			AND ps.org_internal_id = ?
+			AND rownum &lt;= 250
+
+		</statement>
+
+	</sql-statements>
+</xaf>

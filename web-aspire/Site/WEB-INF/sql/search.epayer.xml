@@ -1,0 +1,43 @@
+<?xml version="1.0"?>
+
+<xaf>
+	<sql-statements package="search.epayer">
+		<statement name="id">
+			App::Statements::Search::Epayer
+		</statement>
+
+		<statement name="sel_id">
+			
+			SELECT *
+			FROM ref_epayer
+			WHERE
+			UPPER(id) LIKE UPPER(?) AND psource = ?
+			AND rownum &lt;= 250
+			ORDER BY name
+
+		</statement>
+
+		<statement name="sel_id2">
+			
+			SELECT *
+			FROM ref_epayer
+			WHERE
+			UPPER(id2) LIKE UPPER(?)
+			AND rownum &lt;= 250
+			ORDER BY name
+
+		</statement>
+
+		<statement name="sel_name">
+			
+			SELECT *
+			FROM ref_epayer
+			WHERE
+			UPPER(name) LIKE UPPER(?) AND psource = ? 
+			AND rownum &lt;= 250
+			ORDER BY name
+
+		</statement>
+
+	</sql-statements>
+</xaf>

@@ -1,0 +1,1126 @@
+<?xml version="1.0"?>
+
+<xaf>
+	<sql-statements package="invoice">
+		<statement name="checkOfficeVisitCPT">
+			
+			select cpt
+			from ref_cpt
+			where cpt = ?
+			and cpt in ('99201','99202','99203','99204','99205','99211','99212','99213','99214','99215')
+			
+		</statement>
+
+		<statement name="delAutoWriteoffAdjustmentsForItem">
+			
+			delete
+			from invoice_item_adjust
+			where parent_id = ?
+			and adjustment_type = 3
+			
+		</statement>
+
+		<statement name="delInvoiceBillingParties">
+			
+			delete
+			from invoice_billing
+			where invoice_id = ?
+			and invoice_item_id is NULL
+			
+		</statement>
+
+		<statement name="delPostSubmitAddresses">
+			
+			delete
+			from invoice_address
+			where parent_id = ?
+			
+		</statement>
+
+		<statement name="delPostSubmitAttributes">
+			
+			delete
+			from invoice_attribute
+			where parent_id = ?
+			and value_intB = 1
+			and item_name not like 'Invoice/TWCC%'
+			
+		</statement>
+
+		<statement name="delRefProviderAttrs">
+			
+			delete from invoice_attribute where parent_id = ? and item_name like 'Ref Provider/%'
+			
+		</statement>
+
+		<statement name="hasInvoiceItems">
+			
+			select 1 from Invoice_Item
+			where invoice_id = ?
+			
+		</statement>
+
+		<statement name="id">
+			App::Statements::Invoice
+		</statement>
+
+		<statement name="selAccidentDropDown">
+			
+			select caption, id, 2 as myorder
+			from trans_related_to
+			UNION
+			(select 'None' as caption, -99999 as id, 1 as myorder
+			from dual)
+			order by myorder
+			
+		</statement>
+
+		<statement name="selAdjTypeCaption">
+			
+			select caption
+			from adjust_method
+			where id = ?
+			
+		</statement>
+
+		<statement name="selAllAttributesExclHistoryAndTransferred">
+			
+			select item_id, parent_id, item_type, item_name, value_type, value_text, value_textB, value_int, value_intB, value_float, value_floatB, value_block,
+			to_char(value_date, 'MM/DD/YYYY') as value_date, to_char(value_dateEnd, 'MM/DD/YYYY') as value_dateEnd,
+			to_char(value_dateA, 'MM/DD/YYYY') as value_dateA, to_char(value_dateB, 'MM/DD/YYYY') as value_dateB
+			from invoice_attribute
+			where parent_id = ?
+			and NOT item_name = 'Invoice/History/Item'
+			and NOT item_name = 'Invoice/Transferred'
+			
+		</statement>
+
+		<statement name="selAllHistoryItems">
+			
+			select cr_stamp, cr_user_id, value_text, value_textb, value_int, value_intb, value_float, value_floatb,
+			to_char(value_date, 'MM/DD/YYYY') as value_date, to_char(value_dateEnd, 'MM/DD/YYYY') as value_dateend,
+			to_char(value_dateA, 'MM/DD/YYYY') as value_datea, to_char(value_dateB, 'MM/DD/YYYY') as value_dateb
+			from invoice_history
+			where parent_id = ?
+			order by value_date desc, cr_stamp desc
+			
+		</statement>
+
+		<statement name="selAllInvoiceTypeForClient">
+			
+			SELECT
+			i.invoice_id,
+			i.total_items,
+			TO_CHAR(MIN(iit.service_begin_date), 'MM/DD/YYYY') AS service_begin_date,
+			ist.caption as invoice_status,
+			ib.bill_to_id,
+			i.total_cost,
+			i.total_adjust,
+			i.balance,
+			i.client_id,
+			ib.bill_to_id,
+			o.org_id,
+			ib.bill_party_type,
+			i.invoice_status as status_id,
+			i.parent_invoice_id,
+			to_char(i.invoice_date, 'MM/DD/YYYY') as invoice_date,
+			trans.care_provider_id,
+			trans.provider_id,
+			trans.service_facility_id,
+			sf.org_id
+			FROM invoice i, invoice_status ist, invoice_billing ib, invoice_item iit, org o, transaction trans, org sf
+			WHERE
+			upper(client_id) = ? and (owner_type = 1 and owner_id = ?)
+			AND i.main_transaction = trans.trans_id
+			AND trans.service_facility_id = sf.org_internal_id
+			AND iit.parent_id (+) = i.invoice_id
+			AND ib.bill_id (+) = i.billing_id
+			AND ist.id = i.invoice_status
+			AND to_char(o.org_internal_id (+)) = ib.bill_to_id
+			GROUP BY
+			i.invoice_id,
+			i.total_items,
+			ist.caption,
+			i.total_cost,
+			i.total_adjust,
+			i.balance,
+			i.client_id,
+			ib.bill_to_id,
+			o.org_id,
+			ib.bill_party_type,
+			i.invoice_status,
+			i.parent_invoice_id,
+			i.invoice_date,
+			trans.care_provider_id,
+			trans.provider_id,
+			trans.service_facility_id,
+			sf.org_id
+			ORDER BY i.invoice_id desc
+
+		</statement>
+
+		<statement name="selAllNonVoidedInvoicesByClient">
+			
+			select i.invoice_id, i.balance, i.invoice_status, inv_stat.caption as status_caption
+			from invoice_status inv_stat, invoice i
+			where i.client_id = ?
+			and i.owner_id = ?
+			and i.invoice_status != 16
+			and i.invoice_status = inv_stat.id (+)
+			
+		</statement>
+
+		<statement name="selAllNonZeroBalanceInvoicesByClient">
+			
+			select i.invoice_id, i.balance, inv_stat.caption as status_caption
+			from invoice_status inv_stat, invoice i
+			where i.client_id = ?
+			and i.owner_id = ?
+			and i.invoice_status != 16
+			and i.invoice_status != 15
+			and i.invoice_status = inv_stat.id (+)
+			
+		</statement>
+
+		<statement name="selAllOutstandingInvoicesByClient">
+			
+			select i.invoice_id, i.balance, inv_stat.caption as status_caption
+			from invoice_status inv_stat, invoice i
+			where i.balance &gt; 0
+			and i.client_id = ?
+			and i.owner_id = ?
+			and i.invoice_status != 15
+			and i.invoice_status != 16
+			and i.invoice_status = inv_stat.id (+)
+			
+		</statement>
+
+		<statement name="selAutoWriteoffAdjustmentsForItem">
+			
+			select *
+			from invoice_item_adjust
+			where parent_id = ?
+			and adjustment_type = 3
+			
+		</statement>
+
+		<statement name="selBatchPaymentAttr">
+			
+			select *
+			from invoice_attribute
+			where parent_id = ?
+			and value_int = ?
+			and item_name = 'Invoice/Payment/Batch ID'
+			
+		</statement>
+
+		<statement name="selBeenTransferred">
+			
+			select value_int
+			from invoice_attribute
+			where parent_id = ?
+			and item_name = 'Invoice/Transferred'
+			
+		</statement>
+
+		<statement name="selClaimDiags">
+			
+			select claim_diags from invoice
+			where invoice_id = ?
+			
+		</statement>
+
+		<statement name="selClaimPrintHistoryItemByUser">
+			
+			select to_char(max(cr_stamp), 'YYYYMMDDHH24MISS') as cr_stamp, to_char(sysdate, 'YYYYMMDDHH24MISS') as timenow, cr_user_id, 
+			value_text, value_textb, to_char(value_date, 'MM/DD/YYYY') as value_date
+			from invoice_history
+			where parent_id = ?
+			and cr_user_id = ?
+			and value_text = 'Claim printed'
+			group by
+			cr_user_id, value_text, value_textb, value_date
+			
+		</statement>
+
+		<statement name="selClaimTypeCaption">
+			
+			select caption
+			from claim_type
+			where id = ?
+			
+		</statement>
+
+		<statement name="selCreditInvoicesByClient">
+			
+			select * from invoice
+			where client_id = ?
+			and owner_id = ?
+			and balance &lt; 0
+			
+		</statement>
+
+		<statement name="selExplCodeInvItems">
+			
+			select parent_id, item_id, item_type, hcfa_service_place, hcfa_service_type, emergency, comments, caption, code, code_type, modifier, flags,
+			unit_cost, quantity, rel_diags, to_char(service_begin_date, 'MM/DD/YYYY') as service_begin_date, parent_code,
+			to_char(service_end_date, 'MM/DD/YYYY') as service_end_date, balance, total_adjust, extended_cost,
+			data_text_a, data_text_b, data_text_c, data_num_a, data_num_b, data_num_c
+			from invoice_item
+			where parent_id = ?
+			and parent_code = ?
+			and data_text_c = 'explosion'			
+			
+		</statement>
+
+		<statement name="selFSHierarchy">
+			
+			select per.value_int as fs, 1 as fs_order
+			from person_attribute per, org_attribute org, insurance_attribute insplan, insurance_attribute insprod
+			where per.parent_id = :1
+			and org.parent_id = :2
+			and insplan.parent_id = :3
+			and insprod.parent_id (+)= :4
+			and per.item_name = 'Fee Schedule'
+			and org.item_name = 'Fee Schedule'
+			and insplan.item_name = 'Fee Schedule'
+			and insprod.item_name (+)= 'Fee Schedule'
+			and per.value_int = org.value_int
+			and org.value_int = insplan.value_text
+			and insplan.value_text = insprod.value_text (+)
+			UNION
+			select per.value_int as fs, 2 as fs_order
+			from person_attribute per, insurance_attribute insplan, insurance_attribute insprod
+			where per.parent_id = :1
+			and insplan.parent_id = :3
+			and insprod.parent_id (+)= :4
+			and per.item_name = 'Fee Schedule'
+			and insplan.item_name = 'Fee Schedule'
+			and insprod.item_name (+)= 'Fee Schedule'
+			and per.value_int = insplan.value_text
+			and insplan.value_text = insprod.value_text (+)
+			UNION
+			select org.value_int as fs, 3 as fs_order
+			from org_attribute org, insurance_attribute insplan, insurance_attribute insprod
+			where org.parent_id = :2
+			and insplan.parent_id = :3
+			and insprod.parent_id (+)= :4
+			and org.item_name = 'Fee Schedule'
+			and insplan.item_name = 'Fee Schedule'
+			and insprod.item_name (+)= 'Fee Schedule'
+			and org.value_int = insplan.value_text
+			and insplan.value_text = insprod.value_text (+)
+			UNION
+			select to_number(insplan.value_text) as fs, 4 as fs_order
+			from insurance_attribute insplan, insurance_attribute insprod
+			where insplan.parent_id = :3
+			and insprod.parent_id (+)= :4
+			and insplan.item_name = 'Fee Schedule'
+			and insprod.item_name (+)= 'Fee Schedule'
+			and insplan.value_text = insprod.value_text (+)
+			UNION
+			select to_number(insprod.value_text) as fs, 5 as fsOrder
+			from insurance_attribute insprod
+			where insprod.parent_id = :4
+			and insprod.item_name = 'Fee Schedule'
+			ORDER BY 2 asc
+			
+		</statement>
+
+		<statement name="selInvoice">
+			
+			select invoice.*, to_char(invoice_date, 'MM/DD/YYYY') as fmt_invoice_date
+			from invoice
+			where invoice_id = ?
+			
+		</statement>
+
+		<statement name="selInvoiceAddr">
+			
+			select *
+			from invoice_address
+			where parent_id = ?
+			and address_name = ?
+			
+		</statement>
+
+		<statement name="selInvoiceAndClaimType">
+			
+			select i.invoice_id, i.invoice_status, iis.caption as invoice_status_caption, i.invoice_type,
+			i.invoice_subtype, ct.caption as claim_type_caption, i.client_id,
+			i.claim_diags, i.total_items, i.total_cost, i.total_adjust, i.balance, i.client_id
+			from invoice i, claim_type ct, invoice_status iis
+			where i.invoice_id = ?
+			and i.invoice_subtype = ct.id (+)
+			and i.invoice_status = iis.id (+)
+			
+		</statement>
+
+		<statement name="selInvoiceAttr">
+			
+			select *
+			from invoice_attribute
+			where parent_id = ?
+			and item_name = ?
+			
+		</statement>
+
+		<statement name="selInvoiceAttrAssignment">
+			
+			select item_id as assignment_item_id, value_int as accept_assignment
+			from invoice_attribute
+			where parent_id = ?
+			and item_name = 'Assignment of Benefits'
+			
+		</statement>
+
+		<statement name="selInvoiceAttrCondition">
+			
+			select item_id as condition_item_id, value_text, value_textB
+			from invoice_attribute
+			where parent_id = ?
+			and item_name = 'Condition/Related To'
+			
+		</statement>
+
+		<statement name="selInvoiceAttrDisability">
+			
+			select item_id as disability_item_id, value_date as disability_begin_date, value_dateEnd as disability_end_date
+			from invoice_attribute
+			where parent_id = ?
+			and item_name = 'Patient/Disability/Dates'
+			
+		</statement>
+
+		<statement name="selInvoiceAttrHospitalization">
+			
+			select item_id as hospital_item_id, value_date as hospitalization_begin_date, value_dateEnd as hospitalization_end_date
+			from invoice_attribute
+			where parent_id = ?
+			and item_name = 'Patient/Hospitalization/Dates'
+			
+		</statement>
+
+		<statement name="selInvoiceAttrIllness">
+			
+			select item_id as illness_item_id, value_date as illness_begin_date, value_dateEnd as illness_end_date
+			from invoice_attribute
+			where parent_id = ?
+			and item_name = 'Patient/Illness/Dates'
+			
+		</statement>
+
+		<statement name="selInvoiceAttrIllnessDates">
+			
+			select value_date as similar_date, value_dateEnd as current_date
+			from invoice_attribute
+			where parent_id = ?
+			and item_name = 'Patient/Illness/Dates'
+			
+		</statement>
+
+		<statement name="selInvoiceAttrInfoRelease">
+			
+			select item_id as info_release_item_id, value_int as info_release
+			from invoice_attribute
+			where parent_id = ?
+			and item_name = 'Information Release/Indicator'
+			
+		</statement>
+
+		<statement name="selInvoiceAttrPatientSign">
+			
+			select item_id as signature_item_id, value_int as patient_signature
+			from invoice_attribute
+			where parent_id = ?
+			and item_name = 'Patient/Signature'
+			
+		</statement>
+
+		<statement name="selInvoiceAttrProvider">
+			
+			select value_text as complete_name, value_textb as provider_id
+			from invoice_attribute
+			where parent_id = ?
+			and item_name = 'Provider/Name/Last'
+			
+		</statement>
+
+		<statement name="selInvoiceAttrServFacility">
+			
+			select value_text as name_primary, value_textb as service_facility_id
+			from invoice_attribute
+			where parent_id = ?
+			and item_name = 'Service Provider/Facility/Service'
+			
+		</statement>
+
+		<statement name="selInvoiceAttributeById">
+			
+			select item_id, permissions, parent_id, item_type, item_name, value_type, value_text, value_textb, name_sort, value_int, value_intb, value_float, value_floatb,
+			to_char(value_date, 'MM/DD/YYYY') as value_date, to_char(value_dateEnd, 'MM/DD/YYYY') as value_dateend,
+			to_char(value_dateA, 'MM/DD/YYYY') as value_datea, to_char(value_dateB, 'MM/DD/YYYY') as value_dateb,
+			value_block
+			from invoice_attribute
+			where item_id = ?
+			
+		</statement>
+
+		<statement name="selInvoiceAuthNumber">
+			
+			select item_id as prior_auth_item_id, value_text as prior_auth
+			from invoice_attribute
+			where parent_id = ?
+			and item_name = 'Prior Authorization Number'
+			
+		</statement>
+
+		<statement name="selInvoiceBillingByInvoiceIdAndBillSeq">
+			
+			select *
+			from invoice_billing
+			where invoice_id = ?
+			and bill_sequence = ?
+			and invoice_item_id is NULL
+			
+		</statement>
+
+		<statement name="selInvoiceBillingCurrent">
+			
+			select *
+			from invoice_billing
+			where bill_id = ?
+			
+		</statement>
+
+		<statement name="selInvoiceBillingPrimary">
+			
+			select *
+			from invoice_billing
+			where invoice_id = ?
+			and bill_sequence = 1
+			and invoice_item_id is NULL
+			
+		</statement>
+
+		<statement name="selInvoiceBillingRecs">
+			
+			select bill_id, invoice_id, invoice_item_id, assoc_bill_id, bill_sequence, bill_party_type, bill_to_id, bill_ins_id, bill_amount,
+			bill_pct, to_char(bill_date, 'MM/DD/YYYY') as bill_date, bill_status, bill_result
+			from invoice_billing
+			where invoice_id = ?
+			order by bill_sequence
+			
+		</statement>
+
+		<statement name="selInvoiceByIdAndClient">
+			
+			select *
+			from invoice
+			where invoice_id = ?
+			and client_id = ?
+			
+		</statement>
+
+		<statement name="selInvoiceByStatusAndDateAndType">
+			
+			select 	invoice_id, invoice_status, client_id,
+			to_char(invoice_date, 'MM/DD/YYYY') as invoice_date,
+			balance, total_adjust
+			from invoice
+			where invoice_type = ?
+			and invoice_status &gt;= ?
+			and invoice_date ?
+			order by invoice_date desc
+			
+		</statement>
+
+		<statement name="selInvoiceByTypeAndMainTrans">
+			
+			select * from invoice
+			where invoice_type = ?
+			and main_transaction = ?
+			
+		</statement>
+
+		<statement name="selInvoiceConditionId">
+			
+			select id
+			from trans_related_to
+			where caption = ?
+			
+		</statement>
+
+		<statement name="selInvoiceDateDatabyID">
+			
+			SELECT 	invoice_id,parent_invoice_id,invoice_status,
+			to_char(invoice_date, 'MM/DD/YYYY') as invoice_date,
+			balance
+			FROM	invoice
+			WHERE	invoice_id = :1
+			
+		</statement>
+
+		<statement name="selInvoiceDeductible">
+			
+			select item_id as deduct_item_id, value_text as deduct_balance
+			from invoice_attribute
+			where parent_id = ?
+			and item_name = 'Patient/Deductible/Balance'
+			
+		</statement>
+
+		<statement name="selInvoiceDiags">
+			
+			select claim_diags as diagcodes
+			from invoice
+			where invoice_id = ?
+			
+		</statement>
+
+		<statement name="selInvoiceIdByEventId">
+			
+			select invoice_id
+			from invoice, transaction t
+			where t.parent_event_id = ?
+			and (t.trans_type between 2000 and 2999)
+			and t.trans_id = main_transaction
+			
+		</statement>
+
+		<statement name="selInvoiceItem">
+			
+			select parent_id, item_id, item_type, hcfa_service_place, hcfa_service_type, emergency, comments, caption, code, code_type, modifier, flags,
+			unit_cost, quantity, rel_diags, to_char(service_begin_date, 'MM/DD/YYYY') as service_begin_date, parent_code,
+			to_char(service_end_date, 'MM/DD/YYYY') as service_end_date, balance, total_adjust, extended_cost,
+			data_text_a, data_text_b, data_text_c, data_num_a, data_num_b, data_num_c
+			from invoice_item
+			where item_id = ?
+			
+		</statement>
+
+		<statement name="selInvoiceItemCount">
+			
+			select count(*) from Invoice_Item
+			where parent_id = ?
+			
+		</statement>
+
+		<statement name="selInvoiceItemCountByType">
+			
+			select count(*) from Invoice_Item
+			where parent_id = ?
+			and item_type = ?
+			
+		</statement>
+
+		<statement name="selInvoiceItems">
+			
+			select parent_id, item_id, item_type, hcfa_service_place, hcfa_service_type, emergency, comments, caption, code, code_type, modifier, flags,
+			unit_cost, quantity, rel_diags, to_char(service_begin_date, 'MM/DD/YYYY') as service_begin_date, parent_code,
+			to_char(service_end_date, 'MM/DD/YYYY') as service_end_date, balance, total_adjust, extended_cost,
+			data_text_a, data_text_b, data_text_c, data_num_a, data_num_b, data_num_c
+			from invoice_item
+			where parent_id = ?
+			
+		</statement>
+
+		<statement name="selInvoiceItemsByType">
+			
+			select parent_id, item_id, item_type, hcfa_service_place, hcfa_service_type, emergency, comments, caption, code, code_type, modifier, flags,
+			unit_cost, quantity, rel_diags, to_char(service_begin_date, 'MM/DD/YYYY') as service_begin_date, parent_code,
+			to_char(service_end_date, 'MM/DD/YYYY') as service_end_date, balance, total_adjust, extended_cost,
+			data_text_a, data_text_b, data_text_c, data_num_a, data_num_b, data_num_c
+			from invoice_item
+			where parent_id = ?
+			and item_type = ?
+			and data_text_b is NULL
+			
+		</statement>
+
+		<statement name="selInvoiceMainTransById">
+			
+			select main_transaction
+			from invoice
+			where invoice_id = ?
+			
+		</statement>
+
+		<statement name="selInvoiceMedicaidResubNumber">
+			
+			select item_id as resub_number_item_id, value_text as resub_number, value_textb as orig_ref
+			from invoice_attribute
+			where parent_id = ?
+			and item_name = 'Medicaid/Resubmission'
+			
+		</statement>
+
+		<statement name="selInvoiceOrder">
+			
+			select value_int
+			from invoice_attribute
+			where parent_id = ?
+			and item_name = 'Submission Order'
+			
+		</statement>
+
+		<statement name="selInvoiceOwner">
+			
+			select owner_id
+			from invoice
+			where invoice_id = ?
+			
+		</statement>
+
+		<statement name="selInvoiceProcedureItemCount">
+			
+			select count(*)
+			from Invoice_Item
+			where parent_id = ?
+			and item_type in (?,?)
+			
+		</statement>
+
+		<statement name="selInvoiceProcedureItems">
+			
+			select parent_id, item_id, item_type, hcfa_service_place, hcfa_service_type, emergency, comments, caption, code, code_type, modifier, flags,
+			unit_cost, quantity, rel_diags, to_char(service_begin_date, 'MM/DD/YYYY') as service_begin_date, parent_code,
+			to_char(service_end_date, 'MM/DD/YYYY') as service_end_date, balance, total_adjust, extended_cost,
+			data_text_a, data_text_b, data_text_c, data_num_a, data_num_b, data_num_c
+			from invoice_item
+			where parent_id = ?
+			and item_type in (?,?)
+			and data_text_b is NULL
+			
+		</statement>
+
+		<statement name="selInvoiceProviderIdentification">
+			
+			select item_id as ref_upin_item_id
+			from invoice_attribute
+			where parent_id = ?
+			and item_name = 'Ref Provider/Identification'
+			
+		</statement>
+
+		<statement name="selInvoiceProviderNameFirst">
+			
+			select item_id as ref_firstname_item_id, value_textB as ref_id
+			from invoice_attribute
+			where parent_id = ?
+			and item_name = 'Ref Provider/Name/First'
+			
+		</statement>
+
+		<statement name="selInvoiceProviderNameLast">
+			
+			select item_id as ref_lastname_item_id
+			from invoice_attribute
+			where parent_id = ?
+			and item_name = 'Ref Provider/Name/Last'
+			
+		</statement>
+
+		<statement name="selInvoiceProviderNameMiddle">
+			
+			select item_id as ref_middlename_item_id
+			from invoice_attribute
+			where parent_id = ?
+			and item_name = 'Ref Provider/Name/Middle'
+			
+		</statement>
+
+		<statement name="selInvoiceStatus">
+			
+			select invoice_status
+			from invoice
+			where invoice_id = ?
+			
+		</statement>
+
+		<statement name="selInvoiceTransaction">
+			
+			SELECT 1
+			FROM 	transaction t
+			WHERE 	t.service_facility_id = :1
+			AND	EXISTS
+			(
+			SELECT 	1
+			FROM 	invoice i ,invoice_attribute ia
+			WHERE 	i.main_transaction = t.trans_id
+			AND	ia.value_date &gt; to_date(:2,'MM/DD/YYYY')
+			AND	ia.value_date &lt; to_date(:3,'MM/DD/YYYY')
+			AND	ia.item_name IN('Invoice/Creation/Batch ID','Invoice/Payment/Batch ID')
+			)
+			
+		</statement>
+
+		<statement name="selInvoiceTypeForOrg">
+			
+			SELECT
+			i.invoice_id,
+			i.total_items,
+			TO_CHAR(MIN(iit.service_begin_date), 'MM/DD/YYYY') AS service_begin_date,
+			ist.caption as invoice_status,
+			ib.bill_to_id,
+			i.total_cost,
+			i.total_adjust,
+			i.balance,
+			i.client_id,
+			ib.bill_to_id,
+			o.org_id,
+			ib.bill_party_type,
+			i.invoice_status as status_id,
+			i.parent_invoice_id,
+			to_char(i.invoice_date, 'MM/DD/YYYY') as invoice_date,
+			trans.care_provider_id,
+			trans.provider_id,
+			trans.service_facility_id,
+			sf.org_id
+			FROM invoice i, invoice_status ist, invoice_billing ib, invoice_item iit, org o, transaction trans, org sf
+			WHERE
+			ib.bill_to_id = ?
+			AND i.main_transaction = trans.trans_id
+			AND trans.service_facility_id = sf.org_internal_id
+			AND iit.parent_id (+) = i.invoice_id
+			AND ib.bill_id (+) = i.billing_id
+			AND ist.id = i.invoice_status
+			AND to_char(o.org_internal_id (+)) = ib.bill_to_id
+			GROUP BY
+			i.invoice_id,
+			i.total_items,
+			ist.caption,
+			i.total_cost,
+			i.total_adjust,
+			i.balance,
+			i.client_id,
+			ib.bill_to_id,
+			o.org_id,
+			ib.bill_party_type,
+			i.invoice_status,
+			i.parent_invoice_id,
+			i.invoice_date,
+			trans.care_provider_id,
+			trans.provider_id,
+			trans.service_facility_id,
+			sf.org_id
+			ORDER BY i.invoice_id desc
+
+		</statement>
+
+		<statement name="selInvoicesByType">
+			
+			select * from invoice
+			where invoice_type = ?
+			
+		</statement>
+
+		<statement name="selItemAdjustments">
+			
+			select 	iia.adjustment_id, iia.adjustment_amount,	iia.payer_id, iia.payer_type, iia.plan_allow, iia.plan_paid, iia.deductible, iia.copay,
+			iia.submit_date, iia.pay_date, comments, pay_ref, pay_method as pay_method_id, writeoff_amount,
+			adjust_codes, net_adjust, data_text_a,
+			pat.caption as pay_type, adm.caption as adjustment_type,
+			pam.caption as pay_method, wt.caption as writeoff_code
+			from invoice_item_adjust iia, adjust_method adm, payment_type pat, payment_method pam, writeoff_type wt
+			where iia.parent_id = ?
+			and iia.writeoff_code = wt.id (+)
+			and iia.pay_method = pam.id (+)
+			and iia.adjustment_type = adm.id (+)
+			and iia.pay_type = pat.id (+)
+			
+		</statement>
+
+		<statement name="selItemAdjustmentsByInvoiceId">
+			
+			select iia.adjustment_id, iia.adjustment_amount, iia.payer_type, iia.payer_id, iia.refund_to_type, iia.refund_to_id, iia.parent_id,
+			iia.plan_allow, iia.plan_paid, iia.deductible, iia.copay, to_char(iia.pay_date, 'MM/DD/YYYY'),
+			iia.pay_type, iia.pay_method, iia.pay_ref, iia.writeoff_code, iia.writeoff_amount, iia.adjust_codes, iia.net_adjust,
+			iia.comments, iia.data_text_a, iia.data_text_b, iia.data_text_c, iia.data_num_a, iia.data_num_b, iia.data_num_c
+			from invoice_item_adjust iia, invoice_item ii, invoice i
+			where i.invoice_id = ?
+			and i.invoice_id = ii.parent_id
+			and ii.item_id = iia.parent_id
+			
+		</statement>
+
+		<statement name="selItemAdjustmentsByItemParent">
+			
+			select *
+			from invoice_item_adjust
+			where parent_id = ?
+			
+		</statement>
+
+		<statement name="selItemTypeCaption">
+			
+			select caption
+			from inv_item_type
+			where id = ?
+			
+		</statement>
+
+		<statement name="selLatestNextPayerTransferByInvoiceId">
+			
+			select iia.net_adjust, iia.adjustment_id
+			from invoice_item_adjust iia, invoice_item ii, invoice i
+			where i.invoice_id = :1
+			and i.invoice_id = ii.parent_id
+			and ii.item_id = iia.parent_id
+			and ii.item_type = 5
+			and iia.adjustment_type = 4
+			and ii.item_id = (select max(item_id) 
+			from invoice_item ii2, invoice_item_adjust iia2 
+			where i.invoice_id = :1 and i.invoice_id = ii2.parent_id and ii2.item_type = 5 and ii2.item_id = iia2.parent_id and iia2.adjustment_type = 4)
+			
+		</statement>
+
+		<statement name="selNextPayerTransferCount">
+			
+			select count(iia.adjustment_id)
+			from invoice_item_adjust iia, invoice_item ii, invoice i
+			where i.invoice_id = :1
+			and i.invoice_id = ii.parent_id
+			and ii.item_id = iia.parent_id
+			and ii.item_type = 5
+			and iia.adjustment_type = 4
+			
+		</statement>
+
+		<statement name="selNonVoidInvoiceTypeForClient">
+			
+			SELECT
+			i.invoice_id,
+			i.total_items,
+			TO_CHAR(MIN(iit.service_begin_date), 'MM/DD/YYYY') AS service_begin_date,
+			ist.caption as invoice_status,
+			ib.bill_to_id,
+			i.total_cost,
+			i.total_adjust,
+			i.balance,
+			i.client_id,
+			ib.bill_to_id,
+			o.org_id,
+			ib.bill_party_type,
+			i.invoice_status as status_id,
+			i.parent_invoice_id,
+			to_char(i.invoice_date, 'MM/DD/YYYY') as invoice_date,
+			trans.care_provider_id,
+			trans.provider_id,
+			trans.service_facility_id,
+			sf.org_id
+			FROM invoice i, invoice_status ist, invoice_billing ib, invoice_item iit, org o, transaction trans, org sf
+			WHERE
+			upper(client_id) = ? and invoice_status != 16 and (owner_type = 1 and owner_id = ?)
+			AND i.main_transaction = trans.trans_id
+			AND trans.service_facility_id = sf.org_internal_id
+			AND iit.parent_id (+) = i.invoice_id
+			AND ib.bill_id (+) = i.billing_id
+			AND ist.id = i.invoice_status
+			AND to_char(o.org_internal_id (+)) = ib.bill_to_id
+			GROUP BY
+			i.invoice_id,
+			i.total_items,
+			ist.caption,
+			i.total_cost,
+			i.total_adjust,
+			i.balance,
+			i.client_id,
+			ib.bill_to_id,
+			o.org_id,
+			ib.bill_party_type,
+			i.invoice_status,
+			i.parent_invoice_id,
+			i.invoice_date,
+			trans.care_provider_id,
+			trans.provider_id,
+			trans.service_facility_id,
+			sf.org_id
+			ORDER BY i.invoice_id desc
+
+		</statement>
+
+		<statement name="selPaperClaims">
+			
+			SELECT Invoice.invoice_id
+			FROM Insurance, Invoice_Billing, Invoice
+			WHERE owner_id = :1
+			and invoice_status = 4
+			and invoice_subtype != 0
+			and invoice_subtype != 7
+			and Invoice_Billing.bill_id = Invoice.billing_id
+			and Insurance.ins_internal_id = Invoice_Billing.bill_ins_id
+			and (Insurance.remit_type is NULL or Insurance.remit_type = 0)
+			ORDER BY 1
+			
+		</statement>
+
+		<statement name="selParentInvoices">
+			
+			select p1.parent_invoice_id as parent1, p2.parent_invoice_id as parent2, p3.parent_invoice_id as parent3
+			from invoice p1, invoice p2, invoice p3
+			where p1.invoice_id = ?
+			and p2.invoice_id = p1.parent_invoice_id
+			and p3.invoice_id (+) = p2.parent_invoice_id
+			
+		</statement>
+
+		<statement name="selPayMethodCaption">
+			
+			select caption
+			from payment_method
+			where id = ?
+			
+		</statement>
+
+		<statement name="selPayTypeCaption">
+			
+			select caption
+			from payment_type
+			where id = ?
+			
+		</statement>
+
+		<statement name="selPaymentMethod">
+			
+			select caption
+			from Payment_Method
+			UNION
+			select 'Payment'
+			from dual
+			
+		</statement>
+
+		<statement name="selPostSubmitAttributes">
+			
+			select item_id, parent_id, item_type, item_name, value_type, value_text, value_textB, value_int, value_intB, value_float, value_floatB,
+			to_char(value_date, 'MM/DD/YYYY'), to_char(value_dateEnd, 'MM/DD/YYYY'),
+			to_char(value_dateA, 'MM/DD/YYYY'), to_char(value_dateB, 'MM/DD/YYYY'),
+			value_block
+			from invoice_attribute
+			where parent_id = ?
+			and value_intB = 1
+			and item_name not like 'Invoice/TWCC%'
+			
+		</statement>
+
+		<statement name="selProcedure">
+			
+			select item_type, code as procedure, code_type, modifier as procmodifier, unit_cost as proccharge,
+			quantity as procunits, emergency as emg, comments, flags, parent_code,
+			data_text_a, data_text_b, data_text_c, data_num_a, data_num_b, data_num_c,
+			rel_diags as procdiags, hcfa_service_place as servplace, hcfa_service_type as servtype,
+			to_char(service_begin_date, 'MM/DD/YYYY') as service_begin_date,
+			to_char(service_end_date, 'MM/DD/YYYY') as service_end_date
+			from invoice_item
+			where item_id = ?
+			
+		</statement>
+
+		<statement name="selRelDiags">
+			
+			select rel_diags from invoice_item
+			where item_id = ?
+			
+		</statement>
+
+		<statement name="selReverseNextPayerTransferCount">
+			
+			select count(iia.adjustment_id)
+			from invoice_item_adjust iia, invoice_item ii, invoice i
+			where i.invoice_id = :1
+			and i.invoice_id = ii.parent_id
+			and ii.item_id = iia.parent_id
+			and ii.item_type = 5
+			and iia.adjustment_type = 5
+			
+		</statement>
+
+		<statement name="selSelfPayOutstandingInvoicesByClient">
+			
+			select i.invoice_id, i.balance, inv_stat.caption as status_caption
+			from invoice_status inv_stat, invoice i
+			where i.balance &gt; 0
+			and i.client_id = ?
+			and i.owner_id = ?
+			and i.invoice_status != 15
+			and i.invoice_status != 16
+			and i.invoice_subtype = 0
+			and i.invoice_status = inv_stat.id (+)
+			
+		</statement>
+
+		<statement name="selServiceDateRangeForAllItems">
+			
+			select to_char(least(service_begin_date), 'MM/DD/YYYY') as service_begin_date,
+			to_char(greatest(service_end_date), 'MM/DD/YYYY') as service_end_date
+			from invoice_item
+			where parent_id = ?
+			
+		</statement>
+
+		<statement name="selServiceOrgByInvoiceId">
+			
+			SELECT	t.service_facility_id
+			FROM	transaction t, invoice i
+			WHERE	i.invoice_id = :1
+			AND	i.main_transaction = t.trans_id
+			
+		</statement>
+
+		<statement name="selStatusList">
+			
+			select id, caption
+			from invoice_status
+			
+		</statement>
+
+		<statement name="selTotalPatientBalance">
+			
+			select sum(balance)
+			from invoice
+			where client_id = ?
+			and owner_id = ?
+			and invoice_status != 16
+			and invoice_status != 15
+			
+		</statement>
+
+		<statement name="selTransferredPaymentsFromChild">
+			
+			select iia.net_adjust, iia.adjustment_id, iia.data_num_a
+			from invoice_item_adjust iia, invoice_item ii, invoice i
+			where i.invoice_id = ?
+			and i.invoice_id = ii.parent_id
+			and ii.item_id = iia.parent_id
+			and iia.adjustment_type = 7
+			
+		</statement>
+
+		<statement name="selWriteoffTypes">
+			
+			select caption, id
+			from writeoff_type
+			
+		</statement>
+
+		<statement name="sel_defaultInvoiceItemDate">
+			
+			select to_char(cr_stamp, 'MM/DD/YYYY') from Invoice_Item
+			where item_id = ?
+			
+		</statement>
+
+		<statement name="sel_previousBalance">
+			
+			select upper(client_id) as client_id, sum(balance) as balance
+			from Invoice
+			where upper(client_id) = (select client_id from Invoice where invoice_id = ?)
+			and invoice_id != ?
+			and balance &gt; 0
+			group by upper(client_id)
+			
+		</statement>
+
+	</sql-statements>
+</xaf>

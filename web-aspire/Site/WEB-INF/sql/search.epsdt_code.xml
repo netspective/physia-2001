@@ -1,0 +1,50 @@
+<?xml version="1.0"?>
+
+<xaf>
+	<sql-statements package="search.epsdt_code">
+		<statement name="id">
+			App::Statements::Search::Code
+		</statement>
+
+		<statement name="sel_epsdt_code">
+			
+			SELECT epsdt,name,description
+			FROM ref_epsdt
+			WHERE
+			epsdt = ?
+			AND rownum &lt; 250
+
+		</statement>
+
+		<statement name="sel_epsdt_code_like">
+			
+			SELECT epsdt,name,description
+			FROM ref_epsdt
+			WHERE
+			epsdt like ?
+			AND rownum &lt; 250
+
+		</statement>
+
+		<statement name="sel_epsdt_description">
+			
+			SELECT epsdt,name,description
+			FROM ref_epsdt
+			WHERE
+			upper(desciption) = ?
+			AND rownum &lt; 250
+
+		</statement>
+
+		<statement name="sel_epsdt_description_like">
+			
+			SELECT epsdt,name,description
+			FROM ref_epsdt
+			WHERE
+			upper(description) like ?
+			AND rownum &lt; 250
+
+		</statement>
+
+	</sql-statements>
+</xaf>

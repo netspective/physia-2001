@@ -1,0 +1,76 @@
+<?xml version="1.0"?>
+
+<xaf>
+	<sql-statements package="search.fee_procedure_code">
+		<statement name="id">
+			App::Statements::Search::FeeProcedure
+		</statement>
+
+		<statement name="sel_fee_procedure_code">
+			
+			SELECT oce.code,oce.name ,oce.description,ce.caption ,oc.catalog_id
+			FROM Offering_Catalog_Entry oce,Offering_Catalog oc,catalog_entry_type ce
+			WHERE oce.catalog_id = oc.internal_catalog_id 
+			AND oce.entry_type = ce.id
+			AND oc.internal_catalog_id = ?
+			AND code = ?
+			
+		</statement>
+
+		<statement name="sel_fee_procedure_code_like">
+			
+			SELECT oce.code,oce.name ,oce.description,ce.caption ,oc.catalog_id
+			FROM Offering_Catalog_Entry oce,Offering_Catalog oc,catalog_entry_type ce
+			WHERE oce.catalog_id = oc.internal_catalog_id 
+			AND oce.entry_type = ce.id
+			AND oc.internal_catalog_id = ?
+			AND code like ?
+			
+		</statement>
+
+		<statement name="sel_fee_procedure_description">
+			
+			SELECT oce.code,oce.name ,oce.description,ce.caption ,oc.catalog_id
+			FROM Offering_Catalog_Entry oce,Offering_Catalog oc,catalog_entry_type ce
+			WHERE oce.catalog_id = oc.internal_catalog_id 
+			AND oce.entry_type = ce.id
+			AND oc.internal_catalog_id = ?
+			AND UPPER(oce.description) = ?
+			
+		</statement>
+
+		<statement name="sel_fee_procedure_description_like">
+			
+			SELECT oce.code,oce.name ,oce.description,ce.caption ,oc.catalog_id
+			FROM Offering_Catalog_Entry oce,Offering_Catalog oc,catalog_entry_type ce
+			WHERE oce.catalog_id = oc.internal_catalog_id 
+			AND oce.entry_type = ce.id
+			AND oc.internal_catalog_id = ?
+			AND UPPER(oce.description) like ?
+			
+		</statement>
+
+		<statement name="sel_fee_procedure_name">
+			
+			SELECT oce.code,oce.name ,oce.description,ce.caption ,oc.catalog_id
+			FROM Offering_Catalog_Entry oce,Offering_Catalog oc,catalog_entry_type ce
+			WHERE oce.catalog_id = oc.internal_catalog_id 
+			AND oce.entry_type = ce.id
+			AND oc.internal_catalog_id = ?
+			AND UPPER(oce.name) = ?
+			
+		</statement>
+
+		<statement name="sel_fee_procedure_name_like">
+			
+			SELECT oce.code,oce.name ,oce.description,ce.caption ,oc.catalog_id
+			FROM Offering_Catalog_Entry oce,Offering_Catalog oc,catalog_entry_type ce
+			WHERE oce.catalog_id = oc.internal_catalog_id 
+			AND oce.entry_type = ce.id
+			AND oc.internal_catalog_id = ?
+			AND UPPER(oce.name) like ?
+			
+		</statement>
+
+	</sql-statements>
+</xaf>

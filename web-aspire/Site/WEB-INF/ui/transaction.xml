@@ -1,0 +1,204 @@
+<?xml version="1.0"?>
+
+<xaf>
+	<dialogs package="transaction">
+		<dialog name="medication_current" heading="$Command Current Medication">
+			<field.select caption="Medication Type" required="yes" name="trans_type"/>
+			<!--  -->
+			<field.date caption="Start Date" max-length="50" name="trans_begin_stamp" size="12"/>
+			<field.memo caption="Name of Medication" name="caption" size="24"/>
+			<field.memo caption="Dosage" name="data_text_a" size="24"/>
+			<field.memo caption="Instructions" name="detail" size="24"/>
+			<field.memo caption="Notes" name="data_text_b" size="24"/>
+
+		</dialog>
+
+		<dialog name="alert_person" heading="$Command Alert">
+			<field.composite caption="*"  name="text_field">
+				<field.date caption="Begin Alert" max-length="10" name="trans_begin_stamp" size="10"/>
+				<field.date caption="End Alert" max-length="10" name="trans_end_stamp" size="10"/>
+			</field.composite>
+			<field.select caption="Type" required="yes" name="trans_type"/>
+			<!--  -->
+			<field.select caption="Accounting Alert"  name="data_text_a" choices="	Bad Address='Bad Address', 				Returned Check='Returned Check', 				Dismissed='Dismissed', 				Collection Agency='Collection Agency', 				Bankruptcy='Bankruptcy', 				In House Collections='In House Collections', 				Incorrect Insurance='Incorrect Insurance', 				Payment Plan='Payment Plan',"/>
+			<!--  -->
+			<field.select caption="Priority" required="yes" name="trans_subtype"/>
+			<!--  -->
+			<field.text caption="Caption" required="yes" name="caption"/>
+			<field.memo caption="Details" name="detail" size="24"/>
+			<field.text caption="Staff Member" required="yes" max-length="16" name="initiator_id" size="16"/>
+			<field.select caption="Alert Status" required="yes" name="trans_status" choices="Active=2, InActive=3" style="radio"/>
+			<!--  -->
+
+		</dialog>
+
+		<dialog name="close_date" heading="Close Date">
+			<field.text caption="Organization ID" required="yes" max-length="16" name="org_id" size="16"/>
+			<field.date caption="Close Date" hint="Only batch date(s) greater than the Close Date will be valid" max-length="10" name="close_date" size="10"/>
+			<field.boolean caption="Set Close Date"  name="create_record" style="check"/>
+			<field.select caption="Apply to Child Organizations" required="yes" name="children" choices="Yes=1;No=0" style="radio"/>
+			<!--  -->
+			<field.boolean caption="Run Close Date Report"  name="run_report" style="check"/>
+
+		</dialog>
+
+		<dialog name="close_account" heading="Close Account">
+			<field.text caption="Person ID" read-only="yes" name="person_id"/>
+			<field.select caption="notes"  name="notes" choices="Retain Notes=0;Delete Notes=1" style="radio"/>
+			<!--  -->
+
+		</dialog>
+
+		<dialog name="referralworkflow" heading="referralworkflow">
+
+		</dialog>
+
+		<dialog name="reck_date" heading="Account Reck Date">
+			<field.memo caption="Person ID" name="person_id" size="24"/>
+			<field.date caption="Reck Date" name="reckdate" size="12"/>
+
+		</dialog>
+
+		<dialog name="refill_request" heading="$Command Refill Request">
+			<field.memo caption="Refill" name="refill" size="24"/>
+			<field.date caption="Date" name="refilldate" size="12"/>
+			<field.text caption="Physician" required="yes" hint="Physician approving the refill." max-length="16" name="provider" size="16"/>
+			<field.text caption="Refill Processor" required="yes" hint="Person processing the refill." max-length="16" name="filler" size="16"/>
+			<field.memo caption="Comments" name="comments" size="24"/>
+			<field.select caption="Status"  name="status" choices="Pending;Filled;Denied" style="radio"/>
+			<!--  -->
+
+		</dialog>
+
+		<dialog name="hospitalization" heading="$Command Hospitalization">
+			<field.text caption="Patient ID" required="yes" max-length="16" name="patient_id" size="16"/>
+			<field.select caption="Type" required="yes" name="trans_type"/>
+			<!--  -->
+			<field.composite caption="Admission/Discharge Dates"  name="hosp_dates">
+				<field.date caption="Admission Date" name="trans_begin_stamp" size="12"/>
+				<field.date caption="Discharge Date" name="trans_end_stamp" size="12"/>
+			</field.composite>
+			<field.integer caption="Duration of Stay" required="yes" hint="Days" max-length="4" name="data_num_a" size="4"/>
+			<field.select caption="Hospital"  name="service_facility_id" choices="query:dialog.stmt19"/>
+			<!--  numPackages="0" pkgList="" stmtNum="19" -->
+			<field.text caption="Room Number"  name="caption"/>
+			<field.text caption="Physician ID"  max-length="16" name="provider_id" size="16"/>
+			<field.select caption="In/Out Patient"  name="data_text_a" choices="In;Out"/>
+			<!--  -->
+			<field.text caption="Procedures"  hint="Enter CPT codes in a comma separated list" name="data_text_c"/>
+			<field.text caption="ICD-9 Codes"  hint="Enter ICD-9 codes in a comma separated list" name="detail"/>
+			<field.text caption="Prior Authorization"  name="auth_ref"/>
+			<field.text caption="Consulting Physician ID"  max-length="16" name="consult_id" size="16"/>
+			<field.text caption="Referring Physician ID"  max-length="16" name="data_text_b" size="16"/>
+
+		</dialog>
+
+		<dialog name="phone_message" heading="$Command Phone Message">
+			<field.text hidden="yes" name="patient_phone_message" caption="patient_phone_message"/>
+			<field.text caption="Call From" required="yes" max-length="16" name="person_called" size="16"/>
+			<field.text caption="Call For" required="yes" max-length="16" name="provider" size="16"/>
+			<field.text caption="Date and Time of Calling" required="yes" name="time"/>
+			<field.memo caption="Phone Message" name="phone_message" size="24"/>
+			<field.memo caption="Comments" name="responsemessage" size="24"/>
+			<field.select caption="Status"  name="status" choices="Not Read;Read" style="radio"/>
+			<!--  -->
+			<field.boolean caption="Deliver With Medical Record"  name="data_num_b" style="check"/>
+			<field.select caption="Printer" prepend-blank="yes" name="printerQueue" choices="query:device.sel_org_devices"/>
+			<!--  -->
+
+		</dialog>
+
+		<dialog name="tests" heading="$Command Tests/Measurements">
+			<field.datetime caption="TestDate" name="trans_begin_stamp" size="20"/>
+			<field.text caption="Height"  name="height_value"/>
+			<field.text caption="Weight"  name="weight_value"/>
+			<field.memo caption="Diet" name="diet_value" size="24"/>
+			<field.text caption="Blood Sugar"  name="blood_sugar_value"/>
+			<field.memo caption="Exercise" name="exercise_value" size="24"/>
+			<field.text caption="Stress"  name="stress_value"/>
+			<field.text caption="Blood Pressure"  name="blood_pressure_value"/>
+			<field.text caption="Cholesterol"  name="cholesterol_value"/>
+
+		</dialog>
+
+		<dialog name="medication_prescribe" heading="$Command Prescription">
+			<field.select caption="Medication Type" required="yes" name="trans_type"/>
+			<!--  -->
+			<field.date caption="Start Date" max-length="50" name="trans_begin_stamp" size="12"/>
+			<field.memo caption="Name of Medication" name="caption" size="24"/>
+			<field.memo caption="Dosage" name="data_text_a" size="24"/>
+			<field.memo caption="Instructions" name="detail" size="24"/>
+			<field.memo caption="Notes" name="data_text_b" size="24"/>
+
+		</dialog>
+
+		<dialog name="account_notes" heading="$Command Account Notes">
+			<field.text caption="Person ID" read-only="yes" max-length="16" name="person_id" size="16"/>
+			<field.memo caption="Notes" name="detail" size="24"/>
+			<field.date caption="Date" name="trans_begin_stamp" size="12"/>
+
+		</dialog>
+
+		<dialog name="on_call" heading="$Command On Call Note">
+			<field.text caption="Patient ID" required="yes" max-length="16" name="person_id" size="16"/>
+			<field.text caption="On Call Physician ID" required="yes" max-length="16" name="physician_id" size="16"/>
+			<field.text caption="Patient's Regular Physician ID"  max-length="16" name="reg_physician_id" size="16"/>
+			<field.datetime caption="Date and Time of encounter" name="begin_stamp" size="20"/>
+			<field.select caption="Reason" prepend-blank="yes" name="reason" choices="Needs refill;Problem with medication;Having pain"/>
+			<!--  -->
+			<field.memo caption="Reason Details" name="other_reason" size="24"/>
+			<field.select caption="Action" prepend-blank="yes" name="action" choices="Call Office in AM;Follow up in office on (date or day of week);Go to ER;Stop present medications;Take Over the Counter Medication"/>
+			<!--  -->
+			<field.memo caption="Action Details" name="other_action" size="24"/>
+
+		</dialog>
+
+		<dialog name="alert_org" heading="$Command Alert">
+			<field.composite caption="*"  name="text_field">
+				<field.date caption="Begin Alert" max-length="10" name="trans_begin_stamp" size="10"/>
+				<field.date caption="End Alert" max-length="10" name="trans_end_stamp" size="10"/>
+			</field.composite>
+			<field.select caption="Type" required="yes" name="trans_type"/>
+			<!--  -->
+			<field.select caption="Accounting Alert"  name="data_text_a" choices="	Bad Address='Bad Address', 				Returned Check='Returned Check', 				Dismissed='Dismissed', 				Collection Agency='Collection Agency', 				Bankruptcy='Bankruptcy', 				In House Collections='In House Collections', 				Incorrect Insurance='Incorrect Insurance', 				Payment Plan='Payment Plan',"/>
+			<!--  -->
+			<field.select caption="Priority" required="yes" name="trans_subtype"/>
+			<!--  -->
+			<field.text caption="Caption" required="yes" name="caption"/>
+			<field.memo caption="Details" name="detail" size="24"/>
+			<field.text caption="Staff Member" required="yes" max-length="16" name="initiator_id" size="16"/>
+			<field.select caption="Alert Status" required="yes" name="trans_status" choices="Active=2, InActive=3" style="radio"/>
+			<!--  -->
+
+		</dialog>
+
+		<dialog name="activeproblems_trans" heading="$Command Transient Diagnosis">
+
+		</dialog>
+
+		<dialog name="transfer_account" heading="Transfer Account">
+			<field.text caption="Person ID" read-only="yes" name="person_id"/>
+			<field.text caption="Transfer To" required="yes" hint="Collector to Transfer Account" max-length="16" name="transfer_id" size="16"/>
+			<field.memo caption="Reason For Transfer" name="detail" size="24"/>
+			<field.date caption="Date" name="trans_begin_stamp" size="12"/>
+
+		</dialog>
+
+		<dialog name="activeproblems_perm" heading="$Command Permanent Diagnosis">
+
+		</dialog>
+
+		<dialog name="activeproblems_icd" heading="$Command ICD Code">
+
+		</dialog>
+
+		<dialog name="activeproblems_notes" heading="$Command Permanent Diagnosis">
+
+		</dialog>
+
+		<dialog name="activeproblems_surgical" heading="$Command Surgical Procedure">
+
+		</dialog>
+
+	</dialogs>
+</xaf>

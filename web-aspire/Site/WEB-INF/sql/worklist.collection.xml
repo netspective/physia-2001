@@ -1,0 +1,1189 @@
+<?xml version="1.0"?>
+
+<xaf>
+	<sql-statements package="worklist.collection">
+		<statement name="TranAccountNotesById">
+			
+			update transaction set provider_id = :1
+			where provider_id = :2 and
+			trans_owner_id = :3 and
+			trans_type=9500
+			
+		</statement>
+
+		<statement name="TranCollectionById">
+			
+			INSERT INTO TRANSACTION	(trans_owner_id,caption,provider_id,trans_owner_type,trans_begin_stamp,trans_type,
+			trans_subtype,trans_status,initiator_type,initiator_id,billing_facility_id,cr_session_id,
+			cr_user_id,cr_org_internal_id,trans_status_reason,data_num_a,trans_invoice_id) 
+			SELECT 	trans_owner_id,'Account Owner',:3,trans_owner_type,trans_begin_stamp,trans_type,
+			trans_subtype,trans_status,initiator_type,:2,billing_facility_id,:4,:5,:6,:7,data_num_a,trans_invoice_id
+			FROM 	transaction
+			WHERE	trans_owner_id = :1 
+			AND	provider_id = :2
+			AND	trans_owner_type= 0
+			AND	trans_type = 9520
+			AND	trans_subtype = 'Owner'
+			AND	trans_status =2	
+			AND NOT EXIST
+			(SELECT trans_owner_id
+			FROM transaction
+			WHERE	trans_owner_id = :1 
+			AND	provider_id = :3
+			AND	trans_owner_type= 0
+			AND	trans_type = 9520
+			AND	trans_subtype = 'Owner'
+			AND	trans_status =2				
+			) 
+			
+		</statement>
+
+		<statement name="TransHistoryRecord">
+			
+			INSERT INTO Trans_Attribute (parent_id, item_type,item_name,value_type,value_text,cr_session_id,
+			cr_user_id,cr_org_internal_id,value_int)		
+			SELECT	trans_id,1,'Account/Transfer/History',0,:3,:4,:5,:6,data_num_a
+			FROM	transaction
+			WHERE	trans_owner_id = :1 
+			AND	provider_id = :2
+			AND	trans_owner_type= 0
+			AND	trans_type = 9520
+			AND	trans_subtype = 'Owner'
+			AND	trans_status =2	;
+			
+		</statement>
+
+		<statement name="closeCollectionById">
+			
+			UPDATE 	transaction
+			SET 	trans_status = 3,
+			trans_subtype = 'Account Closed',
+			trans_status_reason = :1
+			WHERE	trans_owner_id = :2
+			AND trans_status = 2
+			AND trans_type = 9520
+			AND provider_id = :3
+			
+		</statement>
+
+		<statement name="closeInvoiceCollection">
+			
+			UPDATE 	Invoice_Worklist
+			SET 	worklist_status = 'Account Closed'
+			WHERE 	invoice_id=:1
+			AND 	responsible_id = :2
+			AND 	org_internal_id = :3
+			AND	worklist_type='Collection'
+			AND	worklist_status='Account In Collection'	
+			
+		</statement>
+
+		<statement name="delAccountNotesById">
+			
+			UPDATE 	transaction set trans_status = 3
+			WHERE	provider_id = :1 
+			AND	trans_owner_id = :2 
+			AND	trans_type=9500
+			
+		</statement>
+
+		<statement name="delCollectionById">
+			
+			UPDATE 	transaction
+			SET 	trans_subtype = 'Account Transfered',
+			caption ='Transfer Account',
+			trans_status_reason = :1
+			WHERE	trans_owner_id = :2
+			AND 	trans_status = 2
+			AND 	trans_type = 9520
+			AND 	provider_id = :3
+			
+		</statement>
+
+		<statement name="delReckDateById">
+			
+			UPDATE 	transaction 
+			SET 	trans_status = 3
+			WHERE 	trans_type = 9510 
+			AND	trans_owner_id = :1 
+			AND	provider_id = :2		
+			
+		</statement>
+
+		<statement name="delTransferColl">
+			
+			UPDATE 	transaction
+			SET 	trans_status = 3,
+			trans_subtype = 'Account Closed',
+			trans_status_reason = :1
+			WHERE	trans_id in
+			(SELECT parent_id
+			FROM 	transaction t, trans_attribute ta
+			WHERE 	ta.parent_id = t,trans_id
+			AND	t.trans_subtype = 'Account Transfered'
+			AND	t.trans_status = 2
+			AND	t.trans_type = 9520
+			AND	trans_owner_id = :2
+			AND trans_status = 2
+			AND trans_type = 9520
+			AND provider_id = :3
+			)
+			
+		</statement>
+
+		<statement name="del_worklist_associated_physicians">
+			
+			delete from Person_Attribute
+			where parent_id = :1
+			and parent_org_id = :2
+			and value_type = 250
+			and item_name = :3
+			
+		</statement>
+
+		<statement name="del_worklist_associated_products">
+			
+			delete from Person_Attribute
+			where parent_id = :1
+			and parent_org_id = :2
+			and value_type = 110
+			and item_name = :3
+			
+		</statement>
+
+		<statement name="del_worklist_balance_age_range">
+			
+			delete from Person_Attribute
+			where parent_id = :1
+			and parent_org_id = :2
+			and value_type = 110
+			and item_name = :3
+			
+		</statement>
+
+		<statement name="del_worklist_balance_amount_range">
+			
+			delete from Person_Attribute
+			where parent_id = :1
+			and parent_org_id = :2
+			and value_type = 120
+			and item_name = :3
+			
+		</statement>
+
+		<statement name="del_worklist_claim_status">
+			
+			delete from Person_Attribute
+			where parent_id = :1
+			and parent_org_id = :2
+			and item_name = :3
+			
+		</statement>
+
+		<statement name="del_worklist_lastname_range">
+			
+			delete from Person_Attribute
+			where parent_id = :1
+			and parent_org_id = :2
+			and value_type = 0
+			and item_name = :3
+			
+		</statement>
+
+		<statement name="del_worklist_orgvalue">
+			
+			delete from Person_Attribute
+			where 
+			parent_id = :1
+			and parent_org_id = :2
+			and value_type = 252
+			and item_name = :3
+			
+		</statement>
+
+		<statement name="del_worklist_person_assoc">
+			
+			delete from Person_Attribute
+			where parent_id = ?
+			and value_type = 250
+			and item_name = ?
+			
+		</statement>
+
+		<statement name="del_worklist_textvalue">
+			
+			delete from Person_Attribute
+			where parent_id = ?
+			and value_type = 0
+			and item_name = ?
+			
+		</statement>
+
+		<statement name="id">
+			App::Statements::Worklist::WorklistCollection
+		</statement>
+
+		<statement name="isOnCollectionWorklist">
+			
+			SELECT owner_id
+			FROM 	Invoice_Worklist
+			WHERE 	invoice_id=:1
+			AND 	owner_id = :2
+			AND 	org_internal_id = :3
+			AND	worklist_type='Collection'
+			AND	worklist_status='Account In Collection'	
+			
+		</statement>
+
+		<statement name="moveCollectionRecord">
+			
+			Insert into Invoice_Worklist (
+			owner_id,
+			responsible_id,
+			person_id,
+			invoice_id,
+			data_date_a,
+			comments,
+			org_internal_id,
+			worklist_status,
+			worklist_type)
+			SELECT :4,
+			:4,
+			person_id,
+			invoice_id,
+			data_date_a,
+			comments,
+			org_internal_id,
+			worklist_status,
+			worklist_type		
+			FROM 	Invoice_Worklist
+			WHERE 	invoice_id=:1
+			AND 	owner_id = :2
+			AND	responsible_id =:2
+			AND 	org_internal_id = :3
+			AND	worklist_type='Collection'
+			AND	worklist_status='Account In Collection'	
+			AND	rownum &lt; 2
+			
+		</statement>
+
+		<statement name="pullCollectorRecords">
+			
+			Insert into Invoice_Worklist (
+			owner_id,
+			responsible_id,
+			person_id,
+			invoice_id,
+			data_date_a,
+			comments,
+			org_internal_id,
+			worklist_status,
+			worklist_type)
+			SELECT 	
+			:8,
+			:8, 
+			p.person_id,
+			i.invoice_id,
+			(	select min(e.start_time)
+			from event e, event_attribute ea
+			where ea.value_text = p.person_id
+			and ea.item_name = 'Appointment' 
+			and ea.value_type = 333
+			and e.event_id = ea.parent_id
+			and e.start_time - to_date(:9,'MM/DD/YYYY') &gt;=0			
+			)as appt,				
+			(SELECT MIN(iia.comments) FROM invoice_item_adjust iia WHERE parent_id =
+			(SELECT MIN(item_id) FROM invoice_item ii WHERE ii.parent_id = i.invoice_id AND
+			ii.item_type in (0,1,2) )
+			) as description,:7,'Account In Collection','Collection'
+			FROM 	person p ,invoice i , transaction t
+			WHERE	upper(substr(p.name_last,1,1)) between upper(:1) 
+			AND	upper(:2)
+			AND	i.client_id = p.person_id
+			AND	i.balance between (:3) 
+			AND	(:4)
+			AND	i.invoice_date between to_date(:5,'MM/DD/YYYY')
+			AND	to_date(:6,'MM/DD/YYYY')		
+			AND	i.invoice_status not in (15,16)			
+			AND 	t.trans_id = i.main_transaction
+			AND EXISTS
+			(
+			SELECT 	1
+			FROM 	person_attribute
+			WHERE	item_name = 'WorkList-Collection-Setup-Org'
+			AND	value_text = t.service_facility_id 
+			AND 	parent_id = :8
+			AND	parent_org_id = :7
+			)
+			AND EXISTS
+			(
+			SELECT 	1 
+			FROM 	person_org_category poc
+			WHERE 	p.person_id = poc.person_id
+			AND	poc.org_internal_id = :7			
+			)
+			AND EXISTS
+			(	
+			SELECT 	1
+			FROM	person_attribute pa,invoice_billing ib
+			WHERE	pa.item_name = 'WorkList-Collection-Setup-Product'
+			AND	i.billing_id = ib.bill_id
+			AND 	parent_id = :8
+			AND	pa.parent_org_id = :7			
+			AND	(
+			ib.bill_party_type IN (0,1) 
+			OR
+			EXISTS
+			(
+			SELECT 1 
+			FROM 	insurance coverage,insurance prod_plan 
+			WHERE	ib.bill_ins_id = coverage.ins_internal_id
+			AND	prod_plan.ins_internal_id = coverage.parent_ins_id
+			AND	
+			(
+			(prod_plan.ins_internal_id = pa.value_int AND prod_plan.record_type =1)
+			OR prod_plan.parent_ins_id = pa.value_int
+			)					 	
+			)
+			)
+			)
+			AND EXISTS
+			(
+			SELECT 	1
+			FROM	person_attribute
+			WHERE	item_name = 'WorkList-Collection-Setup-Physician'
+			AND	value_text = t.provider_id 
+			AND 	parent_id = :8
+			AND	parent_org_id = :7						
+			)						
+			AND NOT EXISTS
+			(
+			SELECT 	1
+			FROM 	Invoice_Worklist
+			WHERE 	owner_id = :8			
+			AND	org_internal_id = :7
+			AND	worklist_status = 'Account In Collection'
+			AND	worklist_type = 'Collection'		
+			AND	invoice_id = i.invoice_id
+			)	
+			AND	i.owner_id = :7
+			AND	ROWNUM&lt;=:10			
+
+		</statement>
+
+		<statement name="pullCollectorRecordsNoProducts">
+			
+			Insert into Invoice_Worklist (
+			owner_id,
+			responsible_id,
+			person_id,
+			invoice_id,
+			data_date_a,
+			comments,
+			org_internal_id,
+			worklist_status,
+			worklist_type)
+			SELECT 	
+			:8,
+			:8, 
+			p.person_id,
+			i.invoice_id,
+			(	select min(e.start_time)
+			from event e, event_attribute ea
+			where ea.value_text = p.person_id
+			and ea.item_name = 'Appointment' 
+			and ea.value_type = 333
+			and e.event_id = ea.parent_id
+			and e.start_time - to_date(:9,'MM/DD/YYYY') &gt;=0			
+			)as appt,				
+			(SELECT MIN(iia.comments) FROM invoice_item_adjust iia WHERE parent_id =
+			(SELECT MIN(item_id) FROM invoice_item ii WHERE ii.parent_id = i.invoice_id AND
+			ii.item_type in (0,1,2) )
+			) as description,:7,'Account In Collection','Collection'
+			FROM 	person p ,invoice i , transaction t
+			WHERE	upper(substr(p.name_last,1,1)) between upper(:1) 
+			AND	upper(:2)
+			AND	i.client_id = p.person_id
+			AND	i.balance between (:3) 
+			AND	(:4)
+			AND	i.invoice_date between to_date(:5,'MM/DD/YYYY')
+			AND	to_date(:6,'MM/DD/YYYY')		
+			AND	i.invoice_status not in (15,16)			
+			AND 	t.trans_id = i.main_transaction
+			AND EXISTS
+			(
+			SELECT 	1
+			FROM 	person_attribute
+			WHERE	item_name = 'WorkList-Collection-Setup-Org'
+			AND	value_text = t.service_facility_id 
+			AND 	parent_id = :8
+			AND	parent_org_id = :7
+			)
+			AND EXISTS
+			(
+			SELECT 	1 
+			FROM 	person_org_category poc
+			WHERE 	p.person_id = poc.person_id
+			AND	poc.org_internal_id = :7			
+			)
+			AND EXISTS
+			(
+			SELECT 	1
+			FROM	person_attribute
+			WHERE	item_name = 'WorkList-Collection-Setup-Physician'
+			AND	value_text = t.provider_id 
+			AND 	parent_id = :8
+			AND	parent_org_id = :7						
+			)						
+			AND NOT EXISTS
+			(
+			SELECT 	1
+			FROM 	Invoice_Worklist
+			WHERE 	owner_id = :8			
+			AND	org_internal_id = :7
+			AND	worklist_status = 'Account In Collection'
+			AND	worklist_type = 'Collection'		
+			AND	invoice_id = i.invoice_id
+			)	
+			AND	i.owner_id = :7
+			AND	ROWNUM&lt;=:10			
+
+		</statement>
+
+		<statement name="selAccountInfoById">
+			
+			SELECT 	trans_id,
+			data_num_a as invoice_id ,
+			(SELECT trans_id FROM transaction 
+			WHERE 	trans_owner_id = :1 
+			AND	provider_id = :2
+			AND	trans_status =2	
+			AND 	trans_type = 9510 	
+			) as trans_reck_id,
+			provider_id
+			FROM 	transaction 
+			WHERE	trans_owner_id = :1 
+			AND	provider_id = :2
+			AND	trans_owner_type= 0
+			AND	trans_type = 9520
+			AND	trans_subtype = 'Owner'
+			AND	trans_status =2	
+			
+		</statement>
+
+		<statement name="selAccountTransferIdById">
+			
+			SELECT 	item_id,parent_id as trans_id
+			FROM 	transaction t, trans_attribute ta
+			WHERE 	t.trans_owner_id =:1
+			AND	t.trans_type = 9520
+			AND	t.trans_subtype = 'Account Transfered'
+			AND	t.trans_status =2
+			AND	ta.parent_id = t.trans_id
+			AND	ta.value_text = :2
+			AND	ta.value_textb = :1
+			AND	t.trans_invoice_id = :3
+			
+		</statement>
+
+		<statement name="selAllCollectors">
+			
+			SELECT distinct parent_id,parent_org_id
+			FROM person_attribute 
+			WHERE item_name ='WorkList-Collection-Setup-Physician'
+			
+		</statement>
+
+		<statement name="selCloseInvoiceByID">
+			
+			SELECT trans_id,trans_invoice_id
+			FROM transaction
+			WHERE	trans_id= :1 		
+			
+		</statement>
+
+		<statement name="selCollectionRecordById">
+			
+			SELECT 	trans_id
+			FROM	transaction
+			WHERE	provider_id = :2
+			AND	trans_owner_id = :1
+			AND	trans_owner_type= 0
+			AND	trans_type = 9520
+			AND	trans_subtype = 'Owner'
+			AND	trans_status =2	
+			AND	trans_invoice_id = :3
+			
+		</statement>
+
+		<statement name="selCollectorRecordCnt">
+			
+			SELECT 	count (*)
+			FROM 	Invoice_Worklist
+			WHERE 	owner_id = :1
+			AND 	responsible_id = :1
+			AND	org_internal_id = :2
+			AND	worklist_status = 'Account In Collection'
+			AND	worklist_type = 'Collection'
+			
+		</statement>
+
+		<statement name="selInColl">
+			
+			SELECT distinct person_id
+			FROM Invoice_Worklist
+			WHERE person_id = :1
+			AND org_internal_id = :2
+			AND worklist_status = 'Account In Collection'
+			AND worklist_type = 'Collection'
+			
+		</statement>
+
+		<statement name="selNextApptById">
+			
+			select min(to_char(e.start_time,'MM/DD/YYYY')) as appt
+			from event e, event_attribute ea
+			where ea.value_text = :1 
+			and ea.item_name = 'Appointment' 
+			and ea.value_type = 333
+			and e.event_id = ea.parent_id
+			and e.start_time - to_date(:2,'MM/DD/YYYY') &gt;=0
+			
+		</statement>
+
+		<statement name="selPerCollByIdDate">
+			
+			SELECT	p.person_id ,NULL as reason,
+			i.invoice_id,i.balance,round(to_date(:2,'MM/DD/YYYY') - i.invoice_date) as age,
+			(SELECT MIN(iia.comments) FROM invoice_item_adjust iia WHERE parent_id =
+			(SELECT MIN(item_id) FROM invoice_item ii WHERE ii.parent_id = i.invoice_id AND
+			ii.item_type in (0,1,2) )
+			) as description ,
+			to_number(NULL) as trans_id ,
+			pb.value_float as min_amount
+			FROM 	person p, person_attribute pf,person_attribute pp,person_attribute pd ,
+			person_attribute pl,person_attribute pa, person_attribute pb,
+			transaction t, invoice i, invoice_billing ib, person_org_category pog
+			WHERE	pf.parent_id = :1
+			AND	pp.parent_id = :1
+			AND	pd.parent_id = :1
+			AND	pl.parent_id = :1
+			AND	pa.parent_id = :1
+			AND	pb.parent_id = :1
+			AND	pf.item_name = 'WorkList-Collection-Setup-Org'
+			AND	pp.item_name = 'WorkList-Collection-Setup-Product'
+			AND	pd.item_name = 'WorkList-Collection-Setup-Physician' 
+			AND	pl.item_name = 'WorkListCollectionLNameRange'
+			AND	pa.item_name = 'WorkList-Collection-Setup-BalanceAge-Range'
+			AND	pb.item_name = 'WorkList-Collection-Setup-BalanceAmount-Range'
+			AND 	p.person_id = pog.person_id
+			AND	pog.org_internal_id = :3
+			AND NOT EXISTS
+			(
+			SELECT	trans_owner_id 
+			FROM	transaction
+			WHERE	trans_type = 9520
+			AND 	trans_status = 2
+			AND 	provider_id = :1
+			AND	trans_owner_id = i.client_id
+			AND	trans_owner_id = p.person_id	
+			AND	data_num_a = i.invoice_id
+			)		
+			AND	i.main_transaction = t.trans_id
+			AND	i.client_id = p.person_id
+			AND	i.invoice_id = ib.invoice_id
+			AND	ib.bill_sequence = 1		
+			AND 	( SUBSTR(p.name_last,1,1) &gt;= upper(pl.Value_Text) or pl.Value_Text is NULL)
+			AND 	( SUBSTR(p.name_last,1,1) &lt;= upper(pl.Value_TextB) or pl.Value_TextB is NULL)
+			AND 	(i.balance &gt;= pb.value_float OR pb.value_float is null)
+			AND 	(i.balance &lt;= pb.value_floatb OR pb.value_floatb is null)
+			AND 	(round(to_date(:2,'MM/DD/YYYY') - i.invoice_date) &gt;= pa.value_int OR pa.value_int is null)		
+			AND 	(round(to_date(:2,'MM/DD/YYYY') - i.invoice_date) &lt;= pa.value_intB OR pa.value_intB is null) 	
+			AND	(t.provider_id = pd.value_text)
+			AND	(t.service_facility_id = pf.value_text)
+			AND	(
+			ib.bill_party_type IN (0,1) 
+			OR pp.value_int in
+			(SELECT product.ins_internal_id	
+			FROM	insurance product, insurance plan
+			WHERE	plan.ins_internal_id = ib.bill_ins_id 
+			AND	plan.product_name = product.product_name
+			AND	product.record_type = 1
+			AND	product.owner_org_id = plan.owner_org_id
+			)
+			)			
+			UNION
+			SELECT 	distinct t.trans_owner_id as person_id	,		
+			t.trans_status_reason as reason,	
+			i.invoice_id, 
+			i.balance,
+			round(to_date(:2,'MM/DD/YYYY') - i.invoice_date) as age,
+			(SELECT MIN(iia.comments) FROM invoice_item_adjust iia WHERE parent_id =
+			(SELECT MIN(item_id) FROM invoice_item ii WHERE ii.parent_id = i.invoice_id AND
+			ii.item_type in (0,1,2) )
+			) as description,
+			t.trans_id as trans_id,
+			(SELECT value_float FROM person_attribute WHERE parent_id = :1 AND
+			item_name = 'WorkList-Collection-Setup-BalanceAmount-Range') as min_amount 
+			FROM 	transaction t ,invoice i
+			WHERE 	t.trans_type = 9520
+			AND 	t.trans_status = 2
+			AND 	t.trans_subtype = 'Owner'
+			AND	t.provider_id = :1
+			AND	t.data_num_a = i.invoice_id
+			AND NOT EXISTS
+			(SELECT tr.trans_owner_id
+			FROM 	transaction tr
+			WHERE	tr.trans_owner_id = t.trans_owner_id
+			AND 	tr.trans_type (+)= 9510 
+			AND 	tr.provider_id (+)= :1	
+			AND 	tr.trans_status (+)= 2
+			AND	trunc(tr.trans_begin_stamp)&gt;to_date(:2,'MM/DD/YYYY')
+			)		
+			ORDER by 1 
+			
+		</statement>
+
+		<statement name="selPersonAttribute">
+			
+			SELECT 	parent_id, value_text, value_textB,value_int,value_intb,
+			value_float,value_floatb
+			FROM	person_Attribute
+			WHERE	parent_id = :1
+			AND	item_name = :2
+			AND	parent_org_id = :3
+			
+		</statement>
+
+		<statement name="selPhysicianFromOrg">
+			
+			select distinct p.person_id, p.complete_name from person p, person_org_category pcat
+			where p.person_id=pcat.person_id
+			and pcat.org_id= ?
+			and category='Physician'
+			
+		</statement>
+
+		<statement name="selReckDataById">
+			
+			SELECT 	reck_date,invoice_id
+			FROM	Invoice_Worklist
+			WHERE 	invoice_worklist_id = :1
+			
+		</statement>
+
+		<statement name="selReckInfoById">
+			
+			SELECT 	trans_begin_stamp as reck_date , trans_id as reck_id 
+			FROM 	transaction 
+			WHERE 	trans_id = :1
+			
+		</statement>
+
+		<statement name="selReckInfoByOwner">
+			
+			SELECT 	trans_begin_stamp as reck_date , trans_id as reck_id 
+			FROM 	transaction 
+			WHERE 	trans_owner_id = :1
+			AND 	trans_type (+)= 9510 
+			AND 	provider_id (+)= :2	
+			AND 	trans_status (+)= 2
+			
+		</statement>
+
+		<statement name="selSchedulePreferences">
+			
+			select item_id, value_text as resource_id, value_textb as facility_id,
+			value_int as column_no, value_intb as offset
+			from Person_Attribute
+			where parent_id = ?
+			and item_name = ?
+			order by column_no
+			
+		</statement>
+
+		<statement name="selTransCollectionById">
+			
+			SELECT 	tr.trans_begin_stamp reck_date, tr.trans_id as reck_date_id, t.trans_id as trans_id
+			FROM 	transaction t, transaction tr
+			WHERE 	t.trans_type = 9520
+			AND 	t.trans_status = 2
+			AND 	t.trans_owner_id = :1
+			AND 	t.trans_subtype = 'Owner'
+			AND	t.provider_id = :2
+			AND	t.trans_invoice_id = :3
+			AND 	tr.trans_owner_id (+) = t.trans_owner_id
+			AND 	tr.trans_type (+)= 9510 
+			AND 	tr.provider_id (+)= :2	
+			AND 	tr.trans_status (+)= 2		
+			
+		</statement>
+
+		<statement name="selWorkListPop">
+			
+			SELECT 	p.person_id,i.invoice_id,i.balance,to_char(i.invoice_date,'MM/DD/YYYY') as invoice_date,
+			to_number(NULL) as trans_id,NULL as reck_date,
+			(
+			select min(to_char(e.start_time,'MM/DD/YYYY')) 
+			from event e, event_attribute ea
+			where ea.value_text = p.person_id
+			and ea.item_name = 'Appointment' 
+			and ea.value_type = 333
+			and e.event_id = ea.parent_id
+			and e.start_time - to_date(:9,'MM/DD/YYYY') &gt;=0			
+			)as appt,				
+			(SELECT MIN(iia.comments) FROM invoice_item_adjust iia WHERE parent_id =
+			(SELECT MIN(item_id) FROM invoice_item ii WHERE ii.parent_id = i.invoice_id AND
+			ii.item_type in (0,1,2) )
+			) as description,
+			p.simple_name,
+			NULL as link_invoice
+			FROM 	person p ,invoice i 
+			WHERE	upper(substr(p.name_last,1,1)) between upper(:1) 
+			AND	upper(:2)
+			AND	i.client_id = p.person_id
+			AND	i.balance between (:3) 
+			AND	(:4)
+			AND	i.invoice_date between to_date(:5,'MM/DD/YYYY')
+			AND	to_date(:6,'MM/DD/YYYY')		
+			AND	i.invoice_status not in (15,16)			
+			AND EXISTS
+			(
+			SELECT 	1 
+			FROM 	person_org_category poc
+			WHERE 	p.person_id = poc.person_id
+			AND	poc.org_internal_id = :7			
+			)
+			AND EXISTS
+			(
+			SELECT 	1
+			FROM 	person_attribute
+			WHERE	item_name = 'WorkList-Collection-Setup-Org'
+			AND	value_text = (select service_facility_id FROM transaction
+			WHERE trans_id= i.main_transaction)
+			AND 	parent_id = :8
+			AND	parent_org_id = :7
+			)
+			AND EXISTS
+			(	
+			SELECT 	1
+			FROM	person_attribute pa,invoice_billing ib
+			WHERE	pa.item_name = 'WorkList-Collection-Setup-Product'
+			AND	i.billing_id = ib.bill_id
+			AND 	parent_id = :8
+			AND	pa.parent_org_id = :7			
+			AND	(
+			ib.bill_party_type IN (0,1)
+			OR
+			EXISTS
+			(
+			SELECT 1 
+			FROM 	insurance coverage,insurance prod_plan 
+			WHERE	ib.bill_ins_id = coverage.ins_internal_id
+			AND	prod_plan.ins_internal_id = coverage.parent_ins_id
+			AND	
+			(
+			(prod_plan.ins_internal_id = pa.value_int AND prod_plan.record_type =1)
+			OR prod_plan.parent_ins_id = pa.value_int
+			)					 	
+			)
+			)
+			)
+			AND EXISTS
+			(
+			SELECT 	1
+			FROM	person_attribute
+			WHERE	item_name = 'WorkList-Collection-Setup-Physician'
+			AND	value_text = (select provider_id FROM transaction
+			WHERE trans_id= i.main_transaction)
+			AND 	parent_id = :8
+			AND	parent_org_id = :7						
+			)						
+			AND NOT EXISTS
+			(
+			SELECT	1 
+			FROM	transaction
+			WHERE	trans_type = 9520
+			AND 	trans_status = 2
+			AND 	provider_id = :8
+			AND	trans_invoice_id = i.invoice_id	
+			AND 	trans_invoice_id is not NULL
+			AND	billing_facility_id = :7			
+			)	
+			AND	ROWNUM&lt;251
+			UNION ALL
+			SELECT 	t.trans_owner_id as person_id,i.invoice_id,i.balance,to_char(i.invoice_date,'MM/DD/YYYY') as invoice_date,
+			t.trans_id,to_char(trans_begin_stamp,'MM/DD/YYYY') as reck_date ,
+			(
+			select min(to_char(e.start_time,'MM/DD/YYYY')) as appt
+			from event e, event_attribute ea
+			where ea.value_text = t.trans_owner_id 
+			and ea.item_name = 'Appointment' 
+			and ea.value_type = 333
+			and e.event_id = ea.parent_id
+			and e.start_time - to_date(:9,'MM/DD/YYYY') &gt;=0			
+			)as appt,
+			(SELECT MIN(iia.comments) FROM invoice_item_adjust iia WHERE parent_id =
+			(SELECT MIN(item_id) FROM invoice_item ii WHERE ii.parent_id = i.invoice_id AND
+			ii.item_type in (0,1,2) )
+			) as description,
+			p.simple_name,
+			to_char(t.data_num_b) as link_invoice
+			FROM 	transaction t ,invoice i, person p
+			WHERE 	t.trans_type = 9520
+			AND 	t.trans_status = 2
+			AND 	t.trans_subtype = 'Owner'
+			AND	t.provider_id = :8
+			AND	t.trans_invoice_id = i.invoice_id	
+			and t.trans_invoice_id is not null
+			AND	t.billing_facility_id = :7
+			AND	p.person_id = 	t.trans_owner_id
+			AND	ROWNUM&lt;251
+			ORDER BY 1
+			
+		</statement>
+
+		<statement name="selWorkListPopAll">
+			
+			SELECT 	p.person_id,i.invoice_id,i.balance,to_char(i.invoice_date,'MM/DD/YYYY') as invoice_date,
+			to_number(NULL) as trans_id,NULL as reck_date,
+			(
+			select min(to_char(e.start_time,'MM/DD/YYYY')) 
+			from event e, event_attribute ea
+			where ea.value_text = p.person_id
+			and ea.item_name = 'Appointment' 
+			and ea.value_type = 333
+			and e.event_id = ea.parent_id
+			and e.start_time - to_date(:9,'MM/DD/YYYY') &gt;=0			
+			)as appt,				
+			(SELECT MIN(iia.comments) FROM invoice_item_adjust iia WHERE parent_id =
+			(SELECT MIN(item_id) FROM invoice_item ii WHERE ii.parent_id = i.invoice_id AND
+			ii.item_type in (0,1,2) )
+			) as description,
+			p.simple_name,
+			NULL as link_invoice
+			FROM 	person p ,invoice i 
+			WHERE	upper(substr(p.name_last,1,1)) between upper(:1) 
+			AND	upper(:2)
+			AND	i.client_id = p.person_id
+			AND	i.balance between (:3) 
+			AND	(:4)
+			AND	i.invoice_date between to_date(:5,'MM/DD/YYYY')
+			AND	to_date(:6,'MM/DD/YYYY')		
+			AND	i.invoice_status not in (15,16)			
+			AND EXISTS
+			(
+			SELECT 	1 
+			FROM 	person_org_category poc
+			WHERE 	p.person_id = poc.person_id
+			AND	poc.org_internal_id = :7			
+			)
+			AND EXISTS
+			(
+			SELECT 	1
+			FROM 	person_attribute
+			WHERE	item_name = 'WorkList-Collection-Setup-Org'
+			AND	value_text = (select service_facility_id FROM transaction
+			WHERE trans_id= i.main_transaction)
+			AND 	parent_id = :8
+			AND	parent_org_id = :7
+			)
+			AND EXISTS
+			(
+			SELECT 	1
+			FROM	person_attribute
+			WHERE	item_name = 'WorkList-Collection-Setup-Physician'
+			AND	value_text = (select provider_id FROM transaction
+			WHERE trans_id= i.main_transaction)
+			AND 	parent_id = :8
+			AND	parent_org_id = :7						
+			)						
+			AND NOT EXISTS
+			(
+			SELECT	1 
+			FROM	transaction
+			WHERE	trans_type = 9520
+			AND 	trans_status = 2
+			AND 	provider_id = :8
+			AND	trans_invoice_id = i.invoice_id	
+			AND 	trans_invoice_id is not NULL
+			AND	billing_facility_id = :7			
+			)	
+			AND	ROWNUM&lt;251
+			UNION ALL
+			SELECT 	t.trans_owner_id as person_id,i.invoice_id,i.balance,to_char(i.invoice_date,'MM/DD/YYYY') as invoice_date,
+			t.trans_id,to_char(trans_begin_stamp,'MM/DD/YYYY')as reck_date ,
+			(
+			select min(to_char(e.start_time,'MM/DD/YYYY')) as appt
+			from event e, event_attribute ea
+			where ea.value_text = t.trans_owner_id 
+			and ea.item_name = 'Appointment' 
+			and ea.value_type = 333
+			and e.event_id = ea.parent_id
+			and e.start_time - to_date(:9,'MM/DD/YYYY') &gt;=0			
+			)as appt,
+			(SELECT MIN(iia.comments) FROM invoice_item_adjust iia WHERE parent_id =
+			(SELECT MIN(item_id) FROM invoice_item ii WHERE ii.parent_id = i.invoice_id AND
+			ii.item_type in (0,1,2) )
+			) as description,
+			p.simple_name	,
+			to_char(t.data_num_b) as link_invoice
+			FROM 	transaction t ,invoice i, person p
+			WHERE 	t.trans_type = 9520
+			AND 	t.trans_status = 2
+			AND 	t.trans_subtype = 'Owner'
+			AND	t.provider_id = :8
+			AND	t.trans_invoice_id = i.invoice_id	
+			and t.trans_invoice_id is not null
+			AND	t.billing_facility_id = :7
+			AND	p.person_id = t.trans_owner_id
+			AND	ROWNUM&lt;251
+			ORDER BY 1		
+			
+		</statement>
+
+		<statement name="sel_claim_statuses">
+			
+			select id, caption 
+			from Invoice_Status 
+			where not id in 
+			(
+			1, 2,
+			6, 10
+			)
+			order by id
+			
+		</statement>
+
+		<statement name="sel_worklist_all_products">
+			
+			select 	pa.value_int 
+			FROM 	Person_Attribute pa
+			WHERE	pa.value_type = 110
+			AND	item_name = :3
+			AND	parent_id = :1
+			AND	parent_org_id = :2
+			AND	value_int = -1
+			
+		</statement>
+
+		<statement name="sel_worklist_associated_physicians">
+			
+			select pa.value_text as person_id, p.complete_name,p.name_last
+			from Person_Attribute pa, Person p
+			where 
+			parent_id = :1
+			and p.person_id = pa.value_text
+			and value_type = 250
+			and item_name = :2
+			order by p.name_last
+			
+		</statement>
+
+		<statement name="sel_worklist_associated_products">
+			
+			select pa.value_int as product_id, i.product_name
+			from Person_Attribute pa, Insurance i
+			where 
+			parent_id = :1
+			and parent_org_id = :2
+			and i.ins_internal_id = pa.value_int
+			and pa.value_type = 110
+			and item_name = :3
+			order by i.product_name
+			
+		</statement>
+
+		<statement name="sel_worklist_available_physicians">
+			
+			select distinct p.person_id, p.complete_name,p.name_last
+			from person p, person_org_category pcat
+			where p.person_id=pcat.person_id
+			and pcat.org_internal_id= ?
+			and category='Physician'
+			order by p.name_last
+			
+		</statement>
+
+		<statement name="sel_worklist_available_products">
+			
+			select i.ins_internal_id as product_id, product_name || ' (' || ct.caption || ')'
+			from claim_type ct, insurance i, org
+			where i.record_type = 1
+			AND	org.org_internal_id = i.owner_org_id
+			AND	org.owner_org_id = :1
+			AND ct.id = i.ins_type
+			order by product_name
+			
+		</statement>
+
+		<statement name="sel_worklist_balance_age_range">
+			
+			select value_int, value_intB as balance_age_to from Person_Attribute
+			where parent_id = :1
+			and parent_org_id = :2
+			and value_type = 110
+			and item_name = :3
+			
+		</statement>
+
+		<statement name="sel_worklist_balance_amount_range">
+			
+			select value_float, value_floatB as balance_amount_to
+			from Person_Attribute
+			where parent_id = :1
+			and parent_org_id = :2
+			and value_type = 120
+			and item_name = :3
+			
+		</statement>
+
+		<statement name="sel_worklist_claim_status">
+			
+			select value_int as status_id
+			from Person_Attribute
+			where parent_id = :1
+			and parent_org_id = :2
+			and item_name = :3
+			
+		</statement>
+
+		<statement name="sel_worklist_facilities">
+			
+			select value_text as facility_id
+			from Person_Attribute
+			where parent_id = :1
+			and parent_org_id = :2
+			and value_type = 252
+			and item_name = :3
+			
+		</statement>
+
+		<statement name="sel_worklist_lastname_range">
+			
+			select value_text, value_textB as lnameto
+			from Person_Attribute
+			where parent_id = ?
+			and parent_org_id = ?
+			and value_type = 0
+			and item_name = 'WorkListCollectionLNameRange'
+			
+		</statement>
+
+		<statement name="sel_worklist_lastname_range2">
+			
+			select value_text, value_textB as lnameto
+			from Person_Attribute
+			where parent_id = :1
+			and parent_org_id = :2 
+			and value_type = 0
+			and item_name = :3
+			
+		</statement>
+
+		<statement name="sel_worklist_person_assoc">
+			
+			select value_text as resource_id
+			from Person_Attribute
+			where parent_id = ?
+			and value_type = 250
+			and item_name = ?
+			
+		</statement>
+
+		<statement name="sel_worklist_text">
+			
+			select value_text as resource_id
+			from Person_Attribute
+			where parent_id = ?
+			and value_type = 0
+			and item_name = ?
+			
+		</statement>
+
+		<statement name="sel_worklist_textB">
+			
+			select value_textB as resource_id
+			from Person_Attribute
+			where parent_id = ?
+			and value_type = 0
+			and item_name = ?
+			
+		</statement>
+
+		<statement name="sel_worklist_unassociated_physicians">
+			
+			select distinct p.person_id, p.complete_name
+			from person p, person_org_category pcat
+			where p.person_id=pcat.person_id
+			and pcat.org_id= ?
+			and category='Physician'
+			and p.person_id not in 
+			(select value_text as person_id
+			from Person_Attribute
+			where parent_id = ?
+			and value_type = 250
+			and item_name = 'WorkList-Collection-Setup-Physician')
+			
+		</statement>
+
+		<statement name="selectBalanceAgeById">
+			
+			SELECT 	sum(i.balance) as balance, MAX(round(to_date(:2,'MM/DD/YYYY') - i.invoice_date)) as age
+			FROM	invoice i
+			WHERE	i.client_id = :1
+			GROUP BY client_id
+			
+		</statement>
+
+		<statement name="transferCollection">
+			
+			UPDATE 	Invoice_Worklist
+			SET responsible_id = :4
+			WHERE 	invoice_id=:1
+			AND 	responsible_id = :2
+			AND 	org_internal_id = :3
+			AND	worklist_type='Collection'
+			AND	worklist_status='Account In Collection'
+			
+		</statement>
+
+		<statement name="updCollectorRecords">
+			
+			UPDATE Invoice_WorkList
+			set data_date_a = (	select min(e.start_time) as appt
+			from event e, event_attribute ea
+			where ea.value_text = Invoice_Worklist.person_id
+			and ea.item_name = 'Appointment' 
+			and ea.value_type = 333
+			and e.event_id = ea.parent_id
+			and trunc(e.start_time) &gt;= trunc(sysdate) 
+			),
+			comments = (
+			SELECT MIN(iia.comments) FROM invoice_item_adjust iia WHERE parent_id =
+			(SELECT MIN(item_id) FROM invoice_item ii WHERE ii.parent_id = Invoice_WorkList.invoice_id AND
+			ii.item_type in (0,1,2) )				
+			)		
+			WHERE 	owner_id = :1
+			AND 	responsible_id = :1
+			AND	org_internal_id = :2
+			AND	worklist_status = 'Account In Collection'
+			AND	worklist_type = 'Collection'
+			AND 
+			( 	comments is NULL
+			OR 
+			(data_date_a = (	select min(e.start_time) as appt
+			from event e, event_attribute ea
+			where ea.value_text = Invoice_Worklist.person_id
+			and ea.item_name = 'Appointment' 
+			and ea.value_type = 333
+			and e.event_id = ea.parent_id
+			and trunc(e.start_time) &gt;= trunc(sysdate) 
+			)
+			)
+			)
+			
+		</statement>
+
+	</sql-statements>
+</xaf>

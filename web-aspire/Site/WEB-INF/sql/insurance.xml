@@ -1,0 +1,945 @@
+<?xml version="1.0"?>
+
+<xaf>
+	<sql-statements package="insurance">
+		<statement name="delInsurancePlanAttrs">
+			
+			DELETE
+			FROM insurance_attribute
+			WHERE parent_id = ?
+			
+		</statement>
+
+		<statement name="id">
+			App::Statements::Insurance
+		</statement>
+
+		<statement name="selAllWorkCompByOwnerId">
+			
+			SELECT
+			plan_name,
+			product_name
+			FROM insurance
+			WHERE
+			owner_person_id = ?
+			AND ins_type = 6
+			
+		</statement>
+
+		<statement name="selAllWrkCmpAttr">
+			
+			SELECT *
+			FROM org_attribute
+			WHERE
+			value_int = ?
+			AND value_type = ?
+			
+		</statement>
+
+		<statement name="selChildrenPlans">
+			
+			SELECT *
+			FROM Insurance
+			WHERE parent_ins_id = ?
+			
+		</statement>
+
+		<statement name="selDeleteFeeSchedule">
+			
+			DELETE
+			FROM insurance_attribute
+			WHERE
+			parent_id = ?
+			AND item_name = 'Fee Schedule'
+			AND cr_org_internal_id = ?
+			
+		</statement>
+
+		<statement name="selDoesInsSequenceExists">
+			
+			SELECT bill_sequence
+			FROM insurance
+			WHERE
+			owner_person_id = ?
+			AND bill_sequence = ?
+			
+		</statement>
+
+		<statement name="selDoesPlanExistsForPerson">
+			
+			SELECT ins_internal_id
+			FROM insurance
+			WHERE
+			product_name = ?
+			AND owner_person_id = ?
+			
+		</statement>
+
+		<statement name="selDoesProductExists">
+			
+			SELECT ins_internal_id
+			FROM insurance
+			WHERE
+			product_name = ?
+			AND ins_org_id = ?
+			AND record_type = 1
+			
+		</statement>
+
+		<statement name="selEmpExistPlan">
+			
+			SELECT DISTINCT ins.product_name
+			FROM
+			person_attribute patt,
+			insurance ins
+			WHERE
+			patt.parent_id = ?
+			AND patt.value_type between 220 AND 226
+			AND patt.value_int = ins.ins_org_id
+			AND ins.record_type = 6
+			
+		</statement>
+
+		<statement name="selEmployerWorkersCompPlans">
+			
+			SELECT
+			oa.value_text AS ins_id,
+			oa.value_textB AS group_name
+			FROM
+			org_attribute oa,
+			person_attribute pa,
+			insurance ins
+			WHERE
+			pa.value_type in (220, 221)
+			AND pa.value_int = oa.parent_id
+			AND pa.parent_id = ?
+			AND oa.value_type = 361
+			UNION (
+			SELECT
+			ins.product_name,
+			group_name
+			FROM
+			org,
+			insurance ins,
+			person_attribute pa
+			WHERE
+			org.org_internal_id = ins.ins_org_id
+			AND ins.ins_type = 6
+			AND	(
+			pa.value_type in (220, 221)
+			AND pa.value_int = org.org_internal_id
+			AND	pa.parent_id=?
+			)
+			)
+			
+		</statement>
+
+		<statement name="selExistsPlanForPerson">
+			
+			SELECT ins_internal_id
+			FROM insurance
+			WHERE
+			ins_type = ?
+			AND owner_person_id = ?
+			
+		</statement>
+
+		<statement name="selGroupInsurance">
+			
+			SELECT
+			o.ins_internal_id,
+			o.product_name,
+			o.ins_org_id,
+			o.ins_type,
+			o.plan_name,
+			o.group_number,
+			o.group_name,
+			o.policy_number,
+			o.indiv_deductible_amt,
+			o.family_deductible_amt,
+			o.percentage_pay,
+			o.threshold,
+			o.copay_amt,
+			ct.caption AS ins_type_caption
+			FROM
+			insurance o,
+			claim_type ct
+			WHERE
+			o.ins_type = ct.id
+			AND o.product_name = ?
+			
+		</statement>
+
+		<statement name="selInsOrgData">
+			
+			SELECT *
+			FROM org
+			WHERE org_internal_id = ?
+			
+		</statement>
+
+		<statement name="selInsPlan">
+			
+			SELECT *
+			FROM insurance
+			WHERE
+			product_name = ?
+			AND plan_name = ?
+			AND ins_org_id = ?
+			AND record_type = 2
+			
+		</statement>
+
+		<statement name="selInsPlanAttributesForOrg">
+			
+			SELECT
+			item_id,
+			value_text AS product_name,
+			value_textB AS plan_name,
+			value_int AS ins_internal_id
+			FROM org_attribute
+			WHERE
+			parent_id = ?
+			AND item_name like ?
+			
+		</statement>
+
+		<statement name="selInsSequence">
+			
+			SELECT bill_sequence
+			FROM insurance
+			WHERE owner_person_id = ?
+			
+		</statement>
+
+		<statement name="selInsType">
+			
+			select ins_type
+			from insurance
+			where ins_internal_id = ?
+			
+		</statement>
+
+		<statement name="selInsTypeCode">
+			
+			SELECT
+			caption,
+			abbrev
+			FROM insurance_type_code
+			WHERE group_name = 'UI'
+			
+		</statement>
+
+		<statement name="selInsurance">
+			
+			SELECT *
+			FROM insurance
+			WHERE owner_person_id = ?
+			ORDER BY
+			coverage_end_date DESC,
+			bill_sequence
+			
+		</statement>
+
+		<statement name="selInsuranceAddr">
+			
+			SELECT
+			line1 AS addr_line1,
+			line2 AS addr_line2,
+			city AS addr_city,
+			state AS addr_state,
+			zip AS addr_zip,
+			country AS addr_country,
+			item_id
+			FROM insurance_address
+			WHERE
+			parent_id = ?
+			AND address_name = 'Billing'
+			
+		</statement>
+
+		<statement name="selInsuranceAddrWithOutColNameChanges">
+			
+			SELECT
+			line1,
+			line2,
+			city,
+			state,
+			zip,
+			country
+			FROM insurance_address
+			WHERE
+			parent_id = ?
+			AND address_name = 'Billing'
+			
+		</statement>
+
+		<statement name="selInsuranceAttr">
+			
+			SELECT *
+			FROM insurance_attribute
+			WHERE
+			parent_id = ?
+			AND item_name = ?
+			
+		</statement>
+
+		<statement name="selInsuranceAttr_Org">
+			
+			SELECT *
+			FROM insurance_attribute
+			WHERE parent_id = ?
+			AND item_name = ?
+			
+		</statement>
+
+		<statement name="selInsuranceBillCaption">
+			
+			SELECT caption
+			FROM bill_sequence
+			WHERE id = ?
+			
+		</statement>
+
+		<statement name="selInsuranceByBillSequence">
+			
+			SELECT *
+			FROM insurance
+			WHERE
+			bill_sequence = ?
+			AND owner_person_id = ?
+			
+		</statement>
+
+		<statement name="selInsuranceByInsOrgAndMemberNumber">
+			
+			SELECT *
+			FROM insurance
+			WHERE
+			ins_org_id = ?
+			AND member_number = ?
+			
+		</statement>
+
+		<statement name="selInsuranceByInsOrgAndMemberNumberForElig">
+			
+			SELECT
+			ins_internal_id,
+			parent_ins_id,
+			ins_org_id,
+			owner_person_id,
+			plan_name,
+			product_name,
+			TO_CHAR(coverage_begin_date, 'MM/DD/YYYY') AS coverage_begin_date_html,
+			TO_CHAR(coverage_end_date, 'MM/DD/YYYY') AS coverage_end_date_html,
+			TO_CHAR(coverage_begin_date, 'YYYY,MM,DD') AS coverage_begin_date,
+			TO_CHAR(coverage_end_date, 'YYYY,MM,DD') AS coverage_end_date,
+			ct.caption AS ins_type
+			FROM
+			insurance,
+			claim_type ct
+			WHERE
+			ins_org_id = ?
+			AND member_number = ?
+			AND ins_type = ct.id
+			
+		</statement>
+
+		<statement name="selInsuranceByInsType">
+			
+			SELECT *
+			FROM insurance
+			WHERE
+			owner_person_id = ?
+			AND ins_type = ?
+			
+		</statement>
+
+		<statement name="selInsuranceByOwnerAndProductName">
+			
+			SELECT *
+			FROM insurance
+			WHERE
+			product_name = ?
+			AND owner_person_id = ?
+			
+		</statement>
+
+		<statement name="selInsuranceByOwnerAndProductNameForElig">
+			
+			SELECT
+			ins_internal_id,
+			parent_ins_id,
+			ins_org_id,
+			owner_person_id,
+			plan_name,
+			product_name,
+			TO_CHAR(coverage_begin_date, 'MM/DD/YYYY') AS coverage_begin_date_html,
+			TO_CHAR(coverage_end_date, 'MM/DD/YYYY') AS coverage_end_date_html,
+			TO_CHAR(coverage_begin_date, 'YYYY,MM,DD') AS coverage_begin_date,
+			TO_CHAR(coverage_end_date, 'YYYY,MM,DD') AS coverage_end_date,
+			ct.caption AS ins_type
+			FROM
+			insurance,
+			claim_type ct
+			WHERE
+			ins_org_id = ?
+			AND owner_person_id = ?
+			AND ins_type = ct.id
+			
+		</statement>
+
+		<statement name="selInsuranceByPersonAndInsOrg">
+			
+			SELECT *
+			FROM insurance
+			WHERE
+			owner_person_id = ?
+			AND ins_org_id = ?
+			
+		</statement>
+
+		<statement name="selInsuranceByPersonOwnerAndGuarantorAndInsType">
+			
+			SELECT *
+			FROM insurance
+			WHERE
+			owner_person_id = ?
+			AND guarantor_id = ?
+			AND ins_type = ?
+			
+		</statement>
+
+		<statement name="selInsuranceByPlanNameAndPersonAndInsType">
+			
+			SELECT *
+			FROM insurance
+			WHERE
+			plan_name = ?
+			AND owner_person_id = ?
+			AND ins_type = ?
+			
+		</statement>
+
+		<statement name="selInsuranceData">
+			
+			SELECT *
+			FROM Insurance
+			WHERE ins_internal_id = ?
+			
+		</statement>
+
+		<statement name="selInsuranceForInvoiceSubmit">
+			
+			SELECT
+			ins.ins_internal_id,
+			ins.parent_ins_id,
+			ins.ins_org_id,
+			ins.ins_type,
+			ins.plan_name,
+			ins.product_name,
+			ins.owner_person_id,
+			ins.group_name,
+			ins.group_number,
+			ins.insured_id,
+			ins.member_number,
+			ins.employer_org_id,
+			TO_CHAR(coverage_begin_date, 'MM/DD/YYYY'),
+			remit_payer_id,
+			TO_CHAR(coverage_end_date, 'MM/DD/YYYY'),
+			ins.rel_to_insured,
+			ins.record_type,
+			ins.extra,
+			ct.caption AS claim_type
+			FROM
+			insurance ins,
+			claim_type ct
+			WHERE
+			ins.ins_internal_id = ?
+			AND ct.id = ins_type
+			
+		</statement>
+
+		<statement name="selInsuranceGroup">
+			
+			SELECT
+			i.ins_org_id,
+			i.ins_type,
+			i.plan_name,
+			i.group_number,
+			i.group_name,
+			i.policy_number,
+			i.indiv_deductible_amt,
+			i.family_deductible_amt,
+			i.percentage_pay,
+			i.threshold,
+			i.copay_amt,
+			ct.caption AS ins_type_caption
+			FROM
+			insurance i,
+			claim_type ct
+			WHERE
+			i.ins_type = ct.id
+			AND i.ins_internal_id = ?
+			
+		</statement>
+
+		<statement name="selInsuranceGroupData">
+			
+			SELECT
+			ins_org_id,
+			ins_type,
+			plan_name,
+			group_number,
+			group_name,
+			policy_number,
+			record_type,
+			indiv_deductible_amt,
+			family_deductible_amt,
+			percentage_pay,
+			threshold,
+			copay_amt,
+			ct.caption AS ins_type_caption
+			FROM
+			insurance i,
+			claim_type ct
+			WHERE
+			i.ins_type = ct.id
+			AND i.product_name = ?
+			
+		</statement>
+
+		<statement name="selInsuranceGroupName">
+			
+			SELECT group_name
+			FROM insurance
+			WHERE product_name = ?
+			
+		</statement>
+
+		<statement name="selInsurancePayerFax">
+			
+			SELECT
+			item_id,
+			value_text AS fax
+			FROM insurance_attribute
+			WHERE
+			parent_id = ?
+			AND item_name = 'Contact Method/Fax/Primary'
+			
+		</statement>
+
+		<statement name="selInsurancePayerPhone">
+			
+			SELECT
+			item_id,
+			value_text AS phone
+			FROM insurance_attribute
+			WHERE
+			parent_id = ?
+			AND item_name = 'Contact Method/Telephone/Primary'
+			
+		</statement>
+
+		<statement name="selInsurancePlanData">
+			
+			SELECT *
+			FROM insurance
+			WHERE
+			product_name = ?
+			AND record_type in (?, ?, ?, ?)
+			
+		</statement>
+
+		<statement name="selInsurancePlansForOrg">
+			
+			SELECT
+			ins_internal_id,
+			product_name,
+			ins_org_id,
+			ins_type,
+			plan_name,
+			group_number,
+			o.group_name,
+			policy_number,
+			indiv_deductible_amt,
+			family_deductible_amt,
+			percentage_pay,
+			threshold,
+			copay_amt,
+			ct.caption AS ins_type_caption
+			FROM
+			insurance o,
+			claim_type ct
+			WHERE
+			ct.id = o.ins_type
+			AND ins_org_id = ?
+			AND record_type IN (2, 3)
+			AND NOT ins_type = 6
+			
+		</statement>
+
+		<statement name="selInsuranceSingleColumn">
+			
+			SELECT ?
+			FROM insurance
+			WHERE ins_internal_id = ?
+			
+		</statement>
+
+		<statement name="selInsuredRelation">
+			
+			SELECT
+			id,
+			caption
+			FROM insured_relationship
+			
+		</statement>
+
+		<statement name="selInsuredRelationship">
+			
+			SELECT caption
+			FROM insured_relationship
+			WHERE id = ?
+			
+		</statement>
+
+		<statement name="selIsPlanUnique">
+			
+			SELECT ins_internal_id
+			FROM insurance
+			WHERE
+			product_name = ?
+			AND record_type = ?
+			
+		</statement>
+
+		<statement name="selIsPlanWorkComp">
+			
+			SELECT ins_internal_id
+			FROM insurance
+			WHERE
+			product_name = ?
+			AND ins_type = ?
+			
+		</statement>
+
+		<statement name="selNewPlanExists">
+			
+			SELECT plan_name
+			FROM insurance
+			WHERE
+			plan_name = ?
+			AND owner_org_id = ?
+			AND record_type = 2
+			
+		</statement>
+
+		<statement name="selNewProductExists">
+			
+			SELECT product_name
+			FROM insurance
+			WHERE
+			product_name = ?
+			AND owner_org_id = ?
+			AND record_type = 1
+			
+		</statement>
+
+		<statement name="selPatientHasPlan">
+			
+			SELECT ins_internal_id
+			FROM insurance
+			WHERE
+			product_name = ?
+			AND owner_person_id = ?
+			AND ins_type = ?
+			
+		</statement>
+
+		<statement name="selPatientWorkersCompPlan">
+			
+			SELECT *
+			FROM insurance
+			WHERE
+			product_name = ?
+			AND ins_type = 6
+			
+		</statement>
+
+		<statement name="selPayerChoicesByOwnerPersonId">
+			
+			SELECT
+			i.ins_internal_id,
+			i.plan_name,
+			'Insurance' AS group_name,
+			bs.caption AS bill_seq,
+			i.bill_sequence AS bill_seq_id,
+			guarantor_type
+			FROM
+			insurance i,
+			claim_type ct,
+			bill_sequence bs
+			WHERE
+			i.owner_person_id = :1
+			AND ct.id = i.ins_type
+			AND bs.id = i.bill_sequence
+			AND i.bill_sequence IN (1,2,3,4)
+			AND ct.group_name = 'insurance'
+			UNION (
+			SELECT
+			wk.ins_internal_id,
+			wk.plan_name,
+			'Workers Compensation' AS group_name,
+			'' AS bill_seq,
+			wk.bill_sequence AS bill_seq_id,
+			guarantor_type
+			FROM insurance wk
+			WHERE
+			wk.owner_person_id = :1
+			AND wk.ins_type = 6
+			)
+			UNION (
+			SELECT
+			ins_internal_id,
+			guarantor_id AS plan_name,
+			'Third-Party' AS group_name,
+			'' AS bill_seq,
+			bill_sequence AS bill_seq_id,
+			guarantor_type
+			FROM insurance
+			WHERE
+			owner_person_id = :1
+			AND ins_type = 7
+			)
+			ORDER BY bill_seq_id
+			
+		</statement>
+
+		<statement name="selPersonInsurance">
+			
+			SELECT
+			ins.ins_internal_id,
+			ins.parent_ins_id,
+			ins.ins_org_id,
+			ins.ins_type,
+			ins.owner_person_id,
+			ins.group_name,
+			ins.group_number,
+			ins.insured_id,
+			ins.member_number,
+			TO_CHAR(coverage_begin_date, 'MM/DD/YYYY'),
+			TO_CHAR(coverage_end_date, 'MM/DD/YYYY'),
+			ins.rel_to_insured,
+			ins.record_type,
+			ins.extra,
+			ct.caption AS claim_type
+			FROM
+			insurance ins,
+			claim_type ct
+			WHERE
+			ins.owner_person_id = ?
+			AND ins.bill_sequence = ?
+			AND ct.id = ins_type
+			
+		</statement>
+
+		<statement name="selPersonInsuranceId">
+			
+			SELECT *
+			FROM insurance
+			WHERE
+			ins_org_id = ?
+			AND product_name = ?
+			AND ins_type = ?
+			
+		</statement>
+
+		<statement name="selPersonPlanExists">
+			
+			SELECT plan_name
+			FROM insurance
+			WHERE
+			product_name = ?
+			AND plan_name = ?
+			AND record_type = ?
+			AND owner_person_id = ?
+			AND ins_org_id = ?
+			
+		</statement>
+
+		<statement name="selPlanByInsIdAndRecordType">
+			
+			SELECT *
+			FROM insurance ins
+			WHERE
+			product_name = ?
+			AND record_type = ?
+			
+		</statement>
+
+		<statement name="selPlanRecord">
+			
+			SELECT *
+			FROM insurance
+			WHERE
+			record_type = 2 AND
+			owner_org_id = ? AND
+			plan_name = ?
+			
+		</statement>
+
+		<statement name="selPlanRecordExists">
+			
+			SELECT ins_internal_id
+			FROM insurance
+			WHERE
+			record_type = 2 AND
+			owner_org_id = ? AND
+			plan_name = ?
+			
+		</statement>
+
+		<statement name="selPpoHmoIndicator">
+			
+			SELECT
+			caption,
+			abbrev
+			FROM ppo_hmo_Indicator
+			
+		</statement>
+
+		<statement name="selProductRecord">
+			
+			SELECT *
+			FROM insurance
+			WHERE
+			record_type = 1 AND
+			owner_org_id = ? AND
+			product_name = ?
+			
+		</statement>
+
+		<statement name="selProductRecordExists">
+			
+			SELECT ins_internal_id
+			FROM insurance
+			WHERE
+			record_type = 1 AND
+			owner_org_id = ? AND
+			product_name = ?
+			
+		</statement>
+
+		<statement name="selSpecificWrkCmpAttr">
+			
+			SELECT *
+			FROM org_attribute
+			WHERE
+			parent_id = ?
+			AND value_int = ?
+			AND value_type = ?
+			
+		</statement>
+
+		<statement name="selUpdateAndAddInsSeq">
+			
+			UPDATE insurance
+			SET bill_sequence = 99
+			WHERE
+			ins_internal_id = ?
+			AND bill_sequence = ?
+			
+		</statement>
+
+		<statement name="selUpdateCoverage">
+			
+			UPDATE insurance
+			SET
+			ins_org_id = ?,
+			product_name = ?,
+			plan_name = ?,
+			remit_type = ?
+			WHERE parent_ins_id = ?
+			AND record_type = 3
+			AND owner_org_id = ?
+			
+		</statement>
+
+		<statement name="selUpdateInsSequence">
+			
+			UPDATE insurance
+			SET bill_sequence = 99
+			WHERE
+			owner_person_id = ?
+			AND bill_sequence &gt; ?
+			AND bill_sequence &lt; 5
+			
+		</statement>
+
+		<statement name="selUpdatePlanAndCoverage">
+			
+			UPDATE insurance
+			SET
+			ins_type = ?,
+			product_name = ?,
+			ins_org_id = ?
+			WHERE
+			product_name = ?
+			AND ins_org_id = ?
+			AND record_type IN (2, 3)
+			AND owner_org_id = ?
+			
+		</statement>
+
+		<statement name="selWorkersCompPlanInfo">
+			
+			SELECT
+			ins_internal_id,
+			product_name,
+			ins_org_id,
+			remit_type,
+			remit_payer_id,
+			remit_payer_name,
+			ins_type
+			FROM insurance
+			WHERE
+			product_name = ?
+			AND ins_type = 6
+			
+		</statement>
+
+		<statement name="selWorkersCompPlansForOrg">
+			
+			SELECT
+			ins_internal_id,
+			product_name,
+			ins_org_id,
+			remit_type,
+			remit_payer_id,
+			remit_payer_name,
+			ins_type
+			FROM insurance
+			WHERE
+			ins_org_id = ?
+			AND ins_type = ?
+			AND record_type in (?, ?, ?, ?)
+			
+		</statement>
+
+		<statement name="sel_Person_Insurance">
+			
+			SELECT
+			DECODE(bill_sequence,0,'Primary',1,'Secondary',2,'Tertiary',3,'Inactive','','W. Comp'),
+			plan_name,
+			ins_org_id
+			FROM insurance
+			WHERE owner_person_id = ?
+			ORDER BY
+			coverage_end_date DESC,
+			bill_sequence
+			
+		</statement>
+
+	</sql-statements>
+</xaf>

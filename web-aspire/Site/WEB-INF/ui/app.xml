@@ -1,0 +1,2156 @@
+<?xml version="1.0"?>
+
+<xaf>
+	<dialogs package="app">
+		<dialog name="lab_test" heading="lab_test">
+			<field.text caption="Lab Org ID" read-only="yes" max-length="30" name="org_id" size="15"/>
+			<field.text hidden="yes" name="test_type" caption="Test Type"/>
+			<field.select caption="Test Selection" required="yes" name="panel_test" choices="Single=0;Panel=1"/>
+			<!--  -->
+			<field.composite caption="Panel ID/Caption" required="yes" name="panel_id_name">
+				<field.text caption="Panel ID"  max-length="30" name="panel_id" size="15"/>
+				<field.text caption="Panel Name"  max-length="30" name="panel_name" size="15"/>
+			</field.composite>
+			<field.text hidden="yes" name="entry_id" caption="entry_id"/>
+			<field.text hidden="yes" name="lab_type_cap" caption="lab_type_cap"/>
+			<field.composite caption="Test ID/Caption"  name="test">
+				<field.text caption="Test ID"  max-length="30" name="test_id" size="15"/>
+				<field.text caption="Test Caption"  max-length="30" name="test_caption"/>
+			</field.composite>
+			<field.text caption="Charge Code"  name="code"/>
+			<field.currency caption="Physician Cost"  max-length="1024" name="doc_price" size="10"/>
+			<field.currency caption="Patient Cost"  max-length="1024" name="pat_price" size="10"/>
+			<field.composite caption="*"  name="panel">
+				<field.text hidden="yes" name="entry_id_1"/>
+				<field.text caption="Test ID"  max-length="30" name="test_id_1" size="15"/>
+				<field.text caption="Caption"  max-length="30" name="test_caption_1"/>
+				<field.text caption="Charge Code"  name="code_1"/>
+				<field.currency caption="Physician Cost"  max-length="1024" name="doc_price_1" size="10"/>
+				<field.currency caption="Patient Cost"  max-length="1024" name="pat_price_1" size="10"/>
+				<field.text hidden="yes" name="entry_id_2"/>
+				<field.text caption="Test ID"  max-length="30" name="test_id_2" size="15"/>
+				<field.text caption="Caption"  max-length="30" name="test_caption_2"/>
+				<field.text caption="Charge Code"  name="code_2"/>
+				<field.currency caption="Physician Cost"  max-length="1024" name="doc_price_2" size="10"/>
+				<field.currency caption="Patient Cost"  max-length="1024" name="pat_price_2" size="10"/>
+				<field.text hidden="yes" name="entry_id_3"/>
+				<field.text caption="Test ID"  max-length="30" name="test_id_3" size="15"/>
+				<field.text caption="Caption"  max-length="30" name="test_caption_3"/>
+				<field.text caption="Charge Code"  name="code_3"/>
+				<field.currency caption="Physician Cost"  max-length="1024" name="doc_price_3" size="10"/>
+				<field.currency caption="Patient Cost"  max-length="1024" name="pat_price_3" size="10"/>
+				<field.text hidden="yes" name="entry_id_4"/>
+				<field.text caption="Test ID"  max-length="30" name="test_id_4" size="15"/>
+				<field.text caption="Caption"  max-length="30" name="test_caption_4"/>
+				<field.text caption="Charge Code"  name="code_4"/>
+				<field.currency caption="Physician Cost"  max-length="1024" name="doc_price_4" size="10"/>
+				<field.currency caption="Patient Cost"  max-length="1024" name="pat_price_4" size="10"/>
+				<field.text hidden="yes" name="entry_id_5"/>
+				<field.text caption="Test ID"  max-length="30" name="test_id_5" size="15"/>
+				<field.text caption="Caption"  max-length="30" name="test_caption_5"/>
+				<field.text caption="Charge Code"  name="code_5"/>
+				<field.currency caption="Physician Cost"  max-length="1024" name="doc_price_5" size="10"/>
+				<field.currency caption="Patient Cost"  max-length="1024" name="pat_price_5" size="10"/>
+				<field.text hidden="yes" name="entry_id_6"/>
+				<field.text caption="Test ID"  max-length="30" name="test_id_6" size="15"/>
+				<field.text caption="Caption"  max-length="30" name="test_caption_6"/>
+				<field.text caption="Charge Code"  name="code_6"/>
+				<field.currency caption="Physician Cost"  max-length="1024" name="doc_price_6" size="10"/>
+				<field.currency caption="Patient Cost"  max-length="1024" name="pat_price_6" size="10"/>
+				<field.text hidden="yes" name="entry_id_7"/>
+				<field.text caption="Test ID"  max-length="30" name="test_id_7" size="15"/>
+				<field.text caption="Caption"  max-length="30" name="test_caption_7"/>
+				<field.text caption="Charge Code"  name="code_7"/>
+				<field.currency caption="Physician Cost"  max-length="1024" name="doc_price_7" size="10"/>
+				<field.currency caption="Patient Cost"  max-length="1024" name="pat_price_7" size="10"/>
+				<field.text hidden="yes" name="entry_id_8"/>
+				<field.text caption="Test ID"  max-length="30" name="test_id_8" size="15"/>
+				<field.text caption="Caption"  max-length="30" name="test_caption_8"/>
+				<field.text caption="Charge Code"  name="code_8"/>
+				<field.currency caption="Physician Cost"  max-length="1024" name="doc_price_8" size="10"/>
+				<field.currency caption="Patient Cost"  max-length="1024" name="pat_price_8" size="10"/>
+				<field.text hidden="yes" name="entry_id_9"/>
+				<field.text caption="Test ID"  max-length="30" name="test_id_9" size="15"/>
+				<field.text caption="Caption"  max-length="30" name="test_caption_9"/>
+				<field.text caption="Charge Code"  name="code_9"/>
+				<field.currency caption="Physician Cost"  max-length="1024" name="doc_price_9" size="10"/>
+				<field.currency caption="Patient Cost"  max-length="1024" name="pat_price_9" size="10"/>
+				<field.text hidden="yes" name="entry_id_10"/>
+				<field.text caption="Test ID"  max-length="30" name="test_id_10" size="15"/>
+				<field.text caption="Caption"  max-length="30" name="test_caption_10"/>
+				<field.text caption="Charge Code"  name="code_10"/>
+				<field.currency caption="Physician Cost"  max-length="1024" name="doc_price_10" size="10"/>
+				<field.currency caption="Patient Cost"  max-length="1024" name="pat_price_10" size="10"/>
+				<field.text hidden="yes" name="entry_id_11"/>
+				<field.text caption="Test ID"  max-length="30" name="test_id_11" size="15"/>
+				<field.text caption="Caption"  max-length="30" name="test_caption_11"/>
+				<field.text caption="Charge Code"  name="code_11"/>
+				<field.currency caption="Physician Cost"  max-length="1024" name="doc_price_11" size="10"/>
+				<field.currency caption="Patient Cost"  max-length="1024" name="pat_price_11" size="10"/>
+				<field.text hidden="yes" name="entry_id_12"/>
+				<field.text caption="Test ID"  max-length="30" name="test_id_12" size="15"/>
+				<field.text caption="Caption"  max-length="30" name="test_caption_12"/>
+				<field.text caption="Charge Code"  name="code_12"/>
+				<field.currency caption="Physician Cost"  max-length="1024" name="doc_price_12" size="10"/>
+				<field.currency caption="Patient Cost"  max-length="1024" name="pat_price_12" size="10"/>
+				<field.text hidden="yes" name="entry_id_13"/>
+				<field.text caption="Test ID"  max-length="30" name="test_id_13" size="15"/>
+				<field.text caption="Caption"  max-length="30" name="test_caption_13"/>
+				<field.text caption="Charge Code"  name="code_13"/>
+				<field.currency caption="Physician Cost"  max-length="1024" name="doc_price_13" size="10"/>
+				<field.currency caption="Patient Cost"  max-length="1024" name="pat_price_13" size="10"/>
+				<field.text hidden="yes" name="entry_id_14"/>
+				<field.text caption="Test ID"  max-length="30" name="test_id_14" size="15"/>
+				<field.text caption="Caption"  max-length="30" name="test_caption_14"/>
+				<field.text caption="Charge Code"  name="code_14"/>
+				<field.currency caption="Physician Cost"  max-length="1024" name="doc_price_14" size="10"/>
+				<field.currency caption="Patient Cost"  max-length="1024" name="pat_price_14" size="10"/>
+				<field.text hidden="yes" name="entry_id_15"/>
+				<field.text caption="Test ID"  max-length="30" name="test_id_15" size="15"/>
+				<field.text caption="Caption"  max-length="30" name="test_caption_15"/>
+				<field.text caption="Charge Code"  name="code_15"/>
+				<field.currency caption="Physician Cost"  max-length="1024" name="doc_price_15" size="10"/>
+				<field.currency caption="Patient Cost"  max-length="1024" name="pat_price_15" size="10"/>
+			</field.composite>
+			<field.text hidden="yes" name="internal_catalog_id" caption="internal_catalog_id"/>
+
+		</dialog>
+
+		<dialog name="misc_procedure_item" heading="misc_procedure_item">
+			<field.text hidden="yes" name="catalog_id" caption="catalog_id"/>
+			<field.text caption="Procedure Code" read-only="yes" name="proc_code" size="10"/>
+			<field.text caption="Procedure Name" read-only="yes" name="name" size="25"/>
+			<field.text caption="Procedure Description" read-only="yes" name="description" size="50"/>
+			<field.composite caption="*"  name="code_modifier1">
+				<field.text caption="CPT" required="yes" name="cpt_code" size="10"/>
+				<field.text caption="Modifier"  name="modifier" size="10"/>
+			</field.composite>
+			<field.text hidden="yes" name="add_mode" caption="add_mode"/>
+
+		</dialog>
+
+		<dialog name="postpersonalpayment" heading="postpersonalpayment">
+			<field.text hidden="yes" name="list_invoices" caption="list_invoices"/>
+			<field.text hidden="yes" name="credit_warning_flag" caption="credit_warning_flag"/>
+			<field.composite caption="Batch ID Date" required="yes" name="batch_fields">
+				<field.text caption="Batch ID" required="yes" name="batch_id" size="12"/>
+				<field.date caption="Batch Date" name="batch_date" size="12"/>
+			</field.composite>
+			<field.text caption="Patient/Person ID" required="yes" max-length="16" name="payer_id" size="16"/>
+			<field.currency caption="Total Payment Received" required="yes" max-length="1024" name="total_amount" size="10"/>
+			<field.select caption="Payment Type"  name="pay_type"/>
+			<!--  -->
+			<field.composite caption="Payment Method/Check Number"  name="pay_method_fields">
+				<field.select caption="pay_method"  name="pay_method"/>
+				<!--  -->
+				<field.text caption="Check Number"  name="pay_ref"/>
+			</field.composite>
+			<field.text caption="Authorization/Reference Number"  name="auth_ref"/>
+			<field.select caption="Provider ID" prepend-blank="yes" name="provider_id" choices="query:person.selPersonBySessionOrgAndCategory"/>
+			<!--  -->
+			<field.separator heading="Outstanding Invoices" name="outstanding_heading"/>
+			<!-- Unimplemented field type=invoices -->
+
+		</dialog>
+
+		<dialog name="org_ipa" heading="$Command IPA Organization">
+			<field.text hidden="yes" name="clear_item_id" caption="clear_item_id"/>
+			<field.text hidden="yes" name="business_hrs_id" caption="business_hrs_id"/>
+			<field.text hidden="yes" name="area_served_id" caption="area_served_id"/>
+			<field.separator heading="Profile Information" name="gen_info_heading"/>
+			<field.text caption="Parent Organization ID"  max-length="16" name="parent_org_id" size="16"/>
+			<field.text caption="Organization ID" required="yes" max-length="16" name="org_id" size="16"/>
+			<field.memo caption="Organization Name" name="name_primary" size="24"/>
+			<field.memo caption="Doing Business As" name="name_trade" size="24"/>
+			<field.separator heading="Contact Information" name="contact_heading"/>
+			<field.composite caption="*"  name="hours_and_tzone">
+				<field.text caption="Hours of Operation"  name="business_hours"/>
+				<field.select caption="Time Zone"  name="time_zone" choices="GMT=GMT;US-Atlantic=AST4ADT;US-Eastern=EST5EDT;US-Central=CST6CDT;US-Mountain=MST7MDT;US-Pacific=PST8PDT"/>
+				<!--  -->
+			</field.composite>
+			<field.composite caption="*"  name="phone_fax">
+				<field.phone caption="Phone" required="yes" max-length="1024" name="phone"/>
+				<field.phone caption="Fax"  max-length="1024" name="fax"/>
+			</field.composite>
+			<field.composite caption="Mailing Address" required="yes" name="address">
+				<field.text caption="Address (Line 1)"  max-length="128" name="addr_line1" size="36"/>
+				<field.text caption="Address (Line 2)"  max-length="128" name="addr_line2" size="36"/>
+				<field.text caption="City"  max-length="64" name="addr_city" size="16"/>
+				<field.text caption="State"  max-length="2" name="addr_state" size="2"/>
+				<field.text caption="Zip"  name="addr_zip"/>
+			</field.composite>
+			<field.email caption="Email"  max-length="1024" name="email"/>
+			<field.uri caption="Website"  max-length="1024" name="internet"/>
+			<field.composite caption="*"  name="org_contact">
+				<field.text caption="Billing Contact"  name="contact_name"/>
+				<field.phone caption="Phone"  max-length="1024" name="contact_phone"/>
+			</field.composite>
+			<field.separator name="text_field"/>
+			<field.boolean caption="Delete record?"  name="delete_record" style="check"/>
+
+		</dialog>
+
+		<dialog name="person_category" heading="$Command Person With A New Category">
+			<field.text caption="Person ID" required="yes" hint="Please provide an existing Person ID." max-length="16" name="person_id" size="16"/>
+			<field.select caption="Category"  name="category" choices="Patient;Guarantor;Insured-Person"/>
+			<!--  -->
+
+		</dialog>
+
+		<dialog name="org_dept" heading="$Command Department Organization">
+			<field.text hidden="yes" name="clear_item_id" caption="clear_item_id"/>
+			<field.text hidden="yes" name="business_hrs_id" caption="business_hrs_id"/>
+			<field.text hidden="yes" name="area_served_id" caption="area_served_id"/>
+			<field.separator heading="Profile Information" name="gen_info_heading"/>
+			<field.text caption="Parent Organization ID"  max-length="16" name="parent_org_id" size="16"/>
+			<field.text caption="Organization ID" required="yes" max-length="16" name="org_id" size="16"/>
+			<field.memo caption="Organization Name" name="name_primary" size="24"/>
+			<field.memo caption="Doing Business As" name="name_trade" size="24"/>
+			<field.separator heading="Contact Information" name="contact_heading"/>
+			<field.composite caption="*"  name="hours_and_tzone">
+				<field.text caption="Hours of Operation"  name="business_hours"/>
+				<field.select caption="Time Zone"  name="time_zone" choices="GMT=GMT;US-Atlantic=AST4ADT;US-Eastern=EST5EDT;US-Central=CST6CDT;US-Mountain=MST7MDT;US-Pacific=PST8PDT"/>
+				<!--  -->
+			</field.composite>
+			<field.composite caption="*"  name="phone_fax">
+				<field.phone caption="Phone" required="yes" max-length="1024" name="phone"/>
+				<field.phone caption="Fax"  max-length="1024" name="fax"/>
+			</field.composite>
+			<field.composite caption="Mailing Address" required="yes" name="address">
+				<field.text caption="Address (Line 1)"  max-length="128" name="addr_line1" size="36"/>
+				<field.text caption="Address (Line 2)"  max-length="128" name="addr_line2" size="36"/>
+				<field.text caption="City"  max-length="64" name="addr_city" size="16"/>
+				<field.text caption="State"  max-length="2" name="addr_state" size="2"/>
+				<field.text caption="Zip"  name="addr_zip"/>
+			</field.composite>
+			<field.email caption="Email"  max-length="1024" name="email"/>
+			<field.uri caption="Website"  max-length="1024" name="internet"/>
+			<field.composite caption="*"  name="org_contact">
+				<field.text caption="Billing Contact"  name="contact_name"/>
+				<field.phone caption="Phone"  max-length="1024" name="contact_phone"/>
+			</field.composite>
+			<field.separator name="text_field"/>
+			<field.boolean caption="Delete record?"  name="delete_record" style="check"/>
+
+		</dialog>
+
+		<dialog name="shortformPerson" heading="$Command Patient">
+			<field.text hidden="yes" name="home_phone_item_id" caption="home_phone_item_id"/>
+			<field.text hidden="yes" name="work_phone_item_id" caption="work_phone_item_id"/>
+			<field.text hidden="yes" name="driver_license_item_id" caption="driver_license_item_id"/>
+			<field.text hidden="yes" name="addr_item_id" caption="addr_item_id"/>
+			<field.text caption="Person / Patient ID"  hint="To use the ID autosuggestion feature, leave this field blank" max-length="16" name="person_id" size="16"/>
+			<field.composite caption="*"  name="person_id">
+				<field.text caption="Last Name" required="yes" name="name_last" size="16"/>
+				<field.text caption="First Name" required="yes" name="name_first" size="12"/>
+				<field.text caption="Middle Name"  name="name_middle" size="8"/>
+				<field.text caption="Suffix"  name="name_suffix" size="16"/>
+			</field.composite>
+			<field.select caption="Gender"  name="gender" choices="Male=1;Female=2" style="radio"/>
+			<!--  -->
+			<field.date caption="Date of Birth" name="date_of_birth" size="12"/>
+			<field.composite caption="Home Address"  name="address">
+				<field.text caption="Address (Line 1)"  max-length="128" name="addr_line1" size="36"/>
+				<field.text caption="Address (Line 2)"  max-length="128" name="addr_line2" size="36"/>
+				<field.text caption="City"  max-length="64" name="addr_city" size="16"/>
+				<field.text caption="State"  max-length="2" name="addr_state" size="2"/>
+				<field.text caption="Zip"  name="addr_zip"/>
+			</field.composite>
+			<field.composite caption="*"  name="text_field">
+				<field.phone caption="Home "  max-length="1024" name="home_phone"/>
+				<field.phone caption="Work Phone"  max-length="1024" name="work_phone"/>
+			</field.composite>
+			<field.ssn caption="Social Security Number"  max-length="1024" name="ssn" size="11"/>
+			<field.composite caption="*"  name="text_field">
+				<field.text caption="Drivers License Number"  name="license_number"/>
+				<field.text caption="State"  max-length="2" name="license_state" size="2"/>
+			</field.composite>
+
+		</dialog>
+
+		<dialog name="org_employer" heading="$Command Employer Organization">
+			<field.text hidden="yes" name="clear_item_id" caption="clear_item_id"/>
+			<field.text hidden="yes" name="business_hrs_id" caption="business_hrs_id"/>
+			<field.text hidden="yes" name="area_served_id" caption="area_served_id"/>
+			<field.separator heading="Profile Information" name="gen_info_heading"/>
+			<field.text caption="Parent Organization ID"  max-length="16" name="parent_org_id" size="16"/>
+			<field.text caption="Organization ID" required="yes" max-length="16" name="org_id" size="16"/>
+			<field.memo caption="Organization Name" name="name_primary" size="24"/>
+			<field.memo caption="Doing Business As" name="name_trade" size="24"/>
+			<field.separator heading="Contact Information" name="contact_heading"/>
+			<field.composite caption="*"  name="hours_and_tzone">
+				<field.text caption="Hours of Operation"  name="business_hours"/>
+				<field.select caption="Time Zone"  name="time_zone" choices="GMT=GMT;US-Atlantic=AST4ADT;US-Eastern=EST5EDT;US-Central=CST6CDT;US-Mountain=MST7MDT;US-Pacific=PST8PDT"/>
+				<!--  -->
+			</field.composite>
+			<field.composite caption="*"  name="phone_fax">
+				<field.phone caption="Phone" required="yes" max-length="1024" name="phone"/>
+				<field.phone caption="Fax"  max-length="1024" name="fax"/>
+			</field.composite>
+			<field.composite caption="Mailing Address" required="yes" name="address">
+				<field.text caption="Address (Line 1)"  max-length="128" name="addr_line1" size="36"/>
+				<field.text caption="Address (Line 2)"  max-length="128" name="addr_line2" size="36"/>
+				<field.text caption="City"  max-length="64" name="addr_city" size="16"/>
+				<field.text caption="State"  max-length="2" name="addr_state" size="2"/>
+				<field.text caption="Zip"  name="addr_zip"/>
+			</field.composite>
+			<field.email caption="Email"  max-length="1024" name="email"/>
+			<field.uri caption="Website"  max-length="1024" name="internet"/>
+			<field.composite caption="*"  name="org_contact">
+				<field.text caption="Billing Contact"  name="contact_name"/>
+				<field.phone caption="Phone"  max-length="1024" name="contact_phone"/>
+			</field.composite>
+			<field.separator name="text_field"/>
+			<field.boolean caption="Delete record?"  name="delete_record" style="check"/>
+
+		</dialog>
+
+		<dialog name="twcc60" heading="twcc60">
+			<field.text hidden="yes" name="field1_item_id" caption="field1_item_id"/>
+			<field.text hidden="yes" name="field2_item_id" caption="field2_item_id"/>
+			<field.text hidden="yes" name="field3_item_id" caption="field3_item_id"/>
+			<field.text hidden="yes" name="field4_item_id" caption="field4_item_id"/>
+			<field.text hidden="yes" name="field5_item_id" caption="field5_item_id"/>
+			<field.text hidden="yes" name="field6_item_id" caption="field6_item_id"/>
+			<field.text hidden="yes" name="field22_item_id" caption="field22_item_id"/>
+			<field.text hidden="yes" name="field23_item_id" caption="field23_item_id"/>
+			<field.text hidden="yes" name="field24_item_id" caption="field24_item_id"/>
+			<field.text hidden="yes" name="field25_item_id" caption="field25_item_id"/>
+			<field.text hidden="yes" name="field26_item_id" caption="field26_item_id"/>
+			<field.text hidden="yes" name="field27_item_id" caption="field27_item_id"/>
+			<field.text hidden="yes" name="field28_item_id" caption="field28_item_id"/>
+			<field.text hidden="yes" name="field29_item_id" caption="field29_item_id"/>
+			<field.separator heading="Part I: Requestor Information (requestor completes this section)" name="part1_heading"/>
+			<field.select caption="Type of Requestor" required="yes" name="requestor_type" choices="HCP=1;IC=2;IE=3" style="radio"/>
+			<!--  -->
+			<field.select caption="Type of Dispute" required="yes" name="dispute_type" choices="TWCC Refund Order Appeal=1;Medical Necessity=2;Carrier Request for Refund=3;Fee Reimbursement=4;Preauthorization=5"/>
+			<!--  -->
+			<field.text caption="Requestor's Name"  name="requestor_name"/>
+			<field.text caption="Requestor's Address"  name="requestor_addr1"/>
+			<field.text caption="Requestor's City, State, ZIP"  name="requestor_addr2"/>
+			<field.text caption="Contact Person's Name"  name="contact1_name"/>
+			<field.composite caption="Contact's Phone/Fax #"  name="contact2_phone_fax">
+				<field.phone caption="Contact's Telephone #"  max-length="1024" name="contact1_phone"/>
+				<field.phone caption="Contact's Fax #"  max-length="1024" name="contact1_fax"/>
+			</field.composite>
+			<field.email caption="Contact's E-mail"  max-length="1024" name="contact1_email"/>
+			<field.text caption="FEIN"  name="fein1"/>
+			<field.text caption="Professional License # (if applicable)"  name="prof_license1"/>
+			<field.separator heading="Part II: General Claim Information (requestor completes this section; respondent supplements information)" name="part2_heading"/>
+			<field.select caption="Carrier filed notice of denial relating to liability for or compensability of the injury that has not yet been resolved" required="yes" name="denial_notice" choices="Yes=1;No=2" style="radio"/>
+			<!--  -->
+			<field.select caption="Carrier filed notice of dispute relating to extent of injury that has not yet been resolved and is related to this dispute" required="yes" name="dispute_notice" choices="Yes=1;No=2" style="radio"/>
+			<!--  -->
+			<field.separator heading="Part III: Respondent Information (respondent completes this section)" name="part3_heading"/>
+			<field.select caption="Type of Respondent" required="yes" name="respondent_type" choices="HCP=1;IC=2;IE=3" style="radio"/>
+			<!--  -->
+			<field.text caption="Respondent's Name"  name="respondent_name"/>
+			<field.text caption="Respondent's Address"  name="respondent_addr1"/>
+			<field.text caption="Respondent's City, State, ZIP"  name="respondent_addr2"/>
+			<field.text caption="Contact Person's Name"  name="contact2_name"/>
+			<field.composite caption="Contact's Phone/Fax #"  name="contact2_phone_fax">
+				<field.phone caption="Contact's Telephone #"  max-length="1024" name="contact2_phone"/>
+				<field.phone caption="Contact's Fax #"  max-length="1024" name="contact2_fax"/>
+			</field.composite>
+			<field.email caption="Contact's E-mail"  max-length="1024" name="contact2_email"/>
+			<field.text caption="FEIN"  name="fein2"/>
+			<field.text caption="Professional License # (if applicable)"  name="prof_license2"/>
+			<field.select caption="Has the issue(s) been resolved?" required="yes" name="issue_resolved" choices="Yes=1;No=2" style="radio"/>
+			<!--  -->
+			<field.memo caption="If yes, describe how it was resolved and attach documents" name="issue_resolved_reason" size="24"/>
+			<field.separator heading="Table of Disputed Services" name="disputed_services_heading"/>
+			<field.text caption="disputed_services"  name="disputed_services"/>
+
+		</dialog>
+
+		<dialog name="twcc61" heading="twcc61">
+			<field.text hidden="yes" name="field16_item_id" caption="field16_item_id"/>
+			<field.text hidden="yes" name="field17_item_id" caption="field17_item_id"/>
+			<field.text hidden="yes" name="field18_item_id" caption="field18_item_id"/>
+			<field.text hidden="yes" name="field19_item_id" caption="field19_item_id"/>
+			<field.text hidden="yes" name="field20_item_id" caption="field20_item_id"/>
+			<field.text hidden="yes" name="field21_item_id" caption="field21_item_id"/>
+			<field.text hidden="yes" name="field22_item_id" caption="field22_item_id"/>
+			<field.text hidden="yes" name="field23_item_id" caption="field23_item_id"/>
+			<field.text hidden="yes" name="field24_item_id" caption="field24_item_id"/>
+			<field.text hidden="yes" name="field26_item_id" caption="field26_item_id"/>
+			<field.text hidden="yes" name="field27_item_id" caption="field27_item_id"/>
+			<field.date caption="Return to limited type of work" name="return_to_lmtd_work" size="12"/>
+			<field.date caption="Achieve maximum medical improvement" name="max_medical_improve" size="12"/>
+			<field.date caption="Return to full-time work" name="return_to_full_time" size="12"/>
+			<field.memo caption="History of Occupational Injury or Illness" name="injury_history" size="24"/>
+			<field.memo caption="Significant Past Medical History" name="med_history" size="24"/>
+			<field.memo caption="Clinical Assessment Findings" name="clinical_assessment" size="24"/>
+			<field.memo caption="Laboratory, Radiographic, and/or Imaging Tests Ordered and Results" name="lab_tests" size="24"/>
+			<field.memo caption="Treatment Plan" name="treatment_plan" size="24"/>
+			<field.select caption="Referrals or Change of Treating Doctor"  name="referrals_select" choices="Referrals=1;Change of Treating Doctor=2" style="radio"/>
+			<!--  -->
+			<field.memo caption="Details" name="referrals_details" size="24"/>
+			<field.memo caption="Medications or Durable Medical Equipment" name="medications" size="24"/>
+			<field.memo caption="Prognosis" name="prognosis" size="24"/>
+			<field.date caption="Date Report Mailed to Employee" name="mailed_to_employee" size="12"/>
+			<field.date caption="Date Report Mailed to Workers Compensation Insurance Carrier" name="mailed_to_insurance" size="12"/>
+
+		</dialog>
+
+		<dialog name="twcc64" heading="twcc64">
+			<field.text hidden="yes" name="field17_item_id" caption="field17_item_id"/>
+			<field.text hidden="yes" name="field18_item_id" caption="field18_item_id"/>
+			<field.text hidden="yes" name="field20_item_id" caption="field20_item_id"/>
+			<field.text hidden="yes" name="field21_item_id" caption="field21_item_id"/>
+			<field.text hidden="yes" name="field23_item_id" caption="field23_item_id"/>
+			<field.select caption="Reason for Report" required="yes" prepend-blank="yes" name="reason_for_report" choices="Subsequent Medical Report (due every 60 days after initial medical report)=1;Released to Return to Work=2;Changing Treating Doctors=3;Discharged From Hospital=4"/>
+			<!--  -->
+			<field.composite caption="Activity Type"  name="activity_fields">
+				<field.select caption="activity"  name="activity" choices="Limited Activity=1;Normal Activity=2" style="radio"/>
+				<!--  -->
+				<field.date caption="Date Report Mailed to Employee" name="activity_date" size="12"/>
+			</field.composite>
+			<field.composite caption="New Treating Provider"  name="provider_fields">
+				<field.select caption="Treating Provider"  name="provider" choices="query:person.selPersonBySessionOrgAndCategory"/>
+				<!--  -->
+				<field.date caption="Discharge Date" name="provider_date" size="12"/>
+			</field.composite>
+			<field.composite caption="Hospital Name and Date"  name="hospital_fields">
+				<field.text caption="hospital"  name="hospital"/>
+				<field.date caption="Discharge Date" name="discharge_date" size="12"/>
+			</field.composite>
+			<field.memo caption="Changes in Injured Employee's Condition, Including Clinical Assessment and Test Results" name="change_in_condition" size="24"/>
+			<field.memo caption="Referrals" name="referrals" size="24"/>
+			<field.memo caption="Medications or Durable Medical Equipment" name="equipment" size="24"/>
+			<field.memo caption="Compliance by Injured Employee with Recommended Treatment" name="compliance_by_employee" size="24"/>
+
+		</dialog>
+
+		<dialog name="twcc69" heading="twcc69">
+			<field.text hidden="yes" name="field17_item_id" caption="field17_item_id"/>
+			<field.text hidden="yes" name="field18_item_id" caption="field18_item_id"/>
+			<field.text hidden="yes" name="field19_item_id" caption="field19_item_id"/>
+			<field.text hidden="yes" name="field22_item_id" caption="field22_item_id"/>
+			<field.select caption="Employee has reached maximum medical improvement"  name="max_medical_improvement" choices="Yes=1;No=0" style="radio"/>
+			<!--  -->
+			<field.date caption="Date of Medical Improvement" hint="If 'No', give the estimated date on which employee is expected to reach maximum medical improvement" name="max_medical_date" size="12"/>
+			<!-- Unimplemented field type=percentage -->
+			<field.select caption="Doctor Type"  name="doc_type" choices="Treating=1;Other=2;Designated=3" style="radio"/>
+			<!--  -->
+			<field.select caption="Required Medical Examination Doctor"  name="exam_doc" choices="Carrier Selected=1;Commission Selected=2" style="radio"/>
+			<!--  -->
+			<field.separator heading="Treating Doctor's Review of Certification of Maximum Medical Improvement and Assigned Impairment Rating (See TWCC Form 69 for Instructions)" name="review_heading"/>
+			<field.select caption="Certification of Maximum Medical Improvement"  name="max_med_improve_review" choices="I Agree=1;I Disagree=0" style="radio"/>
+			<!--  -->
+			<field.select caption="Assigned Impairment Rating"  name="impairment_rating_review" choices="I Agree=1;I Disagree=0" style="radio"/>
+			<!--  -->
+
+		</dialog>
+
+		<dialog name="twcc73" heading="twcc73">
+			<field.text hidden="yes" name="field4_item_id" caption="field4_item_id"/>
+			<field.text hidden="yes" name="field13_item_id" caption="field13_item_id"/>
+			<field.text hidden="yes" name="field14a_item_id" caption="field14a_item_id"/>
+			<field.text hidden="yes" name="field14b_item_id" caption="field14b_item_id"/>
+			<field.text hidden="yes" name="field14c_item_id" caption="field14c_item_id"/>
+			<field.text hidden="yes" name="field14d_item_id" caption="field14d_item_id"/>
+			<field.text hidden="yes" name="field14e_item_id" caption="field14e_item_id"/>
+			<field.text hidden="yes" name="field14f_item_id" caption="field14f_item_id"/>
+			<field.text hidden="yes" name="field14g_item_id" caption="field14g_item_id"/>
+			<field.text hidden="yes" name="field15_item_id" caption="field15_item_id"/>
+			<field.text hidden="yes" name="field16_item_id" caption="field16_item_id"/>
+			<field.text hidden="yes" name="field17a_item_id" caption="field17a_item_id"/>
+			<field.text hidden="yes" name="field17b_item_id" caption="field17b_item_id"/>
+			<field.text hidden="yes" name="field17c_item_id" caption="field17c_item_id"/>
+			<field.text hidden="yes" name="field17d_item_id" caption="field17d_item_id"/>
+			<field.text hidden="yes" name="field17e_item_id" caption="field17e_item_id"/>
+			<field.text hidden="yes" name="field17f_item_id" caption="field17f_item_id"/>
+			<field.text hidden="yes" name="field17g_item_id" caption="field17g_item_id"/>
+			<field.text hidden="yes" name="field17h_item_id" caption="field17h_item_id"/>
+			<field.text hidden="yes" name="field18_item_id" caption="field18_item_id"/>
+			<field.text hidden="yes" name="field19a_item_id" caption="field19a_item_id"/>
+			<field.text hidden="yes" name="field19b_item_id" caption="field19b_item_id"/>
+			<field.text hidden="yes" name="field19c_item_id" caption="field19c_item_id"/>
+			<field.text hidden="yes" name="field19d_item_id" caption="field19d_item_id"/>
+			<field.text hidden="yes" name="field19e_item_id" caption="field19e_item_id"/>
+			<field.text hidden="yes" name="field19f_item_id" caption="field19f_item_id"/>
+			<field.text hidden="yes" name="field19g_item_id" caption="field19g_item_id"/>
+			<field.text hidden="yes" name="field19h_item_id" caption="field19h_item_id"/>
+			<field.text hidden="yes" name="field19i_item_id" caption="field19i_item_id"/>
+			<field.text hidden="yes" name="field19j_item_id" caption="field19j_item_id"/>
+			<field.text hidden="yes" name="field19k_item_id" caption="field19k_item_id"/>
+			<field.text hidden="yes" name="field20_item_id" caption="field20_item_id"/>
+			<field.text hidden="yes" name="field21_item_id" caption="field21_item_id"/>
+			<field.text hidden="yes" name="field22a_item_id" caption="field22a_item_id"/>
+			<field.text hidden="yes" name="field22b_item_id" caption="field22b_item_id"/>
+			<field.text hidden="yes" name="field22c_item_id" caption="field22c_item_id"/>
+			<field.text hidden="yes" name="field22d_item_id" caption="field22d_item_id"/>
+			<field.text hidden="yes" name="field22e_item_id" caption="field22e_item_id"/>
+			<field.text hidden="yes" name="field23_item_id" caption="field23_item_id"/>
+			<field.text hidden="yes" name="field24_item_id" caption="field24_item_id"/>
+			<field.memo caption="Employee's Description of Injury/Accident" name="employee_descr" size="24"/>
+			<field.separator heading="Work Status Information" name="workstatus_heading"/>
+			<field.select caption="Injured employee's medical condition resulting from work comp injury" required="yes" prepend-blank="yes" name="return_to_work" choices="Return to work (w/o restrictions)=1;Return to work (w/ restrictions)=2;Prevents employee from returning to work=3"/>
+			<!--  -->
+			<field.date caption="Allow employee to return to work as of" name="return_date_no_restrict" size="12"/>
+			<field.composite caption="Allow employee to return to work as of and through"  name="return_date_restrict_fields">
+				<field.date caption="Allow employee to return to work as of" name="return_date_restrict_from" size="12"/>
+				<field.date caption="Allow employee to return to work through" name="return_date_restrict_to" size="12"/>
+			</field.composite>
+			<field.composite caption="Prevents employee from returning to work as of and through"  name="prevent_return_date_fields">
+				<field.date caption="Prevents employee from returning to work as of" name="prevent_return_date_from" size="12"/>
+				<field.date caption="Prevents employee from returning to work through" name="prevent_return_date_to" size="12"/>
+			</field.composite>
+			<field.separator heading="Activity Restrictions (Only complete if 'Return to work (w/ restrictions)' was selected)" name="restrictions_heading"/>
+			<field.composite caption="Posture Restrictions (if any) - " read-only="yes" name="posture_column_heads">
+				<field.text caption="max hrs"  name="max_hrs"/>
+				<field.text caption="other hrs"  name="other_hrs"/>
+			</field.composite>
+			<field.composite caption="Standing"  name="standing_fields">
+				<field.select caption="Standing max hours" prepend-blank="yes" name="standing_hours" choices="0;2;4;6;8"/>
+				<!--  -->
+				<field.integer caption="Standing other hours"  max-length="1024" name="standing_other_hours" size="8"/>
+			</field.composite>
+			<field.composite caption="Sitting"  name="sitting_fields">
+				<field.select caption="Sitting max hours" prepend-blank="yes" name="sitting_hours" choices="0;2;4;6;8"/>
+				<!--  -->
+				<field.integer caption="Sitting other hours"  max-length="1024" name="sitting_other_hours" size="8"/>
+			</field.composite>
+			<field.composite caption="Kneeling/Squatting"  name="kneeling_fields">
+				<field.select caption="Kneeling/Squatting max hours" prepend-blank="yes" name="kneeling_hours" choices="0;2;4;6;8"/>
+				<!--  -->
+				<field.integer caption="Kneeling/Squatting other hours"  max-length="1024" name="kneeling_other_hours" size="8"/>
+			</field.composite>
+			<field.composite caption="Bending/Stooping"  name="bending_fields">
+				<field.select caption="Bending/Stooping max hours" prepend-blank="yes" name="bending_hours" choices="0;2;4;6;8"/>
+				<!--  -->
+				<field.integer caption="Bending/Stooping other hours"  max-length="1024" name="bending_other_hours" size="8"/>
+			</field.composite>
+			<field.composite caption="Pushing/Pulling"  name="pushing_fields">
+				<field.select caption="Pushing/Pulling max hours" prepend-blank="yes" name="pushing_hours" choices="0;2;4;6;8"/>
+				<!--  -->
+				<field.integer caption="Pushing/Pulling other hours"  max-length="1024" name="pushing_other_hours" size="8"/>
+			</field.composite>
+			<field.composite caption="Twisting"  name="twisting_fields">
+				<field.select caption="Twisting max hours" prepend-blank="yes" name="twisting_hours" choices="0;2;4;6;8"/>
+				<!--  -->
+				<field.integer caption="Twisting other hours"  max-length="1024" name="twisting_other_hours" size="8"/>
+			</field.composite>
+			<field.composite caption="Other Posture"  name="other_posture_fields">
+				<field.text caption="Other Posture"  name="other_posture"/>
+				<field.select caption="Other max hours" prepend-blank="yes" name="other_posture_hours" choices="0;2;4;6;8"/>
+				<!--  -->
+				<field.integer caption="Other other hours"  max-length="1024" name="other_posture_other_hours" size="8"/>
+			</field.composite>
+			<field.separator name="divider1"/>
+			<field.select caption="Restrictions specific to (if applicable) - "  name="specific_restrictions" choices="L Hand/Wrist=LH;L Arm=LA;L Leg=LL;L Foot/Ankle=LF;R Hand/Wrist=RH;R Arm=RA;R Leg=RL;R Foot/Ankle=RF;Neck=N;Back=B" style="multicheck"/>
+			<!--  -->
+			<field.text caption="Other"  name="other_specific_restriction"/>
+			<field.separator name="divider2"/>
+			<field.memo caption="Other restrictions (if any) - " name="other_restrictions_notes" size="24"/>
+			<field.separator name="divider3"/>
+			<field.composite caption="Motion Restrictions (if any) - " read-only="yes" name="motion_column_heads">
+				<field.text caption="max hrs"  name="max_hrs"/>
+				<field.text caption="other hrs"  name="other_hrs"/>
+			</field.composite>
+			<field.composite caption="Walking"  name="walking_fields">
+				<field.select caption="Walking max hours" prepend-blank="yes" name="walking_hours" choices="0;2;4;6;8"/>
+				<!--  -->
+				<field.integer caption="Walking other hours"  max-length="1024" name="walking_other_hours" size="8"/>
+			</field.composite>
+			<field.composite caption="Climbing stairs/ladders"  name="climbing_stairs_fields">
+				<field.select caption="Climbing stairs/ladders max hours" prepend-blank="yes" name="climbing_hours" choices="0;2;4;6;8"/>
+				<!--  -->
+				<field.integer caption="Climbing stairs/ladders other hours"  max-length="1024" name="climbing_other_hours" size="8"/>
+			</field.composite>
+			<field.composite caption="Grasping/Squeezing"  name="grasping_fields">
+				<field.select caption="Grasping/Squeezing max hours" prepend-blank="yes" name="grasping_hours" choices="0;2;4;6;8"/>
+				<!--  -->
+				<field.integer caption="Grasping/Squeezing other hours"  max-length="1024" name="grasping_other_hours" size="8"/>
+			</field.composite>
+			<field.composite caption="Wrist flexion/extension"  name="wrist_fields">
+				<field.select caption="Wrist flexion/extension max hours" prepend-blank="yes" name="wrist_hours" choices="0;2;4;6;8"/>
+				<!--  -->
+				<field.integer caption="Wrist flexion/extension other hours"  max-length="1024" name="wrist_other_hours" size="8"/>
+			</field.composite>
+			<field.composite caption="Reaching"  name="reaching_fields">
+				<field.select caption="Reaching max hours" prepend-blank="yes" name="reaching_hours" choices="0;2;4;6;8"/>
+				<!--  -->
+				<field.integer caption="Reaching other hours"  max-length="1024" name="reaching_other_hours" size="8"/>
+			</field.composite>
+			<field.composite caption="Overhead Reaching"  name="overhead_reaching_fields">
+				<field.select caption="Overhead Reaching max hours" prepend-blank="yes" name="overhead_reaching_hours" choices="0;2;4;6;8"/>
+				<!--  -->
+				<field.integer caption="Overhead Reaching other hours"  max-length="1024" name="overhead_reaching_other_hours" size="8"/>
+			</field.composite>
+			<field.composite caption="Keyboarding"  name="keyboarding_fields">
+				<field.select caption="Keyboarding max hours" prepend-blank="yes" name="keyboarding_hours" choices="0;2;4;6;8"/>
+				<!--  -->
+				<field.integer caption="Keyboarding other hours"  max-length="1024" name="keyboarding_other_hours" size="8"/>
+			</field.composite>
+			<field.composite caption="Other Motion"  name="other_motion_fields">
+				<field.text caption="Other motion"  name="other_motion"/>
+				<field.select caption="Other max hours" prepend-blank="yes" name="other_motion_hours" choices="0;2;4;6;8"/>
+				<!--  -->
+				<field.integer caption="Other other hours"  max-length="1024" name="other_motion_other_hours" size="8"/>
+			</field.composite>
+			<field.separator name="divider4"/>
+			<field.select caption="Lift/Carry Restrictions (if any) - " prepend-blank="yes" name="lift_carry_instructions" choices="May not lift/carry objects (conditional)=1;May not perform any lifting/carrying=2;Other=3"/>
+			<!--  -->
+			<field.composite caption="Pounds (lbs) per hour(s)"  name="pounds_hours_fields">
+				<field.integer caption="Max Pounds"  max-length="1024" name="carry_lbs" size="8"/>
+				<field.integer caption="Hours per day"  max-length="1024" name="carry_hours" size="8"/>
+			</field.composite>
+			<field.text caption="Other Lift/Carry Restrictions"  name="other_carry_restrictions"/>
+			<field.separator name="divider5"/>
+			<field.text caption="Misc Restrictions (if any) - " read-only="yes" name="misc_restrict_heading"/>
+			<field.integer caption="Max hours per day of work"  max-length="1024" name="max_hours_of_work" size="8"/>
+			<field.composite caption="Sit/Stretch breaks (number per unit of time)"  name="sit_stretch_breaks_fields">
+				<field.integer caption="Sit/Stretch breaks (number)"  max-length="1024" name="num_of_sit_stretch_breaks" size="8"/>
+				<field.text caption="Sit/Stretch breaks (per unit of time)"  name="sit_stretch_breaks_per"/>
+			</field.composite>
+			<field.boolean caption="Must wear splint/cast at work"  name="wear_splint_cast" style="check"/>
+			<field.boolean caption="Must use crutches at all times"  name="crutches" style="check"/>
+			<field.boolean caption="No driving/operating heavy equipment"  name="no_driving" style="check"/>
+			<field.boolean caption="Can only drive automatic transmission"  name="auto_transmission_only" style="check"/>
+			<field.select caption="Work schedule limitations" prepend-blank="yes" name="work_limitations" choices="No work=1;Limited work hours=2"/>
+			<!--  -->
+			<field.integer caption="Hours per day"  max-length="1024" name="work_hours_per_day" size="8"/>
+			<field.boolean caption="In extreme hot/cold environments"  name="work_temp_environment" style="check"/>
+			<field.boolean caption="At heights or on scaffolding"  name="work_height_environment" style="check"/>
+			<field.composite caption="Must keep (provide body part)"  name="must_keep_fields">
+				<field.text caption="Must keep info"  name="must_keep_text"/>
+				<field.boolean caption="Elevated"  name="elevated" style="check"/>
+				<field.boolean caption="Clean &amp;Dry"  name="clean_dry" style="check"/>
+			</field.composite>
+			<field.text caption="No skin contact with"  name="no_skin_contact_with"/>
+			<field.boolean caption="Dressing changes necessary at work"  name="dress_changes" style="check"/>
+			<field.boolean caption="No Running"  name="no_running" style="check"/>
+			<field.separator name="divider6"/>
+			<field.text caption="Medications Restrictions (if any) - " read-only="yes" name="med_restrict_heading"/>
+			<field.boolean caption="Must take prescription medication(s)"  name="prescription_meds" style="check"/>
+			<field.boolean caption="Advised to take over-the-counter meds"  name="otc_meds" style="check"/>
+			<field.boolean caption="Medication may make drowsy (possible safety/driving issues)"  name="drowsy_meds" style="check"/>
+			<field.separator heading="Treatment/Follow-up Appointment Information" name="divider7"/>
+			<field.memo caption="Work Injury Diagnosis Information" name="injury_diag_info" size="24"/>
+			<field.text caption="Expected Follow-up Services include - " read-only="yes" name="follow_up_services_heading"/>
+			<field.composite caption="Evaluation by the treating doctor (date/time)"  name="eval_by_doc_fields">
+				<field.date caption="Evaluation Date" name="eval_date" size="12"/>
+				<field.time caption="Evaluation Time" name="eval_time" size="8"/>
+			</field.composite>
+			<field.composite caption="Referral to/Consult with (name/date/time)"  name="ref_consult_fields">
+				<field.text caption="Referral to/Consult with"  name="ref_consult_with"/>
+				<field.date caption="Referral to/Consult Date" name="ref_consult_date" size="12"/>
+				<field.time caption="Referral to/Consult Time" name="ref_consult_time" size="8"/>
+			</field.composite>
+			<field.composite caption="Physical medicine (# per week/# of weeks/start date/start time)"  name="phys_med_fields">
+				<field.integer caption="Physical medicine (per week)"  max-length="1024" name="phys_med_per_week" size="8"/>
+				<field.integer caption="Physical medicine (# of weeks)"  max-length="1024" name="phys_med_weeks" size="8"/>
+				<field.date caption="Physical medicine (start date)" name="phys_med_start_date" size="12"/>
+				<field.time caption="Physical medicine (start time)" name="phys_med_start_time" size="8"/>
+			</field.composite>
+			<field.composite caption="Special studies (list/date/time)"  name="special_studies_fields">
+				<field.text caption="Special studies list"  name="special_list"/>
+				<field.date caption="Special studies date" name="special_studies_date" size="12"/>
+				<field.time caption="Special studies time" name="special_studies_time" size="8"/>
+			</field.composite>
+			<field.select caption="None. This is the last scheduled visit for this problem. At this time, no further medical care is anticipated."  name="no_services_anticipated" choices="True=1;False=2" style="radio"/>
+			<!--  -->
+			<field.select caption="Visit Type"  name="visit_type" choices="Initial=1;Follow-up=2"/>
+			<!--  -->
+			<field.select caption="Role of Doctor"  name="doctor_role" choices="Designated doctor=1;Carrier-selected RME=2;TWCC-selected RME=3;Treating doctor=4;Referral doctor=5;Consulting doctor=6;Other doctor=7"/>
+			<!--  -->
+
+		</dialog>
+
+		<dialog name="assign" heading="assign">
+			<field.composite caption="Appointment Dates" required="yes" name="effective">
+				<field.date caption="effective_begin_date" name="effective_begin_date" size="12"/>
+				<field.date caption="effective_end_date" name="effective_end_date" size="12"/>
+			</field.composite>
+			<field.select caption="Roving Physician"  name="roving_physician" choices="query:scheduling.selRovingPhysicianTypes"/>
+			<!--  -->
+			<field.text caption="Resource ID (From)" required="yes" hint="Reassign Appointments From this Resource" max-length="64" name="resource_id_from" size="30"/>
+			<field.text caption="Resource ID (To)" required="yes" hint="To this Resource" max-length="64" name="resource_id_to" size="30"/>
+			<field.text caption="Facility"  max-length="16" name="facility_id" size="16"/>
+
+		</dialog>
+
+		<dialog name="org_pharmacy" heading="$Command Pharmacy">
+			<field.text hidden="yes" name="clear_item_id" caption="clear_item_id"/>
+			<field.text hidden="yes" name="business_hrs_id" caption="business_hrs_id"/>
+			<field.text hidden="yes" name="area_served_id" caption="area_served_id"/>
+			<field.separator heading="Profile Information" name="gen_info_heading"/>
+			<field.text caption="Parent Organization ID"  max-length="16" name="parent_org_id" size="16"/>
+			<field.text caption="Organization ID" required="yes" max-length="16" name="org_id" size="16"/>
+			<field.memo caption="Organization Name" name="name_primary" size="24"/>
+			<field.memo caption="Doing Business As" name="name_trade" size="24"/>
+			<field.separator heading="Contact Information" name="contact_heading"/>
+			<field.composite caption="*"  name="hours_and_tzone">
+				<field.text caption="Hours of Operation"  name="business_hours"/>
+				<field.select caption="Time Zone"  name="time_zone" choices="GMT=GMT;US-Atlantic=AST4ADT;US-Eastern=EST5EDT;US-Central=CST6CDT;US-Mountain=MST7MDT;US-Pacific=PST8PDT"/>
+				<!--  -->
+			</field.composite>
+			<field.composite caption="*"  name="phone_fax">
+				<field.phone caption="Phone" required="yes" max-length="1024" name="phone"/>
+				<field.phone caption="Fax"  max-length="1024" name="fax"/>
+			</field.composite>
+			<field.composite caption="Mailing Address" required="yes" name="address">
+				<field.text caption="Address (Line 1)"  max-length="128" name="addr_line1" size="36"/>
+				<field.text caption="Address (Line 2)"  max-length="128" name="addr_line2" size="36"/>
+				<field.text caption="City"  max-length="64" name="addr_city" size="16"/>
+				<field.text caption="State"  max-length="2" name="addr_state" size="2"/>
+				<field.text caption="Zip"  name="addr_zip"/>
+			</field.composite>
+			<field.email caption="Email"  max-length="1024" name="email"/>
+			<field.uri caption="Website"  max-length="1024" name="internet"/>
+			<field.composite caption="*"  name="org_contact">
+				<field.text caption="Billing Contact"  name="contact_name"/>
+				<field.phone caption="Phone"  max-length="1024" name="contact_phone"/>
+			</field.composite>
+			<field.separator name="text_field"/>
+			<field.boolean caption="Delete record?"  name="delete_record" style="check"/>
+
+		</dialog>
+
+		<dialog name="contract_item" heading="contract_item">
+			<field.text caption="Contract ID" read-only="yes" name="contract_id"/>
+			<field.composite caption="*" read-only="yes" name="code_modifier">
+				<field.text caption="Code" read-only="yes" name="code" size="10"/>
+				<field.text caption="Modifier" read-only="yes" name="modifier" size="10"/>
+			</field.composite>
+			<field.currency caption="Expected Amount"  max-length="1024" name="expected_cost" size="10"/>
+			<field.currency caption="Allowed Amount"  max-length="1024" name="allowed_cost" size="10"/>
+			<field.text hidden="yes" name="add_mode" caption="add_mode"/>
+
+		</dialog>
+
+		<dialog name="ancillary_location" heading="$Command Ancillary Location">
+			<field.text hidden="yes" name="org_internal_id" caption="org_internal_id"/>
+			<field.text hidden="yes" name="add_mode" caption="add_mode"/>
+			<field.text hidden="yes" name="address_item_id" caption="address_item_id"/>
+			<field.text hidden="yes" name="phone_item_id" caption="phone_item_id"/>
+			<field.text hidden="yes" name="fax_item_id" caption="fax_item_id"/>
+			<field.text caption="Ancillary Org ID" read-only="yes" required="yes" max-length="16" name="org_id" size="16"/>
+			<field.text caption="Location Name" required="yes" max-length="30" name="location_name" size="20"/>
+			<field.composite caption=" Address" required="yes" name="address">
+				<field.text caption="Address (Line 1)"  max-length="128" name="addr_line1" size="36"/>
+				<field.text caption="Address (Line 2)"  max-length="128" name="addr_line2" size="36"/>
+				<field.text caption="City"  max-length="64" name="addr_city" size="16"/>
+				<field.text caption="State"  max-length="2" name="addr_state" size="2"/>
+				<field.text caption="Zip"  name="addr_zip"/>
+			</field.composite>
+			<field.composite caption="*"  name="phone_fax">
+				<field.phone caption="Phone"  max-length="1024" name="phone"/>
+				<field.phone caption="Fax"  max-length="1024" name="fax"/>
+			</field.composite>
+
+		</dialog>
+
+		<dialog name="org_insurance" heading="$Command Insurance Organization">
+			<field.text hidden="yes" name="clear_item_id" caption="clear_item_id"/>
+			<field.text hidden="yes" name="business_hrs_id" caption="business_hrs_id"/>
+			<field.text hidden="yes" name="area_served_id" caption="area_served_id"/>
+			<field.separator heading="Profile Information" name="gen_info_heading"/>
+			<field.text caption="Parent Organization ID"  max-length="16" name="parent_org_id" size="16"/>
+			<field.text caption="Organization ID" required="yes" max-length="16" name="org_id" size="16"/>
+			<field.memo caption="Organization Name" name="name_primary" size="24"/>
+			<field.memo caption="Doing Business As" name="name_trade" size="24"/>
+			<field.separator heading="Contact Information" name="contact_heading"/>
+			<field.composite caption="*"  name="hours_and_tzone">
+				<field.text caption="Hours of Operation"  name="business_hours"/>
+				<field.select caption="Time Zone"  name="time_zone" choices="GMT=GMT;US-Atlantic=AST4ADT;US-Eastern=EST5EDT;US-Central=CST6CDT;US-Mountain=MST7MDT;US-Pacific=PST8PDT"/>
+				<!--  -->
+			</field.composite>
+			<field.composite caption="*"  name="phone_fax">
+				<field.phone caption="Phone" required="yes" max-length="1024" name="phone"/>
+				<field.phone caption="Fax"  max-length="1024" name="fax"/>
+			</field.composite>
+			<field.composite caption="Mailing Address" required="yes" name="address">
+				<field.text caption="Address (Line 1)"  max-length="128" name="addr_line1" size="36"/>
+				<field.text caption="Address (Line 2)"  max-length="128" name="addr_line2" size="36"/>
+				<field.text caption="City"  max-length="64" name="addr_city" size="16"/>
+				<field.text caption="State"  max-length="2" name="addr_state" size="2"/>
+				<field.text caption="Zip"  name="addr_zip"/>
+			</field.composite>
+			<field.email caption="Email"  max-length="1024" name="email"/>
+			<field.uri caption="Website"  max-length="1024" name="internet"/>
+			<field.composite caption="*"  name="org_contact">
+				<field.text caption="Billing Contact"  name="contact_name"/>
+				<field.phone caption="Phone"  max-length="1024" name="contact_phone"/>
+			</field.composite>
+			<field.separator name="text_field"/>
+			<field.boolean caption="Delete record?"  name="delete_record" style="check"/>
+
+		</dialog>
+
+		<dialog name="guarantor" heading="$Command Responsible Party">
+			<field.text hidden="yes" name="resp_item_id" caption="resp_item_id"/>
+			<field.text hidden="yes" name="driver_license_item_id" caption="driver_license_item_id"/>
+			<field.text caption="Person/Patient ID"  hint="To use the ID autosuggestion feature, leave this field blank" max-length="16" name="person_id" size="16"/>
+			<field.composite caption="*"  name="person_id">
+				<field.text caption="Last Name" required="yes" name="name_last" size="16"/>
+				<field.text caption="First Name" required="yes" name="name_first" size="12"/>
+				<field.text caption="Middle Name"  name="name_middle" size="8"/>
+				<field.text caption="Suffix"  name="name_suffix" size="16"/>
+			</field.composite>
+			<field.composite caption="*"  name="text_field">
+				<field.ssn caption="Social Security"  max-length="1024" name="ssn" size="11"/>
+				<field.date caption="Date of Birth" name="date_of_birth" size="12"/>
+			</field.composite>
+			<field.select caption="Gender" required="yes" prepend-blank="yes" name="gender" choices="Male=1;Female=2"/>
+			<!--  -->
+			<field.composite caption="Driver's License Number/State"  name="license_num_state">
+				<field.text caption="License Number"  name="license_number"/>
+				<field.text caption="State"  max-length="2" name="license_state" size="2"/>
+			</field.composite>
+			<field.composite caption="Home Address" required="yes" name="address">
+				<field.text caption="Address (Line 1)"  max-length="128" name="addr_line1" size="36"/>
+				<field.text caption="Address (Line 2)"  max-length="128" name="addr_line2" size="36"/>
+				<field.text caption="City"  max-length="64" name="addr_city" size="16"/>
+				<field.text caption="State"  max-length="2" name="addr_state" size="2"/>
+				<field.text caption="Zip"  name="addr_zip"/>
+			</field.composite>
+			<field.composite caption="*"  name="text_field">
+				<field.phone caption="Home Phone" required="yes" max-length="1024" name="home_phone"/>
+				<field.phone caption="Work Phone"  max-length="1024" name="work_phone"/>
+			</field.composite>
+
+		</dialog>
+
+		<dialog name="password" heading="$Command Password">
+			<field.text caption="Person ID" required="yes" max-length="16" name="person_id" size="16"/>
+			<field.text caption="Organization ID" required="yes" max-length="16" name="org_id" size="16"/>
+			<field.text mask-entry="yes" caption="Old Password" required="yes" name="old_password"/>
+			<field.text mask-entry="yes" caption="Password" required="yes" name="password"/>
+			<field.text mask-entry="yes" caption="Confirm Password" required="yes" name="confirm_password"/>
+			<field.integer caption="Max Sessions" default="1" required="yes" hint="The max. number of simultaneous logins" max-length="1024" name="quantity" size="8"/>
+			<field.text hidden="yes" name="have_password" caption="have_password"/>
+			<field.text hidden="yes" name="verify_old_password" caption="verify_old_password"/>
+
+		</dialog>
+
+		<dialog name="org_ancillary" heading="$Command Ancillary Service Organization">
+			<field.text hidden="yes" name="clear_item_id" caption="clear_item_id"/>
+			<field.text hidden="yes" name="business_hrs_id" caption="business_hrs_id"/>
+			<field.text hidden="yes" name="area_served_id" caption="area_served_id"/>
+			<field.separator heading="Profile Information" name="gen_info_heading"/>
+			<field.text caption="Parent Organization ID"  max-length="16" name="parent_org_id" size="16"/>
+			<field.text caption="Organization ID" required="yes" max-length="16" name="org_id" size="16"/>
+			<field.memo caption="Organization Name" name="name_primary" size="24"/>
+			<field.memo caption="Doing Business As" name="name_trade" size="24"/>
+			<field.separator heading="Contact Information" name="contact_heading"/>
+			<field.composite caption="*"  name="hours_and_tzone">
+				<field.text caption="Hours of Operation"  name="business_hours"/>
+				<field.select caption="Time Zone"  name="time_zone" choices="GMT=GMT;US-Atlantic=AST4ADT;US-Eastern=EST5EDT;US-Central=CST6CDT;US-Mountain=MST7MDT;US-Pacific=PST8PDT"/>
+				<!--  -->
+			</field.composite>
+			<field.composite caption="*"  name="phone_fax">
+				<field.phone caption="Phone" required="yes" max-length="1024" name="phone"/>
+				<field.phone caption="Fax"  max-length="1024" name="fax"/>
+			</field.composite>
+			<field.composite caption="Mailing Address" required="yes" name="address">
+				<field.text caption="Address (Line 1)"  max-length="128" name="addr_line1" size="36"/>
+				<field.text caption="Address (Line 2)"  max-length="128" name="addr_line2" size="36"/>
+				<field.text caption="City"  max-length="64" name="addr_city" size="16"/>
+				<field.text caption="State"  max-length="2" name="addr_state" size="2"/>
+				<field.text caption="Zip"  name="addr_zip"/>
+			</field.composite>
+			<field.email caption="Email"  max-length="1024" name="email"/>
+			<field.uri caption="Website"  max-length="1024" name="internet"/>
+			<field.composite caption="*"  name="org_contact">
+				<field.text caption="Billing Contact"  name="contact_name"/>
+				<field.phone caption="Phone"  max-length="1024" name="contact_phone"/>
+			</field.composite>
+			<field.separator name="text_field"/>
+			<field.boolean caption="Delete record?"  name="delete_record" style="check"/>
+
+		</dialog>
+
+		<dialog name="billingcycle" heading="billingcycle">
+			<field.select caption="Patients" required="yes" name="name_range" choices="A-F;G-L;M-S;T-Z"/>
+			<!--  -->
+			<field.select caption="Statement Cycle" required="yes" name="period" choices="First Week;Second Week;Third Week;Fourth Week"/>
+			<!--  -->
+			<field.select caption="Statement Status" required="yes" name="statement_status" choices=";Hold Statement=1;No Statement=2"/>
+			<!--  -->
+			<field.memo caption="Reason" name="reason" rows="4" cols="25" size="24"/>
+
+		</dialog>
+
+		<dialog name="lab_order" heading="lab_order">
+			<field.text caption="Lab Company" read-only="yes" required="yes" name="lab_name"/>
+			<field.text caption="Patient ID" required="yes" max-length="16" name="person_id" size="16"/>
+			<field.text caption="Ordering Provider ID" required="yes" max-length="16" name="provider_id" size="16"/>
+			<field.text hidden="yes" name="org_internal_id" caption="org_internal_id"/>
+			<field.text hidden="yes" name="org_id" caption="org_id"/>
+			<field.select caption="Ancillary Location" prepend-blank="yes" name="location" choices="query:org.selAddresses"/>
+			<!--  -->
+			<field.composite caption="Date/Time Ordered"  name="order_date_time">
+				<field.date caption="Date Ordered" name="order_date" size="12"/>
+				<field.time caption="Time Ordered" name="order_time" size="8"/>
+			</field.composite>
+			<field.composite caption="Date/Time to be Done"  name="done_date_time">
+				<field.date caption="Date to Done" name="done_date" size="12"/>
+				<field.time caption="Time Ordered" name="done_time" size="8"/>
+			</field.composite>
+			<field.text caption="Diagnosis"  name="icd9" size="30"/>
+			<field.text hidden="yes" name="lab_order_id" caption="lab_order_id"/>
+
+		</dialog>
+
+		<dialog name="document" heading="document">
+			<field.text caption="doc_id" read-only="yes" name="doc_id"/>
+			<field.text caption="Owner ID" required="yes" max-length="16" name="owner_id" size="16"/>
+			<field.text caption="Name" required="yes" name="doc_name"/>
+			<field.memo caption="Description" name="doc_description" size="24"/>
+			<!-- Unimplemented field type=file -->
+			<field.text hidden="yes" name="doc_mime_type" caption="doc_mime_type"/>
+
+		</dialog>
+
+		<dialog name="customize" heading="customize">
+			<field.text hidden="yes" name="item_id" caption="item_id"/>
+			<field.text caption="Column" read-only="yes" name="column"/>
+			<field.text caption="Physician ID" required="yes" hint="Physician ID or select a Roving Physician" max-length="64" name="resource_id" size="32"/>
+			<field.select caption="Roving Physician"  name="roving_physician" choices="query:scheduling.selRovingPhysicianTypes"/>
+			<!--  -->
+			<field.text caption="Facility"  max-length="16" name="facility_id" size="16"/>
+			<field.select caption="Relative Date"  name="date_offset" choices="Selected Date -3=-3,Selected Date -2=-2,Selected Date -1=-1,Selected Date=0,Selected Date +1=1,Selected Date +2=2,Selected Date +3=3"/>
+			<!--  -->
+			<field.boolean caption="Remove this column"  name="remove_column" style="check"/>
+			<field.separator name="text_field"/>
+			<field.composite caption="Appt Sheet Start/End Hours"  name="text_field">
+				<field.integer caption="Start Hour" default="6" required="yes" hint="The starting Appointment Sheet time" max-length="1024" name="start_hour" size="2"/>
+				<field.integer caption="End Hour" default="21" required="yes" hint="The starting Appointment Sheet time" max-length="1024" name="end_hour" size="2"/>
+			</field.composite>
+			<field.text hidden="yes" name="have_pref" caption="have_pref"/>
+
+		</dialog>
+
+		<dialog name="postinvoicepayment" heading="postinvoicepayment">
+			<field.text hidden="yes" name="orgpayer_internal_id" caption="orgpayer_internal_id"/>
+			<field.text hidden="yes" name="credit_warning_flag" caption="credit_warning_flag"/>
+			<field.text hidden="yes" name="alert_off" caption="alert_off"/>
+			<field.text hidden="yes" name="client_id" caption="client_id"/>
+			<field.text hidden="yes" name="product_ins_id" caption="product_ins_id"/>
+			<field.text hidden="yes" name="next_payer_exists" caption="next_payer_exists"/>
+			<field.text caption="Invoice ID" required="yes" name="sel_invoice_id"/>
+			<field.composite caption="Batch ID Date" required="yes" name="batch_fields">
+				<field.text caption="Batch ID" required="yes" name="batch_id" size="12"/>
+				<field.date caption="Batch Date" name="batch_date" size="12"/>
+			</field.composite>
+			<field.text hidden="yes" name="list_invoices" caption="list_invoices"/>
+			<field.text caption="Payer" required="yes" max-length="16" name="payer_id"/>
+			<field.composite caption="Check Amount/Number"  name="check_fields">
+				<field.currency caption="Check Amount" required="yes" max-length="1024" name="check_amount" size="10"/>
+				<field.text caption="Check Number/Pay Reference"  max-length="128" name="pay_ref"/>
+			</field.composite>
+			<field.currency caption="Total Amount" required="yes" max-length="1024" name="total_amount" size="10"/>
+			<field.select caption="Payment Type"  name="pay_type"/>
+			<!--  -->
+			<field.composite caption="Pay Method/Check No. or Auth. Code"  name="pay_method_fields">
+				<field.select caption="pay_method"  name="pay_method"/>
+				<!--  -->
+				<field.text caption="pay_ref"  max-length="128" name="pay_ref"/>
+			</field.composite>
+			<field.separator heading="Outstanding Items" name="outstanding_heading"/>
+			<!-- Unimplemented field type=invoices -->
+			<field.select caption="Submit to Next Payer?"  name="next_payer_alert" choices="Yes=1;No=2" style="radio"/>
+			<!--  -->
+			<field.select caption="Reopen Claim?"  name="reopen_alert" choices="Yes=1;No=2" style="radio"/>
+			<!--  -->
+
+		</dialog>
+
+		<dialog name="org_dir_entry" heading="$Command Provider Directory Entry">
+			<field.text hidden="yes" name="clear_item_id" caption="clear_item_id"/>
+			<field.text hidden="yes" name="business_hrs_id" caption="business_hrs_id"/>
+			<field.text hidden="yes" name="area_served_id" caption="area_served_id"/>
+			<field.separator heading="Profile Information" name="gen_info_heading"/>
+			<field.text caption="Parent Organization ID"  max-length="16" name="parent_org_id" size="16"/>
+			<field.text caption="Organization ID" required="yes" max-length="16" name="org_id" size="16"/>
+			<field.memo caption="Organization Name" name="name_primary" size="24"/>
+			<field.memo caption="Doing Business As" name="name_trade" size="24"/>
+			<field.separator heading="Contact Information" name="contact_heading"/>
+			<field.composite caption="*"  name="hours_and_tzone">
+				<field.text caption="Hours of Operation"  name="business_hours"/>
+				<field.select caption="Time Zone"  name="time_zone" choices="GMT=GMT;US-Atlantic=AST4ADT;US-Eastern=EST5EDT;US-Central=CST6CDT;US-Mountain=MST7MDT;US-Pacific=PST8PDT"/>
+				<!--  -->
+			</field.composite>
+			<field.composite caption="*"  name="phone_fax">
+				<field.phone caption="Phone" required="yes" max-length="1024" name="phone"/>
+				<field.phone caption="Fax"  max-length="1024" name="fax"/>
+			</field.composite>
+			<field.composite caption="Mailing Address" required="yes" name="address">
+				<field.text caption="Address (Line 1)"  max-length="128" name="addr_line1" size="36"/>
+				<field.text caption="Address (Line 2)"  max-length="128" name="addr_line2" size="36"/>
+				<field.text caption="City"  max-length="64" name="addr_city" size="16"/>
+				<field.text caption="State"  max-length="2" name="addr_state" size="2"/>
+				<field.text caption="Zip"  name="addr_zip"/>
+			</field.composite>
+			<field.email caption="Email"  max-length="1024" name="email"/>
+			<field.uri caption="Website"  max-length="1024" name="internet"/>
+			<field.composite caption="*"  name="org_contact">
+				<field.text caption="Billing Contact"  name="contact_name"/>
+				<field.phone caption="Phone"  max-length="1024" name="contact_phone"/>
+			</field.composite>
+			<field.separator name="text_field"/>
+			<field.boolean caption="Delete record?"  name="delete_record" style="check"/>
+
+		</dialog>
+
+		<dialog name="eligibility" heading="Verify Eligibility">
+			<field.text caption="Insurance Org Id" required="yes" max-length="16" name="ins_org_id" size="16"/>
+
+		</dialog>
+
+		<dialog name="claim_hold" heading="claim_hold">
+			<field.memo caption="Reason" name="reason" rows="4" cols="25" size="24"/>
+
+		</dialog>
+
+		<dialog name="ins_workerscomp" heading="$Command Workers Compensation Plan">
+			<field.text hidden="yes" name="phone_item_id" caption="phone_item_id"/>
+			<field.text hidden="yes" name="fax_item_id" caption="fax_item_id"/>
+			<field.text hidden="yes" name="address_item_id" caption="address_item_id"/>
+			<field.text caption="Workers Compensation Plan ID" required="yes" max-length="32" name="ins_id" size="16"/>
+			<field.text caption="Insurance Org ID" required="yes" max-length="16" name="ins_org_id" size="16"/>
+			<field.select caption="Remittance Type"  name="remit_type"/>
+			<!--  -->
+			<field.text caption="E-Remittance Payer ID"  hint="(Only for non-Paper types)" max-length="16" name="remit_payer_id"/>
+			<field.separator heading="Contact Information" name="contact_heading"/>
+			<field.composite caption="Billing Address" required="yes" name="billing_addr">
+				<field.text caption="Address (Line 1)"  max-length="128" name="addr_line1" size="36"/>
+				<field.text caption="Address (Line 2)"  max-length="128" name="addr_line2" size="36"/>
+				<field.text caption="City"  max-length="64" name="addr_city" size="16"/>
+				<field.text caption="State"  max-length="2" name="addr_state" size="2"/>
+				<field.text caption="Zip"  name="addr_zip"/>
+			</field.composite>
+			<field.composite caption="Phone/Fax"  name="phone_fax">
+				<field.phone caption="Phone" required="yes" max-length="1024" name="phone"/>
+				<field.phone caption="Fax"  max-length="1024" name="fax"/>
+			</field.composite>
+
+		</dialog>
+
+		<dialog name="org_main" heading="$Command Main Organization">
+			<field.text hidden="yes" name="clear_item_id" caption="clear_item_id"/>
+			<field.text hidden="yes" name="business_hrs_id" caption="business_hrs_id"/>
+			<field.text hidden="yes" name="area_served_id" caption="area_served_id"/>
+			<field.separator heading="Profile Information" name="gen_info_heading"/>
+			<field.text caption="Parent Organization ID"  max-length="16" name="parent_org_id" size="16"/>
+			<field.text caption="Organization ID" required="yes" max-length="16" name="org_id" size="16"/>
+			<field.memo caption="Organization Name" name="name_primary" size="24"/>
+			<field.memo caption="Doing Business As" name="name_trade" size="24"/>
+			<field.separator heading="Contact Information" name="contact_heading"/>
+			<field.composite caption="*"  name="hours_and_tzone">
+				<field.text caption="Hours of Operation"  name="business_hours"/>
+				<field.select caption="Time Zone"  name="time_zone" choices="GMT=GMT;US-Atlantic=AST4ADT;US-Eastern=EST5EDT;US-Central=CST6CDT;US-Mountain=MST7MDT;US-Pacific=PST8PDT"/>
+				<!--  -->
+			</field.composite>
+			<field.composite caption="*"  name="phone_fax">
+				<field.phone caption="Phone" required="yes" max-length="1024" name="phone"/>
+				<field.phone caption="Fax"  max-length="1024" name="fax"/>
+			</field.composite>
+			<field.composite caption="Mailing Address" required="yes" name="address">
+				<field.text caption="Address (Line 1)"  max-length="128" name="addr_line1" size="36"/>
+				<field.text caption="Address (Line 2)"  max-length="128" name="addr_line2" size="36"/>
+				<field.text caption="City"  max-length="64" name="addr_city" size="16"/>
+				<field.text caption="State"  max-length="2" name="addr_state" size="2"/>
+				<field.text caption="Zip"  name="addr_zip"/>
+			</field.composite>
+			<field.email caption="Email"  max-length="1024" name="email"/>
+			<field.uri caption="Website"  max-length="1024" name="internet"/>
+			<field.composite caption="*"  name="org_contact">
+				<field.text caption="Billing Contact"  name="contact_name"/>
+				<field.phone caption="Phone"  max-length="1024" name="contact_phone"/>
+			</field.composite>
+			<field.separator name="text_field"/>
+			<field.boolean caption="Delete record?"  name="delete_record" style="check"/>
+
+		</dialog>
+
+		<dialog name="pharmacy_location" heading="$Command Pharmacy Location">
+			<field.text hidden="yes" name="org_internal_id" caption="org_internal_id"/>
+			<field.text hidden="yes" name="add_mode" caption="add_mode"/>
+			<field.text hidden="yes" name="address_item_id" caption="address_item_id"/>
+			<field.text hidden="yes" name="phone_item_id" caption="phone_item_id"/>
+			<field.text hidden="yes" name="fax_item_id" caption="fax_item_id"/>
+			<field.text caption="Ancillary Org ID" read-only="yes" required="yes" max-length="16" name="org_id" size="16"/>
+			<field.text caption="Location Name" required="yes" max-length="30" name="location_name" size="20"/>
+			<field.composite caption=" Address" required="yes" name="address">
+				<field.text caption="Address (Line 1)"  max-length="128" name="addr_line1" size="36"/>
+				<field.text caption="Address (Line 2)"  max-length="128" name="addr_line2" size="36"/>
+				<field.text caption="City"  max-length="64" name="addr_city" size="16"/>
+				<field.text caption="State"  max-length="2" name="addr_state" size="2"/>
+				<field.text caption="Zip"  name="addr_zip"/>
+			</field.composite>
+			<field.composite caption="*"  name="phone_fax">
+				<field.phone caption="Phone"  max-length="1024" name="phone"/>
+				<field.phone caption="Fax"  max-length="1024" name="fax"/>
+			</field.composite>
+
+		</dialog>
+
+		<dialog name="referral_ppms" heading="referral_ppms">
+			<field.date caption="Date of Request" name="request_date" size="12"/>
+			<field.select caption="Referral Urgency" required="yes" name="referral_urgency" choices="query:referral_ppms.selReferralUrgency" style="radio"/>
+			<!--  -->
+			<field.text caption="User ID" required="yes" max-length="16" name="user_id" size="16"/>
+			<field.text caption="Patient" required="yes" max-length="16" name="patient_id" size="16"/>
+			<field.text hidden="yes" name="old_person_id" caption="old_person_id"/>
+			<field.select caption="Primary Payer" required="yes" name="payer" choices="No Options"/>
+			<!--  -->
+			<field.separator heading="ICD Information" name="icd_heading"/>
+			<field.text caption="ICD Code" required="yes" name="icd_code1" size="6"/>
+			<field.memo caption="ICD Description" name="icd_desc1" size="24"/>
+			<field.text caption="ICD Code"  name="icd_code2" size="6"/>
+			<field.memo caption="ICD Description" name="icd_desc2" size="24"/>
+			<field.separator heading="Reason" name="reason_heading"/>
+			<field.text caption="Reason for Referral" required="yes" name="referral_reason"/>
+			<field.separator heading="Service Requested" name="reason_heading"/>
+			<field.composite caption="Code/Modf"  name="code_mod_desc1">
+				<field.text caption="Code" required="yes" name="cpt_code1" size="9"/>
+				<field.text caption="Modf"  name="modf1" size="5"/>
+			</field.composite>
+			<field.memo caption="Description" name="cpt_desc1" size="24"/>
+			<field.composite caption="Code/Modf"  name="code_mod_desc2">
+				<field.text caption="Code"  name="cpt_code2" size="9"/>
+				<field.text caption="Modf"  name="modf2" size="5"/>
+			</field.composite>
+			<field.memo caption="Description" name="cpt_desc2" size="24"/>
+			<field.text caption="Requesting Physician" required="yes" max-length="16" name="requesting_physician" size="16"/>
+			<field.text caption="Referring to"  max-length="16" name="referring_physician" size="16"/>
+			<field.text caption="Speciality"  name="speciality"/>
+			<field.select caption="Referral Type" prepend-blank="yes" name="referral_type" choices="query:referral_ppms.selReferralType"/>
+			<!--  -->
+			<field.text caption="Number of Visits Allowed"  name="allowed_visits"/>
+			<field.text caption="Authorization Number"  name="auth_number"/>
+			<field.composite caption="Referral Begin/End Date"  name="referral">
+				<field.date caption="Begin Date" name="referral_begin_date" size="12"/>
+				<field.date caption="End Date" name="referral_end_date" size="12"/>
+			</field.composite>
+			<field.select caption="Referral Communicate"  name="communication" choices="query:referral_ppms.selReferralCommunication" style="radio"/>
+			<!--  -->
+			<field.date caption="Date of Completion" name="completion_date" size="12"/>
+			<field.composite caption="Referral Status"  name="inactive_fields">
+				<field.select caption="Make Inactive"  name="referral_status" choices="Active=0;Inactive=1" style="radio"/>
+				<!--  -->
+				<field.date caption="Date " name="referral_status_date" size="12"/>
+			</field.composite>
+			<field.memo caption="Comments" name="comments" size="24"/>
+
+		</dialog>
+
+		<dialog name="personnel" heading="$Command Personnel">
+			<field.text caption="Person ID" required="yes" hint="Please provide an existing Person ID." max-length="16" name="person_id" size="16"/>
+			<field.select caption="Category"  name="category" choices="Physician;Nurse;Staff;Superuser;Administrator"/>
+			<!--  -->
+
+		</dialog>
+
+		<dialog name="loginType" heading="Change Login Type">
+			<field.text caption="Login Type"  name="login_type"/>
+
+		</dialog>
+
+		<dialog name="person_attachworkerscomp" heading="person_attachworkerscomp">
+
+		</dialog>
+
+		<dialog name="login" heading="login">
+			<field.text caption="User ID" required="yes" uppercase="yes" name="person_id"/>
+			<field.text mask-entry="yes" caption="Password" required="yes" name="password"/>
+			<field.boolean caption="Logout of all active sessions" visible="no" name="clear_sessions" style="check"/>
+			<field.separator name="start_sep"/>
+			<field.select caption="Start Page"  name="nextaction_redirecturl" choices="Worklist=/worklist;Home=/home;Main Menu=/menu;Schedule=/schedule"/>
+			<!--  -->
+			<field.select caption="Time Zone"  name="timezone" choices="GMT=GMT;US-Atlantic=AST4ADT;US-Eastern=EST5EDT;US-Central=CST6CDT;US-Mountain=MST7MDT;US-Pacific=PST8PDT"/>
+			<!--  -->
+
+		</dialog>
+
+		<dialog name="feescheduledataentry" heading="$Command Fee Schedule Entry">
+			<field.text caption="Fee Schedule ID" required="yes" max-length="32" name="catalog_id" size="16"/>
+			<field.text caption="CPTs"  hint="Please provide a comma separated list of cpts or cpt ranges, example:xxxxx,xxxxx-xxxxx,xxxxx,xxxxx-xxxxx." name="listofcpts" size="70"/>
+
+		</dialog>
+
+		<dialog name="change_status" heading="change_status">
+			<field.text caption="Invoice ID" required="yes" name="invoice_id"/>
+			<field.select caption="Change invoice to status - " required="yes" name="status" choices="query:invoice.selStatusList"/>
+			<!--  -->
+
+		</dialog>
+
+		<dialog name="referring_doctor" heading="$Command Referring Doctor">
+			<field.text hidden="yes" name="ref_phy_item_id" caption="ref_phy_item_id"/>
+			<field.text caption="Person/Patient ID"  hint="To use the ID autosuggestion feature, leave this field blank" max-length="16" name="person_id" size="16"/>
+			<field.composite caption="*"  name="person_id">
+				<field.text caption="Last Name" required="yes" name="name_last" size="16"/>
+				<field.text caption="First Name" required="yes" name="name_first" size="12"/>
+				<field.text caption="Middle Name"  name="name_middle" size="8"/>
+				<field.text caption="Suffix"  name="name_suffix" size="16"/>
+			</field.composite>
+			<field.composite caption="Work Address"  name="address">
+				<field.text caption="Address (Line 1)"  max-length="128" name="addr_line1" size="36"/>
+				<field.text caption="Address (Line 2)"  max-length="128" name="addr_line2" size="36"/>
+				<field.text caption="City"  max-length="64" name="addr_city" size="16"/>
+				<field.text caption="State"  max-length="2" name="addr_state" size="2"/>
+				<field.text caption="Zip"  name="addr_zip"/>
+			</field.composite>
+			<field.composite caption="*"  name="phone_fax">
+				<field.phone caption="Work Phone" required="yes" max-length="1024" name="phone"/>
+				<field.phone caption="Fax"  max-length="1024" name="fax"/>
+			</field.composite>
+			<field.text hidden="yes" name="phy_type_item_id" caption="phy_type_item_id"/>
+			<field.separator heading="License ID Numbers" name="id_numbers_section"/>
+			<field.composite caption="*"  name="id_numbers">
+				<field.select caption="License" prepend-blank="yes" name="id_name_1" choices="DEA;DPS;IRS;Board Certification;BCBS;Nursing/License;Memorial Sisters Charity;EPSDT"/>
+				<!--  -->
+				<field.text caption="Number"  name="id_num_1"/>
+				<field.date caption="Exp Date" name="id_exp_date_1" size="12"/>
+				<field.select caption="Facility ID" prepend-blank="yes" name="id_facility_1" choices="query:org.selChildFacilityOrgs"/>
+				<!--  -->
+				<field.select caption="License" prepend-blank="yes" name="id_name_2" choices="DEA;DPS;IRS;Board Certification;BCBS;Nursing/License;Memorial Sisters Charity;EPSDT"/>
+				<!--  -->
+				<field.text caption="Number"  name="id_num_2"/>
+				<field.date caption="Exp Date" name="id_exp_date_2" size="12"/>
+				<field.select caption="Facility ID" prepend-blank="yes" name="id_facility_2" choices="query:org.selChildFacilityOrgs"/>
+				<!--  -->
+				<field.select caption="License" prepend-blank="yes" name="id_name_3" choices="DEA;DPS;IRS;Board Certification;BCBS;Nursing/License;Memorial Sisters Charity;EPSDT"/>
+				<!--  -->
+				<field.text caption="Number"  name="id_num_3"/>
+				<field.date caption="Exp Date" name="id_exp_date_3" size="12"/>
+				<field.select caption="Facility ID" prepend-blank="yes" name="id_facility_3" choices="query:org.selChildFacilityOrgs"/>
+				<!--  -->
+				<field.select caption="License" prepend-blank="yes" name="id_name_4" choices="DEA;DPS;IRS;Board Certification;BCBS;Nursing/License;Memorial Sisters Charity;EPSDT"/>
+				<!--  -->
+				<field.text caption="Number"  name="id_num_4"/>
+				<field.date caption="Exp Date" name="id_exp_date_4" size="12"/>
+				<field.select caption="Facility ID" prepend-blank="yes" name="id_facility_4" choices="query:org.selChildFacilityOrgs"/>
+				<!--  -->
+				<field.select caption="License" prepend-blank="yes" name="id_name_5" choices="DEA;DPS;IRS;Board Certification;BCBS;Nursing/License;Memorial Sisters Charity;EPSDT"/>
+				<!--  -->
+				<field.text caption="Number"  name="id_num_5"/>
+				<field.date caption="Exp Date" name="id_exp_date_5" size="12"/>
+				<field.select caption="Facility ID" prepend-blank="yes" name="id_facility_5" choices="query:org.selChildFacilityOrgs"/>
+				<!--  -->
+				<field.select caption="License" prepend-blank="yes" name="id_name_6" choices="DEA;DPS;IRS;Board Certification;BCBS;Nursing/License;Memorial Sisters Charity;EPSDT"/>
+				<!--  -->
+				<field.text caption="Number"  name="id_num_6"/>
+				<field.date caption="Exp Date" name="id_exp_date_6" size="12"/>
+				<field.select caption="Facility ID" prepend-blank="yes" name="id_facility_6" choices="query:org.selChildFacilityOrgs"/>
+				<!--  -->
+				<field.select caption="License" prepend-blank="yes" name="id_name_7" choices="DEA;DPS;IRS;Board Certification;BCBS;Nursing/License;Memorial Sisters Charity;EPSDT"/>
+				<!--  -->
+				<field.text caption="Number"  name="id_num_7"/>
+				<field.date caption="Exp Date" name="id_exp_date_7" size="12"/>
+				<field.select caption="Facility ID" prepend-blank="yes" name="id_facility_7" choices="query:org.selChildFacilityOrgs"/>
+				<!--  -->
+				<field.select caption="License" prepend-blank="yes" name="id_name_8" choices="DEA;DPS;IRS;Board Certification;BCBS;Nursing/License;Memorial Sisters Charity;EPSDT"/>
+				<!--  -->
+				<field.text caption="Number"  name="id_num_8"/>
+				<field.date caption="Exp Date" name="id_exp_date_8" size="12"/>
+				<field.select caption="Facility ID" prepend-blank="yes" name="id_facility_8" choices="query:org.selChildFacilityOrgs"/>
+				<!--  -->
+				<field.select caption="License" prepend-blank="yes" name="id_name_9" choices="DEA;DPS;IRS;Board Certification;BCBS;Nursing/License;Memorial Sisters Charity;EPSDT"/>
+				<!--  -->
+				<field.text caption="Number"  name="id_num_9"/>
+				<field.date caption="Exp Date" name="id_exp_date_9" size="12"/>
+				<field.select caption="Facility ID" prepend-blank="yes" name="id_facility_9" choices="query:org.selChildFacilityOrgs"/>
+				<!--  -->
+				<field.select caption="License" prepend-blank="yes" name="id_name_10" choices="DEA;DPS;IRS;Board Certification;BCBS;Nursing/License;Memorial Sisters Charity;EPSDT"/>
+				<!--  -->
+				<field.text caption="Number"  name="id_num_10"/>
+				<field.date caption="Exp Date" name="id_exp_date_10" size="12"/>
+				<field.select caption="Facility ID" prepend-blank="yes" name="id_facility_10" choices="query:org.selChildFacilityOrgs"/>
+				<!--  -->
+				<field.select caption="License" prepend-blank="yes" name="id_name_11" choices="DEA;DPS;IRS;Board Certification;BCBS;Nursing/License;Memorial Sisters Charity;EPSDT"/>
+				<!--  -->
+				<field.text caption="Number"  name="id_num_11"/>
+				<field.date caption="Exp Date" name="id_exp_date_11" size="12"/>
+				<field.select caption="Facility ID" prepend-blank="yes" name="id_facility_11" choices="query:org.selChildFacilityOrgs"/>
+				<!--  -->
+				<field.select caption="License" prepend-blank="yes" name="id_name_12" choices="DEA;DPS;IRS;Board Certification;BCBS;Nursing/License;Memorial Sisters Charity;EPSDT"/>
+				<!--  -->
+				<field.text caption="Number"  name="id_num_12"/>
+				<field.date caption="Exp Date" name="id_exp_date_12" size="12"/>
+				<field.select caption="Facility ID" prepend-blank="yes" name="id_facility_12" choices="query:org.selChildFacilityOrgs"/>
+				<!--  -->
+				<field.select caption="License" prepend-blank="yes" name="id_name_13" choices="DEA;DPS;IRS;Board Certification;BCBS;Nursing/License;Memorial Sisters Charity;EPSDT"/>
+				<!--  -->
+				<field.text caption="Number"  name="id_num_13"/>
+				<field.date caption="Exp Date" name="id_exp_date_13" size="12"/>
+				<field.select caption="Facility ID" prepend-blank="yes" name="id_facility_13" choices="query:org.selChildFacilityOrgs"/>
+				<!--  -->
+				<field.select caption="License" prepend-blank="yes" name="id_name_14" choices="DEA;DPS;IRS;Board Certification;BCBS;Nursing/License;Memorial Sisters Charity;EPSDT"/>
+				<!--  -->
+				<field.text caption="Number"  name="id_num_14"/>
+				<field.date caption="Exp Date" name="id_exp_date_14" size="12"/>
+				<field.select caption="Facility ID" prepend-blank="yes" name="id_facility_14" choices="query:org.selChildFacilityOrgs"/>
+				<!--  -->
+				<field.select caption="License" prepend-blank="yes" name="id_name_15" choices="DEA;DPS;IRS;Board Certification;BCBS;Nursing/License;Memorial Sisters Charity;EPSDT"/>
+				<!--  -->
+				<field.text caption="Number"  name="id_num_15"/>
+				<field.date caption="Exp Date" name="id_exp_date_15" size="12"/>
+				<field.select caption="Facility ID" prepend-blank="yes" name="id_facility_15" choices="query:org.selChildFacilityOrgs"/>
+				<!--  -->
+				<field.select caption="License" prepend-blank="yes" name="id_name_16" choices="DEA;DPS;IRS;Board Certification;BCBS;Nursing/License;Memorial Sisters Charity;EPSDT"/>
+				<!--  -->
+				<field.text caption="Number"  name="id_num_16"/>
+				<field.date caption="Exp Date" name="id_exp_date_16" size="12"/>
+				<field.select caption="Facility ID" prepend-blank="yes" name="id_facility_16" choices="query:org.selChildFacilityOrgs"/>
+				<!--  -->
+				<field.select caption="License" prepend-blank="yes" name="id_name_17" choices="DEA;DPS;IRS;Board Certification;BCBS;Nursing/License;Memorial Sisters Charity;EPSDT"/>
+				<!--  -->
+				<field.text caption="Number"  name="id_num_17"/>
+				<field.date caption="Exp Date" name="id_exp_date_17" size="12"/>
+				<field.select caption="Facility ID" prepend-blank="yes" name="id_facility_17" choices="query:org.selChildFacilityOrgs"/>
+				<!--  -->
+				<field.select caption="License" prepend-blank="yes" name="id_name_18" choices="DEA;DPS;IRS;Board Certification;BCBS;Nursing/License;Memorial Sisters Charity;EPSDT"/>
+				<!--  -->
+				<field.text caption="Number"  name="id_num_18"/>
+				<field.date caption="Exp Date" name="id_exp_date_18" size="12"/>
+				<field.select caption="Facility ID" prepend-blank="yes" name="id_facility_18" choices="query:org.selChildFacilityOrgs"/>
+				<!--  -->
+				<field.select caption="License" prepend-blank="yes" name="id_name_19" choices="DEA;DPS;IRS;Board Certification;BCBS;Nursing/License;Memorial Sisters Charity;EPSDT"/>
+				<!--  -->
+				<field.text caption="Number"  name="id_num_19"/>
+				<field.date caption="Exp Date" name="id_exp_date_19" size="12"/>
+				<field.select caption="Facility ID" prepend-blank="yes" name="id_facility_19" choices="query:org.selChildFacilityOrgs"/>
+				<!--  -->
+				<field.select caption="License" prepend-blank="yes" name="id_name_20" choices="DEA;DPS;IRS;Board Certification;BCBS;Nursing/License;Memorial Sisters Charity;EPSDT"/>
+				<!--  -->
+				<field.text caption="Number"  name="id_num_20"/>
+				<field.date caption="Exp Date" name="id_exp_date_20" size="12"/>
+				<field.select caption="Facility ID" prepend-blank="yes" name="id_facility_20" choices="query:org.selChildFacilityOrgs"/>
+				<!--  -->
+				<field.select caption="License" prepend-blank="yes" name="id_name_21" choices="DEA;DPS;IRS;Board Certification;BCBS;Nursing/License;Memorial Sisters Charity;EPSDT"/>
+				<!--  -->
+				<field.text caption="Number"  name="id_num_21"/>
+				<field.date caption="Exp Date" name="id_exp_date_21" size="12"/>
+				<field.select caption="Facility ID" prepend-blank="yes" name="id_facility_21" choices="query:org.selChildFacilityOrgs"/>
+				<!--  -->
+				<field.select caption="License" prepend-blank="yes" name="id_name_22" choices="DEA;DPS;IRS;Board Certification;BCBS;Nursing/License;Memorial Sisters Charity;EPSDT"/>
+				<!--  -->
+				<field.text caption="Number"  name="id_num_22"/>
+				<field.date caption="Exp Date" name="id_exp_date_22" size="12"/>
+				<field.select caption="Facility ID" prepend-blank="yes" name="id_facility_22" choices="query:org.selChildFacilityOrgs"/>
+				<!--  -->
+				<field.select caption="License" prepend-blank="yes" name="id_name_23" choices="DEA;DPS;IRS;Board Certification;BCBS;Nursing/License;Memorial Sisters Charity;EPSDT"/>
+				<!--  -->
+				<field.text caption="Number"  name="id_num_23"/>
+				<field.date caption="Exp Date" name="id_exp_date_23" size="12"/>
+				<field.select caption="Facility ID" prepend-blank="yes" name="id_facility_23" choices="query:org.selChildFacilityOrgs"/>
+				<!--  -->
+				<field.select caption="License" prepend-blank="yes" name="id_name_24" choices="DEA;DPS;IRS;Board Certification;BCBS;Nursing/License;Memorial Sisters Charity;EPSDT"/>
+				<!--  -->
+				<field.text caption="Number"  name="id_num_24"/>
+				<field.date caption="Exp Date" name="id_exp_date_24" size="12"/>
+				<field.select caption="Facility ID" prepend-blank="yes" name="id_facility_24" choices="query:org.selChildFacilityOrgs"/>
+				<!--  -->
+				<field.select caption="License" prepend-blank="yes" name="id_name_25" choices="DEA;DPS;IRS;Board Certification;BCBS;Nursing/License;Memorial Sisters Charity;EPSDT"/>
+				<!--  -->
+				<field.text caption="Number"  name="id_num_25"/>
+				<field.date caption="Exp Date" name="id_exp_date_25" size="12"/>
+				<field.select caption="Facility ID" prepend-blank="yes" name="id_facility_25" choices="query:org.selChildFacilityOrgs"/>
+				<!--  -->
+			</field.composite>
+			<field.separator heading="Provider Numbers" name="provider_id_numbers_section"/>
+			<field.composite caption="*"  name="prov_id_numbers">
+				<field.select caption="License" prepend-blank="yes" name="prov_id_name_1" choices="Medicaid;Medicare;UPIN;Tax ID;Railroad Medicare;Champus;WC#;National Provider Identification"/>
+				<!--  -->
+				<field.text caption="Number"  name="prov_id_num_1"/>
+				<field.date caption="Exp Date" name="prov_id_exp_date_1" size="12"/>
+				<field.select caption="Facility ID" prepend-blank="yes" name="prov_id_facility_1" choices="query:org.selChildFacilityOrgs"/>
+				<!--  -->
+				<field.select caption="License" prepend-blank="yes" name="prov_id_name_2" choices="Medicaid;Medicare;UPIN;Tax ID;Railroad Medicare;Champus;WC#;National Provider Identification"/>
+				<!--  -->
+				<field.text caption="Number"  name="prov_id_num_2"/>
+				<field.date caption="Exp Date" name="prov_id_exp_date_2" size="12"/>
+				<field.select caption="Facility ID" prepend-blank="yes" name="prov_id_facility_2" choices="query:org.selChildFacilityOrgs"/>
+				<!--  -->
+				<field.select caption="License" prepend-blank="yes" name="prov_id_name_3" choices="Medicaid;Medicare;UPIN;Tax ID;Railroad Medicare;Champus;WC#;National Provider Identification"/>
+				<!--  -->
+				<field.text caption="Number"  name="prov_id_num_3"/>
+				<field.date caption="Exp Date" name="prov_id_exp_date_3" size="12"/>
+				<field.select caption="Facility ID" prepend-blank="yes" name="prov_id_facility_3" choices="query:org.selChildFacilityOrgs"/>
+				<!--  -->
+				<field.select caption="License" prepend-blank="yes" name="prov_id_name_4" choices="Medicaid;Medicare;UPIN;Tax ID;Railroad Medicare;Champus;WC#;National Provider Identification"/>
+				<!--  -->
+				<field.text caption="Number"  name="prov_id_num_4"/>
+				<field.date caption="Exp Date" name="prov_id_exp_date_4" size="12"/>
+				<field.select caption="Facility ID" prepend-blank="yes" name="prov_id_facility_4" choices="query:org.selChildFacilityOrgs"/>
+				<!--  -->
+				<field.select caption="License" prepend-blank="yes" name="prov_id_name_5" choices="Medicaid;Medicare;UPIN;Tax ID;Railroad Medicare;Champus;WC#;National Provider Identification"/>
+				<!--  -->
+				<field.text caption="Number"  name="prov_id_num_5"/>
+				<field.date caption="Exp Date" name="prov_id_exp_date_5" size="12"/>
+				<field.select caption="Facility ID" prepend-blank="yes" name="prov_id_facility_5" choices="query:org.selChildFacilityOrgs"/>
+				<!--  -->
+				<field.select caption="License" prepend-blank="yes" name="prov_id_name_6" choices="Medicaid;Medicare;UPIN;Tax ID;Railroad Medicare;Champus;WC#;National Provider Identification"/>
+				<!--  -->
+				<field.text caption="Number"  name="prov_id_num_6"/>
+				<field.date caption="Exp Date" name="prov_id_exp_date_6" size="12"/>
+				<field.select caption="Facility ID" prepend-blank="yes" name="prov_id_facility_6" choices="query:org.selChildFacilityOrgs"/>
+				<!--  -->
+				<field.select caption="License" prepend-blank="yes" name="prov_id_name_7" choices="Medicaid;Medicare;UPIN;Tax ID;Railroad Medicare;Champus;WC#;National Provider Identification"/>
+				<!--  -->
+				<field.text caption="Number"  name="prov_id_num_7"/>
+				<field.date caption="Exp Date" name="prov_id_exp_date_7" size="12"/>
+				<field.select caption="Facility ID" prepend-blank="yes" name="prov_id_facility_7" choices="query:org.selChildFacilityOrgs"/>
+				<!--  -->
+				<field.select caption="License" prepend-blank="yes" name="prov_id_name_8" choices="Medicaid;Medicare;UPIN;Tax ID;Railroad Medicare;Champus;WC#;National Provider Identification"/>
+				<!--  -->
+				<field.text caption="Number"  name="prov_id_num_8"/>
+				<field.date caption="Exp Date" name="prov_id_exp_date_8" size="12"/>
+				<field.select caption="Facility ID" prepend-blank="yes" name="prov_id_facility_8" choices="query:org.selChildFacilityOrgs"/>
+				<!--  -->
+				<field.select caption="License" prepend-blank="yes" name="prov_id_name_9" choices="Medicaid;Medicare;UPIN;Tax ID;Railroad Medicare;Champus;WC#;National Provider Identification"/>
+				<!--  -->
+				<field.text caption="Number"  name="prov_id_num_9"/>
+				<field.date caption="Exp Date" name="prov_id_exp_date_9" size="12"/>
+				<field.select caption="Facility ID" prepend-blank="yes" name="prov_id_facility_9" choices="query:org.selChildFacilityOrgs"/>
+				<!--  -->
+				<field.select caption="License" prepend-blank="yes" name="prov_id_name_10" choices="Medicaid;Medicare;UPIN;Tax ID;Railroad Medicare;Champus;WC#;National Provider Identification"/>
+				<!--  -->
+				<field.text caption="Number"  name="prov_id_num_10"/>
+				<field.date caption="Exp Date" name="prov_id_exp_date_10" size="12"/>
+				<field.select caption="Facility ID" prepend-blank="yes" name="prov_id_facility_10" choices="query:org.selChildFacilityOrgs"/>
+				<!--  -->
+				<field.select caption="License" prepend-blank="yes" name="prov_id_name_11" choices="Medicaid;Medicare;UPIN;Tax ID;Railroad Medicare;Champus;WC#;National Provider Identification"/>
+				<!--  -->
+				<field.text caption="Number"  name="prov_id_num_11"/>
+				<field.date caption="Exp Date" name="prov_id_exp_date_11" size="12"/>
+				<field.select caption="Facility ID" prepend-blank="yes" name="prov_id_facility_11" choices="query:org.selChildFacilityOrgs"/>
+				<!--  -->
+				<field.select caption="License" prepend-blank="yes" name="prov_id_name_12" choices="Medicaid;Medicare;UPIN;Tax ID;Railroad Medicare;Champus;WC#;National Provider Identification"/>
+				<!--  -->
+				<field.text caption="Number"  name="prov_id_num_12"/>
+				<field.date caption="Exp Date" name="prov_id_exp_date_12" size="12"/>
+				<field.select caption="Facility ID" prepend-blank="yes" name="prov_id_facility_12" choices="query:org.selChildFacilityOrgs"/>
+				<!--  -->
+				<field.select caption="License" prepend-blank="yes" name="prov_id_name_13" choices="Medicaid;Medicare;UPIN;Tax ID;Railroad Medicare;Champus;WC#;National Provider Identification"/>
+				<!--  -->
+				<field.text caption="Number"  name="prov_id_num_13"/>
+				<field.date caption="Exp Date" name="prov_id_exp_date_13" size="12"/>
+				<field.select caption="Facility ID" prepend-blank="yes" name="prov_id_facility_13" choices="query:org.selChildFacilityOrgs"/>
+				<!--  -->
+				<field.select caption="License" prepend-blank="yes" name="prov_id_name_14" choices="Medicaid;Medicare;UPIN;Tax ID;Railroad Medicare;Champus;WC#;National Provider Identification"/>
+				<!--  -->
+				<field.text caption="Number"  name="prov_id_num_14"/>
+				<field.date caption="Exp Date" name="prov_id_exp_date_14" size="12"/>
+				<field.select caption="Facility ID" prepend-blank="yes" name="prov_id_facility_14" choices="query:org.selChildFacilityOrgs"/>
+				<!--  -->
+				<field.select caption="License" prepend-blank="yes" name="prov_id_name_15" choices="Medicaid;Medicare;UPIN;Tax ID;Railroad Medicare;Champus;WC#;National Provider Identification"/>
+				<!--  -->
+				<field.text caption="Number"  name="prov_id_num_15"/>
+				<field.date caption="Exp Date" name="prov_id_exp_date_15" size="12"/>
+				<field.select caption="Facility ID" prepend-blank="yes" name="prov_id_facility_15" choices="query:org.selChildFacilityOrgs"/>
+				<!--  -->
+				<field.select caption="License" prepend-blank="yes" name="prov_id_name_16" choices="Medicaid;Medicare;UPIN;Tax ID;Railroad Medicare;Champus;WC#;National Provider Identification"/>
+				<!--  -->
+				<field.text caption="Number"  name="prov_id_num_16"/>
+				<field.date caption="Exp Date" name="prov_id_exp_date_16" size="12"/>
+				<field.select caption="Facility ID" prepend-blank="yes" name="prov_id_facility_16" choices="query:org.selChildFacilityOrgs"/>
+				<!--  -->
+				<field.select caption="License" prepend-blank="yes" name="prov_id_name_17" choices="Medicaid;Medicare;UPIN;Tax ID;Railroad Medicare;Champus;WC#;National Provider Identification"/>
+				<!--  -->
+				<field.text caption="Number"  name="prov_id_num_17"/>
+				<field.date caption="Exp Date" name="prov_id_exp_date_17" size="12"/>
+				<field.select caption="Facility ID" prepend-blank="yes" name="prov_id_facility_17" choices="query:org.selChildFacilityOrgs"/>
+				<!--  -->
+				<field.select caption="License" prepend-blank="yes" name="prov_id_name_18" choices="Medicaid;Medicare;UPIN;Tax ID;Railroad Medicare;Champus;WC#;National Provider Identification"/>
+				<!--  -->
+				<field.text caption="Number"  name="prov_id_num_18"/>
+				<field.date caption="Exp Date" name="prov_id_exp_date_18" size="12"/>
+				<field.select caption="Facility ID" prepend-blank="yes" name="prov_id_facility_18" choices="query:org.selChildFacilityOrgs"/>
+				<!--  -->
+				<field.select caption="License" prepend-blank="yes" name="prov_id_name_19" choices="Medicaid;Medicare;UPIN;Tax ID;Railroad Medicare;Champus;WC#;National Provider Identification"/>
+				<!--  -->
+				<field.text caption="Number"  name="prov_id_num_19"/>
+				<field.date caption="Exp Date" name="prov_id_exp_date_19" size="12"/>
+				<field.select caption="Facility ID" prepend-blank="yes" name="prov_id_facility_19" choices="query:org.selChildFacilityOrgs"/>
+				<!--  -->
+				<field.select caption="License" prepend-blank="yes" name="prov_id_name_20" choices="Medicaid;Medicare;UPIN;Tax ID;Railroad Medicare;Champus;WC#;National Provider Identification"/>
+				<!--  -->
+				<field.text caption="Number"  name="prov_id_num_20"/>
+				<field.date caption="Exp Date" name="prov_id_exp_date_20" size="12"/>
+				<field.select caption="Facility ID" prepend-blank="yes" name="prov_id_facility_20" choices="query:org.selChildFacilityOrgs"/>
+				<!--  -->
+				<field.select caption="License" prepend-blank="yes" name="prov_id_name_21" choices="Medicaid;Medicare;UPIN;Tax ID;Railroad Medicare;Champus;WC#;National Provider Identification"/>
+				<!--  -->
+				<field.text caption="Number"  name="prov_id_num_21"/>
+				<field.date caption="Exp Date" name="prov_id_exp_date_21" size="12"/>
+				<field.select caption="Facility ID" prepend-blank="yes" name="prov_id_facility_21" choices="query:org.selChildFacilityOrgs"/>
+				<!--  -->
+				<field.select caption="License" prepend-blank="yes" name="prov_id_name_22" choices="Medicaid;Medicare;UPIN;Tax ID;Railroad Medicare;Champus;WC#;National Provider Identification"/>
+				<!--  -->
+				<field.text caption="Number"  name="prov_id_num_22"/>
+				<field.date caption="Exp Date" name="prov_id_exp_date_22" size="12"/>
+				<field.select caption="Facility ID" prepend-blank="yes" name="prov_id_facility_22" choices="query:org.selChildFacilityOrgs"/>
+				<!--  -->
+				<field.select caption="License" prepend-blank="yes" name="prov_id_name_23" choices="Medicaid;Medicare;UPIN;Tax ID;Railroad Medicare;Champus;WC#;National Provider Identification"/>
+				<!--  -->
+				<field.text caption="Number"  name="prov_id_num_23"/>
+				<field.date caption="Exp Date" name="prov_id_exp_date_23" size="12"/>
+				<field.select caption="Facility ID" prepend-blank="yes" name="prov_id_facility_23" choices="query:org.selChildFacilityOrgs"/>
+				<!--  -->
+				<field.select caption="License" prepend-blank="yes" name="prov_id_name_24" choices="Medicaid;Medicare;UPIN;Tax ID;Railroad Medicare;Champus;WC#;National Provider Identification"/>
+				<!--  -->
+				<field.text caption="Number"  name="prov_id_num_24"/>
+				<field.date caption="Exp Date" name="prov_id_exp_date_24" size="12"/>
+				<field.select caption="Facility ID" prepend-blank="yes" name="prov_id_facility_24" choices="query:org.selChildFacilityOrgs"/>
+				<!--  -->
+				<field.select caption="License" prepend-blank="yes" name="prov_id_name_25" choices="Medicaid;Medicare;UPIN;Tax ID;Railroad Medicare;Champus;WC#;National Provider Identification"/>
+				<!--  -->
+				<field.text caption="Number"  name="prov_id_num_25"/>
+				<field.date caption="Exp Date" name="prov_id_exp_date_25" size="12"/>
+				<field.select caption="Facility ID" prepend-blank="yes" name="prov_id_facility_25" choices="query:org.selChildFacilityOrgs"/>
+				<!--  -->
+			</field.composite>
+			<field.separator heading="Certification/Accreditation" name="cert_for_physician"/>
+			<field.composite caption="Specialty/Sequence"  name="specialty">
+				<field.select caption="Specialty" prepend-blank="yes" name="specialty_code" choices="query:person.selMedicalSpeciality"/>
+				<!--  -->
+				<field.select caption="Specialty Sequence"  name="value_int1" choices="Unknown=5;Primary=1;Secondary=2;Tertiary=3;Quaternary=4"/>
+				<!--  -->
+			</field.composite>
+
+		</dialog>
+
+		<dialog name="batch" heading="$Command Batch">
+			<field.text caption="User ID" read-only="yes" name="user_id"/>
+			<field.text caption="Batch ID" required="yes" name="batch_id" size="12"/>
+			<field.date caption="Batch Date" name="batch_date" size="12"/>
+			<field.select caption="Batch Type" required="yes" prepend-blank="yes" name="batch_type" choices="Insurance Payments=insurance;Personal Payments=personal"/>
+			<!--  -->
+			<field.text caption="Invoice ID"  name="sel_invoice_id"/>
+			<field.text caption="Patient/Person ID"  max-length="16" name="payer_id" size="16"/>
+
+		</dialog>
+
+		<dialog name="payment_plan" heading="payment_plan">
+			<field.text caption="Patient ID" required="yes" max-length="16" name="person_id" size="20"/>
+			<field.date caption="First Payment Due Date" max-length="10" name="first_due" size="10"/>
+			<field.composite caption="*"  name="text_field">
+				<field.currency caption="Balance to Budget"  hint="Leave blank for auto-calculation of balance" max-length="1024" name="balance" size="10"/>
+				<field.boolean caption="Auto-Calc Balance"  name="auto_calc" style="check"/>
+			</field.composite>
+			<field.composite caption="*"  name="text_field">
+				<field.currency caption="Payment Amount" required="yes" max-length="1024" name="payment_min" size="10"/>
+				<field.select caption="Billing Cycle"  name="payment_cycle" choices="Monthly=30; Weekly=7; Bi-Weekly=14"/>
+				<!--  -->
+			</field.composite>
+			<field.select caption="Billing Org"  name="billing_org_id" choices="query:dialog.stmt0"/>
+			<!--  numPackages="0" pkgList="" stmtNum="0" -->
+			<field.select caption="Invoices"  name="inv_ids" choices="query:billing_statement.sel_outstandingInvoices" size="10" style="multidual"/>
+			<!--  -->
+			<field.composite caption="*"  name="lastpay">
+				<field.currency caption="Last Payment Amount"  max-length="1024" name="lastpay_amount" size="10"/>
+				<field.date caption="Date" name="lastpay_date" size="12"/>
+			</field.composite>
+			<field.text hidden="yes" name="plan_id" caption="plan_id"/>
+
+		</dialog>
+
+		<dialog name="test_catalog" heading="test_catalog">
+			<field.text caption="Lab Org Name " read-only="yes" max-length="30" name="org_name" size="15"/>
+			<field.text caption="Service Catalog ID" required="yes" uppercase="yes" max-length="30" name="catalog_id"/>
+			<field.text caption="Service Catalog Name" required="yes" max-length="30" name="caption"/>
+			<field.memo caption="Description" name="description" size="24"/>
+			<field.text hidden="yes" name="internal_catalog_id" caption="internal_catalog_id"/>
+			<field.text hidden="yes" name="org_internal_id" caption="org_internal_id"/>
+
+		</dialog>
+
+		<dialog name="message" heading="message">
+			<field.separator heading="Message" name="message_subhead"/>
+			<field.text hidden="yes" name="message_id" caption="message_id"/>
+			<field.composite caption="From" read-only="yes" name="from_senton">
+				<field.text caption="From"  name="from"/>
+				<field.text caption="send_on"  name="send_on"/>
+			</field.composite>
+			<!-- Unimplemented field type=not_an_identifier -->
+			<!-- Unimplemented field type=not_an_identifier -->
+			<field.text caption="Regarding Patient"  max-length="16" name="patient_id" size="16"/>
+			<field.text hidden="yes" name="patient_name" caption="patient_name"/>
+			<field.text hidden="yes" name="saved_patient_id" caption="saved_patient_id"/>
+			<field.text caption="Caller if Other than Patient"  name="doc_source_system" size="40"/>
+			<field.composite caption="*"  name="return_phones">
+				<field.phone caption="Return Call To -   Home"  max-length="1024" name="return_phone1"/>
+				<field.phone caption="Office"  max-length="1024" name="return_phone2"/>
+				<field.phone caption="Cell"  max-length="1024" name="return_phone3"/>
+			</field.composite>
+			<field.composite caption="*"  name="pager_other">
+				<field.text caption="Pager"  name="return_phone4" size="13"/>
+				<field.text caption="Other"  name="return_phone5" size="13"/>
+			</field.composite>
+			<field.select caption="Priority"  name="priority" choices="Normal;ASAP;Emergency"/>
+			<!--  -->
+			<field.text caption="Subject" required="yes" max-length="255" name="subject" size="70"/>
+			<field.select caption="Message"  name="common_message" choices="; 				Medication Question = medication_question; 				Medication Problem  = medication_problem; 				Wants Lab Results   = want_lab_results; 				Has Question About Lab Results = has_question_about_lab_results; 				Doesn't Feel Well   = does_not_feel_well; 				Complains Of        = complains_of; 				Continue Same Treatment = continue_same_treatment; 				Schedule Appointment = schedule_appointment; 				Follow Up in = follow_up_in; 				Stop Medication = stop_medication; 				Start New Medication = start_new_medication; 				Change Medication Dose = change_medication_dose; 				Refill Medication = refill_medication; 				Call 			"/>
+			<!--  -->
+			<field.memo name="message" rows="5" cols="70" size="24"/>
+			<field.separator heading="Notes" name="notes_subhead"/>
+			<field.text  max-length="-1" name="existing_notes"/>
+			<field.memo caption="Add Notes" name="notes" rows="5" cols="70" size="24"/>
+			<field.boolean caption="Keep notes private?" visible="no" name="notes_private" style="check"/>
+
+		</dialog>
+
+		<dialog name="org_provider" heading="$Command Associated Provider Organization">
+			<field.text hidden="yes" name="clear_item_id" caption="clear_item_id"/>
+			<field.text hidden="yes" name="business_hrs_id" caption="business_hrs_id"/>
+			<field.text hidden="yes" name="area_served_id" caption="area_served_id"/>
+			<field.separator heading="Profile Information" name="gen_info_heading"/>
+			<field.text caption="Parent Organization ID"  max-length="16" name="parent_org_id" size="16"/>
+			<field.text caption="Organization ID" required="yes" max-length="16" name="org_id" size="16"/>
+			<field.memo caption="Organization Name" name="name_primary" size="24"/>
+			<field.memo caption="Doing Business As" name="name_trade" size="24"/>
+			<field.separator heading="Contact Information" name="contact_heading"/>
+			<field.composite caption="*"  name="hours_and_tzone">
+				<field.text caption="Hours of Operation"  name="business_hours"/>
+				<field.select caption="Time Zone"  name="time_zone" choices="GMT=GMT;US-Atlantic=AST4ADT;US-Eastern=EST5EDT;US-Central=CST6CDT;US-Mountain=MST7MDT;US-Pacific=PST8PDT"/>
+				<!--  -->
+			</field.composite>
+			<field.composite caption="*"  name="phone_fax">
+				<field.phone caption="Phone" required="yes" max-length="1024" name="phone"/>
+				<field.phone caption="Fax"  max-length="1024" name="fax"/>
+			</field.composite>
+			<field.composite caption="Mailing Address" required="yes" name="address">
+				<field.text caption="Address (Line 1)"  max-length="128" name="addr_line1" size="36"/>
+				<field.text caption="Address (Line 2)"  max-length="128" name="addr_line2" size="36"/>
+				<field.text caption="City"  max-length="64" name="addr_city" size="16"/>
+				<field.text caption="State"  max-length="2" name="addr_state" size="2"/>
+				<field.text caption="Zip"  name="addr_zip"/>
+			</field.composite>
+			<field.email caption="Email"  max-length="1024" name="email"/>
+			<field.uri caption="Website"  max-length="1024" name="internet"/>
+			<field.composite caption="*"  name="org_contact">
+				<field.text caption="Billing Contact"  name="contact_name"/>
+				<field.phone caption="Phone"  max-length="1024" name="contact_phone"/>
+			</field.composite>
+			<field.separator name="text_field"/>
+			<field.boolean caption="Delete record?"  name="delete_record" style="check"/>
+
+		</dialog>
+
+		<dialog name="worklist_setup" heading="worklist_setup">
+			<field.separator heading="Physicians" name="text_field"/>
+			<field.select caption="Physician"  name="physician_list" choices="query:person.selResourceAssociations" size="5" style="multidual"/>
+			<!--  -->
+			<field.separator heading="Facilities" name="text_field"/>
+			<field.select caption="Facility"  name="facility_list" choices="query:dialog.stmt1" size="5" style="multidual"/>
+			<!--  numPackages="0" pkgList="" stmtNum="1" -->
+			<field.separator heading="On-Select" name="text_field"/>
+			<field.select caption="Patient"  name="patientOnSelect" choices="View Profile=View Profile,View Chart=View Chart,View Account=View Account,Make Appointment=Make Appointment,"/>
+			<!--  -->
+			<field.select caption="Physician"  name="physicianOnSelect" choices="View Schedule=View Schedule,View Profile=View Profile,Add Template=Add Template,"/>
+			<!--  -->
+			<field.select caption="Organization"  name="orgOnSelect" choices="View Profile=View Profile,View Fee Schedules=View Fee Schedules,"/>
+			<!--  -->
+			<field.select caption="Appointment"  name="apptOnSelect" choices="Update=Update,Reschedule=Reschedule,No-Show=No-Show,Cancel=Cancel,"/>
+			<!--  -->
+
+		</dialog>
+
+		<dialog name="appointment" heading="appointment">
+			<field.text hidden="yes" name="event_id" caption="event_id"/>
+			<field.text caption="Patient ID"  hint="Leave blank to use ID autosuggestion feature for new patients" max-length="16" name="attendee_id" size="25"/>
+			<field.select caption="Patient Type" required="yes" name="patient_type"/>
+			<!--  -->
+			<field.text caption="Reason for Visit" required="yes" name="subject" size="40"/>
+			<field.memo caption="Symptoms / Remarks" name="remarks" size="24"/>
+			<field.select caption="Appointment Type"  name="appt_type" choices="query:scheduling.sel_ApptTypesDropDown"/>
+			<!--  -->
+			<field.select caption="Super Bill Type"  name="superbill_id" choices="query:scheduling.sel_SuperBillTypesDropDown"/>
+			<!--  -->
+			<field.composite caption="*"  name="appt_date_time">
+				<field.date caption="Appointment Date" max-length="10" name="appt_date_0" size="10"/>
+				<field.time caption="Time" max-length="8" name="appt_time_0" size="8"/>
+				<field.text hidden="yes" name="parent_id_0"/>
+				<field.text hidden="yes" name="processConflict_0"/>
+			</field.composite>
+			<field.composite caption="*"  name="appt_date_time_0">
+				<field.date caption="Appointment 1 Date" max-length="10" name="appt_date_0" size="10"/>
+				<field.time caption="Time" max-length="8" name="appt_time_0" size="8"/>
+				<field.select  name="join_0" choices="=0, and=1"/>
+				<!--  -->
+				<field.text hidden="yes" name="parent_id_0"/>
+				<field.text hidden="yes" name="processConflict_0"/>
+			</field.composite>
+			<field.composite caption="*"  name="minutes_util_0">
+				<field.text caption="Appt 1 Time Minute"  name="appt_minute_0"/>
+				<field.text caption="AM PM"  name="appt_am_0"/>
+			</field.composite>
+			<field.composite caption="*"  name="appt_date_time_1">
+				<field.date caption="Appointment 2 Date" max-length="10" name="appt_date_1" size="10"/>
+				<field.time caption="Time" max-length="8" name="appt_time_1" size="8"/>
+				<field.text hidden="yes" name="parent_id_1"/>
+				<field.text hidden="yes" name="processConflict_1"/>
+			</field.composite>
+			<field.composite caption="*"  name="minutes_util_1">
+				<field.text caption="Appt 2 Time Minute"  name="appt_minute_1"/>
+				<field.text caption="AM PM"  name="appt_am_1"/>
+			</field.composite>
+			<field.boolean caption="Check for Conflicts"  name="conflict_check" style="check"/>
+			<field.text hidden="yes" name="duration" caption="duration"/>
+			<field.text caption="Physician ID" required="yes" hint="Physician ID or select a Roving Physician" max-length="64" name="resource_id" size="32"/>
+			<field.select caption="Roving Physician"  name="roving_physician" choices="query:scheduling.selRovingPhysicianTypes"/>
+			<!--  -->
+			<field.select caption="Facility"  name="facility_id" choices="query:dialog.stmt2"/>
+			<!--  numPackages="0" pkgList="" stmtNum="2" -->
+			<field.memo caption="$Command Remarks" name="discard_remarks" size="24"/>
+			<field.select caption="$Command Reason"  name="cancel_remarks" choices=" ;Weather;Illness;Death in family;Doctor cancel;Patient cancel;Accident;Miscellaneous;Invalid appt;"/>
+			<!--  -->
+			<field.select caption="Rescheduled By" required="yes" name="rescheduled" choices="Patient;Office"/>
+			<!--  -->
+			<field.select caption="Waiting List"  name="waiting_patients" choices="query:scheduling.selWaitingPatients"/>
+			<!--  -->
+			<field.text caption="Confirmed By" required="yes" max-length="16" name="app_verified_by" size="20"/>
+			<field.date caption="Confirm Date" max-length="10" name="app_verify_date" size="10"/>
+			<field.select caption="Action" required="yes" name="verify_action" choices="Talked to Patient=Talked to Patient,Left Message=Left Message, Unable to Reach=Unable to Reach, Incorrect Phone Number=Incorrect Phone Number" style="radio"/>
+			<!--  -->
+
+		</dialog>
+
+		<dialog name="postcappayment" heading="postcappayment">
+			<field.composite caption="Batch ID Date" required="yes" name="batch_fields">
+				<field.text caption="Batch ID" required="yes" name="batch_id" size="12"/>
+				<field.date caption="Batch Date" name="batch_date" size="12"/>
+			</field.composite>
+			<field.select caption="Pay To Org" required="yes" name="pay_to_org_id" choices="query:dialog.stmt3"/>
+			<!--  numPackages="0" pkgList="" stmtNum="3" -->
+			<field.text caption="Physician ID"  max-length="16" name="provider_id" size="16"/>
+			<field.text caption="Insurance Product"  max-length="32" name="product_name" size="16"/>
+			<field.text caption="Insurance Plan"  max-length="32" name="plan_name" size="16"/>
+			<field.select caption="Month" required="yes" name="month"/>
+			<!--  -->
+			<field.composite caption="Check Amount/Number"  name="check_fields">
+				<field.currency caption="Check Amount" required="yes" max-length="1024" name="check_amount" size="10"/>
+				<field.text caption="Check Number/Pay Reference"  name="check_number"/>
+			</field.composite>
+
+		</dialog>
+
+		<dialog name="template" heading="template">
+			<field.text caption="Template ID" read-only="yes" name="template_id"/>
+			<field.composite caption="Effective Dates"  name="effective">
+				<field.date caption="effective_begin_date" name="effective_begin_date" size="12"/>
+				<field.date caption="effective_end_date" name="effective_end_date" size="12"/>
+			</field.composite>
+			<field.memo caption="Caption" name="caption" size="24"/>
+			<!-- Unimplemented field type=not_an_identifier -->
+			<field.select caption="Roving Physician"  name="roving_physician" choices="query:scheduling.selRovingPhysicianTypes"/>
+			<!--  -->
+			<field.composite caption="Facility/Type/Status"  name="text_field">
+				<field.select caption="Facility"  name="facility_id" choices="query:dialog.stmt4"/>
+				<!--  numPackages="0" pkgList="" stmtNum="4" -->
+				<field.select caption="available" required="yes" name="available" choices="Available=1;Not Available=0"/>
+				<!--  -->
+				<field.select caption="status" required="yes" name="status" choices="Active=1;Not Active=0"/>
+				<!--  -->
+			</field.composite>
+			<field.select caption="Patient Type(s)"  name="patient_types" style="multicheck"/>
+			<!--  -->
+			<field.select caption="Appointment Type(s)"  name="appt_types" choices="query:scheduling.sel_AllApptTypes" size="5" style="multidual"/>
+			<!--  -->
+			<field.separator name="text_field"/>
+			<field.composite caption="Start / End Time" required="yes" name="duration" size="8">
+				<field.time caption="duration_begin_time" name="duration_begin_time" size="8"/>
+				<field.time caption="duration_end_time" name="duration_end_time" size="8"/>
+			</field.composite>
+			<field.select caption="Days"  name="days_of_week" choices="Sun=1,Mon=2,Tue=3,Wed=4,Thu=5,Fri=6,Sat=7" style="multicheck"/>
+			<!--  -->
+			<field.select caption="Months"  name="months" choices="Jan=1,Feb=2,Mar=3,Apr=4,May=5,Jun=6,Jul=7,Aug=8,Sep=9,Oct=10,Nov=11,Dec=12" style="multicheck"/>
+			<!--  -->
+			<field.text caption="Days of Month"  hint="eg. 1,3,5-10,25-30" name="days_of_month" size="32"/>
+			<field.separator name="text_field"/>
+			<field.composite caption="Remarks / Preferences"  name="text_field">
+				<field.memo caption="Remarks" name="remarks" size="24"/>
+				<field.memo caption="Preferences" name="preferences" size="24"/>
+			</field.composite>
+
+		</dialog>
+
+		<dialog name="appttype" heading="appttype">
+			<field.text caption="Appointment Type ID" read-only="yes" name="appt_type_id"/>
+			<!-- Unimplemented field type=not_an_identifier -->
+			<field.memo caption="Caption" name="caption" size="24"/>
+			<field.integer caption="Appointment Duration" default="10" required="yes" hint="Duration in Minutes" max-length="1024" name="duration" size="8"/>
+			<field.composite caption="*"  name="text_field">
+				<field.integer caption="Lead Time"  hint="minutes" max-length="1024" name="lead_time" size="8"/>
+				<field.integer caption="Lag Time (minutes)"  hint="minutes" max-length="1024" name="lag_time" size="8"/>
+			</field.composite>
+			<field.boolean caption="Back To Back Appointment Allowed"  name="back_to_back" style="check"/>
+			<field.composite caption="*"  name="simultaneous">
+				<field.integer caption="Multiple Simultaneous Appts Limits"  hint="Max # simultaneous appointments" max-length="1024" name="num_sim" size="8"/>
+				<field.boolean caption="Allowed"  name="multiple" style="check"/>
+			</field.composite>
+			<field.composite caption="*"  name="limits">
+				<field.integer caption="AM Limits"  hint="Max # appointments of this type during AM hours" max-length="1024" name="am_limit" size="8"/>
+				<field.integer caption="PM Limits"  hint="Max # appointments of this type during PM hours" max-length="1024" name="pm_limit" size="8"/>
+				<field.integer caption="All Day Limits"  hint="Max # appointments of this type for entire day" max-length="1024" name="day_limit" size="8"/>
+			</field.composite>
+			<!-- Unimplemented field type=not_an_identifier -->
+			<field.select caption="Roving Physician"  name="roving_physician" choices="query:scheduling.selRovingPhysicianTypes"/>
+			<!--  -->
+			<field.select caption="Super Bill Type"  name="superbill_id" choices="query:scheduling.sel_SuperBillTypesDropDown"/>
+			<!--  -->
+
+		</dialog>
+
+		<dialog name="feescheduleentry" heading="$Command Fee Schedule Entry">
+			<field.text caption="feescheduleentries"  name="feescheduleentries"/>
+
+		</dialog>
+
+		<dialog name="printsuperbill" heading="printsuperbill">
+			<field.text hidden="yes" name="patient_id" caption="patient_id"/>
+			<field.boolean caption="Print report"  name="printReport" style="check"/>
+			<field.select caption="Printer" prepend-blank="yes" name="printerQueue" choices="query:device.sel_org_devices"/>
+			<!--  -->
+
+		</dialog>
+
+		<dialog name="book_marks" heading="$Command Bookmarks">
+			<field.text caption="Caption" required="yes" hint="Please provide a friendly name of the bookmark" name="caption"/>
+			<field.text caption="URL" required="yes" hint="Please type in a URL" name="url"/>
+
+		</dialog>
+
+		<dialog name="catalog" heading="catalog">
+			<field.text hidden="yes" name="org_item_id" caption="org_item_id"/>
+			<field.text hidden="yes" name="phy_item_id" caption="phy_item_id"/>
+			<field.text hidden="yes" name="phy_item_id" caption="phy_item_id"/>
+			<field.text hidden="yes" name="parent_catalog_id" caption="Internal Catalog ID"/>
+			<field.text hidden="yes" name="internal_catalog_id" caption="Internal Catalog ID"/>
+			<field.text caption="Fee Schedule Name" required="yes" max-length="32" name="catalog_id" size="20"/>
+			<field.text hidden="yes" name="catalog_type" caption="id"/>
+			<field.text caption="Fee Schedule Caption" required="yes" name="caption" size="45"/>
+			<field.memo caption="Description" name="description" size="24"/>
+			<field.composite caption="Effective Date Range"  name="effective">
+				<field.date caption="effective_begin_date" name="effective_begin_date" size="12"/>
+				<field.date caption="effective_end_date" name="effective_end_date" size="12"/>
+			</field.composite>
+			<field.float caption="RVRBS Multiplier"  max-length="1024" name="rvrbs_multiplier" size="16"/>
+			<field.text caption="Physician ID" uppercase="yes" max-length="255" name="physician_id" size="40"/>
+			<field.text caption=" Site Organization ID " uppercase="yes" max-length="255" name="org_id" size="40"/>
+			<field.text caption="Parent Fee Schedule ID"  max-length="32" name="parent_catalog_name" size="16"/>
+			<field.boolean caption="Capitated Contract"  name="capitated_contract" style="check"/>
+			<field.text hidden="yes" name="add_mode" caption="add_mode"/>
+
+		</dialog>
+
+		<dialog name="procedure" heading="procedure">
+			<field.text hidden="yes" name="item_type" caption="item_type"/>
+			<field.text hidden="yes" name="claim_diags" caption="claim_diags"/>
+			<field.text hidden="yes" name="data_num_a" caption="data_num_a"/>
+			<field.text hidden="yes" name="code_type" caption="code_type"/>
+			<field.text hidden="yes" name="use_fee" caption="use_fee"/>
+			<field.text hidden="yes" name="fee_schedules_item_id" caption="fee_schedules_item_id"/>
+			<field.text hidden="yes" name="fee_schedules_catalog_ids" caption="fee_schedules_catalog_ids"/>
+			<field.composite caption="Illness -  Similar/Current"  name="illness">
+				<field.date caption="Similar Illness Date" name="illness_begin_date" size="12"/>
+				<field.date caption="Current Illness Date" name="illness_end_date" size="12"/>
+			</field.composite>
+			<field.composite caption="Disability -  Begin/End"  name="disability">
+				<field.date caption="Begin Date" name="disability_begin_date" size="12"/>
+				<field.date caption="End Date" name="disability_end_date" size="12"/>
+			</field.composite>
+			<field.composite caption="Hospitalization -  Admit/Discharge"  name="hospitalization">
+				<field.date caption="Admission Date" name="hospitalization_begin_date" size="12"/>
+				<field.date caption="Discharge Date" name="hospitalization_end_date" size="12"/>
+			</field.composite>
+			<field.composite caption="Service Dates -  From/To"  name="service">
+				<field.date caption="From Date" name="service_begin_date" size="12"/>
+				<field.date caption="To Date" name="service_end_date" size="12"/>
+			</field.composite>
+			<field.text hidden="yes" name="servtype" caption="servtype"/>
+			<field.composite caption="CPT / Modf"  name="cptModfField">
+				<field.text caption="Procedure" required="yes" name="procedure" size="8"/>
+				<field.text caption="Modifier"  name="procmodifier" size="4"/>
+			</field.composite>
+			<field.select caption="ICD-9 Codes" required="yes" name="procdiags" choices="No Options" style="multicheck"/>
+			<!--  -->
+			<field.text caption="Fee Schedule(s)"  name="fee_schedules"/>
+			<field.composite caption="Charge/Units"  name="proc_charge_fields">
+				<field.currency caption="Charge"  max-length="1024" name="proccharge" size="10"/>
+				<field.integer caption="Units" default="1" required="yes" max-length="1024" name="procunits" size="6"/>
+				<field.boolean caption="EMG"  name="emg" style="check"/>
+			</field.composite>
+			<field.composite caption="Units"  name="units_emg_fields">
+				<field.integer caption="Units" default="1" required="yes" max-length="1024" name="procunits" size="6"/>
+				<field.boolean caption="EMG"  name="emg" style="check"/>
+			</field.composite>
+			<field.text caption="Unit Cost"  name="alt_cost"/>
+			<field.memo caption="Comments" name="comments" rows="4" cols="25" size="24"/>
+
+		</dialog>
+
+		<dialog name="training" heading="training">
+			<field.float caption="Float"  max-length="1024" name="float" size="16"/>
+			<!-- Unimplemented field type=percentage -->
+			<field.currency caption="Currency"  max-length="1024" name="currency" size="10"/>
+			<field.integer caption="Integer"  max-length="1024" name="integer" size="8"/>
+			<field.date caption="Date" name="date" size="12"/>
+			<field.time caption="Time" name="time" size="8"/>
+			<field.datetime caption="DateTime Stamp" name="stamp" size="20"/>
+			<field.ssn caption="SSN" required="yes" max-length="1024" name="ssn" size="11"/>
+			<field.phone caption="Phone" required="yes" max-length="1024" name="phone"/>
+			<!-- Unimplemented field type=pager -->
+			<field.zip caption="Zipcode" required="yes" max-length="1024" name="zipcode" size="10"/>
+			<field.email caption="EMail" required="yes" max-length="1024" name="email"/>
+			<field.uri caption="URL"  max-length="1024" name="URL"/>
+
+		</dialog>
+
+		<dialog name="auto_forward_msg" heading="$Command Auto Forward">
+			<field.text hidden="yes" name="phone_id" caption="phone_id"/>
+			<field.text hidden="yes" name="internal_id" caption="internal_id"/>
+			<field.text hidden="yes" name="prescription_id" caption="prescription_id"/>
+			<field.composite caption="Phone Message"  name="phone_fields">
+				<field.text caption="Phone Message" required="yes" max-length="16" name="phone_msg_id" size="16"/>
+				<field.select caption="Auto Forward" required="yes" name="phone_status" choices="Active=1;Inactive=0" style="radio"/>
+				<!--  -->
+			</field.composite>
+			<field.composite caption="Internal Message"  name="internal_fields">
+				<field.text caption="Internal Message" required="yes" max-length="16" name="internal_msg_id" size="16"/>
+				<field.select caption="Auto Forward" required="yes" name="internal_status" choices="Active=1;Inactive=0" style="radio"/>
+				<!--  -->
+			</field.composite>
+			<field.composite caption="Prescription Message"  name="prescription_fields">
+				<field.text caption="Prescription Message" required="yes" max-length="16" name="prescription_msg_id" size="16"/>
+				<field.select caption="Auto Forward" required="yes" name="prescription_status" choices="Active=1;Inactive=0" style="radio"/>
+				<!--  -->
+			</field.composite>
+
+		</dialog>
+
+		<dialog name="insured_Person" heading="$Command Insured Person">
+			<field.text hidden="yes" name="resp_item_id" caption="resp_item_id"/>
+			<field.text hidden="yes" name="driver_license_item_id" caption="driver_license_item_id"/>
+			<field.text caption="Person/Patient ID"  hint="To use the ID autosuggestion feature, leave this field blank" max-length="16" name="person_id" size="16"/>
+			<field.composite caption="*"  name="person_id">
+				<field.text caption="Last Name" required="yes" name="name_last" size="16"/>
+				<field.text caption="First Name" required="yes" name="name_first" size="12"/>
+				<field.text caption="Middle Name"  name="name_middle" size="8"/>
+				<field.text caption="Suffix"  name="name_suffix" size="16"/>
+			</field.composite>
+			<field.composite caption="*"  name="text_field">
+				<field.ssn caption="Social Security"  max-length="1024" name="ssn" size="11"/>
+				<field.date caption="Date of Birth" name="date_of_birth" size="12"/>
+			</field.composite>
+			<field.select caption="Gender" required="yes" prepend-blank="yes" name="gender" choices="Male=1;Female=2"/>
+			<!--  -->
+			<field.composite caption="Driver's License Number/State"  name="license_num_state">
+				<field.text caption="License Number"  name="license_number"/>
+				<field.text caption="State"  max-length="2" name="license_state" size="2"/>
+			</field.composite>
+			<field.composite caption="Home Address" required="yes" name="address">
+				<field.text caption="Address (Line 1)"  max-length="128" name="addr_line1" size="36"/>
+				<field.text caption="Address (Line 2)"  max-length="128" name="addr_line2" size="36"/>
+				<field.text caption="City"  max-length="64" name="addr_city" size="16"/>
+				<field.text caption="State"  max-length="2" name="addr_state" size="2"/>
+				<field.text caption="Zip"  name="addr_zip"/>
+			</field.composite>
+			<field.composite caption="*"  name="text_field">
+				<field.phone caption="Home Phone" required="yes" max-length="1024" name="home_phone"/>
+				<field.phone caption="Work Phone"  max-length="1024" name="work_phone"/>
+			</field.composite>
+
+		</dialog>
+
+		<dialog name="postrefund" heading="postrefund">
+			<field.composite caption="Batch ID Date" required="yes" name="batch_fields">
+				<field.text caption="Batch ID" required="yes" name="batch_id" size="12"/>
+				<field.date caption="Batch Date" name="batch_date" size="12"/>
+			</field.composite>
+			<!-- Unimplemented field type=invoices -->
+			<field.text hidden="yes" name="list_invoices" caption="list_invoices"/>
+
+		</dialog>
+
+		<dialog name="health_rule" heading="$Command Health Maintenance Rule">
+			<field.text caption="Rule ID" required="yes" name="rule_id"/>
+			<field.composite caption="Start Age/End Age/Age Metric"  name="text_field">
+				<field.text caption="start_age"  max-length="3" name="start_age" size="3"/>
+				<field.text caption="end_age"  max-length="3" name="end_age" size="3"/>
+				<field.select caption="Age Metric"  name="age_metric" choices="query:org.selTimeMetric"/>
+				<!--  -->
+			</field.composite>
+			<field.select caption="Gender" required="yes" name="gender"/>
+			<!--  -->
+			<field.text caption="Measure"  name="measure"/>
+			<field.composite caption="Periodicity/Peroidicity Metric"  name="text_field">
+				<field.text caption="Periodicity"  name="periodicity"/>
+				<field.select caption="Periodicity Metric"  name="periodicity_metric" choices="query:org.selTimeMetric"/>
+				<!--  -->
+			</field.composite>
+			<field.text caption="Diagnoses" required="yes" name="diagnoses"/>
+			<field.text caption="Directions"  name="directions"/>
+			<field.text caption="Source"  name="source"/>
+			<field.composite caption="Begin/End Source Date"  name="text_field">
+				<field.date caption="src_begin_date" name="src_begin_date" size="12"/>
+				<field.date caption="src_end_date" name="src_end_date" size="12"/>
+			</field.composite>
+
+		</dialog>
+
+		<dialog name="medication" heading="medication">
+			<field.text caption="Patient Name" read-only="yes" required="yes" name="parent_id"/>
+			<field.text caption="Medication" required="yes" name="med_name"/>
+			<field.composite caption="*"  name="medication_multi">
+				<field.float caption="Dose"  max-length="1024" name="dose" size="5"/>
+				<field.select caption="Units"  name="dose_units" choices="mg;ug;gm;kg;pills;caps;tabs;supp;cc;ml;ggts;mm;oz;tsp;tbls;liter;gallon;applicator;inhalation;puff;spray;packets;patch;other"/>
+				<!--  -->
+				<field.select caption="Route"  name="route" choices="PO;chew;suck;sublingual;inhaled nasally;topically;rectally;vaginally;eyes;OD;OS;ears;SQ;IM;IV"/>
+				<!--  -->
+			</field.composite>
+			<field.text caption="Other Units"  name="other_dose_units"/>
+			<field.composite caption="*"  name="freq_prn_multi">
+				<field.select caption="Frequency"  name="frequency" choices="QD;BID;TID;QID;Q2H;Q4H;Q6H;Q8H;Q12H;other"/>
+				<!--  -->
+				<field.select caption="PRN" prepend-blank="yes" name="prn" choices="Pain;Severe Pain;Nausea;Vomiting;Diarrhea;Fever;Cough;SOB;Chest Pain;Angina;other"/>
+				<!--  -->
+			</field.composite>
+			<field.text caption="Other Frequency"  name="other_frequency"/>
+			<field.text caption="Other PRN"  name="other_prn"/>
+			<field.select caption="First Dose" required="yes" prepend-blank="yes" name="first_dose" choices="Now;In;After Completing"/>
+			<!--  -->
+			<field.text caption="First Dose Details"  name="first_dose_specs"/>
+			<field.composite caption="*"  name="dates_multi">
+				<field.date caption="Start Date" max-length="10" name="start_date" size="10"/>
+				<field.date caption="End Date" max-length="10" name="end_date" size="10"/>
+			</field.composite>
+			<field.boolean caption="Ongoing?"  name="ongoing" style="check"/>
+			<field.composite caption="Duration"  name="duration_multi">
+				<field.integer caption="Duration"  max-length="1024" name="duration" size="4"/>
+				<field.select  name="duration_units" choices="days;weeks;months"/>
+				<!--  -->
+			</field.composite>
+			<field.composite caption="*"  name="quantity_refills_multi">
+				<field.float caption="Quantity"  max-length="1024" name="quantity" size="5"/>
+				<field.select caption="# of Refills"  name="num_refills" choices="0;1;2;3;4;5;6;7;8;9;10;11;12;other"/>
+				<!--  -->
+			</field.composite>
+			<field.integer caption="Other # of Refills"  max-length="1024" name="other_num_refills" size="3"/>
+			<field.select caption="Label?"  name="label" choices="Yes=1;No=2" style="radio"/>
+			<!--  -->
+			<field.select caption="Print Label in"  name="label_language" choices="English;Spanish;other;"/>
+			<!--  -->
+			<field.text caption="Other Language"  name="other_label"/>
+			<field.select caption="Substitution allowed?"  name="allow_substitutions" choices="Yes=1;No=2" style="radio"/>
+			<!--  -->
+			<field.select caption="Generic allowed?"  name="allow_generic" choices="Yes=1;No=2" style="radio"/>
+			<!--  -->
+			<field.select caption="Priority" visible="no" name="priority" choices="Normal;Emergency;ASAP" style="radio"/>
+			<!--  -->
+			<field.memo caption="Notes" name="notes" rows="5" cols="50" size="24"/>
+			<field.text caption="Prescription Approved By"  max-length="16" name="approved_by" size="16"/>
+			<field.text caption="Physician for Approval"  max-length="16" name="get_approval_from" size="16"/>
+			<field.text caption="Prescribed By"  max-length="16" name="prescribed_by" size="16"/>
+			<field.text caption="Prescribed By (If not in system)"  name="other_prescribed_by"/>
+			<field.select caption="Prescription Output" prepend-blank="yes" name="destination" choices="Fax to Pharmacy=fax;Print to Printer=printer"/>
+			<!--  -->
+			<field.text caption="Pharmacy"  max-length="16" name="pharmacy_id" size="16"/>
+			<field.text mask-entry="yes" caption="PIN#" required="yes" name="physician_pin"/>
+			<field.text caption="Printer"  name="printer"/>
+			<field.text hidden="yes" name="status" caption="status"/>
+
+		</dialog>
+
+		<dialog name="budget" heading="budget">
+			<field.text hidden="yes" name="budget_date_id" caption="budget_date_id"/>
+			<field.text hidden="yes" name="budget_balance_id" caption="budget_balance_id"/>
+			<field.text hidden="yes" name="staff_id" caption="staff_id"/>
+			<field.text hidden="yes" name="payment_cycle_id" caption="payment_cycle_id"/>
+			<field.text hidden="yes" name="payment_due_date_id" caption="payment_due_date_id"/>
+			<field.date caption="Date" name="budget_date" size="12"/>
+			<field.currency caption="Balance to Budget"  max-length="1024" name="budget_balance" size="10"/>
+			<field.text caption="Staff ID" required="yes" max-length="16" name="staff_id" size="16"/>
+			<field.select caption="Cycle of Payment"  name="payment_cycle" choices="Monthly=monthly;Weekly=weekly;Bi-Weekly=biweekky"/>
+			<!--  -->
+			<field.date caption="First Payment Due Date" name="payment_due_date" size="12"/>
+
+		</dialog>
+
+		<dialog name="posttransfer" heading="posttransfer">
+			<field.composite caption="Batch ID Date" required="yes" name="batch_fields">
+				<field.text caption="Batch ID" required="yes" name="batch_id" size="12"/>
+				<field.date caption="Batch Date" name="batch_date" size="12"/>
+			</field.composite>
+			<field.separator heading="Transfer From" name="transfer_from_heading"/>
+			<field.composite caption="Invoice ID/Amount"  name="trans_from_fields">
+				<field.text caption="Invoice ID" required="yes" name="trans_from_invoice_id"/>
+				<field.currency caption="Transfer Amount" required="yes" max-length="1024" name="trans_from_amt" size="10"/>
+			</field.composite>
+			<field.memo caption="Comments" name="from_comments" size="24"/>
+			<field.separator heading="Transfer To" name="transfer_to_heading"/>
+			<field.text caption="Invoice ID" required="yes" name="trans_to_invoice_id"/>
+			<field.memo caption="Comments" name="to_comments" size="24"/>
+			<field.separator heading="Invoices" name="transfer_invoices_heading"/>
+			<!-- Unimplemented field type=invoices -->
+
+		</dialog>
+
+		<dialog name="invoice" heading="invoice">
+			<field.text hidden="yes" name="trans_id" caption="trans_id"/>
+			<field.text hidden="yes" name="trans_begin_stamp" caption="trans_begin_stamp"/>
+			<field.text hidden="yes" name="claim_type" caption="claim_type"/>
+			<field.text hidden="yes" name="current_status" caption="current_status"/>
+			<field.text hidden="yes" name="invoice_date" caption="invoice_date"/>
+			<field.text hidden="yes" name="batch_item_id" caption="batch_item_id"/>
+			<field.composite caption="Batch ID Date" required="yes" name="batch_fields">
+				<field.text caption="Batch ID" required="yes" name="batch_id" size="12"/>
+				<field.date caption="Batch Date" name="batch_date" size="12"/>
+			</field.composite>
+			<field.text caption="Patient ID" required="yes" max-length="16" name="client_id" size="16"/>
+			<field.composite caption="Payer ID/Type"  hint="If left blank, invoice will be billed to the 'Patient ID'" name="other_payer_fields">
+				<field.text caption="Payer ID"  name="bill_to_id"/>
+				<field.select caption="Payer Type"  name="bill_to_type" choices="Person=person;Organization=org"/>
+				<!--  -->
+			</field.composite>
+			<field.select caption="Provider" required="yes" name="provider_id" choices="query:person.selPersonBySessionOrgAndCategory"/>
+			<!--  -->
+			<field.select caption="Pay To Org"  name="owner_id" choices="query:dialog.stmt5"/>
+			<!--  numPackages="0" pkgList="" stmtNum="5" -->
+			<!-- Unimplemented field type=invoice_items -->
+
+		</dialog>
+
+		<dialog name="catalog_item" heading="catalog_item">
+			<field.text hidden="yes" name="show_cap" caption="show_cap"/>
+			<field.text caption="Fee Schedule ID" required="yes" max-length="32" name="catalog_id" size="16"/>
+			<field.select caption="Fee Schedule Entry Type" required="yes" name="entry_type" choices="query:catalog.selFeeScheduleEntryTypes"/>
+			<!--  -->
+			<field.select caption="Entry Cost Type"  name="flags" choices="Capitated=0,FFS=1" style="radio"/>
+			<!--  -->
+			<field.composite caption="*"  name="code_modifier">
+				<field.text caption="Code" required="yes" max-length="32" name="code" size="10"/>
+				<field.text caption="Modifier"  max-length="32" name="modifier" size="10"/>
+			</field.composite>
+			<field.text caption="Item Name"  hint="autofill for CPT, EPSDT and HCPCS codes" max-length="64" name="name" size="40"/>
+			<field.memo caption="Description" name="description" size="50"/>
+			<field.text caption="Service Type"  max-length="2" name="data_text" size="2"/>
+			<field.select caption="Status" required="yes" name="status"/>
+			<!--  -->
+			<field.select caption="Cost Type" required="yes" name="cost_type"/>
+			<!--  -->
+			<field.text caption="Unit Cost" required="yes" max-length="8" name="unit_cost" size="10"/>
+			<field.text caption="Units Available"  max-length="8" name="units_avail" size="5"/>
+			<field.text caption="Parent Entry ID"  hint="Numeric Entry ID" name="parent_entry_id" size="16"/>
+			<field.text hidden="yes" name="add_mode" caption="add_mode"/>
+
+		</dialog>
+
+		<dialog name="service_catalog" heading="service_catalog">
+			<field.text hidden="yes" name="internal_catalog_id" caption="internal_catalog_id"/>
+			<field.text caption="Service Catalog ID" read-only="yes" max-length="32" name="catalog_id" size="20"/>
+			<field.text caption="Service Catalog Name" read-only="yes" name="caption" size="45"/>
+			<field.select caption="Service Category"  name="code" choices="query:dialog.stmt6"/>
+			<!--  numPackages="0" pkgList="" stmtNum="6" -->
+
+		</dialog>
+
+	</dialogs>
+</xaf>

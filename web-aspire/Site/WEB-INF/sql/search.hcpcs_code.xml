@@ -1,0 +1,90 @@
+<?xml version="1.0"?>
+
+<xaf>
+	<sql-statements package="search.hcpcs_code">
+		<statement name="id">
+			App::Statements::Search::Code
+		</statement>
+
+		<statement name="sel_hcpcs_code">
+			
+			SELECT hcpcs, name, replace(description, '''', '`') as description
+			FROM REF_HCPCS
+			WHERE
+			hcpcs = ?
+			AND rownum &lt; 250
+
+		</statement>
+
+		<statement name="sel_hcpcs_code_like">
+			
+			SELECT hcpcs, name, replace(description, '''', '`') as description
+			FROM REF_HCPCS
+			WHERE
+			hcpcs like ?
+			AND rownum &lt; 250
+
+		</statement>
+
+		<statement name="sel_hcpcs_description">
+			
+			SELECT hcpcs, name, replace(description, '''', '`') as description
+			FROM REF_HCPCS
+			WHERE
+			upper(description) = ?
+			AND rownum &lt; 250
+
+		</statement>
+
+		<statement name="sel_hcpcs_description_like">
+			
+			SELECT hcpcs, name, replace(description, '''', '`') as description
+			FROM REF_HCPCS
+			WHERE
+			upper(description) like ?
+			AND rownum &lt; 250
+
+		</statement>
+
+		<statement name="sel_hcpcs_name">
+			
+			SELECT hcpcs, name, replace(description, '''', '`') as description
+			FROM REF_HCPCS
+			WHERE
+			upper(name) = ?
+			AND rownum &lt; 250
+
+		</statement>
+
+		<statement name="sel_hcpcs_name_like">
+			
+			SELECT hcpcs, name, replace(description, '''', '`') as description
+			FROM REF_HCPCS
+			WHERE
+			upper(name) like ?
+			AND rownum &lt; 250
+
+		</statement>
+
+		<statement name="sel_hcpcs_nameordescr">
+			
+			SELECT hcpcs, name, replace(description, '''', '`') as description
+			FROM REF_HCPCS
+			WHERE
+			upper(name) = ? or upper(description) = ?
+			AND rownum &lt; 250
+
+		</statement>
+
+		<statement name="sel_hcpcs_nameordescr_like">
+			
+			SELECT hcpcs, name, replace(description, '''', '`') as description
+			FROM REF_HCPCS
+			WHERE
+			upper(name) like ? or upper(description) like ?
+			AND rownum &lt; 250
+
+		</statement>
+
+	</sql-statements>
+</xaf>

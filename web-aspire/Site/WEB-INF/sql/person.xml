@@ -1,0 +1,949 @@
+<?xml version="1.0"?>
+
+<xaf>
+	<sql-statements package="person">
+		<statement name="id">
+			App::Statements::Person
+		</statement>
+
+		<statement name="insPersonLogin">
+			
+			insert into Person_Login
+			(cr_session_id, cr_stamp, cr_user_id, cr_org_internal_id, person_id, org_internal_id, password, quantity)
+			values
+			(? , sysdate , ? , ? , ? , ? , ? , ?)
+			
+		</statement>
+
+		<statement name="insSessionActivity">
+			
+			insert into PerSess_Activity
+			(session_id, activity_type, action_type, action_scope, action_key, detail_level, activity_data, person_id ) values
+			(? , ? , ? , ? , ? , ? , ? , ?)
+			
+		</statement>
+
+		<statement name="selAddresses">
+			
+			select parent_id, address_name, complete_addr_html
+			from person_address where parent_id = ?
+			order by address_name
+			
+		</statement>
+
+		<statement name="selAlerts">
+			
+			select trans_type, trans_id, caption, detail, to_char(trans_begin_stamp, 'MM/DD/YYYY') as trans_begin_stamp, trans_end_stamp, trans_subtype
+			from transaction
+			where
+			(
+			(trans_owner_type = 0 and trans_owner_id = ?)
+			)
+			and
+			(
+			trans_type between 8000 and 8999
+			)
+			and
+			(
+			trans_status = 2
+			)
+			order by trans_begin_stamp desc
+			
+		</statement>
+
+		<statement name="selAllergicRxn">
+			
+			select id from allergen_reaction
+			where caption = ?
+			
+		</statement>
+
+		<statement name="selAssocNurse">
+			
+			select distinct p.person_id, p.complete_name
+			from person p, person_org_category pcat
+			where p.person_id=pcat.person_id and pcat.org_internal_id = ? and category='Physician'
+			
+		</statement>
+
+		<statement name="selAttrByItemNameParentNameSort">
+			
+			SELECT *
+			FROM person_attribute
+			WHERE parent_id = ?
+			AND item_name = ?
+			AND name_sort = ?
+			
+		</statement>
+
+		<statement name="selAttribute">
+			
+			select item_id, permissions, parent_id, item_type, item_name, value_type, value_text, value_textB, value_int, value_intB, value_float, value_floatB,
+			to_char(value_date, 'MM/DD/YYYY') as value_date, to_char(value_dateEnd, 'MM/DD/YYYY') as value_dateEnd,
+			to_char(value_dateA, 'MM/DD/YYYY') as value_dateA, to_char(value_dateB, 'MM/DD/YYYY') as value_dateB,
+			value_block, parent_org_id
+			from person_attribute
+			where parent_id = ? and item_name = ?
+			
+		</statement>
+
+		<statement name="selAttributeById">
+			
+			select item_id, permissions, parent_id, item_type, item_name, value_type, value_text, value_textB, name_sort, value_int, value_intB, value_float, value_floatB,
+			to_char(value_date, 'MM/DD/YYYY') as value_date, to_char(value_dateEnd, 'MM/DD/YYYY') as value_dateend,
+			to_char(value_dateA, 'MM/DD/YYYY') as value_dateA, to_char(value_dateB, 'MM/DD/YYYY') as value_dateb,
+			value_block, parent_org_id
+			from person_attribute
+			where item_id = ?
+			
+		</statement>
+
+		<statement name="selAttributeByIdValueIntParent">
+			
+			SELECT	item_id
+			FROM	Person_Attribute
+			WHERE	parent_id = :1
+			AND	value_int = :2
+			AND	item_name = :3
+			
+		</statement>
+
+		<statement name="selAttributeByItemNameAndValueTypeAndParent">
+			
+			select item_id, permissions, parent_id, item_type, item_name, value_type, value_text, value_textB, value_int, value_intB, value_float, value_floatB,
+			to_char(value_date, 'MM/DD/YYYY') as value_date, to_char(value_dateEnd, 'MM/DD/YYYY') as value_dateEnd,
+			to_char(value_dateA, 'MM/DD/YYYY') as value_dateA, to_char(value_dateB, 'MM/DD/YYYY') as value_dateB,
+			value_block, parent_org_id
+			from person_attribute
+			where parent_id = ? and item_name = ? and value_type = ?
+			
+		</statement>
+
+		<statement name="selAttributeByPersonAndValueType">
+			
+			select item_id, permissions, parent_id, item_type, item_name, value_type, value_text, value_textB, value_int, value_intB, value_float, value_floatB,
+			to_char(value_date, 'MM/DD/YYYY') as value_date, to_char(value_dateEnd, 'MM/DD/YYYY') as value_dateend,
+			to_char(value_dateA, 'MM/DD/YYYY') as value_dateA, to_char(value_dateB, 'MM/DD/YYYY') as value_dateb,
+			value_block, parent_org_id
+			from person_attribute
+			where parent_id = ? and value_type = ?
+			
+		</statement>
+
+		<statement name="selAttributeByValueInt">
+			
+			select item_id, permissions, parent_id, item_type, item_name, value_type, value_text, value_textB, value_int, value_intB, value_float, value_floatB,
+			to_char(value_date, 'MM/DD/YYYY') as value_date, to_char(value_dateEnd, 'MM/DD/YYYY') as value_dateend,
+			to_char(value_dateA, 'MM/DD/YYYY') as value_dateA, to_char(value_dateB, 'MM/DD/YYYY') as value_dateb,
+			value_block, parent_org_id
+			from person_attribute
+			where value_int = ?
+			
+		</statement>
+
+		<statement name="selAuthAssignCaption">
+			
+			select caption from auth_assign
+			where abbrev = ?
+			
+		</statement>
+
+		<statement name="selAuthSignatureCaption">
+			
+			select caption from auth_signature
+			where abbrev = ?
+			
+		</statement>
+
+		<statement name="selBloodTypeCaption">
+			
+			select caption from Blood_Type
+			where id = ?
+			
+		</statement>
+
+		<statement name="selBookmarkById">
+			
+			SELECT value_textb Caption, value_text URL
+			FROM Person_Attribute
+			WHERE item_id = ?
+			
+		</statement>
+
+		<statement name="selCategory">
+			
+			select category
+			from person_org_category
+			where person_id = ? and org_internal_id = ?
+			order by category
+			
+		</statement>
+
+		<statement name="selContactMethods">
+			
+			select * from person_attribute
+			where parent_id = ?
+			and value_type in (
+			10,
+			15,
+			20,
+			40,
+			50
+			)
+			order by name_sort, item_name
+			
+		</statement>
+
+		<statement name="selEmergencyAssociations">
+			
+			select * from person_attribute
+			where parent_id = ?
+			and value_type = 201
+			
+		</statement>
+
+		<statement name="selEmpStatus">
+			
+			select id, caption from attribute_value_type
+			where id between 220 and 227
+			
+		</statement>
+
+		<statement name="selEmploymentAssociations">
+			
+			select * from person_attribute
+			where parent_id = ?
+			and value_type between 220 and 227
+			
+		</statement>
+
+		<statement name="selEmploymentStatus">
+			
+			select caption
+			from attribute_value_type
+			where id = ?
+			
+		</statement>
+
+		<statement name="selEmploymentStatusCaption">
+			
+			select value_type, value_text, value_textB, value_int, caption
+			from person_attribute, attribute_value_type
+			where parent_id = ?
+			and value_type between 220 and 227
+			and value_type = id
+			
+		</statement>
+
+		<statement name="selFamilyAssociations">
+			
+			select * from person_attribute
+			where parent_id = ?
+			and value_type = 200
+			
+		</statement>
+
+		<statement name="selFirstLastName">
+			
+			select p.name_first, p.name_last, p.ssn as ssn, p.person_id as person_id
+			from person p, person_org_category pcat
+			where p.person_id = pcat.person_id and pcat.org_internal_id = ?
+			
+		</statement>
+
+		<statement name="selHomeAddress">
+			
+			select *
+			from person_address
+			where parent_id = ?
+			and address_name = 'Home'
+			
+		</statement>
+
+		<statement name="selHomePhone">
+			
+			select value_text
+			from person_attribute
+			where parent_id = ?
+			and item_name = 'Home'
+			
+		</statement>
+
+		<statement name="selLogin">
+			
+			select person_id, org_internal_id, password, quantity
+			from person_login
+			where person_id = ?
+			and org_internal_id is null
+			
+		</statement>
+
+		<statement name="selLoginAnyOrg">
+			
+			select person_id, org_internal_id, password, quantity
+			from person_login
+			where person_id = ?
+			
+		</statement>
+
+		<statement name="selLoginOrg">
+			
+			select person_id, org_internal_id, password, quantity
+			from person_login
+			where person_id = ? and org_internal_id = ?
+			
+		</statement>
+
+		<statement name="selMedicalSpeciality">
+			
+			select caption, abbrev
+			from Medical_Specialty
+			
+		</statement>
+
+		<statement name="selMedicalSpecialtyCaption">
+			
+			select caption from medical_specialty
+			where abbrev = ?
+			
+		</statement>
+
+		<statement name="selOfficeLocationData">
+			
+			SELECT *
+			FROM person_attribute
+			WHERE parent_id = ?
+			AND item_name = 'Office Location'
+			
+		</statement>
+
+		<statement name="selOfficeLocationOrg">
+			
+			SELECT *
+			FROM person_attribute
+			WHERE parent_id = ?
+			AND value_text = ?
+			AND item_name = 'Office Location'
+			
+		</statement>
+
+		<statement name="selOrgEmployee">
+			
+			select distinct p.person_id, p.complete_name
+			from person p, person_org_category pcat,person_attribute patt
+			where p.person_id=pcat.person_id and p.person_id=patt.parent_id and pcat.org_internal_id= ? and patt.value_type in (220, 221) and patt.value_text= ?
+			
+		</statement>
+
+		<statement name="selPatientAge">
+			
+			select pkg_entity.getPersonAge(date_of_birth) as Age
+			from person
+			where person_id = ?
+			
+		</statement>
+
+		<statement name="selPatientSign">
+			
+			select abbrev, caption from auth_signature
+			
+		</statement>
+
+		<statement name="selPayerInfo">
+			
+			select complete_name as payer_name, person_id as payer_id
+			from person
+			where person_id = ?
+			
+		</statement>
+
+		<statement name="selPerMedById">
+			
+			SELECT *
+			FROM Person_Medication
+			WHERE permed_id = ?
+			
+		</statement>
+
+		<statement name="selPersonAddressByAddrName">
+			
+			select *
+			from person_address
+			where parent_id = ?
+			and address_name = ?
+			
+		</statement>
+
+		<statement name="selPersonAddressById">
+			
+			select *
+			from person_address
+			where item_id = ?
+			
+		</statement>
+
+		<statement name="selPersonAssociation">
+			
+			select value_textB as phone_number, value_date as begin_date, value_dateEnd as end_date,
+			value_int, item_name, value_type
+			from person_attribute
+			where item_id = ?
+			
+		</statement>
+
+		<statement name="selPersonBillingInfo">
+			
+			select	value_type, item_id, value_text, value_textb, value_int, decode(to_char(value_date, 'YYYY'), to_char(sysdate, 'YYYY'), to_char(value_date, 'Mon DD'), to_char(value_date, 'MM/DD/YY'))
+			from	person_attribute
+			where	parent_id = ?
+			and	value_type = 960
+			order by value_int
+			
+		</statement>
+
+		<statement name="selPersonBySessionOrgAndCategory">
+			
+			select distinct person_id
+			from person_org_category
+			where org_internal_id = ?
+			and category = ?
+			
+		</statement>
+
+		<statement name="selPersonCategory">
+			
+			SELECT category
+			FROM person_org_category
+			WHERE person_id = ?
+			AND org_internal_id = ?
+			
+		</statement>
+
+		<statement name="selPersonCategoryExists">
+			
+			SELECT person_id
+			FROM person_org_category
+			WHERE person_id = ?
+			AND category IN ('Physician', 'Staff', 'Nurse','Administrator', 'Superuser')
+			
+		</statement>
+
+		<statement name="selPersonData">
+			
+			select *
+			from Person
+			where person_id = ?
+			
+		</statement>
+
+		<statement name="selPersonEmpIdAssociation">
+			
+			select value_text as rel_id
+			from person_attribute
+			where item_id = ?
+			
+		</statement>
+
+		<statement name="selPersonEmpNameAssociation">
+			
+			select value_text as rel_name
+			from person_attribute
+			where item_id = ?
+			
+		</statement>
+
+		<statement name="selPersonEncounterProvider">
+			
+			select provider_id, complete_name
+			from transaction, person
+			where trans_id = ?
+			and person_id = provider_id
+			
+		</statement>
+
+		<statement name="selPersonExists">
+			
+			select person_id
+			from person
+			where person_id = ?
+			
+		</statement>
+
+		<statement name="selPersonServiceFFSByInternalId">
+			
+			SELECT	distinct pa.parent_id ,pa.value_int
+			FROM	person_org_category poc, person_attribute pa
+			WHERE	poc.org_internal_id = :1
+			AND	UPPER(poc.category) = 'PHYSICIAN'
+			AND	pa.parent_id = poc.person_id
+			AND	pa.item_name ='Fee Schedules'
+			AND	pa.item_type = 0
+			
+		</statement>
+
+		<statement name="selPersonSimpleNameById">
+			
+			select initcap(simple_name) as simple_name from person where person_id = ?
+			
+		</statement>
+
+		<statement name="selPhysStateLicense">
+			
+			select * from person_attribute
+			where parent_id = ? and value_type = 510 and value_int = ?
+			
+		</statement>
+
+		<statement name="selPhysicianSpecialty">
+			
+			select value_textB, item_id
+			from person_attribute
+			where value_type = 210
+			and parent_id = ?
+			and value_text = ?
+			and value_textB = ?
+			
+		</statement>
+
+		<statement name="selPhysicianSpecialtyByIdAndSequence">
+			
+			select item_id, permissions, parent_id, item_type, item_name, value_type, value_text, value_textB, value_int, value_intB, value_float, value_floatB,
+			to_char(value_date, 'MM/DD/YYYY') as value_date, to_char(value_dateEnd, 'MM/DD/YYYY') as value_dateend,
+			to_char(value_dateA, 'MM/DD/YYYY') as value_dateA, to_char(value_dateB, 'MM/DD/YYYY') as value_dateb,
+			value_block, parent_org_id
+			from person_attribute
+			where parent_id = ? and value_int = ?
+			and value_type = 540
+			
+		</statement>
+
+		<statement name="selPreferredPhoneExists">
+			
+			select value_text
+			from person_attribute
+			where value_type = 10
+			and parent_id = ?
+			and value_int = 1
+			
+		</statement>
+
+		<statement name="selPrimaryMail">
+			
+			select *
+			from person_attribute
+			where parent_id = ?
+			and value_type = 40
+			and item_name = 'Primary'
+			
+		</statement>
+
+		<statement name="selPrimaryPhysician">
+			
+			select p.person_id, p.complete_name, pcat.person_id,pcat.org_internal_id, patt.value_text as phy, patt.parent_id
+			from person p, person_org_category pcat, person_attribute patt
+			where p.person_id=pcat.person_id
+			and p.person_id=patt.value_text
+			and patt.item_name like 'Primary%'
+			and pcat.category = 'Physician'
+			and pcat.org_internal_id = ?
+			and patt.parent_id = ?
+			
+		</statement>
+
+		<statement name="selPrimaryPhysicianOrProvider">
+			
+			select * from person_attribute
+			where parent_id = ?
+			and value_type = 210
+			and value_int = 1
+			
+		</statement>
+
+		<statement name="selProviderAssign">
+			
+			select abbrev, caption from auth_assign
+			
+		</statement>
+
+		<statement name="selProviderAssociations">
+			
+			select * from person_attribute
+			where parent_id = ?
+			and value_type = 210
+			
+		</statement>
+
+		<statement name="selReferralReason">
+			
+			select id, caption
+			from Referral_Reason
+			
+		</statement>
+
+		<statement name="selRegistry">
+			
+			select person_id, ssn, name_first, name_middle, name_last, gen.caption as gender_caption, complete_name,
+			mar.caption as marstat_caption,
+			pkg_entity.getPersonAge(date_of_birth) as Age,
+			to_char(date_of_birth, 'MM/DD/YYYY') as date_of_birth,
+			short_sortable_name, ethnicity, person_ref, simple_name
+			from person, gender gen, marital_status mar
+			where person_id = ?
+			and person.gender = gen.id
+			and person.marital_status = mar.id
+			
+		</statement>
+
+		<statement name="selRegistryByLastAndFirstNameAndDOB">
+			
+			select person_id, ssn, name_first, name_middle, name_last, gen.caption as gender_caption, complete_name,
+			mar.caption as marstat_caption,
+			pkg_entity.getPersonAge(date_of_birth) as Age,
+			to_char(date_of_birth, 'MM/DD/YYYY') as date_of_birth,
+			short_sortable_name, ethnicity, person_ref, simple_name
+			from person, gender gen, marital_status mar
+			where name_last = ?
+			and name_first = ?
+			and date_of_birth = to_date(?, 'MM/DD/YYYY')
+			and person.gender = gen.id
+			and person.marital_status = mar.id
+			
+		</statement>
+
+		<statement name="selRegistryBySSN">
+			
+			select person_id, ssn, name_first, name_middle, name_last, gen.caption as gender_caption, complete_name,
+			mar.caption as marstat_caption,
+			pkg_entity.getPersonAge(date_of_birth) as Age,
+			to_char(date_of_birth, 'MM/DD/YYYY') as date_of_birth,
+			short_sortable_name, ethnicity, person_ref, simple_name
+			from person, gender gen, marital_status mar
+			where ssn = ?
+			and person.gender = gen.id
+			and person.marital_status = mar.id
+			
+		</statement>
+
+		<statement name="selRelationship">
+			
+			select caption from resp_party_relationship
+			
+		</statement>
+
+		<statement name="selResourceAssociations">
+			
+			select distinct p.person_id, p.complete_name, name_last, name_first, name_middle
+			from person p, person_org_category pcat
+			where p.person_id=pcat.person_id
+			and pcat.org_internal_id= ?
+			and category='Physician'
+			order by upper(name_last), upper(name_first), upper(name_middle)
+			
+		</statement>
+
+		<statement name="selRoleNameExists">
+			
+			select role_name, role_name_id
+			from role_name
+			where role_name = ?
+			
+		</statement>
+
+		<statement name="selSessionActivity">
+			
+			select to_char(a.activity_stamp, 'MM/DD/YYYY HH12:MI AM') as activity_date, b.caption as caption, a.activity_data as data, a.action_scope as scope, a.action_key as action_key from perSess_Activity a, Session_Action_Type b
+			where activity_stamp &gt; (select max(activity_stamp) - 1 from perSess_Activity) and
+			a.session_id = ? and
+			a.action_type = b.id and
+			rownum &lt;= 20
+			order by activity_date desc
+			
+		</statement>
+
+		<statement name="selSessionPhysicians">
+			
+			select *
+			from person_attribute
+			where value_type = 250
+			and item_name = 'SessionPhysicians'
+			and value_int = 1
+			and parent_id = ?
+			
+		</statement>
+
+		<statement name="selSessions">
+			
+			select person_id, org_internal_id, remote_host, remote_addr, to_char(first_access, 'MM/DD/YYYY HH12:MI AM') as first_access, to_char(last_access, 'MM/DD/YYYY HH12:MI AM') as last_access from person_session
+			where status = 0 and person_id = ?
+			
+		</statement>
+
+		<statement name="selSessionsOrg">
+			
+			select person_id, org_internal_id, remote_host, remote_addr, to_char(first_access, 'MM/DD/YYYY HH12:MI AM') as first_access, to_char(last_access, 'MM/DD/YYYY HH12:MI AM') as last_access from person_session
+			where status = 0 and person_id = ? and org_internal_id = ?
+			
+		</statement>
+
+		<statement name="selSpecialtyExists">
+			
+			select value_text, item_id
+			from person_attribute
+			where value_type = 540
+			and parent_id = ?
+			and value_text = ?
+			
+		</statement>
+
+		<statement name="selSpecialtySequence">
+			
+			select value_int, item_id
+			from person_attribute
+			where value_type = 540
+			and parent_id = ?
+			and value_int = ?
+			
+		</statement>
+
+		<statement name="selStatementsForClient">
+			
+SELECT * FROM (
+			select s.billto_id,
+			s.patient_id,
+			to_char(s.transmission_stamp, 'MM/DD/YYYY') as send_date,
+			to_char(s.ack_stamp, 'MM/DD/YYYY') as ack_date,
+			o1.org_id as org_id1,
+			ts.caption as status,
+			s.amount_due,
+			decode (instr(s.inv_ids, ','),
+			0, decode(sign(s.inv_ids), -1, 'Payment Plan', s.inv_ids),
+			s.inv_ids) as claims,
+			o.org_id,
+			s.billto_type
+			from org o1, org o, transmission_status ts, statement s
+			where (s.patient_id = :1 or s.billto_id = :1)
+			and s.cr_org_internal_id = :2
+			and ts.id (+) = s.transmission_status
+			and to_char(o.org_internal_id (+)) = s.billto_id
+			and o1.org_internal_id = s.payto_id
+			order by s.statement_id desc
+			) WHERE ROWNUM &lt; 11
+			
+		</statement>
+
+		<statement name="selTaxIdType">
+			
+			select id, caption
+			from tax_id_type
+			
+		</statement>
+
+		<statement name="selValidOrgs">
+			
+			SELECT DISTINCT
+			org.org_id,
+			poc.org_internal_id
+			FROM
+			person_org_category poc,
+			org
+			WHERE
+			poc.org_internal_id = org.org_internal_id AND
+			poc.person_id = ?
+			
+		</statement>
+
+		<statement name="selVerifyCategory">
+			
+			select category
+			from person_org_category
+			where person_id = ? and org_internal_id = ? and category = ?
+			
+		</statement>
+
+		<statement name="sel_Person_Addresses">
+			
+			select address_name, complete_addr_html
+			from person_address
+			where parent_id = ?
+			order by address_name
+			
+		</statement>
+
+		<statement name="sel_Person_Alerts">
+			
+			select 	caption, detail
+			from 	transaction
+			where	trans_type between 8000 and 8999
+			and	trans_owner_type = 0
+			and 	trans_owner_id = ?
+			and	trans_status = 2
+			order by trans_begin_stamp desc
+			
+		</statement>
+
+		<statement name="sel_Person_ContactMethods">
+			
+			select value_int, value_type, item_name, value_text, item_id from person_attribute
+			where parent_id = ?
+			and value_type in (
+			10,
+			15,
+			20,
+			40,
+			50
+			)
+			order by name_sort, item_name
+			
+		</statement>
+
+		<statement name="sel_Person_ContactMethods_And_Addresses">
+			
+			select value_int as preferred, value_type, item_name, value_text, item_id
+			from person_attribute pa
+			where parent_id = ?
+			and value_type in (
+			10,
+			15,
+			20,
+			40,
+			50
+			)
+			union all
+			select 0 as preferred, 9998 as value_type, '-' as item_name, '-' as value_text, -1
+			from dual
+			union all
+			select 0 as preferred, 9999 as value_type, address_name as item_name, complete_addr_html as value_text, -1
+			from person_address
+			where parent_id = ?
+			order by value_type, item_name
+			
+		</statement>
+
+		<statement name="sel_Person_EmergencyAssociations">
+			
+			select 	item_name, value_text, value_textb
+			from 	person_attribute
+			where	parent_id = ?
+			and 	value_type = 201
+			
+		</statement>
+
+		<statement name="sel_Person_EmploymentAssociations">
+			
+			select	pa.item_name, pa.value_text, pa.value_int, avt.caption
+			from 	person_attribute pa, attribute_value_type avt
+			where	pa.parent_id = ?
+			and	pa.value_type = avt.id
+			and	pa.value_type between 220 and 227
+			
+		</statement>
+
+		<statement name="sel_Person_FamilyAssociations">
+			
+			select	item_name, value_text, value_textb
+			from 	person_attribute
+			where	parent_id = ?
+			and	value_type = 200
+			
+		</statement>
+
+		<statement name="selssn">
+			
+			select p.ssn,p.person_id
+			from person p,person_org_category pcat where p.person_id = pcat.person_id and pcat.org_internal_id = ?
+			
+		</statement>
+
+		<statement name="selupdClearDefaultOrg">
+			
+			UPDATE person_attribute
+			SET value_int = ''
+			WHERE item_id = ?
+			
+		</statement>
+
+		<statement name="updClearPreferredEmailFlag">
+			
+			update person_attribute
+			set value_int = 0
+			where value_type = 40
+			and (value_int is not null and value_int &lt;&gt; 0)
+			and parent_id = ?
+			
+		</statement>
+
+		<statement name="updClearPreferredFaxFlag">
+			
+			update person_attribute
+			set value_int = 0
+			where value_type = 15
+			and (value_int is not null and value_int &lt;&gt; 0)
+			and parent_id = ?
+			
+		</statement>
+
+		<statement name="updClearPreferredInternetFlag">
+			
+			update person_attribute
+			set value_int = 0
+			where value_type = 50
+			and (value_int is not null and value_int &lt;&gt; 0)
+			and parent_id = ?
+			
+		</statement>
+
+		<statement name="updClearPreferredPagerFlag">
+			
+			update person_attribute
+			set value_int = 0
+			where value_type = 20
+			and (value_int is not null and value_int &lt;&gt; 0)
+			and parent_id = ?
+			
+		</statement>
+
+		<statement name="updClearPreferredPhoneFlag">
+			
+			update person_attribute
+			set value_int = 0
+			where value_type = 10
+			and (value_int is not null and value_int &lt;&gt; 0)
+			and parent_id = ?
+			
+		</statement>
+
+		<statement name="updClearPrimaryPhysician">
+			
+			update person_attribute
+			set value_int = ''
+			where value_type = 210
+			and item_id = ?
+			
+		</statement>
+
+		<statement name="updPersonLogin">
+			
+			update Person_Login
+			set password = ?,
+			quantity = ?
+			where person_id = ?
+			and org_internal_id = ?
+			
+		</statement>
+
+		<statement name="updSessionsTimeout">
+			
+			update person_session set status = 2
+			where status = 0 and person_id = ?
+			
+		</statement>
+
+		<statement name="updSessionsTimeoutOrg">
+			
+			update person_session set status = 2
+			where status = 0 and person_id = ? and org_internal_id = ?
+			
+		</statement>
+
+	</sql-statements>
+</xaf>

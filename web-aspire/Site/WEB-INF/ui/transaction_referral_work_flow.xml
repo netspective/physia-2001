@@ -1,0 +1,93 @@
+<?xml version="1.0"?>
+
+<xaf>
+	<dialogs package="transaction_referral_work_flow">
+		<dialog name="referral_intake" heading="Show Followup Worklist">
+			<field.text caption="Intake Coordinator ID" required="yes" max-length="16" name="person_id" size="16"/>
+
+		</dialog>
+
+		<dialog name="referral_person" heading="$Command Service Request">
+			<field.separator heading="Patient Information" name="patient_info_heading"/>
+			<field.text caption="Person/Patient ID" required="yes" max-length="16" name="person_id" size="16"/>
+
+		</dialog>
+
+		<dialog name="referral_auth" heading="$Command Referral">
+			<field.text hidden="yes" name="name_item_id" caption="name_item_id"/>
+			<field.text hidden="yes" name="provider_item_id" caption="provider_item_id"/>
+			<field.text hidden="yes" name="prev_intake_form" caption="prev_intake_form"/>
+			<field.text caption="Service Request ID"  name="ref_id" size="6"/>
+			<field.text caption="Person/Patient ID" required="yes" max-length="16" name="person_id" size="16"/>
+			<field.separator heading="Tracking" name="text_field"/>
+			<field.text caption="Intake Coordinator "  max-length="16" name="coordinator" size="16"/>
+			<field.date caption="Referral Date" name="ref_date" size="12"/>
+			<field.currency caption="Source of Service Request" read-only="yes" max-length="1024" name="source_referral" size="7"/>
+			<field.separator heading="Assign provider" name="text_field"/>
+			<field.text caption="Provider Contact"  name="contact_provider"/>
+			<field.composite caption="*"  name="text_field">
+				<field.phone caption="Provider Phone"  max-length="1024" name="provider_phone"/>
+				<field.text caption="Ext"  name="provider_phone_ext" size="4"/>
+			</field.composite>
+			<field.text caption="Provider Org"  name="provider"/>
+			<field.text caption="Provider Name"  name="provider_name"/>
+			<field.separator heading="Fee Negotiation" name="text_field"/>
+			<field.currency caption="Point of Service Rate"  max-length="1024" name="charge" size="7"/>
+			<field.text caption="Percent of Usual Customary"  name="percent_usual" size="3"/>
+			<field.text caption="Percent of Fee Schedule"  name="percent_actual" size="3"/>
+			<field.select caption="Referral Result" prepend-blank="yes" name="ref_result" choices="query:org.selReferralResult"/>
+			<!--  -->
+			<field.separator heading="Service" name="text_field"/>
+			<field.composite caption="Service Begin/End Date"  name="begin_end_date">
+				<field.date caption="Begin Date" name="begin_date" size="12"/>
+				<field.date caption="End Date" name="end_date" size="12"/>
+			</field.composite>
+			<field.select caption="Service" prepend-blank="yes" name="service" choices="query:transaction.selReferralServiceDesc"/>
+			<!--  -->
+			<field.composite caption="*"  name="text_field">
+				<field.text caption="Units"  name="units" size="4"/>
+				<field.select caption="Unit Detail" prepend-blank="yes" name="unit_detail" choices="query:org.selReferralUnitType"/>
+				<!--  -->
+			</field.composite>
+			<field.text caption="Code" read-only="yes" name="code" size="7"/>
+			<field.memo caption="Description" name="code_description" size="24"/>
+			<field.text caption="Referral Type " read-only="yes" name="referral_type"/>
+			<field.memo caption="Comment" name="code_comment" size="24"/>
+			<field.currency caption="Service Request Charge" read-only="yes" max-length="1024" name="service_rate" size="7"/>
+			<field.separator heading="Authorization" name="text_field"/>
+			<field.composite caption="*"  name="clientid_num">
+				<field.select caption="Client" prepend-blank="yes" name="client" choices="query:transaction.selIntakeClient"/>
+				<!--  -->
+				<field.text caption="Case #"  name="claim_num" size="7"/>
+			</field.composite>
+			<field.text caption="Auth Num"  name="auth_num"/>
+			<field.composite caption="*"  name="text_field">
+				<field.text caption="Authorized By "  name="provider_id"/>
+				<field.date caption="Authorization Date" name="auth_date" size="12"/>
+			</field.composite>
+			<field.composite caption="*"  name="text_field">
+				<field.phone caption="Auth Phone"  max-length="1024" name="auth_phone"/>
+				<field.text caption="Ext"  name="auth_phone_ext" size="4"/>
+			</field.composite>
+			<field.separator heading="Follow Up" name="text_field"/>
+			<field.composite caption="*"  name="text_field">
+				<field.select caption="Follow Up" prepend-blank="yes" name="follow_up" choices="query:transaction.selReferralFollowStatus"/>
+				<!--  -->
+				<field.date caption="Date" name="followup_date" size="12"/>
+			</field.composite>
+			<field.composite caption="*"  name="text_field">
+				<field.text caption="HDS Claim Number"  name="hds_num"/>
+				<field.date caption="Confirm Delivery Date" name="delivery_date" size="12"/>
+			</field.composite>
+			<field.memo caption="Comments" name="comments" size="24"/>
+
+		</dialog>
+
+		<dialog name="referral_enquiry" heading="Referral Inquiry">
+			<field.text caption="Authorization Number " read-only="yes" max-length="16" name="auth_ref" size="16"/>
+			<field.memo caption="Comments" name="comments" size="24"/>
+
+		</dialog>
+
+	</dialogs>
+</xaf>

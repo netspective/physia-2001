@@ -1,0 +1,126 @@
+<?xml version="1.0"?>
+
+<xaf>
+	<sql-statements package="lab_test">
+		<statement name="countXray">
+			
+			SELECT 	Count (*)
+			FROM	Lab_Order_Entry loe,offering_catalog_entry oce
+			WHERE	loe.parent_id= :1
+			AND	oce.entry_type = 310
+			AND	oce.entry_id = loe.test_entry_id
+			
+		</statement>
+
+		<statement name="delLabEntriesByOrderID">
+			
+			DELETE 
+			FROM lab_order_entry
+			WHERE parent_id = :1
+			
+		</statement>
+
+		<statement name="delPanelById">
+			
+			DELETE 
+			FROM lab_test_panel
+			WHERE parent_id = :1
+			
+		</statement>
+
+		<statement name="id">
+			App::Statements::LabTest
+		</statement>
+
+		<statement name="selLabEntryOptions">
+			
+			SELECT *
+			FROM	Lab_Order_Entry_Options
+			WHERE	parent_id = :1
+			
+		</statement>
+
+		<statement name="selLabOrderByID">
+			
+			SELECT 	l.*, o.org_id ,o.name_primary,o.org_internal_id, to_char(l.date_done,'HH12:MI AM') as done_time,
+			to_char(l.date_order,'HH12:MI AM') as order_time		
+			FROM 	person_lab_order l, org o
+			WHERE 	lab_order_id = :1
+			AND	l.lab_internal_id = o.org_internal_id
+			
+		</statement>
+
+		<statement name="selLabTestByID">
+			
+			SELECT *
+			FROM lab_test
+			WHERE lab_test_id= :1
+			
+		</statement>
+
+		<statement name="selLabTestPanelByID">
+			
+			SELECT *
+			FROM lab_test_panel
+			WHERE parent_id= :1
+			
+		</statement>
+
+		<statement name="selOtherEntryLabCode">
+			
+			SELECT 	*
+			FROM	lab_order_entry
+			WHERE	parent_id = :1
+			AND	modifier='OTHER'
+			
+		</statement>
+
+		<statement name="selSelectTestByParentId">
+			
+			SELECT	loe.test_entry_id, oce.catalog_id
+			FROM	lab_order_entry loe, offering_catalog_entry oce
+			WHERE	loe.test_entry_id = oce.entry_id
+			AND	parent_id = :1
+			
+		</statement>
+
+		<statement name="selTestEntryByParentId">
+			
+			SELECT	oce.*
+			FROM	lab_order_entry loa,offering_catalog_entry oce
+			WHERE 	loa.parent_id = :1
+			AND	loa.test_entry_id = oce.entry_id
+			
+		</statement>
+
+		<statement name="selTestItems">
+			
+			SELECT entry_id,decode(data_text,'Panel Test','*'||name,name) ,data_text || ': ' || description
+			FROM	offering_catalog_entry
+			WHERE	catalog_id = :1
+			AND	parent_entry_id IS NULL
+			
+		</statement>
+
+		<statement name="selTestType">
+			
+			SELECT id,caption
+			FROM offering_catalog_type
+			WHERE id IN (5,6,7)
+			
+		</statement>
+
+		<statement name="selXrayOrder">
+			
+			SELECT 	oce.entry_id, oce.entry_type,loe.options,
+			oce.name,loe.entry_id as lab_entry_id,
+			loe.test_entry_id
+			FROM	Lab_Order_Entry loe,offering_catalog_entry oce
+			WHERE	loe.parent_id= :1
+			AND	oce.entry_type = 310
+			AND	oce.entry_id = loe.test_entry_id
+			
+		</statement>
+
+	</sql-statements>
+</xaf>

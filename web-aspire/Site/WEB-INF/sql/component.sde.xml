@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+
+<xaf>
+	<sql-statements package="component.sde">
+		<statement name="id">
+			App::Statements::Component::SDE
+		</statement>
+
+		<statement name="sde.dbstats">
+			
+			SELECT
+			sn.name,
+			my.value
+			FROM
+			v$mystat my,
+			v$statname sn
+			WHERE my.statistic# = sn.statistic#
+			
+		</statement>
+
+	</sql-statements>
+</xaf>

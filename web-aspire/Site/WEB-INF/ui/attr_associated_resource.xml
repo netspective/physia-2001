@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+
+<xaf>
+	<dialogs package="attr_associated_resource">
+		<dialog name="resource_org" heading="$Command Associated Organization">
+			<field.text hidden="yes" name="attr_path" caption="attr_path"/>
+			<field.text caption="Org ID" required="yes" max-length="16" name="value_text" size="16"/>
+
+		</dialog>
+
+		<dialog name="resource_orgemp" heading="$Command Associated Employee">
+			<field.text caption="Employee ID"  max-length="16" name="emp_id" size="16"/>
+
+		</dialog>
+
+		<dialog name="resource_session_physicians" heading="$Command Session Set Of Physicians">
+			<field.select caption="Physician"  name="physician_list" choices="query:person.selResourceAssociations" size="5" style="multicheck"/>
+			<!--  -->
+
+		</dialog>
+
+		<dialog name="resource_nurse" heading="$Command Associated Physician">
+			<field.text hidden="yes" name="attr_path" caption="attr_path"/>
+			<field.select caption="Physician Name" required="yes" name="value_text" choices="query:person.selResourceAssociations"/>
+			<!--  -->
+
+		</dialog>
+
+	</dialogs>
+</xaf>

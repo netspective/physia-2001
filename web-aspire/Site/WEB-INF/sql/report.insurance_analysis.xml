@@ -1,0 +1,90 @@
+<?xml version="1.0"?>
+
+<xaf>
+	<sql-statements package="report.insurance_analysis">
+		<statement name="id">
+			App::Statements::Report::InsuranceAnalysis
+		</statement>
+
+		<statement name="selInsuranceAnalysisByCpt">
+			
+			SELECT
+			o.name_primary,
+			ii.code, ref_cpt.name,
+			sum(quantity) units,
+			avg(iia.plan_allow) avg_charge,
+			avg(iia.plan_paid) avg_paid,
+			max(iia.plan_paid) max_paid,
+			min(iia.plan_paid) min_paid,
+			o.org_id
+			FROM
+			invoice i,
+			invoice_item ii,
+			invoice_item_adjust iia,
+			invoice_billing ib,
+			insurance ins,
+			org o,
+			ref_cpt
+			WHERE i.invoice_id = ii.parent_id
+			and ii.item_id = iia.parent_id
+			and i.billing_id = ib.bill_id
+			and ib.bill_ins_id = ins.ins_internal_id
+			and i.invoice_subtype not in ( 0,7 )
+			and o.org_internal_id = ins.ins_org_id
+			and ref_cpt.cpt = ii.code
+			and iia.plan_paid != 0
+			and (i.invoice_date &gt;= to_date(:1, 'MM/DD/YYYY') or :1 is null)
+			and (i.invoice_date &lt;= to_date(:2, 'MM/DD/YYYY') or :2 is null)
+			and (ii.service_begin_date &gt;= to_date(:3, 'MM/DD/YYYY') or :3 is null)
+			and (ii.service_end_date &lt;= to_date(:4, 'MM/DD/YYYY') or :4 is null)
+			and (ii.code &gt;= :5 or :5 is null)
+			and (ii.code &lt;= :6 or :6 is null)
+			and (o.org_id = :7 or :7 is null)
+			and i.owner_id = :8
+			GROUP BY o.name_primary, ii.code, ref_cpt.name, o.org_id
+			order by code
+
+		</statement>
+
+		<statement name="selInsuranceAnalysisByInsurance">
+			
+			SELECT
+			o.name_primary,
+			ii.code, ref_cpt.name,
+			sum(quantity) units,
+			avg(iia.plan_allow) avg_charge,
+			avg(iia.plan_paid) avg_paid,
+			max(iia.plan_paid) max_paid,
+			min(iia.plan_paid) min_paid,
+			o.org_id
+			FROM
+			invoice i,
+			invoice_item ii,
+			invoice_item_adjust iia,
+			invoice_billing ib,
+			insurance ins,
+			org o,
+			ref_cpt
+			WHERE i.invoice_id = ii.parent_id
+			and ii.item_id = iia.parent_id
+			and i.billing_id = ib.bill_id
+			and ib.bill_ins_id = ins.ins_internal_id
+			and i.invoice_subtype not in ( 0,7 )
+			and o.org_internal_id = ins.ins_org_id
+			and ref_cpt.cpt = ii.code
+			and iia.plan_paid != 0
+			and (i.invoice_date &gt;= to_date(:1, 'MM/DD/YYYY') or :1 is null)
+			and (i.invoice_date &lt;= to_date(:2, 'MM/DD/YYYY') or :2 is null)
+			and (ii.service_begin_date &gt;= to_date(:3, 'MM/DD/YYYY') or :3 is null)
+			and (ii.service_end_date &lt;= to_date(:4, 'MM/DD/YYYY') or :4 is null)
+			and (ii.code &gt;= :5 or :5 is null)
+			and (ii.code &lt;= :6 or :6 is null)
+			and (o.org_id = :7 or :7 is null)
+			and i.owner_id = :8
+			GROUP BY o.name_primary, ii.code, ref_cpt.name, o.org_id
+			order by name_primary
+
+		</statement>
+
+	</sql-statements>
+</xaf>

@@ -1,0 +1,1388 @@
+<?xml version="1.0"?>
+
+<xaf>
+	<sql-statements package="report.accounting">
+		<statement name="id">
+			App::Statements::Report::Accounting
+		</statement>
+
+		<statement name="procAnalysis">
+			
+			SELECT 	p.simple_name,
+			tt.caption as visit_type,
+			NVL(i.code,'UNK') as code,
+			NVL(r.name,'N/A') as proc,
+			sum(i.unit_cost) as year_cost,
+			sum(i.units)	as year_units,
+			sum(decode(
+			trunc(invoice_date,'MM'),
+			trunc(to_date(:3,'MM/DD/YYYY'),'MM')
+			,i.unit_cost,
+			0)
+			) as month_cost,
+			sum(decode(
+			trunc(invoice_date,'MM'),
+			trunc(to_date(:3,'MM/DD/YYYY'),'MM')
+			,i.units,
+			0)
+			) as month_units,
+			sum(decode(
+			invoice_date,
+			to_date(:3,'MM/DD/YYYY')
+			,i.unit_cost,
+			0)
+			) as batch_cost,
+			sum(decode(
+			invoice_date,
+			to_date(:3,'MM/DD/YYYY')
+			,i.units,
+			0)
+			) as batch_units
+			FROM 	invoice_charges i, person p, transaction_type tt,
+			(
+			select cpt code, name
+			from ref_cpt
+			union all
+			select epsdt code, name
+			from ref_epsdt
+			) r
+			WHERE (:1 IS NULL OR provider= :1 )
+			AND (i.invoice_date) BETWEEN to_date(:2,'MM/DD/YYYY')
+			AND to_date(:3,'MM/DD/YYYY')
+			AND (:4 IS NULL OR :4 = i.facility)
+			AND (:5 IS NULL OR :5 &lt;=i.code)
+			AND (:6 is NULL OR :6 &gt;=i.code)
+			AND owner_org_id = :7
+			AND tt.id (+)= i.trans_type
+			AND r.code(+)=i.code
+			AND p.person_id = i.provider
+			AND i.invoice_id in
+			(select parent_id from invoice_item ii
+			where (ii.service_begin_date &gt;= to_date(:8,'MM/DD/YYYY') OR :8 is NULL)
+			AND (ii.service_end_date &lt;= to_date(:9,'MM/DD/YYYY') OR :9 is NULL)
+			AND ii.item_type in (0,1,2)
+			AND ii.data_text_b is NULL)
+			group by p.simple_name,
+			tt.caption,
+			NVL(i.code,'UNK'),
+			NVL(r.name,'N/A')
+			order by 1,2,3
+			
+		</statement>
+
+		<statement name="selBillCycleData">
+			
+			SELECT	s.amount_due,
+			p.simple_name,
+			s.patient_id,
+			ts.caption as status
+			FROM	Statement s, person p,Transmission_Status ts
+			WHERE	to_char(s.TRANsMISSION_STAMP,'MM/DD/YYYY') = :1
+			AND	p.person_id = s.patient_id
+			AND	ts.id (+)= s.transmission_status
+			AND	EXISTS
+			(
+			SELECT 1
+			FROM 	auto_invoice_chrg aic, statement_inv_ids sii
+			WHERE 	aic.invoice_id = sii.member_name
+			AND	(aic.care_provider_id = :3 OR :3 IS NULL)
+			AND	(aic.service_facility_id = :2 or :2 IS NULL)
+			AND	owner_org_id = :4
+			AND	s.statement_id = sii.parent_id
+			)
+			
+		</statement>
+
+		<statement name="selChildernOrgs">
+			
+			SELECT	org_internal_id,org_id
+			FROM	org
+			WHERE	owner_org_id = :1
+			AND	( (parent_org_id = :2 AND :3 = 1) OR org_internal_id = :2 OR :2 IS NULL)
+			AND	upper(category) IN ('PRACTICE', 'CLINIC','FACILITY/SITE','DIAGNOSTIC SERVICES', 'DEPARTMENT', 'HOSPITAL', 'THERAPEUTIC SERVICES')
+			ORDER BY org_id
+			
+		</statement>
+
+		<statement name="selDeposit">
+			
+			SELECT to_char(aic.invoice_date,'MM/DD/YYYY') as batch_date,
+aic.batch_id,
+			aic.payer_id,
+			aic.payer_type,
+			iia.pay_ref,
+			aic.invoice_id,
+			sum(nvl(aic.insurance_pay,0)+nvl(aic.person_pay,0)) as amount,
+			pm.caption as pay_type
+			FROM invoice_charges aic,invoice_item_adjust iia,
+			payment_method pm
+			WHERE iia.adjustment_id = aic.adjustment_id
+			AND invoice_date between to_date(:1,'MM/DD/YYYY')
+			AND to_date(:2,'MM/DD/YYYY')
+			AND (:3 IS NULL OR facility = :3)
+			AND (:4 IS NULL OR provider = :4)
+			AND owner_org_id = :5
+			AND aic.batch_id between :6 AND :7
+			AND	 pm.id = aic.pay_type
+			AND		pm.caption = 'Check'
+			GROUP BY aic.invoice_date , pm.caption,aic.payer_id,iia.pay_ref,aic.payer_type,aic.invoice_id
+,aic.batch_id
+			ORDER BY aic.invoice_date , aic.payer_id,iia.pay_ref
+			
+		</statement>
+
+		<statement name="selDepositSummary">
+			
+			SELECT to_char(aic.invoice_date,'MM/DD/YYYY') as batch_date,
+aic.batch_id,
+			aic.payer_id,
+			aic.payer_type,
+			iia.pay_ref,
+			sum(nvl(aic.insurance_pay,0)+nvl(aic.person_pay,0)) as amount,
+			pm.caption as pay_type
+			FROM invoice_charges aic,invoice_item_adjust iia,
+			payment_method pm
+			WHERE iia.adjustment_id = aic.adjustment_id
+			AND invoice_date between to_date(:1,'MM/DD/YYYY')
+			AND to_date(:2,'MM/DD/YYYY')
+			AND (:3 IS NULL OR facility = :3)
+			AND (:4 IS NULL OR provider = :4)
+			AND owner_org_id = :5
+			AND aic.batch_id between :6 AND :7
+			AND	 pm.id = aic.pay_type
+			GROUP BY aic.invoice_date , pm.caption,aic.payer_id,iia.pay_ref,aic.payer_type
+,aic.batch_id
+			ORDER BY aic.invoice_date , pm.caption,aic.payer_id,iia.pay_ref
+			
+		</statement>
+
+		<statement name="selFourBillCycleData">
+			
+			SELECT *
+			FROM
+			(
+			SELECT	count (*) as stmt_count , sum(amount_due) as amount, to_char(TRANsMISSION_STAMP,'MM/DD/YYYY') as cycle_date
+			FROM	Statement s
+			WHERE	to_char(s.transmission_stamp,'DD') = to_number(:1)
+			AND	EXISTS
+			(
+			SELECT 1
+			FROM 	auto_invoice_chrg aic, statement_inv_ids sii
+			WHERE 	aic.invoice_id = sii.member_name
+			AND	(aic.care_provider_id = :3 OR :3 IS NULL)
+			AND	(aic.service_facility_id = :2 or :2 IS NULL)
+			AND	owner_org_id = :4
+			AND	s.statement_id = sii.parent_id
+			)
+			GROUP BY to_char(TRANsMISSION_STAMP,'MM/DD/YYYY')
+			ORDER BY to_char(TRANsMISSION_STAMP,'MM/DD/YYYY')
+			)
+			WHERE ROWNUM &lt; 5
+			
+		</statement>
+
+		<statement name="selGetVisit">
+			
+			SELECT 	sum (decode(t.trans_type ,2000,1,2010,1,2040,1,2050,1,2060,1,2070,1,2080,1,2090,1,2100,1,2120,1,2130,1,2160,1,2170,1,2180,1,0))
+			as office_visit,
+			sum (decode(t.trans_type,2020,1,0)) as hospital_visit
+			FROM	transaction t, invoice i, invoice_attribute ia,org o
+			WHERE	i.main_transaction = t.trans_id
+			AND	ia.parent_id = i.invoice_id
+			AND	ia.item_name = 'Invoice/Creation/Batch ID'
+			AND	(invoice_status !=15 or parent_invoice_id is null)
+			AND 	o.org_internal_id = t.service_facility_id
+			AND	ia.value_date between to_date(:1,'MM/DD/YYYY')
+			AND 	to_date(:2,'MM/DD/YYYY')
+			AND 	(:3 is NULL OR t.service_facility_id = :3 )
+			AND	t.provider_id = :4
+			AND 	(ia.value_text &gt;= :5 OR :5 is NULL)
+			AND 	(ia.value_text &lt;= :6 OR :6 is NULL)
+			AND 	o.owner_org_id = :7
+			
+		</statement>
+
+		<statement name="selParentInvoicebyId">
+			
+SELECT invoice_id
+			FROM invoice
+			WHERE parent_invoice_id = :1
+			AND parent_invoice_id IS NOT NULL
+			
+		</statement>
+
+		<statement name="selPatientInBillCycle">
+			
+			SELECT	oa.value_int as cycle ,count (distinct(pog.person_id)) as tlt_patient
+			FROM	person p, org_attribute oa , person_org_category pog
+			WHERE upper(substr(p.name_last,1,1)) between oa.value_text AND oa.value_textb
+			AND oa.item_name = 'Billing Event'
+			AND oa.value_type = 650
+			AND (:1 IS NULL OR oa.value_int = :1)
+			AND p.person_id = pog.person_id
+			AND pog.category='Patient'
+			AND pog.org_internal_id = :2
+			AND oa.parent_id = :2
+			GROUP BY oa.value_int
+			
+		</statement>
+
+		<statement name="sel_a_r_before">
+			
+			SELECT 	SUM(total_charges+misc_charges-person_write_off-insurance_write_off +
+			balance_transfer -
+			(person_pay+insurance_pay+refund)
+			) as a_r
+			FROM 	invoice_charges
+			WHERE 	invoice_date &gt;= to_date(:1,'MM/DD/YYYY')
+			AND 	invoice_date &lt; to_date(:2,'MM/DD/YYYY')
+			AND	owner_org_id = :3
+			AND (:4 is NULL OR provider = :4)
+			AND (:5 is NULL OR facility = :5)
+			
+		</statement>
+
+		<statement name="sel_aged_all">
+			
+			SELECT
+			p.simple_name person_name,
+			a.person_id person_ID,
+			count(distinct invoice_id),
+			sum(balance_0),
+			sum(balance_31),
+			sum(balance_61),
+			sum(balance_91),
+			sum(balance_121),
+			sum(balance_151),
+			--sum(decode(item_type,3,total_pending,0)),
+			sum(decode(a.bill_party_type,0,total_pending,1,total_pending,0)),
+			sum(decode(a.bill_party_type,2,total_pending,3,total_pending,0)),
+			sum(total_pending)
+			FROM	agedpayments a, person p
+			WHERE	(a.person_id = :1 or :1 is NULL)
+			AND 	(invoice_item_id is NULL or item_type in (3) )
+			AND EXISTS
+			(SELECT 1
+			FROM person_org_category poc
+			WHERE poc.person_id = a.person_id
+			AND poc.org_internal_id = :2
+			)
+			AND	entire_invoice_balance &lt;&gt; 0
+			AND 	p.person_id = a.person_id
+			AND	a.invoice_status &lt;&gt; 15
+			AND 	(:3 IS NULL OR care_provider_id = :3)
+			AND	(:4 IS NULL OR service_facility_id = :4)
+			GROUP BY a.person_id, p.simple_name
+			having sum(total_pending)&gt; 0
+			
+		</statement>
+
+		<statement name="sel_aged_all_total">
+			
+			SELECT
+			count(distinct a.person_id),
+			count(distinct invoice_id),
+			sum(balance_0),
+			sum(balance_31),
+			sum(balance_61),
+			sum(balance_91),
+			sum(balance_121),
+			sum(balance_151),
+			--sum(decode(item_type,3,total_pending,0)),
+			sum(decode(a.bill_party_type,0,total_pending,1,total_pending,0)),
+			sum(decode(a.bill_party_type,2,total_pending,3,total_pending,0)),
+			sum(total_pending)
+			FROM	agedpayments a, person p
+			WHERE	(a.person_id = :1 or :1 is NULL)
+			AND 	(invoice_item_id is NULL or item_type in (3) )
+			AND EXISTS
+			(SELECT 1
+			FROM person_org_category poc
+			WHERE poc.person_id = a.person_id
+			AND poc.org_internal_id = :2
+			)
+			AND	entire_invoice_balance &lt;&gt; 0
+			AND 	p.person_id = a.person_id
+			AND	a.invoice_status &lt;&gt; 15
+			AND 	(:3 IS NULL OR care_provider_id = :3)
+			AND	(:4 IS NULL OR service_facility_id = :4)
+			AND EXISTS
+			(
+			SELECT	b.person_id
+			FROM	agedpayments b
+			WHERE	(b.person_id = :1 or :1 is NULL)
+			AND 	(b.invoice_item_id is NULL or b.item_type in (3) )
+			and b.person_id = a.person_id
+			AND EXISTS
+			(SELECT 1
+			FROM person_org_category poc
+			WHERE poc.person_id = b.person_id
+			AND poc.org_internal_id = :2
+			)
+			AND	b.entire_invoice_balance &lt;&gt; 0
+			AND	b.invoice_status &lt;&gt; 15
+			AND (:3 IS NULL OR b.care_provider_id = :3)
+			AND	(:4 IS NULL OR b.service_facility_id = :4)
+			group by b.person_id
+			having sum(b.total_pending) &gt; 0
+			)
+			
+		</statement>
+
+		<statement name="sel_aged_data_detail">
+			
+			SELECT
+			a.invoice_id,
+			sum(a.item_count),
+			a.invoice_date,
+			ist.caption,
+			a.bill_to_id,
+			sum(nvl(a.extended_cost,0)),
+			sum(nvl(a.total_adjust,0)),
+			sum(nvl(a.balance,0))
+			FROM	agedpayments a, person p,
+			invoice_status ist
+			WHERE	(a.person_id = :1 or :1 is NULL)
+			AND 	(invoice_item_id is NULL or item_type in (3) )
+			AND 	a.balance &lt;&gt; 0
+			AND 	p.person_id = a.person_id
+			AND 	ist.id = a.invoice_status
+			AND EXISTS
+			(SELECT 1
+			FROM person_org_category poc
+			WHERE poc.person_id = a.person_id
+			AND poc.org_internal_id = :2
+			)
+			AND 	(:3 IS NULL OR care_provider_id = :3)
+			AND	(:4 IS NULL OR service_facility_id = :4)
+			AND	a.invoice_status &lt;&gt; 15
+			GROUP BY a.invoice_id,a.invoice_date,a.bill_to_id,ist.caption
+			having sum(balance)&lt;&gt; 0
+			
+		</statement>
+
+		<statement name="sel_aged_insurance">
+			
+			SELECT 	bill_to_id as insurance_ID , count (distinct(invoice_id)),
+			sum(balance_0),
+			sum(balance_31),
+			sum(balance_61),
+			sum(balance_91),
+			sum(balance_121),
+			sum(balance_151),
+			sum(total_pending)
+			FROM	agedpayments a,org
+			WHERE	(a.bill_plain = :1 or :1 is NULL)
+			AND	a.bill_party_type in (2,3)
+			AND	a.bill_plain = org.org_internal_id
+			AND	org.owner_org_id = :2
+			AND 	(:3 IS NULL OR care_provider_id = :3)
+			AND	(:4 IS NULL OR service_facility_id = :4)
+			AND 	a.invoice_status &lt;&gt; 15
+			AND	entire_invoice_balance &lt;&gt; 0
+			AND a.invoice_id in
+			(select parent_id from invoice_item ii
+			where (ii.service_begin_date &gt;= to_date(:5, 'MM/DD/YYYY') OR :5 is NULL)
+			AND (ii.service_end_date &lt;= to_date(:6, 'MM/DD/YYYY') OR :6 is NULL)
+			AND ii.item_type in (0,1,2)
+			AND ii.data_text_b is NULL
+			)
+			GROUP BY bill_to_id
+			--having sum(total_pending) &lt;&gt; 0
+			
+		</statement>
+
+		<statement name="sel_aged_insurance_detail">
+			
+			SELECT
+			a.invoice_id,
+			sum(a.item_count),
+			a.invoice_date,
+			ist.caption,
+			a.person_id,
+			a.bill_to_id,
+			sum(nvl(a.extended_cost,0)),
+			sum(nvl(a.total_adjust,0)),
+			sum(nvl(a.balance,0)),
+			p.simple_name
+			FROM	agedpayments a, org ,	invoice_status ist,person p
+			WHERE	(a.bill_to_id = :1 or :1 is NULL)
+			AND 	(invoice_item_id is NULL or item_type in (3) )
+			AND	bill_party_type in (2,3)
+			AND 	a.balance &lt;&gt; 0
+			AND 	ist.id = a.invoice_status
+			AND	a.bill_plain = org.org_internal_id
+			AND	org.owner_org_id = :2
+			AND 	(:3 IS NULL OR care_provider_id = :3)
+			AND	(:4 IS NULL OR service_facility_id = :4)
+			AND	a.invoice_status &lt;&gt; 15
+			AND	p.person_id (+) = a.person_id
+			AND a.invoice_id in
+			(select parent_id from invoice_item ii
+			where (ii.service_begin_date &gt;= to_date(:5, 'MM/DD/YYYY') OR :5 is NULL)
+			AND (ii.service_end_date &lt;= to_date(:6, 'MM/DD/YYYY') OR :6 is NULL)
+			AND ii.item_type in (0,1,2)
+			AND ii.data_text_b is NULL
+			)
+			GROUP BY a.invoice_id,a.invoice_date,a.bill_to_id,ist.caption, a.person_id,
+			p.simple_name
+			having sum(balance)&lt;&gt; 0
+			
+		</statement>
+
+		<statement name="sel_aged_insurance_org">
+			
+			SELECT 	a.bill_to_id as insurance_ID , count (distinct(a.invoice_id)),
+			sum(balance_0),
+			sum(balance_31),
+			sum(balance_61),
+			sum(balance_91),
+			sum(balance_121),
+			sum(balance_151),
+			sum(total_pending)
+			FROM	agedpayments a,org, transaction t, invoice i
+			WHERE	(a.bill_plain = :1 or :1 is NULL)
+			AND	a.bill_party_type in (2,3)
+			AND	a.bill_plain = org.org_internal_id
+			AND	org.owner_org_id = :2
+			and i.invoice_id = a.invoice_id
+			and t.trans_id = i.main_transaction
+			and t.service_facility_id = :3
+			GROUP BY bill_to_id
+
+		</statement>
+
+		<statement name="sel_aged_insurance_prov_org">
+			
+			SELECT 	a.bill_to_id as insurance_ID , count (distinct(a.invoice_id)),
+			sum(balance_0),
+			sum(balance_31),
+			sum(balance_61),
+			sum(balance_91),
+			sum(balance_121),
+			sum(balance_151),
+			sum(total_pending)
+			FROM	agedpayments a,org, transaction t, invoice i
+			WHERE	(a.bill_plain = :1 or :1 is NULL)
+			AND	a.bill_party_type in (2,3)
+			AND	a.bill_plain = org.org_internal_id
+			AND	org.owner_org_id = :2
+			and i.invoice_id = a.invoice_id
+			and t.trans_id = i.main_transaction
+			and t.care_provider_id = :3 and t.service_facility_id = :4
+			GROUP BY bill_to_id
+
+		</statement>
+
+		<statement name="sel_aged_insurance_total">
+			
+			SELECT 	count (distinct (bill_to_id)), count (distinct(invoice_id)),
+			sum(balance_0),
+			sum(balance_31),
+			sum(balance_61),
+			sum(balance_91),
+			sum(balance_121),
+			sum(balance_151),
+			sum(total_pending)
+			FROM	agedpayments a,org
+			WHERE	(a.bill_plain = :1 or :1 is NULL)
+			AND	a.bill_party_type in (2,3)
+			AND	a.bill_plain = org.org_internal_id
+			AND	org.owner_org_id = :2
+			AND 	(:3 IS NULL OR care_provider_id = :3)
+			AND	(:4 IS NULL OR service_facility_id = :4)
+			AND 	a.invoice_status &lt;&gt; 15
+			AND	entire_invoice_balance &lt;&gt; 0
+			AND a.invoice_id in
+			(select parent_id from invoice_item ii
+			where (ii.service_begin_date &gt;= to_date(:5, 'MM/DD/YYYY') OR :5 is NULL)
+			AND (ii.service_end_date &lt;= to_date(:6, 'MM/DD/YYYY') OR :6 is NULL)
+			AND ii.item_type in (0,1,2)
+			AND ii.data_text_b is NULL
+			)
+			--having sum(total_pending) &lt;&gt; 0
+			
+		</statement>
+
+		<statement name="sel_aged_patient">
+			
+			SELECT
+			p.simple_name person_name,
+			a.person_id person_ID,
+			count(distinct invoice_id),
+			sum(balance_0),
+			sum(balance_31),
+			sum(balance_61),
+			sum(balance_91),
+			sum(balance_121),
+			sum(balance_151),
+			sum(decode(item_type,3,total_pending,0)),
+			sum(total_pending)
+			FROM	agedpayments a, person p
+			WHERE	(a.person_id = :1 or :1 is NULL)
+			AND 	(invoice_item_id is NULL or item_type in (3) )
+			AND	( bill_party_type in (0,1) or (bill_party_type=3 AND item_type=3 AND total_pending &lt;&gt;0))
+			AND	entire_invoice_balance &lt;&gt; 0
+			AND 	p.person_id = a.person_id
+			AND	a.invoice_status &lt;&gt; 15
+			AND	EXISTS
+			(SELECT 1
+			FROM person_org_category poc
+			WHERE poc.person_id = a.person_id
+			AND poc.org_internal_id = :2
+			)
+			AND 	(:3 IS NULL OR care_provider_id = :3)
+			AND	(:4 IS NULL OR service_facility_id = :4)
+			AND a.invoice_id in
+			(select parent_id from invoice_item ii
+			where (ii.service_begin_date &gt;= to_date(:5, 'MM/DD/YYYY') OR :5 is NULL)
+			AND (ii.service_end_date &lt;= to_date(:6, 'MM/DD/YYYY') OR :6 is NULL)
+			AND ii.item_type in (0,1,2)
+			AND ii.data_text_b is NULL
+			)
+			GROUP BY a.person_id, p.simple_name
+			having sum(total_pending)&gt; 0
+			
+		</statement>
+
+		<statement name="sel_aged_patient_detail">
+			
+			SELECT
+			a.invoice_id,
+			sum(a.item_count),
+			a.invoice_date,
+			ist.caption,
+			a.bill_to_id,
+			sum(nvl(a.extended_cost,0)),
+			sum(nvl(a.total_adjust,0)),
+			sum(nvl(a.balance,0))
+			FROM	agedpayments a, person p,
+			invoice_status ist
+			WHERE	(a.person_id = :1 or :1 is NULL)
+			AND 	(invoice_item_id is NULL or item_type in (3) )
+			AND	(bill_party_type in (0,1) or (bill_party_type=3 AND item_type=3 AND total_pending &lt;&gt;0 ))
+			AND 	a.balance &lt;&gt; 0
+			AND 	p.person_id = a.person_id
+			AND 	ist.id = a.invoice_status
+			AND	EXISTS
+			(SELECT 1
+			FROM person_org_category poc
+			WHERE poc.person_id = a.person_id
+			AND poc.org_internal_id = :2
+			)
+			AND 	(:3 IS NULL OR care_provider_id = :3)
+			AND	(:4 IS NULL OR service_facility_id = :4)
+			AND	a.invoice_status &lt;&gt; 15
+			AND a.invoice_id in
+			(select parent_id from invoice_item ii
+			where (ii.service_begin_date &gt;= to_date(:5, 'MM/DD/YYYY') OR :5 is NULL)
+			AND (ii.service_end_date &lt;= to_date(:6, 'MM/DD/YYYY') OR :6 is NULL)
+			AND ii.item_type in (0,1,2)
+			AND ii.data_text_b is NULL
+			)
+			GROUP BY a.invoice_id,a.invoice_date,a.bill_to_id,ist.caption
+			having sum(balance)&lt;&gt; 0
+			
+		</statement>
+
+		<statement name="sel_aged_patient_org">
+			
+			SELECT
+			p.simple_name person_name,
+			a.person_id person_ID ,
+			count(distinct a.invoice_id),
+			sum(balance_0),
+			sum(balance_31),
+			sum(balance_61),
+			sum(balance_91),
+			sum(balance_121),
+			sum(balance_151),
+			sum(decode(item_type,3,total_pending,0)),
+			sum(total_pending)
+			FROM	agedpayments a, person p, transaction t, invoice i
+			WHERE	(a.person_id = :1 or :1 is NULL)
+			AND 	(a.invoice_item_id is NULL or a.item_type in (3) )
+			AND	a.bill_party_type in (0,1)
+			AND a.balance &lt;&gt; 0
+			AND p.person_id = a.person_id
+			AND	a.person_id IN
+			(
+			SELECT poc.person_id
+			FROM 	person_org_category poc
+			WHERE org_internal_id = :2
+			)
+			and i.invoice_id = a.invoice_id
+			and t.trans_id = i.main_transaction
+			and t.service_facility_id = :3
+			GROUP BY a.person_id, p.simple_name
+			having sum(total_pending)&gt; 0
+
+		</statement>
+
+		<statement name="sel_aged_patient_prov">
+			
+			SELECT
+			p.simple_name person_name,
+			a.person_id person_ID ,
+			count(distinct a.invoice_id),
+			sum(balance_0),
+			sum(balance_31),
+			sum(balance_61),
+			sum(balance_91),
+			sum(balance_121),
+			sum(balance_151),
+			sum(decode(item_type,3,total_pending,0)),
+			sum(total_pending)
+			FROM	agedpayments a, person p, transaction t, invoice i
+			WHERE	(a.person_id = :1 or :1 is NULL)
+			AND 	(a.invoice_item_id is NULL or a.item_type in (3) )
+			AND	a.bill_party_type in (0,1)
+			AND a.balance &lt;&gt; 0
+			AND p.person_id = a.person_id
+			AND	a.person_id IN
+			(
+			SELECT poc.person_id
+			FROM 	person_org_category poc
+			WHERE org_internal_id = :2
+			)
+			and i.invoice_id = a.invoice_id
+			and t.trans_id = i.main_transaction
+			and t.care_provider_id = :3
+			GROUP BY a.person_id, p.simple_name
+			having sum(total_pending)&gt; 0
+
+		</statement>
+
+		<statement name="sel_aged_patient_prov_org">
+			
+			SELECT
+			p.simple_name person_name,
+			a.person_id person_ID ,
+			count(distinct a.invoice_id),
+			sum(balance_0),
+			sum(balance_31),
+			sum(balance_61),
+			sum(balance_91),
+			sum(balance_121),
+			sum(balance_151),
+			sum(decode(item_type,3,total_pending,0)),
+			sum(total_pending)
+			FROM	agedpayments a, person p, transaction t, invoice i
+			WHERE	(a.person_id = :1 or :1 is NULL)
+			AND 	(a.invoice_item_id is NULL or a.item_type in (3) )
+			AND	a.bill_party_type in (0,1)
+			AND a.balance &lt;&gt; 0
+			AND p.person_id = a.person_id
+			AND	a.person_id IN
+			(
+			SELECT poc.person_id
+			FROM 	person_org_category poc
+			WHERE org_internal_id = :2
+			)
+			and i.invoice_id = a.invoice_id
+			and t.trans_id = i.main_transaction
+			and t.care_provider_id = :3 and t.service_facility_id = :4
+			GROUP BY a.person_id, p.simple_name
+			having sum(total_pending)&gt; 0
+
+		</statement>
+
+		<statement name="sel_aged_patient_total">
+			
+			SELECT
+			count(distinct a.person_id),
+			count(distinct invoice_id),
+			sum(balance_0),
+			sum(balance_31),
+			sum(balance_61),
+			sum(balance_91),
+			sum(balance_121),
+			sum(balance_151),
+			sum(decode(item_type,3,total_pending,0)),
+			sum(total_pending)
+			FROM	agedpayments a
+			WHERE	(a.person_id = :1 or :1 is NULL)
+			AND 	(invoice_item_id is NULL or item_type in (3) )
+			AND	( bill_party_type in (0,1) or (bill_party_type=3 AND item_type=3 AND total_pending &lt;&gt;0))
+			AND	entire_invoice_balance &lt;&gt; 0
+			AND	a.invoice_status &lt;&gt; 15
+			AND	EXISTS
+			(SELECT 1
+			FROM person_org_category poc
+			WHERE poc.person_id = a.person_id
+			AND poc.org_internal_id = :2
+			)
+			AND 	(:3 IS NULL OR care_provider_id = :3)
+			AND	(:4 IS NULL OR service_facility_id = :4)
+			AND a.invoice_id in
+			(select parent_id from invoice_item ii
+			where (ii.service_begin_date &gt;= to_date(:5, 'MM/DD/YYYY') OR :5 is NULL)
+			AND (ii.service_end_date &lt;= to_date(:6, 'MM/DD/YYYY') OR :6 is NULL)
+			AND ii.item_type in (0,1,2)
+			AND ii.data_text_b is NULL
+			)
+			and exists
+			(
+			SELECT b.person_id
+			FROM	agedpayments b
+			WHERE	(b.person_id = :1 or :1 is NULL)
+			AND 	(b.invoice_item_id is NULL or b.item_type in (3) )
+			AND	( b.bill_party_type in (0,1) or (b.bill_party_type=3 AND b.item_type=3 AND b.total_pending &lt;&gt;0))
+			AND	b.entire_invoice_balance &lt;&gt; 0
+			AND	b.invoice_status &lt;&gt; 15
+			and b.person_id = a.person_id
+			AND	EXISTS
+			(SELECT 1
+			FROM person_org_category poc
+			WHERE poc.person_id = b.person_id
+			AND poc.org_internal_id = :2
+			)
+			AND 	(:3 IS NULL OR b.care_provider_id = :3)
+			AND	(:4 IS NULL OR b.service_facility_id = :4)
+			AND b.invoice_id in
+			(select parent_id from invoice_item ii
+			where (ii.service_begin_date &gt;= to_date(:5, 'MM/DD/YYYY') OR :5 is NULL)
+			AND (ii.service_end_date &lt;= to_date(:6, 'MM/DD/YYYY') OR :6 is NULL)
+			AND ii.item_type in (0,1,2)
+			AND ii.data_text_b is NULL
+			)
+			group by b.person_id
+			having sum(b.total_pending) &gt; 0
+			)
+			
+		</statement>
+
+		<statement name="sel_daily_audit">
+			
+			SELECT	to_char(invoice_date,'MM/DD/YYYY') invoice_date ,
+			sum(total_charges) as total_charges ,
+			sum(misc_charges) misc_charges,
+			sum(charge_adjust) charge_adjust,
+			sum(insurance_write_off) insurance_write_off,
+			sum(balance_transfer) balance_transfer,
+			sum(person_pay) person_pay,
+			sum(insurance_pay) insurance_pay ,
+			sum(person_write_off) person_write_off,
+			sum(refund) as refund
+			FROM 	invoice_charges
+			--,org o
+			WHERE invoice_date between to_date(:1,'MM/DD/YYYY')
+			AND to_date(:2,'MM/DD/YYYY')
+			AND (facility = :3 OR :3 is NULL)
+			AND (care_provider_id =:4 OR :4 is NULL)
+			AND (batch_id &gt;= :5 OR :5 is NULL)
+			AND (batch_id &lt;= :6 OR :6 is NULL)
+			--AND o.org_internal_id = invoice_charges.facility
+			--AND i.owner_org_id = :7
+			AND invoice_charges.owner_org_id = :7
+			group by invoice_date
+
+		</statement>
+
+		<statement name="sel_daily_audit_detail">
+			
+			SELECT	invoice_charges.invoice_id ,
+			invoice_charges.invoice_date as invoice_batch_date,
+			invoice_charges.service_begin_date,
+			invoice_charges.service_end_date,
+			invoice_charges.care_provider_id as care_provider_id ,
+			invoice_charges.client_id as patient_id,
+			invoice_charges.code,
+			invoice_charges.caption,
+			invoice_charges.rel_diags,
+			decode(item_type,7,0,units) as units,
+			decode(item_type,7,0,unit_cost) as unit_cost,
+			(invoice_charges.total_charges) total_charges,
+			(invoice_charges.misc_charges) misc_charges ,
+			(invoice_charges.person_pay) person_pay,
+			(invoice_charges.insurance_pay) insurance_pay,
+			(invoice_charges.insurance_write_off) insurance_write_off,
+			(invoice_charges.balance_transfer) balance_transfer,
+			(invoice_charges.charge_adjust) as charge_adjust,
+			(invoice_charges.person_write_off) as person_write_off,
+			(invoice_charges.refund) as refund,
+			pm.caption as pay_type ,
+			p.simple_name simple_name
+			FROM	invoice_charges,
+			--org o,
+			person p, payment_method pm
+			WHERE 	invoice_date = to_date(:1,'MM/DD/YYYY')
+			AND (facility = :2 or :2 IS NULL )
+			AND (care_provider_id = :3 or :3 IS NULL)
+			AND pm.id (+)= invoice_charges.pay_type
+			AND
+			(
+			(batch_id &gt;= :4 or :4 is NULL)
+			AND
+			(batch_id &lt;= :5 or :5 is NULL)
+			)
+			--AND o.org_internal_id = invoice_charges.facility
+			--AND o.owner_org_id = :6
+			AND invoice_charges.owner_org_id = :6
+			AND client_id = p.person_id
+			order by invoice_id
+			
+		</statement>
+
+		<statement name="sel_financial_monthly">
+			
+			SELECT to_char(invoice_date,'MONTH') as invoice_month,
+			SUM(total_charges) as total_charges,
+			SUM(misc_charges) as misc_charges,
+			SUM(person_write_off) as person_write_off,
+			SUM(insurance_write_off)as insurance_write_off,
+			SUM(total_charges+misc_charges-person_write_off-insurance_write_off) as net_charge,
+			SUM(balance_transfer) as balance_transfer,
+			SUM(person_pay) as person_pay,
+			SUM(insurance_pay) as insurance_pay,
+			SUM(refund) as refund,
+			SUM(person_pay+insurance_pay+refund) as net_rcpts,
+			SUM(total_charges+misc_charges-person_write_off-insurance_write_off +
+			balance_transfer -
+			(person_pay+insurance_pay+refund)
+			) as a_r,
+			to_char(invoice_date,'YYYY') as invoice_year
+			FROM 	invoice_charges
+			WHERE invoice_date between to_date(:1,'MM/DD/YYYY')
+			AND to_date(:2,'MM/DD/YYYY')
+			AND (facility = :3 OR :3 is NULL)
+			AND (provider =:4 OR :4 is NULL)
+			AND invoice_charges.owner_org_id = :5
+			AND ( :6 IS NULL OR
+			(service_begin_date &gt;= to_date(:6,'MM/DD/YYYY')	 OR
+			( 	service_begin_date is NULL
+			AND real_invoice_date &gt;= to_date(:6,'MM/DD/YYYY')
+			AND (adj_type !=0 or adj_type is NULL)
+			)
+			)
+			)
+			AND (:7 IS NULL OR
+			(service_end_date &lt;= to_date(:7,'MM/DD/YYYY') OR
+			(
+			service_begin_date is NULL
+			AND real_invoice_date &lt;= to_date(:7,'MM/DD/YYYY')
+			AND (adj_type !=0 or adj_type is NULL)
+			)
+			)
+			)
+			GROUP BY to_char(invoice_date,'YYYY'),to_char(invoice_date,'MONTH'),to_char(invoice_date,'MM')
+			ORDER BY 13, to_char(invoice_date,'MM')
+			
+		</statement>
+
+		<statement name="sel_monthly_audit">
+			
+			SELECT	to_char(invoice_date,'MM/YYYY') invoice_date ,
+			sum(total_charges) as total_charges ,
+			sum(misc_charges) misc_charges,
+			sum(charge_adjust) charge_adjust,
+			sum(insurance_write_off) insurance_write_off,
+			sum(balance_transfer) balance_transfer,
+			sum(person_pay) person_pay,
+			sum(insurance_pay) insurance_pay ,
+			sum(person_write_off) person_write_off,
+			sum(refund) as refund
+			FROM 	invoice_charges
+			--,org o
+			WHERE invoice_date between to_date(:1,'MM/DD/YYYY')
+			AND to_date(:2,'MM/DD/YYYY')
+			AND (facility = :3 OR :3 is NULL)
+			AND (care_provider_id =:4 OR :4 is NULL)
+			AND (batch_id &gt;= :5 OR :5 is NULL)
+			AND (batch_id &lt;= :6 OR :6 is NULL)
+			--AND o.org_internal_id = invoice_charges.facility
+			--AND o.owner_org_id = :7
+			AND invoice_charges.owner_org_id = :7
+			group by to_char(invoice_date,'MM/YYYY')
+			order by invoice_date asc
+		</statement>
+
+		<statement name="sel_monthly_audit_detail">
+			
+			SELECT	invoice_charges.invoice_id ,
+			to_char(invoice_date,'MM/DD/YY') as invoice_batch_date,
+			invoice_charges.service_begin_date,
+			invoice_charges.service_end_date,
+			invoice_charges.care_provider_id as care_provider_id ,
+			invoice_charges.client_id as patient_id,
+			invoice_charges.code,
+			invoice_charges.caption,
+			invoice_charges.rel_diags,
+			decode(item_type,7,0,units) as units,
+			decode(item_type,7,0,unit_cost) as unit_cost,
+			(total_charges) total_charges,
+			(misc_charges) misc_charges ,
+			(person_pay) person_pay,
+			(insurance_pay) insurance_pay,
+			(insurance_write_off) insurance_write_off,
+			(balance_transfer) balance_transfer,
+			(charge_adjust) as charge_adjust,
+			(person_write_off) as person_write_off,
+			(refund) as refund,
+			pm.caption as pay_type ,
+			p.simple_name
+			FROM 	invoice_charges,
+			--org o,
+			person p,payment_method pm
+			WHERE 	to_char(invoice_date,'MM/YYYY') = :1
+			AND	invoice_date between to_date(:7,'MM/DD/YYYY')
+			AND 	to_date(:8,'MM/DD/YYYY')
+			AND 	(facility = :2 or :2 IS NULL )
+			AND 	pm.id (+)= invoice_charges.pay_type
+			AND 	(care_provider_id = :3 or :3 IS NULL)
+			AND
+			(
+			(batch_id &gt;= :4 or :4 is NULL)
+			AND
+			(batch_id &lt;= :5 or :5 is NULL)
+			)
+			--AND 	o.org_internal_id = invoice_charges.facility
+			--AND 	o.owner_org_id = :6
+			AND invoice_charges.owner_org_id = :6
+			AND 	client_id = p.person_id
+			ORDER BY invoice_date asc
+			
+		</statement>
+
+		<statement name="sel_monthly_audit_estpatient_count">
+			
+			SELECT
+			count(at.caption) as count, to_char(e.start_time,'MM/YYYY') start_time
+			FROM 		Appt_Attendee_Type at, Event e, Event_Attribute ea
+			WHERE 	ea.value_type = 333
+			AND 		e.facility_id = :3
+			AND EXISTS
+			(
+			SELECT 'x'
+			FROM org
+			WHERE owner_org_id = :4
+			AND org_internal_id = e.facility_id
+			)
+			AND 		e.event_id = ea.parent_id
+			--AND e.start_time between to_date(:1,'MM/DD/YYYY')
+			--AND to_date(:2,'MM/DD/YYYY')
+			AND e.start_time between to_date(:1|| ' 12:00 AM', 'MM/DD/YYYY HH12:MI AM') + :5
+			AND to_date(:2 || ' 11:59 PM', 'MM/DD/YYYY HH12:MI AM') + :5
+			AND at.id = ea.value_int
+			AND e.event_status in (1,2)
+			AND at.caption = 'Established Patient'
+			GROUP BY to_char(start_time,'MM/YYYY')
+			ORDER BY start_time asc
+			
+		</statement>
+
+		<statement name="sel_monthly_audit_estpatient_count_new">
+			
+			SELECT count( distinct client_id) as count, to_char(invoice_date, 'MM/YYYY') invoice_prd
+			FROM invoice_charges
+			WHERE invoice_date between to_date(:1,'MM/DD/YYYY')
+			AND to_date(:2,'MM/DD/YYYY')
+			AND (facility = :3 OR :3 is NULL)
+			AND (care_provider_id =:4 OR :4 is NULL)
+			AND owner_org_id = :5
+			AND code in ('99211','99212','99213','99214','99215','99391','99392','99393','99394','99395','99396','99397')
+			GROUP BY to_char(invoice_date, 'MM/YYYY')
+			
+		</statement>
+
+		<statement name="sel_monthly_audit_newpatient_count">
+			
+			SELECT
+			count(at.caption) as count, to_char(e.start_time,'MM/YYYY') start_time
+			FROM 		Appt_Attendee_Type at, Event e, Event_Attribute ea
+			WHERE 	ea.value_type = 333
+			AND 		e.facility_id = :3
+			AND EXISTS
+			(
+			SELECT 'x'
+			FROM org
+			WHERE owner_org_id = :4
+			AND org_internal_id = e.facility_id
+			)
+			AND 		e.event_id = ea.parent_id
+			AND e.start_time between to_date(:1|| ' 12:00 AM', 'MM/DD/YYYY HH12:MI AM') + :5
+			AND to_date(:2 || ' 11:59 PM', 'MM/DD/YYYY HH12:MI AM') + :5
+			--AND e.start_time between to_date(:1,'MM/DD/YYYY')
+			--AND to_date(:2,'MM/DD/YYYY')
+			AND at.id = ea.value_int
+			AND e.event_status in (1,2)
+			AND at.caption = 'New Patient'
+			GROUP BY to_char(start_time,'MM/YYYY')
+			ORDER BY start_time asc
+			
+		</statement>
+
+		<statement name="sel_monthly_audit_newpatient_count_new">
+			
+			SELECT count( distinct client_id) as count, to_char(invoice_date, 'MM/YYYY') invoice_prd
+			FROM invoice_charges
+			WHERE invoice_date between to_date(:1,'MM/DD/YYYY')
+			AND to_date(:2,'MM/DD/YYYY')
+			AND (facility = :3 OR :3 is NULL)
+			AND (care_provider_id =:4 OR :4 is NULL)
+			AND owner_org_id = :5
+			AND code in ('99201','99202','99203','99204','99205','99381','99382','99383','99384','99385','99386','99387')
+			GROUP BY to_char(invoice_date, 'MM/YYYY')
+			
+		</statement>
+
+		<statement name="sel_patient_id_from_eventid">
+			
+			select	DISTINCT
+			thePatientAppointmentAttr.value_text
+			FROM	Person thePatient,
+			Person_Address thePatientAddr,
+			Org theApptOrg,
+			Event_Attribute theAppointmentAttr,
+			Event thePatientAppt
+			WHERE	thePatientAppt.event_id = :1
+			AND theAppointmentAttr.parent_id = thePatientAppt.event_id
+			AND theAppointmentAttr.value_type = '333'
+			AND theAppointmentAttr.value_text = thePatient.person_id
+			AND thePatientAppt.owner_id = theApptOrg.org_internal_id
+			
+		</statement>
+
+		<statement name="sel_patient_superbill_info">
+			
+			select	DISTINCT TO_CHAR(thePatientAppt.start_time -:2 , 'MM/DD/YY') AS startDate,
+			TO_CHAR(thePatientAppt.start_time - :2, 'HH24:MI') AS startTime,
+			thePatient.short_name AS patientname,
+			thePatientAppt.subject AS reason,
+			theDoctor.person_id AS doctorID,
+			theDoctor.short_name AS doctorName,
+			theApptOrg.name_primary as location,
+			TO_CHAR(thePatient.date_of_birth, 'MM/DD/YY') AS dob,
+			thePatient.person_id AS patientNo,
+			thePatient.person_id AS respParty,
+			thePatient.gender AS sex,
+			thePatientAddr.line1 AS patientAddress,
+			thePatientAddr.city,
+			thePatientAddr.state,
+			thePatientAddr.zip
+			FROM
+			Person thePatient,
+			Person theDoctor,
+			Person_Address thePatientAddr,
+			Person_Address theDoctorAddr,
+			Org theApptOrg,
+			Event_Attribute theAppointmentAttr,
+			Event thePatientAppt
+			WHERE
+			thePatientAppt.start_time &gt;= TO_DATE(:1, 'MM/DD/YYYY') + :2
+			AND thePatientAppt.start_time &lt; TO_DATE(:1, 'MM/DD/YYYY') + 1 + :2
+			AND theAppointmentAttr.parent_id = thePatientAppt.event_id
+			AND theAppointmentAttr.value_type = '333'
+			AND theAppointmentAttr.value_text = thePatient.person_id
+			AND theAppointmentAttr.value_textB = theDoctor.person_id
+			AND thePatientAppt.owner_id = theApptOrg.org_internal_id
+			AND thePatient.person_id = thePatientAddr.parent_id
+			AND theDoctor.person_id = theDoctorAddr.parent_id
+			
+		</statement>
+
+		<statement name="sel_patient_superbill_info_from_eventid">
+			
+			select	DISTINCT TO_CHAR(thePatientAppt.start_time -:2 , 'MM/DD/YY') AS startDate,
+			TO_CHAR(thePatientAppt.start_time - :2, 'HH24:MI') AS startTime,
+			thePatient.short_name AS patientname,
+			thePatientAppt.subject AS reason,
+			theDoctor.person_id AS doctorID,
+			theDoctor.short_name AS doctorName,
+			theApptOrg.name_primary as location,
+			TO_CHAR(thePatient.date_of_birth, 'MM/DD/YY') AS dob,
+			thePatient.person_id AS patientNo,
+			thePatient.person_id AS respParty,
+			thePatient.gender AS sex,
+			thePatientAddr.line1 AS patientAddress,
+			thePatientAddr.city,
+			thePatientAddr.state,
+			thePatientAddr.zip
+			FROM
+			Person thePatient,
+			Person theDoctor,
+			Person_Address thePatientAddr,
+			Person_Address theDoctorAddr,
+			Org theApptOrg,
+			Event_Attribute theAppointmentAttr,
+			Event thePatientAppt
+			WHERE
+			thePatientAppt.event_id = :1
+			AND theAppointmentAttr.parent_id = thePatientAppt.event_id
+			AND theAppointmentAttr.value_type = '333'
+			AND theAppointmentAttr.value_text = thePatient.person_id
+			AND theAppointmentAttr.value_textB = theDoctor.person_id
+			AND thePatientAppt.owner_id = theApptOrg.org_internal_id
+			AND thePatient.person_id = thePatientAddr.parent_id
+			AND theDoctor.person_id = theDoctorAddr.parent_id
+			
+		</statement>
+
+		<statement name="sel_patient_superbill_ins_info">
+			
+			SELECT	DISTINCT
+			thePatient.short_name,
+			theOrganization.name_primary,
+			theInsurance.member_number,
+			NVL(theInsurance.rel_to_guarantor, 9)
+			FROM	Org theOrganization,
+			Insurance theInsurance,
+			Person thePatient
+			WHERE	theInsurance.ins_org_id = theOrganization.org_internal_id
+			AND	theInsurance.owner_person_id = thePatient.person_id
+			AND	thePatient.person_id = :1
+			
+		</statement>
+
+		<statement name="sel_providerreceipt">
+			
+			SELECT	p.simple_name as provider,
+			ic.payer_type,
+			ic.payer_id,
+			pm.caption as pay_type,
+			sum(nvl(insurance_pay,0)+nvl(person_pay,0)) as year_rcpt,
+			sum(decode(
+			trunc(ic.invoice_date,'MM'),
+			trunc(to_date(:5,'MM/DD/YYYY'),'MM'),
+			(nvl(insurance_pay,0)+nvl(person_pay,0)),
+			0)
+			) as month_rcpt,
+			sum(decode(
+			ic.invoice_date,
+			to_date(:5,'MM/DD/YYYY'),
+			(nvl(insurance_pay,0)+nvl(person_pay,0)),
+			0)
+			) as batch_rcpt,
+			sum(nvl(ic.refund,0)) as year_refund,
+			sum(decode(
+			trunc(ic.invoice_date,'MM'),
+			trunc(to_date(:5,'MM/DD/YYYY'),'MM'),
+			(nvl(ic.refund,0)),
+			0)
+			) as month_refund,
+			sum(decode(
+			ic.invoice_date,
+			to_date(:5,'MM/DD/YYYY'),
+			(nvl(ic.refund,0)),
+			0)
+			) as batch_refund
+			FROM 	invoice_charges ic, person p, invoice_item_adjust iia, payment_method pm
+			WHERE 	(:1 IS NULL OR provider = :1)
+			AND	(:3 IS NULL OR batch_id = :3)
+			AND	ic.invoice_date between to_date(:4,'MM/DD/YYYY')
+			AND 	to_date(:5,'MM/DD/YYYY')
+			AND	ic.owner_org_id = :6
+			AND	p.person_id (+)= ic.provider
+			AND	iia.adjustment_id (+) = ic.adjustment_id
+			AND	pm.id (+)= iia.pay_method
+			AND	(:2 IS NULL OR upper(pm.caption) = upper(:2))
+			AND (:7 IS NULL OR ic.payer_id = :7)
+			AND (:8 IS NULL OR ic.facility = :8)
+			GROUP BY p.simple_name,pm.caption,
+			ic.payer_type,	ic.payer_id,
+			ic.pay_type
+			UNION
+			SELECT	p.simple_name as provider,
+			max(-1) as payer_type,
+			nvl(data_text_b,data_text_a) as payer_id,
+			max('Check') as pay_type,
+			sum(nvl(unit_cost,0)) as year_rcpt,
+			sum(decode(
+			trunc(value_date,'MM'),
+			trunc(to_date(:5,'MM/DD/YYYY'),'MM'),
+			(nvl(unit_cost,0)),
+			0)
+			) as month_rcpt,
+			sum(decode(
+			value_date,
+			to_date(:5,'MM/DD/YYYY'),
+			(nvl(unit_cost,0)),
+			0)
+			) as batch_rcpt,
+			0 as year_refund,
+			0 as month_refund,
+			0 as batch_refund
+			FROM 	transaction t,trans_attribute ta,person p,org
+			WHERE	t.trans_id = ta.parent_id
+			AND	ta.item_name = 'Monthly Cap/Payment/Batch ID'
+			AND	trans_type = 9030
+			AND	trans_status =7
+			AND	(:1 IS NULL OR provider_id = :1)
+			AND	(:2 IS NULL OR 'CHECK' = upper(:2))
+			AND	(:3 IS NULL OR	ta.value_text = :3)
+			AND	ta.value_date between to_date(:4,'MM/DD/YYYY')
+			AND 	to_date(:5,'MM/DD/YYYY')
+			AND	provider_id is not null
+			AND	p.person_id (+)= t.provider_id
+			AND	t.receiver_id =org.org_internal_id
+			AND	org.owner_org_id = :6
+			AND (:8 IS NULL OR t.service_facility_id = :8)
+			GROUP BY p.simple_name,
+			nvl(data_text_b,data_text_a)
+			ORDER BY 1,4,3,5
+			
+		</statement>
+
+		<statement name="sel_providerreceipt2">
+			
+			SELECT	(SELECT simple_name FROM person where person_id = ic.provider) as provider,
+			ic.invoice_id,
+			decode(payer_type,0,'Personal Receipts', 'Insurance Receipts') as category,
+			decode(payer_type,
+			0,payer_id,
+			1,(SELECT org_id FROM org WHERE payer_id = org_internal_id)) as payer_name,
+			pay_type,
+			invoice_date ,
+			(nvl(insurance_pay,0)+nvl(person_pay,0)) as rcpt,
+			trunc(invoice_date,'MM') as month_date,
+			trunc(invoice_date,'YYYY') as year_date
+			FROM 	invoice_charges ic
+			WHERE 	(:1 IS NULL OR provider = :1)
+			AND	(:2 IS NULL OR upper(pay_type) = upper(:2))
+			AND	(:3 IS NULL OR batch_id = :3)
+			AND	invoice_date between to_date(:4,'MM/DD/YYYY')
+			AND 	to_date(:5,'MM/DD/YYYY')
+			AND	payer_type is not null
+			AND	owner_org_id = :6
+			UNION
+			SELECT (SELECT simple_name FROM person WHERE person_id = t.provider_id) as provider,
+			to_number(NULL) as invoice_id,
+			'Cap Insurance Receipts' as category,
+			nvl(nvl(data_text_b,data_text_a),'UNK') as payer_name,
+			'Check' as pay_type,
+			value_date,
+			unit_cost as rcpt,
+			trunc(value_date,'MM') as month_date,
+			trunc(value_date,'YYYY') as year_date
+			FROM	transaction t,trans_attribute ta
+			WHERE 	t.trans_id = ta.parent_id
+			AND	ta.item_name = 'Monthly Cap/Payment/Batch ID'
+			AND	trans_type = 9030
+			AND	trans_status =7
+			AND	(:1 IS NULL OR provider_id = :1)
+			AND	(:2 IS NULL OR 'CHECK' = upper(:2))
+			AND	(:3 IS NULL OR	ta.value_text = :3)
+			AND	ta.value_date between to_date(:4,'MM/DD/YYYY')
+			AND 	to_date(:5,'MM/DD/YYYY')
+			AND	EXISTS
+			(SELECT 1 FROM org where org_internal_id = t.receiver_id AND owner_org_id = :6)
+			AND	provider_id is not null
+			ORDER BY 1,3,5,6
+			
+		</statement>
+
+		<statement name="sel_providerreceiptTotal">
+			
+			SELECT	max('ALL') as provider,
+			ic.payer_type,
+			max('ALL') as payer_id,
+			pm.caption as pay_type,
+			sum(nvl(insurance_pay,0)+nvl(person_pay,0)) as year_rcpt,
+			sum(decode(
+			trunc(ic.invoice_date,'MM'),
+			trunc(to_date(:5,'MM/DD/YYYY'),'MM'),
+			(nvl(insurance_pay,0)+nvl(person_pay,0)),
+			0)
+			) as month_rcpt,
+			sum(decode(
+			ic.invoice_date,
+			to_date(:5,'MM/DD/YYYY'),
+			(nvl(insurance_pay,0)+nvl(person_pay,0)),
+			0)
+			) as batch_rcpt,
+			sum(nvl(ic.refund,0)) as year_refund,
+			sum(decode(
+			trunc(ic.invoice_date,'MM'),
+			trunc(to_date(:5,'MM/DD/YYYY'),'MM'),
+			(nvl(ic.refund,0)),
+			0)
+			) as month_refund,
+			sum(decode(
+			ic.invoice_date,
+			to_date(:5,'MM/DD/YYYY'),
+			(nvl(ic.refund,0)),
+			0)
+			) as batch_refund
+			FROM 	invoice_charges ic, person p, invoice_item_adjust iia, payment_method pm
+			WHERE 	(:1 IS NULL OR provider = :1)
+			AND	(:3 IS NULL OR batch_id = :3)
+			AND	ic.invoice_date between to_date(:4,'MM/DD/YYYY')
+			AND 	to_date(:5,'MM/DD/YYYY')
+			AND	ic.owner_org_id = :6
+			AND	p.person_id (+)= ic.provider
+			AND	iia.adjustment_id (+) = ic.adjustment_id
+			AND	pm.id (+)= iia.pay_method
+			AND	(:2 IS NULL OR upper(pm.caption) = upper(:2))
+			AND (:7 IS NULL OR ic.payer_id = :7)
+			AND (:8 IS NULL OR ic.facility = :8)
+			GROUP BY pm.caption,
+			ic.payer_type,
+			ic.pay_type
+			UNION
+			SELECT	max('ALL') provider,
+			max(-1) as payer_type,
+			max('ALL') as payer_id,
+			max('Check') as pay_type,
+			sum(nvl(unit_cost,0)) as year_rcpt,
+			sum(decode(
+			trunc(value_date,'MM'),
+			trunc(to_date(:5,'MM/DD/YYYY'),'MM'),
+			(nvl(unit_cost,0)),
+			0)
+			) as month_rcpt,
+			sum(decode(
+			value_date,
+			to_date(:5,'MM/DD/YYYY'),
+			(nvl(unit_cost,0)),
+			0)
+			) as batch_rcpt,
+			0 as year_refund,
+			0 as month_refund,
+			0 as batch_refund
+			FROM 	transaction t,trans_attribute ta,person p
+			WHERE	t.trans_id = ta.parent_id
+			AND	ta.item_name = 'Monthly Cap/Payment/Batch ID'
+			AND	trans_type = 9030
+			AND	trans_status =7
+			AND	(:1 IS NULL OR provider_id = :1)
+			AND	(:2 IS NULL OR 'CHECK' = upper(:2))
+			AND	(:3 IS NULL OR	ta.value_text = :3)
+			AND	ta.value_date between to_date(:4,'MM/DD/YYYY')
+			AND 	to_date(:5,'MM/DD/YYYY')
+			AND	provider_id is not null
+			AND	p.person_id (+)= t.provider_id
+			AND (:8 IS NULL OR t.service_facility_id = :8)
+			GROUP BY 'ALL'
+			ORDER BY 1,3,4,5
+			
+		</statement>
+
+		<statement name="sel_revenue_collection">
+			
+			SELECT care_provider_id as provider,
+			sum(nvl(ffs_prof,0)+nvl(misc_charges,0)) as ffs_prof,
+			sum(nvl(x_ray,0)) as x_ray,
+			sum(nvl(lab,0)) as lab,
+			sum(nvl(cap_ffs_prof,0)) as cap_ffs_prof,
+			sum(nvl(cap_x_ray,0)) as cap_x_ray,
+			sum(nvl(cap_lab,0)) as cap_lab,
+			sum(nvl(ffs_pmt,0)+nvl(ancill_pmt,0)) as ffs_pmt,
+			sum(nvl(cap_pmt,0)++ nvl(cap_month,0)) as cap_pmt,
+			sum(nvl(ancill_pmt,0) + nvl(lab_pmt,0) + nvl(x_ray_pmt,0) ) as ancill_pmt,
+			sum(nvl(refund,0)) as refund,
+			sum(nvl(prof_pmt,0)+ nvl(cap_month,0)) as prof_pmt
+			FROM 	revenue_collection rc,org o
+			WHERE invoice_date between to_date(:1,'MM/DD/YYYY')
+			AND to_date(:2,'MM/DD/YYYY')
+			AND (facility = :3 OR :3 is NULL)
+			AND ( (care_provider_id =:4 AND care_provider_id is not null )OR :4 is NULL)
+			AND (batch_id &gt;= :5 OR :5 is NULL)
+			AND (batch_id &lt;= :6 OR :6 is NULL)
+			AND o.org_internal_id = rc.facility
+			AND o.owner_org_id = :7
+			GROUP by care_provider_id
+			
+		</statement>
+
+	</sql-statements>
+</xaf>

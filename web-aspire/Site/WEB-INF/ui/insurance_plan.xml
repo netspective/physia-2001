@@ -1,0 +1,312 @@
+<?xml version="1.0"?>
+
+<xaf>
+	<dialogs package="insurance_plan">
+		<dialog name="ins_exists" heading="ins_exists">
+			<field.composite caption="Insurance Plan ID/Employer Plan ID"  name="ins_plan">
+				<field.text caption="Insurance Plan ID"  max-length="32" name="ins_id" size="16"/>
+				<field.select caption="Employee Plans"  name="emp_plan" choices="query:insurance.selEmpExistPlan"/>
+				<!--  -->
+			</field.composite>
+			<field.select caption="Insurance Sequence"  name="bill_sequence"/>
+			<!--  -->
+			<field.separator heading="General Plan Information" name="gen_plan_heading"/>
+			<field.text caption="Member Number"  max-length="32" name="member_number"/>
+			<field.text caption="Policy Number"  max-length="32" name="policy_number"/>
+			<field.composite caption="Insured/Guarantor ID"  name="insured_guarantor_ids">
+				<field.text caption="Insured ID" required="yes" max-length="16" name="insured_id" size="16"/>
+				<field.text caption="Guarantor ID" required="yes" max-length="16" name="guarantor_id" size="16"/>
+			</field.composite>
+			<field.text caption="Insured ID"  max-length="16" name="insured_id" size="16"/>
+			<field.select caption="Relationship to Insured"  name="rel_to_insured" choices="query:insurance.selInsuredRelation"/>
+			<!--  -->
+			<field.composite caption="Indiv/Family Deductible Remaining"  name="deduct_remain">
+				<field.currency caption="indiv_deduct_remain"  name="indiv_deduct_remain" size="10"/>
+				<field.currency caption="family_deduct_remain"  name="family_deduct_remain" size="10"/>
+			</field.composite>
+			<field.separator heading="Coverage Information" name="coverage_heading"/>
+			<field.composite caption="Coverage Begin/End Dates"  name="dates">
+				<field.date caption="Begin Date" name="coverage_begin_date" size="12"/>
+				<field.date caption="End Date" name="coverage_end_date" size="12"/>
+			</field.composite>
+			<field.composite caption="Deductible Amounts"  hint="Individual/Family" name="deduct_amts">
+				<field.currency caption="Individual Deductible Amount"  name="indiv_deductible_amt" size="10"/>
+				<field.currency caption="Family Deductible Amount"  name="family_deductible_amt" size="10"/>
+			</field.composite>
+			<field.composite caption="Percentage Pay/Threshold"  name="percentage_threshold">
+				<!-- Unimplemented field type=percentage -->
+				<field.currency caption="threshold"  name="threshold" size="10"/>
+			</field.composite>
+			<field.currency caption="Co-pay Amount"  name="copay_amt" size="10"/>
+
+		</dialog>
+
+		<dialog name="ins_newplan" heading="$Command Insurance Plan">
+			<field.text hidden="yes" name="phone_item_id" caption="phone_item_id"/>
+			<field.text hidden="yes" name="fax_item_id" caption="fax_item_id"/>
+			<field.text hidden="yes" name="fee_item_id" caption="fee_item_id"/>
+			<field.text hidden="yes" name="item_id" caption="item_id"/>
+			<field.text caption="Insurance Organization ID" required="yes" max-length="16" name="ins_org_id" size="16"/>
+			<field.text caption="Insurance Plan ID" required="yes" max-length="32" name="ins_id" size="16"/>
+			<field.text caption="IPA"  max-length="16" name="ipa_org_id" size="16"/>
+			<field.text caption="Fee Schedules"  name="fee_schedules"/>
+			<field.composite caption="Billing Address" required="yes" name="billing_addr">
+				<field.text caption="Address (Line 1)"  max-length="128" name="addr_line1" size="36"/>
+				<field.text caption="Address (Line 2)"  max-length="128" name="addr_line2" size="36"/>
+				<field.text caption="City"  max-length="64" name="addr_city" size="16"/>
+				<field.text caption="State"  max-length="2" name="addr_state" size="2"/>
+				<field.text caption="Zip"  name="addr_zip"/>
+			</field.composite>
+			<field.composite caption="Phone/Fax"  name="phone_fax">
+				<field.phone caption="Phone" required="yes" max-length="1024" name="phone"/>
+				<field.phone caption="Fax"  max-length="1024" name="fax"/>
+			</field.composite>
+			<field.select caption="Insurance Type" required="yes" name="ins_type"/>
+			<!--  -->
+			<field.select caption="Insurance Type Code" required="yes" name="insurance_type_code" choices="query:insurance.selInsTypeCode"/>
+			<!--  -->
+			<field.select caption="PPO-HMO Indicator" required="yes" name="ppo_hmo_indicator" choices="query:insurance.selPpoHmoIndicator"/>
+			<!--  -->
+			<field.composite caption="Champus Branch/Status/Grade"  hint="(For 'Champus' Insurance Type only)" name="champus_fields">
+				<field.select caption="Champus Branch"  name="champus_branch" choices=";Army;Navy;Air Force;Marines;Coast Guard"/>
+				<!--  -->
+				<field.select caption="Champus Status"  name="champus_status" choices=";Active;Retired;Reserves"/>
+				<!--  -->
+				<field.text caption="Champus Grade"  name="champus_grade"/>
+			</field.composite>
+			<field.text caption="BCBS Plan Code"  hint="(For 'BCBS' Insurance Type only)" name="bcbs_code"/>
+			<field.separator heading="General Plan Information" name="gen_plan_heading"/>
+			<field.composite caption="Group Name/Number"  name="group_name_number">
+				<field.text caption="Group Name"  max-length="32" name="group_name"/>
+				<field.text caption="Group Number"  max-length="32" name="group_number"/>
+			</field.composite>
+			<field.select caption="Remittance Type"  name="remit_type"/>
+			<!--  -->
+			<field.text caption="E-Remittance Payer ID"  hint="(Only for non-Paper types)" name="remit_payer_id"/>
+			<field.separator heading="Coverage Information" name="coverage_heading"/>
+			<field.composite caption="Coverage Begin/End Dates"  name="dates">
+				<field.date caption="Begin Date" name="coverage_begin_date" size="12"/>
+				<field.date caption="End Date" name="coverage_end_date" size="12"/>
+			</field.composite>
+			<field.composite caption="Deductible Amounts"  hint="Individual/Family" name="deduct_amts">
+				<field.currency caption="Individual Deductible Amount"  name="indiv_deductible_amt" size="10"/>
+				<field.currency caption="Family Deductible Amount"  name="family_deductible_amt" size="10"/>
+			</field.composite>
+			<field.composite caption="Percentage Pay/Threshold"  name="percentage_threshold">
+				<!-- Unimplemented field type=percentage -->
+				<field.currency caption="threshold"  name="threshold" size="10"/>
+			</field.composite>
+			<field.currency caption="Co-pay Amount"  name="copay_amt" size="10"/>
+
+		</dialog>
+
+		<dialog name="ins_unique" heading="ins_unique">
+			<field.text hidden="yes" name="phone_item_id" caption="phone_item_id"/>
+			<field.text hidden="yes" name="fax_item_id" caption="fax_item_id"/>
+			<field.text hidden="yes" name="fee_item_id" caption="fee_item_id"/>
+			<field.text hidden="yes" name="item_id" caption="item_id"/>
+			<field.text caption="Insurance Organization ID" required="yes" max-length="16" name="ins_org_id" size="16"/>
+			<field.text caption="Insurance Plan ID" required="yes" max-length="32" name="ins_id" size="16"/>
+			<field.text caption="IPA"  max-length="16" name="ipa_org_id" size="16"/>
+			<field.text caption="Fee Schedules"  name="fee_schedules"/>
+			<field.composite caption="Billing Address" required="yes" name="billing_addr">
+				<field.text caption="Address (Line 1)"  max-length="128" name="addr_line1" size="36"/>
+				<field.text caption="Address (Line 2)"  max-length="128" name="addr_line2" size="36"/>
+				<field.text caption="City"  max-length="64" name="addr_city" size="16"/>
+				<field.text caption="State"  max-length="2" name="addr_state" size="2"/>
+				<field.text caption="Zip"  name="addr_zip"/>
+			</field.composite>
+			<field.composite caption="Phone/Fax"  name="phone_fax">
+				<field.phone caption="Phone" required="yes" max-length="1024" name="phone"/>
+				<field.phone caption="Fax"  max-length="1024" name="fax"/>
+			</field.composite>
+			<field.select caption="Insurance Type" required="yes" name="ins_type"/>
+			<!--  -->
+			<field.select caption="Insurance Type Code" required="yes" name="insurance_type_code" choices="query:insurance.selInsTypeCode"/>
+			<!--  -->
+			<field.select caption="PPO-HMO Indicator" required="yes" name="ppo_hmo_indicator" choices="query:insurance.selPpoHmoIndicator"/>
+			<!--  -->
+			<field.composite caption="Champus Branch/Status/Grade"  hint="(For 'Champus' Insurance Type only)" name="champus_fields">
+				<field.select caption="Champus Branch"  name="champus_branch" choices=";Army;Navy;Air Force;Marines;Coast Guard"/>
+				<!--  -->
+				<field.select caption="Champus Status"  name="champus_status" choices=";Active;Retired;Reserves"/>
+				<!--  -->
+				<field.text caption="Champus Grade"  name="champus_grade"/>
+			</field.composite>
+			<field.text caption="BCBS Plan Code"  hint="(For 'BCBS' Insurance Type only)" name="bcbs_code"/>
+			<field.select caption="Insurance Sequence"  name="bill_sequence"/>
+			<!--  -->
+			<field.separator heading="General Plan Information" name="gen_plan_heading"/>
+			<field.text caption="Member Number"  max-length="32" name="member_number"/>
+			<field.composite caption="Policy Name/Number"  name="policy_name_number">
+				<field.text caption="Policy Name"  max-length="64" name="plan_name"/>
+				<field.text caption="Policy Number"  max-length="32" name="policy_number"/>
+			</field.composite>
+			<field.composite caption="Group Name/Number"  name="group_name_number">
+				<field.text caption="Group Name"  max-length="32" name="group_name"/>
+				<field.text caption="Group Number"  max-length="32" name="group_number"/>
+			</field.composite>
+			<field.composite caption="Insured/Guarantor ID"  name="insured_guarantor_ids">
+				<field.text caption="Insured ID" required="yes" max-length="16" name="insured_id" size="16"/>
+				<field.text caption="Guarantor ID" required="yes" max-length="16" name="guarantor_id" size="16"/>
+			</field.composite>
+			<field.text caption="Insured ID"  max-length="16" name="insured_id" size="16"/>
+			<field.select caption="Relationship to Insured"  name="rel_to_insured" choices="query:insurance.selInsuredRelation"/>
+			<!--  -->
+			<field.composite caption="Indiv/Family Deductible Remaining"  name="deduct_remain">
+				<field.currency caption="indiv_deduct_remain"  name="indiv_deduct_remain" size="10"/>
+				<field.currency caption="family_deduct_remain"  name="family_deduct_remain" size="10"/>
+			</field.composite>
+			<field.select caption="Remittance Type"  name="remit_type"/>
+			<!--  -->
+			<field.text caption="E-Remittance Payer ID"  hint="(Only for non-Paper types)" name="remit_payer_id"/>
+			<field.separator heading="Coverage Information" name="coverage_heading"/>
+			<field.composite caption="Coverage Begin/End Dates"  name="dates">
+				<field.date caption="Begin Date" name="coverage_begin_date" size="12"/>
+				<field.date caption="End Date" name="coverage_end_date" size="12"/>
+			</field.composite>
+			<field.composite caption="Deductible Amounts"  hint="Individual/Family" name="deduct_amts">
+				<field.currency caption="Individual Deductible Amount"  name="indiv_deductible_amt" size="10"/>
+				<field.currency caption="Family Deductible Amount"  name="family_deductible_amt" size="10"/>
+			</field.composite>
+			<field.composite caption="Percentage Pay/Threshold"  name="percentage_threshold">
+				<!-- Unimplemented field type=percentage -->
+				<field.currency caption="threshold"  name="threshold" size="10"/>
+			</field.composite>
+			<field.currency caption="Co-pay Amount"  name="copay_amt" size="10"/>
+
+		</dialog>
+
+		<dialog name="ins_coverage" heading="$Command Personal Insurance Coverage">
+			<field.text hidden="yes" name="injury_item_id" caption="injury_item_id"/>
+			<field.text hidden="yes" name="owner_org_id" caption="owner_org_id"/>
+			<field.text caption="Patient ID" required="yes" max-length="16" name="person_id" size="16"/>
+			<field.text caption="Insurance Product"  max-length="32" name="product_name" size="16"/>
+			<field.text caption="Insurance Plan"  max-length="32" name="plan_name" size="16"/>
+			<field.select caption="Insurance Sequence" required="yes" name="bill_sequence"/>
+			<!--  -->
+			<field.boolean caption="Confirm?" visible="no" name="do_anyway" style="check"/>
+			<field.separator heading="General Plan Information" name="gen_plan_heading"/>
+			<field.select caption="Patient's Relationship to Insured" required="yes" prepend-blank="yes" name="rel_to_insured" choices="query:insurance.selInsuredRelation"/>
+			<!--  -->
+			<field.text caption="Other Relationship"  name="extra"/>
+			<field.text caption="Insured Person ID"  max-length="16" name="insured_id" size="16"/>
+			<field.text caption="Insured Person's Employer"  max-length="16" name="employer_org_id" size="16"/>
+			<field.composite caption="*"  name="group_info">
+				<field.text caption="Group Name"  max-length="32" name="group_name"/>
+				<field.text caption="Number"  max-length="32" name="group_number"/>
+			</field.composite>
+			<field.text caption="Member Number" required="yes" max-length="32" name="member_number"/>
+			<field.date caption="Date Of Injury" name="injury_date" size="12"/>
+			<field.separator heading="Coverage Information" name="coverage_heading"/>
+			<field.composite caption="*"  name="dates">
+				<field.date caption="Coverage Begin Date" name="coverage_begin_date" size="12"/>
+				<field.date caption="End Date" name="coverage_end_date" size="12"/>
+			</field.composite>
+			<field.composite caption="*"  name="deduct_amts">
+				<field.currency caption="Individual"  name="indiv_deductible_amt" size="10"/>
+				<field.currency caption="Family Deductible Amounts"  name="family_deductible_amt" size="10"/>
+			</field.composite>
+			<field.composite caption="*"  name="deduct_remain">
+				<field.currency caption="Individual"  name="indiv_deduct_remain" size="10"/>
+				<field.currency caption="Family Deductible Remaining"  name="family_deduct_remain" size="10"/>
+			</field.composite>
+			<field.composite caption="*"  name="percentage_threshold">
+				<!-- Unimplemented field type=percentage -->
+				<field.currency caption="Threshold"  name="threshold" size="10"/>
+			</field.composite>
+			<field.currency caption="Office Visit Co-pay"  name="copay_amt" size="10"/>
+
+		</dialog>
+
+		<dialog name="ins_thirdparty" heading="$Command Third Party Payer">
+			<field.composite caption="Payer for Today ID/Type"  name="other_payer_fields">
+				<field.text caption="Payer for Today ID" required="yes" name="guarantor_id"/>
+				<field.select caption="Payer for Today Type"  name="guarantor_type" choices="Person=person;Organization=org"/>
+				<!--  -->
+			</field.composite>
+			<field.date caption="Begin Date" name="coverage_begin_date" size="12"/>
+			<field.date caption="End Date" name="coverage_end_date" size="12"/>
+			<field.boolean caption="Inactive Payer"  name="inactive_payer" style="check"/>
+
+		</dialog>
+
+		<dialog name="ins_plan" heading="$Command Insurance Plan">
+			<field.text hidden="yes" name="phone_item_id" caption="phone_item_id"/>
+			<field.text hidden="yes" name="fax_item_id" caption="fax_item_id"/>
+			<field.text hidden="yes" name="item_id" caption="item_id"/>
+			<field.text hidden="yes" name="ins_type" caption="ins_type"/>
+			<field.text hidden="yes" name="owner_org_id" caption="owner_org_id"/>
+			<field.text caption="Insurance Org Id" required="yes" max-length="16" name="ins_org_id" size="16"/>
+			<field.text caption="Product Name" required="yes" max-length="32" name="product_name" size="30"/>
+			<field.text caption="Plan Name" required="yes" max-length="32" name="plan_name" size="30"/>
+			<field.text caption="Fee Schedule ID"  max-length="32" name="fee_schedules" size="16"/>
+			<field.composite caption="Billing Address" required="yes" name="billing_addr">
+				<field.text caption="Address (Line 1)"  max-length="128" name="addr_line1" size="36"/>
+				<field.text caption="Address (Line 2)"  max-length="128" name="addr_line2" size="36"/>
+				<field.text caption="City"  max-length="64" name="addr_city" size="16"/>
+				<field.text caption="State"  max-length="2" name="addr_state" size="2"/>
+				<field.text caption="Zip"  name="addr_zip"/>
+			</field.composite>
+			<field.composite caption="Phone/Fax"  name="phone_fax">
+				<field.phone caption="Phone"  max-length="1024" name="phone"/>
+				<field.phone caption="Fax"  max-length="1024" name="fax"/>
+			</field.composite>
+			<field.separator heading="Coverage Information" name="coverage_heading"/>
+			<field.composite caption="Plan Begin/End Dates"  name="dates">
+				<field.date caption="Begin Date" name="coverage_begin_date" size="12"/>
+				<field.date caption="End Date" name="coverage_end_date" size="12"/>
+			</field.composite>
+			<field.composite caption="Deductible Amounts"  hint="Individual/Family" name="deduct_amts">
+				<field.currency caption="Individual Deductible Amount"  name="indiv_deductible_amt" size="10"/>
+				<field.currency caption="Family Deductible Amount"  name="family_deductible_amt" size="10"/>
+			</field.composite>
+			<field.composite caption="Percentage Pay/Threshold"  name="percentage_threshold">
+				<!-- Unimplemented field type=percentage -->
+				<field.currency caption="threshold"  name="threshold" size="10"/>
+			</field.composite>
+			<field.currency caption="Office Visit Co-pay"  hint="Co-pay is required when 'Insurance Type' is 'HMO (cap)'" name="copay_amt" size="10"/>
+			<field.separator heading="Remittance Information" name="remittance_heading"/>
+			<field.select caption="Remittance Type"  name="remit_type" choices="Paper=0,Electronic=1"/>
+			<!--  -->
+			<field.text caption="E-Remittance Payer ID"  hint="(Only for non-Paper types)" name="remit_payer_id"/>
+			<field.text caption="Remit Payer Name"  name="remit_payer_name"/>
+
+		</dialog>
+
+		<dialog name="ins_product" heading="$Command Insurance Product">
+			<field.text hidden="yes" name="phone_item_id" caption="phone_item_id"/>
+			<field.text hidden="yes" name="fax_item_id" caption="fax_item_id"/>
+			<field.text hidden="yes" name="item_id" caption="item_id"/>
+			<field.text hidden="yes" name="fee_item_id" caption="fee_item_id"/>
+			<field.text hidden="yes" name="pre_product_id" caption="pre_product_id"/>
+			<field.text hidden="yes" name="pre_org_id" caption="pre_org_id"/>
+			<field.text hidden="yes" name="owner_org_id" caption="owner_org_id"/>
+			<field.text hidden="yes" name="medigap_number_id" caption="medigap_number_id"/>
+			<field.text caption="Insurance Company Id" required="yes" max-length="16" name="ins_org_id" size="16"/>
+			<field.text caption="Product Name" required="yes" max-length="32" name="product_name"/>
+			<field.select caption="Product Type" required="yes" name="ins_type"/>
+			<!--  -->
+			<field.text caption="Fee Schedule ID"  max-length="32" name="fee_schedules" size="16"/>
+			<field.composite caption="Billing Address" required="yes" name="billing_addr">
+				<field.text caption="Address (Line 1)"  max-length="128" name="addr_line1" size="36"/>
+				<field.text caption="Address (Line 2)"  max-length="128" name="addr_line2" size="36"/>
+				<field.text caption="City"  max-length="64" name="addr_city" size="16"/>
+				<field.text caption="State"  max-length="2" name="addr_state" size="2"/>
+				<field.text caption="Zip"  name="addr_zip"/>
+			</field.composite>
+			<field.composite caption="Phone/Fax"  name="phone_fax">
+				<field.phone caption="Phone" required="yes" max-length="1024" name="phone"/>
+				<field.phone caption="Fax"  max-length="1024" name="fax"/>
+			</field.composite>
+			<field.text caption="Medigap Number"  max-length="7" name="medigap_number" size="7"/>
+			<field.separator heading="Remittance Information" name="remittance_heading"/>
+			<field.select caption="Remittance Type"  name="remit_type" choices="Paper=0,Electronic=1"/>
+			<!--  -->
+			<field.text caption="E-Remittance Payer ID"  hint="(Only for non-Paper types)" name="remit_payer_id"/>
+			<field.text caption="Remit Payer Name"  name="remit_payer_name"/>
+
+		</dialog>
+
+	</dialogs>
+</xaf>

@@ -1,0 +1,320 @@
+<?xml version="1.0"?>
+
+<xaf>
+	<sql-statements package="search.appointment">
+		<statement name="id">
+			App::Statements::Search::Appointment
+		</statement>
+
+		<statement name="sel_appointment">
+			
+			SELECT *
+			FROM (
+			SELECT
+			patient.simple_name,
+			TO_CHAR(event.start_time - ?, 'MM/DD/YYYY HH12:MI AM') AS start_time,
+			ea.value_textB AS resource_id,
+			replace(aat.caption, 'Patient', null) AS patient_type,
+			initcap(event.subject) as subject,
+			pa.value_text as home_phone,
+			stat.caption,
+			org.org_id,
+			initcap(event.remarks) as remarks,
+			event.event_id,
+			scheduled_by_id,
+			TO_CHAR(scheduled_stamp - ?, 'MM/DD/YYYY HH12:MI AM') AS scheduled_stamp,
+			patient.person_id AS patient_id,
+			at.caption as appt_type,
+			(SELECT value_text
+			FROM Person_Attribute pa
+			WHERE pa.parent_id = patient.person_id
+			AND pa.item_name = 'Patient/Account Number'
+			) as account_number,
+			(SELECT value_text
+			FROM Person_Attribute pa
+			WHERE pa.parent_id = patient.person_id
+			AND pa.item_name = 'Patient/Chart Number'
+			) as chart_number,
+			initcap(patient.complete_sortable_name) as patient_name
+			FROM
+			Person patient,
+			Appt_Attendee_Type aat,
+			Event_Attribute ea,
+			Event,
+			Appt_Status stat,
+			Org,
+			Appt_Type at,
+			Person_Attribute pa
+			WHERE
+			Org.org_id like upper(?)
+			AND Event.facility_id = org.org_internal_id
+			AND Event.start_time BETWEEN
+			TO_DATE(?, 'MM/DD/YYYY HH12:MI AM')
+			AND TO_DATE(?, 'MM/DD/YYYY HH12:MI AM')
+			AND ea.parent_id = event.event_id
+			AND ea.value_type = 333
+			AND patient.person_id = ea.value_text
+			AND upper(ea.value_textB) LIKE upper(?)
+			AND Event.event_status = stat.id
+			AND stat.id BETWEEN ? and ?
+			AND aat.id = ea.value_int
+			AND Event.owner_id = ?
+			AND at.appt_type_id (+) = Event.appt_type
+			AND pa.parent_id (+) = patient.person_id
+			AND pa.value_type (+) = 10
+			AND pa.item_name (+) = 'Home'
+			ORDER BY event.start_time, event.event_id
+			)
+			WHERE rownum &lt;= 250
+
+		</statement>
+
+		<statement name="sel_appointment_orderbyAccount">
+			
+			SELECT *
+			FROM (
+			SELECT
+			patient.simple_name,
+			TO_CHAR(event.start_time - ?, 'MM/DD/YYYY HH12:MI AM') AS start_time,
+			ea.value_textB AS resource_id,
+			replace(aat.caption, 'Patient', null) AS patient_type,
+			initcap(event.subject) as subject,
+			pa.value_text as home_phone,
+			stat.caption,
+			org.org_id,
+			initcap(event.remarks) as remarks,
+			event.event_id,
+			scheduled_by_id,
+			TO_CHAR(scheduled_stamp - ?, 'MM/DD/YYYY HH12:MI AM') AS scheduled_stamp,
+			patient.person_id AS patient_id,
+			at.caption as appt_type,
+			(SELECT value_text
+			FROM Person_Attribute pa
+			WHERE pa.parent_id = patient.person_id
+			AND pa.item_name = 'Patient/Account Number'
+			) as account_number,
+			(SELECT value_text
+			FROM Person_Attribute pa
+			WHERE pa.parent_id = patient.person_id
+			AND pa.item_name = 'Patient/Chart Number'
+			) as chart_number,
+			initcap(patient.complete_sortable_name) as patient_name
+			FROM
+			Person patient,
+			Appt_Attendee_Type aat,
+			Event_Attribute ea,
+			Event,
+			Appt_Status stat,
+			Org,
+			Appt_Type at,
+			Person_Attribute pa
+			WHERE
+			Org.org_id like upper(?)
+			AND Event.facility_id = org.org_internal_id
+			AND Event.start_time BETWEEN
+			TO_DATE(?, 'MM/DD/YYYY HH12:MI AM')
+			AND TO_DATE(?, 'MM/DD/YYYY HH12:MI AM')
+			AND ea.parent_id = event.event_id
+			AND ea.value_type = 333
+			AND patient.person_id = ea.value_text
+			AND upper(ea.value_textB) LIKE upper(?)
+			AND Event.event_status = stat.id
+			AND stat.id BETWEEN ? and ?
+			AND aat.id = ea.value_int
+			AND Event.owner_id = ?
+			AND at.appt_type_id (+) = Event.appt_type
+			AND pa.parent_id (+) = patient.person_id
+			AND pa.value_type (+) = 10
+			AND pa.item_name (+) = 'Home'
+			ORDER BY upper(account_number)
+			)
+			WHERE rownum &lt;= 250
+
+		</statement>
+
+		<statement name="sel_appointment_orderbyChart">
+			
+			SELECT *
+			FROM (
+			SELECT
+			patient.simple_name,
+			TO_CHAR(event.start_time - ?, 'MM/DD/YYYY HH12:MI AM') AS start_time,
+			ea.value_textB AS resource_id,
+			replace(aat.caption, 'Patient', null) AS patient_type,
+			initcap(event.subject) as subject,
+			pa.value_text as home_phone,
+			stat.caption,
+			org.org_id,
+			initcap(event.remarks) as remarks,
+			event.event_id,
+			scheduled_by_id,
+			TO_CHAR(scheduled_stamp - ?, 'MM/DD/YYYY HH12:MI AM') AS scheduled_stamp,
+			patient.person_id AS patient_id,
+			at.caption as appt_type,
+			(SELECT value_text
+			FROM Person_Attribute pa
+			WHERE pa.parent_id = patient.person_id
+			AND pa.item_name = 'Patient/Account Number'
+			) as account_number,
+			(SELECT value_text
+			FROM Person_Attribute pa
+			WHERE pa.parent_id = patient.person_id
+			AND pa.item_name = 'Patient/Chart Number'
+			) as chart_number,
+			initcap(patient.complete_sortable_name) as patient_name
+			FROM
+			Person patient,
+			Appt_Attendee_Type aat,
+			Event_Attribute ea,
+			Event,
+			Appt_Status stat,
+			Org,
+			Appt_Type at,
+			Person_Attribute pa
+			WHERE
+			Org.org_id like upper(?)
+			AND Event.facility_id = org.org_internal_id
+			AND Event.start_time BETWEEN
+			TO_DATE(?, 'MM/DD/YYYY HH12:MI AM')
+			AND TO_DATE(?, 'MM/DD/YYYY HH12:MI AM')
+			AND ea.parent_id = event.event_id
+			AND ea.value_type = 333
+			AND patient.person_id = ea.value_text
+			AND upper(ea.value_textB) LIKE upper(?)
+			AND Event.event_status = stat.id
+			AND stat.id BETWEEN ? and ?
+			AND aat.id = ea.value_int
+			AND Event.owner_id = ?
+			AND at.appt_type_id (+) = Event.appt_type
+			AND pa.parent_id (+) = patient.person_id
+			AND pa.value_type (+) = 10
+			AND pa.item_name (+) = 'Home'
+			ORDER BY upper(chart_number) 
+			)
+			WHERE rownum &lt;= 250
+
+		</statement>
+
+		<statement name="sel_appointment_orderbyName">
+			
+			SELECT *
+			FROM (
+			SELECT
+			patient.simple_name,
+			TO_CHAR(event.start_time - ?, 'MM/DD/YYYY HH12:MI AM') AS start_time,
+			ea.value_textB AS resource_id,
+			replace(aat.caption, 'Patient', null) AS patient_type,
+			initcap(event.subject) as subject,
+			pa.value_text as home_phone,
+			stat.caption,
+			org.org_id,
+			initcap(event.remarks) as remarks,
+			event.event_id,
+			scheduled_by_id,
+			TO_CHAR(scheduled_stamp - ?, 'MM/DD/YYYY HH12:MI AM') AS scheduled_stamp,
+			patient.person_id AS patient_id,
+			at.caption as appt_type,
+			(SELECT value_text
+			FROM Person_Attribute pa
+			WHERE pa.parent_id = patient.person_id
+			AND pa.item_name = 'Patient/Account Number'
+			) as account_number,
+			(SELECT value_text
+			FROM Person_Attribute pa
+			WHERE pa.parent_id = patient.person_id
+			AND pa.item_name = 'Patient/Chart Number'
+			) as chart_number,
+			initcap(patient.complete_sortable_name) as patient_name
+			FROM
+			Person patient,
+			Appt_Attendee_Type aat,
+			Event_Attribute ea,
+			Event,
+			Appt_Status stat,
+			Org,
+			Appt_Type at,
+			Person_Attribute pa
+			WHERE
+			Org.org_id like upper(?)
+			AND Event.facility_id = org.org_internal_id
+			AND Event.start_time BETWEEN
+			TO_DATE(?, 'MM/DD/YYYY HH12:MI AM')
+			AND TO_DATE(?, 'MM/DD/YYYY HH12:MI AM')
+			AND ea.parent_id = event.event_id
+			AND ea.value_type = 333
+			AND patient.person_id = ea.value_text
+			AND upper(ea.value_textB) LIKE upper(?)
+			AND Event.event_status = stat.id
+			AND stat.id BETWEEN ? and ?
+			AND aat.id = ea.value_int
+			AND Event.owner_id = ?
+			AND at.appt_type_id (+) = Event.appt_type
+			AND pa.parent_id (+) = patient.person_id
+			AND pa.value_type (+) = 10
+			AND pa.item_name (+) = 'Home'
+			ORDER BY upper(patient.name_last), upper(patient.name_first), upper(patient.name_middle)
+			)
+			WHERE rownum &lt;= 250
+
+		</statement>
+
+		<statement name="sel_conflict_appointments">
+			
+			SELECT *
+			FROM (
+			SELECT
+			patient.simple_name,
+			TO_CHAR(event.start_time - ?, 'MM/DD/YYYY HH12:MI AM') AS start_time,
+			ea.value_textB AS resource_id,
+			replace(aat.caption, 'Patient', null) AS patient_type,
+			initcap(event.subject) as subject,
+			pa.value_text as home_phone,
+			stat.caption,
+			org.org_id,
+			initcap(event.remarks) as remarks,
+			event.event_id,
+			scheduled_by_id,
+			TO_CHAR(scheduled_stamp - ?, 'MM/DD/YYYY HH12:MI AM') AS scheduled_stamp,
+			patient.person_id AS patient_id,
+			at.caption as appt_type,
+			(SELECT value_text
+			FROM Person_Attribute pa
+			WHERE pa.parent_id = patient.person_id
+			AND pa.item_name = 'Patient/Account Number'
+			) as account_number,
+			(SELECT value_text
+			FROM Person_Attribute pa
+			WHERE pa.parent_id = patient.person_id
+			AND pa.item_name = 'Patient/Chart Number'
+			) as chart_number,
+			initcap(patient.complete_sortable_name) as patient_name
+			FROM
+			Person patient,
+			Appt_Attendee_Type aat,
+			Event_Attribute ea,
+			Event,
+			Appt_Status stat,
+			Org,
+			Appt_Type at,
+			Person_Attribute pa
+			WHERE
+			event.facility_id = org.org_internal_id
+			AND event.parent_id = ?
+			AND ea.parent_id = event.event_id
+			AND ea.value_type = 333
+			AND patient.person_id = ea.value_text
+			AND stat.id = event.event_status
+			AND aat.id = ea.value_int
+			AND event.owner_id = ?
+			AND at.appt_type_id (+) = Event.appt_type
+			AND pa.parent_id = patient.person_id (+)
+			AND pa.value_type = 10
+			AND pa.item_name = 'Home'
+			ORDER BY event.start_time, event.event_id
+			)
+			WHERE rownum &lt;= 250
+
+		</statement>
+
+	</sql-statements>
+</xaf>

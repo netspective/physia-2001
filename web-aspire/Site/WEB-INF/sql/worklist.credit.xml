@@ -1,0 +1,203 @@
+<?xml version="1.0"?>
+
+<xaf>
+	<sql-statements package="worklist.credit">
+		<statement name="del_worklist_credit_dates">
+			
+			delete from Person_Attribute
+			where parent_id = :1
+			and parent_org_id = :2
+			and value_type = 150
+			and item_name = :3
+			
+		</statement>
+
+		<statement name="del_worklist_credit_org">
+			
+			delete from Person_Attribute
+			where
+			parent_id = :1
+			and parent_org_id = :2
+			and value_type = 252
+			and item_name = :3
+			
+		</statement>
+
+		<statement name="del_worklist_credit_physician">
+			
+			delete from Person_Attribute
+			where parent_id = :1
+			and parent_org_id = :2
+			and value_type = 250
+			and item_name = :3
+			
+		</statement>
+
+		<statement name="del_worklist_credit_products">
+			
+			delete from Person_Attribute
+			where parent_id = :1
+			and parent_org_id = :2
+			and value_type = 110
+			and item_name = :3
+			
+		</statement>
+
+		<statement name="del_worklist_credit_sorting">
+			
+			delete from Person_Attribute
+			where parent_id = :1
+			and parent_org_id = :2
+			and value_type = 110
+			and item_name = :3
+			
+		</statement>
+
+		<statement name="id">
+			App::Statements::Worklist::InvoiceCreditBalance
+		</statement>
+
+		<statement name="sel_invoice_credit_balance_age">
+			
+			select client_id, p.simple_name, i.invoice_id, i.balance, trunc(sysdate) - trunc(i.invoice_date) age
+			from invoice i, person p , transaction t, invoice_billing ib, insurance ins
+			where i.client_id = p.person_id
+			and t.trans_id = i.main_transaction
+			and ib.bill_id = i.billing_id
+			and ins.ins_internal_id (+) = ib.bill_ins_id
+			and i.balance &lt; 0 
+			and i.invoice_status != 16
+			and (i.invoice_date &gt;= to_date(:1,'mm/dd/yyyy') OR :1 is NULL)
+			and (i.invoice_date &lt;= to_date(:2,'mm/dd/yyyy') OR :2 is NULL)
+			and (t.care_provider_id = :3 OR :3 is NULL)
+			and (t.service_facility_id = :4 OR :4 is NULL)
+			and (ins.product_name = :5 OR :5 is NULL)
+			order by age desc
+			
+		</statement>
+
+		<statement name="sel_invoice_credit_balance_patient">
+			
+			select client_id, p.simple_name, i.invoice_id, i.balance, trunc(sysdate) - trunc(i.invoice_date) age
+			from invoice i, person p , transaction t, invoice_billing ib, insurance ins
+			where i.client_id = p.person_id
+			and t.trans_id = i.main_transaction
+			and ib.bill_id = i.billing_id
+			and ins.ins_internal_id (+) = ib.bill_ins_id
+			and i.balance &lt; 0 
+			and i.invoice_status != 16
+			and (i.invoice_date &gt;= to_date(:1,'mm/dd/yyyy') OR :1 is NULL)
+			and (i.invoice_date &lt;= to_date(:2,'mm/dd/yyyy') OR :2 is NULL)
+			and (t.care_provider_id = :3 OR :3 is NULL)
+			and (t.service_facility_id = :4 OR :4 is NULL)
+			and (ins.product_name = :5 OR :5 is NULL)
+			order by client_id	
+			
+		</statement>
+
+		<statement name="sel_worklist_credit">
+			
+			select client_id, simple_name, invoice_id, balance, trunc(sysdate) - trunc(invoice.invoice_date) as age
+			from invoice, person
+			where client_id = :1
+			and balance &lt; 0
+			and person.person_id = invoice.client_id
+			and invoice_date between to_date(:2,'mm/dd/yyyy') and to_date(:3,'mm/dd/yyyy')
+			AND	ROWNUM&lt;=:4
+			
+		</statement>
+
+		<statement name="sel_worklist_credit_all_products">
+			
+			select 	pa.value_int
+			FROM 	Person_Attribute pa
+			WHERE	pa.value_type = 110
+			AND	parent_id = :1
+			AND	parent_org_id = :2
+			AND	item_name = :3
+			AND	value_int = -1
+			
+		</statement>
+
+		<statement name="sel_worklist_credit_available_products">
+			
+			select i.ins_internal_id as product_id, product_name || ' (' || ct.caption || ')'
+			from claim_type ct, insurance i, org
+			where i.record_type = 1
+			AND	org.org_internal_id = i.owner_org_id
+			AND	org.owner_org_id = :1
+			AND ct.id = i.ins_type
+			order by product_name
+			
+		</statement>
+
+		<statement name="sel_worklist_credit_count">
+			
+			select count(*)
+			from invoice, person
+			where client_id = :1
+			and balance &lt; 0
+			and person.person_id = invoice.client_id
+			
+		</statement>
+
+		<statement name="sel_worklist_credit_dates">
+			
+			select
+			to_char(value_date, 'DD-MON-YYYY') value_date,
+			to_char(value_dateend, 'DD-MON-YYYY') value_dateend
+			from Person_Attribute
+			where parent_id = :1
+			and parent_org_id = :2
+			and value_type = 150
+			and item_name = :3
+			
+		</statement>
+
+		<statement name="sel_worklist_credit_org">
+			
+			select value_text from Person_Attribute
+			where
+			parent_id = :1
+			and parent_org_id = :2
+			and value_type = 252
+			and item_name = :3
+			
+		</statement>
+
+		<statement name="sel_worklist_credit_physician">
+			
+			select value_text from Person_Attribute
+			where parent_id = :1
+			and parent_org_id = :2
+			and value_type = 250
+			and item_name = :3
+			
+		</statement>
+
+		<statement name="sel_worklist_credit_products">
+			
+			select pa.value_int as product_id, i.product_name
+			from Person_Attribute pa, Insurance i
+			where
+			parent_id = :1
+			and parent_org_id = :2
+			and i.ins_internal_id = pa.value_int
+			and pa.value_type = 110
+			and item_name = :3
+			order by i.product_name
+			
+		</statement>
+
+		<statement name="sel_worklist_credit_sorting">
+			
+			select value_int from Person_Attribute
+			where parent_id = :1
+			and parent_org_id = :2
+			and value_type = 110
+			and item_name = :3
+			
+		</statement>
+
+	</sql-statements>
+</xaf>

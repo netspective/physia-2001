@@ -1,0 +1,275 @@
+<?xml version="1.0"?>
+
+<xaf>
+	<sql-statements package="handheld">
+		<statement name="id">
+			App::Statements::HandHeld
+		</statement>
+
+		<statement name="sel_allAppts">
+			
+			SELECT to_char(e.start_time - :1, 'hh24:mi') as time,
+			patient.person_id as patient_id,
+			patient.short_sortable_name as patient,
+			initcap(e.subject) as reason,
+			at.caption as appt_type,
+			astat.caption as status,
+			patient.person_id
+			FROM Appt_Status astat, Person patient, Person provider,
+			Event_Attribute ea, Appt_Type at, Event e
+			WHERE e.start_time &gt;= to_date(:2, 'MM/DD/YYYY') + :1
+			AND e.start_time &lt; to_date(:2, 'MM/DD/YYYY') + :1 + 1
+			AND e.discard_type is null
+			AND at.appt_type_id (+) = e.appt_type
+			AND ea.parent_id = e.event_id
+			AND ea.value_type = 333
+			AND ea.value_text = patient.person_id
+			AND ea.value_textB = provider.person_id
+			AND
+			(	ea.value_textB = :3 or ea.value_textB in
+			(select value_text
+			from person_attribute
+			where parent_id = :3
+			and item_name = 'WorkList'
+			and value_type = 250
+			and parent_org_id = :4
+			)
+			)
+			AND astat.id = e.event_status
+			ORDER BY e.start_time
+
+		</statement>
+
+		<statement name="sel_completedAppts">
+			
+			SELECT to_char(e.start_time - :1, 'hh24:mi') as time,
+			patient.person_id as patient_id,
+			patient.short_sortable_name as patient,
+			initcap(e.subject) as reason,
+			at.caption as appt_type,
+			astat.caption as status,
+			patient.person_id
+			FROM Appt_Status astat, Person patient, Person provider,
+			Event_Attribute ea, Appt_Type at, Event e
+			WHERE e.start_time &gt;= to_date(:2, 'MM/DD/YYYY') + :1
+			AND e.start_time &lt; to_date(:2, 'MM/DD/YYYY') + :1 + 1
+			AND e.discard_type is null
+			AND e.event_status = 2
+			AND at.appt_type_id (+) = e.appt_type
+			AND ea.parent_id = e.event_id
+			AND ea.value_type = 333
+			AND ea.value_text = patient.person_id
+			AND ea.value_textB = provider.person_id
+			AND
+			(	ea.value_textB = :3 or ea.value_textB in
+			(select value_text
+			from person_attribute
+			where parent_id = :3
+			and item_name = 'WorkList'
+			and value_type = 250
+			and parent_org_id = :4
+			)
+			)
+			AND astat.id = e.event_status
+			ORDER BY e.start_time
+
+		</statement>
+
+		<statement name="sel_inPatients">
+			
+			select o.name_primary as hospital_name,
+			caption as room,
+			initcap(simple_name) as patient_name,
+			provider_id,
+			trans_owner_id as patient_id,
+			to_char(trans_begin_stamp, 'MM/DD/YYYY') as begin_date,
+			detail as diags, data_text_c as procs
+			from Org o, Person, Transaction
+			where trans_type between 11000 and 11999
+			and trans_status = 2
+			and trans_begin_stamp &gt;= sysdate - data_num_a
+			and (provider_id = :1 OR provider_id in
+			(	select value_text from person_attribute
+			where parent_id = :1
+			and value_type = 250
+			and item_name = 'WorkList'
+			and parent_org_id = :2
+			)
+			)
+			and person.person_id = transaction.trans_owner_id
+			and o.org_internal_id = transaction.service_facility_id
+			
+		</statement>
+
+		<statement name="sel_inProgressAppts">
+			
+			SELECT to_char(e.start_time - :1, 'hh24:mi') as time,
+			patient.person_id as patient_id,
+			patient.short_sortable_name as patient,
+			initcap(e.subject) as reason,
+			at.caption as appt_type,
+			astat.caption as status,
+			patient.person_id
+			FROM Appt_Status astat, Person patient, Person provider,
+			Event_Attribute ea, Appt_Type at, Event e
+			WHERE e.start_time &gt;= to_date(:2, 'MM/DD/YYYY') + :1
+			AND e.start_time &lt; to_date(:2, 'MM/DD/YYYY') + :1 + 1
+			AND e.discard_type is null
+			AND e.event_status = 1
+			AND at.appt_type_id (+) = e.appt_type
+			AND ea.parent_id = e.event_id
+			AND ea.value_type = 333
+			AND ea.value_text = patient.person_id
+			AND ea.value_textB = provider.person_id
+			AND
+			(	ea.value_textB = :3 or ea.value_textB in
+			(select value_text
+			from person_attribute
+			where parent_id = :3
+			and item_name = 'WorkList'
+			and value_type = 250
+			and parent_org_id = :4
+			)
+			)
+			AND astat.id = e.event_status
+			ORDER BY e.start_time
+
+		</statement>
+
+		<statement name="sel_patientActiveMeds">
+			
+			SELECT
+			permed_id, med_name, dose, dose_units, frequency, route,
+			TO_CHAR(start_date, 'MM/DD/YYYY') as start_date,
+			TO_CHAR(end_date, 'MM/DD/YYYY') as end_date,
+			frequency, num_refills, approved_by
+			FROM
+			Person_Medication
+			WHERE
+			parent_id = upper(:1)
+			and (end_date IS NULL OR end_date &gt; TRUNC(sysdate))
+			ORDER BY
+			start_date DESC,
+			med_name
+			
+		</statement>
+
+		<statement name="sel_patientActiveProblems">
+			
+			select to_char(t.curr_onset_date, 'MM/DD/YYYY') as curr_onset_date,
+			to_char(t.trans_begin_stamp, 'MM/DD/YYYY') as trans_date,
+			initcap(ref.name) as name, t.provider_id, 'ICD ' || t.code as code
+			from ref_icd ref, transaction t
+			where t.trans_owner_id = upper(:1)
+			and t.trans_owner_type = 0
+			and t.trans_type = 3020
+			and t.trans_status = 2
+			and ref.icd (+) = t.code
+			order by trans_date desc, trans_id desc
+			
+		</statement>
+
+		<statement name="sel_patientAllergies">
+			
+			select value_type,
+			item_id,
+			item_name,
+			value_text
+			from person_attribute
+			where parent_id = upper(:1)
+			and value_type in (410, 411, 412)
+			
+		</statement>
+
+		<statement name="sel_patientBloodType">
+			
+			SELECT b.caption
+			FROM Blood_Type b, Person_Attribute pa
+			WHERE pa.parent_id = upper(:1)
+			AND pa.item_name = 'BloodType'
+			AND b.id = pa.value_text
+			
+		</statement>
+
+		<statement name="sel_patientDemographics">
+			
+			select complete_sortable_name as name,
+			complete_addr_html as address,
+			home.value_text as home_phone,
+			work.value_text as work_phone,
+			to_char(date_of_birth, 'mm/dd/yyyy') as dob,
+			decode(gender, 1, 'Male', 2, 'Female', 'Gender Unknown') as gender,
+			trunc((sysdate - date_of_birth)/365) as age
+			from person_attribute home, person_attribute work, person_address, person
+			where person_id = upper(:1)
+			and person_address.parent_id = person.person_id
+			and work.parent_id (+) = person.person_id
+			and work.item_name (+) = 'Work'
+			and home.parent_id (+) = person.person_id
+			and home.item_name (+) = 'Home'
+			
+		</statement>
+
+		<statement name="sel_patientInsurance">
+			
+			SELECT
+			product_name,
+			plan_name,
+			DECODE(bill_sequence,1,'Primary', 2,'Secondary', 3,'Tertiary', 4,'Quaternary', 5,'W. Comp', '') as bill_sequence,
+			guarantor_name,
+			ct.caption,
+			o.org_id
+			FROM claim_type ct, org o, insurance i
+			WHERE record_type = 3
+			AND owner_person_id = upper(:1)
+			AND o.org_internal_id (+)= i.ins_org_id
+			AND ct.id = i.ins_type
+			GROUP BY
+			product_name,
+			plan_name,
+			bill_sequence,
+			guarantor_name,
+			ct.caption,
+			o.org_id,
+			guarantor_name
+			ORDER BY bill_sequence
+			
+		</statement>
+
+		<statement name="sel_scheduledAppts">
+			
+			SELECT to_char(e.start_time - :1, 'hh24:mi') as time,
+			patient.person_id as patient_id,
+			patient.short_sortable_name as patient,
+			initcap(e.subject) as reason,
+			at.caption as appt_type,
+			astat.caption as status,
+			patient.person_id
+			FROM Appt_Status astat, Person patient, Person provider,
+			Event_Attribute ea, Appt_Type at, Event e
+			WHERE e.start_time &gt;= to_date(:2, 'MM/DD/YYYY') + :1
+			AND e.start_time &lt; to_date(:2, 'MM/DD/YYYY') + :1 + 1
+			AND e.discard_type is null
+			AND e.event_status = 0
+			AND at.appt_type_id (+) = e.appt_type
+			AND ea.parent_id = e.event_id
+			AND ea.value_type = 333
+			AND ea.value_text = patient.person_id
+			AND ea.value_textB = provider.person_id
+			AND
+			(	ea.value_textB = :3 or ea.value_textB in
+			(select value_text
+			from person_attribute
+			where parent_id = :3
+			and item_name = 'WorkList'
+			and value_type = 250
+			and parent_org_id = :4
+			)
+			)
+			AND astat.id = e.event_status
+			ORDER BY e.start_time
+
+		</statement>
+
+	</sql-statements>
+</xaf>

@@ -1,0 +1,119 @@
+<?xml version="1.0"?>
+
+<xaf>
+	<sql-statements package="report.referring_doctor">
+		<statement name="id">
+			App::Statements::Report::ReferringDoctor
+		</statement>
+
+		<statement name="patientCount">
+			
+			select
+			p.simple_name name,
+			p.person_id,
+			count(i.client_id) patientCount,
+			pa.item_name category,
+			p.name_last,
+			round((count(i.client_id) / cnt.ptCount * 100), 2) || '%' patientPercent
+			from
+			person p,
+			transaction t,
+			invoice i,
+			(
+			select parent_id, item_name
+			from person_attribute
+			where value_type = 540
+			and value_int = 1
+			) pa,
+			(
+			select count(i.client_id) ptCount
+			from person p, transaction t, invoice i,
+			(
+			select parent_id from invoice_item ii
+			where (ii.service_begin_date &gt;= to_date(:3, 'MM/DD/YYYY') OR :3 is NULL)
+			and (ii.service_end_date &lt;= to_date(:4, 'MM/DD/YYYY') OR :4 is NULL)
+			and ii.item_type in (0, 1, 2)
+			and ii.data_text_b is null
+			) inv_items
+			where i.invoice_date between to_date(:1, 'MM/DD/YYYY') and to_date(:2, 'MM/DD/YYYY')
+			and t.trans_id = i.main_transaction
+			and p.person_id = t.data_text_a
+			and i.invoice_id = inv_items.parent_id
+			) cnt,
+			(
+			select parent_id from invoice_item ii
+			where (ii.service_begin_date &gt;= to_date(:3, 'MM/DD/YYYY') OR :3 is NULL)
+			and (ii.service_end_date &lt;= to_date(:4, 'MM/DD/YYYY') OR :4 is NULL)
+			and ii.item_type in (0, 1, 2)
+			and ii.data_text_b is null
+			) inv_items
+			where i.invoice_date between to_date(:1, 'MM/DD/YYYY') and to_date(:2, 'MM/DD/YYYY')
+			and t.trans_id = i.main_transaction
+			and p.person_id = t.data_text_a
+			and i.invoice_id = inv_items.parent_id
+			and p.person_id = pa.parent_id (+)
+			group by p.simple_name, p.person_id, pa.item_name, p.name_last, cnt.ptCount
+			order by pa.item_name, p.name_last
+			
+		</statement>
+
+		<statement name="patientOrgCount">
+			
+			select p.simple_name name, p.person_id, o.name_primary, count(i.client_id) patientCount
+			from person p, transaction t, invoice i, org o, invoice_billing ib, insurance ins,
+			(
+			select parent_id from invoice_item ii
+			where (ii.service_begin_date &gt;= to_date(:3, 'MM/DD/YYYY') OR :3 is NULL)
+			and (ii.service_end_date &lt;= to_date(:4, 'MM/DD/YYYY') OR :4 is NULL)
+			and ii.item_type in (0, 1, 2)
+			and ii.data_text_b is null
+			) inv_items
+			where i.invoice_date between to_date(:1, 'MM/DD/YYYY') and to_date(:2, 'MM/DD/YYYY')
+			and t.trans_id = i.main_transaction
+			and p.person_id = t.data_text_a
+			and i.billing_id = ib.bill_id
+			and ib.bill_ins_id = ins.ins_internal_id
+			and ins.ins_org_id = o.org_internal_id
+			and ib.bill_party_type = 3
+			and i.invoice_id = inv_items.parent_id
+			group by p.simple_name, p.person_id, o.name_primary
+			union
+			select p.simple_name name, p.person_id, null, count(i.client_id) patientCount
+			from person p, transaction t, invoice i, invoice_billing ib,
+			(
+			select parent_id from invoice_item ii
+			where (ii.service_begin_date &gt;= to_date(:3, 'MM/DD/YYYY') OR :3 is NULL)
+			and (ii.service_end_date &lt;= to_date(:4, 'MM/DD/YYYY') OR :4 is NULL)
+			and ii.item_type in (0, 1, 2)
+			and ii.data_text_b is null
+			) inv_items
+			where i.invoice_date between to_date(:1, 'MM/DD/YYYY') and to_date(:2, 'MM/DD/YYYY')
+			and t.trans_id = i.main_transaction
+			and p.person_id = t.data_text_a
+			and i.billing_id = ib.bill_id
+			and ib.bill_party_type &lt;&gt; 3
+			and i.invoice_id = inv_items.parent_id
+			group by p.simple_name, p.person_id
+			
+		</statement>
+
+		<statement name="totalPatientCount">
+			
+			select count(i.client_id) patientCount
+			from person p, transaction t, invoice i,
+			(
+			select parent_id from invoice_item ii
+			where (ii.service_begin_date &gt;= to_date(:3, 'MM/DD/YYYY') OR :3 is NULL)
+			and (ii.service_end_date &lt;= to_date(:4, 'MM/DD/YYYY') OR :4 is NULL)
+			and ii.item_type in (0, 1, 2)
+			and ii.data_text_b is null
+			) inv_items
+			where i.invoice_date between to_date(:1, 'MM/DD/YYYY') and to_date(:2, 'MM/DD/YYYY')
+			and t.trans_id = i.main_transaction
+			and p.person_id = t.data_text_a
+			and i.invoice_id = inv_items.parent_id
+			
+		</statement>
+
+	</sql-statements>
+</xaf>

@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+
+<xaf>
+	<sql-statements package="worklist.claim">
+		<statement name="id">
+			App::Statements::Worklist::Claim
+		</statement>
+
+		<statement name="sel_invoice_worklist_item">
+			
+			select to_char(data_date_a, 'MM/DD/YYYY') as close_date, Invoice_Worklist.*
+			from Invoice_Worklist
+			where invoice_id = :1
+			and worklist_type = :2
+			and worklist_status = :3
+			
+		</statement>
+
+		<statement name="sel_invoice_worklist_item_by_person">
+			
+			select to_char(reck_date, 'MM/DD/YYYY') as formatted_reck_date,
+			invoice_worklist.*
+			from Invoice_Worklist
+			where invoice_id = :1
+			and worklist_type = :2
+			and responsible_id = :3
+			and worklist_status = :4
+			
+		</statement>
+
+	</sql-statements>
+</xaf>

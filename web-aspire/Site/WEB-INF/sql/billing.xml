@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+
+<xaf>
+	<sql-statements package="billing">
+		<statement name="id">
+			App::Statements::Billing
+		</statement>
+
+		<statement name="orgNameAndID">
+			
+			select name_primary, org_id
+			from org
+			where org_internal_id = ?
+			
+		</statement>
+
+	</sql-statements>
+</xaf>

@@ -1,0 +1,157 @@
+<?xml version="1.0"?>
+
+<xaf>
+	<sql-statements package="intellicode">
+		<statement name="id">
+			App::Statements::IntelliCode
+		</statement>
+
+		<statement name="insCptUsage">
+			
+			insert into REF_CPT_USAGE (parent_id, person_id, org_internal_id, read_count)
+			values (?, ?, ?, 1)
+			
+		</statement>
+
+		<statement name="insHcpcsUsage">
+			
+			insert into REF_HCPCS_USAGE (parent_id, person_id, org_internal_id, read_count)
+			values (?, ?, ?, 1)
+			
+		</statement>
+
+		<statement name="insIcdUsage">
+			
+			insert into REF_ICD_USAGE (parent_id, person_id, org_internal_id, read_count)
+			values (?, ?, ?, 1)
+			
+		</statement>
+
+		<statement name="selCptData">
+			
+			select * from REF_CPT where cpt = ?
+			
+		</statement>
+
+		<statement name="selCptUsage1">
+			
+			select parent_id from REF_CPT_USAGE where parent_id = ? and person_id = ? and org_internal_id = ?
+			
+		</statement>
+
+		<statement name="selCptUsage2">
+			
+			select parent_id from REF_CPT_USAGE where parent_id = ? and person_id is NULL and org_internal_id = ?
+			
+		</statement>
+
+		<statement name="selHcpcsUsage1">
+			
+			select parent_id from REF_HCPCS_USAGE where parent_id = ? and person_id = ? and org_internal_id = ?
+			
+		</statement>
+
+		<statement name="selHcpcsUsage2">
+			
+			select parent_id from REF_HCPCS_USAGE where parent_id = ? and person_id is NULL and org_internal_id = ?
+			
+		</statement>
+
+		<statement name="selIcdData">
+			
+			select * from REF_ICD where icd = ?
+			
+		</statement>
+
+		<statement name="selIcdUsage1">
+			
+			select parent_id from REF_ICD_USAGE where parent_id = ? and person_id = ? and org_internal_id = ?
+			
+		</statement>
+
+		<statement name="selIcdUsage2">
+			
+			select parent_id from REF_ICD_USAGE where parent_id = ? and person_id is NULL and org_internal_id = ?
+			
+		</statement>
+
+		<statement name="selServTypeByCode">
+			
+			SELECT	service_type 
+			FROM 	REF_Code_Service_Type 
+			WHERE 	:1 between code_min and code_max
+			AND	:2 = entry_type 		
+			
+		</statement>
+
+		<statement name="sel_gpci">
+			
+			select * from Ref_Gpci
+			where gpci_id = ?
+			
+		</statement>
+
+		<statement name="sel_pfs_rvu_by_code">
+			
+			select * from Ref_Pfs_Rvu 
+			where code = upper(:1)
+			and modifier is NULL
+			and eff_begin_date &lt;= to_date(:2, 'MM/DD/YYYY')
+			and eff_end_date &gt;= to_date(:2, 'MM/DD/YYYY')
+			
+		</statement>
+
+		<statement name="sel_pfs_rvu_by_code_modifier">
+			
+			select * from Ref_Pfs_Rvu 
+			where code = upper(:1)
+			and modifier = :2
+			and eff_begin_date &lt;= to_date(:3, 'MM/DD/YYYY')
+			and eff_end_date &gt;= to_date(:3, 'MM/DD/YYYY')
+			
+		</statement>
+
+		<statement name="updCptUsage1">
+			
+			update REF_CPT_USAGE set read_count = read_count +1
+			where parent_id = ? and person_id = ? and org_internal_id = ?
+			
+		</statement>
+
+		<statement name="updCptUsage2">
+			
+			update REF_CPT_USAGE set read_count = read_count +1
+			where parent_id = ? and person_id is NULL and org_internal_id = ?
+			
+		</statement>
+
+		<statement name="updHcpcsUsage1">
+			
+			update REF_HCPCS_USAGE set read_count = read_count +1
+			where parent_id = ? and person_id = ? and org_internal_id = ?
+			
+		</statement>
+
+		<statement name="updHcpcsUsage2">
+			
+			update REF_HCPCS_USAGE set read_count = read_count +1
+			where parent_id = ? and person_id is NULL and org_internal_id = ?
+			
+		</statement>
+
+		<statement name="updIcdUsage1">
+			
+			update REF_ICD_USAGE set read_count = read_count +1
+			where parent_id = ? and person_id = ? and org_internal_id = ?
+			
+		</statement>
+
+		<statement name="updIcdUsage2">
+			
+			update REF_ICD_USAGE set read_count = read_count +1
+			where parent_id = ? and person_id is NULL and org_internal_id = ?
+			
+		</statement>
+
+	</sql-statements>
+</xaf>

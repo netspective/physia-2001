@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+
+<xaf>
+	<dialogs package="catalog">
+		<dialog name="catalog_copy" heading="catalog_copy">
+			<field.text hidden="yes" name="checkbox_validation" caption="checkbox_validation"/>
+			<field.text hidden="yes" name="internal_catalog_id" caption="internal_catalog_id"/>
+			<field.text caption="Existing Fee Schedule ID" required="yes" max-length="32" name="catalog_id" size="16"/>
+			<field.separator name="text_field"/>
+			<field.text caption="New Fee Schedule Name" required="yes" max-length="32" name="new_catalog_id" size="25"/>
+			<field.text caption="New Fee Schedule Caption"  hint="Same as Source if not specified" name="caption" size="45"/>
+			<field.memo caption="New Fee Schedule Description" name="description" size="24"/>
+			<field.select caption="Make all entries capitated"  name="copy_entries_as" choices="Capitated;FFS;Copy As Is" style="radio"/>
+			<!--  -->
+
+		</dialog>
+
+	</dialogs>
+</xaf>

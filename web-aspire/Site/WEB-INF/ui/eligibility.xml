@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+
+<xaf>
+	<dialogs package="eligibility">
+		<dialog name="eligibility_bcbs" heading="$Command Eligibility">
+			<field.text hidden="yes" name="input_option" caption="input_option"/>
+			<field.separator heading="Carrier Detail" name="carrier_product_heading"/>
+			<field.text caption="&lt;b&gt;Blue Cross/Blue Shield&lt;b&gt;" read-only="yes" name="text_field"/>
+			<field.separator heading="Patient Details" name="patient_heading"/>
+			<field.text caption="Member Number" required="yes" name="member_number"/>
+			<field.separator heading="Other Details" name="other_heading"/>
+			<field.date caption="Date to Check Eligibility" name="eligdate" size="12"/>
+
+		</dialog>
+
+		<dialog name="eligibility_aetna" heading="$Command Eligibility">
+			<field.text hidden="yes" name="input_option" caption="input_option"/>
+			<field.separator heading="Carrier Details" name="carrier_product_heading"/>
+			<field.text caption="&lt;img src='/resources/images/aetnalogo.gif'/&gt; ; ;&lt;b&gt;AETNA&lt;b&gt;" read-only="yes" name="text_field"/>
+			<field.separator heading="Patient Details" name="patient_heading"/>
+			<field.text caption="Last Name" required="yes" name="last_name"/>
+			<field.text caption="First Name" required="yes" name="first_name"/>
+			<field.date caption="Date of Birth" name="dob" size="12"/>
+			<field.separator heading="Other Details" name="other_heading"/>
+			<field.date caption="Date to Check Eligibility" name="eligdate" size="12"/>
+
+		</dialog>
+
+		<dialog name="eligibility_other" heading="$Command Eligibility">
+			<field.text hidden="yes" name="input_option" caption="input_option"/>
+			<field.separator heading="Carrier Detail" name="carrier_product_heading"/>
+
+		</dialog>
+
+	</dialogs>
+</xaf>

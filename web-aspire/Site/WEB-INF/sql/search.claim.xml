@@ -1,0 +1,1934 @@
+<?xml version="1.0"?>
+
+<xaf>
+	<sql-statements package="search.claim">
+		<statement name="id">
+			App::Statements::Search::Claim
+		</statement>
+
+		<statement name="sel_date">
+			
+			SELECT *
+			FROM (
+			SELECT
+			DISTINCT i.invoice_id,
+			i.total_items,
+			i.client_id,
+			TO_CHAR(MIN(iit.service_begin_date), 'MM/DD/YYYY') AS service_begin_date,
+			iis.caption AS invoice_status,
+			ib.bill_to_id,
+			i.total_cost, 
+			i.total_adjust,
+			i.balance,
+			ib.bill_party_type,
+			TO_CHAR(i.invoice_date, 'MM/DD/YYYY') AS invoice_date,
+			o.org_id,
+			i.invoice_status as status_id,
+			i.parent_invoice_id
+			FROM
+			invoice_status iis,
+			invoice i,
+			invoice_billing ib,
+			invoice_item iit,
+			org o
+			WHERE
+			invoice_date = to_date(?, 'MM/DD/YYYY')
+			AND iit.parent_id (+) = i.invoice_id
+			AND ib.bill_id (+) = i.billing_id
+			AND (owner_type = 1 AND owner_id = ?)
+			AND iis.id = i.invoice_status
+			AND to_char(o.org_internal_id (+)) = ib.bill_to_id			
+			GROUP BY
+			i.invoice_id,
+			i.total_items,
+			i.client_id,
+			iis.caption,
+			ib.bill_to_id,
+			i.total_cost, 
+			i.total_adjust,
+			i.balance,
+			ib.bill_party_type,			
+			i.invoice_date,
+			o.org_id,
+			i.invoice_status,
+			i.parent_invoice_id
+			ORDER BY
+			i.invoice_id desc
+			)
+			WHERE rownum &lt;= 250
+
+		</statement>
+
+		<statement name="sel_date_like">
+			
+			SELECT *
+			FROM (
+			SELECT
+			DISTINCT i.invoice_id,
+			i.total_items,
+			i.client_id,
+			TO_CHAR(MIN(iit.service_begin_date), 'MM/DD/YYYY') AS service_begin_date,
+			iis.caption AS invoice_status,
+			ib.bill_to_id,
+			i.total_cost, 
+			i.total_adjust,
+			i.balance,
+			ib.bill_party_type,
+			TO_CHAR(i.invoice_date, 'MM/DD/YYYY') AS invoice_date,
+			o.org_id,
+			i.invoice_status as status_id,
+			i.parent_invoice_id
+			FROM
+			invoice_status iis,
+			invoice i,
+			invoice_billing ib,
+			invoice_item iit,
+			org o
+			WHERE
+			'%' = ?
+			AND iit.parent_id (+) = i.invoice_id
+			AND ib.bill_id (+) = i.billing_id
+			AND (owner_type = 1 AND owner_id = ?)
+			AND iis.id = i.invoice_status
+			AND to_char(o.org_internal_id (+)) = ib.bill_to_id			
+			GROUP BY
+			i.invoice_id,
+			i.total_items,
+			i.client_id,
+			iis.caption,
+			ib.bill_to_id,
+			i.total_cost, 
+			i.total_adjust,
+			i.balance,
+			ib.bill_party_type,			
+			i.invoice_date,
+			o.org_id,
+			i.invoice_status,
+			i.parent_invoice_id
+			ORDER BY
+			i.invoice_id desc
+			)
+			WHERE rownum &lt;= 250
+
+		</statement>
+
+		<statement name="sel_date_status">
+			
+			SELECT *
+			FROM (
+			SELECT
+			DISTINCT i.invoice_id,
+			i.total_items,
+			i.client_id,
+			TO_CHAR(MIN(iit.service_begin_date), 'MM/DD/YYYY') AS service_begin_date,
+			iis.caption AS invoice_status,
+			ib.bill_to_id,
+			i.total_cost, 
+			i.total_adjust,
+			i.balance,
+			ib.bill_party_type,
+			TO_CHAR(i.invoice_date, 'MM/DD/YYYY') AS invoice_date,
+			o.org_id,
+			i.invoice_status as status_id,
+			i.parent_invoice_id
+			FROM
+			invoice_status iis,
+			invoice i,
+			invoice_billing ib,
+			invoice_item iit,
+			org o
+			WHERE
+			i.invoice_status = ? and invoice_date = to_date(?, 'MM/DD/YYYY')
+			AND iit.parent_id (+) = i.invoice_id
+			AND ib.bill_id (+) = i.billing_id
+			AND (owner_type = 1 AND owner_id = ?)
+			AND iis.id = i.invoice_status
+			AND to_char(o.org_internal_id (+)) = ib.bill_to_id			
+			GROUP BY
+			i.invoice_id,
+			i.total_items,
+			i.client_id,
+			iis.caption,
+			ib.bill_to_id,
+			i.total_cost, 
+			i.total_adjust,
+			i.balance,
+			ib.bill_party_type,			
+			i.invoice_date,
+			o.org_id,
+			i.invoice_status,
+			i.parent_invoice_id
+			ORDER BY
+			i.invoice_id desc
+			)
+			WHERE rownum &lt;= 250
+
+		</statement>
+
+		<statement name="sel_date_status_like">
+			
+			SELECT *
+			FROM (
+			SELECT
+			DISTINCT i.invoice_id,
+			i.total_items,
+			i.client_id,
+			TO_CHAR(MIN(iit.service_begin_date), 'MM/DD/YYYY') AS service_begin_date,
+			iis.caption AS invoice_status,
+			ib.bill_to_id,
+			i.total_cost, 
+			i.total_adjust,
+			i.balance,
+			ib.bill_party_type,
+			TO_CHAR(i.invoice_date, 'MM/DD/YYYY') AS invoice_date,
+			o.org_id,
+			i.invoice_status as status_id,
+			i.parent_invoice_id
+			FROM
+			invoice_status iis,
+			invoice i,
+			invoice_billing ib,
+			invoice_item iit,
+			org o
+			WHERE
+			i.invoice_status = ? and invoice_date like to_date(?, 'MM/DD/YYYY')
+			AND iit.parent_id (+) = i.invoice_id
+			AND ib.bill_id (+) = i.billing_id
+			AND (owner_type = 1 AND owner_id = ?)
+			AND iis.id = i.invoice_status
+			AND to_char(o.org_internal_id (+)) = ib.bill_to_id			
+			GROUP BY
+			i.invoice_id,
+			i.total_items,
+			i.client_id,
+			iis.caption,
+			ib.bill_to_id,
+			i.total_cost, 
+			i.total_adjust,
+			i.balance,
+			ib.bill_party_type,			
+			i.invoice_date,
+			o.org_id,
+			i.invoice_status,
+			i.parent_invoice_id
+			ORDER BY
+			i.invoice_id desc
+			)
+			WHERE rownum &lt;= 250
+
+		</statement>
+
+		<statement name="sel_employer">
+			
+			SELECT *
+			FROM (
+			SELECT
+			DISTINCT i.invoice_id,
+			i.total_items,
+			i.client_id,
+			TO_CHAR(MIN(iit.service_begin_date), 'MM/DD/YYYY') AS service_begin_date,
+			iis.caption AS invoice_status,
+			ib.bill_to_id,
+			i.total_cost, 
+			i.total_adjust,
+			i.balance,
+			ib.bill_party_type,
+			TO_CHAR(i.invoice_date, 'MM/DD/YYYY') AS invoice_date,
+			o.org_id,
+			i.invoice_status as status_id,
+			i.parent_invoice_id
+			FROM
+			invoice_status iis,
+			invoice i,
+			invoice_billing ib,
+			invoice_item iit,
+			org o
+			, org o2, person_attribute attr
+			WHERE
+			i.client_id = attr.parent_id and attr.value_type between 220 and 226 and attr.value_int = o2.org_internal_id and upper(o2.name_primary) = ?
+			AND iit.parent_id (+) = i.invoice_id
+			AND ib.bill_id (+) = i.billing_id
+			AND (owner_type = 1 AND owner_id = ?)
+			AND iis.id = i.invoice_status
+			AND to_char(o.org_internal_id (+)) = ib.bill_to_id			
+			GROUP BY
+			i.invoice_id,
+			i.total_items,
+			i.client_id,
+			iis.caption,
+			ib.bill_to_id,
+			i.total_cost, 
+			i.total_adjust,
+			i.balance,
+			ib.bill_party_type,			
+			i.invoice_date,
+			o.org_id,
+			i.invoice_status,
+			i.parent_invoice_id
+			ORDER BY
+			i.invoice_id desc
+			)
+			WHERE rownum &lt;= 250
+
+		</statement>
+
+		<statement name="sel_employer_like">
+			
+			SELECT *
+			FROM (
+			SELECT
+			DISTINCT i.invoice_id,
+			i.total_items,
+			i.client_id,
+			TO_CHAR(MIN(iit.service_begin_date), 'MM/DD/YYYY') AS service_begin_date,
+			iis.caption AS invoice_status,
+			ib.bill_to_id,
+			i.total_cost, 
+			i.total_adjust,
+			i.balance,
+			ib.bill_party_type,
+			TO_CHAR(i.invoice_date, 'MM/DD/YYYY') AS invoice_date,
+			o.org_id,
+			i.invoice_status as status_id,
+			i.parent_invoice_id
+			FROM
+			invoice_status iis,
+			invoice i,
+			invoice_billing ib,
+			invoice_item iit,
+			org o
+			, org o2, person_attribute attr
+			WHERE
+			i.client_id = attr.parent_id and attr.value_type between 220 and 226 and attr.value_int = o2.org_internal_id and upper(o2.name_primary) like ?
+			AND iit.parent_id (+) = i.invoice_id
+			AND ib.bill_id (+) = i.billing_id
+			AND (owner_type = 1 AND owner_id = ?)
+			AND iis.id = i.invoice_status
+			AND to_char(o.org_internal_id (+)) = ib.bill_to_id			
+			GROUP BY
+			i.invoice_id,
+			i.total_items,
+			i.client_id,
+			iis.caption,
+			ib.bill_to_id,
+			i.total_cost, 
+			i.total_adjust,
+			i.balance,
+			ib.bill_party_type,			
+			i.invoice_date,
+			o.org_id,
+			i.invoice_status,
+			i.parent_invoice_id
+			ORDER BY
+			i.invoice_id desc
+			)
+			WHERE rownum &lt;= 250
+
+		</statement>
+
+		<statement name="sel_employer_status">
+			
+			SELECT *
+			FROM (
+			SELECT
+			DISTINCT i.invoice_id,
+			i.total_items,
+			i.client_id,
+			TO_CHAR(MIN(iit.service_begin_date), 'MM/DD/YYYY') AS service_begin_date,
+			iis.caption AS invoice_status,
+			ib.bill_to_id,
+			i.total_cost, 
+			i.total_adjust,
+			i.balance,
+			ib.bill_party_type,
+			TO_CHAR(i.invoice_date, 'MM/DD/YYYY') AS invoice_date,
+			o.org_id,
+			i.invoice_status as status_id,
+			i.parent_invoice_id
+			FROM
+			invoice_status iis,
+			invoice i,
+			invoice_billing ib,
+			invoice_item iit,
+			org o
+			, org o2, person_attribute attr
+			WHERE
+			i.invoice_status = ? and i.client_id = attr.parent_id and attr.value_type between 220 and 226 and attr.value_int = o2.org_internal_id and upper(o2.name_primary) = ?
+			AND iit.parent_id (+) = i.invoice_id
+			AND ib.bill_id (+) = i.billing_id
+			AND (owner_type = 1 AND owner_id = ?)
+			AND iis.id = i.invoice_status
+			AND to_char(o.org_internal_id (+)) = ib.bill_to_id			
+			GROUP BY
+			i.invoice_id,
+			i.total_items,
+			i.client_id,
+			iis.caption,
+			ib.bill_to_id,
+			i.total_cost, 
+			i.total_adjust,
+			i.balance,
+			ib.bill_party_type,			
+			i.invoice_date,
+			o.org_id,
+			i.invoice_status,
+			i.parent_invoice_id
+			ORDER BY
+			i.invoice_id desc
+			)
+			WHERE rownum &lt;= 250
+
+		</statement>
+
+		<statement name="sel_employer_status_like">
+			
+			SELECT *
+			FROM (
+			SELECT
+			DISTINCT i.invoice_id,
+			i.total_items,
+			i.client_id,
+			TO_CHAR(MIN(iit.service_begin_date), 'MM/DD/YYYY') AS service_begin_date,
+			iis.caption AS invoice_status,
+			ib.bill_to_id,
+			i.total_cost, 
+			i.total_adjust,
+			i.balance,
+			ib.bill_party_type,
+			TO_CHAR(i.invoice_date, 'MM/DD/YYYY') AS invoice_date,
+			o.org_id,
+			i.invoice_status as status_id,
+			i.parent_invoice_id
+			FROM
+			invoice_status iis,
+			invoice i,
+			invoice_billing ib,
+			invoice_item iit,
+			org o
+			, org o2, person_attribute attr
+			WHERE
+			i.invoice_status = ? and i.client_id = attr.parent_id and attr.value_type between 220 and 226 and attr.value_int = o2.org_internal_id and upper(o2.name_primary) like ?
+			AND iit.parent_id (+) = i.invoice_id
+			AND ib.bill_id (+) = i.billing_id
+			AND (owner_type = 1 AND owner_id = ?)
+			AND iis.id = i.invoice_status
+			AND to_char(o.org_internal_id (+)) = ib.bill_to_id			
+			GROUP BY
+			i.invoice_id,
+			i.total_items,
+			i.client_id,
+			iis.caption,
+			ib.bill_to_id,
+			i.total_cost, 
+			i.total_adjust,
+			i.balance,
+			ib.bill_party_type,			
+			i.invoice_date,
+			o.org_id,
+			i.invoice_status,
+			i.parent_invoice_id
+			ORDER BY
+			i.invoice_id desc
+			)
+			WHERE rownum &lt;= 250
+
+		</statement>
+
+		<statement name="sel_id">
+			
+			SELECT *
+			FROM (
+			SELECT
+			DISTINCT i.invoice_id,
+			i.total_items,
+			i.client_id,
+			TO_CHAR(MIN(iit.service_begin_date), 'MM/DD/YYYY') AS service_begin_date,
+			iis.caption AS invoice_status,
+			ib.bill_to_id,
+			i.total_cost, 
+			i.total_adjust,
+			i.balance,
+			ib.bill_party_type,
+			TO_CHAR(i.invoice_date, 'MM/DD/YYYY') AS invoice_date,
+			o.org_id,
+			i.invoice_status as status_id,
+			i.parent_invoice_id
+			FROM
+			invoice_status iis,
+			invoice i,
+			invoice_billing ib,
+			invoice_item iit,
+			org o
+			WHERE
+			i.invoice_id = ?
+			AND iit.parent_id (+) = i.invoice_id
+			AND ib.bill_id (+) = i.billing_id
+			AND (owner_type = 1 AND owner_id = ?)
+			AND iis.id = i.invoice_status
+			AND to_char(o.org_internal_id (+)) = ib.bill_to_id			
+			GROUP BY
+			i.invoice_id,
+			i.total_items,
+			i.client_id,
+			iis.caption,
+			ib.bill_to_id,
+			i.total_cost, 
+			i.total_adjust,
+			i.balance,
+			ib.bill_party_type,			
+			i.invoice_date,
+			o.org_id,
+			i.invoice_status,
+			i.parent_invoice_id
+			ORDER BY
+			i.invoice_id desc
+			)
+			WHERE rownum &lt;= 250
+
+		</statement>
+
+		<statement name="sel_id_like">
+			
+			SELECT *
+			FROM (
+			SELECT
+			DISTINCT i.invoice_id,
+			i.total_items,
+			i.client_id,
+			TO_CHAR(MIN(iit.service_begin_date), 'MM/DD/YYYY') AS service_begin_date,
+			iis.caption AS invoice_status,
+			ib.bill_to_id,
+			i.total_cost, 
+			i.total_adjust,
+			i.balance,
+			ib.bill_party_type,
+			TO_CHAR(i.invoice_date, 'MM/DD/YYYY') AS invoice_date,
+			o.org_id,
+			i.invoice_status as status_id,
+			i.parent_invoice_id
+			FROM
+			invoice_status iis,
+			invoice i,
+			invoice_billing ib,
+			invoice_item iit,
+			org o
+			WHERE
+			i.invoice_id like ?
+			AND iit.parent_id (+) = i.invoice_id
+			AND ib.bill_id (+) = i.billing_id
+			AND (owner_type = 1 AND owner_id = ?)
+			AND iis.id = i.invoice_status
+			AND to_char(o.org_internal_id (+)) = ib.bill_to_id			
+			GROUP BY
+			i.invoice_id,
+			i.total_items,
+			i.client_id,
+			iis.caption,
+			ib.bill_to_id,
+			i.total_cost, 
+			i.total_adjust,
+			i.balance,
+			ib.bill_party_type,			
+			i.invoice_date,
+			o.org_id,
+			i.invoice_status,
+			i.parent_invoice_id
+			ORDER BY
+			i.invoice_id desc
+			)
+			WHERE rownum &lt;= 250
+
+		</statement>
+
+		<statement name="sel_id_status">
+			
+			SELECT *
+			FROM (
+			SELECT
+			DISTINCT i.invoice_id,
+			i.total_items,
+			i.client_id,
+			TO_CHAR(MIN(iit.service_begin_date), 'MM/DD/YYYY') AS service_begin_date,
+			iis.caption AS invoice_status,
+			ib.bill_to_id,
+			i.total_cost, 
+			i.total_adjust,
+			i.balance,
+			ib.bill_party_type,
+			TO_CHAR(i.invoice_date, 'MM/DD/YYYY') AS invoice_date,
+			o.org_id,
+			i.invoice_status as status_id,
+			i.parent_invoice_id
+			FROM
+			invoice_status iis,
+			invoice i,
+			invoice_billing ib,
+			invoice_item iit,
+			org o
+			WHERE
+			i.invoice_status = ? and i.invoice_id = ?
+			AND iit.parent_id (+) = i.invoice_id
+			AND ib.bill_id (+) = i.billing_id
+			AND (owner_type = 1 AND owner_id = ?)
+			AND iis.id = i.invoice_status
+			AND to_char(o.org_internal_id (+)) = ib.bill_to_id			
+			GROUP BY
+			i.invoice_id,
+			i.total_items,
+			i.client_id,
+			iis.caption,
+			ib.bill_to_id,
+			i.total_cost, 
+			i.total_adjust,
+			i.balance,
+			ib.bill_party_type,			
+			i.invoice_date,
+			o.org_id,
+			i.invoice_status,
+			i.parent_invoice_id
+			ORDER BY
+			i.invoice_id desc
+			)
+			WHERE rownum &lt;= 250
+
+		</statement>
+
+		<statement name="sel_id_status_like">
+			
+			SELECT *
+			FROM (
+			SELECT
+			DISTINCT i.invoice_id,
+			i.total_items,
+			i.client_id,
+			TO_CHAR(MIN(iit.service_begin_date), 'MM/DD/YYYY') AS service_begin_date,
+			iis.caption AS invoice_status,
+			ib.bill_to_id,
+			i.total_cost, 
+			i.total_adjust,
+			i.balance,
+			ib.bill_party_type,
+			TO_CHAR(i.invoice_date, 'MM/DD/YYYY') AS invoice_date,
+			o.org_id,
+			i.invoice_status as status_id,
+			i.parent_invoice_id
+			FROM
+			invoice_status iis,
+			invoice i,
+			invoice_billing ib,
+			invoice_item iit,
+			org o
+			WHERE
+			i.invoice_status = ? and i.invoice_id like ?
+			AND iit.parent_id (+) = i.invoice_id
+			AND ib.bill_id (+) = i.billing_id
+			AND (owner_type = 1 AND owner_id = ?)
+			AND iis.id = i.invoice_status
+			AND to_char(o.org_internal_id (+)) = ib.bill_to_id			
+			GROUP BY
+			i.invoice_id,
+			i.total_items,
+			i.client_id,
+			iis.caption,
+			ib.bill_to_id,
+			i.total_cost, 
+			i.total_adjust,
+			i.balance,
+			ib.bill_party_type,			
+			i.invoice_date,
+			o.org_id,
+			i.invoice_status,
+			i.parent_invoice_id
+			ORDER BY
+			i.invoice_id desc
+			)
+			WHERE rownum &lt;= 250
+
+		</statement>
+
+		<statement name="sel_insurance">
+			
+			SELECT *
+			FROM (
+			SELECT
+			DISTINCT i.invoice_id,
+			i.total_items,
+			i.client_id,
+			TO_CHAR(MIN(iit.service_begin_date), 'MM/DD/YYYY') AS service_begin_date,
+			iis.caption AS invoice_status,
+			ib.bill_to_id,
+			i.total_cost, 
+			i.total_adjust,
+			i.balance,
+			ib.bill_party_type,
+			TO_CHAR(i.invoice_date, 'MM/DD/YYYY') AS invoice_date,
+			o.org_id,
+			i.invoice_status as status_id,
+			i.parent_invoice_id
+			FROM
+			invoice_status iis,
+			invoice i,
+			invoice_billing ib,
+			invoice_item iit,
+			org o
+			WHERE
+			ib.bill_party_type in (2,3) and ib.bill_to_id = o.org_internal_id and upper(o.name_primary) = ?
+			AND iit.parent_id (+) = i.invoice_id
+			AND ib.bill_id (+) = i.billing_id
+			AND (owner_type = 1 AND owner_id = ?)
+			AND iis.id = i.invoice_status
+			AND to_char(o.org_internal_id (+)) = ib.bill_to_id			
+			GROUP BY
+			i.invoice_id,
+			i.total_items,
+			i.client_id,
+			iis.caption,
+			ib.bill_to_id,
+			i.total_cost, 
+			i.total_adjust,
+			i.balance,
+			ib.bill_party_type,			
+			i.invoice_date,
+			o.org_id,
+			i.invoice_status,
+			i.parent_invoice_id
+			ORDER BY
+			i.invoice_id desc
+			)
+			WHERE rownum &lt;= 250
+
+		</statement>
+
+		<statement name="sel_insurance_like">
+			
+			SELECT *
+			FROM (
+			SELECT
+			DISTINCT i.invoice_id,
+			i.total_items,
+			i.client_id,
+			TO_CHAR(MIN(iit.service_begin_date), 'MM/DD/YYYY') AS service_begin_date,
+			iis.caption AS invoice_status,
+			ib.bill_to_id,
+			i.total_cost, 
+			i.total_adjust,
+			i.balance,
+			ib.bill_party_type,
+			TO_CHAR(i.invoice_date, 'MM/DD/YYYY') AS invoice_date,
+			o.org_id,
+			i.invoice_status as status_id,
+			i.parent_invoice_id
+			FROM
+			invoice_status iis,
+			invoice i,
+			invoice_billing ib,
+			invoice_item iit,
+			org o
+			WHERE
+			ib.bill_party_type in (2,3) and ib.bill_to_id = o.org_internal_id and upper(o.name_primary) like ?
+			AND iit.parent_id (+) = i.invoice_id
+			AND ib.bill_id (+) = i.billing_id
+			AND (owner_type = 1 AND owner_id = ?)
+			AND iis.id = i.invoice_status
+			AND to_char(o.org_internal_id (+)) = ib.bill_to_id			
+			GROUP BY
+			i.invoice_id,
+			i.total_items,
+			i.client_id,
+			iis.caption,
+			ib.bill_to_id,
+			i.total_cost, 
+			i.total_adjust,
+			i.balance,
+			ib.bill_party_type,			
+			i.invoice_date,
+			o.org_id,
+			i.invoice_status,
+			i.parent_invoice_id
+			ORDER BY
+			i.invoice_id desc
+			)
+			WHERE rownum &lt;= 250
+
+		</statement>
+
+		<statement name="sel_insurance_status">
+			
+			SELECT *
+			FROM (
+			SELECT
+			DISTINCT i.invoice_id,
+			i.total_items,
+			i.client_id,
+			TO_CHAR(MIN(iit.service_begin_date), 'MM/DD/YYYY') AS service_begin_date,
+			iis.caption AS invoice_status,
+			ib.bill_to_id,
+			i.total_cost, 
+			i.total_adjust,
+			i.balance,
+			ib.bill_party_type,
+			TO_CHAR(i.invoice_date, 'MM/DD/YYYY') AS invoice_date,
+			o.org_id,
+			i.invoice_status as status_id,
+			i.parent_invoice_id
+			FROM
+			invoice_status iis,
+			invoice i,
+			invoice_billing ib,
+			invoice_item iit,
+			org o
+			WHERE
+			i.invoice_status = ? and ib.bill_party_type in (2,3) and upper(o.name_primary) = ?
+			AND iit.parent_id (+) = i.invoice_id
+			AND ib.bill_id (+) = i.billing_id
+			AND (owner_type = 1 AND owner_id = ?)
+			AND iis.id = i.invoice_status
+			AND to_char(o.org_internal_id (+)) = ib.bill_to_id			
+			GROUP BY
+			i.invoice_id,
+			i.total_items,
+			i.client_id,
+			iis.caption,
+			ib.bill_to_id,
+			i.total_cost, 
+			i.total_adjust,
+			i.balance,
+			ib.bill_party_type,			
+			i.invoice_date,
+			o.org_id,
+			i.invoice_status,
+			i.parent_invoice_id
+			ORDER BY
+			i.invoice_id desc
+			)
+			WHERE rownum &lt;= 250
+
+		</statement>
+
+		<statement name="sel_insurance_status_like">
+			
+			SELECT *
+			FROM (
+			SELECT
+			DISTINCT i.invoice_id,
+			i.total_items,
+			i.client_id,
+			TO_CHAR(MIN(iit.service_begin_date), 'MM/DD/YYYY') AS service_begin_date,
+			iis.caption AS invoice_status,
+			ib.bill_to_id,
+			i.total_cost, 
+			i.total_adjust,
+			i.balance,
+			ib.bill_party_type,
+			TO_CHAR(i.invoice_date, 'MM/DD/YYYY') AS invoice_date,
+			o.org_id,
+			i.invoice_status as status_id,
+			i.parent_invoice_id
+			FROM
+			invoice_status iis,
+			invoice i,
+			invoice_billing ib,
+			invoice_item iit,
+			org o
+			WHERE
+			i.invoice_status = ? and ib.bill_party_type in (2,3) and upper(o.name_primary) like ?
+			AND iit.parent_id (+) = i.invoice_id
+			AND ib.bill_id (+) = i.billing_id
+			AND (owner_type = 1 AND owner_id = ?)
+			AND iis.id = i.invoice_status
+			AND to_char(o.org_internal_id (+)) = ib.bill_to_id			
+			GROUP BY
+			i.invoice_id,
+			i.total_items,
+			i.client_id,
+			iis.caption,
+			ib.bill_to_id,
+			i.total_cost, 
+			i.total_adjust,
+			i.balance,
+			ib.bill_party_type,			
+			i.invoice_date,
+			o.org_id,
+			i.invoice_status,
+			i.parent_invoice_id
+			ORDER BY
+			i.invoice_id desc
+			)
+			WHERE rownum &lt;= 250
+
+		</statement>
+
+		<statement name="sel_lastname">
+			
+			SELECT *
+			FROM (
+			SELECT
+			DISTINCT i.invoice_id,
+			i.total_items,
+			i.client_id,
+			TO_CHAR(MIN(iit.service_begin_date), 'MM/DD/YYYY') AS service_begin_date,
+			iis.caption AS invoice_status,
+			ib.bill_to_id,
+			i.total_cost, 
+			i.total_adjust,
+			i.balance,
+			ib.bill_party_type,
+			TO_CHAR(i.invoice_date, 'MM/DD/YYYY') AS invoice_date,
+			o.org_id,
+			i.invoice_status as status_id,
+			i.parent_invoice_id
+			FROM
+			invoice_status iis,
+			invoice i,
+			invoice_billing ib,
+			invoice_item iit,
+			org o
+			, person
+			WHERE
+			i.client_id = person_id and upper(name_last) = ?
+			AND iit.parent_id (+) = i.invoice_id
+			AND ib.bill_id (+) = i.billing_id
+			AND (owner_type = 1 AND owner_id = ?)
+			AND iis.id = i.invoice_status
+			AND to_char(o.org_internal_id (+)) = ib.bill_to_id			
+			GROUP BY
+			i.invoice_id,
+			i.total_items,
+			i.client_id,
+			iis.caption,
+			ib.bill_to_id,
+			i.total_cost, 
+			i.total_adjust,
+			i.balance,
+			ib.bill_party_type,			
+			i.invoice_date,
+			o.org_id,
+			i.invoice_status,
+			i.parent_invoice_id
+			ORDER BY
+			i.invoice_id desc
+			)
+			WHERE rownum &lt;= 250
+
+		</statement>
+
+		<statement name="sel_lastname_like">
+			
+			SELECT *
+			FROM (
+			SELECT
+			DISTINCT i.invoice_id,
+			i.total_items,
+			i.client_id,
+			TO_CHAR(MIN(iit.service_begin_date), 'MM/DD/YYYY') AS service_begin_date,
+			iis.caption AS invoice_status,
+			ib.bill_to_id,
+			i.total_cost, 
+			i.total_adjust,
+			i.balance,
+			ib.bill_party_type,
+			TO_CHAR(i.invoice_date, 'MM/DD/YYYY') AS invoice_date,
+			o.org_id,
+			i.invoice_status as status_id,
+			i.parent_invoice_id
+			FROM
+			invoice_status iis,
+			invoice i,
+			invoice_billing ib,
+			invoice_item iit,
+			org o
+			, person
+			WHERE
+			i.client_id = person_id and upper(name_last) like ?
+			AND iit.parent_id (+) = i.invoice_id
+			AND ib.bill_id (+) = i.billing_id
+			AND (owner_type = 1 AND owner_id = ?)
+			AND iis.id = i.invoice_status
+			AND to_char(o.org_internal_id (+)) = ib.bill_to_id			
+			GROUP BY
+			i.invoice_id,
+			i.total_items,
+			i.client_id,
+			iis.caption,
+			ib.bill_to_id,
+			i.total_cost, 
+			i.total_adjust,
+			i.balance,
+			ib.bill_party_type,			
+			i.invoice_date,
+			o.org_id,
+			i.invoice_status,
+			i.parent_invoice_id
+			ORDER BY
+			i.invoice_id desc
+			)
+			WHERE rownum &lt;= 250
+
+		</statement>
+
+		<statement name="sel_lastname_status">
+			
+			SELECT *
+			FROM (
+			SELECT
+			DISTINCT i.invoice_id,
+			i.total_items,
+			i.client_id,
+			TO_CHAR(MIN(iit.service_begin_date), 'MM/DD/YYYY') AS service_begin_date,
+			iis.caption AS invoice_status,
+			ib.bill_to_id,
+			i.total_cost, 
+			i.total_adjust,
+			i.balance,
+			ib.bill_party_type,
+			TO_CHAR(i.invoice_date, 'MM/DD/YYYY') AS invoice_date,
+			o.org_id,
+			i.invoice_status as status_id,
+			i.parent_invoice_id
+			FROM
+			invoice_status iis,
+			invoice i,
+			invoice_billing ib,
+			invoice_item iit,
+			org o
+			, person
+			WHERE
+			i.invoice_status = ? and i.client_id = person_id and upper(name_last) = ?
+			AND iit.parent_id (+) = i.invoice_id
+			AND ib.bill_id (+) = i.billing_id
+			AND (owner_type = 1 AND owner_id = ?)
+			AND iis.id = i.invoice_status
+			AND to_char(o.org_internal_id (+)) = ib.bill_to_id			
+			GROUP BY
+			i.invoice_id,
+			i.total_items,
+			i.client_id,
+			iis.caption,
+			ib.bill_to_id,
+			i.total_cost, 
+			i.total_adjust,
+			i.balance,
+			ib.bill_party_type,			
+			i.invoice_date,
+			o.org_id,
+			i.invoice_status,
+			i.parent_invoice_id
+			ORDER BY
+			i.invoice_id desc
+			)
+			WHERE rownum &lt;= 250
+
+		</statement>
+
+		<statement name="sel_lastname_status_like">
+			
+			SELECT *
+			FROM (
+			SELECT
+			DISTINCT i.invoice_id,
+			i.total_items,
+			i.client_id,
+			TO_CHAR(MIN(iit.service_begin_date), 'MM/DD/YYYY') AS service_begin_date,
+			iis.caption AS invoice_status,
+			ib.bill_to_id,
+			i.total_cost, 
+			i.total_adjust,
+			i.balance,
+			ib.bill_party_type,
+			TO_CHAR(i.invoice_date, 'MM/DD/YYYY') AS invoice_date,
+			o.org_id,
+			i.invoice_status as status_id,
+			i.parent_invoice_id
+			FROM
+			invoice_status iis,
+			invoice i,
+			invoice_billing ib,
+			invoice_item iit,
+			org o
+			, person
+			WHERE
+			i.invoice_status = ? and i.client_id = person_id and upper(name_last) like ?
+			AND iit.parent_id (+) = i.invoice_id
+			AND ib.bill_id (+) = i.billing_id
+			AND (owner_type = 1 AND owner_id = ?)
+			AND iis.id = i.invoice_status
+			AND to_char(o.org_internal_id (+)) = ib.bill_to_id			
+			GROUP BY
+			i.invoice_id,
+			i.total_items,
+			i.client_id,
+			iis.caption,
+			ib.bill_to_id,
+			i.total_cost, 
+			i.total_adjust,
+			i.balance,
+			ib.bill_party_type,			
+			i.invoice_date,
+			o.org_id,
+			i.invoice_status,
+			i.parent_invoice_id
+			ORDER BY
+			i.invoice_id desc
+			)
+			WHERE rownum &lt;= 250
+
+		</statement>
+
+		<statement name="sel_patientid">
+			
+			SELECT *
+			FROM (
+			SELECT
+			DISTINCT i.invoice_id,
+			i.total_items,
+			i.client_id,
+			TO_CHAR(MIN(iit.service_begin_date), 'MM/DD/YYYY') AS service_begin_date,
+			iis.caption AS invoice_status,
+			ib.bill_to_id,
+			i.total_cost, 
+			i.total_adjust,
+			i.balance,
+			ib.bill_party_type,
+			TO_CHAR(i.invoice_date, 'MM/DD/YYYY') AS invoice_date,
+			o.org_id,
+			i.invoice_status as status_id,
+			i.parent_invoice_id
+			FROM
+			invoice_status iis,
+			invoice i,
+			invoice_billing ib,
+			invoice_item iit,
+			org o
+			WHERE
+			i.client_id = ?
+			AND iit.parent_id (+) = i.invoice_id
+			AND ib.bill_id (+) = i.billing_id
+			AND (owner_type = 1 AND owner_id = ?)
+			AND iis.id = i.invoice_status
+			AND to_char(o.org_internal_id (+)) = ib.bill_to_id			
+			GROUP BY
+			i.invoice_id,
+			i.total_items,
+			i.client_id,
+			iis.caption,
+			ib.bill_to_id,
+			i.total_cost, 
+			i.total_adjust,
+			i.balance,
+			ib.bill_party_type,			
+			i.invoice_date,
+			o.org_id,
+			i.invoice_status,
+			i.parent_invoice_id
+			ORDER BY
+			i.invoice_id desc
+			)
+			WHERE rownum &lt;= 250
+
+		</statement>
+
+		<statement name="sel_patientid_like">
+			
+			SELECT *
+			FROM (
+			SELECT
+			DISTINCT i.invoice_id,
+			i.total_items,
+			i.client_id,
+			TO_CHAR(MIN(iit.service_begin_date), 'MM/DD/YYYY') AS service_begin_date,
+			iis.caption AS invoice_status,
+			ib.bill_to_id,
+			i.total_cost, 
+			i.total_adjust,
+			i.balance,
+			ib.bill_party_type,
+			TO_CHAR(i.invoice_date, 'MM/DD/YYYY') AS invoice_date,
+			o.org_id,
+			i.invoice_status as status_id,
+			i.parent_invoice_id
+			FROM
+			invoice_status iis,
+			invoice i,
+			invoice_billing ib,
+			invoice_item iit,
+			org o
+			WHERE
+			i.client_id like ?
+			AND iit.parent_id (+) = i.invoice_id
+			AND ib.bill_id (+) = i.billing_id
+			AND (owner_type = 1 AND owner_id = ?)
+			AND iis.id = i.invoice_status
+			AND to_char(o.org_internal_id (+)) = ib.bill_to_id			
+			GROUP BY
+			i.invoice_id,
+			i.total_items,
+			i.client_id,
+			iis.caption,
+			ib.bill_to_id,
+			i.total_cost, 
+			i.total_adjust,
+			i.balance,
+			ib.bill_party_type,			
+			i.invoice_date,
+			o.org_id,
+			i.invoice_status,
+			i.parent_invoice_id
+			ORDER BY
+			i.invoice_id desc
+			)
+			WHERE rownum &lt;= 250
+
+		</statement>
+
+		<statement name="sel_patientid_status">
+			
+			SELECT *
+			FROM (
+			SELECT
+			DISTINCT i.invoice_id,
+			i.total_items,
+			i.client_id,
+			TO_CHAR(MIN(iit.service_begin_date), 'MM/DD/YYYY') AS service_begin_date,
+			iis.caption AS invoice_status,
+			ib.bill_to_id,
+			i.total_cost, 
+			i.total_adjust,
+			i.balance,
+			ib.bill_party_type,
+			TO_CHAR(i.invoice_date, 'MM/DD/YYYY') AS invoice_date,
+			o.org_id,
+			i.invoice_status as status_id,
+			i.parent_invoice_id
+			FROM
+			invoice_status iis,
+			invoice i,
+			invoice_billing ib,
+			invoice_item iit,
+			org o
+			WHERE
+			i.invoice_status = ? and i.client_id = ?
+			AND iit.parent_id (+) = i.invoice_id
+			AND ib.bill_id (+) = i.billing_id
+			AND (owner_type = 1 AND owner_id = ?)
+			AND iis.id = i.invoice_status
+			AND to_char(o.org_internal_id (+)) = ib.bill_to_id			
+			GROUP BY
+			i.invoice_id,
+			i.total_items,
+			i.client_id,
+			iis.caption,
+			ib.bill_to_id,
+			i.total_cost, 
+			i.total_adjust,
+			i.balance,
+			ib.bill_party_type,			
+			i.invoice_date,
+			o.org_id,
+			i.invoice_status,
+			i.parent_invoice_id
+			ORDER BY
+			i.invoice_id desc
+			)
+			WHERE rownum &lt;= 250
+
+		</statement>
+
+		<statement name="sel_patientid_status_like">
+			
+			SELECT *
+			FROM (
+			SELECT
+			DISTINCT i.invoice_id,
+			i.total_items,
+			i.client_id,
+			TO_CHAR(MIN(iit.service_begin_date), 'MM/DD/YYYY') AS service_begin_date,
+			iis.caption AS invoice_status,
+			ib.bill_to_id,
+			i.total_cost, 
+			i.total_adjust,
+			i.balance,
+			ib.bill_party_type,
+			TO_CHAR(i.invoice_date, 'MM/DD/YYYY') AS invoice_date,
+			o.org_id,
+			i.invoice_status as status_id,
+			i.parent_invoice_id
+			FROM
+			invoice_status iis,
+			invoice i,
+			invoice_billing ib,
+			invoice_item iit,
+			org o
+			WHERE
+			i.invoice_status = ? and i.client_id like ?
+			AND iit.parent_id (+) = i.invoice_id
+			AND ib.bill_id (+) = i.billing_id
+			AND (owner_type = 1 AND owner_id = ?)
+			AND iis.id = i.invoice_status
+			AND to_char(o.org_internal_id (+)) = ib.bill_to_id			
+			GROUP BY
+			i.invoice_id,
+			i.total_items,
+			i.client_id,
+			iis.caption,
+			ib.bill_to_id,
+			i.total_cost, 
+			i.total_adjust,
+			i.balance,
+			ib.bill_party_type,			
+			i.invoice_date,
+			o.org_id,
+			i.invoice_status,
+			i.parent_invoice_id
+			ORDER BY
+			i.invoice_id desc
+			)
+			WHERE rownum &lt;= 250
+
+		</statement>
+
+		<statement name="sel_servicedate">
+			
+			SELECT *
+			FROM (
+			SELECT
+			DISTINCT i.invoice_id,
+			i.total_items,
+			i.client_id,
+			TO_CHAR(MIN(iit.service_begin_date), 'MM/DD/YYYY') AS service_begin_date,
+			iis.caption AS invoice_status,
+			ib.bill_to_id,
+			i.total_cost, 
+			i.total_adjust,
+			i.balance,
+			ib.bill_party_type,
+			TO_CHAR(i.invoice_date, 'MM/DD/YYYY') AS invoice_date,
+			o.org_id,
+			i.invoice_status as status_id,
+			i.parent_invoice_id
+			FROM
+			invoice_status iis,
+			invoice i,
+			invoice_billing ib,
+			invoice_item iit,
+			org o
+			WHERE
+			service_begin_date = to_date(?, 'MM/DD/YYYY')
+			AND iit.parent_id (+) = i.invoice_id
+			AND ib.bill_id (+) = i.billing_id
+			AND (owner_type = 1 AND owner_id = ?)
+			AND iis.id = i.invoice_status
+			AND to_char(o.org_internal_id (+)) = ib.bill_to_id			
+			GROUP BY
+			i.invoice_id,
+			i.total_items,
+			i.client_id,
+			iis.caption,
+			ib.bill_to_id,
+			i.total_cost, 
+			i.total_adjust,
+			i.balance,
+			ib.bill_party_type,			
+			i.invoice_date,
+			o.org_id,
+			i.invoice_status,
+			i.parent_invoice_id
+			ORDER BY
+			i.invoice_id desc
+			)
+			WHERE rownum &lt;= 250
+
+		</statement>
+
+		<statement name="sel_servicedate_like">
+			
+			SELECT *
+			FROM (
+			SELECT
+			DISTINCT i.invoice_id,
+			i.total_items,
+			i.client_id,
+			TO_CHAR(MIN(iit.service_begin_date), 'MM/DD/YYYY') AS service_begin_date,
+			iis.caption AS invoice_status,
+			ib.bill_to_id,
+			i.total_cost, 
+			i.total_adjust,
+			i.balance,
+			ib.bill_party_type,
+			TO_CHAR(i.invoice_date, 'MM/DD/YYYY') AS invoice_date,
+			o.org_id,
+			i.invoice_status as status_id,
+			i.parent_invoice_id
+			FROM
+			invoice_status iis,
+			invoice i,
+			invoice_billing ib,
+			invoice_item iit,
+			org o
+			WHERE
+			'%' = ?
+			AND iit.parent_id (+) = i.invoice_id
+			AND ib.bill_id (+) = i.billing_id
+			AND (owner_type = 1 AND owner_id = ?)
+			AND iis.id = i.invoice_status
+			AND to_char(o.org_internal_id (+)) = ib.bill_to_id			
+			GROUP BY
+			i.invoice_id,
+			i.total_items,
+			i.client_id,
+			iis.caption,
+			ib.bill_to_id,
+			i.total_cost, 
+			i.total_adjust,
+			i.balance,
+			ib.bill_party_type,			
+			i.invoice_date,
+			o.org_id,
+			i.invoice_status,
+			i.parent_invoice_id
+			ORDER BY
+			i.invoice_id desc
+			)
+			WHERE rownum &lt;= 250
+
+		</statement>
+
+		<statement name="sel_servicedate_status">
+			
+			SELECT *
+			FROM (
+			SELECT
+			DISTINCT i.invoice_id,
+			i.total_items,
+			i.client_id,
+			TO_CHAR(MIN(iit.service_begin_date), 'MM/DD/YYYY') AS service_begin_date,
+			iis.caption AS invoice_status,
+			ib.bill_to_id,
+			i.total_cost, 
+			i.total_adjust,
+			i.balance,
+			ib.bill_party_type,
+			TO_CHAR(i.invoice_date, 'MM/DD/YYYY') AS invoice_date,
+			o.org_id,
+			i.invoice_status as status_id,
+			i.parent_invoice_id
+			FROM
+			invoice_status iis,
+			invoice i,
+			invoice_billing ib,
+			invoice_item iit,
+			org o
+			WHERE
+			i.invoice_status = ? and service_begin_date = to_date(?, 'MM/DD/YYYY')
+			AND iit.parent_id (+) = i.invoice_id
+			AND ib.bill_id (+) = i.billing_id
+			AND (owner_type = 1 AND owner_id = ?)
+			AND iis.id = i.invoice_status
+			AND to_char(o.org_internal_id (+)) = ib.bill_to_id			
+			GROUP BY
+			i.invoice_id,
+			i.total_items,
+			i.client_id,
+			iis.caption,
+			ib.bill_to_id,
+			i.total_cost, 
+			i.total_adjust,
+			i.balance,
+			ib.bill_party_type,			
+			i.invoice_date,
+			o.org_id,
+			i.invoice_status,
+			i.parent_invoice_id
+			ORDER BY
+			i.invoice_id desc
+			)
+			WHERE rownum &lt;= 250
+
+		</statement>
+
+		<statement name="sel_servicedate_status_like">
+			
+			SELECT *
+			FROM (
+			SELECT
+			DISTINCT i.invoice_id,
+			i.total_items,
+			i.client_id,
+			TO_CHAR(MIN(iit.service_begin_date), 'MM/DD/YYYY') AS service_begin_date,
+			iis.caption AS invoice_status,
+			ib.bill_to_id,
+			i.total_cost, 
+			i.total_adjust,
+			i.balance,
+			ib.bill_party_type,
+			TO_CHAR(i.invoice_date, 'MM/DD/YYYY') AS invoice_date,
+			o.org_id,
+			i.invoice_status as status_id,
+			i.parent_invoice_id
+			FROM
+			invoice_status iis,
+			invoice i,
+			invoice_billing ib,
+			invoice_item iit,
+			org o
+			WHERE
+			i.invoice_status = ? and service_begin_date like to_date(?, 'MM/DD/YYYY')
+			AND iit.parent_id (+) = i.invoice_id
+			AND ib.bill_id (+) = i.billing_id
+			AND (owner_type = 1 AND owner_id = ?)
+			AND iis.id = i.invoice_status
+			AND to_char(o.org_internal_id (+)) = ib.bill_to_id			
+			GROUP BY
+			i.invoice_id,
+			i.total_items,
+			i.client_id,
+			iis.caption,
+			ib.bill_to_id,
+			i.total_cost, 
+			i.total_adjust,
+			i.balance,
+			ib.bill_party_type,			
+			i.invoice_date,
+			o.org_id,
+			i.invoice_status,
+			i.parent_invoice_id
+			ORDER BY
+			i.invoice_id desc
+			)
+			WHERE rownum &lt;= 250
+
+		</statement>
+
+		<statement name="sel_ssn">
+			
+			SELECT *
+			FROM (
+			SELECT
+			DISTINCT i.invoice_id,
+			i.total_items,
+			i.client_id,
+			TO_CHAR(MIN(iit.service_begin_date), 'MM/DD/YYYY') AS service_begin_date,
+			iis.caption AS invoice_status,
+			ib.bill_to_id,
+			i.total_cost, 
+			i.total_adjust,
+			i.balance,
+			ib.bill_party_type,
+			TO_CHAR(i.invoice_date, 'MM/DD/YYYY') AS invoice_date,
+			o.org_id,
+			i.invoice_status as status_id,
+			i.parent_invoice_id
+			FROM
+			invoice_status iis,
+			invoice i,
+			invoice_billing ib,
+			invoice_item iit,
+			org o
+			, person
+			WHERE
+			i.client_id = person_id and ssn = ?
+			AND iit.parent_id (+) = i.invoice_id
+			AND ib.bill_id (+) = i.billing_id
+			AND (owner_type = 1 AND owner_id = ?)
+			AND iis.id = i.invoice_status
+			AND to_char(o.org_internal_id (+)) = ib.bill_to_id			
+			GROUP BY
+			i.invoice_id,
+			i.total_items,
+			i.client_id,
+			iis.caption,
+			ib.bill_to_id,
+			i.total_cost, 
+			i.total_adjust,
+			i.balance,
+			ib.bill_party_type,			
+			i.invoice_date,
+			o.org_id,
+			i.invoice_status,
+			i.parent_invoice_id
+			ORDER BY
+			i.invoice_id desc
+			)
+			WHERE rownum &lt;= 250
+
+		</statement>
+
+		<statement name="sel_ssn_like">
+			
+			SELECT *
+			FROM (
+			SELECT
+			DISTINCT i.invoice_id,
+			i.total_items,
+			i.client_id,
+			TO_CHAR(MIN(iit.service_begin_date), 'MM/DD/YYYY') AS service_begin_date,
+			iis.caption AS invoice_status,
+			ib.bill_to_id,
+			i.total_cost, 
+			i.total_adjust,
+			i.balance,
+			ib.bill_party_type,
+			TO_CHAR(i.invoice_date, 'MM/DD/YYYY') AS invoice_date,
+			o.org_id,
+			i.invoice_status as status_id,
+			i.parent_invoice_id
+			FROM
+			invoice_status iis,
+			invoice i,
+			invoice_billing ib,
+			invoice_item iit,
+			org o
+			, person
+			WHERE
+			i.client_id = person_id and ssn like ?
+			AND iit.parent_id (+) = i.invoice_id
+			AND ib.bill_id (+) = i.billing_id
+			AND (owner_type = 1 AND owner_id = ?)
+			AND iis.id = i.invoice_status
+			AND to_char(o.org_internal_id (+)) = ib.bill_to_id			
+			GROUP BY
+			i.invoice_id,
+			i.total_items,
+			i.client_id,
+			iis.caption,
+			ib.bill_to_id,
+			i.total_cost, 
+			i.total_adjust,
+			i.balance,
+			ib.bill_party_type,			
+			i.invoice_date,
+			o.org_id,
+			i.invoice_status,
+			i.parent_invoice_id
+			ORDER BY
+			i.invoice_id desc
+			)
+			WHERE rownum &lt;= 250
+
+		</statement>
+
+		<statement name="sel_ssn_status">
+			
+			SELECT *
+			FROM (
+			SELECT
+			DISTINCT i.invoice_id,
+			i.total_items,
+			i.client_id,
+			TO_CHAR(MIN(iit.service_begin_date), 'MM/DD/YYYY') AS service_begin_date,
+			iis.caption AS invoice_status,
+			ib.bill_to_id,
+			i.total_cost, 
+			i.total_adjust,
+			i.balance,
+			ib.bill_party_type,
+			TO_CHAR(i.invoice_date, 'MM/DD/YYYY') AS invoice_date,
+			o.org_id,
+			i.invoice_status as status_id,
+			i.parent_invoice_id
+			FROM
+			invoice_status iis,
+			invoice i,
+			invoice_billing ib,
+			invoice_item iit,
+			org o
+			, person
+			WHERE
+			i.invoice_status = ? and i.client_id = person_id and ssn = ?
+			AND iit.parent_id (+) = i.invoice_id
+			AND ib.bill_id (+) = i.billing_id
+			AND (owner_type = 1 AND owner_id = ?)
+			AND iis.id = i.invoice_status
+			AND to_char(o.org_internal_id (+)) = ib.bill_to_id			
+			GROUP BY
+			i.invoice_id,
+			i.total_items,
+			i.client_id,
+			iis.caption,
+			ib.bill_to_id,
+			i.total_cost, 
+			i.total_adjust,
+			i.balance,
+			ib.bill_party_type,			
+			i.invoice_date,
+			o.org_id,
+			i.invoice_status,
+			i.parent_invoice_id
+			ORDER BY
+			i.invoice_id desc
+			)
+			WHERE rownum &lt;= 250
+
+		</statement>
+
+		<statement name="sel_ssn_status_like">
+			
+			SELECT *
+			FROM (
+			SELECT
+			DISTINCT i.invoice_id,
+			i.total_items,
+			i.client_id,
+			TO_CHAR(MIN(iit.service_begin_date), 'MM/DD/YYYY') AS service_begin_date,
+			iis.caption AS invoice_status,
+			ib.bill_to_id,
+			i.total_cost, 
+			i.total_adjust,
+			i.balance,
+			ib.bill_party_type,
+			TO_CHAR(i.invoice_date, 'MM/DD/YYYY') AS invoice_date,
+			o.org_id,
+			i.invoice_status as status_id,
+			i.parent_invoice_id
+			FROM
+			invoice_status iis,
+			invoice i,
+			invoice_billing ib,
+			invoice_item iit,
+			org o
+			, person
+			WHERE
+			i.invoice_status = ? and i.client_id = person_id and ssn like ?
+			AND iit.parent_id (+) = i.invoice_id
+			AND ib.bill_id (+) = i.billing_id
+			AND (owner_type = 1 AND owner_id = ?)
+			AND iis.id = i.invoice_status
+			AND to_char(o.org_internal_id (+)) = ib.bill_to_id			
+			GROUP BY
+			i.invoice_id,
+			i.total_items,
+			i.client_id,
+			iis.caption,
+			ib.bill_to_id,
+			i.total_cost, 
+			i.total_adjust,
+			i.balance,
+			ib.bill_party_type,			
+			i.invoice_date,
+			o.org_id,
+			i.invoice_status,
+			i.parent_invoice_id
+			ORDER BY
+			i.invoice_id desc
+			)
+			WHERE rownum &lt;= 250
+
+		</statement>
+
+		<statement name="sel_upin">
+			
+			SELECT *
+			FROM (
+			SELECT
+			DISTINCT i.invoice_id,
+			i.total_items,
+			i.client_id,
+			TO_CHAR(MIN(iit.service_begin_date), 'MM/DD/YYYY') AS service_begin_date,
+			iis.caption AS invoice_status,
+			ib.bill_to_id,
+			i.total_cost, 
+			i.total_adjust,
+			i.balance,
+			ib.bill_party_type,
+			TO_CHAR(i.invoice_date, 'MM/DD/YYYY') AS invoice_date,
+			o.org_id,
+			i.invoice_status as status_id,
+			i.parent_invoice_id
+			FROM
+			invoice_status iis,
+			invoice i,
+			invoice_billing ib,
+			invoice_item iit,
+			org o
+			, transaction, person_attribute attr
+			WHERE
+			i.main_transaction = transaction.trans_id and transaction.provider_id = attr.parent_id and attr.item_name = 'UPIN' and upper(attr.value_text) = ?
+			AND iit.parent_id (+) = i.invoice_id
+			AND ib.bill_id (+) = i.billing_id
+			AND (owner_type = 1 AND owner_id = ?)
+			AND iis.id = i.invoice_status
+			AND to_char(o.org_internal_id (+)) = ib.bill_to_id			
+			GROUP BY
+			i.invoice_id,
+			i.total_items,
+			i.client_id,
+			iis.caption,
+			ib.bill_to_id,
+			i.total_cost, 
+			i.total_adjust,
+			i.balance,
+			ib.bill_party_type,			
+			i.invoice_date,
+			o.org_id,
+			i.invoice_status,
+			i.parent_invoice_id
+			ORDER BY
+			i.invoice_id desc
+			)
+			WHERE rownum &lt;= 250
+
+		</statement>
+
+		<statement name="sel_upin_like">
+			
+			SELECT *
+			FROM (
+			SELECT
+			DISTINCT i.invoice_id,
+			i.total_items,
+			i.client_id,
+			TO_CHAR(MIN(iit.service_begin_date), 'MM/DD/YYYY') AS service_begin_date,
+			iis.caption AS invoice_status,
+			ib.bill_to_id,
+			i.total_cost, 
+			i.total_adjust,
+			i.balance,
+			ib.bill_party_type,
+			TO_CHAR(i.invoice_date, 'MM/DD/YYYY') AS invoice_date,
+			o.org_id,
+			i.invoice_status as status_id,
+			i.parent_invoice_id
+			FROM
+			invoice_status iis,
+			invoice i,
+			invoice_billing ib,
+			invoice_item iit,
+			org o
+			, transaction, person_attribute attr
+			WHERE
+			i.main_transaction = transaction.trans_id and transaction.provider_id = attr.parent_id and attr.item_name = 'UPIN' and upper(attr.value_text) like ?
+			AND iit.parent_id (+) = i.invoice_id
+			AND ib.bill_id (+) = i.billing_id
+			AND (owner_type = 1 AND owner_id = ?)
+			AND iis.id = i.invoice_status
+			AND to_char(o.org_internal_id (+)) = ib.bill_to_id			
+			GROUP BY
+			i.invoice_id,
+			i.total_items,
+			i.client_id,
+			iis.caption,
+			ib.bill_to_id,
+			i.total_cost, 
+			i.total_adjust,
+			i.balance,
+			ib.bill_party_type,			
+			i.invoice_date,
+			o.org_id,
+			i.invoice_status,
+			i.parent_invoice_id
+			ORDER BY
+			i.invoice_id desc
+			)
+			WHERE rownum &lt;= 250
+
+		</statement>
+
+		<statement name="sel_upin_status">
+			
+			SELECT *
+			FROM (
+			SELECT
+			DISTINCT i.invoice_id,
+			i.total_items,
+			i.client_id,
+			TO_CHAR(MIN(iit.service_begin_date), 'MM/DD/YYYY') AS service_begin_date,
+			iis.caption AS invoice_status,
+			ib.bill_to_id,
+			i.total_cost, 
+			i.total_adjust,
+			i.balance,
+			ib.bill_party_type,
+			TO_CHAR(i.invoice_date, 'MM/DD/YYYY') AS invoice_date,
+			o.org_id,
+			i.invoice_status as status_id,
+			i.parent_invoice_id
+			FROM
+			invoice_status iis,
+			invoice i,
+			invoice_billing ib,
+			invoice_item iit,
+			org o
+			, transaction, person_attribute attr
+			WHERE
+			i.invoice_status = ? and i.main_transaction = transaction.trans_id and transaction.provider_id = attr.parent_id and attr.item_name = 'UPIN' and upper(attr.value_text) = ?
+			AND iit.parent_id (+) = i.invoice_id
+			AND ib.bill_id (+) = i.billing_id
+			AND (owner_type = 1 AND owner_id = ?)
+			AND iis.id = i.invoice_status
+			AND to_char(o.org_internal_id (+)) = ib.bill_to_id			
+			GROUP BY
+			i.invoice_id,
+			i.total_items,
+			i.client_id,
+			iis.caption,
+			ib.bill_to_id,
+			i.total_cost, 
+			i.total_adjust,
+			i.balance,
+			ib.bill_party_type,			
+			i.invoice_date,
+			o.org_id,
+			i.invoice_status,
+			i.parent_invoice_id
+			ORDER BY
+			i.invoice_id desc
+			)
+			WHERE rownum &lt;= 250
+
+		</statement>
+
+		<statement name="sel_upin_status_like">
+			
+			SELECT *
+			FROM (
+			SELECT
+			DISTINCT i.invoice_id,
+			i.total_items,
+			i.client_id,
+			TO_CHAR(MIN(iit.service_begin_date), 'MM/DD/YYYY') AS service_begin_date,
+			iis.caption AS invoice_status,
+			ib.bill_to_id,
+			i.total_cost, 
+			i.total_adjust,
+			i.balance,
+			ib.bill_party_type,
+			TO_CHAR(i.invoice_date, 'MM/DD/YYYY') AS invoice_date,
+			o.org_id,
+			i.invoice_status as status_id,
+			i.parent_invoice_id
+			FROM
+			invoice_status iis,
+			invoice i,
+			invoice_billing ib,
+			invoice_item iit,
+			org o
+			, transaction, person_attribute attr
+			WHERE
+			i.invoice_status = ? and i.main_transaction = transaction.trans_id and transaction.provider_id = attr.parent_id and attr.item_name = 'UPIN' and upper(attr.value_text) like ?
+			AND iit.parent_id (+) = i.invoice_id
+			AND ib.bill_id (+) = i.billing_id
+			AND (owner_type = 1 AND owner_id = ?)
+			AND iis.id = i.invoice_status
+			AND to_char(o.org_internal_id (+)) = ib.bill_to_id			
+			GROUP BY
+			i.invoice_id,
+			i.total_items,
+			i.client_id,
+			iis.caption,
+			ib.bill_to_id,
+			i.total_cost, 
+			i.total_adjust,
+			i.balance,
+			ib.bill_party_type,			
+			i.invoice_date,
+			o.org_id,
+			i.invoice_status,
+			i.parent_invoice_id
+			ORDER BY
+			i.invoice_id desc
+			)
+			WHERE rownum &lt;= 250
+
+		</statement>
+
+	</sql-statements>
+</xaf>

@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+
+<xaf>
+	<dialogs package="invoice_worklist_collection">
+		<dialog name="close_collection" heading="Close Invoice Collection">
+			<field.text caption="Person ID" read-only="yes" max-length="16" name="person_id" size="16"/>
+			<field.text caption="Invoice" read-only="yes" name="invoice_id"/>
+			<field.select caption="notes"  name="notes" choices="Retain Notes=0;Delete Notes=1" style="radio"/>
+			<!--  -->
+
+		</dialog>
+
+		<dialog name="collection_reck_date" heading="Collection Reck Date">
+			<field.text caption="Person ID" read-only="yes" max-length="16" name="person_id" size="16"/>
+			<field.text caption="Invoice ID" read-only="yes" name="invoice_id"/>
+			<field.date caption="Reck Date" name="reckdate" size="12"/>
+
+		</dialog>
+
+	</dialogs>
+</xaf>

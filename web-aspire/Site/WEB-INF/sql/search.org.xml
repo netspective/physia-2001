@@ -1,0 +1,250 @@
+<?xml version="1.0"?>
+
+<xaf>
+	<sql-statements package="search.org">
+		<statement name="id">
+			App::Statements::Search::Org
+		</statement>
+
+		<statement name="sel_category">
+			
+			SELECT *
+			FROM (
+			SELECT
+			DISTINCT o.org_id,
+			o.name_primary,
+			o.category,
+			DECODE(t.group_name, 'other', 'main', t.group_name)
+			FROM
+			org o,
+			org_category cat,
+			org_type t
+			WHERE
+			cat.parent_id = o.org_internal_id
+			AND	cat.member_name = t.caption
+			AND	cat.member_name = (
+			SELECT caption
+			FROM org_type
+			WHERE id = (
+			SELECT MIN(id)
+			FROM
+			org_type,
+			org_category
+			WHERE
+			parent_id = o.org_internal_id
+			AND caption = member_name
+			)
+			) 
+			AND	UPPER(cat.member_name) = ?
+			AND (
+			owner_org_id IS NULL
+			OR owner_org_id = ?
+			)
+			ORDER BY o.org_id
+			)
+			WHERE rownum &lt;= 250
+
+		</statement>
+
+		<statement name="sel_category_like">
+			
+			SELECT *
+			FROM (
+			SELECT
+			DISTINCT o.org_id,
+			o.name_primary,
+			o.category,
+			DECODE(t.group_name, 'other', 'main', t.group_name)
+			FROM
+			org o,
+			org_category cat,
+			org_type t
+			WHERE
+			cat.parent_id = o.org_internal_id
+			AND	cat.member_name = t.caption
+			AND	cat.member_name = (
+			SELECT caption
+			FROM org_type
+			WHERE id = (
+			SELECT MIN(id)
+			FROM
+			org_type,
+			org_category
+			WHERE
+			parent_id = o.org_internal_id
+			AND caption = member_name
+			)
+			) 
+			AND	UPPER(cat.member_name) LIKE ?
+			AND (
+			owner_org_id IS NULL
+			OR owner_org_id = ?
+			)
+			ORDER BY o.org_id
+			)
+			WHERE rownum &lt;= 250
+
+		</statement>
+
+		<statement name="sel_id">
+			
+			SELECT *
+			FROM (
+			SELECT
+			DISTINCT o.org_id,
+			o.name_primary,
+			o.category,
+			DECODE(t.group_name, 'other', 'main', t.group_name)
+			FROM
+			org o,
+			org_category cat,
+			org_type t
+			WHERE
+			cat.parent_id = o.org_internal_id
+			AND	cat.member_name = t.caption
+			AND	cat.member_name = (
+			SELECT caption
+			FROM org_type
+			WHERE id = (
+			SELECT MIN(id)
+			FROM
+			org_type,
+			org_category
+			WHERE
+			parent_id = o.org_internal_id
+			AND caption = member_name
+			)
+			) 
+			AND	UPPER(o.org_id) = ?
+			AND (
+			owner_org_id IS NULL
+			OR owner_org_id = ?
+			)
+			ORDER BY o.org_id
+			)
+			WHERE rownum &lt;= 250
+
+		</statement>
+
+		<statement name="sel_id_like">
+			
+			SELECT *
+			FROM (
+			SELECT
+			DISTINCT o.org_id,
+			o.name_primary,
+			o.category,
+			DECODE(t.group_name, 'other', 'main', t.group_name)
+			FROM
+			org o,
+			org_category cat,
+			org_type t
+			WHERE
+			cat.parent_id = o.org_internal_id
+			AND	cat.member_name = t.caption
+			AND	cat.member_name = (
+			SELECT caption
+			FROM org_type
+			WHERE id = (
+			SELECT MIN(id)
+			FROM
+			org_type,
+			org_category
+			WHERE
+			parent_id = o.org_internal_id
+			AND caption = member_name
+			)
+			) 
+			AND	UPPER(o.org_id) LIKE ?
+			AND (
+			owner_org_id IS NULL
+			OR owner_org_id = ?
+			)
+			ORDER BY o.org_id
+			)
+			WHERE rownum &lt;= 250
+
+		</statement>
+
+		<statement name="sel_primname">
+			
+			SELECT *
+			FROM (
+			SELECT
+			DISTINCT o.org_id,
+			o.name_primary,
+			o.category,
+			DECODE(t.group_name, 'other', 'main', t.group_name)
+			FROM
+			org o,
+			org_category cat,
+			org_type t
+			WHERE
+			cat.parent_id = o.org_internal_id
+			AND	cat.member_name = t.caption
+			AND	cat.member_name = (
+			SELECT caption
+			FROM org_type
+			WHERE id = (
+			SELECT MIN(id)
+			FROM
+			org_type,
+			org_category
+			WHERE
+			parent_id = o.org_internal_id
+			AND caption = member_name
+			)
+			) 
+			AND	UPPER(o.name_primary) = ?
+			AND (
+			owner_org_id IS NULL
+			OR owner_org_id = ?
+			)
+			ORDER BY o.org_id
+			)
+			WHERE rownum &lt;= 250
+
+		</statement>
+
+		<statement name="sel_primname_like">
+			
+			SELECT *
+			FROM (
+			SELECT
+			DISTINCT o.org_id,
+			o.name_primary,
+			o.category,
+			DECODE(t.group_name, 'other', 'main', t.group_name)
+			FROM
+			org o,
+			org_category cat,
+			org_type t
+			WHERE
+			cat.parent_id = o.org_internal_id
+			AND	cat.member_name = t.caption
+			AND	cat.member_name = (
+			SELECT caption
+			FROM org_type
+			WHERE id = (
+			SELECT MIN(id)
+			FROM
+			org_type,
+			org_category
+			WHERE
+			parent_id = o.org_internal_id
+			AND caption = member_name
+			)
+			) 
+			AND	UPPER(o.name_primary) LIKE ?
+			AND (
+			owner_org_id IS NULL
+			OR owner_org_id = ?
+			)
+			ORDER BY o.org_id
+			)
+			WHERE rownum &lt;= 250
+
+		</statement>
+
+	</sql-statements>
+</xaf>

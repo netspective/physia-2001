@@ -1,0 +1,278 @@
+<?xml version="1.0"?>
+
+<xaf>
+	<sql-statements package="component.invoice">
+		<statement name="id">
+			App::Statements::Component::Invoice
+		</statement>
+
+		<statement name="invoice.agedInsuranceData">
+			
+			select 	insurance, sum(patients), sum(ageperiod1), sum(ageperiod2), sum(ageperiod3),
+			sum(ageperiod4), sum(ageperiod5), sum(ageperiod6), sum(total)
+			from 	agedinsdata
+			where	insurance = ?
+			group by insurance
+			
+		</statement>
+
+		<statement name="invoice.agedInsuranceDataAll">
+			
+			select 	insurance, sum(patients), sum(ageperiod1), sum(ageperiod2), sum(ageperiod3),
+			sum(ageperiod4), sum(ageperiod5), sum(ageperiod6), sum(total)
+			from 	agedinsdata
+			group by insurance
+			
+		</statement>
+
+		<statement name="invoice.agedPatientData">
+			
+			select 	patient, sum(ageperiod1),
+			sum(ageperiod2), sum(ageperiod3),
+			sum(ageperiod4), sum(ageperiod5),
+			sum(ageperiod6), sum(copay),
+			sum(total), sum(insurance)
+			from 	agedpatientdata
+			where	patient = ?
+			group by patient
+			
+		</statement>
+
+		<statement name="invoice.agedPatientDataAll">
+			
+			select 	patient, sum(ageperiod1),
+			sum(ageperiod2), sum(ageperiod3),
+			sum(ageperiod4), sum(ageperiod5),
+			sum(ageperiod6), sum(copay),
+			sum(total), sum(insurance)
+			from 	agedpatientdata
+			group by patient
+			
+		</statement>
+
+		<statement name="invoice.appointmentCharges">
+			
+			select 	p1.simple_name,
+			trunc(e.start_time - :4),
+			to_char(e.start_time - :4, 'HH12:MIAM'),
+			to_char(e.start_time - :4 +(e.duration/1440), 'HH12:MIAM'),
+			o.name_primary,
+			e.subject,
+			t.caption,
+			tt.caption,
+			p.simple_name,
+			p2.simple_name,
+			nvl(i.total_cost, 0),
+			i.client_id,
+			p3.simple_name
+			from 	event e, transaction t, org o, transaction_type tt,
+			person p, person p1, person p2, invoice i, invoice_billing ib, person p3
+			where	e.start_time &gt;= to_date(:1, 'MM/DD/YYYY') + :4
+			and e.start_time &lt; to_date(:2, 'MM/DD/YYYY') + 1 + :4
+			and	e.event_id = t.parent_event_id
+			and e.facility_id = o.org_internal_id
+			and t.trans_type = tt.id
+			and p.person_id = t.provider_id
+			and p1.person_id = e.scheduled_by_id
+			and t.trans_id = i.main_transaction
+			and ib.invoice_id = i.invoice_id
+			and ib.bill_id = i.billing_id
+			and ib.bill_to_id = p2.person_id
+			and ib.bill_party_type in (0,1)
+			and ib.bill_sequence = 1
+			and ib.invoice_item_id is NULL
+			and o.owner_org_id = :3
+			and i.client_id = p3.person_id
+			UNION ALL
+			select	p1.simple_name, trunc(e.start_time - :4),
+			to_char(e.start_time - :4, 'HH12:MIAM'),
+			to_char(e.start_time - :4 +(e.duration/1440), 'HH12:MIAM'),
+			o.name_primary, e.subject,
+			t.caption, tt.caption, p.simple_name,
+			o1.name_primary,
+			nvl(i.total_cost, 0),
+			i.client_id,
+			p3.simple_name
+			from 	event e, transaction t, org o, org o1, transaction_type tt,
+			person p, person p1, invoice i, invoice_billing ib, person p3
+			where	e.start_time &gt;= to_date(:1, 'MM/DD/YYYY') + :4
+			and e.start_time &lt; to_date(:2, 'MM/DD/YYYY') + 1 + :4
+			and e.event_id = t.parent_event_id
+			and e.facility_id = o.org_internal_id
+			and t.trans_type = tt.id
+			and p.person_id = t.provider_id
+			and p1.person_id = e.scheduled_by_id
+			and t.trans_id = i.main_transaction
+			and ib.invoice_id = i.invoice_id
+			and ib.bill_id = i.billing_id
+			and ib.bill_to_id = o1.org_internal_id
+			and ib.bill_party_type in (2,3)
+			and ib.bill_sequence = 1
+			and ib.invoice_item_id is NULL
+			and o.owner_org_id = :3
+			and i.client_id = p3.person_id
+			ORDER BY 2,12
+			
+		</statement>
+
+		<statement name="invoice.claim-notes">
+			
+			select item_id, parent_id, value_text, value_textb,
+			to_char(value_date, 'MM/DD/YYYY') as value_date, value_type
+			from invoice_attribute
+			where parent_id = :1 and
+			value_type = 20000
+			order by value_date desc
+			
+		</statement>
+
+		<statement name="invoice.claimStatus">
+			
+			select 	invoice_id,
+			total_items, client_id,
+			to_char(invoice_date, 'DD/MM/YYYY') as invoice_date,
+			invoice_status as invoice_status,
+			bill_to_id,
+			total_cost,
+			total_adjust,
+			balance,
+			reference,
+			bill_to_type
+			from 	invoice
+			where	invoice_status in (?)
+			and 	owner_type = 1
+			and 	owner_id = ?
+			and trunc(invoice_date) between to_date(?, 'mm/dd/yyyy') and to_date(?, 'mm/dd/yyyy')
+			order by invoice_date DESC
+			
+		</statement>
+
+		<statement name="invoice.dailyAuditRecap">
+			
+			select 	DAY_OF_MONTH,
+			ORG_ID,
+			sum(charges) as CHARGES,
+			sum(misc_charges) as MISC_CHARGES,
+			sum(charge_adjust) as CHARGE_ADJUST,
+			sum(insurance_write_off) as INSURANCE_WRITE_OFF,
+			sum(net_charges) as NET_CHARGES,
+			sum(balance_transfers) as BALANCE_TRANSFERS,
+			sum(personal_receipts) as PERSONAL_RECEIPTS,
+			sum(insurance_receipts) as INSURANCE_RECEIPTS,
+			sum(total_receipts) as TOTAL_RECEIPTS,
+			sum(ending_a_r) as ENDING_A_R
+			from 	daily_audit_recap
+			where 	to_date(day_of_month, 'mm/dd/yyyy') between to_date(?, 'mm/dd/yyyy') and to_date(?, 'mm/dd/yyyy')
+			and	org_id = ?
+			group by DAY_OF_MONTH, ORG_ID
+			
+		</statement>
+
+		<statement name="invoice.financialAnalysisReport">
+			
+			select 	PROVIDER, ORG_ID,
+			sum(charges) as CHARGES,
+			sum(PERSONAL_RECEIPTS),
+			sum(INSURANCE_RECEIPTS),
+			sum(CHARGE_ADJUST),
+			sum(INSURANCE_WRITE_OFF),
+			sum(NET_CHARGES),
+			sum(BALANCE_TRANSFERS),
+			sum(MISC_CHARGES),
+			sum(CHANGE_A_R)
+			from 	provider_by_location
+			where	provider = ?
+			group by org_id, provider
+			
+		</statement>
+
+		<statement name="invoice.financialAnalysisReportAll">
+			
+			select 	PROVIDER, ORG_ID,
+			sum(charges) as CHARGES,
+			sum(PERSONAL_RECEIPTS),
+			sum(INSURANCE_RECEIPTS),
+			sum(CHARGE_ADJUST),
+			sum(INSURANCE_WRITE_OFF),
+			sum(NET_CHARGES),
+			sum(BALANCE_TRANSFERS),
+			sum(MISC_CHARGES),
+			sum(CHANGE_A_R)
+			from 	provider_by_location
+			group by org_id, provider
+			
+		</statement>
+
+		<statement name="invoice.monthlyAuditRecap">
+			
+			select to_char(to_date(DAY_OF_MONTH,'mm/dd/yyyy'), 'YYYY-MON') as Month,
+			ORG_ID,
+			sum(charges) as CHARGES,
+			sum(misc_charges) as MISC_CHARGES,
+			sum(charge_adjust) as CHARGE_ADJUST,
+			sum(insurance_write_off) as INSURANCE_WRITE_OFF,
+			sum(net_charges) as NET_CHARGES,
+			sum(balance_transfers) as BALANCE_TRANSFERS,
+			sum(personal_receipts) as PERSONAL_RECEIPTS,
+			sum(insurance_receipts) as INSURANCE_RECEIPTS,
+			sum(total_receipts) as TOTAL_RECEIPTS,
+			sum(change_a_r) as CHANGE_A_R
+			from daily_audit_recap
+			where 	to_date(day_of_month, 'mm/dd/yyyy') between to_date(?, 'mm/dd/yyyy') and to_date(?, 'mm/dd/yyyy')
+			and org_id = ?
+			group by to_char(to_date(DAY_OF_MONTH,'mm/dd/yyyy'), 'YYYY-MON'), ORG_ID
+			order by Month
+			
+		</statement>
+
+		<statement name="invoice.procAnalysis">
+			
+			select p.short_sortable_name,
+			tt.caption as visit_type,
+			nvl(i.code,'UNK') as code,
+			nvl(r.name,'N/A') as proc,
+			sum(decode(trunc(invoice_date,'MM'),trunc(to_date(:2,'MM/DD/YYYY'),'MM'),i.units,0)) as month_to_date_units,
+			sum(decode(trunc(invoice_date,'MM'),trunc(to_date(:2,'MM/DD/YYYY'),'MM'),i.unit_cost,0)) as month_to_date_unit_cost,
+			sum(i.units) as year_to_date_units,
+			sum(i.unit_cost) as year_to_date_unit_cost
+			from invoice_charges i
+			, ref_cpt r,person p, transaction t,
+			Transaction_type tt,
+			org o
+			where r.CPT (+) = i.code
+			AND p.person_id= provider
+			AND (p.person_id = :1 OR :1 IS NULL)
+			AND trunc(i.invoice_date,'YYYY') =trunc(to_date(:2,'MM/DD/YYYY'),'YYYY')
+			AND (:3 IS NULL OR :3 = i.facility)
+			AND (:4 IS NULL OR :4 &lt;=i.code)
+			AND (:5 is NULL OR :5 &gt;=i.code)
+			AND o.org_internal_id = i.facility
+			AND o.owner_org_id = :6
+			AND t.trans_id (+)= i.trans_id
+			AND tt.id (+)= t.trans_type
+			group by r.name,p.short_sortable_name,
+			i.code,tt.caption
+			order by p.short_sortable_name,tt.caption
+			
+		</statement>
+
+		<statement name="invoice.procAnalysisAll">
+			
+			select 	y.NAME,
+			y.DEPARTMENTNAME,
+			y.CPTCODE,
+			y.CPTNAME,
+			m.MONTHUNITS,
+			m.MONTHAMOUNT,
+			y.YEARUNITS,
+			y.YEARAMOUNT
+			from 	monthToDateReceiptProcAnalysis m, yearToDateReceiptProcAnalysis y
+			where	m.PROVIDERID(+) = y.PROVIDERID
+			and	m.CPTCODE(+) = y.CPTCODE
+			and	m.CPTNAME(+) = y.CPTNAME
+			and	m.DEPARTMENTNAME(+) = y.DEPARTMENTNAME
+			
+		</statement>
+
+	</sql-statements>
+</xaf>

@@ -1,0 +1,78 @@
+<?xml version="1.0"?>
+
+<xaf>
+	<dialogs package="message">
+		<dialog name="message_prescription" heading="message_prescription">
+			<field.separator heading="Message" name="message_subhead"/>
+			<field.text hidden="yes" name="message_id" caption="message_id"/>
+			<field.composite caption="From" read-only="yes" name="from_senton">
+				<field.text caption="From"  name="from"/>
+				<field.text caption="send_on"  name="send_on"/>
+			</field.composite>
+			<!-- Unimplemented field type=not_an_identifier -->
+			<!-- Unimplemented field type=not_an_identifier -->
+			<field.text caption="Regarding Patient"  max-length="16" name="patient_id" size="16"/>
+			<field.text hidden="yes" name="patient_name" caption="patient_name"/>
+			<field.text hidden="yes" name="saved_patient_id" caption="saved_patient_id"/>
+			<field.text caption="Caller if Other than Patient"  name="doc_source_system" size="40"/>
+			<field.text hidden="yes" name="permed_id" caption="permed_id"/>
+			<field.text caption="Prescription Request" read-only="yes" name="prescription"/>
+			<field.composite caption="*"  name="return_phones">
+				<field.phone caption="Return Call To -   Home"  max-length="1024" name="return_phone1"/>
+				<field.phone caption="Office"  max-length="1024" name="return_phone2"/>
+				<field.phone caption="Cell"  max-length="1024" name="return_phone3"/>
+			</field.composite>
+			<field.composite caption="*"  name="pager_other">
+				<field.text caption="Pager"  name="return_phone4" size="13"/>
+				<field.text caption="Other"  name="return_phone5" size="13"/>
+			</field.composite>
+			<field.select caption="Priority"  name="priority" choices="Normal;ASAP;Emergency"/>
+			<!--  -->
+			<field.text caption="Subject" required="yes" max-length="255" name="subject" size="70"/>
+			<field.select caption="Message"  name="common_message" choices="; 				Medication Question = medication_question; 				Medication Problem  = medication_problem; 				Wants Lab Results   = want_lab_results; 				Has Question About Lab Results = has_question_about_lab_results; 				Doesn't Feel Well   = does_not_feel_well; 				Complains Of        = complains_of; 				Continue Same Treatment = continue_same_treatment; 				Schedule Appointment = schedule_appointment; 				Follow Up in = follow_up_in; 				Stop Medication = stop_medication; 				Start New Medication = start_new_medication; 				Change Medication Dose = change_medication_dose; 				Refill Medication = refill_medication; 				Call 			"/>
+			<!--  -->
+			<field.memo name="message" rows="5" cols="70" size="24"/>
+			<field.separator heading="Notes" name="notes_subhead"/>
+			<field.text  max-length="-1" name="existing_notes"/>
+			<field.memo caption="Add Notes" name="notes" rows="5" cols="70" size="24"/>
+			<field.boolean caption="Keep notes private?" visible="no" name="notes_private" style="check"/>
+
+		</dialog>
+
+		<dialog name="phone_message" heading="phone_message">
+			<field.separator heading="Message" name="message_subhead"/>
+			<field.text hidden="yes" name="message_id" caption="message_id"/>
+			<field.composite caption="From" read-only="yes" name="from_senton">
+				<field.text caption="From"  name="from"/>
+				<field.text caption="send_on"  name="send_on"/>
+			</field.composite>
+			<!-- Unimplemented field type=not_an_identifier -->
+			<!-- Unimplemented field type=not_an_identifier -->
+			<field.text caption="Regarding Patient"  max-length="16" name="patient_id" size="16"/>
+			<field.text hidden="yes" name="patient_name" caption="patient_name"/>
+			<field.text hidden="yes" name="saved_patient_id" caption="saved_patient_id"/>
+			<field.text caption="Caller if Other than Patient"  name="doc_source_system" size="40"/>
+			<field.composite caption="*"  name="return_phones">
+				<field.phone caption="Return Call To -   Home"  max-length="1024" name="return_phone1"/>
+				<field.phone caption="Office"  max-length="1024" name="return_phone2"/>
+				<field.phone caption="Cell"  max-length="1024" name="return_phone3"/>
+			</field.composite>
+			<field.composite caption="*"  name="pager_other">
+				<field.text caption="Pager"  name="return_phone4" size="13"/>
+				<field.text caption="Other"  name="return_phone5" size="13"/>
+			</field.composite>
+			<field.select caption="Priority"  name="priority" choices="Normal;ASAP;Emergency"/>
+			<!--  -->
+			<field.text caption="Subject" required="yes" max-length="255" name="subject" size="70"/>
+			<field.select caption="Message"  name="common_message" choices="; 				Medication Question = medication_question; 				Medication Problem  = medication_problem; 				Wants Lab Results   = want_lab_results; 				Has Question About Lab Results = has_question_about_lab_results; 				Doesn't Feel Well   = does_not_feel_well; 				Complains Of        = complains_of; 				Continue Same Treatment = continue_same_treatment; 				Schedule Appointment = schedule_appointment; 				Follow Up in = follow_up_in; 				Stop Medication = stop_medication; 				Start New Medication = start_new_medication; 				Change Medication Dose = change_medication_dose; 				Refill Medication = refill_medication; 				Call 			"/>
+			<!--  -->
+			<field.memo name="message" rows="5" cols="70" size="24"/>
+			<field.separator heading="Notes" name="notes_subhead"/>
+			<field.text  max-length="-1" name="existing_notes"/>
+			<field.memo caption="Add Notes" name="notes" rows="5" cols="70" size="24"/>
+			<field.boolean caption="Keep notes private?" visible="no" name="notes_private" style="check"/>
+
+		</dialog>
+
+	</dialogs>
+</xaf>

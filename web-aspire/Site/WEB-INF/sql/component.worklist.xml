@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+
+<xaf>
+	<sql-statements package="component.worklist">
+		<statement name="id">
+			App::Statements::Component::WorkList
+		</statement>
+
+		<statement name="worklist.account-notes">
+			
+			select trans_owner_id, detail,trans_id,trans_type,provider_id,
+			nvl(to_char(trans_begin_stamp, 'MM/DD/YYYY'),'No Date') as trans_begin_stamp
+			from transaction
+			where trans_owner_id = :1 and					
+			trans_status = 2 and
+			trans_type = 9500 	
+			ORDER BY 6 asc
+			
+		</statement>
+
+		<statement name="worklist.group-account-notes">
+			
+			select simple_name, count (*) as count, min(trans_begin_stamp),max(trans_begin_stamp),
+			trans_owner_id
+			from transaction t, person
+			where 	trans_owner_id = person.person_id and
+			trans_status = 2 and
+			trans_type = 9500 and
+			EXISTS
+			(SELECT 1 FROM Invoice_Worklist iw
+			WHERE
+			trans_owner_id = iw.person_id 
+			AND	worklist_status = 'Account In Collection'
+			AND	worklist_type = 'Collection'				
+			AND 	owner_id = :1
+			AND	responsible_id = :1
+			AND 	org_internal_id = :2
+			)
+			group by simple_name,trans_owner_id
+			
+		</statement>
+
+	</sql-statements>
+</xaf>

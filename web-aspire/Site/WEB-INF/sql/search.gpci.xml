@@ -1,0 +1,144 @@
+<?xml version="1.0"?>
+
+<xaf>
+	<sql-statements package="search.gpci">
+		<statement name="id">
+			App::Statements::Search::Gpci
+		</statement>
+
+		<statement name="sel_GPCI_carrierNo">
+			
+			SELECT *
+			FROM (
+			SELECT
+			gpci_id,
+			TO_CHAR(eff_begin_date, 'MM/DD/YYYY'),
+			TO_CHAR(eff_end_date, 'MM/DD/YYYY'),
+			locality_name,
+			state,
+			county
+			FROM ref_gpci
+			WHERE
+			UPPER(carrier_number) LIKE UPPER(?)
+			AND eff_begin_date &lt;= to_date(?, 'MM/DD/YYYY')
+			AND eff_end_date &gt;= to_date(?, 'MM/DD/YYYY')
+			ORDER BY
+			state,
+			locality_name
+			)
+			WHERE rownum &lt;= 250
+
+		</statement>
+
+		<statement name="sel_GPCI_county">
+			
+			SELECT *
+			FROM (
+			SELECT
+			gpci_id,
+			TO_CHAR(eff_begin_date, 'MM/DD/YYYY'),
+			TO_CHAR(eff_end_date, 'MM/DD/YYYY'),
+			locality_name,
+			state,
+			county
+			FROM ref_gpci
+			WHERE
+			UPPER(county) LIKE UPPER(?)
+			AND eff_begin_date &lt;= to_date(?, 'MM/DD/YYYY')
+			AND eff_end_date &gt;= to_date(?, 'MM/DD/YYYY')
+			ORDER BY
+			state,
+			locality_name
+			)
+			WHERE rownum &lt;= 250
+
+		</statement>
+
+		<statement name="sel_GPCI_id">
+			
+			SELECT *
+			FROM (
+			SELECT
+			gpci_id,
+			TO_CHAR(eff_begin_date, 'MM/DD/YYYY'),
+			TO_CHAR(eff_end_date, 'MM/DD/YYYY'),
+			locality_name,
+			state,
+			county
+			FROM ref_gpci
+			WHERE
+			gpci_id like ?
+			AND eff_begin_date &lt;= to_date(?, 'MM/DD/YYYY')
+			AND eff_end_date &gt;= to_date(?, 'MM/DD/YYYY')
+			ORDER BY
+			state,
+			locality_name
+			)
+			WHERE rownum &lt;= 250
+
+		</statement>
+
+		<statement name="sel_GPCI_locality">
+			
+			SELECT *
+			FROM (
+			SELECT
+			gpci_id,
+			TO_CHAR(eff_begin_date, 'MM/DD/YYYY'),
+			TO_CHAR(eff_end_date, 'MM/DD/YYYY'),
+			locality_name,
+			state,
+			county
+			FROM ref_gpci
+			WHERE
+			UPPER(locality_name) LIKE UPPER(?)
+			AND eff_begin_date &lt;= to_date(?, 'MM/DD/YYYY')
+			AND eff_end_date &gt;= to_date(?, 'MM/DD/YYYY')
+			ORDER BY
+			state,
+			locality_name
+			)
+			WHERE rownum &lt;= 250
+
+		</statement>
+
+		<statement name="sel_GPCI_state">
+			
+			SELECT *
+			FROM (
+			SELECT
+			gpci_id,
+			TO_CHAR(eff_begin_date, 'MM/DD/YYYY'),
+			TO_CHAR(eff_end_date, 'MM/DD/YYYY'),
+			locality_name,
+			state,
+			county
+			FROM ref_gpci
+			WHERE
+			LTRIM(RTRIM(UPPER(state))) LIKE UPPER(?)
+			AND eff_begin_date &lt;= to_date(?, 'MM/DD/YYYY')
+			AND eff_end_date &gt;= to_date(?, 'MM/DD/YYYY')
+			ORDER BY
+			state,
+			locality_name
+			)
+			WHERE rownum &lt;= 250
+
+		</statement>
+
+		<statement name="sel_stateForOrg">
+			
+			SELECT caption
+			FROM
+			states,
+			org_address
+			WHERE
+			parent_id = ?
+			AND address_name IN ('Street', 'Shipping', 'Mailing')
+			AND states.abbrev = LTRIM(RTRIM(upper(org_address.state)))
+			AND rownum &lt;= 250
+			
+		</statement>
+
+	</sql-statements>
+</xaf>

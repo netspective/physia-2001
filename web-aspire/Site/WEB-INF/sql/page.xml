@@ -1,0 +1,53 @@
+<?xml version="1.0"?>
+
+<xaf>
+	<sql-statements package="page">
+		<statement name="id">
+			App::Statements::Page
+		</statement>
+
+		<statement name="ins_newKey">
+			
+			insert into Persess_View_Count
+			(session_id, person_id, view_scope, view_key, view_count, view_caption, view_arl, view_init, view_latest)
+			values
+			(? , ? , ? , ? , 1 , ? , ? , sysdate , sysdate)
+			
+		</statement>
+
+		<statement name="person.mySessionViewCount">
+			
+			select view_caption, view_count, decode(to_char(view_init - :1, 'YYYYMMDD'), to_char(sysdate - :1, 'YYYYMMDD'), to_char(view_init - :1, 'hh:miam'), to_char(view_init - :1, 'MM/DD/YYYY hh:miam')),	
+			decode(to_char(view_latest - :1, 'YYYYMMDD'), to_char(sysdate - :1, 'YYYYMMDD'), to_char(view_latest - :1, 'hh:miam'), to_char(view_latest - :1, 'MM/DD/YYYY hh:miam')), view_arl
+			from Persess_View_Count 
+			where person_id = :2
+			and view_init &gt; trunc(sysdate) + :1
+			order by view_count DESC
+			
+		</statement>
+
+		<statement name="sel_SessionInfo">
+			
+			select * 
+			from Persess_View_Count 
+			where person_id = ?
+			and view_init &gt;= trunc(sysdate)
+			and view_scope = ?
+			and view_key = ?
+			
+		</statement>
+
+		<statement name="upd_count">
+			
+			update Persess_View_Count
+			set view_count = view_count +1,
+			view_latest = sysdate
+			where person_id = ?
+			and view_init &gt;= trunc(sysdate)
+			and view_scope = ?
+			and view_key = ?
+			
+		</statement>
+
+	</sql-statements>
+</xaf>

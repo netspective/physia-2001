@@ -1,0 +1,1330 @@
+<?xml version="1.0"?>
+
+<xaf>
+	<sql-statements package="search.insurance">
+		<statement name="id">
+			App::Statements::Search::Insurance
+		</statement>
+
+		<statement name="sel_city">
+			
+			SELECT *
+			FROM (
+			SELECT
+			org.org_id,
+			ins.product_name,
+			ins.plan_name,
+			addr.line1,
+			addr.city,
+			addr.state,
+			ins.ins_internal_id
+			FROM
+			insurance ins,
+			insurance_address addr,
+			org
+			WHERE
+			ins.ins_internal_id = addr.parent_id
+			AND org.org_internal_id = ins.ins_org_id
+			AND	UPPER(addr.city) = ? 
+			AND ( (ins.owner_org_id = ?)
+			OR EXISTS
+			(SELECT 1 
+			FROM org_association assn
+			WHERE assn.assn_org_internal_id = ins.owner_org_id
+			AND assn.org_internal_id = ?
+			AND assn.org_assn_type = 100 
+			AND assn.org_assn_status = 0
+			)
+			) 
+			ORDER BY 1
+			)
+			WHERE rownum &lt;= 250
+
+		</statement>
+
+		<statement name="sel_city_insplan">
+			
+			SELECT *
+			FROM (
+			SELECT
+			org.org_id,
+			ins.product_name,
+			ins.plan_name,
+			addr.line1,
+			addr.city,
+			addr.state,
+			ins.ins_internal_id
+			FROM
+			insurance ins,
+			insurance_address addr,
+			org
+			WHERE
+			ins.ins_internal_id = addr.parent_id
+			AND org.org_internal_id = ins.ins_org_id
+			AND	UPPER(addr.city) = ? 
+			AND ( (ins.owner_org_id = ?)
+			OR EXISTS
+			(SELECT 1 
+			FROM org_association assn
+			WHERE assn.assn_org_internal_id = ins.owner_org_id
+			AND assn.org_internal_id = ?
+			AND assn.org_assn_type = 100 
+			AND assn.org_assn_status = 0
+			)
+			) 
+			AND ins.record_type = 2
+			ORDER BY 1
+			)
+			WHERE rownum &lt;= 250
+
+		</statement>
+
+		<statement name="sel_city_insproduct">
+			
+			SELECT *
+			FROM (
+			SELECT
+			org.org_id,
+			ins.product_name,
+			ins.plan_name,
+			addr.line1,
+			addr.city,
+			addr.state,
+			ins.ins_internal_id
+			FROM
+			insurance ins,
+			insurance_address addr,
+			org
+			WHERE
+			ins.ins_internal_id = addr.parent_id
+			AND org.org_internal_id = ins.ins_org_id
+			AND	UPPER(addr.city) = ? 
+			AND ( (ins.owner_org_id = ?)
+			OR EXISTS
+			(SELECT 1 
+			FROM org_association assn
+			WHERE assn.assn_org_internal_id = ins.owner_org_id
+			AND assn.org_internal_id = ?
+			AND assn.org_assn_type = 100 
+			AND assn.org_assn_status = 0
+			)
+			) 
+			AND ins.record_type = 1
+			ORDER BY 1
+			)
+			WHERE rownum &lt;= 250
+
+		</statement>
+
+		<statement name="sel_city_like">
+			
+			SELECT *
+			FROM (
+			SELECT
+			org.org_id,
+			ins.product_name,
+			ins.plan_name,
+			addr.line1,
+			addr.city,
+			addr.state,
+			ins.ins_internal_id
+			FROM
+			insurance ins,
+			insurance_address addr,
+			org
+			WHERE
+			ins.ins_internal_id = addr.parent_id
+			AND org.org_internal_id = ins.ins_org_id
+			AND	UPPER(addr.city) like ? 
+			AND ( (ins.owner_org_id = ?)
+			OR EXISTS
+			(SELECT 1 
+			FROM org_association assn
+			WHERE assn.assn_org_internal_id = ins.owner_org_id
+			AND assn.org_internal_id = ?
+			AND assn.org_assn_type = 100 
+			AND assn.org_assn_status = 0
+			)
+			) 
+			ORDER BY 1
+			)
+			WHERE rownum &lt;= 250
+
+		</statement>
+
+		<statement name="sel_city_like_insplan">
+			
+			SELECT *
+			FROM (
+			SELECT
+			org.org_id,
+			ins.product_name,
+			ins.plan_name,
+			addr.line1,
+			addr.city,
+			addr.state,
+			ins.ins_internal_id
+			FROM
+			insurance ins,
+			insurance_address addr,
+			org
+			WHERE
+			ins.ins_internal_id = addr.parent_id
+			AND org.org_internal_id = ins.ins_org_id
+			AND	UPPER(addr.city) like ? 
+			AND ( (ins.owner_org_id = ?)
+			OR EXISTS
+			(SELECT 1 
+			FROM org_association assn
+			WHERE assn.assn_org_internal_id = ins.owner_org_id
+			AND assn.org_internal_id = ?
+			AND assn.org_assn_type = 100 
+			AND assn.org_assn_status = 0
+			)
+			) 
+			AND ins.record_type = 2
+			ORDER BY 1
+			)
+			WHERE rownum &lt;= 250
+
+		</statement>
+
+		<statement name="sel_city_like_insproduct">
+			
+			SELECT *
+			FROM (
+			SELECT
+			org.org_id,
+			ins.product_name,
+			ins.plan_name,
+			addr.line1,
+			addr.city,
+			addr.state,
+			ins.ins_internal_id
+			FROM
+			insurance ins,
+			insurance_address addr,
+			org
+			WHERE
+			ins.ins_internal_id = addr.parent_id
+			AND org.org_internal_id = ins.ins_org_id
+			AND	UPPER(addr.city) like ? 
+			AND ( (ins.owner_org_id = ?)
+			OR EXISTS
+			(SELECT 1 
+			FROM org_association assn
+			WHERE assn.assn_org_internal_id = ins.owner_org_id
+			AND assn.org_internal_id = ?
+			AND assn.org_assn_type = 100 
+			AND assn.org_assn_status = 0
+			)
+			) 
+			AND ins.record_type = 1
+			ORDER BY 1
+			)
+			WHERE rownum &lt;= 250
+
+		</statement>
+
+		<statement name="sel_insorgid">
+			
+			SELECT *
+			FROM (
+			SELECT
+			org.org_id,
+			ins.product_name,
+			ins.plan_name,
+			addr.line1,
+			addr.city,
+			addr.state,
+			ins.ins_internal_id
+			FROM
+			insurance ins,
+			insurance_address addr,
+			org
+			WHERE
+			ins.ins_internal_id = addr.parent_id
+			AND org.org_internal_id = ins.ins_org_id
+			AND	UPPER(org.org_id) = ? 
+			AND ( (ins.owner_org_id = ?)
+			OR EXISTS
+			(SELECT 1 
+			FROM org_association assn
+			WHERE assn.assn_org_internal_id = ins.owner_org_id
+			AND assn.org_internal_id = ?
+			AND assn.org_assn_type = 100 
+			AND assn.org_assn_status = 0
+			)
+			) 
+			ORDER BY 1
+			)
+			WHERE rownum &lt;= 250
+
+		</statement>
+
+		<statement name="sel_insorgid_insplan">
+			
+			SELECT *
+			FROM (
+			SELECT
+			org.org_id,
+			ins.product_name,
+			ins.plan_name,
+			addr.line1,
+			addr.city,
+			addr.state,
+			ins.ins_internal_id
+			FROM
+			insurance ins,
+			insurance_address addr,
+			org
+			WHERE
+			ins.ins_internal_id = addr.parent_id
+			AND org.org_internal_id = ins.ins_org_id
+			AND	UPPER(org.org_id) = ? 
+			AND ( (ins.owner_org_id = ?)
+			OR EXISTS
+			(SELECT 1 
+			FROM org_association assn
+			WHERE assn.assn_org_internal_id = ins.owner_org_id
+			AND assn.org_internal_id = ?
+			AND assn.org_assn_type = 100 
+			AND assn.org_assn_status = 0
+			)
+			) 
+			AND ins.record_type = 2
+			ORDER BY 1
+			)
+			WHERE rownum &lt;= 250
+
+		</statement>
+
+		<statement name="sel_insorgid_insproduct">
+			
+			SELECT *
+			FROM (
+			SELECT
+			org.org_id,
+			ins.product_name,
+			ins.plan_name,
+			addr.line1,
+			addr.city,
+			addr.state,
+			ins.ins_internal_id
+			FROM
+			insurance ins,
+			insurance_address addr,
+			org
+			WHERE
+			ins.ins_internal_id = addr.parent_id
+			AND org.org_internal_id = ins.ins_org_id
+			AND	UPPER(org.org_id) = ? 
+			AND ( (ins.owner_org_id = ?)
+			OR EXISTS
+			(SELECT 1 
+			FROM org_association assn
+			WHERE assn.assn_org_internal_id = ins.owner_org_id
+			AND assn.org_internal_id = ?
+			AND assn.org_assn_type = 100 
+			AND assn.org_assn_status = 0
+			)
+			) 
+			AND ins.record_type = 1
+			ORDER BY 1
+			)
+			WHERE rownum &lt;= 250
+
+		</statement>
+
+		<statement name="sel_insorgid_like">
+			
+			SELECT *
+			FROM (
+			SELECT
+			org.org_id,
+			ins.product_name,
+			ins.plan_name,
+			addr.line1,
+			addr.city,
+			addr.state,
+			ins.ins_internal_id
+			FROM
+			insurance ins,
+			insurance_address addr,
+			org
+			WHERE
+			ins.ins_internal_id = addr.parent_id
+			AND org.org_internal_id = ins.ins_org_id
+			AND	UPPER(org.org_id) LIKE ? 
+			AND ( (ins.owner_org_id = ?)
+			OR EXISTS
+			(SELECT 1 
+			FROM org_association assn
+			WHERE assn.assn_org_internal_id = ins.owner_org_id
+			AND assn.org_internal_id = ?
+			AND assn.org_assn_type = 100 
+			AND assn.org_assn_status = 0
+			)
+			) 
+			ORDER BY 1
+			)
+			WHERE rownum &lt;= 250
+
+		</statement>
+
+		<statement name="sel_insorgid_like_insplan">
+			
+			SELECT *
+			FROM (
+			SELECT
+			org.org_id,
+			ins.product_name,
+			ins.plan_name,
+			addr.line1,
+			addr.city,
+			addr.state,
+			ins.ins_internal_id
+			FROM
+			insurance ins,
+			insurance_address addr,
+			org
+			WHERE
+			ins.ins_internal_id = addr.parent_id
+			AND org.org_internal_id = ins.ins_org_id
+			AND	UPPER(org.org_id) LIKE ? 
+			AND ( (ins.owner_org_id = ?)
+			OR EXISTS
+			(SELECT 1 
+			FROM org_association assn
+			WHERE assn.assn_org_internal_id = ins.owner_org_id
+			AND assn.org_internal_id = ?
+			AND assn.org_assn_type = 100 
+			AND assn.org_assn_status = 0
+			)
+			) 
+			AND ins.record_type = 2
+			ORDER BY 1
+			)
+			WHERE rownum &lt;= 250
+
+		</statement>
+
+		<statement name="sel_insorgid_like_insproduct">
+			
+			SELECT *
+			FROM (
+			SELECT
+			org.org_id,
+			ins.product_name,
+			ins.plan_name,
+			addr.line1,
+			addr.city,
+			addr.state,
+			ins.ins_internal_id
+			FROM
+			insurance ins,
+			insurance_address addr,
+			org
+			WHERE
+			ins.ins_internal_id = addr.parent_id
+			AND org.org_internal_id = ins.ins_org_id
+			AND	UPPER(org.org_id) LIKE ? 
+			AND ( (ins.owner_org_id = ?)
+			OR EXISTS
+			(SELECT 1 
+			FROM org_association assn
+			WHERE assn.assn_org_internal_id = ins.owner_org_id
+			AND assn.org_internal_id = ?
+			AND assn.org_assn_type = 100 
+			AND assn.org_assn_status = 0
+			)
+			) 
+			AND ins.record_type = 1
+			ORDER BY 1
+			)
+			WHERE rownum &lt;= 250
+
+		</statement>
+
+		<statement name="sel_plan">
+			
+			SELECT *
+			FROM (
+			SELECT
+			org.org_id,
+			ins.product_name,
+			ins.plan_name,
+			addr.line1,
+			addr.city,
+			addr.state,
+			ins.ins_internal_id
+			FROM
+			insurance ins,
+			insurance_address addr,
+			org
+			WHERE
+			ins.ins_internal_id = addr.parent_id
+			AND org.org_internal_id = ins.ins_org_id
+			AND	UPPER(ins.plan_name) = ? 
+			AND ( (ins.owner_org_id = ?)
+			OR EXISTS
+			(SELECT 1 
+			FROM org_association assn
+			WHERE assn.assn_org_internal_id = ins.owner_org_id
+			AND assn.org_internal_id = ?
+			AND assn.org_assn_type = 100 
+			AND assn.org_assn_status = 0
+			)
+			) 
+			ORDER BY 1
+			)
+			WHERE rownum &lt;= 250
+
+		</statement>
+
+		<statement name="sel_plan_insplan">
+			
+			SELECT *
+			FROM (
+			SELECT
+			org.org_id,
+			ins.product_name,
+			ins.plan_name,
+			addr.line1,
+			addr.city,
+			addr.state,
+			ins.ins_internal_id
+			FROM
+			insurance ins,
+			insurance_address addr,
+			org
+			WHERE
+			ins.ins_internal_id = addr.parent_id
+			AND org.org_internal_id = ins.ins_org_id
+			AND	UPPER(ins.plan_name) = ? 
+			AND ( (ins.owner_org_id = ?)
+			OR EXISTS
+			(SELECT 1 
+			FROM org_association assn
+			WHERE assn.assn_org_internal_id = ins.owner_org_id
+			AND assn.org_internal_id = ?
+			AND assn.org_assn_type = 100 
+			AND assn.org_assn_status = 0
+			)
+			) 
+			AND ins.record_type = 2
+			ORDER BY 1
+			)
+			WHERE rownum &lt;= 250
+
+		</statement>
+
+		<statement name="sel_plan_insproduct">
+			
+			SELECT *
+			FROM (
+			SELECT
+			org.org_id,
+			ins.product_name,
+			ins.plan_name,
+			addr.line1,
+			addr.city,
+			addr.state,
+			ins.ins_internal_id
+			FROM
+			insurance ins,
+			insurance_address addr,
+			org
+			WHERE
+			ins.ins_internal_id = addr.parent_id
+			AND org.org_internal_id = ins.ins_org_id
+			AND	UPPER(ins.plan_name) = ? 
+			AND ( (ins.owner_org_id = ?)
+			OR EXISTS
+			(SELECT 1 
+			FROM org_association assn
+			WHERE assn.assn_org_internal_id = ins.owner_org_id
+			AND assn.org_internal_id = ?
+			AND assn.org_assn_type = 100 
+			AND assn.org_assn_status = 0
+			)
+			) 
+			AND ins.record_type = 1
+			ORDER BY 1
+			)
+			WHERE rownum &lt;= 250
+
+		</statement>
+
+		<statement name="sel_plan_like">
+			
+			SELECT *
+			FROM (
+			SELECT
+			org.org_id,
+			ins.product_name,
+			ins.plan_name,
+			addr.line1,
+			addr.city,
+			addr.state,
+			ins.ins_internal_id
+			FROM
+			insurance ins,
+			insurance_address addr,
+			org
+			WHERE
+			ins.ins_internal_id = addr.parent_id
+			AND org.org_internal_id = ins.ins_org_id
+			AND	UPPER(ins.plan_name) LIKE ? 
+			AND ( (ins.owner_org_id = ?)
+			OR EXISTS
+			(SELECT 1 
+			FROM org_association assn
+			WHERE assn.assn_org_internal_id = ins.owner_org_id
+			AND assn.org_internal_id = ?
+			AND assn.org_assn_type = 100 
+			AND assn.org_assn_status = 0
+			)
+			) 
+			ORDER BY 1
+			)
+			WHERE rownum &lt;= 250
+
+		</statement>
+
+		<statement name="sel_plan_like_insplan">
+			
+			SELECT *
+			FROM (
+			SELECT
+			org.org_id,
+			ins.product_name,
+			ins.plan_name,
+			addr.line1,
+			addr.city,
+			addr.state,
+			ins.ins_internal_id
+			FROM
+			insurance ins,
+			insurance_address addr,
+			org
+			WHERE
+			ins.ins_internal_id = addr.parent_id
+			AND org.org_internal_id = ins.ins_org_id
+			AND	UPPER(ins.plan_name) LIKE ? 
+			AND ( (ins.owner_org_id = ?)
+			OR EXISTS
+			(SELECT 1 
+			FROM org_association assn
+			WHERE assn.assn_org_internal_id = ins.owner_org_id
+			AND assn.org_internal_id = ?
+			AND assn.org_assn_type = 100 
+			AND assn.org_assn_status = 0
+			)
+			) 
+			AND ins.record_type = 2
+			ORDER BY 1
+			)
+			WHERE rownum &lt;= 250
+
+		</statement>
+
+		<statement name="sel_plan_like_insproduct">
+			
+			SELECT *
+			FROM (
+			SELECT
+			org.org_id,
+			ins.product_name,
+			ins.plan_name,
+			addr.line1,
+			addr.city,
+			addr.state,
+			ins.ins_internal_id
+			FROM
+			insurance ins,
+			insurance_address addr,
+			org
+			WHERE
+			ins.ins_internal_id = addr.parent_id
+			AND org.org_internal_id = ins.ins_org_id
+			AND	UPPER(ins.plan_name) LIKE ? 
+			AND ( (ins.owner_org_id = ?)
+			OR EXISTS
+			(SELECT 1 
+			FROM org_association assn
+			WHERE assn.assn_org_internal_id = ins.owner_org_id
+			AND assn.org_internal_id = ?
+			AND assn.org_assn_type = 100 
+			AND assn.org_assn_status = 0
+			)
+			) 
+			AND ins.record_type = 1
+			ORDER BY 1
+			)
+			WHERE rownum &lt;= 250
+
+		</statement>
+
+		<statement name="sel_product">
+			
+			SELECT *
+			FROM (
+			SELECT
+			org.org_id,
+			ins.product_name,
+			ins.plan_name,
+			addr.line1,
+			addr.city,
+			addr.state,
+			ins.ins_internal_id
+			FROM
+			insurance ins,
+			insurance_address addr,
+			org
+			WHERE
+			ins.ins_internal_id = addr.parent_id
+			AND org.org_internal_id = ins.ins_org_id
+			AND	UPPER(ins.product_name) = REPLACE(?, '%20', ' ') 
+			AND ( (ins.owner_org_id = ?)
+			OR EXISTS
+			(SELECT 1 
+			FROM org_association assn
+			WHERE assn.assn_org_internal_id = ins.owner_org_id
+			AND assn.org_internal_id = ?
+			AND assn.org_assn_type = 100 
+			AND assn.org_assn_status = 0
+			)
+			) 
+			ORDER BY 1
+			)
+			WHERE rownum &lt;= 250
+
+		</statement>
+
+		<statement name="sel_product_insplan">
+			
+			SELECT *
+			FROM (
+			SELECT
+			org.org_id,
+			ins.product_name,
+			ins.plan_name,
+			addr.line1,
+			addr.city,
+			addr.state,
+			ins.ins_internal_id
+			FROM
+			insurance ins,
+			insurance_address addr,
+			org
+			WHERE
+			ins.ins_internal_id = addr.parent_id
+			AND org.org_internal_id = ins.ins_org_id
+			AND	UPPER(ins.product_name) = REPLACE(?, '%20', ' ') 
+			AND ( (ins.owner_org_id = ?)
+			OR EXISTS
+			(SELECT 1 
+			FROM org_association assn
+			WHERE assn.assn_org_internal_id = ins.owner_org_id
+			AND assn.org_internal_id = ?
+			AND assn.org_assn_type = 100 
+			AND assn.org_assn_status = 0
+			)
+			) 
+			AND ins.record_type = 2
+			ORDER BY 1
+			)
+			WHERE rownum &lt;= 250
+
+		</statement>
+
+		<statement name="sel_product_insproduct">
+			
+			SELECT *
+			FROM (
+			SELECT
+			org.org_id,
+			ins.product_name,
+			ins.plan_name,
+			addr.line1,
+			addr.city,
+			addr.state,
+			ins.ins_internal_id
+			FROM
+			insurance ins,
+			insurance_address addr,
+			org
+			WHERE
+			ins.ins_internal_id = addr.parent_id
+			AND org.org_internal_id = ins.ins_org_id
+			AND	UPPER(ins.product_name) = REPLACE(?, '%20', ' ') 
+			AND ( (ins.owner_org_id = ?)
+			OR EXISTS
+			(SELECT 1 
+			FROM org_association assn
+			WHERE assn.assn_org_internal_id = ins.owner_org_id
+			AND assn.org_internal_id = ?
+			AND assn.org_assn_type = 100 
+			AND assn.org_assn_status = 0
+			)
+			) 
+			AND ins.record_type = 1
+			ORDER BY 1
+			)
+			WHERE rownum &lt;= 250
+
+		</statement>
+
+		<statement name="sel_product_like">
+			
+			SELECT *
+			FROM (
+			SELECT
+			org.org_id,
+			ins.product_name,
+			ins.plan_name,
+			addr.line1,
+			addr.city,
+			addr.state,
+			ins.ins_internal_id
+			FROM
+			insurance ins,
+			insurance_address addr,
+			org
+			WHERE
+			ins.ins_internal_id = addr.parent_id
+			AND org.org_internal_id = ins.ins_org_id
+			AND	UPPER(ins.product_name) LIKE ? 
+			AND ( (ins.owner_org_id = ?)
+			OR EXISTS
+			(SELECT 1 
+			FROM org_association assn
+			WHERE assn.assn_org_internal_id = ins.owner_org_id
+			AND assn.org_internal_id = ?
+			AND assn.org_assn_type = 100 
+			AND assn.org_assn_status = 0
+			)
+			) 
+			ORDER BY 1
+			)
+			WHERE rownum &lt;= 250
+
+		</statement>
+
+		<statement name="sel_product_like_insplan">
+			
+			SELECT *
+			FROM (
+			SELECT
+			org.org_id,
+			ins.product_name,
+			ins.plan_name,
+			addr.line1,
+			addr.city,
+			addr.state,
+			ins.ins_internal_id
+			FROM
+			insurance ins,
+			insurance_address addr,
+			org
+			WHERE
+			ins.ins_internal_id = addr.parent_id
+			AND org.org_internal_id = ins.ins_org_id
+			AND	UPPER(ins.product_name) LIKE ? 
+			AND ( (ins.owner_org_id = ?)
+			OR EXISTS
+			(SELECT 1 
+			FROM org_association assn
+			WHERE assn.assn_org_internal_id = ins.owner_org_id
+			AND assn.org_internal_id = ?
+			AND assn.org_assn_type = 100 
+			AND assn.org_assn_status = 0
+			)
+			) 
+			AND ins.record_type = 2
+			ORDER BY 1
+			)
+			WHERE rownum &lt;= 250
+
+		</statement>
+
+		<statement name="sel_product_like_insproduct">
+			
+			SELECT *
+			FROM (
+			SELECT
+			org.org_id,
+			ins.product_name,
+			ins.plan_name,
+			addr.line1,
+			addr.city,
+			addr.state,
+			ins.ins_internal_id
+			FROM
+			insurance ins,
+			insurance_address addr,
+			org
+			WHERE
+			ins.ins_internal_id = addr.parent_id
+			AND org.org_internal_id = ins.ins_org_id
+			AND	UPPER(ins.product_name) LIKE ? 
+			AND ( (ins.owner_org_id = ?)
+			OR EXISTS
+			(SELECT 1 
+			FROM org_association assn
+			WHERE assn.assn_org_internal_id = ins.owner_org_id
+			AND assn.org_internal_id = ?
+			AND assn.org_assn_type = 100 
+			AND assn.org_assn_status = 0
+			)
+			) 
+			AND ins.record_type = 1
+			ORDER BY 1
+			)
+			WHERE rownum &lt;= 250
+
+		</statement>
+
+		<statement name="sel_state">
+			
+			SELECT *
+			FROM (
+			SELECT
+			org.org_id,
+			ins.product_name,
+			ins.plan_name,
+			addr.line1,
+			addr.city,
+			addr.state,
+			ins.ins_internal_id
+			FROM
+			insurance ins,
+			insurance_address addr,
+			org
+			WHERE
+			ins.ins_internal_id = addr.parent_id
+			AND org.org_internal_id = ins.ins_org_id
+			AND	UPPER(addr.state) = ? 
+			AND ( (ins.owner_org_id = ?)
+			OR EXISTS
+			(SELECT 1 
+			FROM org_association assn
+			WHERE assn.assn_org_internal_id = ins.owner_org_id
+			AND assn.org_internal_id = ?
+			AND assn.org_assn_type = 100 
+			AND assn.org_assn_status = 0
+			)
+			) 
+			ORDER BY 1
+			)
+			WHERE rownum &lt;= 250
+
+		</statement>
+
+		<statement name="sel_state_insplan">
+			
+			SELECT *
+			FROM (
+			SELECT
+			org.org_id,
+			ins.product_name,
+			ins.plan_name,
+			addr.line1,
+			addr.city,
+			addr.state,
+			ins.ins_internal_id
+			FROM
+			insurance ins,
+			insurance_address addr,
+			org
+			WHERE
+			ins.ins_internal_id = addr.parent_id
+			AND org.org_internal_id = ins.ins_org_id
+			AND	UPPER(addr.state) = ? 
+			AND ( (ins.owner_org_id = ?)
+			OR EXISTS
+			(SELECT 1 
+			FROM org_association assn
+			WHERE assn.assn_org_internal_id = ins.owner_org_id
+			AND assn.org_internal_id = ?
+			AND assn.org_assn_type = 100 
+			AND assn.org_assn_status = 0
+			)
+			) 
+			AND ins.record_type = 2
+			ORDER BY 1
+			)
+			WHERE rownum &lt;= 250
+
+		</statement>
+
+		<statement name="sel_state_insproduct">
+			
+			SELECT *
+			FROM (
+			SELECT
+			org.org_id,
+			ins.product_name,
+			ins.plan_name,
+			addr.line1,
+			addr.city,
+			addr.state,
+			ins.ins_internal_id
+			FROM
+			insurance ins,
+			insurance_address addr,
+			org
+			WHERE
+			ins.ins_internal_id = addr.parent_id
+			AND org.org_internal_id = ins.ins_org_id
+			AND	UPPER(addr.state) = ? 
+			AND ( (ins.owner_org_id = ?)
+			OR EXISTS
+			(SELECT 1 
+			FROM org_association assn
+			WHERE assn.assn_org_internal_id = ins.owner_org_id
+			AND assn.org_internal_id = ?
+			AND assn.org_assn_type = 100 
+			AND assn.org_assn_status = 0
+			)
+			) 
+			AND ins.record_type = 1
+			ORDER BY 1
+			)
+			WHERE rownum &lt;= 250
+
+		</statement>
+
+		<statement name="sel_state_like">
+			
+			SELECT *
+			FROM (
+			SELECT
+			org.org_id,
+			ins.product_name,
+			ins.plan_name,
+			addr.line1,
+			addr.city,
+			addr.state,
+			ins.ins_internal_id
+			FROM
+			insurance ins,
+			insurance_address addr,
+			org
+			WHERE
+			ins.ins_internal_id = addr.parent_id
+			AND org.org_internal_id = ins.ins_org_id
+			AND	UPPER(addr.state) like ? 
+			AND ( (ins.owner_org_id = ?)
+			OR EXISTS
+			(SELECT 1 
+			FROM org_association assn
+			WHERE assn.assn_org_internal_id = ins.owner_org_id
+			AND assn.org_internal_id = ?
+			AND assn.org_assn_type = 100 
+			AND assn.org_assn_status = 0
+			)
+			) 
+			ORDER BY 1
+			)
+			WHERE rownum &lt;= 250
+
+		</statement>
+
+		<statement name="sel_state_like_insplan">
+			
+			SELECT *
+			FROM (
+			SELECT
+			org.org_id,
+			ins.product_name,
+			ins.plan_name,
+			addr.line1,
+			addr.city,
+			addr.state,
+			ins.ins_internal_id
+			FROM
+			insurance ins,
+			insurance_address addr,
+			org
+			WHERE
+			ins.ins_internal_id = addr.parent_id
+			AND org.org_internal_id = ins.ins_org_id
+			AND	UPPER(addr.state) like ? 
+			AND ( (ins.owner_org_id = ?)
+			OR EXISTS
+			(SELECT 1 
+			FROM org_association assn
+			WHERE assn.assn_org_internal_id = ins.owner_org_id
+			AND assn.org_internal_id = ?
+			AND assn.org_assn_type = 100 
+			AND assn.org_assn_status = 0
+			)
+			) 
+			AND ins.record_type = 2
+			ORDER BY 1
+			)
+			WHERE rownum &lt;= 250
+
+		</statement>
+
+		<statement name="sel_state_like_insproduct">
+			
+			SELECT *
+			FROM (
+			SELECT
+			org.org_id,
+			ins.product_name,
+			ins.plan_name,
+			addr.line1,
+			addr.city,
+			addr.state,
+			ins.ins_internal_id
+			FROM
+			insurance ins,
+			insurance_address addr,
+			org
+			WHERE
+			ins.ins_internal_id = addr.parent_id
+			AND org.org_internal_id = ins.ins_org_id
+			AND	UPPER(addr.state) like ? 
+			AND ( (ins.owner_org_id = ?)
+			OR EXISTS
+			(SELECT 1 
+			FROM org_association assn
+			WHERE assn.assn_org_internal_id = ins.owner_org_id
+			AND assn.org_internal_id = ?
+			AND assn.org_assn_type = 100 
+			AND assn.org_assn_status = 0
+			)
+			) 
+			AND ins.record_type = 1
+			ORDER BY 1
+			)
+			WHERE rownum &lt;= 250
+
+		</statement>
+
+		<statement name="sel_street">
+			
+			SELECT *
+			FROM (
+			SELECT
+			org.org_id,
+			ins.product_name,
+			ins.plan_name,
+			addr.line1,
+			addr.city,
+			addr.state,
+			ins.ins_internal_id
+			FROM
+			insurance ins,
+			insurance_address addr,
+			org
+			WHERE
+			ins.ins_internal_id = addr.parent_id
+			AND org.org_internal_id = ins.ins_org_id
+			AND	UPPER(addr.line1) = ? 
+			AND ( (ins.owner_org_id = ?)
+			OR EXISTS
+			(SELECT 1 
+			FROM org_association assn
+			WHERE assn.assn_org_internal_id = ins.owner_org_id
+			AND assn.org_internal_id = ?
+			AND assn.org_assn_type = 100 
+			AND assn.org_assn_status = 0
+			)
+			) 
+			ORDER BY 1
+			)
+			WHERE rownum &lt;= 250
+
+		</statement>
+
+		<statement name="sel_street_insplan">
+			
+			SELECT *
+			FROM (
+			SELECT
+			org.org_id,
+			ins.product_name,
+			ins.plan_name,
+			addr.line1,
+			addr.city,
+			addr.state,
+			ins.ins_internal_id
+			FROM
+			insurance ins,
+			insurance_address addr,
+			org
+			WHERE
+			ins.ins_internal_id = addr.parent_id
+			AND org.org_internal_id = ins.ins_org_id
+			AND	UPPER(addr.line1) = ? 
+			AND ( (ins.owner_org_id = ?)
+			OR EXISTS
+			(SELECT 1 
+			FROM org_association assn
+			WHERE assn.assn_org_internal_id = ins.owner_org_id
+			AND assn.org_internal_id = ?
+			AND assn.org_assn_type = 100 
+			AND assn.org_assn_status = 0
+			)
+			) 
+			AND ins.record_type = 2
+			ORDER BY 1
+			)
+			WHERE rownum &lt;= 250
+
+		</statement>
+
+		<statement name="sel_street_insproduct">
+			
+			SELECT *
+			FROM (
+			SELECT
+			org.org_id,
+			ins.product_name,
+			ins.plan_name,
+			addr.line1,
+			addr.city,
+			addr.state,
+			ins.ins_internal_id
+			FROM
+			insurance ins,
+			insurance_address addr,
+			org
+			WHERE
+			ins.ins_internal_id = addr.parent_id
+			AND org.org_internal_id = ins.ins_org_id
+			AND	UPPER(addr.line1) = ? 
+			AND ( (ins.owner_org_id = ?)
+			OR EXISTS
+			(SELECT 1 
+			FROM org_association assn
+			WHERE assn.assn_org_internal_id = ins.owner_org_id
+			AND assn.org_internal_id = ?
+			AND assn.org_assn_type = 100 
+			AND assn.org_assn_status = 0
+			)
+			) 
+			AND ins.record_type = 1
+			ORDER BY 1
+			)
+			WHERE rownum &lt;= 250
+
+		</statement>
+
+		<statement name="sel_street_like">
+			
+			SELECT *
+			FROM (
+			SELECT
+			org.org_id,
+			ins.product_name,
+			ins.plan_name,
+			addr.line1,
+			addr.city,
+			addr.state,
+			ins.ins_internal_id
+			FROM
+			insurance ins,
+			insurance_address addr,
+			org
+			WHERE
+			ins.ins_internal_id = addr.parent_id
+			AND org.org_internal_id = ins.ins_org_id
+			AND	UPPER(addr.line1) like ? 
+			AND ( (ins.owner_org_id = ?)
+			OR EXISTS
+			(SELECT 1 
+			FROM org_association assn
+			WHERE assn.assn_org_internal_id = ins.owner_org_id
+			AND assn.org_internal_id = ?
+			AND assn.org_assn_type = 100 
+			AND assn.org_assn_status = 0
+			)
+			) 
+			ORDER BY 1
+			)
+			WHERE rownum &lt;= 250
+
+		</statement>
+
+		<statement name="sel_street_like_insplan">
+			
+			SELECT *
+			FROM (
+			SELECT
+			org.org_id,
+			ins.product_name,
+			ins.plan_name,
+			addr.line1,
+			addr.city,
+			addr.state,
+			ins.ins_internal_id
+			FROM
+			insurance ins,
+			insurance_address addr,
+			org
+			WHERE
+			ins.ins_internal_id = addr.parent_id
+			AND org.org_internal_id = ins.ins_org_id
+			AND	UPPER(addr.line1) like ? 
+			AND ( (ins.owner_org_id = ?)
+			OR EXISTS
+			(SELECT 1 
+			FROM org_association assn
+			WHERE assn.assn_org_internal_id = ins.owner_org_id
+			AND assn.org_internal_id = ?
+			AND assn.org_assn_type = 100 
+			AND assn.org_assn_status = 0
+			)
+			) 
+			AND ins.record_type = 2
+			ORDER BY 1
+			)
+			WHERE rownum &lt;= 250
+
+		</statement>
+
+		<statement name="sel_street_like_insproduct">
+			
+			SELECT *
+			FROM (
+			SELECT
+			org.org_id,
+			ins.product_name,
+			ins.plan_name,
+			addr.line1,
+			addr.city,
+			addr.state,
+			ins.ins_internal_id
+			FROM
+			insurance ins,
+			insurance_address addr,
+			org
+			WHERE
+			ins.ins_internal_id = addr.parent_id
+			AND org.org_internal_id = ins.ins_org_id
+			AND	UPPER(addr.line1) like ? 
+			AND ( (ins.owner_org_id = ?)
+			OR EXISTS
+			(SELECT 1 
+			FROM org_association assn
+			WHERE assn.assn_org_internal_id = ins.owner_org_id
+			AND assn.org_internal_id = ?
+			AND assn.org_assn_type = 100 
+			AND assn.org_assn_status = 0
+			)
+			) 
+			AND ins.record_type = 1
+			ORDER BY 1
+			)
+			WHERE rownum &lt;= 250
+
+		</statement>
+
+	</sql-statements>
+</xaf>

@@ -1,0 +1,66 @@
+<?xml version="1.0"?>
+
+<xaf>
+	<sql-statements package="search.otherservice">
+		<statement name="id">
+			App::Statements::Search::OtherService
+		</statement>
+
+		<statement name="sel_other_service_code">
+			
+			SELECT 	oce.modifier,oce.name
+			FROM 	offering_catalog_entry oce, offering_catalog oc 		
+			WHERE	oc.org_internal_id = :1
+			AND	oc.catalog_id = 'OTHER'
+			AND	oce.catalog_id = oc.internal_catalog_id
+			AND	oc.catalog_type = 5
+			AND	UPPER(oce.modifier) = :2
+			AND 	rownum &lt;= 250
+			ORDER BY name
+
+		</statement>
+
+		<statement name="sel_other_service_code_like">
+			
+			SELECT 	oce.modifier,oce.name
+			FROM 	offering_catalog_entry oce, offering_catalog oc 		
+			WHERE	oc.org_internal_id = :1
+			AND	oc.catalog_id = 'OTHER'
+			AND	oce.catalog_id = oc.internal_catalog_id
+			AND	oc.catalog_type = 5
+			AND	UPPER(oce.modifier) LIKE :2
+			AND 	rownum &lt;= 250
+			ORDER BY name
+
+		</statement>
+
+		<statement name="sel_other_service_name">
+			
+			SELECT 	oce.modifier,oce.name
+			FROM 	offering_catalog_entry oce, offering_catalog oc 		
+			WHERE	oc.org_internal_id = :1
+			AND	oc.catalog_id = 'OTHER'
+			AND	oce.catalog_id = oc.internal_catalog_id
+			AND	oc.catalog_type = 5
+			AND	UPPER(oce.name) = :2
+			AND 	rownum &lt;= 250
+			ORDER BY name
+
+		</statement>
+
+		<statement name="sel_other_service_name_like">
+			
+			SELECT 	oce.modifier,oce.name
+			FROM 	offering_catalog_entry oce, offering_catalog oc 		
+			WHERE	oc.org_internal_id = :1
+			AND	oc.catalog_id = 'OTHER'
+			AND	oce.catalog_id = oc.internal_catalog_id
+			AND	oc.catalog_type = 5
+			AND	UPPER(oce.name) LIKE :2
+			AND 	rownum &lt;= 250
+			ORDER BY name
+
+		</statement>
+
+	</sql-statements>
+</xaf>

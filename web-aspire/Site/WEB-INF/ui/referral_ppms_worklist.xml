@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+
+<xaf>
+	<dialogs package="referral_ppms_worklist">
+		<dialog name="referral_reck_date" heading="Referral Recheck Date">
+			<field.text caption="Referral ID" read-only="yes" name="referral_id"/>
+			<field.text caption="Patient ID" read-only="yes" max-length="16" name="person_id" size="16"/>
+			<field.text caption="Requesting Physician" read-only="yes" name="requester_id"/>
+			<field.date caption="Recheck Date" max-length="10" name="recheck_date" size="10"/>
+
+		</dialog>
+
+		<dialog name="referral_notes" heading="$Command Referral Notes">
+			<field.text caption="Referral ID" read-only="yes" name="referral_id"/>
+			<field.text caption="Patient ID" read-only="yes" max-length="16" name="person_id" size="16"/>
+			<field.text caption="Requesting Physician" read-only="yes" name="requester_id"/>
+			<field.memo caption="Notes" name="note" size="24"/>
+			<field.date caption="Date" name="note_date" size="12"/>
+
+		</dialog>
+
+		<dialog name="transfer_referral" heading="Transfer Referral">
+			<field.text caption="Referral ID" read-only="yes" name="referral_id"/>
+			<field.text caption="Patient ID" read-only="yes" max-length="16" name="person_id" size="16"/>
+			<field.text caption="Requesting Physician" read-only="yes" name="requester_id"/>
+			<field.text caption="Transfer To" required="yes" hint="Person to Transfer Referral" max-length="16" name="transfer_id" size="16"/>
+			<field.memo caption="Reason For Transfer" name="detail" size="24"/>
+
+		</dialog>
+
+		<dialog name="close_referral" heading="Close Referral">
+			<field.text caption="Referral ID" read-only="yes" name="referral_id"/>
+			<field.text caption="Person ID" read-only="yes" max-length="16" name="person_id" size="16"/>
+			<field.text caption="Requesting Physician" read-only="yes" name="requester_id"/>
+
+		</dialog>
+
+	</dialogs>
+</xaf>

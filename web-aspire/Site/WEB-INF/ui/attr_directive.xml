@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+
+<xaf>
+	<dialogs package="attr_directive">
+		<dialog name="directive_patient" heading="directive_patient">
+			<field.select caption="Directive" required="yes" name="directive" choices=";Living Will-Advanced Directive;Will;Durable Power of Attorney;Medical Power of Attorney;Triage Status-Do Not Resuscitate;Organ Donation;"/>
+			<!--  -->
+			<field.date caption="Date" name="value_date" size="12"/>
+
+		</dialog>
+
+		<dialog name="directive_physician" heading="directive_physician">
+			<field.text caption="Directive" required="yes" name="directive"/>
+			<field.date caption="Date" name="value_date" size="12"/>
+
+		</dialog>
+
+	</dialogs>
+</xaf>

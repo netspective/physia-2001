@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+
+<xaf>
+	<dialogs package="invoice_worklist">
+		<dialog name="transfer_collection" heading="Transfer Invoice">
+			<field.text caption="Person ID" read-only="yes" max-length="16" name="person_id" size="16"/>
+			<field.text caption="Transfer To" required="yes" hint="Collector to Transfer Account" max-length="16" name="transfer_id" size="16"/>
+			<field.memo caption="Reason For Transfer" name="detail" size="24"/>
+			<field.date caption="Date" name="date_data_b" size="12"/>
+
+		</dialog>
+
+	</dialogs>
+</xaf>

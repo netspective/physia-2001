@@ -1,0 +1,50 @@
+<?xml version="1.0"?>
+
+<xaf>
+	<sql-statements package="search.servicetype_code">
+		<statement name="id">
+			App::Statements::Search::Code
+		</statement>
+
+		<statement name="sel_type_code">
+			
+			SELECT abbrev, caption
+			FROM hcfa1500_service_type_code
+			WHERE
+			abbrev = ?
+			AND rownum &lt; 250
+
+		</statement>
+
+		<statement name="sel_type_code_like">
+			
+			SELECT abbrev, caption
+			FROM hcfa1500_service_type_code
+			WHERE
+			abbrev like ?
+			AND rownum &lt; 250
+
+		</statement>
+
+		<statement name="sel_type_name">
+			
+			SELECT abbrev, caption
+			FROM hcfa1500_service_type_code
+			WHERE
+			upper(caption) = ?
+			AND rownum &lt; 250
+
+		</statement>
+
+		<statement name="sel_type_name_like">
+			
+			SELECT abbrev, caption
+			FROM hcfa1500_service_type_code
+			WHERE
+			upper(caption) like ?
+			AND rownum &lt; 250
+
+		</statement>
+
+	</sql-statements>
+</xaf>

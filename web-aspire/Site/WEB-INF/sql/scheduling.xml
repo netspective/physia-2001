@@ -1,0 +1,738 @@
+<?xml version="1.0"?>
+
+<xaf>
+	<sql-statements package="scheduling">
+		<statement name="id">
+			App::Statements::Scheduling
+		</statement>
+
+		<statement name="insApptSheetTimesPref">
+			
+			insert into Person_Attribute
+			(parent_id, item_name , value_int, value_intB)
+			values
+			(? , 'ApptSheet Times', ? , ? )
+			
+		</statement>
+
+		<statement name="selActionOption">
+			
+			select item_id, value_int from Person_Attribute
+			where parent_id = ?
+			and item_name = ?
+			
+		</statement>
+
+		<statement name="selAppointmentConflictCheck">
+			
+			select to_char(start_time - ?, 'hh24mi') as start_minute,
+			to_char(start_time - ?, 'yyyy,mm,dd') as start_day, duration,
+			event_id,	ea.value_text as patient_id, ea.value_textB as resource_id,
+			Event.parent_id, Event.appt_type
+			from 	Event_Attribute ea, Event
+			where start_time between to_date(?, 'yyyy,mm,dd') + ?
+			and to_date(?, 'yyyy,mm,dd') + ?
+			and discard_type is null
+			and event_status in (0,1,2)
+			and facility_id = ?
+			and ea.parent_id = event_id
+			and ea.value_textB = ?
+			and ea.value_type = 333
+			order by nvl(Event.parent_id, 0), event_id
+			
+		</statement>
+
+		<statement name="selApptDuration">
+			
+			select id, caption
+			from appt_duration
+			
+		</statement>
+
+		<statement name="selApptSheetTimes">
+			
+			select value_int as start_time, value_intB as end_time
+			from Person_Attribute
+			where parent_id = ?
+			and item_name = 'ApptSheet Times'
+			
+		</statement>
+
+		<statement name="selApptTypeById">
+			
+			select * from Appt_Type where appt_type_id = :1
+			
+		</statement>
+
+		<statement name="selApptTypeSearch">
+			
+			select distinct
+			appt_type_id, r_ids, caption, duration, lead_time, lag_time,
+			decode(back_to_back, 0, 'No', 1, 'Yes', 'No'),
+			decode(multiple, 0, 'No', 1, 'Yes', 'No'),
+			num_sim, am_limit, pm_limit, rr_ids, day_limit
+			from Appt_Type_R_Ids, Appt_Type
+			where owner_org_id = :1
+			and (upper(member_name) = upper(:2) or upper(r_ids) like upper(:3))
+			and upper(caption) like upper(:4)
+			and Appt_Type_R_Ids.parent_id = appt_type_id
+			order by caption, r_ids, appt_type_id
+			
+		</statement>
+
+		<statement name="selAssociatedResources">
+			
+			select value_text as resource_id, value_textb as facility_id
+			from Person_Attribute
+			where parent_id = ?
+			and value_type = 250
+			and item_name = 'Physician'
+			and parent_org_id = ?
+			
+		</statement>
+
+		<statement name="selColumnPreference">
+			
+			select item_id, value_text as resource_id, org_id as facility_id,
+			nvl(value_intb, 0) as date_offset
+			from Org, Person_Attribute
+			where parent_id = ?
+			and item_name = 'Preference/Schedule/DayView/Column'
+			and value_int = ?
+			and org_internal_id (+) = to_number(value_textb)
+			and Person_Attribute.parent_org_id = ?
+			
+		</statement>
+
+		<statement name="selCompleteName">
+			
+			select complete_name from Person where person_id = ?
+			
+		</statement>
+
+		<statement name="selCountWaiting">
+			
+			select count(*) +1 from Event where parent_id = ? and event_status &lt; 3
+			
+		</statement>
+
+		<statement name="selEffectiveTemplate">
+			
+			select template_id,
+			r_ids as resources,
+			caption,
+			org_id,
+			to_char(start_time - ?, 'HH:MI AM') as start_time,
+			to_char(end_time - ?, 'HH:MI AM') as end_time,
+			to_char(effective_begin_date, 'MM/DD/YYYY') as begin_date,
+			to_char(effective_end_date, 'MM/DD/YYYY') as end_date,
+			decode(available,0,'Not Available',1,'Available') as available,
+			patient_types,
+			appt_types,
+			days_of_month,
+			months,
+			days_of_week
+			from Org, Sch_Template
+			where Sch_Template.owner_org_id = ?
+			and facility_id = org_internal_id
+			and upper(r_ids) like upper(?)
+			and upper(org_id) like upper(?)
+			and (available = ? or available = ?)
+			and status = ?
+			and nvl(effective_end_date, sysdate+1) &gt; sysdate
+			order by available, r_ids, template_id
+
+		</statement>
+
+		<statement name="selEncountersCheckIn/Out">
+			
+			select e.event_id, e.parent_id, e.facility_id as service_facility_id, e.event_status, e.event_type, e.subject,
+			to_char(e.start_time - :1, 'MM/DD/YYYY HH12:MI AM') as start_time,
+			e.duration, e.remarks, e.owner_id,
+			e.scheduled_by_id, e.scheduled_stamp, e.checkin_by_id, at.caption as appt_type,
+			ea.value_text as attendee_id, ea.value_int as attendee_type,
+			ea.value_textB as care_provider_id, '2' as bill_type
+			from Appt_Type at, Event_Attribute ea, Event e
+			where e.event_id = :2
+			and ea.parent_id = e.event_id
+			and ea.value_type = 333
+			and at.appt_type_id(+) = e.appt_type
+			
+		</statement>
+
+		<statement name="selEventAttribute">
+			
+			select *
+			from event_attribute
+			where parent_id = ?
+			and value_type = ?
+			
+		</statement>
+
+		<statement name="selEventById">
+			
+			select * from Event where event_id = :1
+			
+		</statement>
+
+		<statement name="selExistingApptInfo">
+			
+			select event_type, subject, duration, remarks, facility_id, value_int as attendee_type
+			from Event_Attribute, Event
+			where event_id = ?
+			and Event_Attribute.parent_id = Event.event_id
+			and Event_Attribute.value_type = 333
+			
+		</statement>
+
+		<statement name="selFacilityList">
+			
+			select distinct o.ORG_ID, o.NAME_PRIMARY
+			from org o, org_category oc
+			where o.ORG_ID = oc.PARENT_ID
+			and UPPER(oc.MEMBER_NAME) in ('FACILITY','CLINIC')
+			
+		</statement>
+
+		<statement name="selFacilityName">
+			
+			select name_primary from Org
+			where org_internal_id = ?
+			
+		</statement>
+
+		<statement name="selInEffectiveTemplate">
+			
+			select template_id,
+			r_ids as resources,
+			caption,
+			org_id,
+			to_char(start_time - ?, 'HH:MI AM') as start_time,
+			to_char(end_time - ?, 'HH:MI AM') as end_time,
+			to_char(effective_begin_date, 'MM/DD/YYYY') as begin_date,
+			to_char(effective_end_date, 'MM/DD/YYYY') as end_date,
+			decode(available,0,'Not Available',1,'Available') as available,
+			patient_types,
+			appt_types,
+			days_of_month,
+			months,
+			days_of_week
+			from Org, Sch_Template
+			where Sch_Template.owner_org_id = ?
+			and facility_id = org_internal_id
+			and upper(r_ids) like upper(?)
+			and upper(org_id) like upper(?)
+			and (available = ? or available = ?)
+			and (status = ? or
+			(	effective_end_date is NOT NULL
+			and trunc(effective_end_date) &lt; trunc(sysdate)
+			)
+			)
+			order by available, r_ids, template_id
+
+		</statement>
+
+		<statement name="selNextInLineEventID">
+			
+			select min(event_id) from Event where parent_id = ? and event_status &lt; 3
+			
+		</statement>
+
+		<statement name="selNumPreferences">
+			
+			select count(*) from Person_Attribute
+			where parent_id = ?
+			and item_name = 'Preference/Schedule/DayView/Column'
+			and parent_org_id = ?
+			
+		</statement>
+
+		<statement name="selOrderInLine">
+			
+			select value_intB from Event_Attribute where parent_id = ? and value_intB is NOT NULL
+			
+		</statement>
+
+		<statement name="selParentEventID">
+			
+			select parent_id from Event where event_id = ?
+			
+		</statement>
+
+		<statement name="selPatientInfo">
+			
+			select complete_name, pa1.value_text as hphone, pa2.value_text as wphone, complete_addr_html,
+			pa3.value_text as email
+			from Person_Address, Person_Attribute pa3, Person_Attribute pa2, Person_Attribute pa1, Person
+			where person_id = ?
+			and pa1.parent_id (+) = Person.person_id
+			and pa1.item_name (+) = 'Contact Method/Telephone/Home'
+			and pa2.parent_id (+) = Person.person_id
+			and pa2.item_name (+) = 'Contact Method/Telephone/Work'
+			and pa3.parent_id (+) = Person.person_id
+			and pa3.item_name (+) = 'Contact Method/EMail/Primary'
+			and Person_Address.parent_id = Person.person_id
+			
+		</statement>
+
+		<statement name="selPatientTypes">
+			
+			select id, caption from Appt_Attendee_Type
+			
+		</statement>
+
+		<statement name="selPatientTypesDropDown">
+			
+			select id, caption from Appt_Attendee_Type
+			UNION
+			select -1 as id, ' ' as caption from dual
+			order by caption
+			
+		</statement>
+
+		<statement name="selPopulateAppointmentDialog">
+			
+			select e.event_id, e.facility_id, e.event_status, e.event_type, e.subject,
+			to_char(e.start_time - :1, 'MM/DD/YYYY') as appt_date_0,
+			to_char(e.start_time - :1, 'HH:MI AM') as appt_time_0,
+			e.duration, e.remarks, e.owner_id,
+			e.scheduled_by_id, e.scheduled_stamp, e.checkin_by_id,
+			ea.value_text as attendee_id,
+			ea.value_int as patient_type,
+			ea.value_textB as resource_id,
+			e.appt_type, e.parent_id, e.superbill_id
+			from Event_Attribute ea, event e
+			where event_id = :2
+			and ea.parent_id = e.event_id
+			and ea.value_type = 333
+			
+		</statement>
+
+		<statement name="selPopulateApptTypeDialog">
+			
+			select appt_type_id, r_ids, caption, duration, lead_time, lag_time, back_to_back,
+			multiple, num_sim, rr_ids, am_limit, pm_limit, day_limit, superbill_id
+			from Appt_Type
+			where appt_type_id = :1
+			
+		</statement>
+
+		<statement name="selPopulateTemplateDialog">
+			
+			select template_id, caption, r_ids, facility_id, available, status, remarks,
+			preferences, days_of_month, months, days_of_week, patient_types, appt_types,
+			to_char(effective_begin_date,'MM/DD/YYYY') as effective_begin_date,
+			to_char(effective_end_date,'MM/DD/YYYY') as effective_end_date,
+			to_char(start_time - :1, 'HH:MI AM') as duration_begin_time,
+			to_char(end_time - :1,'HH:MI AM') as duration_end_time
+			from Sch_Template_R_Ids, Sch_Template
+			where template_id = :2
+			and parent_id = template_id
+			and rownum = 1
+			
+		</statement>
+
+		<statement name="selResourcesAtFacility">
+			
+			select distinct attendee_id
+			from Template
+			where facility_id = ?
+			
+		</statement>
+
+		<statement name="selRovingPhysicianTypes">
+			
+			select translate(caption, '/ ', '__') as caption
+			from Medical_Specialty
+			where group_name = 'Physician Specialty'
+			UNION
+			select ' ' as caption from Dual
+			order by caption
+			
+		</statement>
+
+		<statement name="selRovingResources">
+			
+			select distinct member_name from Sch_Template_R_Ids where upper(member_name) like ?
+			
+		</statement>
+
+		<statement name="selSchedulePreferences">
+			
+			select item_id, value_text as resource_id, value_textb as facility_id,
+			value_int as column_no, value_intb as offset
+			from Person_Attribute
+			where parent_id = ?
+			and item_name = ?
+			order by column_no
+			
+		</statement>
+
+		<statement name="selSchedulePreferencesByOrg">
+			
+			select item_id, value_text as resource_id, value_textb as facility_id,
+			value_int as column_no, value_intb as offset
+			from Person_Attribute
+			where parent_id = ?
+			and item_name = ?
+			and parent_org_id = ?
+			order by column_no
+			
+		</statement>
+
+		<statement name="selWaitingPatients">
+			
+			select value_text, event_id
+			from Event_Attribute, Event
+			where Event.parent_id = ?
+			and Event_Attribute.parent_id = Event.event_id
+			and Event_Attribute.value_type = 333
+			union
+			select 'None' as value_text, 9999999999999999 as event_id from Dual
+			order by event_id
+			
+		</statement>
+
+		<statement name="sel_AllApptTypes">
+			
+			select appt_type_id, caption || ' (' || appt_type_id || ')' as caption
+			from Appt_Type
+			where owner_org_id = :1
+			order by upper(caption)
+			
+		</statement>
+
+		<statement name="sel_ApptTypesDropDown">
+			
+			select appt_type_id, caption || ' (' || appt_type_id || ')' as caption,
+			upper(caption) as upperCaption
+			from Appt_Type
+			where owner_org_id = :1
+			UNION
+			select 0 as appt_type_id, ' ' as caption, ' ' as upperCaption from Dual
+			order by 3
+			
+		</statement>
+
+		<statement name="sel_SuperBillTypesDropDown">
+			
+			select internal_catalog_id, catalog_id || ' (' || caption || ')' as caption,
+			upper(catalog_id) as upperCaption
+			from Offering_catalog
+			where org_internal_id = :1
+			and catalog_type = 4
+			UNION
+			select 0 as internal_catalog_id, ' ' as caption, ' ' as upperCaption from Dual
+			order by 3
+			
+		</statement>
+
+		<statement name="sel_analyze_events">
+			
+			select to_char(e.start_time - :1, 'hh24mi') as start_minute,
+			to_char(e.start_time - :1, 'yyyy,mm,dd') as start_day,
+			e.duration,
+			e.event_id,
+			ea.value_text as patient_id,
+			ea.value_textB as resource_id,
+			patient.name_last || ', ' || substr(patient.name_first,1,1) as short_patient_name,
+			patient.complete_name as patient_complete_name,
+			initcap(e.subject) as subject,
+			aat.caption as patient_type,
+			initcap(e.remarks) as remarks,
+			e.event_status,
+			e.facility_id,
+			to_char(e.checkin_stamp - :1, 'MM/DD/YYYY HH12:MI AM') as checkin_stamp,
+			to_char(e.checkout_stamp - :1, 'MM/DD/YYYY HH12:MI AM') as checkout_stamp,
+			stat.caption as appt_status,
+			e.parent_id,
+			e.scheduled_by_id,
+			to_char(e.scheduled_stamp - :1, 'MM/DD/YYYY HH12:MI AM') as scheduled_stamp,
+			at.caption as appt_type,
+			e.appt_type as appt_type_id,
+			initcap(patient.complete_sortable_name) as patient_name
+			from Appt_Type at, Appt_Status stat, Appt_Attendee_type aat, Person patient,
+			Event_Attribute ea, Event e
+			where e.start_time &gt;= to_date(:2, 'yyyy,mm,dd') + :1
+			and e.start_time &lt; to_date(:3, 'yyyy,mm,dd') + :1
+			and e.discard_type is null
+			and e.event_status in (0,1,2)
+			and e.facility_id = :4
+			and ea.parent_id = e.event_id
+			and ea.value_text = patient.person_id
+			and upper(ea.value_textB) = upper(:5)
+			and ea.value_type = 333
+			and aat.id = ea.value_int
+			and stat.id = e.event_status
+			and at.appt_type_id (+) = e.appt_type
+			order by nvl(e.parent_id, 0), e.event_id
+
+		</statement>
+
+		<statement name="sel_apptAlert">
+			
+			select value_text as patient_id 
+			from event_attribute ea, event e
+			where e.event_id = :1
+			and ea.parent_id = e.event_id
+			and exists (select 'x' from transaction t
+			where t.trans_owner_id = ea.value_text
+			and t.trans_status = 2
+			and t.trans_type = 8026
+			)
+			
+		</statement>
+
+		<statement name="sel_apptAlertFromPersonId">
+			
+			select 'x' from transaction t
+			where t.trans_owner_id = upper(:1)
+			and t.trans_status = 2
+			and t.trans_type = 8026
+			and rownum &lt; 2
+			
+		</statement>
+
+		<statement name="sel_eventInfo">
+			
+			select event_status, checkin_by_id, checkout_by_id, discard_by_id,
+			to_char(checkin_stamp - :1, 'MM/DD/YYYY HH12:MI AM') as checkin_stamp,
+			to_char(checkout_stamp - :1, 'MM/DD/YYYY HH12:MI AM') as checkout_stamp,
+			to_char(discard_stamp - :1, 'MM/DD/YYYY HH12:MI AM') as discard_stamp,
+			Appt_Discard_type.caption as discard_type
+			from Appt_Discard_type, Event
+			where event_id = :2
+			and Appt_Discard_type.id(+) = Event.discard_type
+			
+		</statement>
+
+		<statement name="sel_events_any_facility">
+			
+			select to_char(e.start_time - :1, 'hh24mi') as start_minute,
+			to_char(e.start_time - :1, 'yyyy,mm,dd') as start_day,
+			e.duration,
+			e.event_id,
+			ea.value_text as patient_id,
+			ea.value_textB as resource_id,
+			patient.name_last || ', ' || substr(patient.name_first,1,1) as short_patient_name,
+			patient.complete_name as patient_complete_name,
+			initcap(e.subject) as subject,
+			aat.caption as patient_type,
+			initcap(e.remarks) as remarks,
+			e.event_status,
+			e.facility_id,
+			to_char(e.checkin_stamp - :1, 'MM/DD/YYYY HH12:MI AM') as checkin_stamp,
+			to_char(e.checkout_stamp - :1, 'MM/DD/YYYY HH12:MI AM') as checkout_stamp,
+			stat.caption as appt_status,
+			e.parent_id,
+			e.scheduled_by_id,
+			to_char(e.scheduled_stamp - :1, 'MM/DD/YYYY HH12:MI AM') as scheduled_stamp,
+			at.caption as appt_type,
+			e.appt_type as appt_type_id,
+			initcap(patient.complete_sortable_name) as patient_name
+			from Appt_Type at, Appt_Status stat, Appt_Attendee_type aat, Person patient,
+			Event_Attribute ea, Event e
+			where e.start_time &gt;= to_date(:2, 'yyyy,mm,dd') + :1
+			and e.start_time &lt; to_date(:3, 'yyyy,mm,dd') + :1
+			and e.discard_type is null
+			and e.event_status in (0,1,2)
+			and e.facility_id &gt; :4
+			and ea.parent_id = e.event_id
+			and ea.value_text = patient.person_id
+			and upper(ea.value_textB) = upper(:5)
+			and ea.value_type = 333
+			and aat.id = ea.value_int
+			and stat.id = e.event_status
+			and at.appt_type_id (+) = e.appt_type
+			order by e.start_time, nvl(e.parent_id, 0), e.event_id
+
+		</statement>
+
+		<statement name="sel_events_at_facility">
+			
+			select to_char(e.start_time - :1, 'hh24mi') as start_minute,
+			to_char(e.start_time - :1, 'yyyy,mm,dd') as start_day,
+			e.duration,
+			e.event_id,
+			ea.value_text as patient_id,
+			ea.value_textB as resource_id,
+			patient.name_last || ', ' || substr(patient.name_first,1,1) as short_patient_name,
+			patient.complete_name as patient_complete_name,
+			initcap(e.subject) as subject,
+			aat.caption as patient_type,
+			initcap(e.remarks) as remarks,
+			e.event_status,
+			e.facility_id,
+			to_char(e.checkin_stamp - :1, 'MM/DD/YYYY HH12:MI AM') as checkin_stamp,
+			to_char(e.checkout_stamp - :1, 'MM/DD/YYYY HH12:MI AM') as checkout_stamp,
+			stat.caption as appt_status,
+			e.parent_id,
+			e.scheduled_by_id,
+			to_char(e.scheduled_stamp - :1, 'MM/DD/YYYY HH12:MI AM') as scheduled_stamp,
+			at.caption as appt_type,
+			e.appt_type as appt_type_id,
+			initcap(patient.complete_sortable_name) as patient_name
+			from Appt_Type at, Appt_Status stat, Appt_Attendee_type aat, Person patient,
+			Event_Attribute ea, Event e
+			where e.start_time &gt;= to_date(:2, 'yyyy,mm,dd') + :1
+			and e.start_time &lt; to_date(:3, 'yyyy,mm,dd') + :1
+			and e.discard_type is null
+			and e.event_status in (0,1,2)
+			and e.facility_id = :4
+			and ea.parent_id = e.event_id
+			and ea.value_text = patient.person_id
+			and upper(ea.value_textB) = upper(:5)
+			and ea.value_type = 333
+			and aat.id = ea.value_int
+			and stat.id = e.event_status
+			and at.appt_type_id (+) = e.appt_type
+			order by e.start_time, nvl(e.parent_id, 0), e.event_id
+
+		</statement>
+
+		<statement name="sel_facilities_from_templates">
+			
+			select distinct facility_id
+			from Sch_Template
+			where owner_org_id = ?
+			
+		</statement>
+
+		<statement name="sel_facilities_like">
+			
+			select distinct org_internal_id, org_id
+			from Org, Sch_Template
+			where upper(org_id) like upper(?)
+			and Org.org_internal_id = Sch_Template.facility_id
+			and Sch_Template.owner_org_id = ?
+			
+		</statement>
+
+		<statement name="sel_futureAppointments">
+			
+			select to_char(e.start_time - ?, 'MM/DD/YYYY HH12:MI AM') appt_time,
+			ea.value_textB as physician, e.subject, e.event_id
+			from Event_Attribute ea, Event e
+			where e.start_time &gt; sysdate
+			and ea.parent_id = e.event_id
+			and upper(ea.value_text) = upper(?)
+			and e.owner_id = ?
+			and e.event_status = 0
+			order by e.start_time
+			
+		</statement>
+
+		<statement name="sel_resources_like">
+			
+			select distinct member_name as person_id
+			from Sch_Template_R_Ids
+			where upper(member_name) like upper(?)
+			and parent_id in (select template_id from Sch_Template where owner_org_id = ?)
+			
+		</statement>
+
+		<statement name="sel_resources_with_templates">
+			
+			select distinct member_name as resource_id
+			from Sch_Template_R_Ids
+			where parent_id in (select template_id from Sch_Template where owner_org_id = ?)
+			
+		</statement>
+
+		<statement name="sel_voidInvoice">
+			
+			select Invoice.invoice_id, to_char(value_date - :1, 'MM/DD/YYYY HH12:MI AM')
+			as void_stamp, Invoice_History.cr_user_id
+			from Invoice_History, Invoice, Transaction, Event
+			where Event.event_id = :2
+			and Transaction.parent_event_id = Event.event_id
+			and Invoice.main_transaction = Transaction.trans_id
+			and Invoice.invoice_status = 16
+			and Invoice_History.parent_id = Invoice.invoice_id
+			and Invoice_History.value_text = 'Voided claim'
+			
+		</statement>
+
+		<statement name="updApptSheetTimesPref">
+			
+			update Person_Attribute set
+			value_int = ?,
+			value_intB = ?
+			where parent_id = ?
+			and item_name = 'ApptSheet Times'
+			
+		</statement>
+
+		<statement name="updAssignResource">
+			
+			update Event_Attribute set value_textB = ?
+			where upper(value_textB) = upper(?)
+			and parent_id in
+			(select event_id from Event
+			where start_time between to_date(?, 'MM/DD/YYYY') + ?
+			and to_date (?, 'MM/DD/YYYY') + ? +1
+			and facility_id = ?
+			)
+			
+		</statement>
+
+		<statement name="updAssignResource_noFacility">
+			
+			update Event_Attribute set value_textB = ?
+			where upper(value_textB) = upper(?)
+			and parent_id in
+			(select event_id from Event
+			where start_time between to_date(?, 'MM/DD/YYYY') + ?
+			and to_date (?, 'MM/DD/YYYY') + ? +1
+			and owner_id = ?
+			)
+			
+		</statement>
+
+		<statement name="updCleanUpWaitingList0">
+			
+			update Event_Attribute set value_intB = NULL
+			where value_type = 333
+			and value_intB &lt;= 0
+			
+		</statement>
+
+		<statement name="updParentEventToNULL">
+			
+			update Event set parent_id = NULL where event_id = ?
+			
+		</statement>
+
+		<statement name="updSchedulingPref">
+			
+			update Person_Attribute set value_int = value_int-1
+			where parent_id = ?
+			and value_int &gt; ?
+			and item_name like 'Preference/Schedule/DayView/Column%'
+			and parent_org_id = ?
+			
+		</statement>
+
+		<statement name="updSetNewParentEvent">
+			
+			update Event set parent_id = ? where parent_id = ?
+			
+		</statement>
+
+		<statement name="updShiftWaitingList_BrotherCancel">
+			
+			update Event_Attribute set value_intB = value_intB -1
+			where parent_id in (select event_id from Event where Event.parent_id = ?)
+			and value_intB &gt; ?
+			
+		</statement>
+
+		<statement name="updShiftWaitingList_ParentCancel">
+			
+			update Event_Attribute set value_intB = value_intB -1
+			where parent_id in (select event_id from Event where Event.parent_id = ? and event_status &lt; 3)
+			
+		</statement>
+
+	</sql-statements>
+</xaf>

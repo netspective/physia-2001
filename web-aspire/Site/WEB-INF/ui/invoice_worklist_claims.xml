@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+
+<xaf>
+	<dialogs package="invoice_worklist_claims">
+		<dialog name="reckdate_claims_wl_invoice" heading="reckdate_claims_wl_invoice">
+			<field.text caption="Invoice ID" read-only="yes" name="invoice_id"/>
+			<field.text caption="User ID" read-only="yes" name="user_id"/>
+			<field.date caption="Reck Date" max-length="10" name="reck_date" size="10"/>
+			<field.memo caption="Comments" name="comments" size="24"/>
+			<field.text hidden="yes" name="owner_id" caption="owner_id"/>
+
+		</dialog>
+
+		<dialog name="close_claims_wl_invoice" heading="close_claims_wl_invoice">
+			<field.text caption="Date" read-only="yes" name="date"/>
+			<field.text caption="Invoice ID" read-only="yes" name="invoice_id"/>
+			<field.text caption="User ID" read-only="yes" name="user_id"/>
+			<field.memo caption="Comments" name="comments" size="24"/>
+
+		</dialog>
+
+		<dialog name="transfer_claims_wl_invoice" heading="transfer_claims_wl_invoice">
+			<field.text caption="Date" read-only="yes" name="date"/>
+			<field.text caption="Invoice ID" read-only="yes" name="invoice_id"/>
+			<field.text caption="Transfer From" read-only="yes" name="user_id"/>
+			<field.text caption="Transfer To" required="yes" hint="Collector to Transfer Account" max-length="16" name="responsible_id" size="16"/>
+			<field.memo caption="Reason For Transfer" name="comments" size="24"/>
+
+		</dialog>
+
+	</dialogs>
+</xaf>

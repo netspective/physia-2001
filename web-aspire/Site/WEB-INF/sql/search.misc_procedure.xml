@@ -1,0 +1,158 @@
+<?xml version="1.0"?>
+
+<xaf>
+	<sql-statements package="search.misc_procedure">
+		<statement name="id">
+			App::Statements::Search::MiscProcedure
+		</statement>
+
+		<statement name="sel_misc_procedure_code">
+			
+			SELECT	oce.code,
+			oce.name AS name,
+			oce.description AS description,
+			(
+			SELECT 	count (*)
+			FROM 	offering_catalog_entry 
+			WHERE 	parent_entry_id = oce.entry_id			
+			),
+			entry_id 
+			FROM 	Offering_catalog oc,offering_catalog_entry oce
+			WHERE 
+			oce.code = ?			
+			AND 	oc.catalog_type =2
+			AND 	oc.org_internal_id = ?
+			AND 	oce.catalog_id = oc.internal_catalog_id 
+			AND 	oce.entry_type = 230
+			AND 	rownum &lt;= 250
+
+		</statement>
+
+		<statement name="sel_misc_procedure_code_like">
+			
+			SELECT	oce.code,
+			oce.name AS name,
+			oce.description AS description,
+			(
+			SELECT 	count (*)
+			FROM 	offering_catalog_entry 
+			WHERE 	parent_entry_id = oce.entry_id			
+			),
+			entry_id 
+			FROM 	Offering_catalog oc,offering_catalog_entry oce
+			WHERE 
+			oce.code like ?			
+			AND 	oc.catalog_type =2
+			AND 	oc.org_internal_id = ?
+			AND 	oce.catalog_id = oc.internal_catalog_id 
+			AND 	oce.entry_type = 230
+			AND 	rownum &lt;= 250
+
+		</statement>
+
+		<statement name="sel_misc_procedure_description">
+			
+			SELECT	oce.code,
+			oce.name AS name,
+			oce.description AS description,
+			(
+			SELECT 	count (*)
+			FROM 	offering_catalog_entry 
+			WHERE 	parent_entry_id = oce.entry_id			
+			),
+			entry_id 
+			FROM 	Offering_catalog oc,offering_catalog_entry oce
+			WHERE 
+			upper(oce.description) = ?			
+			AND 	oc.catalog_type =2
+			AND 	oc.org_internal_id = ?
+			AND 	oce.catalog_id = oc.internal_catalog_id 
+			AND 	oce.entry_type = 230
+			AND 	rownum &lt;= 250
+
+		</statement>
+
+		<statement name="sel_misc_procedure_description_like">
+			
+			SELECT	oce.code,
+			oce.name AS name,
+			oce.description AS description,
+			(
+			SELECT 	count (*)
+			FROM 	offering_catalog_entry 
+			WHERE 	parent_entry_id = oce.entry_id			
+			),
+			entry_id 
+			FROM 	Offering_catalog oc,offering_catalog_entry oce
+			WHERE 
+			upper(oce.description) like ?			
+			AND 	oc.catalog_type =2
+			AND 	oc.org_internal_id = ?
+			AND 	oce.catalog_id = oc.internal_catalog_id 
+			AND 	oce.entry_type = 230
+			AND 	rownum &lt;= 250
+
+		</statement>
+
+		<statement name="sel_misc_procedure_detail">
+			
+			SELECT	oce.code,
+			oce.modifier,
+			cet.caption,
+			oce.name,
+			oce.entry_id
+			FROM offering_catalog_entry oce,
+			catalog_entry_type cet
+			WHERE
+			oce.parent_entry_id = ? 
+			AND	oce.entry_type = cet.id (+)		
+			AND 	rownum &lt;= 250
+
+		</statement>
+
+		<statement name="sel_misc_procedure_name">
+			
+			SELECT	oce.code,
+			oce.name AS name,
+			oce.description AS description,
+			(
+			SELECT 	count (*)
+			FROM 	offering_catalog_entry 
+			WHERE 	parent_entry_id = oce.entry_id			
+			),
+			entry_id 
+			FROM 	Offering_catalog oc,offering_catalog_entry oce
+			WHERE 
+			upper(oce.name) = ?			
+			AND 	oc.catalog_type =2
+			AND 	oc.org_internal_id = ?
+			AND 	oce.catalog_id = oc.internal_catalog_id 
+			AND 	oce.entry_type = 230
+			AND 	rownum &lt;= 250
+
+		</statement>
+
+		<statement name="sel_misc_procedure_name_like">
+			
+			SELECT	oce.code,
+			oce.name AS name,
+			oce.description AS description,
+			(
+			SELECT 	count (*)
+			FROM 	offering_catalog_entry 
+			WHERE 	parent_entry_id = oce.entry_id			
+			),
+			entry_id 
+			FROM 	Offering_catalog oc,offering_catalog_entry oce
+			WHERE 
+			upper(oce.name) like ?			
+			AND 	oc.catalog_type =2
+			AND 	oc.org_internal_id = ?
+			AND 	oce.catalog_id = oc.internal_catalog_id 
+			AND 	oce.entry_type = 230
+			AND 	rownum &lt;= 250
+
+		</statement>
+
+	</sql-statements>
+</xaf>

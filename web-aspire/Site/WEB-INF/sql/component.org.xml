@@ -1,0 +1,690 @@
+<?xml version="1.0"?>
+
+<xaf>
+	<sql-statements package="component.org">
+		<statement name="id">
+			App::Statements::Component::Org
+		</statement>
+
+		<statement name="org.AllLabOrder">
+			
+			Select	org_id,primary_name,org_internal_id
+			FROM	org ,ORG_CATEGORY oc
+			WHERE 	owner_org_id= :1 
+			AND	oc.parent_id = org.org_internal_id
+			AND	oc.member_name='Lab'			
+			order by org_id
+			
+		</statement>
+
+		<statement name="org.ContractCatalogDetail">
+			
+			SELECT	code,
+			modifier,
+			(SELECT caption FROM Catalog_Entry_Type WHERE id = oce.entry_type) as type,
+			name,
+			(expected_cost) as exp_cost,
+			(allowed_cost) as all_cost,
+			oce.entry_id,
+			con.internal_contract_id,
+			ocp.price_id,
+			decode(ocp.price_id,NULL,'Add','Mod')
+			FROM 	Contract_Catalog con, Offering_catalog_Entry oce,
+			Offering_CatEntry_Price ocp
+			WHERE 	con.internal_contract_id = :1
+			AND	oce.catalog_id = con.parent_catalog_id
+			AND	con.org_internal_id = :2
+			AND	ocp.internal_contract_id (+)= :1
+			AND	ocp.entry_id (+) = oce.entry_id
+			order by modifier, code
+			
+		</statement>
+
+		<statement name="org.ContractCatalogSummary">
+			
+			SELECT	con.contract_id,
+			con.caption,
+			(SELECT catalog_id from offering_catalog oc WHERE oc.internal_catalog_id = con.parent_catalog_id) as catalog_id,
+			(SELECT product_name FROM Insurance WHERE ins_internal_id = con.product_ins_id) as product_name,
+			(SELECT count (*) FROM offering_catalog_entry where catalog_id = con.parent_catalog_id) as code_entry,
+			(SELECT 0 from dual) as price_entry,
+			internal_contract_id
+			FROM 	Contract_Catalog con
+			WHERE 	org_internal_id = :1
+			
+		</statement>
+
+		<statement name="org.FSCatalogDetail">
+			
+			SELECT
+			oce.code AS code,
+			oce.modifier AS modifier,
+			catalog_entry_type.caption AS Type,
+			oce.name,
+			--description AS description,
+			DECODE(oce.flags, 0, NULL, '(FFS)'),
+			oce.unit_cost AS price,
+			--default_units AS uoh,
+			'Add',
+			oce.parent_entry_id,
+			oce.entry_id AS ID,
+			oc.internal_catalog_id
+			FROM
+			catalog_entry_type,
+			offering_catalog_entry oce,
+			offering_catalog oc
+			WHERE	oce.catalog_id = :1
+			AND	oce.catalog_id = oc.internal_catalog_id
+			AND	oc.org_internal_id = :2
+			AND	oce.entry_type = catalog_entry_type.id
+			ORDER BY
+			oce.entry_type,
+			oce.code,
+			oce.modifier
+			
+		</statement>
+
+		<statement name="org.FSCatalogInsuranceSummary">
+			
+			SELECT *
+			FROM (
+			SELECT	oc.catalog_id,
+			oc.caption,
+			--oc.description,
+			DECODE(oc_a.value_int, 1, '(Capitated)', '(FFS)') AS capitated	,
+			count(oce.entry_id) entries_count,
+			oc.parent_catalog_id,
+			oc.internal_catalog_id,
+			'Add'
+			FROM
+			ofcatalog_Attribute oc_a,
+			offering_catalog oc,
+			offering_catalog_entry oce
+			WHERE
+			oce.catalog_id (+) = oc.internal_catalog_id
+			AND oc_a.parent_id (+) = oc.internal_catalog_id
+			AND oc.catalog_type = 0
+			AND (oc.org_internal_id IS NULL OR oc.org_internal_id = :1)
+			AND EXISTS
+			(
+			SELECT unique ia.value_text
+			FROM 	insurance i, org o,	insurance_attribute ia
+			WHERE ia.value_text = oc.internal_catalog_id
+			AND ia.parent_id = i.ins_internal_id
+			AND ia.item_name = 'Fee Schedule'
+			AND i.owner_org_id = :1
+			AND i.ins_org_id = o.org_internal_id
+			AND o.org_id = :2
+			)
+			GROUP BY
+			oc.catalog_id,
+			oc.internal_catalog_id,
+			oc.caption,
+			oc.description,
+			oc.parent_catalog_id ,
+			oc_a.value_int
+			ORDER BY
+			oc.catalog_id
+			)
+			WHERE rownum &lt;= 250
+			
+		</statement>
+
+		<statement name="org.FSCatalogSummary">
+			
+			SELECT *
+			FROM (
+			SELECT	oc.catalog_id,
+			oc.caption,
+			--oc.description,
+			DECODE(oc_a.value_int, 1, '(Capitated)', '(FFS)') AS capitated	,
+			count(oce.entry_id) entries_count,
+			oc.parent_catalog_id,
+			oc.internal_catalog_id,
+			'Add'
+			FROM
+			ofcatalog_Attribute oc_a,
+			offering_catalog oc,
+			offering_catalog_entry oce
+			WHERE
+			oce.catalog_id (+) = oc.internal_catalog_id
+			AND oc_a.parent_id (+) = oc.internal_catalog_id
+			AND oc.catalog_type = 0
+			AND (oc.org_internal_id IS NULL OR oc.org_internal_id = :1)
+			GROUP BY
+			oc.catalog_id,
+			oc.internal_catalog_id,
+			oc.caption,
+			oc.description,
+			oc.parent_catalog_id ,
+			oc_a.value_int
+			ORDER BY
+			oc.catalog_id
+			)
+			WHERE rownum &lt;= 250
+			
+		</statement>
+
+		<statement name="org.LabTestDetail">
+			
+			SELECT oce.code,
+			--oce.name,
+			oce.modifier,
+			--oce.description,
+			oce.name,
+			--oce.modifier,
+			oce.data_text,
+			oce.entry_id,
+			oce.catalog_id,
+			oce.entry_type,
+			oce.unit_cost,
+			oce.data_num
+			FROM 	offering_catalog oc,org o,
+			offering_catalog_entry oce
+			WHERE 	o.owner_org_id = :2
+			AND	o.org_id = :1
+			AND	o.org_internal_id = oc.org_internal_id
+			AND	oc.internal_catalog_id = :3
+			AND	oce.catalog_id=oc.internal_catalog_id
+			AND	parent_entry_id is null
+			order by oce.modifier,oce.code,oce.name 
+			
+		</statement>
+
+		<statement name="org.LabTestSummary">
+			
+			SELECT oc.catalog_id,oc.caption , count (oce.catalog_id),oc.internal_catalog_id
+			FROM	offering_catalog oc, org, offering_catalog_entry oce
+			WHERE	oc.catalog_type = 5
+			AND	oc.org_internal_id = org.org_internal_id
+			AND	org.org_id = :1
+			AND	org.owner_org_id = :2
+			AND	oce.catalog_id (+)= oc.internal_catalog_id
+			AND	oce.parent_entry_id IS NULL
+			group by oc.catalog_id,oc.caption ,oc.internal_catalog_id
+			order by oc.catalog_id
+			
+		</statement>
+
+		<statement name="org.alerts">
+			
+			SELECT
+			trans_id,
+			trans_type,
+			t.caption,
+			detail,
+			trans_subtype
+			FROM 	transaction t, alert_priority a
+			WHERE	trans_owner_type = 1
+			AND 	trans_owner_id =
+			(
+			SELECT org_internal_id
+			FROM org
+			WHERE owner_org_id = :2 AND
+			org_id = :1
+			)
+			AND	trans_type between 8000 and 8999
+			AND	trans_status = 2
+			AND a.caption = t.trans_subtype
+			ORDER BY a.id desc, trans_begin_stamp desc
+			
+		</statement>
+
+		<statement name="org.associatedOrgs">
+			
+			select 	item_id, value_type, item_name, value_text
+			from 	org_attribute
+			where	parent_id =
+			(select org_internal_id
+			from org
+			where owner_org_id = :2 AND
+			org_id = :1
+			)
+			and 	value_type = 252
+			
+		</statement>
+
+		<statement name="org.associatedResourcesStats">
+			
+			select 	category, count(category), org_internal_id
+			from 	person_org_category
+			where	org_internal_id =
+			(select org_internal_id
+			from org
+			where owner_org_id = :2 AND
+			org_id = :1
+			)
+			group by category, org_internal_id
+			
+		</statement>
+
+		<statement name="org.billingEvents">
+			
+			SELECT
+			item_id,
+			value_int AS day,
+			value_text AS name_begin,
+			value_textb AS name_end,
+			value_intb AS balance_condition,
+			value_float AS balance_criteria
+			FROM
+			org_attribute
+			WHERE
+			parent_id = (SELECT org_internal_id FROM org WHERE owner_org_id = :2 AND org_id = :1) AND
+			value_type = 650
+			ORDER BY
+			day
+			
+		</statement>
+
+		<statement name="org.billinginfo">
+			
+			(select	oa.value_type, oa.item_id, oa.value_text, decode(to_char(oa.value_date, 'YYYY'), to_char(sysdate, 'YYYY'), to_char(oa.value_date, 'Mon DD'), to_char(oa.value_date, 'MM/DD/YY')),
+			decode(oa.value_int, 0,'Per-Se',2,'THINet', 'Other'),
+			decode(oa.value_intb, '1','Active', 'Inactive'),
+			o.org_id, 2 as entity_type
+			from	org o, org_attribute oa
+			where	o.owner_org_id = :1
+			and o.org_id = :2
+			and	oa.parent_id = o.org_internal_id
+			and	oa.item_name = 'Organization Default Clearing House ID'
+			and	oa.value_type = 960)
+			UNION
+			(select	pa.value_type, pa.item_id, pa.value_text, decode(to_char(pa.value_date, 'YYYY'), to_char(sysdate, 'YYYY'), to_char(pa.value_date, 'Mon DD'), to_char(pa.value_date, 'MM/DD/YY')),
+			decode(pa.value_int, 0,'Per-Se', 2,'THINet', 'Other'),
+			decode(pa.value_intb,'1','Active', 'Inactive'),
+			pa.parent_id, 0 as entity_type
+			from	Person_Attribute pa, Person_Org_Category poc
+			where	poc.org_internal_id = :1
+			and poc.category = 'Physician'
+			and	pa.parent_id = poc.person_id
+			and	pa.value_type = 960)
+			UNION
+			(select	-1 as value_type, -1 as item_id, '-' as value_text, '-' as value_date,
+			'-', '-', '-', 1 as entity_type
+			from dual
+			)
+			order by entity_type DESC
+			
+		</statement>
+
+		<statement name="org.catalogItems">
+			
+			select 	oce.entry_id, oce.catalog_id, oce.code, oce.unit_cost
+			from 	offering_catalog_entry oce, offering_catalog oc
+			where	oc.catalog_id = oce.catalog_id
+			and	oc.org_internal_id =
+			(select org_internal_id
+			from org
+			where owner_org_id = :2 AND
+			org_id = :1
+			)
+			order by oce.entry_type, oce.status, oce.name, oce.code
+			
+		</statement>
+
+		<statement name="org.closingDateInfo">
+			
+			SELECT
+			o.org_id,
+			a.value_date,
+			DECODE (o.org_id, :1, 'Parent Org', 'Child Org') as parent_child,
+			oc.member_name
+			FROM 	org o, org_attribute a, org_category oc
+			WHERE 	a.parent_id = o.org_internal_id
+			AND a.item_name = 'Retire Batch Date'
+			AND	EXISTS
+			(
+			SELECT o1.org_id
+			FROM org o1
+			WHERE o1.org_id = :1
+			AND ( o1.org_internal_id = o.parent_org_id OR o1.org_internal_id = o.owner_org_id OR o1.org_internal_id = o.org_internal_id )
+			)
+			AND o.org_internal_id = oc.parent_id
+			AND UPPER(LTRIM(RTRIM(oc.member_name))) IN
+			('CLINIC','HOSPITAL','FACILITY/SITE','PRACTICE','DIAGNOSTIC SERVICES', 'DEPARTMENT', 'THERAPEUTIC SERVICES')
+			ORDER BY parent_child DESC, o.org_id
+			
+		</statement>
+
+		<statement name="org.contactMethods">
+			
+			SELECT
+			value_int,
+			value_type,
+			item_name,
+			value_text,
+			item_id,
+			'attr-Org-' AS dialogid_suffix
+			FROM Org_Attribute
+			WHERE
+			parent_id = ?
+			AND	value_type IN (
+			10,
+			15,
+			20,
+			40,
+			50,
+			25
+			)
+			ORDER BY
+			value_type,
+			name_sort,
+			item_name
+
+		</statement>
+
+		<statement name="org.contactMethodsAndAddresses">
+			
+			SELECT
+			value_int AS preferred,
+			value_type,
+			value_text || ' (' || DECODE(value_type, 25, value_textb, item_name) || ')',
+			item_id,
+			avt.caption AS caption,
+			'attr-Org-' || value_type AS dialogid_suffix
+			FROM
+			Org_attribute,
+			attribute_value_type avt 
+			WHERE 
+			parent_id = (
+			SELECT org_internal_id
+			FROM org
+			WHERE
+			owner_org_id = :2
+			AND	org_id = :1
+			)
+			AND	value_type IN (
+			10,
+			15,
+			20,
+			40,
+			50,
+			25
+			)
+			AND	avt.id = value_type
+			AND	EXISTS
+			(	SELECT 1 FROM Org_Contact_Name ocn 
+			WHERE 	(ocn.caption = item_name AND value_type &lt;&gt; 25)
+			OR	(ocn.caption = value_textb and value_type = 25)
+			)
+			UNION ALL (
+			SELECT
+			0 AS preferred,
+			99998 AS value_type,
+			'-' AS value_text,
+			-1,
+			'-',
+			'-'
+			FROM dual
+			)
+			UNION ALL (
+			SELECT
+			0 AS preferred,
+			99910 AS value_type,
+			complete_addr_html AS value_text,
+			item_id,
+			address_name AS caption,
+			DECODE('Org', 'Person', 'attr-person-', 'Org', 'attr-org-' ) || 99910 AS dialogid_suffix
+			FROM Org_address, Org_Contact_Addrs oca
+			WHERE
+			parent_id = (
+			SELECT org_internal_id
+			FROM org
+			WHERE
+			owner_org_id = :2
+			AND	org_id = :1
+			)
+			AND	oca.caption = 	Org_address.address_name		
+			)
+			ORDER BY value_type
+
+		</statement>
+
+		<statement name="org.credentials">
+			
+			select value_type, item_id, item_name, value_text
+			from 	org_attribute
+			where	parent_id =
+			(select org_internal_id
+			from org
+			where owner_org_id = :2 AND
+			org_id = :1
+			)
+			and 	value_type = 600
+			
+		</statement>
+
+		<statement name="org.departments">
+			
+			select 	ocat.parent_id, org.name_primary, org.parent_org_id, org.org_id, org.org_internal_id
+			from 	org org, org_category ocat
+			where 	org.parent_org_id =
+			(select org_internal_id
+			from org
+			where owner_org_id = :2 AND
+			org_id = :1
+			)
+			and 	ocat.member_name = 'Department'
+			and 	ocat.parent_id = org.org_internal_id
+			
+		</statement>
+
+		<statement name="org.feeSchedule">
+			
+			select 	oc.catalog_id, oc.caption, count(oce.entry_id)
+			from	offering_catalog oc, offering_catalog_entry oce
+			where	oc.catalog_id = oce.catalog_id (+)
+			and	oc.org_internal_id =
+			(select org_internal_id
+			from org
+			where owner_org_id = :2 AND
+			org_id = :1
+			)
+			group by oc.catalog_id, oc.caption, oc.description, oc.parent_catalog_id
+			order by oc.caption
+			
+		</statement>
+
+		<statement name="org.feeschedules">
+			
+SELECT	oc.catalog_id,
+			oc.caption,
+			oc.description,
+			oc.internal_catalog_id,
+			oa.item_id
+			FROM org_attribute oa,
+			offering_catalog oc
+			WHERE oa.parent_id = :1
+			AND	oa.item_name = 'Fee Schedule'
+			AND	oa.item_type = 0
+			AND	oa.value_type = 110
+			AND	oa.value_int = oc.internal_catalog_id
+			ORDER BY oc.catalog_id
+			
+		</statement>
+
+		<statement name="org.fsCatalogEntry">
+			
+			SELECT	oce.code,oce.name,(SELECT caption FROM catalog_entry_type WHERE id = oce.entry_type), oce.entry_id,
+			oce.unit_cost
+			FROM 	offering_catalog_entry oce,offering_catalog oc
+			WHERE 	oce.catalog_id = :1
+			AND	oc.internal_catalog_id = oce.catalog_id
+			ORDER BY 1
+			
+		</statement>
+
+		<statement name="org.generalInformation">
+			
+			select 	name_primary, name_trade, category, tax_id, org_id, org_internal_id
+			from 	org
+			where owner_org_id = :2 AND
+			org_id = :1
+			)
+			
+		</statement>
+
+		<statement name="org.healthMaintenanceRule">
+			
+			select rule_id, start_age, end_age, diagnoses, measure, directions, src_begin_date, src_end_date
+			from 	Hlth_Maint_Rule
+			where 	org_internal_id =
+			(select org_internal_id
+			from org
+			where owner_org_id = :2 AND
+			org_id = :1
+			)
+			
+		</statement>
+
+		<statement name="org.insurancePlans">
+			
+			SELECT
+			insurance.ins_internal_id,
+			insurance.parent_ins_id,
+			insurance.product_name,
+			decode(insurance.record_type, 1, 'product', 2, 'plan', 3, 'coverage') as record_type,
+			insurance.plan_name,
+			insurance.ins_internal_id,
+			insurance.owner_org_id,
+			claim_type.caption,
+			insurance.ins_type,
+			insurance.indiv_deductible_amt,
+			insurance.family_deductible_amt,
+			insurance.percentage_pay,
+			insurance.copay_amt,
+			org.org_id
+			FROM
+			insurance,
+			claim_type,
+			org
+			WHERE
+			org.org_id = :1 AND
+			org.owner_org_id = :2 AND
+			insurance.record_type in (1, 2) AND
+			insurance.ins_type = claim_type.id AND
+			insurance.ins_org_id = org.org_internal_id
+			ORDER BY
+			insurance.product_name,
+			insurance.plan_name
+			
+		</statement>
+
+		<statement name="org.listAssociatedOrgs">
+			
+			SELECT
+			org_id,
+			name_primary,
+			org_internal_id,
+			DECODE (o.org_internal_id, (SELECT oo.parent_org_id from org oo
+			WHERE oo.org_id = :1 AND owner_org_id = :2), 'Parent Org', 'Child Org')
+			FROM 	Org o
+			WHERE 	org_internal_id =
+			(
+			SELECT parent_org_id
+			FROM org
+			WHERE owner_org_id = :2 AND
+			org_id = :1
+			)
+			OR
+			parent_org_id =
+			(
+			SELECT org_internal_id
+			FROM org
+			WHERE owner_org_id = :2 AND
+			org_id = :1
+			)
+			AND rownum &lt;= 250
+			ORDER BY org_id
+			
+		</statement>
+
+		<statement name="org.location">
+			
+			select 0 as preferred, 99910 as value_type, complete_addr_html,item_id,address_name,parent_id
+			from org_address , org where org.org_id = :1
+			AND	org.owner_org_id = :2
+			AND	org_address.parent_id = org.org_internal_id	
+			AND	NOT EXISTS
+			(SELECT 1 FROM Org_Contact_Addrs oac
+			WHERE org_address.address_name = oac.caption)
+			order by address_name
+			
+		</statement>
+
+		<statement name="org.miscNotes">
+			
+			SELECT
+			value_type,
+			item_id,
+			parent_id,
+			item_name,
+			value_text,
+			value_textB,
+			decode(to_char(value_date, 'YYYY'), to_char(sysdate, 'YYYY'), to_char(value_date, 'Mon DD'), to_char(value_date, 'MM/DD/YY')),
+			decode(to_char(value_dateB, 'YYYY'), to_char(sysdate, 'YYYY'), to_char(value_dateB, 'Mon DD'), to_char(value_dateB, 'MM/DD/YY'))
+			from Org_Attribute
+			WHERE 	parent_id =
+			(
+			SELECT org_internal_id
+			FROM org
+			WHERE owner_org_id = :2 AND
+			org_id = :1
+			)
+			AND item_name = 'Org Notes'
+			
+		</statement>
+
+		<statement name="org.personnel">
+			
+			select 	p.simple_name, pa.category, pa.person_id, pa.org_internal_id
+			from 	person_org_category pa, person p
+			where	pa.org_internal_id =
+			(select org_internal_id
+			from org
+			where owner_org_id = :2 AND
+			org_id = :1
+			)
+			and pa.category in ('Physician', 'Nurse', 'Staff', 'Administrator', 'Superuser')
+			and	p.person_id = pa.person_id
+			order by pa.person_id, pa.category, p.complete_name
+			
+		</statement>
+
+		<statement name="org.serviceCatalog">
+			
+			SELECT	oc.catalog_id,oct.caption, count (oce.catalog_id) ,oc.internal_catalog_id
+			FROM 	offering_catalog oc, offering_catalog_entry oce,org_attribute oa,
+			offering_catalog_type oct
+			WHERE 	oce.catalog_id (+)= oc.internal_catalog_id
+			AND 	oa.parent_id = :1
+			AND 	oa.item_name = 'Fee Schedule'
+			AND 	oa.value_int = oc.internal_catalog_id
+			AND oct.id = oc.catalog_type
+			GROUP BY oc.catalog_id,oct.caption,oc.internal_catalog_id
+			
+		</statement>
+
+		<statement name="org.serviceCatalogEntry">
+			
+			SELECT	oce.code,(SELECT name FROM ref_service_category WHERE oce.code = serv_category), oce.entry_id
+			FROM 	offering_catalog_entry oce,offering_catalog oc
+			WHERE 	oce.catalog_id = :1
+			AND	oc.internal_catalog_id = oce.catalog_id
+			ORDER BY 1
+			
+		</statement>
+
+		<statement name="org.superbills">
+			
+			select	oc.internal_catalog_id, oc.catalog_id, oc.caption, oc.description
+			from	Offering_Catalog oc
+			where	oc.catalog_type = 4
+			and	oc.org_internal_id = ?
+			and	oc.flags = 1
+			
+		</statement>
+
+	</sql-statements>
+</xaf>
