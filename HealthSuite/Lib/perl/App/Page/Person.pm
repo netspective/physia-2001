@@ -133,7 +133,7 @@ sub prepare_page_content_header
 
 	my $personId = $self->param('person_id');
 	my $urlPrefix = "/person/$personId";
-	
+
 	$self->{page_heading} = $self->property('person_simple_name');
 	$self->{page_menu_sibling} = [
 			['Summary', "$urlPrefix/profile", 'profile'],
@@ -144,16 +144,16 @@ sub prepare_page_content_header
 			#['Add Appointment', "$urlPrefix/appointment", 'appointment'],
 		];
 	$self->{page_menu_siblingSelectorParam} = '_pm_view';
-	
+
 	$self->SUPER::prepare_page_content_header(@_);
-	
+
 	return 1 if $self->flagIsSet(PAGEFLAG_ISDISABLED);
 
 	my $category = lc($self->property('person_categories')->[0]) || undef;
 	# If the category isnt one of the predefined four, assume its staff.
 	my $updateCategory = $category;
 
-	unless (($category eq 'nurse') or ($category eq 'physician') or ($category eq 'staff') or ($category eq 'patient')) {
+	unless (($category eq 'nurse') or ($category eq 'physician') or ($category eq 'staff') or ($category eq 'patient') or ($category eq 'referring-doctor')) {
 		$updateCategory = 'staff';
 	}
 
