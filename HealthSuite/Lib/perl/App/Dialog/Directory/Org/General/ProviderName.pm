@@ -10,51 +10,40 @@ use App::Universal;
 use CGI::Dialog;
 use CGI::Validator::Field;
 use DBI::StatementManager;
+use App::Statements::Search::OrgDirectory;
 
-use App::Statements::Component::Invoice;
 
-use vars qw(@ISA $INSTANCE);
+use vars qw(@ISA $INSTANCE %RESOURCE_MAP);
 
 @ISA = qw(App::Dialog::Directory);
 
 sub new
 {
-	my $self = App::Dialog::Directory::new(@_, id => 'provider-name', heading => 'Provider Name');
+	my $self = App::Dialog::Directory::new(@_, id => 'providername', heading => 'Provider Name');
 
 	$self->addContent(
-			new CGI::Dialog::Field(caption => 'Provider Name',  name => 'providername'),
+			new CGI::Dialog::Field(caption => 'Provider Name',  name => 'provider_name'),
 			);
 	$self->addFooter(new CGI::Dialog::Buttons);
 
 	$self;
 }
 
-#sub populateData
-#{
-#	my ($self, $page, $command, $activeExecMode, $flags) = @_;
-#
-#	$page->field('person_id', $page->session('person_id'));
-#}
-
 
 sub execute
 {
 	my ($self, $page, $command, $flags) = @_;
 
-	my $personId = $page->field('person_id');
-
-	if ( $personId ne '')
-	{
-		return $STMTMGR_COMPONENT_INVOICE->createHtml($page, STMTMGRFLAG_NONE, 'invoice.procAnalysis', [$personId]);
-	}
-	else
-	{
-		return $STMTMGR_COMPONENT_INVOICE->createHtml($page, STMTMGRFLAG_NONE, 'invoice.procAnalysisAll');
-	}
-
-
+	my $provider = $page->field('provider_name') eq '' ? '*' : $page->field('provider_name');
+	my $providerLike = $provider =~ s/\*/%/g ? 'providername' : '';
+	my $like = $providerLike  ? '_like' : 'providername';
+	my $appendStmtName = "sel_$providerLike$like";
+	my $sessionId = $page->session('org_internal_id');
+	return $STMTMGR_ORG_DIR_SEARCH->createHtml($page, STMTMGRFLAG_NONE, "$appendStmtName",
+						[uc($provider), $sessionId]);
 
 }
+
 
 
 # create a new instance which will automatically add it to the directory of
