@@ -1,6 +1,6 @@
-##############################################################################
+######################################################################################################################################
 package App::Dialog::Attribute::PreventiveCare;
-##############################################################################
+#####################################################################################################################################
 
 use DBI::StatementManager;
 use App::Statements::Invoice;
@@ -41,8 +41,9 @@ sub new
 		new CGI::Dialog::MultiField(caption =>'Measure Frequency/Number Of Times',
 					fields => [
 						new CGI::Dialog::Field(caption => 'Frequency', name => 'frequency', type => 'select', selOptions => ' : 0;Weekly:1;Monthly:2;Annualy:3',value => ''),
-						new CGI::Dialog::Field(caption => 'Measure', name => 'measure', size => '3'),
+						new CGI::Dialog::Field(caption => 'Measure', name => 'measure', size => '3')
 				]),
+
 		new CGI::Dialog::Field(type => 'date', name => 'value_date', caption => 'Last Performed', options => FLDFLAG_REQUIRED, futureOnly => 0),
 		new CGI::Dialog::Field(type => 'date', caption => 'Due', name => 'value_dateend', options => FLDFLAG_REQUIRED, futureOnly => 0)
 	);
@@ -59,6 +60,14 @@ sub new
 	return $self;
 }
 
+sub makeStateChanges
+{
+	my ($self, $page, $command, $dlgFlags) = @_;
+
+	$self->updateFieldFlags('freq_measure', FLDFLAG_INVISIBLE, 1);
+	$self->SUPER::makeStateChanges($page, $command, $dlgFlags);
+}
+
 sub populateData
 {
 	my ($self, $page, $command, $activeExecMode, $flags) = @_;
@@ -73,7 +82,7 @@ sub populateData
 	$page->field('value_dateend' , $preventiveCare->{'value_dateend'});
 	$page->field('value_text', $preventiveCare->{'value_text'});
 	$page->field('frequency', $preventiveCare->{'value_int'});
-	$page->field('measure', $preventiveCare->{'value_block'});
+	$page->field('measure', $preventiveCare->{'value_intb'});
 
 }
 
@@ -97,9 +106,10 @@ sub execute
 		value_textB => $page->field('cpt_name') || undef,
 		value_dateEnd => $page->field('value_dateend') || undef,
 		value_int => $page->field('frequency') || undef,
-		value_block => $page->field('measure') || undef,
+		value_intB => $page->field('measure') || undef,
+		_debug => 0
 	);
-	#$self->handlePostExecute($page, $command, $flags | CGI::Dialog::DLGFLAG_IGNOREREDIRECT);
+	$self->handlePostExecute($page, $command, $flags | CGI::Dialog::DLGFLAG_IGNOREREDIRECT);
 	return "\u$command completed.";
 }
 
