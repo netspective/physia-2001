@@ -53,6 +53,10 @@
 			sequence has been added to the physician or not
 		</deliverable>
 
+		<deliverable id="1038">
+			Report (Aged Insurance Receivables) : Corrected drill down on Aged Insurance and Aged Patient Report, Constraints have been added for 'Site Organization ID' and Providerd. 
+		</deliverable>
+
 		<deliverable id="1107">
 			UI: Created Appointment Query.
 		</deliverable>
@@ -183,6 +187,11 @@
 
 		<deliverable id="1457">
 			Added batch fields to post transfer dialog.
+		</deliverable>
+		
+		<deliverable id="1463">
+			Report (Total Recv.) Created new report which shows all outstanding balances whether it is a 
+			pending insurance balance or patient balance.
 		</deliverable>
 		
 		<deliverable id="1470">
