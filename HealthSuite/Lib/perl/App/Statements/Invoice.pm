@@ -157,6 +157,12 @@ $STMTMGR_INVOICE = new App::Statements::Invoice(
 			and invoice_status != 16
 			and invoice_status != 15
 		},
+	'selAllNonVoidedInvoicesByClient' => q{
+		select * from invoice
+		where client_id = ?
+			and owner_id = ?
+			and invoice_status != 16
+		},
 	'selTotalPatientBalance' => qq{
 		select sum(balance)
 		from invoice
