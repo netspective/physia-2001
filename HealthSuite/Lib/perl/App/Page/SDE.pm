@@ -8,7 +8,7 @@ use App::Universal;
 use Exporter;
 use DBI::StatementManager;
 use App::Configuration;
-use App::ImageManager;
+use CGI::ImageManager;
 use App::ResourceDirectory;
 use Data::Publish;
 use Data::Dumper;
@@ -18,12 +18,17 @@ use vars qw(@ISA %RESOURCE_MAP);
 @ISA = qw(Exporter App::Page);
 %RESOURCE_MAP = (
 	'sde' => {
+		_title => 'SDE',
+		_iconSmall => 'icons/sde',
+		_iconMedium => 'icons/sde',
+		_iconLarge => 'icons/sde',
 		_views => [
 			{caption => 'ACL', name => 'acl',},
 			{caption => 'Tables', name => 'tables',},
 			{caption => 'Statistics', name => 'stats',},
 			{caption => 'Statements', name => 'stmgrs',},
 			{caption => 'Resources', name => 'resources',},
+			{caption => 'ImageTags', name => 'imagetags',},
 			{caption => 'Source', name => 'source',},
 			],
 		},
@@ -33,13 +38,13 @@ use constant DEFAULT_HIDE_COLUMNS => 'CR_SESSION_ID,CR_STAMP,CR_USER_ID,CR_ORG_I
 
 sub getContentHandlers
 {
-	return ('prepare_view_$_view$');
+	return ('prepare_view_$_pm_view$');
 }
 
 sub initialize
 {
 	my $self = shift;
-	$self->addLocatorLinks(['<IMG SRC="/resources/icons/home-sm.gif" BORDER=0> SDE', '/sde']);
+	$self->addLocatorLinks([qq{$IMAGETAGS{'icons/home-sm'} SDE}, '/sde']);
 	$self->addContent(qq{
 	<style>
 		body { background-color: white }
@@ -61,57 +66,18 @@ sub initialize
 	my $activeView = $self->param('_pm_view');
 	if ($activeView) 
 	{
-		unless($self->hasPermission("page/SDE/$activeView"))
+		unless($self->hasPermission("page/sde/$activeView"))
 		{
 			$self->disable(
 					qq{
 						<br>
 						You do not have permission to view this information. 
-						Permission page/SDE/$activeView is required.
+						Permission page/sde/$activeView is required.
 
 						Click <a href='javascript:history.back()'>here</a> to go back.
 					});
 		}
 	}
-}
-
-sub prepare_page_content_header
-{
-	my ($self, $colors, $fonts, $personId, $personData) = @_;
-	return 1 if $self->flagIsSet(App::Page::PAGEFLAG_ISPOPUP);
-	$self->SUPER::prepare_page_content_header(@_);
-	my $urlPrefix = "/sde";
-	my $functions = $self->getMenu_Simple(App::Page::MENUFLAG_SELECTEDISLARGER,
-		'_view',
-		[
-			['ACL', "$urlPrefix/acl", 'acl'],
-			['Database', "$urlPrefix/tables", 'tables'],
-			['Statements', "$urlPrefix/stmgrs", 'stmgrs'],
-			['Statistics', "$urlPrefix/stats", 'stats'],
-			['Resources', "$urlPrefix/resources", 'resources'],
-			['Source', "$urlPrefix/source", 'source'],
-		], ' | ');
-
-	push(@{$self->{page_content_header}}, qq{
-		<TABLE WIDTH=100% BGCOLOR=LIGHTSTEELBLUE CELLSPACING=0 CELLPADDING=3 BORDER=0>
-			<TR VALIGN=BOTTOM>
-			<TD WIDTH=32>
-				$IMAGETAGS{'icon-m/sde'}
-			</TD>
-			<TD VALIGN=MIDDLE>
-				<FONT FACE="Arial,Helvetica" SIZE=4 COLOR=DARKRED>
-					&nbsp;<B>Software Development Environment</B>
-				</FONT>
-			</TD>
-			<TD ALIGN=RIGHT VALIGN=MIDDLE>
-				<FONT FACE="Arial,Helvetica" SIZE=2>
-				$functions
-				</FONT>
-			</TD>
-			</TR>
-		</TABLE>
-		});
-	return 1;
 }
 
 sub getTableListAsOptionsAlpha
@@ -120,7 +86,7 @@ sub getTableListAsOptionsAlpha
 	my $rows = "";
 	foreach (sort { $a->{name} cmp $b->{name} } @{$list})
 	{
-		$rows .= "<option value='/sde/table/$_->{name}'>$_->{name}</option>";
+		$rows .= "<option value='/sde/tables/$_->{name}'>$_->{name}</option>";
 	}
 	return $rows;
 }
@@ -137,7 +103,7 @@ sub getTableListAsOptions
 		my $children .= scalar(@{$_->{childTables}}) > 0 ? getTableListAsOptions($self, $_->{childTables}, $level+1) : '';
 		my $indent = $level > 0 ? "&nbsp;&nbsp;&nbsp;&nbsp;"x$level : '';
 		my $aClass = $level == 0 ? 'tableNameParToc' : 'tableNameChlToc';
-		$rows .= "<option value='/sde/table/$_->{name}'>$indent$_->{name}</option>$children";
+		$rows .= "<option value='/sde/tables/$_->{name}'>$indent$_->{name}</option>$children";
 	}
 
 	return $rows;
@@ -165,7 +131,7 @@ sub getTableListAsRows
 		my $children .= scalar(@{$_->{childTables}}) > 0 ? getTableListAsRows($self, $_->{childTables}, $level+1) : '';
 		my $indent = $level > 0 ? "<td>&nbsp;&nbsp;</td>" : '';
 		my $aClass = $level == 0 ? 'tableNameParToc' : 'tableNameChlToc';
-		$rows .= "<tr>$indent<td><font face='Tahoma,Arial' size='2'><a class='$aClass' href='/sde/table/$_->{name}'>$_->{name}</a></font>$children</td></tr>";
+		$rows .= "<tr>$indent<td><font face='Tahoma,Arial' size='2'><a class='$aClass' href='/sde/tables/$_->{name}'>$_->{name}</a></font>$children</td></tr>";
 	}
 
 	return "<table border=0 cellspacing=0 cellpadding=0>$rows</table>";
@@ -281,7 +247,7 @@ sub prepare_TableStruct
 			<TABLE WIDTH=100% BGCOLOR='#EEEEEE' BORDER=0 CELLPADDING=0 CELLSPACING=0>
 			<TR><TD><FONT FACE="Arial,Helvetica" SIZE=2 STYLE="font-family: tahoma; font-size: 8pt">&nbsp;<B>$table->{name}</B> Table ($table->{abbrev})</FONT></TD>
 			<TD ALIGN=RIGHT><FONT FACE="Arial,Helvetica" SIZE=2>@{[ $self->getTableListAsSelect() ]}</FONT></TD></TR>
-			<TR><TD COLSPAN=3><IMG SRC="/resources/design/bar.gif" WIDTH=100% HEIGHT=1></TD></TR>
+			<TR><TD COLSPAN=3>@{[ getImageTag('design/bar', { width => '100%', height => 1}) ]}</TD></TR>
 			</TABLE>
 			<P>$table->{descr}</P>
 		} : '';
@@ -350,18 +316,19 @@ sub prepare_TableStruct
 				$fKeyHint = "$colName is the same type/defn as $col->{useType}$forwardFkeyHint (useType reference)";
 			}
 
-			my $flags = '';
-			$flags .= "<img src='/resources/icons/dbdd_pk.gif' title='$colName is a primary key (unique, required, and indexed)'>" if $col->{primarykey};
-			$flags .= ' '. "<img src='/resources/icons/dbdd_r.gif' title='$colName is a required column (by the front-end and the dbms)'>" if $col->{required} == 1;
-			$flags .= ' '. "<img src='/resources/icons/dbdd_rd.gif' title='$colName is a required column (only by the dbms, not the front-end)'>" if $col->{required} == 2;
-			$flags .= ' '. "<a href='$fKeyHref'><img src='/resources/icons/dbdd_$fKeyImgSuffix.gif' border=0 title='$fKeyHint'></a>" if $col->{type} eq 'ref' || $col->{useType};
-			$flags .= ' '. "<img src='/resources/icons/dbdd_u.gif' title='Each $colName in the $table->{name} table must have a unique value'>" if $col->{unique};
-			$flags .= ' '. "<img src='/resources/icons/dbdd_c.gif' title='$colName is a calculated field (by a dbms trigger)'>" if $col->{calc};
-			$flags .= ' '. "<img src='/resources/icons/dbdd_ix.gif' title='$colName is an indexed column'>" if $col->{index};
-			$flags .= ' '. "<img src='/resources/icons/dbdd_ch.gif' title='$colName caches data from other columns (for performance benefits)'>" if exists $col->{cache};
-			$flags .= ' '. "<img src='/resources/icons/dbdd_ts.gif' title='$colName has a text search table ($table->{abbrev}_\u$col->{name}_Word)'>" if $col->{type} eq 'text_search';
-			$flags .= ' '. "<a href='$colDetailHref'><img src='/resources/icons/dbdd_cr.gif' border=0 title='$colName is cached by $cacheRefsCount other columns (for performance benefits)'></a>" if $cacheRefsCount > 0;
-			$flags .= ' '. "<a href='$colDetailHref'><img src='/resources/icons/dbdd_fr.gif' border=0 title='$colName is referenced by $foreignRefsCount other columns (as a foreign key)'></a>" if $foreignRefsCount > 0;
+			my @flags = ();
+			push @flags, getImageTag('icons/dbdd_pk', { title => "$colName is a primary key (unique, required, and indexed)" }) if $col->{primarykey};
+			push @flags, getImageTag('icons/dbdd_r', { title => "$colName is a required column (by the front-end and the dbms)" }) if $col->{required} == 1;
+			push @flags, getImageTag('icons/dbdd_rd', { title => "$colName is a required column (only by the dbms, not the front-end)" }) if $col->{required} == 2;
+			push @flags, qq{<a href="$fKeyHref">} . getImageTag("icons/dbdd_$fKeyImgSuffix", { border => 0, title => "$fKeyHint" }) . '</a>' if $col->{type} eq 'ref' || $col->{useType};
+			push @flags, getImageTag('icons/dbdd_u', { title => "Each $colName in the $table->{name} table must have a unique value" }) if $col->{unique};
+			push @flags, getImageTag('icons/dbdd_c', { title => "$colName is a calculated field (by a dbms trigger)" }) if $col->{calc};
+			push @flags, getImageTag('icons/dbdd_ix', { title => "$colName is an indexed column" }) if $col->{index};
+			push @flags, getImageTag('icons/dbdd_ch', { title => "$colName caches data from other columns (for performance benefits)" }) if exists $col->{cache};
+			push @flags, getImageTag('icons/dbdd_ts', { title => "$colName has a text search table ($table->{abbrev}_\u$col->{name}_Word)" }) if $col->{type} eq 'text_search';
+			push @flags, qq{<a href="$colDetailHref">} . getImageTag('icons/dbdd_cr', { border => 0, title => "$colName is cached by $cacheRefsCount other columns (for performance benefits)" }) .  '</a>' if $cacheRefsCount > 0;
+			push @flags, qq{<a href="$colDetailHref">} . getImageTag('icons/dbdd_fr', { border => 0, title => "$colName is referenced by $foreignRefsCount other columns (as a foreign key)" }) . '</a>' if $foreignRefsCount > 0;
+			my $flags = join ' ', @flags;
 
 			my $allKeys = join(', ', sort keys %$col);
 
@@ -396,7 +363,7 @@ sub prepare_TableStruct
 		my $defaultQuery = $self->escape("select * from $table->{name} where rownum < 250");
 		$html .= qq{
 			<table border=0 cellspacing=0>$rows</table>
-			<h1>$table->{name} <a href='table/$table->{name}?query=$defaultQuery'>Data</a></h1>
+			<h1>$table->{name} <a href='tables/$table->{name}?query=$defaultQuery'>Data</a></h1>
 			$curData
 			};
 
@@ -420,7 +387,7 @@ sub prepare_ColumnDetail
 				<TABLE WIDTH=100% BGCOLOR=#EEEEEE BORDER=0 CELLPADDING=0 CELLSPACING=0>
 				<TR><TD><FONT FACE="Arial,Helvetica" SIZE=2 STYLE="font-family: tahoma; font-size: 8pt">&nbsp;Column <B>$table->{name}.$col->{name}</FONT></TD>
 				<TD ALIGN=RIGHT><FONT FACE="Arial,Helvetica" SIZE=2>@{[ $self->getTableListAsSelect() ]}</FONT></TD></TR>
-				<TR><TD COLSPAN=3><IMG SRC="/resources/design/bar.gif" WIDTH=100% HEIGHT=1></TD></TR>
+				<TR><TD COLSPAN=3>@{[ getImageTag('design/bar', { width => '100%', height => 1}) ]}</TD></TR>
 				</TABLE>
 				<P>
 				$col->{descr}
@@ -507,7 +474,7 @@ sub prepare_TableQuery
 		<TABLE WIDTH=100% BGCOLOR='#EEEEEE' BORDER=0 CELLPADDING=0 CELLSPACING=0>
 		<TR><TD><FONT FACE="Arial,Helvetica" SIZE=2 STYLE="font-family: tahoma; font-size: 8pt">&nbsp;SQL Query</FONT></TD>
 		<TD ALIGN=RIGHT><FONT FACE="Arial,Helvetica" SIZE=2>@{[ $self->getTableListAsSelect() ]}</FONT></TD></TR>
-		<TR><TD COLSPAN=3><IMG SRC="/resources/design/bar.gif" WIDTH=100% HEIGHT=1></TD></TR>
+		<TR><TD COLSPAN=3>@{[ getImageTag('design/bar', { width => '100%', height => 1}) ]}</TD></TR>
 		</TABLE>
 		<P>
 		<form method="post">
@@ -533,7 +500,7 @@ sub prepare_TableList
 		<TABLE WIDTH=100% BGCOLOR=#EEEEEE BORDER=0 CELLPADDING=0 CELLSPACING=0>
 		<TR><TD><FONT FACE="Arial,Helvetica" SIZE=2 STYLE="font-family: tahoma; font-size: 8pt">&nbsp;All Tables</font></TD>
 		<TD ALIGN=RIGHT><FONT FACE="Arial,Helvetica" SIZE=2>@{[ $self->getTableListAsSelect() ]}</FONT></TD></TR>
-		<TR><TD COLSPAN=3><IMG SRC="/resources/design/bar.gif" WIDTH=100% HEIGHT=1></TD></TR>
+		<TR><TD COLSPAN=3>@{[ getImageTag('design/bar', { width => '100%', height => 1}) ]}</TD></TR>
 		</TABLE>
 		$msg
 		<BR><A HREF='tables/refresh'>Refresh (reload) $self->{schemaFile} now.</A>
@@ -560,14 +527,14 @@ sub prepare_view_tables
 
 	if($self->param('query'))
 	{
-		$self->addLocatorLinks(["\u$pathItems[1] Query", '/sde/table/' . $pathItems[1]]);
+		$self->addLocatorLinks(["\u$pathItems[1] Query", '/sde/tables/' . $pathItems[1]]);
 		$self->param('table', $pathItems[1]);
 		$self->prepare_TableQuery();
 	}
 	elsif($self->param('column'))
 	{
-		$self->addLocatorLinks(["\u$pathItems[1]", '/sde/table/' . $pathItems[1]]);
-		$self->addLocatorLinks(["Column " . $self->param('column'), '/sde/table/' . $pathItems[1] . '?' . 'column=' . $self->param('column')]);
+		$self->addLocatorLinks(["\u$pathItems[1]", '/sde/tables/' . $pathItems[1]]);
+		$self->addLocatorLinks(["Column " . $self->param('column'), '/sde/tables/' . $pathItems[1] . '?' . 'column=' . $self->param('column')]);
 		$self->param('table', $pathItems[1]);
 		$self->prepare_ColumnDetail();
 		$self->addContent('<P>');
@@ -581,7 +548,7 @@ sub prepare_view_tables
 	}
 	elsif(scalar(@pathItems) > 1)
 	{
-		$self->addLocatorLinks(["\u$pathItems[1]", '/sde/table/' . $pathItems[1]]);
+		$self->addLocatorLinks(["\u$pathItems[1]", '/sde/tables/' . $pathItems[1]]);
 		$self->param('table', $pathItems[1]);
 		$self->prepare_TableStruct();
 	}
@@ -593,10 +560,6 @@ sub prepare_view_tables
 	return 1;
 }
 
-sub prepare_view_table
-{
-	return prepare_view_tables(@_);
-}
 
 #---------------------------------------------------------------------------------
 
@@ -610,8 +573,8 @@ sub getStmtMgrsList
 		my $stMgrObjName = $stMgrObjId;
 		$stMgrObjName =~ s/^App::Statements:://;
 		$rows .= $type eq 'select' ?
-			"<option value='/sde/stmgr/$stMgrObjId'>$stMgrObjName</option>" :
-			"<a href='/sde/stmgr/$stMgrObjId'>$stMgrObjName</a><BR>";
+			"<option value='/sde/stmgrs/$stMgrObjId'>$stMgrObjName</option>" :
+			"<a href='/sde/stmgrs/$stMgrObjId'>$stMgrObjName</a><BR>";
 			;
 	}
 
@@ -635,8 +598,8 @@ sub getStmtsList
 		next if $stmtId =~ m/^publishDefn/;
 
 		$rows .= $type eq 'select' ?
-			"<option value='/sde/stmgr/$stMgrId/$stmtId'>$stmtId</option>" :
-			"<a href='/sde/stmgr/$stMgrId/$stmtId'>$stmtId</a><font color=#555555><pre>@{[ $stMgr->{$stmtId} ]}</pre></font><P>";
+			"<option value='/sde/stmgrs/$stMgrId/$stmtId'>$stmtId</option>" :
+			"<a href='/sde/stmgrs/$stMgrId/$stmtId'>$stmtId</a><font color=#555555><pre>@{[ $stMgr->{$stmtId} ]}</pre></font><P>";
 			;
 	}
 
@@ -662,7 +625,7 @@ sub prepare_view_stmgrs
 				<TABLE WIDTH=100% BGCOLOR=#EEEEEE BORDER=0 CELLPADDING=0 CELLSPACING=0>
 				<TR><TD><FONT FACE="Arial,Helvetica" SIZE=2 STYLE="font-family: tahoma; font-size: 8pt">&nbsp;Statement Managers</font></TD>
 				<TD ALIGN=RIGHT><FONT FACE="Arial,Helvetica" SIZE=2>$allMgrs</FONT></TD></TR>
-				<TR><TD COLSPAN=3><IMG SRC="/resources/design/bar.gif" WIDTH=100% HEIGHT=1></TD></TR>
+				<TR><TD COLSPAN=3>@{[ getImageTag('design/bar', { width => '100%', height => 1}) ]}</TD></TR>
 				</TABLE>
 			<P>
 			@{[ $self->getStmtMgrsList() ]}
@@ -672,12 +635,12 @@ sub prepare_view_stmgrs
 	{
 		my $stMgrObjId = $pathItems[1];
 		my $stMgrObj = $ALL_STMT_MANAGERS->{$stMgrObjId};
-		$self->addLocatorLinks([$stMgrObjId, '/sde/stmgr/' . $stMgrObjId]);
+		$self->addLocatorLinks([$stMgrObjId, '/sde/stmgrs/' . $stMgrObjId]);
 		$self->addContent(qq{
 				<TABLE WIDTH=100% BGCOLOR=#EEEEEE BORDER=0 CELLPADDING=0 CELLSPACING=0>
 				<TR><TD><FONT FACE="Arial,Helvetica" SIZE=2 STYLE="font-family: tahoma; font-size: 8pt">&nbsp;$stMgrObjId</font></TD>
 				<TD ALIGN=RIGHT><FONT FACE="Arial,Helvetica" SIZE=2>$allMgrs</FONT></TD></TR>
-				<TR><TD COLSPAN=3><IMG SRC="/resources/design/bar.gif" WIDTH=100% HEIGHT=1></TD></TR>
+				<TR><TD COLSPAN=3>@{[ getImageTag('design/bar', { width => '100%', height => 1}) ]}</TD></TR>
 				</TABLE>
 			<P>
 			@{[ $self->getStmtsList($stMgrObjId, $stMgrObj) ]}
@@ -721,13 +684,13 @@ sub prepare_view_stmgrs
 		my @sqlLines = split(/\n/, $sql);
 		my $stmtLines = scalar(@sqlLines) + 3;
 
-		$self->addLocatorLinks([$stMgrObjId, "/sde/stmgr/$stMgrObjId"]);
-		$self->addLocatorLinks([$stmtId, "/sde/stmgr/$stMgrObjId/$stmtId"]);
+		$self->addLocatorLinks([$stMgrObjId, "/sde/stmgrs/$stMgrObjId"]);
+		$self->addLocatorLinks([$stmtId, "/sde/stmgrs/$stMgrObjId/$stmtId"]);
 		$self->addContent(qq{
 				<TABLE WIDTH=100% BGCOLOR=#EEEEEE BORDER=0 CELLPADDING=0 CELLSPACING=0>
 				<TR><TD><FONT FACE="Arial,Helvetica" SIZE=2 STYLE="font-family: tahoma; font-size: 8pt">&nbsp;Statement <b>$stmtId</b></font></TD>
 				<TD ALIGN=RIGHT><FONT FACE="Arial,Helvetica" SIZE=2>@{[ $self->getStmtsList($stMgrObjId, $stMgrObj, 'select') ]}</FONT></TD></TR>
-				<TR><TD COLSPAN=3><IMG SRC="/resources/design/bar.gif" WIDTH=100% HEIGHT=1></TD></TR>
+				<TR><TD COLSPAN=3>@{[ getImageTag('design/bar', { width => '100%', height => 1}) ]}</TD></TR>
 				</TABLE>
 				<P>
 				<form method="post" href="/">
@@ -746,10 +709,6 @@ $sql
 	}
 }
 
-sub prepare_view_stmgr
-{
-	prepare_view_stmgrs(@_);
-}
 
 #---------------------------------------------------------------------------------
 
@@ -803,7 +762,7 @@ sub prepare_view_source
 		<TABLE WIDTH=100% BGCOLOR=#EEEEEE BORDER=0 CELLPADDING=0 CELLSPACING=0>
 		<TR><TD><FONT FACE="Arial,Helvetica" SIZE=2 STYLE="font-family: tahoma; font-size: 8pt">&nbsp;Source Code</FONT></TD>
 		<TD ALIGN=RIGHT><FONT FACE="Arial,Helvetica" SIZE=2></FONT></TD></TR>
-		<TR><TD COLSPAN=3><IMG SRC="/resources/design/bar.gif" WIDTH=100% HEIGHT=1></TD></TR>
+		<TR><TD COLSPAN=3>@{[ getImageTag('design/bar', { width => '100%', height => 1}) ]}</TD></TR>
 		</TABLE>
 		<P>
 		<FONT FACE="Arial,Helvetica" SIZE=2 STYLE="font-family: tahoma; font-size: 8pt">
@@ -829,11 +788,11 @@ sub prepare_view_resources
 		<TABLE WIDTH=100% BGCOLOR=#EEEEEE BORDER=0 CELLPADDING=0 CELLSPACING=0>
 		<TR><TD><FONT FACE="Arial,Helvetica" SIZE=2 STYLE="font-family: tahoma; font-size: 8pt">&nbsp;Resources</FONT></TD>
 		<TD ALIGN=RIGHT><FONT FACE="Arial,Helvetica" SIZE=2></FONT></TD></TR>
-		<TR><TD COLSPAN=3><IMG SRC="/resources/design/bar.gif" WIDTH=100% HEIGHT=1></TD></TR>
+		<TR><TD COLSPAN=3>@{[ getImageTag('design/bar', { width => '100%', height => 1}) ]}</TD></TR>
 		</TABLE>
 		<BR>
 		<A HREF="/sde/resources">\%App::ResourceDirectory::RESOURCES</A> = (<BR>
-		@{[ $self->displayResources('/sde/resource', \@path) ]}
+		@{[ $self->displayResources('/sde/resources', \@path) ]}
 		);
 		});
 
@@ -898,9 +857,77 @@ sub hashAsStr
 	return $data;
 }
 
-sub prepare_view_resource
+
+#---------------------------------------------------------------------------------
+
+sub prepare_view_imagetags
 {
-	prepare_view_resources(@_);
+	my $self = shift;
+	my @pathItems = $self->param('arl_pathItems');
+	my $arl = $self->param('arl');
+	my @path = @pathItems;
+	my $view = shift @path;
+
+	$self->addLocatorLinks(['ImageTags', '/sde/imagetags']);
+	$self->addContent(qq{
+		<TABLE WIDTH=100% BGCOLOR=#EEEEEE BORDER=0 CELLPADDING=0 CELLSPACING=0>
+		<TR><TD><FONT FACE="Arial,Helvetica" SIZE=2 STYLE="font-family: tahoma; font-size: 8pt">&nbsp;Image Tags</FONT></TD>
+		<TD ALIGN=RIGHT><FONT FACE="Arial,Helvetica" SIZE=2></FONT></TD></TR>
+		<TR><TD COLSPAN=3>@{[ getImageTag('design/bar', { width => '100%', height => 1}) ]}</TD></TR>
+		</TABLE>
+		<BR>
+		@{[ $self->displayImageTags(\@path) ]}
+		});
+
+	return 1;
+}
+
+sub displayImageTags
+{
+	my $self = shift;
+	my $path = shift;
+	my $pathItem = join '/', @$path;
+	my $data = '';
+	if ($pathItem)
+	{
+		unless (exists $IMAGETAGS{$pathItem})
+		{
+			return "<font color=red size=5>Error: ARL Path Item '$pathItem' doesn't exists</font><br>\n"
+		}
+		if ( ref($IMAGETAGS{$pathItem}) )
+		{
+			return "<font color=red size=5>Error: ARL Path Item '$pathItem' is not a valid image tag entry</font><br>\n";
+		}
+		
+		$data .= "<br><br><h1>Example 1</h1>\n";
+		my $dispTag = $IMAGETAGS{$pathItem};
+		$dispTag =~ s/\</\&lt;/g;
+		$dispTag =~ s/\>/\&gt;/g;
+		$data .= qq{<pre><font size="3">use CGI::ImageManager;\n...\n};
+		$data .= qq{\$html .= \$IMAGETAGS{'$pathItem'};\n...\n</font></pre>};
+		$data .= qq{<center>$IMAGETAGS{$pathItem}<br><br>$dispTag</center><br><br>};
+		
+		$data .= "<br><br><h1>Example 2</h1>\n";
+		$dispTag = getImageTag("$pathItem", { border => 10, title => "tool tip" });
+		$dispTag =~ s/\</\&lt;/g;
+		$dispTag =~ s/\>/\&gt;/g;
+		$data .= qq{<pre><font size="3">use CGI::ImageManager;\n...\n};
+		$data .= qq{\$html .= getImageTag('$pathItem', { border => 10, title => "tool tip" });\n...\n</font></pre>\n};
+		$data .= '<center>' . getImageTag("$pathItem", { border => 10, title => "tool tip" }) . "<br><br>$dispTag</center>";
+	}
+	else
+	{
+		$data .= qq{<A HREF="/sde/imagetags">\%IMAGETAGS</A> = (<BR>};
+		$data .= qq{<table width="100%" style="margin-left: 25">};
+		foreach my $key (sort keys %IMAGETAGS)
+		{
+			my $href = "/sde/imagetags/$key";
+			my $value = ref($IMAGETAGS{$key});
+			$data .= qq{<tr><td><a href=$href>$key</a></td></tr>\n};
+		}
+		$data .= qq{</table>\n);};
+	}
+	return $data;
 }
 
 
@@ -917,9 +944,9 @@ sub prepare_view_acl
 	$self->addLocatorLinks(['ACL', '/sde/acl']);
 	$self->addContent(qq{
 		<TABLE WIDTH=100% BGCOLOR=#EEEEEE BORDER=0 CELLPADDING=0 CELLSPACING=0>
-		<TR><TD><FONT FACE="Arial,Helvetica" SIZE=2 STYLE="font-family: tahoma; font-size: 8pt">&nbsp;Resources</FONT></TD>
+		<TR><TD><FONT FACE="Arial,Helvetica" SIZE=2 STYLE="font-family: tahoma; font-size: 8pt">&nbsp;Access Control Lists</FONT></TD>
 		<TD ALIGN=RIGHT><FONT FACE="Arial,Helvetica" SIZE=2></FONT></TD></TR>
-		<TR><TD COLSPAN=3><IMG SRC="/resources/design/bar.gif" WIDTH=100% HEIGHT=1></TD></TR>
+		<TR><TD COLSPAN=3>@{[ getImageTag('design/bar', { width => '100%', height => 1}) ]}</TD></TR>
 		</TABLE>
 		<BR>
 		@{[ $self->displayAcl() ]}
@@ -946,7 +973,7 @@ sub displayAcl
 			{ head => 'Variable', dataFmt => '<B>#0#:</B>', dAlign => 'RIGHT' },
 			{ head => 'Value' },
 			],
-		rowSepStr => "\n<IMG SRC='/resources/design/bar.gif' WIDTH=100% HEIGHT=1>\n",
+		rowSepStr => "\n" . getImageTag('design/bar', { width => '100%', height => 1}) . "\n",
 	};
 	my $acl = $self->{acl};	
 	my $allowPerms = '';
@@ -993,9 +1020,9 @@ sub prepare_view_stats
 	$self->addLocatorLinks(['Statistics', '/sde/stats']);
 	$self->addContent(qq{
 		<TABLE WIDTH=100% BGCOLOR=#EEEEEE BORDER=0 CELLPADDING=0 CELLSPACING=0>
-		<TR><TD><FONT FACE="Arial,Helvetica" SIZE=2 STYLE="font-family: tahoma; font-size: 8pt">&nbsp;Resources</FONT></TD>
+		<TR><TD><FONT FACE="Arial,Helvetica" SIZE=2 STYLE="font-family: tahoma; font-size: 8pt">&nbsp;Database Statistics</FONT></TD>
 		<TD ALIGN=RIGHT><FONT FACE="Arial,Helvetica" SIZE=2></FONT></TD></TR>
-		<TR><TD COLSPAN=3><IMG SRC="/resources/design/bar.gif" WIDTH=100% HEIGHT=1></TD></TR>
+		<TR><TD COLSPAN=3>@{[ getImageTag('design/bar', { width => '100%', height => 1}) ]}</TD></TR>
 		</TABLE>
 		<BR>
 		Process ID: $$<BR>
@@ -1030,7 +1057,7 @@ sub handleARL
 	my ($self, $arl, $params, $rsrc, $pathItems) = @_;
 	return 0 if $self->SUPER::handleARL($arl, $params, $rsrc, $pathItems) == 0;
 
-	$self->param('_view', $pathItems->[0]);
+	$self->param('_pm_view', $pathItems->[0]);
 	$self->printContents();
 
 	return 0;
