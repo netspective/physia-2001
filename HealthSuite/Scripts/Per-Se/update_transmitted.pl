@@ -56,3 +56,20 @@ for my $sqlStmt (@sqlStmts)
 }
 
 $dbh->disconnect();
+
+use Mail::Sendmail;
+
+my $sendMailTo = 'help@physia.com';
+my $user = getpwuid($>) || '';
+
+my %mail =
+(	To => $sendMailTo,
+	From => $user . '@physia.com',
+	Cc => 'thai_nguyen@physia.com',
+	Subject => "Claims Submission to Per-Se - " . `date`,
+	Message => "The following claims were submitted to Per-Se today:\n\n"
+		. "@{[ join(', ', @sortedClaims) ]}." ,
+	Smtp => 'smtp.physia.com',
+);
+
+sendmail(%mail) or die $Mail::Sendmail::error;
