@@ -105,6 +105,7 @@ sub new
 		new App::Dialog::Field::OutstandingItems(name =>'outstanding_items_list'),
 
 		new CGI::Dialog::Field(type => 'select', style => 'radio', selOptions => 'Yes:1;No:2', name => 'next_payer_alert', caption => 'Submit to Next Payer?'),
+		new CGI::Dialog::Field(type => 'select', style => 'radio', selOptions => 'Yes:1;No:2', name => 'reopen_alert', caption => 'Reopen Claim?'),
 
 
 	);
@@ -146,6 +147,8 @@ sub makeStateChanges
 
 	$self->updateFieldFlags('payer_id', FLDFLAG_READONLY, 1);
 	$self->setFieldFlags('next_payer_alert', FLDFLAG_INVISIBLE, 1);
+	$self->setFieldFlags('reopen_alert', FLDFLAG_INVISIBLE, 1);
+
 	if(! $invoiceId || ($isInsurance && $invoiceInfo->{invoice_subtype} == App::Universal::CLAIMTYPE_SELFPAY))
 	{
 		$self->updateFieldFlags('payer_id', FLDFLAG_INVISIBLE, 1);
@@ -252,6 +255,7 @@ sub execute
 
 	my $paidBy = $page->param('paidBy') || 'personal';
 	my $nextPayerExists = $page->field('next_payer_exists');
+	my $reopenClaim = $page->field('reopen_alert');
 	my $invoiceId = $page->param('invoice_id') || $page->param('_sel_invoice_id') || $page->field('sel_invoice_id');
 	my $batchId = $page->field('batch_id');
 	my $batchDate = $page->field('batch_date');
@@ -334,7 +338,7 @@ sub execute
 		$newStatus = App::Universal::INVOICESTATUS_ONHOLD;
 		addHistoryItem($page, $invoiceId, value_text => 'On Hold');
 	}
-	elsif($invoiceStatus == App::Universal::INVOICESTATUS_CLOSED && $claimType != App::Universal::CLAIMTYPE_SELFPAY)
+	elsif($invoiceStatus == App::Universal::INVOICESTATUS_CLOSED && $claimType != App::Universal::CLAIMTYPE_SELFPAY && $reopenClaim == 1)
 	{
 		reopenInsuranceClaim($page, $invoiceId);
 	}
@@ -351,7 +355,7 @@ sub execute
 		addHistoryItem($page, $invoiceId, value_text => 'Closed');
 		handleDataStorage($page, $invoiceId);
 	}
-	else
+	elsif(! $reopenClaim)
 	{
 		$newStatus = App::Universal::INVOICESTATUS_PAYAPPLIED;
 	}
@@ -392,29 +396,35 @@ sub customValidate
 	my $billingInfo = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoiceBillingCurrent', $invoiceInfo->{billing_id});
 	my $nextBillingInfo = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoiceBillingByInvoiceIdAndBillSeq', $invoiceId, $billingInfo->{bill_sequence} + 1);
 	my $nextPayer = $nextBillingInfo->{bill_id};
-	my $invoiceStat = $invoiceInfo->{invoice_status};
+	my $invoiceStatus = $invoiceInfo->{invoice_status};
 
 	#indicate that a next payer does exist in hidden field (used in sub execute to determine if claim should be closed or not)
 	$page->field('next_payer_exists', 1) if defined $nextPayer;
 
-
 	#ask if claim should be sent to next payer
 	if($paidBy eq 'insurance')	#this 'if' will never occur for self-pay invoices
 	{
-		if( 
+		if(
 			 $nextPayer && ! $page->field('next_payer_alert') && 
 			(
-				($invoiceStat >= App::Universal::INVOICESTATUS_INTNLREJECT && $invoiceStat <= App::Universal::INVOICESTATUS_MTRANSFERRED) ||
-				$invoiceStat == App::Universal::INVOICESTATUS_EXTNLREJECT || $invoiceStat == App::Universal::INVOICESTATUS_AWAITINSPAYMENT ||
-				$invoiceStat == App::Universal::INVOICESTATUS_PAYAPPLIED || $invoiceStat == App::Universal::INVOICESTATUS_PAPERCLAIMPRINTED ||
-				$invoiceStat == App::Universal::INVOICESTATUS_CLOSED
-			) 
+				($invoiceStatus >= App::Universal::INVOICESTATUS_INTNLREJECT && $invoiceStatus <= App::Universal::INVOICESTATUS_MTRANSFERRED) ||
+				$invoiceStatus == App::Universal::INVOICESTATUS_EXTNLREJECT || $invoiceStatus == App::Universal::INVOICESTATUS_AWAITINSPAYMENT ||
+				$invoiceStatus == App::Universal::INVOICESTATUS_PAYAPPLIED || $invoiceStatus == App::Universal::INVOICESTATUS_PAPERCLAIMPRINTED
+			)
 		    )
 		{
 			my $getNextPayerAlert = $self->getField('next_payer_alert');
 			$self->updateFieldFlags('next_payer_alert', FLDFLAG_INVISIBLE, 0);
 			$getNextPayerAlert->invalidate($page, "Would you like to submit this claim to the next payer?");
 		}
+	}
+
+	#if claim is already closed, ask if it should be reopened (which would cause parent claims to be voided)
+	if($invoiceStatus == App::Universal::INVOICESTATUS_CLOSED && $invoiceInfo->{invoice_subtype} != App::Universal::CLAIMTYPE_SELFPAY && ! $page->field('reopen_alert'))
+	{
+			my $reopenClaim = $self->getField('reopen_alert');
+			$self->updateFieldFlags('reopen_alert', FLDFLAG_INVISIBLE, 0);
+			$reopenClaim->invalidate($page, "Would you like to reopen this claim and void all subsequent claims?");
 	}
 }
 
