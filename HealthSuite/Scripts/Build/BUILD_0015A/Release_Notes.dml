@@ -40,7 +40,15 @@
 			entered so far.  Also fixed a bug in query that didn't allow you to go past the second page of results.
 		</deliverable>
 		
-		
+		<deliverable id="758">
+			Reports: Daily Audit Recap, Revenue/Collection, Appointment Charges
+			Added: (UI) A pull-down combo box labelled "Printer" that lists all the printers that an
+			       organization has.
+			Added: (UI) A checkbox labeled "Print" which, when checked, causes an ASCII version of the
+			       generated report to be sent to the printer chosen in the Printer combo box.
+			Added: (UI) A link at the top of each report's output that points to an ASCII version of the
+			       same report executed with the same parameters.
+		</deliverable>
 		
 	</deliverables>
 </release-notes>
