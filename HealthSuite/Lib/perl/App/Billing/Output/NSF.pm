@@ -83,8 +83,8 @@ sub processClaims
     	# creat the THIN.pm of File directory once
     	$self->{nsfTHINFileObj} = new App::Billing::Output::File::THIN();
 
-		# To get new serial number from serial.txt file
-		my $serialNumber = $self->getFileSerialNumber();
+		# To get new serial number from serial.txt file (but only if we're not running inside a webserver)
+		my $serialNumber = $ENV{HTTP_USER_AGENT} ? 0 : $self->getFileSerialNumber();
 
 		# creates logical files for multiple payers
 		foreach my $key(keys %$claimsCollection)
