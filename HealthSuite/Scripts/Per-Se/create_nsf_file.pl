@@ -23,6 +23,11 @@ use constant INVOICESTATUS_TRANSMITTED => 5;
 
 use Date::Manip;
 
+my %fileNameStem = (
+	@{[NSF_HALLEY]} => 'phy169_',
+	@{[NSF_THIN]} => 'physia_',
+);
+
 sub main
 {
 	my @ARGV = @_;
@@ -37,7 +42,7 @@ sub main
 	$cs =~ /(.*?)\/(.*?)\@(.*)/;
 	my ($userName, $password, $twoTask) =  ($1, $2, $3);
 
-	my $NSF_FILE_NAME = 'phy169_' . $today . '.nsf';
+	my $NSF_FILE_NAME = $fileNameStem{$nsfType} . $today . '.nsf';
 
 	my $claimList = new App::Billing::Claims;
 	my $valMgr = new App::Billing::Validators;
@@ -80,8 +85,8 @@ sub main
 						FLAG_STRIPDASH => '1',
 					);
 
-					print " Total Claims Processed = $st->{count} \n ";
-
+					print "\nFile Created: $NSF_FILE_NAME\n";
+					print "Total Claims Processed = $st->{count} \n ";
 				}
 				else
 				{
