@@ -39,14 +39,14 @@ sub autoSuggest
 {
 	my ($self, $page, $validator) = @_;
 	my $name = $self->{name};
-	
+
 	# First, retrieve names, ssn & birthdate into local variables
 	my $firstname = $page->field('name_first');
 	my $MI = substr($page->field('name_middle'),0,1) || "X";
 	my $lastname = $page->field('name_last');
 	my $ssn = $page->field('ssn');
  	my $DOB = $page->field('date_of_birth');
-	
+
 	#Create some commonly used intermediaries
 	#First initial of first name
 	my $FIFN = substr($firstname,0,1);
@@ -55,8 +55,8 @@ sub autoSuggest
 	#Birthyear (last two digits of date_of_birth string)
 	my $ldob = length($DOB);
 	my $L2DOB = substr($DOB,$ldob-2,2);
-		
-	
+
+
 	#Generate array of possibles
 	my @possible = ();
 	#First initial of first name plus last name, total not greater than 16 characters
@@ -79,11 +79,11 @@ sub autoSuggest
 	push (@possible, $FIFN . $MI . substr($lastname,0,10) . int(10000*rand));
 	push (@possible, $FIFN . $MI . substr($lastname,0,10) . int(10000*rand));
 	push (@possible, $FIFN . $MI . substr($lastname,0,10) . int(10000*rand));
-	
-	
-	
+
+
+
 	#Check array of possibles for availability, stop after three are OK
-	
+
 	my $goodcount = 0;
 	my $count = 0;
 	my @goodones = ();
@@ -97,18 +97,18 @@ sub autoSuggest
 			$count = $count + 1;
 			}
 		}
-	
-return qq{	
-	<input type="radio" name="_f_radio$name" value="$goodones[0]" 
+
+return qq{
+	<input type="radio" name="_f_radio$name" value="$goodones[0]"
 				onClick="document.dialog._f_radioperson_id[0].checked=true; document.dialog._f_person_id.value=this.value"
 									> $goodones[0] &nbsp
 		<input type="radio" name="_f_radio$name" value="$goodones[1]"
 				onClick="document.dialog._f_person_id.value=this.value;	document.dialog._f_radioperson_id[1].checked=true"> $goodones[1] &nbsp
-		<input type="radio" name="_f_radio$name" value="$goodones[2]" 
+		<input type="radio" name="_f_radio$name" value="$goodones[2]"
 				onClick="document.dialog._f_person_id.value=this.value;	document.dialog._f_radioperson_id[2].checked=true"> $goodones[2] &nbsp
-		
+
 	};
-	
+
 
 }
 
@@ -125,7 +125,7 @@ sub isValid
 
 	if($self->SUPER::isValid($page, $validator))
 	{
-		
+
 		my $value = $page->field($self->{name});
 		my $suggest = 0;
 		unless($value)
@@ -141,7 +141,7 @@ sub isValid
 		{
 			my $suggestion = $self->autoSuggest($page,$validator);
 			$self->invalidate($page, "Please select an ID:<BR>$suggestion");
-		}		
+		}
 	}
 
 	# return TRUE if there were no errors, FALSE (0) if there were errors
@@ -277,28 +277,28 @@ sub isValid
 				}
 				unless ($STMTMGR_PERSON->recordExists($page, STMTMGRFLAG_NONE,'selRegistry', $value))
 				{
-					$invMsg .= qq{<a href="$createPersonHref">$types</a>}
+					$invMsg .= qq{<a href="$createPersonHref">$types</a> }
 				}
 			}
-			
+
 			if ($STMTMGR_PERSON->recordExists($page, STMTMGRFLAG_NONE, 'selCategory', $value,
 				$page->session('org_internal_id')))
 			{
 				if ( ($STMTMGR_PERSON->recordExists($page, STMTMGRFLAG_NONE, 'selRegistry', $value))
 					&& ((my $category = $self->{types}->[0]) ne 'Patient') )
 				{
-					$self->invalidate($page, qq{'$value' is not a $category in this Org.}) 
-						unless $STMTMGR_PERSON->recordExists($page, STMTMGRFLAG_NONE, 
+					$self->invalidate($page, qq{'$value' is not a $category in this Org.})
+						unless $STMTMGR_PERSON->recordExists($page, STMTMGRFLAG_NONE,
 						'selVerifyCategory', $value, $page->session('org_internal_id'), $category);
 				}
 			}
 			else
 			{
-				$self->invalidate($page, $invMsg);				
+				$self->invalidate($page, $invMsg);
 			}
 		}
 		else
-		{			
+		{
 			my $orgIntId = $page->session('org_internal_id');
 			$self->invalidate($page, "You do not have permission to select people outside of your organization.")
 			unless $STMTMGR_PERSON->recordExists($page, STMTMGRFLAG_NONE,'selCategory', $value, $orgIntId) ;
