@@ -121,7 +121,7 @@ sub execute
 
 	# oracle likes '%' instead of wildcard '*'
 	my $appendStmtName = $expression =~ s/\*/%/g ? '_like' : '';
-	my $orgId = $self->session('org_id');
+	my $orgId = $self->session('org_internal_id');
 
 	$self->addContent(
 		'<CENTER>',
