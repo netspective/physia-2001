@@ -753,12 +753,11 @@ sub storeInsuranceInfo
 		if($partyType == App::Universal::INVOICEBILLTYPE_THIRDPARTYORG)
 		{
 			my $thirdPartyInsur = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selInsuranceData', $insIntId);
-			my $parentInsId = $thirdPartyInsur->{parent_ins_id};
 			my $thirdPartyId = $thirdPartyInsur->{guarantor_id};
 			
 			my $thirdPartyName = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgSimpleNameById', $thirdPartyId);
-			my $thirdPartyPhone = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInsurancePayerPhone', $parentInsId);
-			my $thirdPartyAddr = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInsuranceAddrWithOutColNameChanges', $parentInsId);
+			my $thirdPartyPhone = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInsurancePayerPhone', $insIntId);
+			my $thirdPartyAddr = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInsuranceAddrWithOutColNameChanges', $insIntId);
 
 			$page->schemaAction(
 					'Invoice_Attribute', $command,
@@ -795,12 +794,11 @@ sub storeInsuranceInfo
 		elsif($partyType == App::Universal::INVOICEBILLTYPE_THIRDPARTYPERSON)
 		{
 			my $thirdPartyInsur = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selInsuranceData', $insIntId);
-			my $parentInsId = $thirdPartyInsur->{parent_ins_id};
 			my $thirdPartyId = $thirdPartyInsur->{guarantor_id};
 
-			my $thirdPartyName = $STMTMGR_PERSON->getSingleValue($page, STMTMGRFLAG_NONE, 'selRegistry', $thirdPartyId);
-			my $thirdPartyPhone = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInsurancePayerPhone', $parentInsId);
-			my $thirdPartyAddr = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInsuranceAddrWithOutColNameChanges', $parentInsId);
+			my $thirdPartyName = $STMTMGR_PERSON->getSingleValue($page, STMTMGRFLAG_NONE, 'selPersonSimpleNameById', $thirdPartyId);
+			my $thirdPartyPhone = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInsurancePayerPhone', $insIntId);
+			my $thirdPartyAddr = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInsuranceAddrWithOutColNameChanges', $insIntId);
 
 			$page->schemaAction(
 					'Invoice_Attribute', $command,
