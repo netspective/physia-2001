@@ -210,5 +210,9 @@
 			Removed diagnoses dialog from claim summary.
 		</deliverable>
 
+		<deliverable id="1841">
+			Fixed code to add the ShortFormPerson record correctly.
+		</deliverable>
+
 	</deliverables>
 </release-notes>
