@@ -40,6 +40,7 @@ sub new
 		
 		new CGI::Dialog::Field(type => 'hidden', name => 'code_type'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'use_fee'),
+		new CGI::Dialog::Field(type => 'hidden', name => 'fee_schedules_item_id'),	#for storing and updating fee schedules as attribute
 	
 
 		new CGI::Dialog::Field::Duration(
@@ -205,6 +206,7 @@ sub populateData
 	
 	my $feeSchedules = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoiceAttr', $invoiceId, 'Fee Schedules');
 	$page->field('fee_schedules', $feeSchedules->{value_text});
+	$page->field('fee_schedules_item_id', $feeSchedules->{item_id});
 }
 
 sub execAction_submit
@@ -1518,6 +1520,18 @@ sub execute_addOrUpdate
 			_debug => 0
 	);
 
+
+	## UPDATE FEE SCHEDULES ATTRIBUTE
+	if(my $feeSchedItemId = $page->field('fee_schedules_item_id'))
+	{
+		my $feeSchedules = $page->field('fee_schedules');
+		$page->schemaAction(
+				'Invoice_Attribute', 'update',
+				item_id => $feeSchedItemId,
+				value_text => $feeSchedules || undef,
+				_debug => 0
+		);
+	}
 }
 
 sub voidProcedure
