@@ -122,7 +122,7 @@ sub populateData
 	$page->field('batch_id', $batchInfo->{value_text});
 	$page->field('batch_date', $batchInfo->{value_date});
 
-	my $items = $STMTMGR_INVOICE->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'selInvoiceItems', $invoiceId);
+	my $items = $STMTMGR_INVOICE->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'selInvoiceItemsByType', $invoiceId, App::Universal::INVOICEITEMTYPE_INVOICE);
 	my $totalItems = scalar(@{$items});
 	foreach my $idx (0..$totalItems)
 	{
