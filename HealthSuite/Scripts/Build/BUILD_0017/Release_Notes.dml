@@ -148,6 +148,8 @@
 		<deliverable id="1348">
 			UI: Created a new "MailBox" view on your own person page.  (You can't get there on someone else's person page)
 			This new view allows the sending/reading/forwarding/replying to user-to-user, and phone messages.
+			Added new message type for Refill Requests and it's associated dialog.  Also changed the Active Medications
+			component to look at the new data and give the ability to add medication, prescriptions, and refill requests.
 		</deliverable>
 
 		<deliverable id="1359">
