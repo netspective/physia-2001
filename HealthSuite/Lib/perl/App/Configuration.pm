@@ -187,14 +187,14 @@ sub getDefaultConfig
 	'db-sun-test02' => getDefaultConfig('SUN Test Configuration 02', CONFIGGROUP_TEST, 'test02/test@dbi:Oracle:TEST-DBS-A'),
 	'db-sun-test03' => getDefaultConfig('SUN Test Configuration 03', CONFIGGROUP_TEST, 'test03/test@dbi:Oracle:TEST-DBS-B'),
 	'db-sun-test04' => getDefaultConfig('SUN Test Configuration 04', CONFIGGROUP_TEST, 'test04/test@dbi:Oracle:TEST-DBS-B'),
-	'db-sun-sde01' => getDefaultConfig('SUN SDE Configuration 01', CONFIGGROUP_SDE, 'sde01/sde@dbi:Oracle:SDE-DBS-A'),
-	'db-sun-sde02' => getDefaultConfig('SUN SDE Configuration 02', CONFIGGROUP_SDE, 'sde02/sde@dbi:Oracle:SDE-DBS-A'),
-	'db-sun-sde03' => getDefaultConfig('SUN SDE Configuration 03', CONFIGGROUP_SDE, 'sde03/sde@dbi:Oracle:SDE-DBS-A'),
-	'db-sun-sde04' => getDefaultConfig('SUN SDE Configuration 04', CONFIGGROUP_SDE, 'sde04/sde@dbi:Oracle:SDE-DBS-A'),
-	'db-sun-sde05' => getDefaultConfig('SUN SDE Configuration 05', CONFIGGROUP_SDE, 'sde05/sde@dbi:Oracle:SDE-DBS-B'),
-	'db-sun-sde06' => getDefaultConfig('SUN SDE Configuration 06', CONFIGGROUP_SDE, 'sde06/sde@dbi:Oracle:SDE-DBS-B'),
-	'db-sun-sde07' => getDefaultConfig('SUN SDE Configuration 07', CONFIGGROUP_SDE, 'sde07/sde@dbi:Oracle:SDE-DBS-B'),
-	'db-sun-sde08' => getDefaultConfig('SUN SDE Configuration 08', CONFIGGROUP_SDE, 'sde08/sde@dbi:Oracle:SDE-DBS-B'),
+	'db-sun-sde01' => getDefaultConfig('SUN SDE Configuration 01', CONFIGGROUP_SWDEV, 'sde01/sde@dbi:Oracle:SDE-DBS-A'),
+	'db-sun-sde02' => getDefaultConfig('SUN SDE Configuration 02', CONFIGGROUP_SWDEV, 'sde02/sde@dbi:Oracle:SDE-DBS-A'),
+	'db-sun-sde03' => getDefaultConfig('SUN SDE Configuration 03', CONFIGGROUP_SWDEV, 'sde03/sde@dbi:Oracle:SDE-DBS-A'),
+	'db-sun-sde04' => getDefaultConfig('SUN SDE Configuration 04', CONFIGGROUP_SWDEV, 'sde04/sde@dbi:Oracle:SDE-DBS-A'),
+	'db-sun-sde05' => getDefaultConfig('SUN SDE Configuration 05', CONFIGGROUP_SWDEV, 'sde05/sde@dbi:Oracle:SDE-DBS-B'),
+	'db-sun-sde06' => getDefaultConfig('SUN SDE Configuration 06', CONFIGGROUP_SWDEV, 'sde06/sde@dbi:Oracle:SDE-DBS-B'),
+	'db-sun-sde07' => getDefaultConfig('SUN SDE Configuration 07', CONFIGGROUP_SWDEV, 'sde07/sde@dbi:Oracle:SDE-DBS-B'),
+	'db-sun-sde08' => getDefaultConfig('SUN SDE Configuration 08', CONFIGGROUP_SWDEV, 'sde08/sde@dbi:Oracle:SDE-DBS-B'),
 );
 
 my $userName = '';
