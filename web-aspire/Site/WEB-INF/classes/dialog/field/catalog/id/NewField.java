@@ -27,24 +27,15 @@ public class NewField extends DialogField
 
 	public boolean isValid(DialogContext dc)
 	{
-		return super.isValid ();
+		return super.isValid (dc);
 	}
 
 	public boolean needsValidation (DialogContext dc)
 	{
-		setFieldFlags ();
 		return true;
 	}
 
 	private void createFields (String captionPrefix)
-	{
-	}
-
-	private void addFields ()
-	{
-	}
-
-	private void setFieldFlags ()
 	{
 	}
 }

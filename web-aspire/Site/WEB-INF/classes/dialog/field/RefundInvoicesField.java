@@ -1,4 +1,4 @@
-package dialog.field.insurance;
+package dialog.field;
 
 import java.io.*;
 import java.util.*;
@@ -8,14 +8,14 @@ import com.xaf.form.*;
 import com.xaf.form.field.*;
 import com.xaf.value.*;
 
-public class PlanField extends DialogField
+public class RefundInvoicesField extends DialogField
 {
-	public PlanField()
+	public RefundInvoicesField()
 	{
 		super();
 	}
 
-	public PlanField(String aName, String aCaption)
+	public RefundInvoicesField(String aName, String aCaption)
 	{
 		super(aName, aCaption);
 	}

@@ -8,24 +8,22 @@ import com.xaf.form.*;
 import com.xaf.form.field.*;
 import com.xaf.value.*;
 
-public class PersonNameField extends DialogField
+public class NameField extends DialogField
 {
 	protected TextField lastNameField;
 	protected TextField firstNameField;
 	protected TextField middleNameField;
 	protected TextField suffixField;
 
-	public PersonNameField()
+	public NameField()
 	{
 		super();
 	}
 
-	public PersonNameField(String aName, String aCaption)
+	public NameField(String aName, String aCaption)
 	{
 		super(aName, aCaption);
-		createFields ("");
-		setFieldFlags ();
-		addFields ();
+		createFields (aName + "_");
 	}
 
 	public TextField getLastNameField() { return lastNameField; }
@@ -38,59 +36,28 @@ public class PersonNameField extends DialogField
 		super.importFromXml(elem);
 		String name = getSimpleName();
 		createFields (name + "_");
-		setFieldFlags ();
-		addFields ();
-	}
-
-	public boolean isValid(DialogContext dc)
-	{
-		boolean status = true;
-		boolean lastNameValid = lastNameField.isValid(dc);
-		boolean firstNameValid = lastNameField.isValid(dc);
-		boolean middleNameValid = middleNameField.isValid(dc);
-		boolean suffixValid = suffixField.isValid(dc);
-
-		/* Preliminary check */
-		if(!(lastNameValid && firstNameValid && middleNameValid && suffixValid)) {
-			status = false;
-			invalidate (dc, "Name is invalid out of hand");
-		}
-
-		return status;
-	}
-
-	public boolean needsValidation (DialogContext dc)
-	{
-		setFieldFlags ();
-		return true;
 	}
 
 	private void createFields (String captionPrefix)
 	{
 		lastNameField = new TextField (captionPrefix + "name_last", "Last Name");
 		lastNameField.setSize (16);
+		lastNameField.setFlag (DialogField.FLDFLAG_REQUIRED);
 
 		firstNameField = new TextField (captionPrefix + "name_first", "First Name");
 		firstNameField.setSize (12);
+		firstNameField.setFlag (DialogField.FLDFLAG_REQUIRED);
 
 		middleNameField = new TextField (captionPrefix + "name_middle", "Middle Name");
 		middleNameField.setSize (8);
 
 		suffixField = new TextField (captionPrefix + "name_suffix", "Suffix");
 		suffixField.setSize (16);
-	}
 
-	private void addFields ()
-	{
+		/* Add fields to the composite */
 		addChildField(lastNameField);
 		addChildField(firstNameField);
 		addChildField(middleNameField);
 		addChildField(suffixField);
-	}
-
-	private void setFieldFlags ()
-	{
-		lastNameField.setFlag (DialogField.FLDFLAG_REQUIRED);
-		firstNameField.setFlag (DialogField.FLDFLAG_REQUIRED);
 	}
 }
