@@ -453,11 +453,6 @@ $STMTMGR_PERSON = new App::Statements::Person(
 			  	from person p, person_org_category pcat
 				where p.person_id=pcat.person_id and pcat.org_internal_id = ? and category='Physician'
 		},
-	'selEmpStatus' => q{
-			select id, caption
-			  	from Attribute_Value_Type
-				where id between @{[App::Universal::ATTRTYPE_EMPLOYEDFULL]} and @{[App::Universal::ATTRTYPE_EMPLOYUNKNOWN]}
-		},
 	'selReferralReason' => q{
 			select id, caption
 			  	from Referral_Reason
