@@ -28,7 +28,7 @@ sub new
 
 	$params{name} = 'procedures_list' unless exists $params{name};
 	$params{type} = 'procedures';
-	$params{lineCount} = 4 unless exists $params{count};
+	$params{lineCount} = 6 unless exists $params{count};
 	$params{allowComments} = 1 unless exists $params{allowComments};
 	$params{allowQuickRef} = 0 unless exists $params{allowQuickRef};
 
@@ -557,6 +557,7 @@ sub getHtml
 	my $errorMsgsHtml;
 	my ($dialogName, $lineCount, $allowComments, $allowQuickRef, $allowRemove) = ($dialog->formName(), $self->{lineCount}, $self->{allowComments}, $self->{allowQuickRef}, $dlgFlags & CGI::Dialog::DLGFLAG_UPDATE);
 	my ($linesHtml, $numCellRowSpan, $removeChkbox) = ('', $allowComments ? 'ROWSPAN=2' : '', '');
+	$lineCount = $isHospClaim ? 10 : $lineCount;
 	for(my $line = 1; $line <= $lineCount; $line++)
 	{
 		$removeChkbox = $allowRemove && ! ($invoiceFlags & $attrDataFlag) ? qq{<TD ALIGN=CENTER $numCellRowSpan><INPUT TYPE="CHECKBOX" NAME='_f_proc_$line\_remove'></TD>} : '';
