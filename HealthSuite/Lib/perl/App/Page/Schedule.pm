@@ -20,10 +20,11 @@ use vars qw(%RESOURCE_MAP);
 use base 'App::Page';
 %RESOURCE_MAP = (
 	'schedule' => {_views => [
-			{caption => 'Schedule', name => 'apptsheet',},
-			{caption => 'Assign', name => 'assign',},
-			],
-		},
+		{caption => 'Schedule', name => 'apptsheet',},
+		{caption => 'Assign', name => 'assign',},
+		{caption => 'handleWaitingList', name => 'handleWaitingList',},
+		],
+	},
 );
 
 my $WORKLIST_ITEMNAME = 'WorkList';
@@ -498,7 +499,6 @@ sub prepare_page_content_header
 	my $today = UnixDate('today', '%m-%d-%Y');
 	my $nextweek = UnixDate('nextweek', '%m-%d-%Y');
 
-	#my $heading = ($self->param('_pm_view') =~ /template/) ? 'Schedule' : 'Appointments';
 	my $heading = 'Scheduling';
 
 	my $urlPrefix = "/schedule";
