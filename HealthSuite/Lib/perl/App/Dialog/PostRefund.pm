@@ -35,8 +35,6 @@ sub new
 
 	$self->addContent(
 		new App::Dialog::Field::BatchDateID(caption => 'Batch ID Date', name => 'batch_fields',listInvoiceFieldName=>'list_invoices'),		
-
-		new CGI::Dialog::Subhead(heading => 'Overpaid Invoices', name => 'credit_heading'),
 		new App::Dialog::Field::CreditInvoices(name =>'credit_invoices_list'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'list_invoices'),
 	);
@@ -84,11 +82,32 @@ sub execute
 	{
 		my $refundAmt = 0 - $page->param("_f_invoice_$line\_refund");
 		next if $refundAmt eq '';
-
-		my $totalAdjustForItemAndItemAdjust = $refundAmt;
-
 		my $invoiceId = $page->param("_f_invoice_$line\_invoice_id");
 
+		my $invoiceBalance = $page->param("_f_invoice_$line\_invoice_balance");
+		if($invoiceBalance == 0)
+		{
+			$page->schemaAction(
+				'Invoice', 'update',
+				invoice_id => $invoiceId || undef,
+				invoice_status => App::Universal::INVOICESTATUS_ONHOLD,
+				flags => 0,
+				_debug => 0
+			);
+
+			$page->schemaAction(
+				'Invoice_Attribute', 'add',
+				parent_id => $invoiceId || undef,
+				item_name => 'Invoice/History/Item',
+				value_type => defined $historyValueType ? $historyValueType : undef,
+				value_text => 'Reopened due to refund',
+				value_date => $todaysDate,
+				_debug => 0
+			);
+		}
+
+
+		my $totalAdjustForItemAndItemAdjust = $refundAmt;
 		my $itemBalance = $totalAdjustForItemAndItemAdjust;	# because this is a "dummy" item that is made for the sole purpose of applying a general
 															# payment, there is no charge and the balance should be negative.
 		my $itemId = $page->schemaAction(
@@ -96,7 +115,6 @@ sub execute
 				parent_id => $invoiceId,
 				item_type => defined $itemType ? $itemType : undef,
 				total_adjust => defined $totalAdjustForItemAndItemAdjust ? $totalAdjustForItemAndItemAdjust : undef,
-				#balance => defined $itemBalance ? $itemBalance : undef,
 				_debug => 0
 			);
 
@@ -107,33 +125,20 @@ sub execute
 
 		my $adjType = App::Universal::ADJUSTMENTTYPE_REFUND;
 		my $comments = $page->param("_f_invoice_$line\_comments");
+		my $refundToId = $page->param("_f_invoice_$line\_refund_to_id");
+		my $refundToType = $refundToId ? $page->param("_f_invoice_$line\_refund_to_type") : '';
 		my $adjItemId = $page->schemaAction(
 				'Invoice_Item_Adjust', 'add',
 				adjustment_type => defined $adjType ? $adjType : undef,
 				adjustment_amount => defined $refundAmt ? $refundAmt : undef,
 				parent_id => $itemId || undef,
+				refund_to_type => defined $refundToType ? $refundToType : undef,
+				refund_to_id => $refundToId || undef,
 				pay_date => $todaysDate || undef,
-				#net_adjust => defined $totalAdjustForItemAndItemAdjust ? $totalAdjustForItemAndItemAdjust : undef,
 				comments => $comments || undef,
 				_debug => 0
 			);
 
-
-
-		#Update the invoice
-
-		#my $invoice = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selInvoice', $invoiceId);
-
-		#my $totalAdjustForInvoice = $invoice->{total_adjust} + $totalAdjustForItemAndItemAdjust;
-		#my $invoiceBalance = $invoice->{total_cost} + $totalAdjustForInvoice;
-
-		#$page->schemaAction(
-		#		'Invoice', 'update',
-		#		invoice_id => $invoiceId || undef,
-		#		total_adjust => defined $totalAdjustForInvoice ? $totalAdjustForInvoice : undef,
-		#		balance => defined $invoiceBalance ? $invoiceBalance : undef,
-		#		_debug => 0
-		#	);
 
 
 		#Add batch attribute
@@ -151,15 +156,15 @@ sub execute
 
 		#Create history attribute for this adjustment
 		$page->schemaAction(
-				'Invoice_Attribute', 'add',
-				parent_id => $invoiceId || undef,
-				item_name => 'Invoice/History/Item',
-				value_type => defined $historyValueType ? $historyValueType : undef,
-				value_text => "Refund in the amount of \$$refundAmt",
-				value_textB => $comments || undef,
-				value_date => $todaysDate,
-				_debug => 0
-			);
+			'Invoice_Attribute', 'add',
+			parent_id => $invoiceId || undef,
+			item_name => 'Invoice/History/Item',
+			value_type => defined $historyValueType ? $historyValueType : undef,
+			value_text => "Refunded \$$refundAmt to $refundToId",
+			value_textB => $comments || undef,
+			value_date => $todaysDate,
+			_debug => 0
+		);
 	}
 
 
