@@ -70,7 +70,7 @@ sub initialize
 					fKeyDisplayCol => 1,
 					fKeyValueCol => 0)
 				),
-
+		push(@request,new CGI::Dialog::Field(caption=>'Follow up Status', options=>FLDFLAG_READONLY, type=>'text',name=>"followup$loop"));
 		push(@request,new CGI::Dialog::Field(name=>"comment$loop", caption=>'Comments',type=>'text',size=>55,
 				postHtml=>qq{<A HREF = javascript:setRequestStyle($next,'block');>$IMAGETAGS{'icons/arrow-down-blue'}</A>
 						<BR> </BR>}
@@ -112,6 +112,7 @@ sub initialize
 
 		new CGI::Dialog::Subhead(heading => 'Workers Comp Insurance Info', name => 'insurance_work_heading'),
 		new CGI::Dialog::Field(type=> 'text', caption => 'Claim Number', name => 'claim_number'),
+		new CGI::Dialog::Field(type=> 'text', size=>'16',maxLength=>'16', caption => 'Case Manager Claim Number', name => 'case_claim_number'),				
 		new CGI::Dialog::Field(type=> 'text', caption => 'Case Manager Name', name => 'case_mgr_name'),
 		new CGI::Dialog::Field(type => 'phone', caption => 'Case Mgr Phone', name => 'case_mgr_phone'),
 		new CGI::Dialog::Field(type => 'text', caption => 'Adjuster Name', name => 'adjuster_name'),
@@ -131,7 +132,29 @@ sub initialize
 						name => 'icd_desc',
 						type => 'memo'
 					),
-		new CGI::Dialog::Field(caption => 'Date Of Injury', name => 'trans_begin_stamp', type => 'date', pastOnly => 0, defaultValue => ''),
+		new CGI::Dialog::Field(caption => 'ICD Code', name => 'icd_code2',
+					findPopup => '/lookup/icd', options => FLDFLAG_TRIM, size => 6, secondaryFindField => '_f_icd_desc2' ),
+		new CGI::Dialog::Field(
+						caption => 'ICD Description',
+						name => 'icd_desc2',
+						type => 'memo'
+					),
+		new CGI::Dialog::Field(caption => 'ICD Code', name => 'icd_code3',
+					findPopup => '/lookup/icd', options => FLDFLAG_TRIM, size => 6, secondaryFindField => '_f_icd_desc3' ),
+		new CGI::Dialog::Field(
+						caption => 'ICD Description',
+						name => 'icd_desc3',
+						type => 'memo'
+					),
+		new CGI::Dialog::Field(caption => 'ICD Code', name => 'icd_code4',
+					findPopup => '/lookup/icd', options => FLDFLAG_TRIM, size => 6, secondaryFindField => '_f_icd_desc4' ),
+		new CGI::Dialog::Field(
+						caption => 'ICD Description',
+						name => 'icd_desc4',
+						type => 'memo'
+					),
+					
+		new CGI::Dialog::Field(caption => 'Date Of Injury', name => 'trans_begin_stamp', type => 'date', pastOnly => 0, defaultValue => ''),		
 		new CGI::Dialog::Field(name => 'comments', caption => 'Comments', type => 'memo',rows=>2),
 
 		new CGI::Dialog::Subhead(heading => 'Submitter Information', name => 'submit_info'),
@@ -260,6 +283,7 @@ sub initialize
 			setIdDisplay("comment"+line,styleValue);
 			setIdDisplay("description"+line,styleValue);
 			setIdDisplay("referral_type"+line,styleValue);
+			setIdDisplay("followup"+line,styleValue);			
 		}
 		</script>
 	});
@@ -415,6 +439,10 @@ sub initialize
 			$page->field('date_proc'.$count.'_begin_date',$_->{data_date_a});
 			$page->field('date_proc'.$count.'_end_date',$_->{data_date_b});
 			$page->field("skip_field$count",1);
+			#Get Referral  info if possible
+			my $ref =  $STMTMGR_TRANSACTION->getRowAsHash($page, STMTMGRFLAG_NONE, 'selFollowupByChildTransId',$_->{trans_id});
+			$page->field('followup'.$count,$ref->{caption});	
+			
 			$self->setFieldFlags("code_mod_desc$count", FLDFLAG_READONLY);
 			$self->setFieldFlags("date_proc$count", FLDFLAG_READONLY);
 			$self->setFieldFlags("unit_charge$count", FLDFLAG_READONLY);
@@ -429,18 +457,34 @@ sub initialize
        if ($ServiceData ne '' && $command eq 'add')
        {
 		my $icdCodes = $ServiceData->{'code'};
-		my $cptCodes = $ServiceData->{'related_data'};
+		my $cptCodes = $ServiceData->{'related_data'};		
 		my @icd = split(', ', $icdCodes);
+		my $icd2 =$ServiceData->{data_text_a};
+		my $icd3 =$ServiceData->{data_text_b};
+		my $icd4 =$ServiceData->{data_text_c};
 		$page->field('icd_code1', $icd[0]);
-		#$page->field('icd_code2', $icd[1]);
+		$page->field('icd_code2', $icd2);
+		$page->field('icd_code3', $icd3);
+		$page->field('icd_code4', $icd4);		
+		
 		my @cpt = split(', ', $cptCodes);
 		$page->field('cpt_code1', $cpt[0]);
 		$page->field('cpt_code2', $cpt[1]);
 		my $icd = $page->field('icd_code1');
-		 my $icdData = $STMTMGR_INTELLICODE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selIcdData', $icd);
+		my $icdData;
+		$icdData = $STMTMGR_INTELLICODE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selIcdData', $icd);
+		$page->field('icd_desc', $icdData->{'descr'});
+		
+		$icdData = $STMTMGR_INTELLICODE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selIcdData', $icd2);
+		$page->field('icd_desc2', $icdData->{'descr'});
 
+		$icdData = $STMTMGR_INTELLICODE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selIcdData', $icd3);
+		$page->field('icd_desc3', $icdData->{'descr'});
 
-		$page->field('trans_end_stamp', $ServiceData->{'trans_end_stamp'});
+		$icdData = $STMTMGR_INTELLICODE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selIcdData', $icd4);
+		$page->field('icd_desc4', $icdData->{'descr'});
+		
+		$page->field('trans_end_stamp', $ServiceData->{'trans_end_stamp'});		
 		$page->field('trans_begin_stamp', $ServiceData->{'trans_begin_stamp'});
 		$page->field('intake_coordinator', $ServiceData->{'trans_subtype'});
 		#$page->field('status', $ServiceData->{'trans_substatus_reason'});
@@ -448,7 +492,7 @@ sub initialize
 		$page->field('contact_org', $ServiceData->{'modifier'});
 		$page->field('mdfirstname', $ServiceData->{'auth_by'});
 		$page->field('mdlastname', $ServiceData->{'auth_ref'});
-		$page->field('icd_desc', $icdData->{'descr'});
+
 		#$page->field('cpt_desc', $ServiceData->{'data_text_b'});
 		#$page->field('hcspcs_desc', $ServiceData->{'data_text_c'});
 		$page->field('source', $ServiceData->{'caption'});
@@ -463,6 +507,7 @@ sub initialize
 		my $caseManagerData = $STMTMGR_TRANSACTION->getRowAsHash($page, STMTMGRFLAG_NONE, 'selByParentIdItemName', $parentTransId, 'Case Manager Info');
 		$page->field('case_mgr_name', $caseManagerData->{'value_text'});
 		$page->field('case_mgr_phone', $caseManagerData->{'value_textb'});
+		$page->field('case_claim_number',$caseManagerData->{'name_sort'});
 
 		my $orgContactData = $STMTMGR_TRANSACTION->getRowAsHash($page, STMTMGRFLAG_NONE, 'selByParentIdItemName', $parentTransId, 'Work');
 		$page->field('org_phone', $orgContactData->{'value_text'});
@@ -513,17 +558,34 @@ sub populateData_update
 	my @cpt = split(', ', $cptCodes);
 	$page->field('cpt_code1', $cpt[0]);
 	$page->field('cpt_code2', $cpt[1]);
-
+	my $icd2 =$referralData->{data_text_a};
+	my $icd3 =$referralData->{data_text_b};
+	my $icd4 =$referralData->{data_text_c};
+	$page->field('icd_code1', $icd[0]);
+	$page->field('icd_code2', $icd2);
+	$page->field('icd_code3', $icd3);
+	$page->field('icd_code4', $icd4);		
 	my $icd = $page->field('icd_code1');
+	
 	my $icdData = $STMTMGR_INTELLICODE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selIcdData', $icd);
+	$page->field('icd_desc', $icdData->{'descr'});
+	
 
+	$icdData = $STMTMGR_INTELLICODE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selIcdData', $icd2);
+	$page->field('icd_desc2', $icdData->{'descr'});
+
+	$icdData = $STMTMGR_INTELLICODE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selIcdData', $icd3);
+	$page->field('icd_desc3', $icdData->{'descr'});
+
+	$icdData = $STMTMGR_INTELLICODE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selIcdData', $icd4);
+	$page->field('icd_desc4', $icdData->{'descr'});
+	
 	$page->field('person_id', $referralData->{'consult_id'});
 	$page->field('trans_end_stamp', $referralData->{'trans_end_stamp'});
 	$page->field('trans_begin_stamp', $referralData->{'trans_begin_stamp'});
 	$page->field('intake_coordinator', $referralData->{'trans_subtype'});
 	$page->field('status', $referralData->{'trans_substatus_reason'});
 	#$page->field('referral_type', $referralData->{'trans_expire_reason'});
-	$page->field('icd_desc', $icdData->{'descr'});
 	$page->field('contact_org', $referralData->{'modifier'});
 	$page->field('comments', $referralData->{'display_summary'});
 	$page->field('details', $referralData->{'detail'});
@@ -546,6 +608,7 @@ sub populateData_update
 	$page->field('case_mgr_name', $caseManagerData->{'value_text'});
 	$page->field('case_mgr_phone', $caseManagerData->{'value_textb'});
 	$page->field('case_item_id', $caseManagerData->{'item_id'});
+	$page->field('case_claim_number',$caseManagerData->{'name_sort'});
 
 	my $orgContactData = $STMTMGR_TRANSACTION->getRowAsHash($page, STMTMGRFLAG_NONE, 'selByParentIdItemName', $page->param('trans_id'), 'Work');
 	$page->field('org_phone', $orgContactData->{'value_text'});
@@ -600,7 +663,9 @@ sub populateData_update
 		$page->field("procedure_id$count",$_->{trans_id});
 		$page->field('date_proc'.$count.'_begin_date',$_->{data_date_a});
 		$page->field('date_proc'.$count.'_end_date',$_->{data_date_b});
-
+		#Get Referral  info if possible
+		my $ref =  $STMTMGR_TRANSACTION->getRowAsHash($page, STMTMGRFLAG_NONE, 'selFollowupByChildTransId',$_->{trans_id});
+		$page->field('followup'.$count,$ref->{caption} );
 		$count++;
 	}
 
@@ -619,6 +684,8 @@ sub execute
 	my $transOwnerType = App::Universal::ENTITYTYPE_ORG;
 	my $icd1 = $page->field('icd_code1');
 	my $icd2 = $page->field('icd_code2');
+	my $icd3 = $page->field('icd_code3');
+	my $icd4 = $page->field('icd_code4');	
 	my $cpt1 = $page->field('cpt_code1');
 	my $cpt2 = $page->field('cpt_code2');
 	my @cpt = ();
@@ -650,9 +717,9 @@ sub execute
 				provider_id 				=> $page->field('provider_id') || undef,
 				care_provider_id 			=> $page->field('referral_id') || undef,
 				#trans_expire_reason 		=> $page->field('referral_type') || undef,
-				#data_text_a 				=> $page->field('icd_desc') || undef,
-				#data_text_b 				=> $page->field('cpt_desc') || undef,
-				#data_text_c 				=> $page->field('hcspcs_desc') || undef,
+				data_text_a 				=> $icd2 || undef, #ICD2
+				data_text_b 				=> $icd3 || undef, #ICD3
+				data_text_c 				=> $icd4 || undef, #ICD4
 				auth_by 						=> $page->field('mdfirstname') || undef,
 				auth_ref 					=> $page->field('mdlastname') || undef,
 				consult_id 					=> $page->field('person_id') || undef,
@@ -695,6 +762,7 @@ sub execute
 			value_type =>  App::Universal::ATTRTYPE_TEXT,
 			value_text =>  $page->field('case_mgr_name') || undef,
 			value_textB => $page->field('case_mgr_phone') || undef,
+			name_sort =>  $page->field('case_claim_number'),
 			_debug => 0
 	);
 
