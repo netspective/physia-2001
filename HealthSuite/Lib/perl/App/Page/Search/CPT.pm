@@ -23,8 +23,7 @@ sub handleARL
 sub getForm
 {
 	my ($self, $flags) = @_;
-	my $search_type = $self->flagIsSet(App::Page::PAGEFLAG_ISPOPUP) ? "code" : $self->param('search_type') || "nameordescr";
-	#my $search_compare = $self->flagIsSet(App::Page::PAGEFLAG_ISPOPUP) ? "is" : $self->param('search_compare');
+	my $search_type = $self->param('search_type') || "description";
 	my $search_compare = $self->param('search_compare');
 
 	return ('Lookup CPT-4 code/description', qq{
