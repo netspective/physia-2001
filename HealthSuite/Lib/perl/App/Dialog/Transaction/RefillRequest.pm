@@ -18,11 +18,11 @@ use vars qw(@ISA %RESOURCE_MAP);
 
 %RESOURCE_MAP = (
 	'refill-request' => {
-		transType => App::Universal::TRANSTYPE_PRESCRIBEMEDICATION, 
-		heading => '$Command Refill Request', 
-		_arl => ['person_id'] , 
-		_arl_modify => ['trans_id'], 
-		_idSynonym => 'trans-refill-' .App::Universal::TRANSTYPE_PRESCRIBEMEDICATION() 
+		transType => App::Universal::TRANSTYPE_PRESCRIBEMEDICATION,
+		heading => '$Command Refill Request',
+		_arl => ['person_id'] ,
+		_arl_modify => ['trans_id'],
+		_idSynonym => 'trans-refill-' .App::Universal::TRANSTYPE_PRESCRIBEMEDICATION()
 		},
 	);
 sub new
@@ -38,9 +38,10 @@ sub new
 		new CGI::Dialog::Field(name => 'refilldate', caption => 'Date', type => 'date'),
 		new App::Dialog::Field::Person::ID(name => 'provider', caption => 'Physician', types => ['Physician'], options => FLDFLAG_REQUIRED, hints => 'Physician approving the refill.'),
 		new App::Dialog::Field::Person::ID(name => 'filler', caption => 'Refill Processor', options => FLDFLAG_REQUIRED, hints => 'Person processing the refill.'),
+		new CGI::Dialog::Field(name => 'comments', caption => 'Comments', type => 'memo'),
 		new CGI::Dialog::Field(type => 'select',
 				style => 'radio',
-				selOptions => 'Pending;Filled',
+				selOptions => 'Pending;Filled;Denied',
 				caption => 'Status',
 				preHtml => "<B><FONT COLOR=DARKRED>",
 				postHtml => "</FONT></B>",
@@ -88,6 +89,7 @@ sub populateData
 		$page->field('refilldate', $refillInfo->{trans_begin_stamp});
 		$page->field('provider', $refillInfo->{provider_id});
 		$page->field('refill', $refillInfo->{data_text_a});
+		$page->field('comments', $refillInfo->{display_summary});
 		$page->field('status', $refillStatus);
 	}
 	elsif($refillInfo->{data_num_a} ne '')
@@ -97,6 +99,7 @@ sub populateData
                 $page->field('refilldate', $refillInfo->{trans_begin_stamp});
                 $page->field('provider', $refillInfo->{provider_id});
                 $page->field('refill', $refillInfo->{data_text_a});
+                $page->field('comments', $refillInfo->{display_summary});
                 $page->field('status', $refillStatus);
         }
 
@@ -126,6 +129,7 @@ sub execute
                         trans_status => $refillStatus,
                         trans_begin_stamp => $page->field('refilldate'),
                         data_text_a => $page->field('refill') || undef,
+                        display_summary => $page->field('comments') || undef,
                         _debug => 0
                 );
 
@@ -144,6 +148,7 @@ sub execute
                         trans_status => $refillStatus,
                         trans_begin_stamp => $page->field('refilldate'),
                         data_text_a => $page->field('refill') || undef,
+                        display_summary => $page->field('comments') || undef,
 			data_num_a => $trans_id,
                         _debug => 0
                 );
@@ -165,6 +170,7 @@ sub execute
                         	trans_begin_stamp => $page->field('refilldate'),
                         	data_text_a => $page->field('refill') || undef,
                         	data_text_b => $page->field('filler')  || undef,
+                        	display_summary => $page->field('comments') || undef,
                         	_debug => 0
                		);
                         my $fillerData = $STMTMGR_TRANSACTION->getRowAsHash($page, STMTMGRFLAG_NONE, 'selTransactionByData_num_a', $transId);
@@ -177,6 +183,7 @@ sub execute
                         	trans_begin_stamp => $page->field('refilldate'),
                         	data_text_a => $page->field('refill') || undef,
                         	data_text_b => $page->param('person_id')  || undef,
+                        	display_summary => $page->field('comments') || undef,
                         	_debug => 0
                 	);
 
@@ -191,6 +198,7 @@ sub execute
                                 trans_status => $refillStatus,
                                 trans_begin_stamp => $page->field('refilldate'),
                                 data_text_a => $page->field('refill') || undef,
+                                display_summary => $page->field('comments') || undef,
                                 _debug => 0
                         );
                         my $parentItemId = $refillDataInfo->{data_num_a};
@@ -205,6 +213,7 @@ sub execute
                                 trans_begin_stamp => $page->field('refilldate'),
                                 data_text_a => $page->field('refill') || undef,
                                 data_text_b => $page->param('person_id')  || undef,
+                                display_summary => $page->field('comments') || undef,
                                 _debug => 0
                         );
 
