@@ -10,9 +10,15 @@ use App::ImageManager;
 
 use enum qw(BITMASK:SEARCHFLAG_ LOOKUPWINDOW SEARCHBAR);
 
-use vars qw(@ISA @EXPORT);
+use vars qw(@ISA @EXPORT %RESOURCE_MAP);
 @ISA = qw(Exporter App::Page);
 @EXPORT = qw(SEARCHFLAG_LOOKUPWINDOW SEARCHFLAG_SEARCHBAR);
+
+%RESOURCE_MAP = (
+	'search' => {
+		_idSynonym => ['lookup'],
+		},
+	);
 
 sub prepare_page_content_header
 {
@@ -196,7 +202,8 @@ sub getSearchBar
 	my ($page, $dirARLSuffix) = @_;
 	my @pathItems = split(/\//, $dirARLSuffix);
 
-	my $class = $App::ResourceDirectory::SEARCH_CLASSES->{$pathItems[0]};
+	my $pagePrefix = &App::ResourceDirectory::PAGE_RESOURCE_PREFIX;
+	my $class = $App::ResourceDirectory::RESOURCES{$pagePrefix . 'search'}{$pathItems[0]}{_class};
 	my $flags = SEARCHFLAG_SEARCHBAR;
 	my ($heading, $searchForm) = &{\&{"$class\::getForm"}}($page, $flags);
 	return qq{

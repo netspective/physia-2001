@@ -38,7 +38,18 @@ use App::Page::Search;
 use vars qw(@ISA %RESOURCE_MAP);
 @ISA = qw(App::Page);
 %RESOURCE_MAP = (
-	'invoice' => {},
+	'invoice' => {
+		_views => [
+					{caption => 'Summary', name => 'summary',},
+					{caption => 'HCFA 1500', name => '1500',},
+					{caption => '1500 PDF', name => '1500pdf',},
+					{caption => 'Errors', name => 'errors',},
+					{caption => 'History', name => 'history',},
+					{caption => 'Envoy NSF', name => 'envoy_nsf',},
+					{caption => 'Envoy NSF', name => 'envoy_nsf',},
+					{caption => 'Halley NSF', name => 'halley_nsf',},
+			],
+		},
 	);
 
 use constant NSFDEST_ARRAY => 0;
@@ -1549,6 +1560,19 @@ sub initialize
 			#[$invoiceId, '', undef, App::Page::MENUITEMFLAG_FORCESELECTED],
 			[$invoiceId, "/invoice/$invoiceId"],
 		);
+
+	my $activeView = $self->param('_pm_view');
+	unless($self->hasPermission("page/invoice/$activeView"))
+	{
+		$self->disable(
+				qq{
+					<br>
+					You do not have permission to view this information. 
+					Permission page/invoice/$activeView is required.
+
+					Click <a href='javascript:history.back()'>here</a> to go back.
+				});
+	}
 
 	return 1;
 }

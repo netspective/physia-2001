@@ -54,6 +54,19 @@ sub initialize
 			);
 	#}
 	#$self->addDebugStmt(@{[$self->property('org_group_name')]});
+	
+	my $activeView = $self->param('_pm_view');
+	unless($self->hasPermission("page/org/$activeView"))
+	{
+		$self->disable(
+				qq{
+					<br>
+					You do not have permission to view this information. 
+					Permission page/org/$activeView is required.
+
+					Click <a href='javascript:history.back()'>here</a> to go back.
+				});
+	}
 }
 
 sub getContentHandlers

@@ -77,6 +77,37 @@ sub initialize
 					Click <a href='javascript:history.back()'>here</a> to go back.
 				});
 	}
+	
+	# Check user's permission
+	my $activeView = $self->param('_pm_view');
+	unless($activeView eq 'home')
+	{
+		unless($self->hasPermission("page/person/$activeView"))
+		{
+			$self->disable(
+					qq{
+						<br>
+						You do not have permission to view this information. 
+						Permission page/person/$activeView is required.
+
+						Click <a href='javascript:history.back()'>here</a> to go back.
+					});
+		}
+	}
+	else
+	{
+		unless($personId eq $userId)
+		{
+			$self->disable(
+					qq{
+						<br>
+						You do not have permission to view this information. 
+						Only the user $personId can view this page.
+
+						Click <a href='javascript:history.back()'>here</a> to go back.
+					});
+		}
+	}
 
 	unless($personId eq $userId)
 	{
@@ -616,33 +647,6 @@ sub handleARL
 	unless($self->arlHasStdAction($rsrc, $pathItems, 1))
 	{
 		$self->param('_pm_view', $pathItems->[1]) if $pathItems->[1];
-
-		if(defined $pathItems->[2] && $self->param('_pm_view') eq 'dialog')
-		{
-			$self->param('_pm_dialog', $pathItems->[2]);
-			$self->param('_pm_dialog_cmd', $pathItems->[3]) if defined $pathItems->[3];
-		}
-		else
-		{
-			unless($pathItems->[1])
-			{
-				$self->redirect("/$arl/profile");
-				$self->send_http_header();
-				return 0;
-			}
-
-			if(scalar(@$pathItems) > 3)
-			{
-				$self->param('_panefile', $pathItems->[2]);
-				$self->param('_panepkg', $pathItems->[3]);
-			}
-			else
-			{
-				$self->param('_panefile', $pathItems->[2]);
-				$self->param('_panepkg', $pathItems->[2]);
-			};
-			$self->param('_panemode', 2);
-		}
 	}
 
 	$self->printContents();

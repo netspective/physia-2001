@@ -18,13 +18,7 @@ use App::Statements::Search::Appointment;
 use vars qw(%RESOURCE_MAP);
 use base 'App::Page';
 %RESOURCE_MAP = (
-	'schedule' => {
-		'_views' => [
-			{ caption => '', name => '', },
-			{ caption => '', name => '', },
-			{ caption => '', name => '', },
-			],
-		},
+	'schedule' => {},
 	);
 
 # ------------------------------------------------------------------------------------------
@@ -212,7 +206,7 @@ sub prepare_view_handleWaitingList
 	$self->addContent(
 		'<CENTER>',
 		$STMTMGR_APPOINTMENT_SEARCH->createHtml($self, STMTMGRFLAG_NONE, 'sel_conflict_appointments',
-			[$eventId, $self->session('org_id')], 
+			[$eventId, $self->session('org_id')],
 		),
 		'</CENTER>'
 	);
@@ -259,10 +253,10 @@ sub prepare_view_apptcol
 sub getApptSheetTimes
 {
 	my ($self) = @_;
-	
+
 	my $apptsheetTimes = $STMTMGR_SCHEDULING->getRowAsHash($self, STMTMGRFLAG_NONE,
 		'selApptSheetTimes', $self->session('user_id'));
-	
+
 	my ($apptSheetStartTime, $apptSheetEndTime);
 
 	if(defined $apptsheetTimes->{start_time})
@@ -274,8 +268,8 @@ sub getApptSheetTimes
 	{
 		$apptSheetStartTime = 6;
 		$apptSheetEndTime   = 21;
-	}	
-	
+	}
+
 	return ($apptSheetStartTime, $apptSheetEndTime);
 }
 
@@ -340,12 +334,12 @@ sub prepare_view_apptsheet
 	my $apptSheet = new App::Schedule::ApptSheet(
 		inputSpec => \@inputSpec
 	);
-	
+
 	my ($apptSheetStartTime, $apptSheetEndTime) = $self->getApptSheetTimes();
-	
+
 	my $flags = APPTSHEET_ALL;
 	my $addColumn_legend;
-	
+
 	if ($self->flagIsSet(App::Page::PAGEFLAG_ISPOPUP))
 	{
 		$flags &= ~APPTSHEET_TEMPLATE;
@@ -374,7 +368,7 @@ sub prepare_view_apptsheet
 						</TR>
 					</TABLE>
 				</TD>
-				
+
 				$addColumn_legend
 			</TR>
 
@@ -574,15 +568,15 @@ sub getApptSheetHeaderHtml
 					<input name=right type=button value='>' onClick="updatePage('$nextDay')" title="Goto $nDay">
 			</td>
 			</FORM>
-			
-			<!--- 
+
+			<!---
 			<TD align=center>
 				<img src='/resources/icons/arrow_right_red.gif'>
 				<a href="javascript:doActionPopup('/schedule-p/apptsheet', null, 'toolbar,scrollbars,resizable');" style='font-size:8pt; font-family: Tahoma'>
 				<b><nobr>Print</nobr></b></a>
 			</TD>
 			--->
-			
+
 			<FORM name="actionForm" method=POST>
 			<td ALIGN=RIGHT>
 				<input type="hidden" name="patient_id">

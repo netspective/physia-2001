@@ -9,6 +9,8 @@ use Exporter;
 use DBI::StatementManager;
 use App::Configuration;
 use App::ImageManager;
+use App::ResourceDirectory;
+use Data::Publish;
 use Devel::Symdump;
 
 use vars qw(@ISA %RESOURCE_MAP);
@@ -61,6 +63,7 @@ sub prepare_page_content_header
 	my $functions = $self->getMenu_Simple(App::Page::MENUFLAG_SELECTEDISLARGER,
 		'_view',
 		[
+			['ACL', "$urlPrefix/acl", 'acl'],
 			['Database', "$urlPrefix/tables", 'tables'],
 			['Statements', "$urlPrefix/stmgrs", 'stmgrs'],
 			['Resources', "$urlPrefix/resources", 'resources'],
@@ -748,10 +751,13 @@ sub getConfigHtml
 		<TR><TD ALIGN=RIGHT>Org Report:</TD><TD><B>@{[ $CONFDATA_SERVER->path_OrgReports() ]}</TD></TR>
 		<TR><TD ALIGN=RIGHT>PDF Output:</TD><TD><B>@{[ $CONFDATA_SERVER->path_PDFOutput() ]}</TD></TR>
 		<TR><TD ALIGN=RIGHT>PDF Output HREF:</TD><TD><B>@{[ $CONFDATA_SERVER->path_PDFOutputHREF() ]}</TD></TR>
+		<TR><TD ALIGN=RIGHT>Application Config:</TD><TD><B>@{[ $CONFDATA_SERVER->path_AppConf() ]}</TD></TR>
 		<TR BGCOLOR=#EEEEEE><TD COLSPAN=2><B>Files</TD></TR>
 		<TR><TD ALIGN=RIGHT>Schema defn:</TD><TD><B>@{[ $CONFDATA_SERVER->file_SchemaDefn() ]}</TD></TR>
 		<TR><TD ALIGN=RIGHT>Access control defn:</TD><TD><B>@{[ $CONFDATA_SERVER->file_AccessControlDefn() ]}</TD></TR>
 		<TR><TD ALIGN=RIGHT>Build log:</TD><TD><B>@{[ $CONFDATA_SERVER->file_BuildLog() ]}</TD></TR>
+		<TR><TD ALIGN=RIGHT>Access Control:</TD><TD><B>@{[ $CONFDATA_SERVER->file_AccessControlDefn() ]}</TD></TR>
+		<TR><TD ALIGN=RIGHT>Access Control Auto Permissions:</TD><TD><B>@{[ $CONFDATA_SERVER->file_AccessControlAutoPermissons() ]}</TD></TR>
 		</TABLE>
 	}
 }
@@ -785,19 +791,150 @@ sub prepare_view_resources
 {
 	my $self = shift;
 	my @pathItems = $self->param('arl_pathItems');
+	my $arl = $self->param('arl');
+	my @path = @pathItems;
+	my $view = shift @path;
 
-	$self->addLocatorLinks(['Resources', '/sde/resources']);
+	$self->addLocatorLinks(['Resources', '/sde/resource']);
 	$self->addContent(qq{
 		<TABLE WIDTH=100% BGCOLOR=#EEEEEE BORDER=0 CELLPADDING=0 CELLSPACING=0>
 		<TR><TD><FONT FACE="Arial,Helvetica" SIZE=2 STYLE="font-family: tahoma; font-size: 8pt">&nbsp;Resources</FONT></TD>
 		<TD ALIGN=RIGHT><FONT FACE="Arial,Helvetica" SIZE=2></FONT></TD></TR>
 		<TR><TD COLSPAN=3><IMG SRC="/resources/design/bar.gif" WIDTH=100% HEIGHT=1></TD></TR>
 		</TABLE>
-		<P>
-		<B><I>Not Yet Implemented... sorry</I></B>
+		<BR>
+		<A HREF="/sde/resources">\%App::ResourceDirectory::RESOURCES</A> = (<BR>
+		@{[ $self->displayResources('/sde/resource', \@path) ]}
+		);
 		});
 
 	return 1;
+}
+
+sub displayResources
+{
+	my $self = shift;
+	my $arl = shift;
+	my $path = shift;
+	my $resources = shift || \%App::ResourceDirectory::RESOURCES;
+	my $pathItem = shift @$path;
+	my $data = qq{<table width="100%" style="margin-left: 25">};
+	foreach my $key (sort keys %$resources)
+	{
+		my $href = "$arl/$key";
+		if (defined $pathItem && $key eq $pathItem)
+		{
+			unless (exists $resources->{$pathItem})
+			{
+				return "<font color=red size=5>Error: ARL Path Item '$pathItem' doesn't exists</font><br>\n"
+			}
+			unless ( ref($resources->{$pathItem}) eq 'HASH')
+			{
+				return "<font color=red size=5>Error: ARL Path Item '$pathItem' is data element not a resource</font><br>\n";
+			}
+			$data .= '<tr><td colspan=3>...</td></tr>';
+			$data .= qq{<tr><td colspan=3><a href=$href>$pathItem</a>\&nbsp;\&nbsp;=> </td></tr>};
+			$data .= '<tr><td colspan=3><font color=red>{</td></tr>';
+			$data .= '<tr><td colspan=3>' . $self->displayResources($href, $path, $resources->{$pathItem}) . '</td></tr>';
+			$data .= '<tr><td colspan=3><font color=red>},</td></tr>';
+			$data .= '<tr><td colspan=3>...</td></tr>';
+		}
+		elsif (! defined $pathItem)
+		{
+			my $value = ref($resources->{$key});
+			for ($value)
+			{
+				$_ eq 'HASH' and do {last;};
+				$_ eq 'ARRAY' and do { $value = '[ ' . join(', ', map("<font color=teal>$_</font>",map {ref($_) eq 'HASH' ? $self->hashAsStr($_) . "<BR>" : "'$_'";} @{$resources->{$key}} )) . ' ]'; last;};
+				$_ eq '' and do { $value = "<font color=teal>'$resources->{$key}'</font>"; last; };
+				$value = "Reference to <B>$value</B>";
+			}
+			$data .= $value eq 'HASH' ? qq{<tr><td colspan=3><a href=$href>$key</a>\&nbsp;\&nbsp;=> {...}</td></tr>\n} : "<tr><td width=1 valign=top><nobr>$key</nobr></td><td width=50 align=center valign=top>=\&gt;<td>$value</td></tr>\n";
+		}
+			
+	}
+	$data .= qq{</table>\n};
+	return $data;
+}
+
+sub hashAsStr
+{
+	my ($self, $hashRef) = @_;
+	my $data = "{ ";
+	while (my ($key, $value) = each %$hashRef)
+	{
+		$data .= "$key =\&gt; $value, ";
+	}
+	$data .= " }";
+	return $data;
+}
+
+sub prepare_view_resource
+{
+	prepare_view_resources(@_);
+}
+
+
+#---------------------------------------------------------------------------------
+
+sub prepare_view_acl
+{
+	my $self = shift;
+	my @pathItems = $self->param('arl_pathItems');
+	my $arl = $self->param('arl');
+	my @path = @pathItems;
+	my $view = shift @path;
+
+	$self->addLocatorLinks(['ACL', '/sde/acl']);
+	$self->addContent(qq{
+		<TABLE WIDTH=100% BGCOLOR=#EEEEEE BORDER=0 CELLPADDING=0 CELLSPACING=0>
+		<TR><TD><FONT FACE="Arial,Helvetica" SIZE=2 STYLE="font-family: tahoma; font-size: 8pt">&nbsp;Resources</FONT></TD>
+		<TD ALIGN=RIGHT><FONT FACE="Arial,Helvetica" SIZE=2></FONT></TD></TR>
+		<TR><TD COLSPAN=3><IMG SRC="/resources/design/bar.gif" WIDTH=100% HEIGHT=1></TD></TR>
+		</TABLE>
+		<BR>
+		@{[ $self->displayAcl() ]}
+		});
+
+	return 1;
+}
+
+sub displayAcl
+{
+	my ($self) = @_;
+	my $publishDefn =
+	{
+		style => 'panel.static',
+		width => '100%',
+		frame =>
+		{
+			heading => $self->{heading},
+			headColor => 'white',
+			borderColor => 'white',
+			contentColor => 'white',
+		},
+		columnDefn => [
+			{ head => 'Variable', dataFmt => '#0#:', dAlign => 'RIGHT' },
+			{ head => 'Value' },
+			],
+	};
+	my $acl = $self->{acl};	
+	my $allPerms = '';
+	foreach my $item (sort keys %{$acl->{permissionIds}})
+	{
+		my $allowed = $self->hasPermission($item) ? '(allowed)' : '';
+		$allPerms .= ($allowed ? '<FONT COLOR=green>' : '') . "$item: " . $acl->{permissionIds}->{$item}->[Security::AccessControl::PERMISSIONINFOIDX_CHILDPERMISSIONS]->run_list() . " $allowed" . ($allowed ? '</FONT>' : '') . " <BR>";
+	}
+
+	my $userRoles = $self->session('aclRoleNames');
+	my $data =
+		[
+			['User Roles', ref $userRoles eq 'ARRAY' ? join(', ', @{$userRoles}) : '(none)'],
+			['User Permissions', $self->{permissions}->run_list()],
+			['ACL File(s)', join(', ', $acl->{sourceFiles}->{primary}, @{$acl->{sourceFiles}->{includes}})],
+			['All Permissions', $allPerms],
+		];
+	return createHtmlFromData($self, $self->{flags}, $data, $publishDefn);
 }
 
 #---------------------------------------------------------------------------------
