@@ -35,7 +35,7 @@ use vars qw(%RESOURCE_MAP @EXPORT
 
 use base qw(CGI::Component Exporter);
 
-my $arlPrefix = '/worklist/verify';
+my $arlPrefix = '/worklist/insverify';
 
 @ITEM_TYPES = ('patient', 'physician', 'org', 'appt');
 
@@ -84,7 +84,7 @@ my $PUBLISH_DEFN =
 		{colIdx => 0, head => '', dAlign => 'center'},
 		{colIdx => 1, head => 'Patient / Physician (Facility)'},
 		{colIdx => 2, head => 'Appointment', dAlign => 'center'},
-		{colIdx => 3, head => 'Confirm', dAlign => 'center'},
+		{colIdx => 3, head => 'Verify', dAlign => 'center'},
 	],
 };
 
@@ -186,6 +186,9 @@ sub getComponentHtml
 	my $oldEventId = 0;
 	foreach (@$appts)
 	{
+		my $flags = $_->{flags};
+		next if $flags & VERIFYFLAG_INSURANCE_COMPLETE;
+		
 		my ($apptMinutes, $checkinMinutes, $checkoutMinutes, $waitMinutes, $visitMinutes);
 		$apptMinutes = stamp2minutes($_->{appointment_time});
 
@@ -218,18 +221,9 @@ sub getComponentHtml
 		$orgTitle =~ s/Org/$_->{facility_name}/;
 		my $apptTitle = $APPT_URLS{$page->session('apptOnSelect')}->{title};
 
-		my $flags = $_->{flags};
-		my $apptVerifyIcon = $flags & VERIFYFLAG_APPOINTMENT_COMPLETE ?
-			$IMAGETAGS{'icons/green_a'}	: $flags & VERIFYFLAG_APPOINTMENT_PARTIAL ?
-			$IMAGETAGS{'icons/black_a'} : $IMAGETAGS{'icons/red_a'};
 		my $insVerifyIcon = $flags & VERIFYFLAG_INSURANCE_COMPLETE ?
 			$IMAGETAGS{'icons/green_i'} : $flags & VERIFYFLAG_INSURANCE_PARTIAL ?
 			$IMAGETAGS{'icons/black_i'} : $IMAGETAGS{'icons/red_i'};
-
-		my $medVerifyIcon = $flags & VERIFYFLAG_MEDICAL ? $IMAGETAGS{'icons/green_m'}
-			: $IMAGETAGS{'icons/red_m'};
-		my $perVerifyIcon = $flags & VERIFYFLAG_PERSONAL ? $IMAGETAGS{'icons/green_p'}
-			: $IMAGETAGS{'icons/red_p'};
 
 		my @rowData = (
 			qq{<nobr>
@@ -259,17 +253,8 @@ sub getComponentHtml
 			},
 
 			qq{<nobr>
-				<A HREF='/person/$_->{patient_id}/dlg-confirm-appointment/$_->{event_id}?_dialogreturnurl=$arlPrefix'
-				TITLE='Confirm Appointment'>$apptVerifyIcon</A>
-
 				<A HREF='/person/$_->{patient_id}/dlg-verify-insurance-records/$_->{event_id}/$_->{patient_id}?_dialogreturnurl=$arlPrefix'
 				TITLE='Verify Insurance Records'>$insVerifyIcon</A>
-
-				<A HREF='/person/$_->{patient_id}/dlg-verify-medical/$_->{event_id}/$_->{patient_id}?_dialogreturnurl=$arlPrefix'
-				TITLE='Verify Medical Records'>$medVerifyIcon</A>
-
-				<A HREF='/person/$_->{patient_id}/dlg-verify-personal-records/$_->{event_id}/$_->{patient_id}?_dialogreturnurl=$arlPrefix'
-				TITLE='Verify Personal Records'>$perVerifyIcon</A>
 
 				<A HREF="javascript:doActionPopup('/person/$_->{patient_id}/facesheet')"
 				TITLE='Print Face Sheet'>$IMAGETAGS{'icons/black_f'}</A>

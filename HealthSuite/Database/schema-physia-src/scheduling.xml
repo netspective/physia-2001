@@ -20,6 +20,7 @@
 		<column name="day_limit" type="integer" descr="Limit the number of appointments of this type for the day"/>
 		<column name="rr_ids" type="text" size="255" descr="Additional Resource(s) required for this appointment type"/>
 		<column name="owner_org_id" lookupref="Org.org_internal_id" required="yes" indexed="yes" descr="The organization which owns this record"/>
+		<column name="appt_width" type="integer" descr="The Appointment Width for parallel appointments"/>
 	</table>
 	
 	<table name="Sch_Template" abbrev="ScTmpl" type="Audit,Secure,Restrict_Rows">
@@ -42,6 +43,7 @@
 		<column name="preferences" type="text" size="1024" descr="Any preferences noted by Physician regarding scheduling during this block of time"/>
 		<column name="remarks" type="text" size="2048" descr="Any other data needed for the template"/>
 		<column name="owner_org_id" lookupref="Org.org_internal_id" required="yes" indexed="yes" descr="The organization which owns this record"/>
+		<column name="slot_width" type="integer" descr="The Slot Width for parallel appointments"/>
 	</table>
 
 	<table name="Appt_Chain_Entry" abbrev="ApChainE" type="Audit,Secure,Restrict_Rows">
@@ -61,15 +63,15 @@
 		<column name="event_type" required="yes" lookupref="Event_Type" descr="The type of event"/>
 		<column name="event_status" required="yes" lookupref="Appt_Status" descr="The status of the event"/>
 		<column name="subject" type="text" size="128" required="yes" descr="The reason for the event"/>
-		<column name="facility_id" lookupref="Org.org_internal_id" descr="The location where the event will take place"/>
+		<column name="facility_id" indexed="yes" lookupref="Org.org_internal_id" descr="The location where the event will take place"/>
 		<column name="start_time" type="stamp" indexed="yes" required="yes" descr="The starting time of the event"/>
 		<column name="duration" type="integer" required="yes" descr="The expected duration of the event in minutes"/>
 		<column name="end_time" type="stamp" descr="Based on the start and duration, trigger fills in the end time (if left NULL)"/>
 		<column name="remarks" type="text" size="2048" descr="Any other data needed for the event"/>
 		<column name="scheduled_by_id" lookupref="Person.person_id" descr="The person who checked the patient in"/>
-		<column name="scheduled_stamp" type="stamp" descr="The date/time when the event was taken (if differnt from system time)"/>
+		<column name="scheduled_stamp" indexed="yes" type="stamp" descr="The date/time when the event was taken (if differnt from system time)"/>
 		<column name="checkin_by_id" lookupref="Person.person_id" descr="The person who checked the patient in"/>
-		<column name="checkin_stamp" type="stamp" descr="The date/time when the patient was checked in"/>
+		<column name="checkin_stamp" indexed="yes" type="stamp" descr="The date/time when the patient was checked in"/>
 		<column name="checkout_by_id" lookupref="Person.person_id" descr="The person who checked the patient out"/>
 		<column name="checkout_stamp" type="stamp" descr="The date/time when the patient was checked out"/>
 		<column name="discard_type" lookupref="Appt_Discard_Type" descr="The type of discard (cancel, no-show, etc)"/>
@@ -87,6 +89,8 @@
 		<column name="effective_begin_date" type="date" descr="The effective start date of the Insurance"/>
 		<column name="deductible" type="currency" descr="Deductible amount"/>
 		<column name="deductible_met" type="currency" descr="The amount of deductible met"/>
+		<column name="ovcopay" type="currency" descr="Office Visit Copay amount"/>
+		<column name="labcopay" type="currency" descr="Lab/XRay Copay amount"/>
 		<column name="referral_required" type="boolean" descr="Whether or not referral is required"/>
 		<column name="sep_copay_xray" type="boolean" descr="Whether or not separate copay for X-ray"/>
 		<column name="lab" type="text" size="128" descr="The Lab Organization "/>

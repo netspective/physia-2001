@@ -152,7 +152,7 @@ sub initialize
 	$self->SUPER::initialize(@_);
 
 	$self->addLocatorLinks(
-		['Patient Flow', '/worklist/patientflow'],
+		['Patient Flow', $baseArl],
 	);
 
 	# Check user's permission to page
@@ -160,13 +160,13 @@ sub initialize
 	if ($activeView)
 	{
 		#unless($self->hasPermission("page/worklist/patientflow/$activeView"))
-		unless($self->hasPermission("page/worklist/patientflow"))
+		unless($self->hasPermission("page$baseArl"))
 		{
 			$self->disable(
 					qq{
 						<br>
 						You do not have permission to view this information.
-						Permission page/worklist/patientflow is required.
+						Permission page$baseArl is required.
 
 						Click <a href='javascript:history.back()'>here</a> to go back.
 					});
@@ -227,7 +227,7 @@ sub getJavascripts
 			function updatePage(selectedDate)
 			{
 				var dashDate = selectedDate.replace(/\\//g, "-");
-				location.href = '/worklist/patientflow/date/' + dashDate;
+				location.href = '$baseArl/date/' + dashDate;
 			}
 		</SCRIPT>
 	};

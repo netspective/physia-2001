@@ -20,20 +20,20 @@ use base qw{App::Page::WorkList};
 
 use vars qw(%RESOURCE_MAP);
 %RESOURCE_MAP = (
-	'worklist/verify' => {
+	'worklist/insverify' => {
 		_views => [
 			{caption => '#session.decodedDate#', name => 'date',},
 			{caption => 'Recent Activity', name => 'recentActivity',},
 			{caption => 'Setup', name => 'setup',},
 			],
-		_title => 'Verifications Work List',
+		_title => 'Insurance Verification Work List',
 		_iconSmall => 'images/page-icons/worklist-verification',
 		_iconMedium => 'images/page-icons/worklist-verification',
 		_iconLarge => 'images/page-icons/worklist-verification',
 		},
 	);
 
-my $baseArl = '/worklist/verify';
+my $baseArl = '/worklist/insverify';
 
 sub prepare_view_date
 {
@@ -121,7 +121,7 @@ sub initialize
 	$self->SUPER::initialize(@_);
 
 	$self->addLocatorLinks(
-		['Verifications', '/worklist/verify'],
+		['Insurance Verifications', $baseArl],
 	);
 
 	# Check user's permission to page
@@ -129,13 +129,13 @@ sub initialize
 	if ($activeView)
 	{
 		#unless($self->hasPermission("page/worklist/patientflow/$activeView"))
-		unless($self->hasPermission("page/worklist/verify"))
+		unless($self->hasPermission("page$baseArl"))
 		{
 			$self->disable(
 					qq{
 						<br>
 						You do not have permission to view this information.
-						Permission page/worklist/verify is required.
+						Permission page$baseArl is required.
 
 						Click <a href='javascript:history.back()'>here</a> to go back.
 					});
@@ -196,7 +196,7 @@ sub getJavascripts
 			function updatePage(selectedDate)
 			{
 				var dashDate = selectedDate.replace(/\\//g, "-");
-				location.href = '/worklist/verify/date/' + dashDate;
+				location.href = '$baseArl/date/' + dashDate;
 			}
 		</SCRIPT>
 	};

@@ -62,6 +62,19 @@ sub new
 			name => 'referral_required',
 			type => 'bool', style => 'check', 
 		),
+		
+				new CGI::Dialog::Field::TableColumn(
+					caption => 'Office Visit Copay',
+					schema => $schema,
+					column => 'Sch_Verify.ovcopay',
+				),
+
+				new CGI::Dialog::Field::TableColumn(
+					caption => 'Lab/X-Ray Copay',
+					schema => $schema,
+					column => 'Sch_Verify.labcopay',
+				),
+		
 		new CGI::Dialog::Field(caption => 'Separate Co-pay for Lab/X-Ray',
 			name => 'sep_copay_xray',
 			type => 'bool', style => 'check', 
@@ -271,6 +284,8 @@ sub execute
 		effective_begin_date => $page->field('effective_begin_date') || undef,
 		deductible => $page->field('deductible') || undef,
 		deductible_met => $page->field('deductible_met') || undef,
+		ovcopay => $page->field('ovcopay') || undef,
+		labcopay => $page->field('labcopay') || undef,
 		referral_required => $page->field('referral_required') || undef,
 		sep_copay_xray => $page->field('sep_copay_xray') || undef,
 		lab => $page->field('lab') || undef,
