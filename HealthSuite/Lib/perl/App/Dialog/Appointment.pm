@@ -130,7 +130,8 @@ sub new
 		),
 		new App::Dialog::Field::OrgType(
 			caption => 'Facility',
-			name => 'facility_id'
+			name => 'facility_id',
+			types => qq{'CLINIC','HOSPITAL','FACILITY/SITE','PRACTICE'},
 		),
 		new CGI::Dialog::Field(caption => '$Command Remarks',
 		 	type => 'memo', name => 'discard_remarks'
