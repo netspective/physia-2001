@@ -932,7 +932,7 @@ sub storeInsuranceInfo
 					parent_id => $invoiceId,
 					item_name => "Insurance/$payerBillSeq/E-Remitter ID",
 					value_type => defined $textValueType ? $textValueType : undef,
-					value_text => $personInsur->{test} || undef,
+					value_text => $personInsur->{remit_payer_id} || undef,
 					_debug => 0
 				);
 
