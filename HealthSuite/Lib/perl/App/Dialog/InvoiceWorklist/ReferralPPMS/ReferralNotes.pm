@@ -21,7 +21,8 @@ my $ACCOUNT_NOTES = App::Universal::TRANSTYPE_ACCOUNTNOTES;
 
 %RESOURCE_MAP=('referral-notes' => { transType => 9500, heading => '$Command Referral Notes'
 			,  _arl => ['person_id'], _arl_modify => ['referral_id'] ,
-                          _idSynonym => [ 'trans-' . '9500' ]},
+#                          _idSynonym => [ 'trans-' . '9500' ]
+                          },
                           );
 
 

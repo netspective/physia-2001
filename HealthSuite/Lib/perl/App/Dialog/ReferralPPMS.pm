@@ -12,6 +12,7 @@ use App::Statements::ReferralPPMS;
 use App::Dialog::Field::Person;
 use App::Statements::IntelliCode;
 
+
 use Carp;
 use CGI::Dialog;
 use CGI::Validator::Field;
@@ -28,6 +29,8 @@ use vars qw(@ISA %RESOURCE_MAP);
 
 %RESOURCE_MAP = (
 	'referral-ppms' => {
+		_arl_add => ['person_id'],
+		_arl_modify => ['referral_id','person_id']
 	},
 );
 
@@ -35,23 +38,23 @@ sub new
 {
 	my ($self, $command) = CGI::Dialog::new(@_, id => 'referral-ppms', heading => '$Command Referral Dialog');
 
-#	my $schema = $self->{schema};
-#	delete $self->{schema};  # make sure we don't store this!
-#	croak 'schema parameter required' unless $schema;
+	my $schema = $self->{schema};
+	delete $self->{schema};  # make sure we don't store this!
+	croak 'schema parameter required' unless $schema;
 
 	$self->addContent(
 
-		new CGI::Dialog::Field(name => 'request_date', 
+		new CGI::Dialog::Field(name => 'request_date',
 			caption => 'Date of Request',
-			type => 'date', 
-			options => FLDFLAG_REQUIRED, 
+			type => 'date',
+			options => FLDFLAG_REQUIRED,
 		),
-		
+
 		new CGI::Dialog::Field(type => 'select',
 			name => 'referral_urgency',
 			style => 'radio',
 			caption => 'Referral Urgency',
-			options => FLDFLAG_REQUIRED, 
+			options => FLDFLAG_REQUIRED,
 			fKeyStmtMgr => $STMTMGR_REFERRAL_PPMS,
 			fKeyStmt => 'selReferralUrgency',
 			fKeyDisplayCol => 1,
@@ -60,31 +63,31 @@ sub new
 
 		new App::Dialog::Field::Person::ID(caption => 'User ID',
 			name => 'user_id',
-			options => FLDFLAG_REQUIRED, 
+			options => FLDFLAG_REQUIRED,
 			types => ['Staff']
 		),
 
 		new App::Dialog::Field::Person::ID(caption => 'Patient',
 			name => 'patient_id',
-			options => FLDFLAG_REQUIRED, 
+			options => FLDFLAG_REQUIRED,
 			types => ['Patient']
 		),
 
 		new CGI::Dialog::Field(type => 'hidden', name => 'old_person_id'),		#if user changes patient id, need to refresh payer list for the new patient id
 
-		new CGI::Dialog::Field(caption => 'Primary Payer', 
-			type => 'select', 
+		new CGI::Dialog::Field(caption => 'Primary Payer',
+			type => 'select',
 			name => 'payer',
 			options => FLDFLAG_REQUIRED,
 		),
-		
+
 		new CGI::Dialog::Subhead(heading => 'ICD Information', name => 'icd_heading'),
-		new CGI::Dialog::Field(caption => 'ICD Code', 
+		new CGI::Dialog::Field(caption => 'ICD Code',
 					name => 'icd_code1',
 					findPopup => '/lookup/icd',
 					secondaryFindField => '_f_icd_desc1',
-					options => FLDFLAG_TRIM, 
-					size => 6, 
+					options => FLDFLAG_TRIM,
+					size => 6,
 					options => FLDFLAG_REQUIRED
 					),
 		new CGI::Dialog::Field(
@@ -92,7 +95,7 @@ sub new
 					name => 'icd_desc1',
 					type => 'memo'
 					),
-		new CGI::Dialog::Field(caption => 'ICD Code', name => 'icd_code2', 
+		new CGI::Dialog::Field(caption => 'ICD Code', name => 'icd_code2',
 					secondaryFindField => '_f_icd_desc2', size => 6,
 					findPopup => '/lookup/icd', options => FLDFLAG_TRIM,  ),
 		new CGI::Dialog::Field(
@@ -102,7 +105,7 @@ sub new
 					),
 
 		new CGI::Dialog::Subhead(heading => 'Reason', name => 'reason_heading'),
-		new CGI::Dialog::Field(caption => 'Reason for Referral', 
+		new CGI::Dialog::Field(caption => 'Reason for Referral',
 					name => 'referral_reason',
 					options => FLDFLAG_REQUIRED
 					),
@@ -110,43 +113,43 @@ sub new
 		new CGI::Dialog::Subhead(heading => 'Service Requested', name => 'reason_heading'),
 		new CGI::Dialog::MultiField(caption=>'Code/Modf',name=>"code_mod_desc1",
 			fields=>[
-				new CGI::Dialog::Field(caption=>'Code', type=>'text',size=>9, options => FLDFLAG_REQUIRED, 
+				new CGI::Dialog::Field(caption=>'Code', type=>'text',size=>9, options => FLDFLAG_REQUIRED,
 				name=>"cpt_code1",findPopup => '/lookup/cpt',  secondaryFindField => '_f_cpt_desc1'),
 				new CGI::Dialog::Field(caption=>'Modf',type=>'text',size=>5,name=>"modf1"),
 				],
-		),		
-		new CGI::Dialog::Field(caption=>'Description', 
+		),
+		new CGI::Dialog::Field(caption=>'Description',
 			type=>'memo',
 			name=>'cpt_desc1',
 		),
-		
+
 		new CGI::Dialog::MultiField(caption=>'Code/Modf',name=>"code_mod_desc2",
 			fields=>[
-				new CGI::Dialog::Field(caption=>'Code', type=>'text',size=>9, 
+				new CGI::Dialog::Field(caption=>'Code', type=>'text',size=>9,
 				name=>"cpt_code2",findPopup => '/lookup/cpt',  secondaryFindField => '_f_cpt_desc2'),
 				new CGI::Dialog::Field(caption=>'Modf',type=>'text',size=>5,name=>"modf2"),
 				],
-		),		
-		new CGI::Dialog::Field(caption=>'Description', 
+		),
+		new CGI::Dialog::Field(caption=>'Description',
 			type=>'memo',
 			name=>'cpt_desc2',
 		),
 
-		new App::Dialog::Field::Person::ID(caption => 'Requesting Physician', 
-			name => 'requesting_physician', 
-			options => FLDFLAG_REQUIRED, 
+		new App::Dialog::Field::Person::ID(caption => 'Requesting Physician',
+			name => 'requesting_physician',
+			options => FLDFLAG_REQUIRED,
 			types => ['Physician'],
 			incSimpleName => 1,
 		),
 
-		new App::Dialog::Field::Person::ID(caption => 'Referring to', 
-			name => 'referring_physician', 
-			types => ['Referring-Doctor'], 
+		new App::Dialog::Field::Person::ID(caption => 'Referring to',
+			name => 'referring_physician',
+			types => ['Referring-Doctor'],
 			incSimpleName => 1,
 		),
 
 		new CGI::Dialog::Field(caption => 'Speciality', name => 'speciality'),
-		new CGI::Dialog::Field(caption => 'Referral Type', 
+		new CGI::Dialog::Field(caption => 'Referral Type',
 			name => 'referral_type',
 			type => 'select',
 			fKeyStmtMgr => $STMTMGR_REFERRAL_PPMS,
@@ -177,9 +180,9 @@ sub new
 			style => 'radio',
 		),
 
-		new CGI::Dialog::Field(caption => 'Date of Completion', 
-			name => 'completion_date', 
-			type => 'date', 
+		new CGI::Dialog::Field(caption => 'Date of Completion',
+			name => 'completion_date',
+			type => 'date',
 			defaultValue => ''
 		),
 
@@ -194,16 +197,16 @@ sub new
 					caption => 'Referral Status',
 					name => 'referral_status',
 				),
-				new CGI::Dialog::Field(caption => 'Date ', 
-					name => 'referral_status_date', 
-					type => 'date', 
+				new CGI::Dialog::Field(caption => 'Date ',
+					name => 'referral_status_date',
+					type => 'date',
 					defaultValue => '',
 					flags => FLDFLAG_INLINECAPTION
 				),
 			]
 		),
-		
-		new CGI::Dialog::Field(caption=>'Comments', 
+
+		new CGI::Dialog::Field(caption=>'Comments',
 			type=>'memo',
 			name=>'comments',
 		),
@@ -228,33 +231,6 @@ sub populateData_add
 		}
 		$page->field('old_person_id', $personId);
 	}
-	
-	my $referralId = $page->param('referral_id');
-	
-	if ($referralId)
-	{
-		$self->populateData_update;
-		#popualte fields
-#		my $referralData = $STMTMGR_REFERRAL_PPMS->getRowAsHash($page, STMTMGRFLAG_NONE, 'selReferralById', $referralId);
-#		$page->field('request_date', $referralData->{request_date});
-#		$page->field('referral_type', $referralData->{referral_type});
-#		$page->field('patient_id', $referralData->{person_id});
-#		$page->field('icd_code1', $referralData->{rel_diags});
-#		$page->field('code1', $referralData->{code});
-#		$page->field('requesting_physician', $referralData->{requester_id});
-#		$page->field('referring_physician', $referralData->{provider_id});
-#		$page->field('speciality', $referralData->{speciality});
-#		$page->field('allowed_visits', $referralData->{allowed_visits});
-#		$page->field('auth_number', $referralData->{auth_number});
-#		$page->field('referral_begin_date', $referralData->{referral_begin_date});
-#		$page->field('referral_end_date', $referralData->{referral_end_date});
-#		$page->field('communication', $referralData->{communication});
-#		$page->field('completion_date', $referralData->{completion_date});
-#		$page->field('referral_status', $referralData->{referral_status});
-#		$page->field('referral_status_date', $referralData->{referral_status_date});
-#		$self->setFieldFlags('patient_id', FLDFLAG_READONLY);
-	}
-
 
 }
 
@@ -353,11 +329,11 @@ sub createPayerDropDown
 sub makeStateChanges
 {
 	my ($self, $page, $command, $dlgFlags) = @_;
-	$command ||= 'add';
+#	$command ||= 'add';
 
 	#keep third party other invisible unless it is chosen (see customValidate)
 #	$self->setFieldFlags('other_payer_fields', FLDFLAG_INVISIBLE, 1);
-	$self->setFieldFlags('payer', FLDFLAG_INVISIBLE, 1);
+#	$self->setFieldFlags('payer', FLDFLAG_INVISIBLE, 1);
 
 	#Set patient_id field and make it read only if person_id exists
 	if(my $personId = $page->param('person_id'))
@@ -393,32 +369,35 @@ sub populateData_update
 
 	# Populating the fields while updating the dialog
 	return unless ($flags & CGI::Dialog::DLGFLAG_UPDORREMOVE_DATAENTRY_INITIAL);
-	my $referralData = $STMTMGR_REFERRAL_PPMS->getRowAsHash($page, STMTMGRFLAG_NONE, 'selByReferralId', $page->param('referral_id'));
+	my $referralData = $STMTMGR_REFERRAL_PPMS->getRowAsHash($page, STMTMGRFLAG_NONE, 'selReferralById', $page->param('referral_id'));
 
 	my $icdCodes = $referralData->{'rel_diags'};
-	my $cptCodes = $referralData->{'codes'};
+	my $cptCodes = $referralData->{'code'};
 	my @icd = split(', ', $icdCodes);
 	$page->field('icd_code1', $icd[0]);
 	$page->field('icd_code2', $icd[1]);
 	my @cpt = split(', ', $cptCodes);
 	$page->field('cpt_code1', $cpt[0]);
 	$page->field('cpt_code2', $cpt[1]);
-	
+
 	my $icdData = $STMTMGR_INTELLICODE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selIcdData', $icd[0]);
 	$page->field('icd_desc1', $icdData->{'descr'});
 
 	$icdData = $STMTMGR_INTELLICODE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selIcdData', $icd[1]);
 	$page->field('icd_desc2', $icdData->{'descr'});
 
-	my $cptData = $STMTMGR_CATALOG->getRowAsHash($page,STMTMGRFLAG_NONE,'selFindDescByCode', $cpt[0] ,$page->session('org_internal_id') );
-	$page->field('cpt_desc1', $icdData->{'description'});
+#	my $cptData = $STMTMGR_CATALOG->getRowAsHash($page,STMTMGRFLAG_NONE,'selFindDescByCode', $cpt[0] ,$page->session('org_internal_id') );
+#	$page->field('cpt_desc1', $icdData->{'description'});
 
-	$cptData = $STMTMGR_CATALOG->getRowAsHash($page,STMTMGRFLAG_NONE,'selFindDescByCode', $cpt[1] ,$page->session('org_internal_id') );
-	$page->field('cpt_desc2', $icdData->{'description'});
+#	$cptData = $STMTMGR_CATALOG->getRowAsHash($page,STMTMGRFLAG_NONE,'selFindDescByCode', $cpt[1] ,$page->session('org_internal_id') );
+#	$page->field('cpt_desc2', $icdData->{'description'});
 
 	$page->field('request_date', $referralData->{request_date});
 	$page->field('referral_type', $referralData->{referral_type});
+	$page->field('referral_urgency', $referralData->{referral_urgency});
+	$page->field('referral_reason', $referralData->{referral_reason});
 	$page->field('patient_id', $referralData->{person_id});
+	$page->field('user_id', $referralData->{user_id});
 	$page->field('requesting_physician', $referralData->{requester_id});
 	$page->field('referring_physician', $referralData->{provider_id});
 	$page->field('speciality', $referralData->{speciality});
@@ -430,6 +409,18 @@ sub populateData_update
 	$page->field('completion_date', $referralData->{completion_date});
 	$page->field('referral_status', $referralData->{referral_status});
 	$page->field('referral_status_date', $referralData->{referral_status_date});
+	$page->field('comments', $referralData->{comments});
+
+#	$self->setFieldFlags('payer', FLDFLAG_INVISIBLE, 0);
+#	if( my $personId =  $page->param('person_id') || $page->field('patient_id'))
+#	{
+#		if($STMTMGR_PERSON->recordExists($page, STMTMGRFLAG_NONE, 'selPersonData', $personId))
+#		{
+			createPayerDropDown($self, $page, $command, $activeExecMode, $flags,  $page->field('patient_id'));
+#		}
+#		$page->field('old_person_id', $personId);
+#	}
+
 	$self->setFieldFlags('patient_id', FLDFLAG_READONLY);
 
 }
@@ -474,8 +465,9 @@ sub execute
 
 	my $newId = $page->schemaAction(
 		'Person_Referral', $command,
+		referral_id => $page->param('referral_id') || undef,
 		request_date => $page->field('request_date') || undef,
-		user_id => $page->field('user_id'), 
+		user_id => $page->field('user_id'),
 		referral_urgency => $page->field('referral_urgency'),
 		referral_reason => $page->field('referral_reason'),
 		referral_type => $page->field('referral_type') || undef,
@@ -506,6 +498,7 @@ sub execute
 sub getSupplementaryHtml
 {
 	my ($self, $page, $command) = @_;
+
 
 	return (CGI::Dialog::PAGE_SUPPLEMENTARYHTML_RIGHT, qq{
 				#component.stpd-person.contactMethodsAndAddresses#<BR>

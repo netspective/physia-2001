@@ -6,6 +6,7 @@
 	<query-defn id="ReferralPPMS" caption="Referral Worklist" db="Oracle">
 
 		<!-- Fields -->
+		<field id="referral_id" join="person_referral" column="referral_id"/>
 		<field id="request_date" join="person_referral" column="request_date"/>
 		<field id="person_id" caption="Patient ID" join="person" column="person_id"/>
 		<field id="name_last" caption="Last Name" join="person" column="name_last"/>

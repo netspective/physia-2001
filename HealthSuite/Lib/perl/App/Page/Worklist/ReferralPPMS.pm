@@ -61,27 +61,27 @@ my $itemNamePrefix = 'Referral-Worklist-Setup';
 		[
 			{head => '#', dataFmt => '#{auto_row_number}#',},
 			{head => 'Request Date', dAlign => 'center',colIdx=>'#{request_date}#'},
-			{head => 'Patient ID', hAlign=> 'left',dAlign => 'left',hint=>'#{name}#',url=>'/person/#{person_id}#/profile',dataFmt=>'#{person_id}#',},
+			{head => 'Patient ID', hAlign=> 'left',dAlign => 'left',hint=>'#{name}#',url=>'/worklist/referralPPMS/dlg-update-referral-ppms/#{referral_id}#/#{person_id}#',dataFmt=>'#{person_id}#',},
 #			{head => 'Patient Name', hAlign=> 'left',dAlign => 'left',dataFmt=>'#{name}#',},
 			{head => 'Physician', colIdx=>'#{requester_id}#', hAlign=> 'left',},
 			{head => 'Insurance Org', colIdx=>'#{ins_org}#', hAlign=> 'left',},
-			{head => 'Product', dAlign => 'center', dataFmt=>'#{product_name}#' },
-			{head => 'Speciality' , colIdx=>'#{speciality}#', dAlign => 'center', },
+			{head => 'Product', dAlign => 'left', dataFmt=>'#{product_name}#' },
+			{head => 'Speciality' , colIdx=>'#{speciality}#', dAlign => 'left', },
 			{head => 'Begin Date' , colIdx=>'#{referral_begin_date}#', dAlign => 'center', },
 			{head => 'End Date' , colIdx=>'#{referral_end_date}#', dAlign => 'center', },
 
 			{head => "Actions", dAlign => 'left' ,
 			   dataFmt => qq{
-					<A HREF=""
+					<A HREF="/worklist/referralPPMS/dlg-add-account-notes/#{person_id}#"
 						TITLE='Add Referral Notes'>
 						<IMG SRC='/resources/icons/coll-account-notes.gif' BORDER=0></A>
-					<A HREF=""
+					<A HREF="/worklist/referralPPMS/dlg-add-transfer-referral/#{person_id}#/#{referral_id}#"
 						TITLE='Transfer Referral to another person'>
 						<IMG SRC='/resources/icons/coll-transfer-account.gif' BORDER=0></A>
-					<A HREF=""
+					<A HREF="/worklist/referralPPMS/dlg-add-referral-reck-date/#{person_id}#/#{referral_id}#"
 						TITLE='Add Recheck Date'>
 						<IMG SRC='/resources/icons/coll-reck-date.gif' BORDER=0></A>
-					<A HREF=""
+					<A HREF="/worklist/referralPPMS/dlg-add-close-referral/#{person_id}#/#{referral_id}#"
 						TITLE='Close Referral'>
 						<IMG SRC='/resources/icons/coll-close-account.gif' BORDER=0></A>
 					},
@@ -91,6 +91,7 @@ my $itemNamePrefix = 'Referral-Worklist-Setup';
 	],
 	dnQuery => \&referralQuery,
 	dnAncestorFmt => 'Referrals Worklist',
+	dnARLParams => ['referral_id'],
 );
 
 %PUB_REFERRAL_EXP = (
@@ -101,20 +102,28 @@ my $itemNamePrefix = 'Referral-Worklist-Setup';
 		[
 			{head => '#', dataFmt => '#{auto_row_number}#',},
 			{head => 'Request Date', dAlign => 'center',colIdx=>'#{request_date}#'},
-			{head => 'Patient ID', hAlign=> 'left',dAlign => 'left',hint=>'#{name}#',url=>'/person/#{person_id}#/profile',dataFmt=>'#{person_id}#',},
+			{head => 'Patient ID', hAlign=> 'left',dAlign => 'left',hint=>'#{name}#',url=>'/worklist/referralPPMS/dlg-update-referral-ppms/#{referral_id}#/#{person_id}#',dataFmt=>'#{person_id}#',},
 			{head => 'Physician', colIdx=>'#{requester_id}#', hAlign=> 'left',},
 			{head => 'Insurance Org', colIdx=>'#{ins_org}#', hAlign=> 'left',},
-			{head => 'Product', dAlign => 'center', dataFmt=>'#{product_name}#' },
-			{head => 'Speciality' , colIdx=>'#{speciality}#', dAlign => 'center', },
+			{head => 'Product', dAlign => 'left', dataFmt=>'#{product_name}#' },
+			{head => 'Speciality' , colIdx=>'#{speciality}#', dAlign => 'left', },
 			{head => 'Begin Date' , colIdx=>'#{referral_begin_date}#', dAlign => 'center', },
 			{head => 'End Date' , colIdx=>'#{referral_end_date}#', dAlign => 'center', },
 
 			{head => "Actions", dAlign => 'left' ,
 			   dataFmt => qq{
-						<IMG SRC='/resources/icons/coll-account-notes.gif' BORDER=0>
-						<IMG SRC='/resources/icons/coll-transfer-account.gif' BORDER=0>
-						<IMG SRC='/resources/icons/coll-reck-date.gif' BORDER=0>
-						<IMG SRC='/resources/icons/coll-close-account.gif' BORDER=0>
+					<A HREF="/worklist/referralPPMS/dlg-add-referral-notes/#{person_id}#"
+						TITLE='Add Referral Notes'>
+						<IMG SRC='/resources/icons/coll-account-notes.gif' BORDER=0></A>
+					<A HREF="/worklist/referralPPMS/dlg-add-transfer-referral/#{person_id}#/#{referral_id}#"
+						TITLE='Transfer Referral to another person'>
+						<IMG SRC='/resources/icons/coll-transfer-account.gif' BORDER=0></A>
+					<A HREF="/worklist/referralPPMS/dlg-add-referral-reck-date/#{person_id}#/#{referral_id}#"
+						TITLE='Add Recheck Date'>
+						<IMG SRC='/resources/icons/coll-reck-date.gif' BORDER=0></A>
+					<A HREF="/worklist/referralPPMS/dlg-add-close-referral/#{person_id}#/#{referral_id}#"
+						TITLE='Close Referral'>
+						<IMG SRC='/resources/icons/coll-close-account.gif' BORDER=0></A>
 					},
 
 			},
@@ -162,7 +171,8 @@ sub referralQuery
 		'speciality',
 		'referral_begin_date',
 		'referral_end_date',
-		'referral_urgency'
+		'referral_urgency',
+		'referral_id'
 	);
 
 	my $arrSorting = ['ins_org', 'product_name', 'speciality', 'request_date'];
@@ -217,7 +227,8 @@ sub referralExpQuery
 		'speciality',
 		'referral_begin_date',
 		'referral_end_date',
-		'referral_urgency'
+		'referral_urgency',
+		'referral_id'
 	);
 
 	my $arrSorting = ["ins_org", "product_name", "speciality", "request_date"];
