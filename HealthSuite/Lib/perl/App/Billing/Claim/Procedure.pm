@@ -42,8 +42,21 @@ sub new
 	$param{paymentDate} = undef;
 	$param{itemStatus} = undef;
 	$param{codeType} = undef;
+	$param{explosion} = undef;
 
 	return bless \%param, $type;
+}
+
+sub setExplosion
+{
+	my ($self, $value) = @_;
+	$self->{explosion} = $value;
+}
+
+sub getExplosion
+{
+	my $self = shift;
+	return $self->{explosion};
 }
 
 sub setCodeType
