@@ -290,34 +290,6 @@ sub initialize
 					invisibleWhen => CGI::Dialog::DLGFLAG_UPDATE),
 			]),
 	);
-	if ($self->{orgtype} eq 'main')
-	{
-		$self->addContent(
-			new CGI::Dialog::MultiField(
-				fields => [
-					new CGI::Dialog::Field(caption => 'Clearing House',
-						name => 'org_billing_id_type',
-						type => 'select',
-						selOptions => 'Per Se:1; THINet:2; Other:3',
-					),
-
-					new CGI::Dialog::Field(caption => 'Billing ID',
-						name => 'org_billing_id',
-						size => 16,
-					),
-					new App::Dialog::Field::Scheduling::Date(caption => 'Effective Date',
-						name => 'org_billing_effective_date',
-						type => 'date',
-					),
-				],
-			),
-
-			new CGI::Dialog::Field(
-				name => 'org_billing_item_id',
-				type => 'hidden',
-			),
-		);
-	}
 
 	if ($self->{orgtype} eq 'main' || $self->{orgtype} eq 'provider' || $self->{orgtype} eq 'dir-entry' || $type eq 'pharmacy')
 	{
@@ -592,20 +564,6 @@ sub populateData
 	$page->field('business_hours', $businessAttribute->{value_text});
 	$page->field('business_hrs_id', $businessAttribute->{item_id});
 
-	if ($self->{orgtype} eq 'main')
-	{
-		my $clearHouseData = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_NONE,
-			'selAttributeByItemNameAndValueTypeAndParent', $orgIntId, 'Organization Default Clearing House ID',
-			App::Universal::ATTRTYPE_BILLING_INFO
-		);
-
-		$page->field('org_billing_id_type', $clearHouseData->{value_int});
-		$page->field('org_billing_id', $clearHouseData->{value_text});
-
-		$page->field('org_billing_effective_date', $clearHouseData->{value_date});
-		$page->field('org_billing_item_id', $clearHouseData->{item_id});
-	}
-
 	my $areaServedData = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_NONE,
 		'selAttributeByItemNameAndValueTypeAndParent', $orgIntId, 'Area Served',
 		App::Universal::ATTRTYPE_TEXT
@@ -874,18 +832,6 @@ sub execute_add
 	);
 
 	$page->schemaAction(
-		'Org_Attribute', $command,
-		item_id => undef,
-		parent_id => $orgIntId,
-		item_name => 'Organization Default Clearing House ID',
-		value_type => App::Universal::ATTRTYPE_BILLING_INFO || undef,
-		value_text => $page->field('org_billing_id') || undef,
-		value_int => $page->field('org_billing_id_type') || undef,
-		value_date => $page->field('org_billing_effective_date') || undef,
-		_debug => 0
-	) if ($self->{orgtype} eq 'main');
-
-	$page->schemaAction(
 			'Org_Address', $command,
 			parent_id => $orgIntId || undef,
 			address_name => 'Billing',
@@ -1025,18 +971,6 @@ sub execute_update
 			value_text => $page->field('business_hours') || undef,
 			_debug => 0
 		);
-
-	$page->schemaAction(
-		'Org_Attribute', 'update',
-		parent_id => $orgIntId,
-		item_id => $page->field('org_billing_item_id'),
-		item_name => 'Organization Default Clearing House ID',
-		value_type => App::Universal::ATTRTYPE_BILLING_INFO || undef,
-		value_text => $page->field('org_billing_id') || undef,
-		value_int => $page->field('org_billing_id_type') || undef,
-		value_date => $page->field('org_billing_effective_date') || undef,
-		_debug => 0
-	) if $page->field('org_billing_item_id') && ($self->{orgtype} eq 'main');
 
 		my $areaCommand = $page->field('area_served_id') eq '' ? 'add' : $command;
 		$page->schemaAction(
