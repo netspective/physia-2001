@@ -14,6 +14,7 @@ use CGI::Validator::Field;
 use App::Dialog::Field::Person;
 use App::Dialog::Field::Invoice;
 use App::Universal;
+use App::InvoiceUtilities;
 use App::Dialog::Field::BatchDateID;
 use Date::Manip;
 
@@ -197,7 +198,6 @@ sub executePrePayment
 	my $sessOrgIntId = $page->session('org_internal_id');
 
 	my $itemType = App::Universal::INVOICEITEMTYPE_ADJUST;
-	my $historyValueType = App::Universal::ATTRTYPE_HISTORY;
 	my $payerType = App::Universal::ENTITYTYPE_PERSON;
 	my $adjType = App::Universal::ADJUSTMENTTYPE_PAYMENT;
 	my $textValueType = App::Universal::ATTRTYPE_TEXT;
@@ -297,26 +297,11 @@ sub executePrePayment
 		_debug => 0
 	);
 
-	#Add history attributes
-	#$page->schemaAction(
-	#	'Invoice_Attribute', 'add',
-	#	parent_id => $invoiceId || undef,
-	#	item_name => 'Invoice/History/Item',
-	#	value_type => defined $historyValueType ? $historyValueType : undef,
-	#	value_text => "Invoice created specifically for prepayment.",
-	#	value_date => $todaysDate,
-	#	_debug => 0
-	#);
-
-	$page->schemaAction(
-		'Invoice_Attribute', 'add',
-		parent_id => $invoiceId || undef,
-		item_name => 'Invoice/History/Item',
-		value_type => defined $historyValueType ? $historyValueType : undef,
+	#Create history item for this adjustment
+	addHistoryItem($page, $invoiceId,
 		value_text => "Prepayment of $totalAmtRecvd made by $payerId",
-		value_textB => "$comments " . "Batch ID: $batchId" || undef,
+		value_textB => "$comments " . "Batch ID: $batchId",
 		value_date => $todaysDate,
-		_debug => 0
 	);
 
 
@@ -342,7 +327,6 @@ sub executePostPayment
 
 	my $todaysDate = $page->getDate();
 	my $itemType = App::Universal::INVOICEITEMTYPE_ADJUST;
-	my $historyValueType = App::Universal::ATTRTYPE_HISTORY;
 	my $payerType = App::Universal::ENTITYTYPE_PERSON;
 	my $adjType = App::Universal::ADJUSTMENTTYPE_PAYMENT;
 	my $textValueType = App::Universal::ATTRTYPE_TEXT;
@@ -401,18 +385,13 @@ sub executePostPayment
 			_debug => 0
 		);
 
-
-		#Create history attribute for this adjustment
-		$page->schemaAction(
-			'Invoice_Attribute', 'add',
-			parent_id => $invoiceId || undef,
-			item_name => 'Invoice/History/Item',
-			value_type => defined $historyValueType ? $historyValueType : undef,
+		#Create history item for this adjustment
+		addHistoryItem($page, $invoiceId,
 			value_text => "Personal payment of $totalAmtRecvd made by $payerId",
-			value_textB => "$comments " . "Batch ID: $batchId" || undef,
+			value_textB => "$comments " . "Batch ID: $batchId",
 			value_date => $todaysDate,
-			_debug => 0
 		);
+
 
 		$page->schemaAction(
 			'Invoice_Attribute', 'add',
