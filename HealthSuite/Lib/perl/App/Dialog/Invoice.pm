@@ -118,6 +118,8 @@ sub populateData
 	foreach my $idx (0..$totalItems)
 	{
 		my $line = $idx + 1;
+		$page->param("_f_item_$line\_dos_begin", $items->[$idx]->{service_begin_date});
+		$page->param("_f_item_$line\_dos_end", $items->[$idx]->{service_end_date});
 		$page->param("_f_item_$line\_item_id", $items->[$idx]->{item_id});
 		$page->param("_f_item_$line\_unit_cost", $items->[$idx]->{unit_cost});
 		$page->param("_f_item_$line\_quantity", $items->[$idx]->{quantity});
@@ -421,6 +423,8 @@ sub addTransactionAndInvoice
 			item_id => $itemId || undef,
 			parent_id => $invoiceId || undef,
 			item_type => defined $itemType ? $itemType : undef,
+			service_begin_date => $page->param("_f_item_$line\_dos_begin") || undef,		#default for service start date is today
+			service_end_date => $page->param("_f_item_$line\_dos_end") || undef,			#default for service end date is today
 			caption => $codeInfo->{name} || undef,
 			code => $code || undef,
 			quantity => defined $quantity ? $quantity : undef,
@@ -436,8 +440,9 @@ sub addTransactionAndInvoice
 
 
 
-	## Add history attribute
-	my $description = $command eq 'add' ? 'Created' : 'Modified';
+	## Add history and batch creation attribute
+	my $batchId = $page->field('batch_id');
+	my $description = $command eq 'add' ? "Created (Batch ID: $batchId)" : 'Modified';
 	$page->schemaAction(
 		'Invoice_Attribute', 'add',
 		parent_id => $invoiceId,
@@ -454,7 +459,7 @@ sub addTransactionAndInvoice
 		parent_id => $invoiceId || undef,
 		item_name => 'Invoice/Creation/Batch ID',
 		value_type => defined $textValueType ? $textValueType : undef,
-		value_text => $page->field('batch_id') || undef,
+		value_text => $batchId || undef,
 		value_date => $page->field('batch_date') || undef,
 		_debug => 0
 	);
