@@ -37,10 +37,10 @@ sub new
 			new CGI::Dialog::MultiField(caption => 'Batch ID Range', name => 'batch_fields', readOnlyWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
 						fields => [
 			new CGI::Dialog::Field(caption => 'Batch ID From', name => 'batch_id_from', size => 12),
-			new CGI::Dialog::Field(caption => 'Batch ID To', name => 'batch_id_to', size => 12),											
-			]),				
+			new CGI::Dialog::Field(caption => 'Batch ID To', name => 'batch_id_to', size => 12),
+			]),
 			new App::Dialog::Field::Organization::ID(caption =>'Site Organization ID', name => 'org_id', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE),
-			new App::Dialog::Field::Person::ID(incSimpleName=>1,caption =>'Physician ID', name => 'person_id',types => ['Physician'] ),			
+			new App::Dialog::Field::Person::ID(incSimpleName=>1,caption =>'Physician ID', name => 'person_id',types => ['Physician'] ),
 			new CGI::Dialog::Field(type => 'select',
 							style => 'radio',
 							selOptions => 'Segmented:0;Whole:1',
@@ -48,7 +48,7 @@ sub new
 							preHtml => "<B><FONT COLOR=DARKRED>",
 							postHtml => "</FONT></B>",
 							name => 'format',options=>FLDFLAG_REQUIRED,
-				defaultValue => '0',),			
+				defaultValue => '0',),
 			new CGI::Dialog::Field(
 				name => 'printReport',
 				type => 'bool',
@@ -98,7 +98,7 @@ sub execute
 	my $format_report = $page->field('format');
 	my $orgIntId = undef;
 	$orgIntId = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgId', $page->session('org_internal_id'), $orgId) if $orgId;
-	my @data=undef;	
+	my @data=undef;
 
 	my $hardCopy = $page->field('printReport');
 	my $html;
@@ -109,7 +109,7 @@ sub execute
 	my $printerDevice;
 	$printerDevice = ($page->field('printerQueue') ne '') ? $page->field('printerQueue') : App::Device::getPrinter ($page, 0);
 	my $printHandle = App::Device::openRawPrintHandle ($printerDevice);
-	
+
 	$printerAvailable = 0 if (ref $printHandle eq 'SCALAR');
 
 	my $allPub =
@@ -117,7 +117,7 @@ sub execute
 		reportTitle => $self->heading(),
 		columnDefn =>
 			[
-			{ colIdx => 0, head => 'Physican ID',  dAlign => 'LEFT' },			
+			{ colIdx => 0, head => 'Physican ID',  dAlign => 'LEFT' },
 			{ colIdx => 1, head => 'FFS Prof', summarize => 'sum',  dformat => 'currency' },
 			{ colIdx => 2, head => 'X-Ray', summarize => 'sum',  dformat => 'currency' },
 			{ colIdx => 3, head => 'Lab', summarize => 'sum', , dformat => 'currency' },
@@ -126,27 +126,27 @@ sub execute
 			{ colIdx => 6, head => 'Cap X-Ray', summarize => 'sum', dformat => 'currency' },
 			{ colIdx => 7, head => 'Cap Lab', summarize => 'sum', dataFmt => '#5#', dformat => 'currency' },
 			{ colIdx => 8, head => 'Total Cap Prod', summarize => 'sum', , dformat => 'currency' },
-			{ colIdx => 9, head => 'Total Prof Prod', summarize => 'sum', dformat => 'currency' },			
-			{ colIdx => 10, head => 'Grand Total Prod', summarize => 'sum', dformat => 'currency' },			
-			{ colIdx => 11, head =>'Recpt Adj', summarize => 'sum',  dformat => 'currency' },			
+			{ colIdx => 9, head => 'Total Prof Prod', summarize => 'sum', dformat => 'currency' },
+			{ colIdx => 10, head => 'Grand Total Prod', summarize => 'sum', dformat => 'currency' },
+			{ colIdx => 11, head =>'Recpt Adj', summarize => 'sum',  dformat => 'currency' },
 			{ colIdx => 12, head =>'Ancill Pmts', summarize => 'sum',  dformat => 'currency' },
 			{ colIdx => 13, head =>'Prof Pmts', summarize => 'sum',  dformat => 'currency' },
-			{ colIdx => 14, head =>'FFS Pmts', summarize => 'sum',  dformat => 'currency' },			
+			{ colIdx => 14, head =>'FFS Pmts', summarize => 'sum',  dformat => 'currency' },
 			{ colIdx => 15, head =>'Cap Pmts', summarize => 'sum',  dformat => 'currency' },
-			{ colIdx => 16, head =>'Net Recpts', summarize => 'sum',  dformat => 'currency' },	
-			{ colIdx => 17, head =>'% To Gross', tAlign=>'RIGHT',tDataFmt=> '&{sum_percent:16,10}'},	
-			{ colIdx => 18 ,head =>'Hospital Visits', summarize => 'sum',  },				
-			{ colIdx => 19, head =>'Office Visits', summarize => 'sum',  },			
-			{ colIdx => 20, head =>'Avg Chrg per Visit', summarize => 'sum',  dformat => 'currency' },	
+			{ colIdx => 16, head =>'Net Recpts', summarize => 'sum',  dformat => 'currency' },
+			{ colIdx => 17, head =>'% To Gross', tAlign=>'RIGHT',tDataFmt=> '&{sum_percent:16,10}'},
+			{ colIdx => 18 ,head =>'Hospital Visits', summarize => 'sum',  },
+			{ colIdx => 19, head =>'Office Visits', summarize => 'sum',  },
+			{ colIdx => 20, head =>'Avg Chrg per Visit', summarize => 'sum',  dformat => 'currency' },
 		],
-	};		
+	};
 
 	my $collPub =
 	{
 		reportTitle => 'Collection Information',
 		columnDefn =>
 			[
-			{ colIdx => 0, head => 'Physican ID',  dAlign => 'LEFT' },			
+			{ colIdx => 0, head => 'Physican ID',  dAlign => 'LEFT' },
 			{ colIdx => 1, head => 'FFS Prof', summarize => 'sum',  dformat => 'currency' },
 			{ colIdx => 2, head => 'X-Ray', summarize => 'sum',  dformat => 'currency' },
 			{ colIdx => 3, head => 'Lab', summarize => 'sum', , dformat => 'currency' },
@@ -155,36 +155,36 @@ sub execute
 			{ colIdx => 6, head => 'Cap X-Ray', summarize => 'sum', dformat => 'currency' },
 			{ colIdx => 7, head => 'Cap Lab', summarize => 'sum', dataFmt => '#5#', dformat => 'currency' },
 			{ colIdx => 8, head => 'Total Cap Prod', summarize => 'sum', , dformat => 'currency' },
-			{ colIdx => 9, head => 'Total Prof Prod', summarize => 'sum', dformat => 'currency' },			
-			{ colIdx => 10, head => 'Grand Total Prod', summarize => 'sum', dformat => 'currency' },					
+			{ colIdx => 9, head => 'Total Prof Prod', summarize => 'sum', dformat => 'currency' },
+			{ colIdx => 10, head => 'Grand Total Prod', summarize => 'sum', dformat => 'currency' },
 		],
-	};		
+	};
 	my $prodPub =
 		{
 			reportTitle => 'Production Information',
 			columnDefn =>
-				[	
-				{ colIdx => 0, head => 'Physican ID',  dAlign => 'LEFT' },	
-				{ colIdx => 1, head =>'Recpt Adj', summarize => 'sum',  dformat => 'currency' },							
+				[
+				{ colIdx => 0, head => 'Physican ID',  dAlign => 'LEFT' },
+				{ colIdx => 1, head =>'Recpt Adj', summarize => 'sum',  dformat => 'currency' },
 				{ colIdx => 2, head =>'Ancill Pmts', summarize => 'sum',  dformat => 'currency' },
 				{ colIdx => 3, head =>'Prof Pmts', summarize => 'sum',  dformat => 'currency' },
-				{ colIdx => 4, head =>'FFS Pmts', summarize => 'sum',  dformat => 'currency' },			
+				{ colIdx => 4, head =>'FFS Pmts', summarize => 'sum',  dformat => 'currency' },
 				{ colIdx => 5, head =>'Cap Pmts', summarize => 'sum',  dformat => 'currency' },
-				{ colIdx => 6, head =>'Net Recpts', summarize => 'sum',  dformat => 'currency' },			
+				{ colIdx => 6, head =>'Net Recpts', summarize => 'sum',  dformat => 'currency' },
 				{ colIdx => 7, head =>'% To Gross',tAlign=>'RIGHT', tDataFmt=> '&{sum_percent:6,11}', dAlign=>'Right' },
-				{ colIdx => 8 ,head =>'Hospital Visits', summarize => 'sum',  },			
-				{ colIdx => 9, head =>'Office Visits', summarize => 'sum',  },			
-				{ colIdx => 10, head =>'Avg Chrg per Visit',  dformat => 'currency' },			
+				{ colIdx => 8 ,head =>'Hospital Visits', summarize => 'sum',  },
+				{ colIdx => 9, head =>'Office Visits', summarize => 'sum',  },
+				{ colIdx => 10, head =>'Avg Chrg per Visit',  dformat => 'currency' },
 			],
-	};		
+	};
 	my $rev_coll = $STMTMGR_REPORT_ACCOUNTING->getRowsAsHashList($page,STMTMGRFLAG_NONE,'sel_revenue_collection',$reportBeginDate,$reportEndDate,
 	,$orgIntId,$person_id,$batch_from,$batch_to,$page->session('org_internal_id'));
-	my @data = ();	
+	my @data = ();
 	my @data2 = ();
 	foreach (@$rev_coll)
 	{
-		
-		next unless $_->{provider}; 				
+
+		next unless $_->{provider};
 		my $visit = $STMTMGR_REPORT_ACCOUNTING->getRowAsHash($page,STMTMGRFLAG_NONE,'selGetVisit',$reportBeginDate,$reportEndDate,
 						,$orgIntId,$_->{provider},$batch_from,$batch_to,$page->session('org_internal_id'));
 		$_->{total_non_cap_prod} = $_->{ffs_prof} + $_->{x_ray} + $_->{lab};
@@ -196,8 +196,8 @@ sub execute
 		$_->{chrg_per_visit} = $visit->{visits} / $_->{grand_total_prod} if  $_->{grand_total_prod} >0;
 		$_->{prof_pmt} ;
 		$_->{avg_cost_vist} = $_->{grand_total_prod} / $visit->{office_visit} if $visit->{office_visit} > 0;
-		my @rowData = 
-		(	
+		my @rowData =
+		(
 			$_->{provider},
 			$_->{ffs_prof},
 			$_->{x_ray},
@@ -220,24 +220,24 @@ sub execute
 			$_->{cap_pmt},
 			$_->{net_recpts},
 			$_->{gross_per}||'0.00',
-			$visit->{hospital_visit},			
+			$visit->{hospital_visit},
 			$visit->{office_visit},
 			$_->{avg_cost_vist}||'0',
-			$_->{grand_total_prod},			
+			$_->{grand_total_prod},
 		);
 		if ($format_report != 0)
 		{
-			push(@data,[@rowData, @rowData2[1..scalar(@rowData2)] ]);	
+			push(@data,[@rowData, @rowData2[1..scalar(@rowData2)] ]);
 		}
 		else
 		{
-			push(@data2, \@rowData2);		
-			push(@data, \@rowData);		
+			push(@data2, \@rowData2);
+			push(@data, \@rowData);
 		}
 	}
 	if($format_report != 0)
-	{		
-		$html .= createHtmlFromData($page, 0, \@data,$allPub);			
+	{
+		$html .= createHtmlFromData($page, 0, \@data,$allPub);
 		$textOutputFilename = createTextRowsFromData($page, 0, \@data, $allPub);
 		$html = ($textOutputFilename ? qq{<a href="/temp$textOutputFilename">Printable version</a> <br>} : "" ) . $html;
 		$self->heading("Revenue Collection Report");
@@ -260,10 +260,10 @@ sub execute
 		$html .= createHtmlFromData($page, 0, \@data,$collPub);
 		$collFilename = createTextRowsFromData($page, 0, \@data, $collPub);
 		$html .="<BR><BR><b>COLLECTION INFORMATION<b>";
-		$html .= createHtmlFromData($page, 0, \@data2,$prodPub);	
+		$html .= createHtmlFromData($page, 0, \@data2,$prodPub);
 		$prodFilename = createTextRowsFromData($page, 0, \@data2, $prodPub);
-		$html = ($prodFilename ? qq{<a href="/temp$prodFilename">Collection Information (Printable version)</a> <br>} : "" ) . $html;
-		$html = ($collFilename ? qq{<a href="/temp$collFilename">Production Information (Printable version)</a> <br>} : "" ) . $html;
+		$html = ($prodFilename ? qq{<a href="/temp$prodFilename">Production Information (Printable version)</a> <br>} : "" ) . $html;
+		$html = ($collFilename ? qq{<a href="/temp$collFilename">Collection Information (Printable version)</a> <br>} : "" ) . $html;
 		$self->heading("Revenue / Collection Report");
 
 		if ($hardCopy == 1 and $printerAvailable) {
@@ -290,7 +290,7 @@ sub execute
 		}
 	}
 	return $html
-	
+
 }
 
 
