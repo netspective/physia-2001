@@ -47,6 +47,7 @@ $STMTFMT_SEL_CLAIM = qq{
 			AND (owner_type = 1 AND owner_id = ?)
 			AND iis.id = i.invoice_status
 			AND to_char(o.org_internal_id (+)) = ib.bill_to_id
+			AND NOT (i.invoice_status = 15 AND i.parent_invoice_id is not NULL)
 		GROUP BY
 			i.invoice_id,
 			i.total_items,
