@@ -427,6 +427,7 @@
 		<deliverable id="1741">
 			In the Revenue/Collection report interchanged the headings 'Collection Information (Printable version)' 
 			and 'Production Information (Printable version)'.
+			NOTE: Fixed code to showup correct reports with Correct headings.
 		</deliverable>
 		
 	</deliverables>
