@@ -11,6 +11,7 @@ use App::Dialog::Person;
 use App::Dialog::Field::Person;
 use App::Dialog::Field::Address;
 use App::Dialog::Field::Organization;
+use App::Dialog::Field::Insurance;
 use App::Dialog::Field::Association;
 use DBI::StatementManager;
 use App::Statements::Insurance;
@@ -88,8 +89,8 @@ sub initialize
 		new CGI::Dialog::MultiField(caption =>'Ins CompanyID/Product Name/Plan Name', name => 'insplan',invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
 				fields => [
 							new App::Dialog::Field::Organization::ID(caption => 'Ins Company ID', name => 'ins_org_id',invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE),
-							new CGI::Dialog::Field(caption => 'Product Name', name => 'product_name', findPopup => '/lookup/insurance/product_name', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE),
-							new CGI::Dialog::Field(caption => 'Plan Name', name => 'plan_name', findPopup => '/lookup/insurance/plan_name', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE)
+							new App::Dialog::Field::Insurance::Product(caption => 'Product Name', name => 'product_name', findPopup => '/lookup/insurance/product_name', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE),
+							new App::Dialog::Field::Insurance::Plan(caption => 'Plan Name', name => 'plan_name', findPopup => '/lookup/insurance/plan_name', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE)
 						]),
 
 		new CGI::Dialog::Field(
