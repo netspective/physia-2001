@@ -452,165 +452,273 @@ sub prepare_view_superbills
 	#$self->addLocatorLinks(['Profile', 'profile']);
 
 	if ($self->param ('action') eq 'add') {
-		my $groups = $self->param ('groups');
-		my @groups = split ' ', $groups;
-		my $cpts = $self->param ('cpts');
-		my @cpts = split ' ', $cpts;
+		my $catalogIDExists = $STMTMGR_ORG->recordExists($self, STMTMGRFLAG_NONE, 'selSuperbillsByCatalogId', $self->param('catalog_id'));
 		
-		my @groupArray;
-		my %cptHash;
-		my @cptArray;
-		
-		foreach my $grp (@groups) {
-			my ($order, $name) = split '_', $grp, 2;
-			$name =~ s/_/ /g;
-			
-			push @groupArray, $name;
-		}
-		
-		foreach my $cpt (@cpts) {
-			my ($group, $order, $name) = split '_', $cpt, 3;
-			$name =~ s/_/ /g;
-			
-			if (exists $cptHash {$group}) {
-				push @{$cptHash {$group}}, $name;
-			} else {
-				$cptHash {$group} = [ $name ];
-			}
-		}
-		
-		my $displayHierarchy = "<b>Org:</b><i>".$self->param('org_id')."</i><br>groups = $groups<br>cpts = $cpts<br>";
-		
-		# Display all the groups with corresponding members...
-		my $i = 0;
-		foreach my $grp (@groupArray) {
-			$displayHierarchy .= 'Group #'."$i: $grp ";
+		if ($catalogIDExists) {
+			my $superbillID = $self->param ('int_cat_id');
+			my $superbillCatalogID = $self->param ('catalog_id');
+			my $superbillCaption = $self->param ('caption');
+			my $superbillDescription = $self->param ('description');
+			my $groupsField = $self->param ('groups');
+			my $cptField = $self->param ('cpts');
 
-			my $cptList = $cptHash {$i};
-			$displayHierarchy .= '(<i>'.(join ", ", @{$cptList}).'</i>)' if (defined $cptList);
-			$displayHierarchy .= '<br>';
-
-			$i ++;
-		}
-
-		my $orgRecord = $STMTMGR_ORG->getRowAsArray($self, STMTMGRFLAG_NONE, 'selOwnerOrgId', $self->param ('org_id'));
-		my $orgIntId = $orgRecord->[0];
-		my $internalCatalogID = $self->param('int_cat_id');
-
-		if ($internalCatalogID) {
-			# First delete the old superbill...
-			my $superbillList = $STMTMGR_ORG->getRowsAsHashList($self, STMTMGRFLAG_NONE, 'selSuperbillInfoByCatalogID', $internalCatalogID);
-
-			$self->schemaAction(
-				'Offering_Catalog', 'remove',
-				internal_catalog_id => $internalCatalogID,
-				catalog_id => $self->param('catalog_id'),
-				org_internal_id => $orgIntId,
-				caption => $self->param ('caption') || undef,
-				catalog_type => 4,
-				description => $self->param ('description'),
-				_debug => 0
-			);
-			
-			for my $superbillItem (@{$superbillList}) {
-				$self->schemaAction(
-					'Offering_Catalog_Entry', 'remove',
-					entry_id => $superbillItem->{entry_id},
-					_debug => 0,
-				);
-			}
-
-			# Then create a new superbill...
-			my $catIntId = $self->schemaAction(
-				'Offering_Catalog', 'add',
-				catalog_id => $self->param('catalog_id'),
-				org_internal_id => $orgIntId,
-				caption => $self->param ('caption') || undef,
-				catalog_type => 4,
-				description => $self->param ('description'),
-				_debug => 0
-			);
-			
-			$i = 0;
-			foreach my $grp (@groupArray) {
-				my $cptList = $cptHash {$i};
-        
-				my $groupEntryID = $self->schemaAction (
-					'Offering_Catalog_Entry', 'add',
-					catalog_id => $catIntId,
-					parent_entry_id => undef,
-					entry_type => 0,
-					status => 1,
-					cost_type => 0,
-					name => $grp,
-					sequence => $i,
-				);
-				
-				my $j = 0;
-				foreach my $cpt (@{$cptList}) {
-					my ($code, $name) = split /:/, $cpt, 2;
-					$self->schemaAction (
-						'Offering_Catalog_Entry', 'add',
-						catalog_id => $catIntId,
-						parent_entry_id => $groupEntryID,
-						entry_type => 100,
-						status => 1,
-						code => $code,
-						name => $name,
-						cost_type => 0,
-						sequence => $j,
-					);
-					$j ++;
-				}
-				$i ++;
-			}
+			$self->addContent(qq{
+				<script src="/lib/superbill.js" language="JavaScript1.2">
+				</script>
+				<form name="superbillItemList">
+	
+				<table>
+					<tr>
+						<td align="right" valign="top">Superbill ID:</td>
+						<td align="left" valign="top"><input name="superbillID" type="text" size="15"><br>
+						<font color="red">Another superbill already exists by this name.  Please change this and re-submit.  Thank you.</font>
+						</td>
+					</tr>
+					<tr>
+						<td align="right" valign="top">Name:</td>
+						<td align="left" valign="top"><input name="superbillName" type="text" size="40"></td>
+					</tr>
+					<tr>
+						<td align="right" valign="top">Description:</td>
+						<td align="left" valign="top"><textarea name="superbillDescription" rows="5" cols="26"></textarea></td>
+					</tr>
+					<tr>
+						<td align="right" valign="top">Groups:</td>
+						<td align="left" valign="top">
+						<table>
+							<tr>
+								<td valign="top" align="left">
+									<input name="groupHeading" type="text" size="26">&nbsp;
+								</td>
+	                        
+								<td valign="top" align="center">
+									<input name="addGroupHeading" type="button" value="+" title="Add Group" onClick="javascript:_addGroupHeading()">
+									<input name="delGroupHeading" type="button" value="-" title="Delete Group" onClick="javascript:_delGroupHeading()"><br>
+									<input name="moveUpGroup" type="button" value="^" title="Add Codes" onClick="javascript:_moveGroupUp()"><br>
+									<input name="moveDownGroup" type="button" value="v" title="Delete Codes" onClick="javascript:_moveGroupDown()">
+	                                        		</td>
+								
+								<td valign="top" align="right">
+									<select name="superbillGroups" onChange="javascript:_populateGroupCPT(document.superbillItemList.superbillGroups)">
+										<option value="0"> </option>
+        								</select>
+								</td>
+							</tr>
+						</table>
+					</tr>
+					<tr>
+        					<td align="right" valign="top">Codes:</td>
+						<td align="left" valign="top">
+						<table>
+							<tr>
+								<td valign="top" align="left">
+									<textarea name="cpts" rows="10" cols="20"></textarea>
+								</td>
+	                        
+								<td valign="top" align="center">
+									<input name="addSelected" type="button" value="+" title="Add Codes" onClick="javascript:_addCPT()">
+									<input name="delSelected" type="button" value="-" title="Delete Codes" onClick="javascript:_delCPT()"><br><br>
+									<input name="moveUpSelected" type="button" value="^" title="Add Codes" onClick="javascript:_moveCPTUp()"><br>
+									<input name="moveDownSelected" type="button" value="v" title="Delete Codes" onClick="javascript:_moveCPTDown()">
+	                                        		</td>
+								
+								<td valign="top" align="right">
+									<select name="superbillData" size="12" multiple></select>
+								</td>
+        							<td valign="top" align="left">
+									Caption:<br>
+									<input name="superbillDataCaption" type="text" size="10" onChange="javascript:_updateCaption()">
+								</td>
+							</tr>
+						</table>
+        				</tr>
+					<tr>		
+						<td valign="top" align="center" colspan="0">
+							<input name="submitButton" type="button" value="Submit" title="Create this Superbill" onClick="javascript:_createSuperbill()">
+						</td>
+					</tr>
+				</table>
+	        
+				</form>
+				<form name="superbillData" action="/org/#param.org_id#/superbills" method="post">
+					<input name="action" type="hidden" value="add">
+					<input name="formSubmitted" type="hidden" value="1">
+					<input name="int_cat_id" type="hidden" value="$superbillID">
+					<input name="catalog_id" type="hidden" value="$superbillCatalogID">
+					<input name="caption" type="hidden" value="$superbillCaption">
+					<input name="description" type="hidden" value="$superbillDescription">
+					<input name="names" type="hidden">
+					<input name="groups" type="hidden" value="$groupsField">
+        				<input name="cpts" type="hidden" value="$cptField">
+				</form>
+				<script language="JavaScript1.2">
+	//				alert ('groups: ' + document.superbillData.groups.value);
+	//				alert ('cpts: ' + document.superbillData.cpts.value);
+					_refreshSuperbill ();
+					_refreshGroupList ();
+				</script>
+			});
 		} else {
-			my $catIntId = $self->schemaAction(
-				'Offering_Catalog', 'add',
-				catalog_id => $self->param('catalog_id'),
-				org_internal_id => $orgIntId,
-				caption => $self->param ('caption') || undef,
-				catalog_type => 4,
-				description => $self->param ('description'),
-				_debug => 0
-			);
+			my $groups = $self->param ('groups');
+			my @groups = split ' ', $groups;
+			my $cpts = $self->param ('cpts');
+			my @cpts = split ' ', $cpts;
 			
-			$i = 0;
-			foreach my $grp (@groupArray) {
-				my $cptList = $cptHash {$i};
-        
-				my $groupEntryID = $self->schemaAction (
-					'Offering_Catalog_Entry', 'add',
-					catalog_id => $catIntId,
-					parent_entry_id => undef,
-					entry_type => 0,
-					status => 1,
-					cost_type => 0,
-					name => $grp,
-					sequence => $i,
-				);
+			my @groupArray;
+			my %cptHash;
+			my @cptArray;
+			
+			foreach my $grp (@groups) {
+				my ($order, $name) = split '_', $grp, 2;
+				$name =~ s/_/ /g;
 				
-				my $j = 0;
-				foreach my $cpt (@{$cptList}) {
-					my ($code, $name) = split /:/, $cpt, 2;
-					$self->schemaAction (
-						'Offering_Catalog_Entry', 'add',
-						catalog_id => $catIntId,
-						parent_entry_id => $groupEntryID,
-						entry_type => 100,
-						status => 1,
-						code => $code,
-						name => $name,
-						cost_type => 0,
-						sequence => $j,
-					);
-					$j ++;
+				push @groupArray, $name;
+			}
+			
+			foreach my $cpt (@cpts) {
+				my ($group, $order, $name) = split '_', $cpt, 3;
+				$name =~ s/_/ /g;
+				
+				if (exists $cptHash {$group}) {
+					push @{$cptHash {$group}}, $name;
+				} else {
+					$cptHash {$group} = [ $name ];
 				}
+			}
+			
+			my $displayHierarchy = "<b>Org:</b><i>".$self->param('org_id')."</i><br>groups = $groups<br>cpts = $cpts<br>";
+			
+			# Display all the groups with corresponding members...
+			my $i = 0;
+			foreach my $grp (@groupArray) {
+				$displayHierarchy .= 'Group #'."$i: $grp ";
+
+				my $cptList = $cptHash {$i};
+				$displayHierarchy .= '(<i>'.(join ", ", @{$cptList}).'</i>)' if (defined $cptList);
+				$displayHierarchy .= '<br>';
+
 				$i ++;
 			}
+
+			my $orgRecord = $STMTMGR_ORG->getRowAsArray($self, STMTMGRFLAG_NONE, 'selOwnerOrgId', $self->param ('org_id'));
+			my $orgIntId = $orgRecord->[0];
+			my $internalCatalogID = $self->param('int_cat_id');
+
+			if ($internalCatalogID) {
+				# First delete the old superbill...
+				my $superbillList = $STMTMGR_ORG->getRowsAsHashList($self, STMTMGRFLAG_NONE, 'selSuperbillInfoByCatalogID', $internalCatalogID);
+
+				$self->schemaAction(
+					'Offering_Catalog', 'remove',
+					internal_catalog_id => $internalCatalogID,
+					catalog_id => $self->param('catalog_id'),
+					org_internal_id => $orgIntId,
+					caption => $self->param ('caption') || undef,
+					catalog_type => 4,
+					description => $self->param ('description'),
+					_debug => 0
+				);
+				
+				for my $superbillItem (@{$superbillList}) {
+					$self->schemaAction(
+						'Offering_Catalog_Entry', 'remove',
+						entry_id => $superbillItem->{entry_id},
+						_debug => 0,
+					);
+				}
+
+				# Then create a new superbill...
+				my $catIntId = $self->schemaAction(
+					'Offering_Catalog', 'add',
+					catalog_id => $self->param('catalog_id'),
+					org_internal_id => $orgIntId,
+					caption => $self->param ('caption') || undef,
+					catalog_type => 4,
+					description => $self->param ('description'),
+					_debug => 0
+				);
+				
+				$i = 0;
+				foreach my $grp (@groupArray) {
+					my $cptList = $cptHash {$i};
+                
+					my $groupEntryID = $self->schemaAction (
+						'Offering_Catalog_Entry', 'add',
+						catalog_id => $catIntId,
+						parent_entry_id => undef,
+						entry_type => 0,
+						status => 1,
+						cost_type => 0,
+						name => $grp,
+#						sequence => $i,
+					);
+					
+					my $j = 0;
+					foreach my $cpt (@{$cptList}) {
+						my ($code, $name) = split /:/, $cpt, 2;
+						$self->schemaAction (
+							'Offering_Catalog_Entry', 'add',
+							catalog_id => $catIntId,
+							parent_entry_id => $groupEntryID,
+							entry_type => 100,
+							status => 1,
+							code => $code,
+							name => $name,
+							cost_type => 0,
+#							sequence => $j,
+						);
+						$j ++;
+					}
+					$i ++;
+				}
+			} else {
+				my $catIntId = $self->schemaAction(
+					'Offering_Catalog', 'add',
+					catalog_id => $self->param('catalog_id'),
+					org_internal_id => $orgIntId,
+					caption => $self->param ('caption') || undef,
+					catalog_type => 4,
+					description => $self->param ('description'),
+					_debug => 0
+				);
+				
+				$i = 0;
+				foreach my $grp (@groupArray) {
+					my $cptList = $cptHash {$i};
+                
+					my $groupEntryID = $self->schemaAction (
+						'Offering_Catalog_Entry', 'add',
+						catalog_id => $catIntId,
+						parent_entry_id => undef,
+						entry_type => 0,
+						status => 1,
+						cost_type => 0,
+						name => $grp,
+#						sequence => $i,
+					);
+					
+					my $j = 0;
+					foreach my $cpt (@{$cptList}) {
+						my ($code, $name) = split /:/, $cpt, 2;
+						$self->schemaAction (
+							'Offering_Catalog_Entry', 'add',
+							catalog_id => $catIntId,
+							parent_entry_id => $groupEntryID,
+							entry_type => 100,
+							status => 1,
+							code => $code,
+							name => $name,
+							cost_type => 0,
+#							sequence => $j,
+						);
+						$j ++;
+					}
+					$i ++;
+				}
+			}
+			
+			$self->redirect('/org/'.$self->param('org_id').'/catalog?catalog=superbill');
 		}
-		
-		$self->redirect('/org/'.$self->param('org_id').'/catalog?catalog=superbill');
 	} elsif ($self->param ('action') eq 'new') {
 		$self->addContent(qq{
 			<script src="/lib/superbill.js" language="JavaScript1.2"></script>
