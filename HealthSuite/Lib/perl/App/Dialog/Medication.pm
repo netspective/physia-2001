@@ -3,7 +3,7 @@ package App::Dialog::Medication;
 ##############################################################################
 
 use strict;
-use SDE::CVS ('$Id: Medication.pm,v 1.27 2001-01-25 20:38:21 munir_faridi Exp $', '$Name:  $');
+use SDE::CVS ('$Id: Medication.pm,v 1.28 2001-01-30 17:39:42 thai_nguyen Exp $', '$Name:  $');
 use CGI::Validator::Field;
 use CGI::Dialog;
 use base qw(CGI::Dialog);
@@ -664,14 +664,13 @@ sub populateData
 
 	#if ($command eq 'add' || $command eq 'prescribe')
 	#{
-	#	if ($page->param('person_id'))
-	#	{
-
+		if ($page->param('person_id'))
+		{
 			my $personName = $STMTMGR_PERSON->getSingleValue($page, STMTMGRFLAG_NONE, 'selPersonSimpleNameById', $page->param('person_id'));
 			my $personId = $page->param('person_id');
 			my $nameAndId = $personName . " (" .$personId. ")";
 			$page->field('parent_id',  $nameAndId);
-	#	}
+		}
 	#}
 
 	if ($command eq 'update' && $page->field('approved_by'))
@@ -688,6 +687,28 @@ sub populateData
 	elsif ($command eq 'update' && $isPhysician)
 	{
 		$page->field('approved_by', $page->session('person_id'));
+	}
+}
+
+sub getHtml
+{
+	my ($self, $page, $command) = @_;
+	
+	if ($page->flagIsSet(PAGEFLAG_ISHANDHELD))
+	{
+		unless ($page->session('active_person_id'))
+		{
+			$page->addContent("No patient selected.  Please select a patient.");
+			return '';
+		}
+		else
+		{
+			$self->SUPER::getHtml($page, $command);	
+		}
+	}
+	else
+	{
+		$self->SUPER::getHtml($page, $command);
 	}
 }
 
