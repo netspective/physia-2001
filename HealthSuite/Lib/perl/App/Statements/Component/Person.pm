@@ -76,7 +76,10 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 		# automatically inherits columnDefn and other items from publishDefn
 		style => 'panel',
 		separateDataColIdx => 2, # when the item_name is '-' add a row separator
-		frame => { heading => 'Contact Methods/Addresses' },
+		frame => {
+					heading => 'Contact Methods/Addresses',
+					editUrl => '/person/#param.person_id#/stpe-#my.stmtId#?home=/#param.arl#',
+				},
 	},
 	publishDefn_panelTransp =>
 	{
@@ -184,15 +187,15 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 			select 	value_type, item_id, parent_id, item_name, value_text, cr_stamp
 				from  Person_Attribute
 			where  	parent_id = ?
-			and item_name = 'Misc Notes'			
+			and item_name = 'Misc Notes'
 		},
 		sqlStmtBindParamDescr => ['Person ID for Attribute Table'],
-		
+
 	publishDefn =>
 	{
-		columnDefn => [				
+		columnDefn => [
 				{colIdx =>0, head => 'Misc Notes', dataFmt => 'Misc Notes (#5#<A HREF = "/person/#2#/profile">#2#</A>)#4#' },
-		],	
+		],
 		bullets => 'stpe-#my.stmtId#/dlg-update-attr-#0#/#1#?home=/#param.arl#',
 		frame => { addUrl => 'stpe-#my.stmtId#/dlg-add-misc-notes?home=/#param.arl#' },
 	},
@@ -462,6 +465,9 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 			#{ colIdx => 4, head => 'Date', dataFmt => '#4#', options => PUBLCOLFLAG_DONTWRAP },
 		],
 		bullets => 'stpe-#my.stmtId#/dlg-update-attr-#0#/#1#?home=/#param.arl#',
+		frame => {
+					editUrl => '/person/#param.person_id#/stpe-#my.stmtId#?home=/#param.arl#',
+				},
 	},
 	publishDefn_panel =>
 	{
@@ -735,6 +741,7 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 
 		],
 		bullets => 'stpe-#my.stmtId#/dlg-update-ins-#4#/#3#?home=/#param.arl#',
+		frame => {	editUrl => '/person/#param.person_id#/stpe-#my.stmtId#?home=/#param.arl#' },
 	},
 	publishDefn_panel =>
 	{
@@ -813,7 +820,10 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 			#{ colIdx => 3, head => 'Phone', dataFmt => '#3#', options => PUBLCOLFLAG_DONTWRAP },
 		],
 		bullets => 'stpe-#my.stmtId#/dlg-update-attr-#0#/#1#?home=/#param.arl#',
-		frame => { addUrl => 'stpe-#my.stmtId#/dlg-add-assoc-provider?home=/#param.arl#' },
+		frame => {
+					addUrl => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-add-assoc-provider?home=/#param.arl#',
+					editUrl => '/person/#param.person_id#/stpe-#my.stmtId#?home=/#param.arl#',
+				},
 	},
 	publishDefn_panel =>
 	{
@@ -1908,7 +1918,11 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 	{
 		# automatically inherites columnDefn and other items from publishDefn
 		style => 'panel',
-		frame => { heading => 'Outstanding Balances' },
+		frame => {
+					heading => 'Outstanding Balances',
+					addUrl => '/person/#param.person_id#/stpe-#my.stmtId#?home=/#param.arl#',
+					editUrl => '/person/#param.person_id#/stpe-#my.stmtId#?home=/#param.arl#',
+				},
 	},
 	publishDefn_panelTransp =>
 	{
