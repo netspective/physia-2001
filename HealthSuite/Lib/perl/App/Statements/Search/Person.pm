@@ -183,7 +183,7 @@ my %personTemplates = (
 #
 # HEY! If you add anything to @categories you must add the array index below
 #
-my @categories = ('physician', 'nurse', 'staff', 'patient', 'associate', 'referring-Doctor');
+my @categories = ('physician', 'nurse', 'staff', 'patient', 'associate', 'referring-Doctor', 'physician-ref');
 my @categorySqls = ();
 foreach my $category (@categories)
 {
@@ -194,7 +194,21 @@ foreach my $category (@categories)
 	foreach (@tmplKeys)
 	{
 		my %sqlData = %{$personTemplates{$_}};
-		$sqlData{catCond} = $category eq 'associate' ? "and cat.category in ('Physician', 'Nurse', 'Staff', 'Referring-Doctor')" : "and cat.category = '\u$category'";
+
+		if ($category eq 'associate')
+		{
+			$sqlData{catCond} =  "and cat.category in ('Physician', 'Nurse', 'Staff', 'Referring-Doctor')";
+		}
+		elsif ($category eq 'physician-ref')
+		{
+			$sqlData{catCond} =  "and cat.category in ('Physician', 'Referring-Doctor')";
+
+		}
+		else
+		{
+			 $sqlData{catCond} = "and cat.category = '\u$category'";
+		}
+		#$sqlData{catCond} = $category eq 'associate' ? "and cat.category in ('Physician', 'Nurse', 'Staff', 'Referring-Doctor')" : "and cat.category = '\u$category'";
 		$sqls->{"$_\_$category"} = \%sqlData;
 	}
 }
@@ -208,6 +222,7 @@ $STMTMGR_PERSON_SEARCH = new App::Statements::Search::Person(
 	%{$categorySqls[3]},
 	%{$categorySqls[4]},
 	%{$categorySqls[5]},
+	%{$categorySqls[6]},
 );
 
 1;
