@@ -6,34 +6,39 @@ use strict;
 use Exporter;
 use DBI::StatementManager;
 use App::Universal;
-use vars qw(@ISA @EXPORT $STMTMGR_PERSON_SEARCH $ITEMNAME_PATH $STMTFMT_SEL_PERSON $STMTRPTDEFN_DEFAULT);
+use vars qw(@ISA @EXPORT $STMTMGR_PERSON_SEARCH $STMTFMT_SEL_PERSON $STMTRPTDEFN_DEFAULT);
 @ISA    = qw(Exporter DBI::StatementManager);
 @EXPORT = qw($STMTMGR_PERSON_SEARCH);
 
 my $LIMIT = App::Universal::SEARCH_RESULTS_LIMIT;
 
-$ITEMNAME_PATH = 'Home';
 $STMTFMT_SEL_PERSON = qq{
 	SELECT *
 	FROM (
 		SELECT
 			per.person_id,
-			per.simple_name AS name,
+			per.name_last,
+			per.name_first,
 			per.ssn,
 			TO_CHAR(per.date_of_birth, '$SQLSTMT_DEFAULTDATEFORMAT'),
-			att.value_text AS value_text,
-			cat.category
+			hphone.value_text AS home_phone,
+			account.value_text as account,
+			chart.value_text as chart,
+			cat.category,
+			per.simple_name AS name
 		FROM
 			person per,
 			person_org_category cat,
-			person_attribute att
+			person_attribute hphone,
+			person_attribute account,
+			person_attribute chart
 		WHERE
-			per.person_id = cat.person_id(+)
-			AND per.person_id = att.parent_id(+)
-			AND att.value_type(+) = @{[ App::Universal::ATTRTYPE_PHONE ]}
-			AND att.item_name(+) = '$ITEMNAME_PATH'
-			AND cat.org_internal_id = ?
-			AND %whereCond%
+			per.person_id = cat.person_id(+) AND
+			(per.person_id = hphone.parent_id(+) AND hphone.value_type(+) = @{[ App::Universal::ATTRTYPE_PHONE ]} AND hphone.item_name(+) = 'Home') AND
+			(per.person_id = account.parent_id(+) AND account.value_type(+) = 0 AND account.item_name(+) = 'Patient/Account Number') AND
+			(per.person_id = chart.parent_id(+) AND chart.value_type(+) = 0 AND chart.item_name(+) = 'Patient/Chart Number') AND
+			cat.org_internal_id = ? AND
+			%whereCond%
 			%catCond%
 		%orderBy%
 	)
@@ -46,10 +51,13 @@ $STMTRPTDEFN_DEFAULT =
 	columnDefn =>
 			[
 				{ head => 'ID', url => q{javascript:chooseEntry('#&{?}#')}, },
-				{ head => 'Name' },
+				{ head => 'Last Name' },
+				{ head => 'First Name' },
 				{ head => 'SSN'},
 				{ head => 'Date of Birth'},
 				{ head => 'Home Phone'},
+				{ head => 'Account'},
+				{ head => 'Chart'},
 				{ head => 'Type'},
 
 			],
@@ -74,70 +82,98 @@ my %personTemplates = (
 		{
 			_stmtFmt => $STMTFMT_SEL_PERSON,
 			 whereCond => 'upper(per.name_last) = ?',
-			 orderBy => 'order by name',
+			 orderBy => 'ORDER BY per.name_last, per.name_last',
 			 publishDefn => $STMTRPTDEFN_DEFAULT,
 		},
 	'sel_lastname_like' =>
 		{
 			_stmtFmt => $STMTFMT_SEL_PERSON,
 			 whereCond => 'upper(per.name_last) like ? ',
-			 orderBy => 'order by name',
+			 orderBy => 'ORDER BY per.name_last, per.name_last',
 			 publishDefn => $STMTRPTDEFN_DEFAULT,
 		},
 	'sel_anyname' =>
 		{
 			_stmtFmt => $STMTFMT_SEL_PERSON,
 			 whereCond => '(upper(per.name_last) = ? or upper(per.name_first) = ?)',
-			 orderBy => 'order by name',
+			 orderBy => 'ORDER BY per.name_last, per.name_last',
 			 publishDefn => $STMTRPTDEFN_DEFAULT,
 		},
 	'sel_anyname_like' =>
 		{
 			_stmtFmt => $STMTFMT_SEL_PERSON,
 			 whereCond => '(upper(per.name_last) like ? or upper(per.name_first) like ? )',
-			 orderBy => 'order by name',
+			 orderBy => 'ORDER BY per.name_last, per.name_last',
 			 publishDefn => $STMTRPTDEFN_DEFAULT,
 		},
 	'sel_ssn' =>
 		{
 			_stmtFmt => $STMTFMT_SEL_PERSON,
 			 whereCond => 'per.ssn = ?',
-			 orderBy => 'order by per.person_id',
+			 orderBy => 'ORDER BY per.name_last, per.name_last',
 			 publishDefn => $STMTRPTDEFN_DEFAULT,
 		},
 	'sel_ssn_like' =>
 		{
 			_stmtFmt => $STMTFMT_SEL_PERSON,
 			 whereCond => 'per.ssn like ?',
-			 orderBy => 'order by per.person_id',
+			 orderBy => 'ORDER BY per.name_last, per.name_last',
 			 publishDefn => $STMTRPTDEFN_DEFAULT,
 		},
 	'sel_dob' =>
 		{
 			_stmtFmt => $STMTFMT_SEL_PERSON,
 			 whereCond => "per.date_of_birth = to_date(?, '$SQLSTMT_DEFAULTDATEFORMAT')",
-			 orderBy => 'order by per.person_id',
+			 orderBy => 'ORDER BY per.name_last, per.name_last',
 			 publishDefn => $STMTRPTDEFN_DEFAULT,
 		},
 	'sel_dob_like' =>
 		{
 			_stmtFmt => $STMTFMT_SEL_PERSON,
 			 whereCond => "to_char(per.date_of_birth, '$SQLSTMT_DEFAULTDATEFORMAT') like ?",
-			 orderBy => 'order by per.person_id',
+			 orderBy => 'ORDER BY per.name_last, per.name_last',
 			 publishDefn => $STMTRPTDEFN_DEFAULT,
 		},
 	'sel_phone' =>
 		{
 			_stmtFmt => $STMTFMT_SEL_PERSON,
 			 whereCond => 'att.value_text = ?',
-			 orderBy => 'order by per.person_id',
+			 orderBy => 'ORDER BY per.name_last, per.name_last',
 			 publishDefn => $STMTRPTDEFN_DEFAULT,
 		},
 	'sel_phone_like' =>
 		{
 			_stmtFmt => $STMTFMT_SEL_PERSON,
 			 whereCond => 'att.value_text like ?',
-			 orderBy => 'order by per.person_id',
+			 orderBy => 'ORDER BY per.name_last, per.name_last',
+			 publishDefn => $STMTRPTDEFN_DEFAULT,
+		},
+	'sel_account' =>
+		{
+			_stmtFmt => $STMTFMT_SEL_PERSON,
+			 whereCond => 'upper(account.value_text) = ?',
+			 orderBy => 'ORDER BY per.name_last, per.name_last',
+			 publishDefn => $STMTRPTDEFN_DEFAULT,
+		},
+	'sel_account_like' =>
+		{
+			_stmtFmt => $STMTFMT_SEL_PERSON,
+			 whereCond => 'upper(account.value_text) like ?',
+			 orderBy => 'ORDER BY per.name_last, per.name_last',
+			 publishDefn => $STMTRPTDEFN_DEFAULT,
+		},
+	'sel_chart' =>
+		{
+			_stmtFmt => $STMTFMT_SEL_PERSON,
+			 whereCond => 'upper(chart.value_text) = ?',
+			 orderBy => 'ORDER BY per.name_last, per.name_last',
+			 publishDefn => $STMTRPTDEFN_DEFAULT,
+		},
+	'sel_chart_like' =>
+		{
+			_stmtFmt => $STMTFMT_SEL_PERSON,
+			 whereCond => 'upper(chart.value_text) like ?',
+			 orderBy => 'ORDER BY per.name_last, per.name_last',
 			 publishDefn => $STMTRPTDEFN_DEFAULT,
 		},
 	);
