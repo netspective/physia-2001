@@ -9,42 +9,54 @@
 	</release-info>
 
 	<deliverables>
+		<deliverable id="219">
+			Added Net Adjustment, Plan Paid, and Plan Allows to Financial Transaction query
+		</deliverable>
+
 		<deliverable id="414">
 			Fixed a problem where URI escape sequences (like %20) weren't getting converted to
 			their character equivalents.  Like %20 to a space.  This fixes a problem in searching
 			using a parameter that contains a space (like looking up an Ins Plan using an Ins 
 			product with a space in it.  This fix could potentially effect the entire application
 		</deliverable>
+
+		<deliverable id="758">
+			Faster text report printing.
+		</deliverable>
+
+		<deliverable id="1038">
+			Aged Patient Reveivables and Aged Insurance Receivables additional selection constraints
+		</deliverable>
 		
+		<deliverable id="1110">
+			TWCC 73
+		</deliverable>
+
 		<deliverable id="1202">
 			Initial Implementation of Close Date Report
+		</deliverable>
+
+		<deliverable id="1206">
+			Added notes component on Patient Account and Claim Summary
+		</deliverable>	
+
+		<deliverable id="1283">
+			Report : Created reporting table to improve performance of financial reports.   This change will impact report under the Reports - Accounting.   Should see improvement in performance but the reports will need to be tested to make sure the calulation are still correct.
+		</deliverable>		
+
+		<deliverable id="1298">
+			Collection report
+		</deliverable>
+
+		<deliverable id="1328">
+			Populate Provider ID on NSF.  Coding is completed.  Bug is left open awaiting THIN
+			test result and resolution on Provider City outside of Houston.
 		</deliverable>
 
 		<deliverable id="1425">
 			Corrected Patient Activity Report
 		</deliverable>
 
-		<deliverable>
-			Added Net Adjustment, Plan Paid, and Plan Allows to Financial Transaction query
-		</deliverable>
-		<deliverable id="1283">
-			Report : Created reporting table to improve performance of financial reports.   This change will impact report under the Reports - Accounting.   Should see improvement in performance but the reports will need to be tested to make sure the calulation are still correct.
-		</deliverable>		
-		<deliverable id="1206">
-			Added notes component on Patient Account and Claim Summary
-		</deliverable>	
-		<deliverable id="1110">
-			TWCC 73
-		</deliverable>
-		<deliverable id="758">
-			Faster text report printing.
-		</deliverable>
-		<deliverable id="1298">
-			Collection report
-		</deliverable>
-		<deliverable id="1038">
-			Aged Patient Reveivables and Aged Insurance Receivables additional selection constraints
-		</deliverable>
 	</deliverables>
 </release-notes>
 
