@@ -8,6 +8,7 @@ use App::Data::MDL::Invoice;
 use App::Universal;
 use DBI::StatementManager;
 use App::Statements::Catalog;
+use App::Statements::Person;
 use Date::Manip;
 use vars qw(@ISA);
 use Dumpvalue;
@@ -765,11 +766,30 @@ sub importRoles
 		$list = [$list] if ref $list eq 'HASH';
 		foreach my $item (@$list)
 		{
+			my $roleName = $item->{'name'};
+			my $roleNameId = '';
+			my $existRoleId = '';
+			my $roleNameExists = $STMTMGR_PERSON->recordExists($self,STMTMGRFLAG_NONE, 'selRoleNameExists', $roleName);
+			if ($roleNameExists !=1)
+			{
+				$roleNameId = $self->schemaAction($flags, "Role_Name", 'add',
+						role_name => $roleName) ;
+			}
+
+			else
+			{
+				my $existRoleData =  $STMTMGR_PERSON->getRowAsHash($self,STMTMGRFLAG_NONE, 'selRoleNameExists', $roleName);
+				$existRoleId = $existRoleData->{'role_name_id'};
+			}
+
+			my $personRoleId = $roleNameId ne '' ? $roleNameId : $existRoleId;
 			$self->schemaAction($flags, "Person_Org_Role", 'add',
-				person_id => $personId,
-				org_id    => $item->{'org-id'},
-				org_role  => $item->{id},
-				role_status => $ROLES_TYPE_MAP{exists $item->{status} ? $item->{status} :'Active'});
+						org_id    => $item->{'org-id'},
+						role_name_id => $personRoleId,
+						person_id => $personId,
+						priority  => $item->{priority},
+						role_status_id => $ROLES_TYPE_MAP{exists $item->{status} ? $item->{status} :'Active'});
+
 		}
 	}
 }
@@ -823,9 +843,6 @@ sub importRegistry
 						value_type => 0,
 						value_int => 1
 					);
-
-			my $dv = new Dumpvalue;
-			$dv->dumpValue($registry->{'responsible-person'});
 			$self->schemaAction($flags, 'Person_Attribute', 'add',
 						parent_id => $personId || undef,
 						item_name => 'Guarantor' || undef,

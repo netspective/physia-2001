@@ -4,12 +4,16 @@ package App::Data::MDL::Organization;
 
 use strict;
 use App::Data::MDL::Module;
+use App::Universal;
 use App::Data::MDL::Invoice;
+use DBI::StatementManager;
+use App::Statements::Person;
+use Date::Manip;
 use vars qw(@ISA);
 
 @ISA = qw(App::Data::MDL::Module App::Data::MDL::Invoice);
 
-use vars qw(%SERVICE_PLACE_TYPE_MAP);
+use vars qw(%SERVICE_PLACE_TYPE_MAP %PERMISSION_ROLE_TYPE);
 
 %SERVICE_PLACE_TYPE_MAP = (
 	'Office' => App::Universal::SERVICE_PLACE_OFFICE,
@@ -17,6 +21,11 @@ use vars qw(%SERVICE_PLACE_TYPE_MAP);
 	'Outpatient Hospital' => App::Universal::SERVICE_PLACE_OUTPATIENTHOSPITAL,
 	'Emergency Room Hospital' => App::Universal::SERVICE_PLACE_EMERGENCYROOM,
 
+);
+
+%PERMISSION_ROLE_TYPE = (
+	'Grant' => App::Universal::ROLE_GRANT,
+	'Revoke' => App::Universal::ROLE_REVOKE,
 );
 
 sub new
@@ -178,8 +187,8 @@ sub importAssociatedOrg
 		$list = [$list] if ref $list eq 'HASH';
 		foreach my $item (@$list)
 		{
-			my $dv = new Dumpvalue;
-			$dv->dumpValue($item);
+			#my $dv = new Dumpvalue;
+			#$dv->dumpValue($item);
 			$self->schemaAction($flags, "Org_Attribute", 'add',
 				parent_id => $orgId,
 				item_name => 'Org',
@@ -198,8 +207,8 @@ sub importAssociatedEmp
 		$list = [$list] if ref $list eq 'HASH';
 		foreach my $item (@$list)
 		{
-			my $dv = new Dumpvalue;
-			$dv->dumpValue($item);
+			#my $dv = new Dumpvalue;
+			#$dv->dumpValue($item);
 			$self->schemaAction($flags, "Org_Attribute", 'add',
 				parent_id => $orgId,
 				item_name => 'Staff',
@@ -218,8 +227,8 @@ sub importContactInfo
 		$list = [$list] if ref $list eq 'HASH';
 		foreach my $item (@$list)
 		{
-			my $dv = new Dumpvalue;
-			$dv->dumpValue($item);
+			#my $dv = new Dumpvalue;
+			#$dv->dumpValue($item);
 			$self->schemaAction($flags, "Org_Attribute", 'add',
 				parent_id => $orgId,
 				item_name => 'Contact Information',
@@ -246,6 +255,43 @@ sub importAppointments
 	}
 }
 
+sub importRolePermissions
+{
+	my ($self,  $flags, $permissions,$org) = @_;
+	my $orgId = $org->{id};
+	if(my $list = $permissions->{permission})
+	{
+		$list = [$list] if ref $list eq 'HASH';
+		foreach my $item (@$list)
+		{
+			my $permissionRole = $item->{'role'};
+			my $roleNameId = '';
+			my $existRoleId = '';
+			my $roleNameExists = $STMTMGR_PERSON->recordExists($self,STMTMGRFLAG_NONE, 'selRoleNameExists', $permissionRole);
+			if ($roleNameExists !=1)
+			{
+				$roleNameId = $self->schemaAction($flags, "Role_Name", 'add',
+									role_name => $permissionRole
+								);
+			}
+			else
+			{
+				my $existRoleData =  $STMTMGR_PERSON->getRowAsHash($self,STMTMGRFLAG_NONE, 'selRoleNameExists', $permissionRole);
+				$existRoleId = $existRoleData->{'role_name_id'};
+			}
+			my $roleId = $roleNameId ne '' ? $roleNameId : $existRoleId;
+			$self->schemaAction($flags, "Role_Permission", 'add',
+						org_id    => $orgId,
+						role_name_id => $roleId,
+						permission_name  => $item->{name},
+						role_activity_id => $PERMISSION_ROLE_TYPE{exists $item->{activity} ? $item->{activity} :'Active'}
+					);
+
+		}
+	}
+}
+
+
 sub importOrgRegistry
 {
 	my ($self, $flags, $registry, $org) = @_;
@@ -255,6 +301,7 @@ sub importOrgRegistry
 		my $registryNames = $registry->{org_names};
 		$self->schemaAction($flags|MDLFLAG_LOGACTIVITY, 'Org', 'add',
 				org_id => $orgId,
+				owner_org_id => $registry->{'owner-org'},
 				name_primary => exists $registryNames->{primary} ? $registryNames->{primary} : undef,
 				name_trade => exists $registryNames->{trade} ? $registryNames->{trade} : undef,
 				tax_id => exists $registry->{taxid} ? $registry->{taxid} : undef,
@@ -287,6 +334,7 @@ sub importStruct
 
 	$self->importOrgRegistry($flags, $org->{org_registry}, $org);
 	$self->importContactMethods($flags, $org->{'contact-methods'}, $org);
+	$self->importRolePermissions($flags, $org->{'role-permissions'}, $org);
 	$self->importAssociations($flags, $org->{associations}, $org);
 	$self->importInsurance($flags, $org->{'insurance-plans'}, $org);
 	$self->importGeneralInfo($flags, $org->{generalinfo}, $org);
