@@ -432,7 +432,15 @@ aic.batch_id,
 	},
 
 
-
+	'selParentInvoicebyId'=>
+	{
+		sqlStmt=>
+		qq
+		{SELECT invoice_id
+		FROM invoice 
+		WHERE parent_invoice_id = :1
+		}
+	},
 
 
 	'sel_providerreceipt2' =>
