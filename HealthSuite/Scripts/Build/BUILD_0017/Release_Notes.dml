@@ -26,6 +26,11 @@
 		<deliverable id="517">
 			UI: For dialogs indicated, a static html confirmation page is shown after execution with a link to continue.
 		</deliverable>
+		
+		<deliverable id="581">
+			The existing Phone Message component/dialog is being replaced by a new MailBox
+			which meets the requirements of this bug.  See notes for bug 1346.
+		</deliverable>
 
 		<deliverable id="613">
 			Implement Claims Work List.  *** Big-Time DB Change Required ***
@@ -118,6 +123,11 @@
 		
 		<deliverable id="1315">
 			Created and added an addPopup icon wherever there is a lookup (magnifying glass).
+		</deliverable>
+		
+		<deliverable id="1348">
+			UI: Created a new "MailBox" view on your own person page.  (You can't get there on someone else's person page)
+			This new view allows the sending/reading/forwarding/replying to user-to-user, and phone messages.
 		</deliverable>
 
 		<deliverable id="1359">
