@@ -31,23 +31,16 @@ FROM 	invoice i ,  transaction t , invoice_item ii,invoice_attribute ia
 WHERE   t.trans_id = i.main_transaction 			
 	AND i.invoice_id = ia.parent_id 
 	AND ii.parent_id  = i.invoice_id
-	AND ia.item_name  = 'Invoice/Creation/Batch ID'				
-	
-	UNION ALL
-	
+	AND ia.item_name  = 'Invoice/Creation/Batch ID'					
+	UNION ALL	
 SELECT	i.invoice_id,
 	ia.value_date invoice_date ,
 	0 as total_charges, 
 	0 as misc_charges ,
 	decode (iia.adjustment_type,2,0,nvl(iia.adjustment_amount,0)) as person_pay ,
 	nvl(iia.plan_paid,0) as insurance_pay,	
-	(  nvl(iia.adjustment_amount,0) + nvl(iia.plan_paid,0) +
-	  nvl(iia.writeoff_amount,0)
-	) * -1 as charge_adjust ,	
-	decode(invoice_type,0,nvl(extended_cost, 0),0) +
-	decode(invoice_type,0,nvl(extended_cost, 0),0) - 
-	( nvl(iia.adjustment_amount,0) + nvl(iia.plan_paid,0) +  nvl(iia.writeoff_amount,0) )
-	 as net_charges,				
+	(  nvl(iia.adjustment_amount,0) + nvl(iia.plan_paid,0) +  nvl(iia.writeoff_amount,0) ) * -1 as charge_adjust ,	
+	decode(invoice_type,0,nvl(extended_cost, 0),0) + decode(invoice_type,0,nvl(extended_cost, 0),0) - ( nvl(iia.adjustment_amount,0) + nvl(iia.plan_paid,0) +  nvl(iia.writeoff_amount,0) )	 as net_charges,				
 	decode(iia.adjustment_type,2,nvl(iia.adjustment_amount,0),0) as balance_transfer,
 	decode(iia.payer_type,1,nvl(iia.writeoff_amount,0),0) as insurance_write_off ,
 	decode(iia.payer_type,0,nvl(iia.writeoff_amount,0),0) as person_write_off ,
