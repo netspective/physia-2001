@@ -95,7 +95,7 @@
 		<description>The category to which a person belongs for a particular organization</description>
 		<column name="person_id" parentref="Person.person_id" primarykey="yes" descr="Unique ID for person"/>
 		<column name="org_id" parentref="Org.org_id" primarykey="yes" descr="Unique ID for company or organization"/>
-		<column name="category" type="text" size="32" descr="The category to which person belongs"/>
+		<column name="category" type="text" size="32" primarykey="yes" descr="The category to which person belongs"/>
 	</table>
 
 	<table name="Insurance" abbrev="InsRec" type="Audit,Secure,Restrict_Rows">
