@@ -117,9 +117,6 @@ sub validateCodes
 
 	$flags = INTELLICODEFLAG_ICDARRAY unless $flags;
 
-	my $javaScript = App::Page::Search::getJavaScript();
-	#$page->addContent($javaScript);
-
 	my @errors = ();
 
 	$page->{db}->{LongReadLen} = 8192;
@@ -195,7 +192,7 @@ sub validateDiags
 
 	for (@{$diagsRef})
 	{
-		my $icd = $_;
+		my $icd = uc($_);
 
 		unless ($ICD_CACHE{$icd}->{icd})
 		{
@@ -232,7 +229,7 @@ sub validateProcs
 
 	for (@$procsRef)
 	{
-		my $cpt = $_->[0];
+		my $cpt = uc($_->[0]);
 
 		unless ($CPT_CACHE{$cpt}->{cpt})
 		{
@@ -281,8 +278,9 @@ sub crossChecks
 
 	for (@$procsRef)
 	{
-		my ($cpt, $modifier) = ($_->[0], $_->[1]);
+		my ($cpt, $modifier) = (uc($_->[0]), $_->[1]);
 		next unless ($CPT_CACHE{$cpt}->{cpt});
+		next if $cpt >= 99000 and $cpt <= 99999;
 
 		my $count = scalar(@$_) -1;
 		my @diags = @$_[2..$count];
@@ -290,6 +288,7 @@ sub crossChecks
 		for my $icd (@diags)
 		{
 			$icd = App::Data::Manipulate::trim($icd);
+			$icd = uc($icd);
 			$diagReferenced{$icd} = 'true';
 
 			my $icdHash = $ICD_CACHE{$icd};
@@ -309,6 +308,7 @@ sub crossChecks
 
 	for my $icd (@{$diagsRef})
 	{
+		$icd = uc($icd);
 		unless ($diagReferenced{$icd} eq 'true')
 		{
 			my $icdName = $ICD_CACHE{$icd}->{name};
@@ -537,7 +537,7 @@ sub detailLink
 	my ($type, $code) = @_;
 
 	return qq{
-		<a HREF="javascript:chooseItem2(\'/lookup/$type/detail/$code\', $code, true)"
+		<a HREF="javascript:chooseItem2('/lookup/$type/detail/$code', $code, true)"
 			STYLE="text-decoration:none"> $code </a>
 	};
 }
