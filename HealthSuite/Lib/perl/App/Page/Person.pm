@@ -21,6 +21,7 @@ use App::Dialog::Person::Nurse;
 use App::Dialog::Adjustment;
 use App::Dialog::PostGeneralPayment;
 use App::Dialog::PostRefund;
+use App::Dialog::PostTransfer;
 
 use App::Page::Search;
 
@@ -147,7 +148,8 @@ sub prepare_page_content_header
 						<OPTION value="/person/$personId/dlg-add-medication-prescribe">Prescribe Medication</OPTION>
 						<!-- <OPTION value="/person/$personId/dlg-add-">Create Note</OPTION> -->
 						<OPTION value="/person/$personId/dialog/postpayment/personal">Apply Payment</OPTION>
-						<!-- <OPTION value="/person/$personId/dialog/postrefund/refund">Post Refund</OPTION> -->
+						<OPTION value="/person/$personId/dialog/postrefund/refund">Post Refund</OPTION>
+						<OPTION value="/person/$personId/dialog/posttransfer/transfer">Post Transfer</OPTION>
 						<OPTION value="/person/$personId/dlg-remove-$category">Delete Record</OPTION>
 					</SELECT>
 					</FONT>
@@ -245,6 +247,25 @@ sub prepare_dialog_postrefund
 
 	my $cancelUrl = "/person/$personId/account";
 	my $dialog = new App::Dialog::PostRefund(schema => $self->getSchema(), cancelUrl => $cancelUrl);
+	$dialog->handle_page($self, $dialogCmd);
+
+	$self->addContent('<p>');
+	return $self->prepare_view_account();
+}
+
+sub prepare_dialog_posttransfer
+{
+	my $self = shift;
+	my $personId = $self->param('person_id');
+
+	my $dialogCmd = $self->param('_pm_dialog_cmd') || 'add';
+	#my ($action, $invoiceId) = split(/,/, $dialogCmd);
+	#$self->param('invoice_id', $invoiceId);
+	#$self->param('posting_action', $action);
+	#$self->addDebugStmt($payType);
+
+	my $cancelUrl = "/person/$personId/account";
+	my $dialog = new App::Dialog::PostTransfer(schema => $self->getSchema(), cancelUrl => $cancelUrl);
 	$dialog->handle_page($self, $dialogCmd);
 
 	$self->addContent('<p>');

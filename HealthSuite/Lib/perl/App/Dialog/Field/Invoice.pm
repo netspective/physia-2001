@@ -482,4 +482,147 @@ sub getHtml
 	};
 }
 
+##############################################################################
+package App::Dialog::Field::AllInvoices;
+##############################################################################
+
+use strict;
+use Carp;
+use CGI::Validator;
+use CGI::Validator::Field;
+use CGI::Dialog;
+use DBI::StatementManager;
+
+use App::Statements::Person;
+use App::Statements::Invoice;
+use App::Universal;
+
+use Date::Manip;
+use Date::Calc qw(:all);
+
+use Devel::ChangeLog;
+use vars qw(@ISA @CHANGELOG);
+
+@ISA = qw(CGI::Dialog::Field);
+
+sub new
+{
+	my ($type, %params) = @_;
+
+	$params{name} = 'invoices_list' unless exists $params{name};
+	$params{type} = 'invoices';
+	#$params{lineCount} = 4 unless exists $params{count};
+	#$params{allowComments} = 1 unless exists $params{allowComments};
+
+	return CGI::Dialog::Field::new($type, %params);
+}
+
+sub needsValidation
+{
+	return 1;
+}
+
+sub isValid
+{
+	my ($self, $page, $validator, $valFlags) = @_;
+
+	my $personId = $page->param('person_id') || $page->field('payer_id');
+	my $transferInvoices = $STMTMGR_INVOICE->getRowsAsHashList($page, STMTMGRFLAG_CACHE, 'selTransferInvoicesByClient', $personId);
+	my $creditInvoices = $STMTMGR_INVOICE->getRowsAsHashList($page, STMTMGRFLAG_CACHE, 'selCreditInvoicesByClient', $personId);
+	if($creditInvoices->[0]->{invoice_id} eq '')
+	{
+		$self->invalidate($page, "Cannot perform a transfer. There are no invoices with a credit for this patient.");	
+	}
+
+	return $page->haveValidationErrors() ? 0 : 1;
+}
+
+sub getHtml
+{
+	my ($self, $page, $dialog, $command, $dlgFlags) = @_;
+
+	my $errorMsgsHtml = '';
+	my $bgColorAttr = '';
+	my $spacerHtml = '&nbsp;';
+	my $textFontAttrs = 'SIZE=1 FACE="Tahoma,Arial,Helvetica" STYLE="font-family:tahoma; font-size:8pt"';
+	my $textFontAttrsForTotalBalRow = 'SIZE=2 FACE="Tahoma,Arial,Helvetica" STYLE="font-family:tahoma; font-size:10pt"';
+
+	if(my @messages = $page->validationMessages($self->{name}))
+	{
+		$spacerHtml = '<img src="/resources/icons/arrow_right_red.gif" border=0>';
+		$bgColorAttr = "bgcolor='$dialog->{errorBgColor}'";
+		$errorMsgsHtml = "<br><font $dialog->{bodyFontErrorAttrs}>" . join("<br>", @messages) . "</font>";
+	}
+
+
+	my $linesHtml = '';
+	my $personId = $page->param('person_id') || $page->field('payer_id');
+	my $transferInvoices = $STMTMGR_INVOICE->getRowsAsHashList($page, STMTMGRFLAG_CACHE, 'selTransferInvoicesByClient', $personId);
+	my $totalInvoices = scalar(@{$transferInvoices});
+	my $totalPatientBalance = 0;
+	for(my $line = 1; $line <= $totalInvoices; $line++)
+	{
+		my $invoice = $transferInvoices->[$line-1];
+		my $invoiceId = $invoice->{invoice_id};
+		my $invoiceBalance = $invoice->{balance};
+		$totalPatientBalance += $invoiceBalance;
+
+		next if $invoiceId == $page->param('invoice_id');	#param(invoiceid) is the invoice for the current visit,
+															#it has it's own payment section
+
+		my $itemServDates = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selServiceDateRangeForAllItems', $invoiceId);
+		my $endDateDisplay = '';
+		if($itemServDates->{service_end_date})
+		{
+			$endDateDisplay = $itemServDates->{service_end_date} ne  $itemServDates->{service_begin_date} ? "- $itemServDates->{service_end_date}" : '';
+		}
+		my $dateDisplay = "$itemServDates->{service_begin_date} $endDateDisplay";
+
+		$page->param('_f_invoice_$line\_invoice_id', $invoiceId);
+
+		$linesHtml .= qq{
+			<INPUT TYPE="HIDDEN" NAME="_f_invoice_$line\_invoice_id" VALUE="$invoiceId"/>
+			<INPUT TYPE="HIDDEN" NAME="_f_invoice_$line\_invoice_balance" VALUE="$invoiceBalance"/>
+			<TR VALIGN=TOP>
+				<TD ALIGN=RIGHT><FONT $textFontAttrs COLOR="#333333"/><B>$line</B></FONT></TD>
+				<TD><FONT $textFontAttrs> $invoiceId </TD>
+				<TD><FONT SIZE=1>&nbsp;</FONT></TD>
+				<TD><FONT $textFontAttrs>$dateDisplay</TD>
+				<TD><FONT SIZE=1>&nbsp;</FONT></TD>
+				<TD ALIGN=RIGHT><FONT $textFontAttrs>\$$invoiceBalance</TD>
+				<!-- <TD><FONT SIZE=1>&nbsp;</FONT></TD>
+				<TD><INPUT NAME='_f_invoice_$line\_refund' TYPE='text' size=10 VALUE='@{[ $page->param("_f_invoice_$line\_refund") ]}'></TD> -->
+			</TR>
+		};
+	}
+
+	return qq{
+		<TR valign=top $bgColorAttr>
+			<TD width=$self->{_spacerWidth}>$spacerHtml</TD>
+			<TD>
+				<TABLE CELLSPACING=0 CELLPADDING=2>
+					<INPUT TYPE="HIDDEN" NAME="_f_line_count" VALUE="$totalInvoices"/>
+					<INPUT TYPE="HIDDEN" NAME="_f_total_patient_balance" VALUE="$totalPatientBalance"/>
+					<TR VALIGN=TOP BGCOLOR=#DDDDDD>
+						<TD ALIGN=CENTER><FONT $textFontAttrs>&nbsp;</FONT></TD>
+						<TD ALIGN=CENTER><FONT $textFontAttrs>Claim #</FONT></TD>
+						<TD><FONT SIZE=1>&nbsp;</FONT></TD>
+						<TD ALIGN=CENTER><FONT $textFontAttrs>Svc Date(s)</FONT></TD>
+						<TD><FONT SIZE=1>&nbsp;</FONT></TD>
+						<TD ALIGN=CENTER><FONT $textFontAttrs>Balance</FONT></TD>
+						<!-- <TD><FONT SIZE=1>&nbsp;</FONT></TD>
+						<TD ALIGN=CENTER><FONT $textFontAttrs>Refund</FONT></TD> -->
+					</TR>
+					$linesHtml
+					<TR VALIGN=TOP BGCOLOR=#DDDDDD>
+						<TD COLSPAN=5><FONT $textFontAttrsForTotalBalRow><b>Balance:</b></FONT></TD>
+						<TD COLSPAN=1 ALIGN=RIGHT><FONT $textFontAttrsForTotalBalRow><b>\$$totalPatientBalance</b></FONT></TD>
+					</TR>
+				</TABLE>
+			</TD>
+			<TD width=$self->{_spacerWidth}>$spacerHtml</TD>
+		</TR>
+	};
+}
+
 1;

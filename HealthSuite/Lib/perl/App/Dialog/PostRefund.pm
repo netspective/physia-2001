@@ -132,7 +132,7 @@ sub execute
 
 		#Create history attribute for this adjustment
 
-		my $description = 'Refund due to credit on balance';
+		my $description = "Refund in the amount of \$$refundAmt";
 
 		$page->schemaAction(
 				'Invoice_Attribute', 'add',
@@ -145,6 +145,8 @@ sub execute
 				_debug => 0
 			);
 	}
+
+	$self->handlePostExecute($page, $command, $flags);
 }
 
 1;

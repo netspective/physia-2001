@@ -25,6 +25,8 @@ use App::Dialog::OnHold;
 use App::Dialog::Diagnoses;
 use App::Dialog::ClaimProblem;
 use App::Dialog::PostGeneralPayment;
+use App::Dialog::PostRefund;
+use App::Dialog::PostTransfer;
 #use App::Billing::Output::tPdfCLaim;
 use App::Billing::Output::PDF;
 use App::Billing::Output::HTML;
@@ -868,7 +870,6 @@ sub prepare_view_summary
 	$self->addLocatorLinks(['Summary', "/invoice/$invoiceId/summary"]);
 
 	my $claim = $self->property('activeClaim');
-	#my $invoiceId = $self->param('invoice_id');
 
 	my $patient = $self->getPersonHtml($claim->{careReceiver});
 	my $provider = $self->getPersonHtml($claim->{renderingProvider});
@@ -1373,7 +1374,7 @@ sub prepare_page_content_header
 						@{[ $claimType != $selfPay && $invStatus >= $submitted ? "<option value='/invoice/$invoiceId/dialog/adjustment/insurance'>Post Insurance Payment</option>" : '' ]}
 						<option value="/person/$clientId/dialog/postpayment/payment,$invoiceId">Post Personal Payment</option>
 						<option value="/person/$clientId/dialog/postrefund/refund">Post Refund</option>
-						<!-- <option value="/person/$clientId/dialog/posttransfer/transfer">Post Transfer</option> -->
+						<option value="/person/$clientId/dialog/posttransfer/transfer">Post Transfer</option>
 						<option value="/person/$clientId/account">View All Claims for the Patient</option>
 						@{[ $invStatus < $submitted ? "<option value='/invoice/$invoiceId/dialog/claim/update'>Edit Claim</option>" : '' ]}
 						@{[ $invStatus < $submitted && $totalItems > 0 ? "<option value='/invoice/$invoiceId/submit'>Submit Claim for Transfer</option>" : '' ]}
