@@ -95,7 +95,6 @@ $STMTFMT_SEL_ORG_DRILL_SERVICE_DIR = qq{
 		AND     value_int = c.internal_catalog_id
 		AND	%whereCond%
 		AND     o.owner_org_id = ?
-		AND     rownum <= $LIMIT
 		ORDER BY a.state, a.city
 };
 
@@ -116,7 +115,6 @@ $STMTFMT_SEL_ORG_SUB_DRILL_SERVICE_DIR = qq{
 		AND     o.owner_org_id = ?
 		AND     oc.code = ?
 		AND     a.city = ?
-		AND     rownum <= $LIMIT
 		ORDER BY o.org_id
 };
 
@@ -149,8 +147,8 @@ $STMTRPTDEFN_DRILL_SERVICE_DEFAULT =
 {
 	columnDefn =>
 			[
-				{ head => 'State'},
 				{ head => 'City', dataFmt => '#1#',  url => q{javascript:location.href='#hrefSelf#&detail=service&city=#1#'},},
+				{ head => 'State', dataFmt => '#0#'},
 			],
 };
 
@@ -320,19 +318,30 @@ $STMTMGR_ORG_SERVICE_DIR_SEARCH = new App::Statements::Search::OrgDirectory(
 			whereCond => " UPPER(oc.code) LIKE ?",
 			publishDefn => $STMTRPTDEFN_SERVICE_DEFAULT,
 		},
-	'sel_donlyservice' =>
+	'sel_donlyservicestate' =>
 		{
 			_stmtFmt => $STMTFMT_SEL_ORG_DRILL_SERVICE_DIR,
-			whereCond => " UPPER(oc.code) = ?",
+			whereCond => " UPPER(oc.code) = ? AND UPPER(a.state) = ?",
 			publishDefn => $STMTRPTDEFN_DRILL_SERVICE_DEFAULT,
 		},
-	'sel_donlyservice_like' =>
+	'sel_donlyservicestate_like' =>
 		{
 			_stmtFmt => $STMTFMT_SEL_ORG_DRILL_SERVICE_DIR,
-			whereCond => " UPPER(oc.code) LIKE ?",
+			whereCond => " UPPER(oc.code) LIKE ? AND UPPER(a.state) LIKE ?",
 			publishDefn => $STMTRPTDEFN_DRILL_SERVICE_DEFAULT,
 		},
-
+'sel_donlyservice_like' =>
+		{
+			_stmtFmt => $STMTFMT_SEL_ORG_DRILL_SERVICE_DIR,
+			whereCond => " UPPER(oc.code) LIKE ? AND UPPER(a.state) = ?",
+			publishDefn => $STMTRPTDEFN_DRILL_SERVICE_DEFAULT,
+		},
+'sel_donlystate_like' =>
+		{
+			_stmtFmt => $STMTFMT_SEL_ORG_DRILL_SERVICE_DIR,
+			whereCond => " UPPER(oc.code) = ? AND UPPER(a.state) LIKE ?",
+			publishDefn => $STMTRPTDEFN_DRILL_SERVICE_DEFAULT,
+		},
 	'sel_sub_service_search' =>
 	{
 		_stmtFmt => $STMTFMT_SEL_ORG_SUB_DRILL_SERVICE_DIR,
