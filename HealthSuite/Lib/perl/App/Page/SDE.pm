@@ -447,6 +447,32 @@ $query
 		}, $html);
 }
 
+sub prepare_TableList
+{
+	my ($self, $refreshed) = @_;
+	my $msg = $refreshed ? qq{
+		<P><font color=red>Refreshed $self->{schemaFile}</font></P>
+	} : '';
+	$self->addContent(qq{
+		<TABLE WIDTH=100% BGCOLOR=LIGHTSTEELBLUE BORDER=0 CELLPADDING=3 CELLSPACING=0>
+		<TR><TD><font size=4 color=darkred face="arial,helvetica"><B>All Tables</font></TD><TD ALIGN=RIGHT>@{[ $self->getTableListAsSelect() ]}</TD></TR>
+		</TABLE>
+		$msg
+		<BR><A HREF='tables/refresh'>Refresh (reload) $self->{schemaFile} now.</A>
+		<P>
+		<TABLE CELLSPACING=10>
+			<TD>
+				<B>Entity-Relationship</B><BR>
+				@{[ $self->getTableListAsSelect('hier', 30) ]}
+			</TD>
+			<TD>
+				<B>Alphabetical</B><BR>
+				@{[ $self->getTableListAsSelect('alpha', 30) ]}
+			</TD>
+		</TABLE>
+		});
+}
+
 sub prepare_view_tables
 {
 	my $self = shift;
@@ -469,6 +495,12 @@ sub prepare_view_tables
 		$self->addContent('<P>');
 		$self->prepare_TableStruct(0);
 	}
+	elsif(scalar(@pathItems) > 1 && $pathItems[1] eq 'refresh')
+	{
+		Schema::API::clearCache();
+		$self->loadSchema();
+		$self->prepare_TableList(1);
+	}
 	elsif(scalar(@pathItems) > 1)
 	{
 		$self->addLocatorLinks([$pathItems[1], '/sde/table/' . $pathItems[1]]);
@@ -477,22 +509,7 @@ sub prepare_view_tables
 	}
 	else
 	{
-		$self->addContent(qq{
-			<TABLE WIDTH=100% BGCOLOR=LIGHTSTEELBLUE BORDER=0 CELLPADDING=3 CELLSPACING=0>
-			<TR><TD><font size=4 color=darkred face="arial,helvetica"><B>All Tables</font></TD><TD ALIGN=RIGHT>@{[ $self->getTableListAsSelect() ]}</TD></TR>
-			</TABLE>
-			<P>
-			<TABLE CELLSPACING=10>
-				<TD>
-					<B>Entity-Relationship</B><BR>
-					@{[ $self->getTableListAsSelect('hier', 30) ]}
-				</TD>
-				<TD>
-					<B>Alphabetical</B><BR>
-					@{[ $self->getTableListAsSelect('alpha', 30) ]}
-				</TD>
-			</TABLE>
-			});
+		$self->prepare_TableList();
 	}
 
 	return 1;
