@@ -25,6 +25,31 @@ $STMTMGR_CATALOG = new App::Statements::Catalog(
 		FROM offering_catalog
 		WHERE catalog_id = ?
 	},	
+	'selOrgIdLinkedFS' =>qq
+	{
+		SELECT  org_id
+		FROM	org o, org_attribute oa, offering_catalog oc
+		WHERE 	o.org_internal_id = oa.parent_id 
+		AND	oc.internal_catalog_id= oa.value_int
+		AND	oa.item_name = 'Fee Schedule'
+		AND	oc.internal_catalog_id = :1
+	},
+	'selPersonIdLinkedFS' =>qq
+	{
+		SELECT  parent_id as person_id
+		FROM	person_attribute pa, offering_catalog oc
+		WHERE 	oc.internal_catalog_id= pa.value_int
+		AND	pa.item_name = 'Fee Schedule'
+		AND	oc.internal_catalog_id = :1
+	},
+	'selFSLinkedProductPlan' =>qq
+	{
+		SELECT  distinct oc.internal_catalog_id as internal_catalog_id
+		FROM	insurance_attribute ia, offering_catalog oc
+		WHERE 	oc.internal_catalog_id= ia.value_text
+		AND	ia.item_name = 'Fee Schedule'
+		AND	ia.parent_id in (:1,:2)	
+	},
 	'selInternalCatalogIdById' => qq
 	{
 		select * from Offering_catalog
@@ -356,6 +381,42 @@ $STMTMGR_CATALOG = new App::Statements::Catalog(
 				and oce.data_text (+) = h.abbrev
 				and oc.internal_catalog_id = oce.catalog_id
 	},
+	
+	
+	'sel_ProcedureInfoByCodeMod'=> qq
+	{
+		SELECT 	oc.internal_catalog_id,
+			oce.entry_type,
+			oc.catalog_id,
+			oce.data_text,
+			h.caption,
+			oce.unit_cost,
+			oce.flags		
+		FROM	Offering_Catalog_Entry oce, HCFA1500_Service_Type_Code h,
+			Offering_Catalog oc
+		WHERE	oce.code = upper(:1)
+		AND	(modifier = :2 or :2 is NULL)
+		AND	oce.catalog_id = :3
+		AND	oce.data_text  = h.abbrev (+)
+		AND	oc.internal_catalog_id = oce.catalog_id
+	},
+	
+	#- DELETE Assoicated FS FOR Orgs and Phyisicians
+	'delOrgIdLinkedFS' =>qq
+	{
+		DELETE
+		FROM	org_attribute 
+		WHERE 	value_int = :1
+		AND	item_name = 'Fee Schedule'
+
+	},
+	'delPersonIdLinkedFS' =>qq
+	{
+		DELETE
+		FROM	person_attribute 
+		WHERE 	value_int = :1
+		AND	item_name = 'Fee Schedule'
+	},	
 );
 
 1;
