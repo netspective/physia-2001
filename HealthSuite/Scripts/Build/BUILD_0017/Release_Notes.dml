@@ -102,8 +102,7 @@
 
 		<deliverable id="1192">
 			Report:  New bill cycle report.  This report serves as a preview of Statements that
-			will be generated for a billing cycle.<br>
-			Database: Needs new Statement tables 
+			will be generated for a billing cycle.  Database: Needs new Statement tables 
 		</deliverable>		
 
 		<deliverable id="1226">
