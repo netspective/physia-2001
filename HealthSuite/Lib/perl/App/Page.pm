@@ -580,7 +580,7 @@ sub send_page_body
 	}
 
 	# replace page variables if there are any
-	$html =~ s/\#(\w+)\.([\w\-\.]*)\#/
+	$html =~ s/\#(\w+)\.?([\w\-\.]*)\#/
 		if(my $method = $self->can($1))
 		{
 			&$method($self, $2);
@@ -592,7 +592,7 @@ sub send_page_body
 		/ge;
 
 	# in case any replacements ended up creating other variables, replace again
-	$html =~ s/\#(\w+)\.([\w\-\.]*)\#/
+	$html =~ s/\#(\w+)\.?([\w\-\.]*)\#/
 		if(my $method = $self->can($1))
 		{
 			&$method($self, $2);

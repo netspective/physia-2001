@@ -366,7 +366,7 @@ sub replaceRedirectVars
 	# do replacements for %session.xxx%, %param.xxx% or %field.xxx% or
 	# any other page method that returns a single value
 	#
-	$src =~ s/\%(\w+)\.([\w\-\.]*)\%/
+	$src =~ s/\%(\w+)\.?([\w\-\.]*)\%/
 		if(my $method = $self->can($1))
 		{
 			&$method($self, $2);
@@ -390,7 +390,7 @@ sub replaceVars
 	# NOTE: FOR PERFORMANCE, A COPY OF THIS SUBSTITION ALSO EXISTS IN DBI::StatementManager and
 	#       App::Page. SO, IF YOU UPDATE THE REGEXP, DO IT THERE, TOO!
 	#
-	$src =~ s/\#(\w+)\.([\w\-\.]*)\#/
+	$src =~ s/\#(\w+)\.?([\w\-\.]*)\#/
 		if(my $method = $self->can($1))
 		{
 			&$method($self, $2);

@@ -209,7 +209,7 @@ sub execute
 		my @params = @_;
 		grep
 		{
-			s/\#(\w+)\.([\w\-\.]*)\#/
+			s/\#(\w+)\.?([\w\-\.]*)\#/
 				if(my $method = $dbpage->can($1))
 				{
 					&$method($dbpage, $2);
