@@ -94,11 +94,22 @@ sub prepare_detail_payment
 	my $batch_from = $page->field('batch_id_from');
 	my $batch_to = $page->field('batch_id_to');
 	my $include_org =$page->field('include_org');
+	my $batch_date = $page->param('batch_date');	
 	my $orgIntId = undef;
 	my $html =undef;	
 	$orgIntId = $page->param('org_internal_id');#$STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgId', $page->session('org_internal_id'), $orgId) if $orgId;	
 
+	my $hardCopy = $page->field('printReport');
+	# Get a printer device handle...
+	my $printerAvailable = 1;
+	my $printerDevice;
+	$printerDevice = ($page->field('printerQueue') ne '') ? $page->field('printerQueue') : App::Device::getPrinter ($page, 0);
+	my $printHandle = App::Device::openRawPrintHandle ($printerDevice);
+	
+	$printerAvailable = 0 if (ref $printHandle eq 'SCALAR');
+
 	my $pub = {
+		reportTitle => "Daily Audit Recap - $batch_date",
 		columnDefn =>
 		[
 			{colIdx => 0, groupBy=>'#0#',head => 'Invoice', dAlign => 'left',url => q{javascript:chooseItemForParent('/invoice/#0#/summary') }, },					
@@ -120,7 +131,6 @@ sub prepare_detail_payment
 
 		],
 	};
-	my $batch_date = $page->param('batch_date');	
 	my $daily_audit_detail = $STMTMGR_REPORT_ACCOUNTING->getRowsAsHashList($page,STMTMGRFLAG_NONE,'sel_daily_audit_detail',
 		$batch_date,$orgIntId,$person_id,$batch_from,$batch_to,$page->session('org_internal_id'));	
 	my @data = ();	
@@ -162,7 +172,23 @@ sub prepare_detail_payment
 		push(@data, \@rowData);
 	}
 	
+	my $textOutputFilename = createTextRowsFromData($page, STMTMGRFLAG_NONE, \@data, $pub);
 	$html = '<b style="font-family:Helvetica; font-size:12pt">(Batch Date '. $batch_date . ' ) </b><br><br>' . createHtmlFromData($page, 0, \@data,$pub);
+
+	if ($hardCopy == 1 and $printerAvailable) {
+		my $reportOpened = 1;
+		my $tempDir = $CONFDATA_SERVER->path_temp();
+		open (ASCIIREPORT, $tempDir.$textOutputFilename) or $reportOpened = 0;
+		if ($reportOpened) {
+			while (my $reportLine = <ASCIIREPORT>) {
+				print $printHandle $reportLine;
+			}
+		}
+		close ASCIIREPORT;
+	}
+
+	$html = ($textOutputFilename ? qq{<a href="/temp$textOutputFilename">Printable version</a> <br>} : "" ) . $html;
+
 	$page->addContent($html);
 
 }
