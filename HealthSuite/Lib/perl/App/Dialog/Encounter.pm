@@ -180,8 +180,9 @@ sub initialize
 		new CGI::Dialog::Field(type => 'memo',
 				caption => 'Comments',
 				name => 'comments'),
-		new CGI::Dialog::Field(type => 'bool',
-				style => 'check',
+		new CGI::Dialog::Field(type => 'select',
+				style => 'radio',
+				selOptions => 'Yes;No',
 				caption => 'Have you confirmed Personal Information/Insurance Coverage?',
 				preHtml => "<B><FONT COLOR=DARKRED>",
 				postHtml => "</FONT></B>",
@@ -586,6 +587,7 @@ sub addTransactionAndInvoice
 	#-------------------------------------------------------------------------------------------------------------------------------
 
 	my $billingFacility = $page->field('billing_facility_id');
+	my $confirmedInfo = $page->field('confirmed_info') eq 'Yes' ? 1 : 0;
 	my $transId = $page->schemaAction(
 			'Transaction', $command,
 			trans_id => $editTransId || undef,
@@ -608,6 +610,7 @@ sub addTransactionAndInvoice
 			bill_type => defined $claimType ? $claimType : undef,
 			data_text_a => $page->field('ref_id') || undef,
 			data_text_b => $page->field('comments') || undef,
+			data_num_a => defined $confirmedInfo ? $confirmedInfo : undef,
 			trans_begin_stamp => $timeStamp || undef,
 			_debug => 0
 		);
@@ -860,6 +863,22 @@ sub handleInvoiceAttrs
 			_debug => 0
 		);
 
+
+	if($page->field('billing_contact') && $page->field('billing_phone'))
+	{
+		$page->schemaAction(
+				'Org_Attribute', $command,
+				parent_id => $billingFacility,
+				item_name => 'Contact Information',
+				value_type => defined $textValueType ? $textValueType : undef,
+				value_text => $page->field('billing_contact') || undef,
+				value_textB => $page->field('billing_phone') || undef,
+				_debug => 0
+			);
+	}
+
+
+
 	my $secondaryIns = App::Universal::INSURANCE_SECONDARY;
 	my $personSecInsur = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selPersonInsurance', $personId, $secondaryIns);
 	my $claimFiling = 'P';
@@ -914,6 +933,7 @@ sub handleInvoiceAttrs
 			zip => $payToFacility->{zip},
 			_debug => 0
 		);
+
 
 	addProcedureItems($self, $page, $command, $flags, $invoiceId);
 
