@@ -602,7 +602,7 @@ $STMTMGR_SCHEDULING = new App::Statements::Scheduling(
 				and ea.parent_id = e.event_id
 				and upper(ea.value_text) = upper(?)
 				and e.owner_id = ?
-				and e.event_id > ?
+				and e.event_status = 0
 			order by e.start_time
 		},
 	},
