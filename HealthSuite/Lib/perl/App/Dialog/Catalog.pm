@@ -67,10 +67,12 @@ sub new
 			new CGI::Dialog::Field::TableColumn(caption => 'Parent Fee Schedule ID', name => 'parent_catalog_id',
 						schema => $schema, column => 'Offering_Catalog_Entry.catalog_id',
 						findPopup => '/lookup/catalog/id'),
-			new CGI::Dialog::Field(type => 'memo', caption => 'Fee Schedule Entries', name => 'feescheduleentries',
-						cols => 40, rows => 5,
-						invisibleWhen => (CGI::Dialog::DLGFLAG_UPDATE | CGI::Dialog::DLGFLAG_REMOVE),
-						hints => 'Format: <b>f.FeeScheduleID,n.ItemName</b>,m.Modifier,u.UnitsAvailable,d.Description,<b>ItemType(item,icd,cpt,proc,procert,service,sercert,product,hcpcs).ItemCode,$UnitCost</b>')
+#			new CGI::Dialog::Field(type => 'memo', caption => 'Fee Schedule Entries', name => 'feescheduleentries',
+#						cols => 40, rows => 5,
+#						invisibleWhen => (CGI::Dialog::DLGFLAG_UPDATE | CGI::Dialog::DLGFLAG_REMOVE),
+#						hints => 'Format: <b>f.FeeScheduleID,n.ItemName</b>,m.Modifier,u.UnitsAvailable,d.Description,<b>ItemType(item,icd,cpt,proc,procert,service,sercert,product,hcpcs).ItemCode,$UnitCost</b>'),
+			#new CGI::Dialog::Field(caption => 'Fee Schedules', name => 'feeschedules',types => ['FeeScheduleEntry']),
+			#new CGI::Dialog::Field(caption => 'CPTs', name => 'listofcpts'),
 			);
 	$self->{activityLog} =
 	{
@@ -94,7 +96,7 @@ sub new
 sub customValidate
 {
 	my ($self, $page) = @_;
-	validateFeeScheduleEntryTextArea($self, $page);
+#	validateFeeScheduleEntryTextArea($self, $page);
 
 }
 
@@ -297,68 +299,69 @@ sub execute
 			_debug => 0
 			);
 
-	if(my $addEntries = $page->field('feescheduleentries'))
-	{
-		my @entries = split(/\n/, $addEntries);
-		foreach (@entries)
-		{
-			my @details = split(/[,;]+/);
-			my %record = (	catalog_id => $page->field('catalog_id'),
-					default_units => App::Universal::INVOICEITEM_QUANTITY,				#default for for units is 1
-					description => ''
-					);
-
-			#my @itemdetails = @details[2 .. $#details];
-			foreach (@details)
-			{
-				if($_ =~ /\r/)
-				{
-					chop($_);
-				}
-				if($_ =~ /^\s/)
-				{
-					substr($_,0,1)="";
-				}
-
-				if(m/^([^\$]*)\.(.*)$/)
-				{
-					if(my $match = $PROCENTRYABBREV{$1})
-					{
-						if(my $fieldName = $ITEMTOFIELDMAP{$match})
-						{
-							$record{$fieldName} = $2;
-						}
-					}
-					else
-					{
-						$record{entry_type} = $CODE_TYPE_MAP{$1};
-						$record{code} = $2;
-					}
-
-				}
-				elsif(m/^\$(.*)/)
-				{
-					$record{unit_cost} = $1;
-					next;
-					#$1 is the amount
-				}
-
-				# f.kkkk fee schedule id
-				# i.jjjj item name
-				# m.xxxx modifier
-				# u.yyyy units
-				# d.zzzz description
-				# $abcd dollar amount
-
-			}
-
-			# IMPORTANT: ADD VALIDATION FOR FIELD ABOVE (TALK TO RADHA/MUNIR/SHAHID)
-			$page->schemaAction('Offering_Catalog_Entry', 'add', %record, _debug => 1);
-		}
-	}
-
+#	if(my $addEntries = $page->field('feescheduleentries'))
+#	{
+#		my @entries = split(/\n/, $addEntries);
+#		foreach (@entries)
+#		{
+#			my @details = split(/[,;]+/);
+#			my %record = (	catalog_id => $page->field('catalog_id'),
+#					default_units => App::Universal::INVOICEITEM_QUANTITY,				#default for for units is 1
+#					description => ''
+#					);
+#
+#			#my @itemdetails = @details[2 .. $#details];
+#			foreach (@details)
+#			{
+#				if($_ =~ /\r/)
+#				{
+#					chop($_);
+#				}
+#				if($_ =~ /^\s/)
+#				{
+#					substr($_,0,1)="";
+#				}
+#
+#				if(m/^([^\$]*)\.(.*)$/)
+#				{
+#					if(my $match = $PROCENTRYABBREV{$1})
+#					{
+#						if(my $fieldName = $ITEMTOFIELDMAP{$match})
+#						{
+#							$record{$fieldName} = $2;
+#						}
+#					}
+#					else
+#					{
+#						$record{entry_type} = $CODE_TYPE_MAP{$1};
+#						$record{code} = $2;
+#					}
+#
+#				}
+#				elsif(m/^\$(.*)/)
+#				{
+#					$record{unit_cost} = $1;
+#					next;
+#					#$1 is the amount
+#				}
+#
+#				# f.kkkk fee schedule id
+#				# i.jjjj item name
+#				# m.xxxx modifier
+#				# u.yyyy units
+#				# d.zzzz description
+#				# $abcd dollar amount
+#
+#			}
+#
+#			# IMPORTANT: ADD VALIDATION FOR FIELD ABOVE (TALK TO RADHA/MUNIR/SHAHID)
+#			$page->schemaAction('Offering_Catalog_Entry', 'add', %record, _debug => 1);
+#		}
+#	}
+#
 
 	$self->handlePostExecute($page, $command, $flags);
+	#$page->redirect("/org/$orgId/dlg-add-feescheduleentry?_f_fs=%field.feeschedules%&_f_cpts=%field.listofcpts%");
 }
 use constant CATALOG_DIALOG => 'Dialog/FeeSchedule';
 
@@ -429,10 +432,10 @@ sub new
 						options => FLDFLAG_REQUIRED,
 						postHtml => "<a href=\"javascript:doActionPopup('/lookup/catalog');\">Lookup existing fee schedules</a>"),
 			new CGI::Dialog::Field::TableColumn(type => 'hidden',column => 'offering_catalog_type.id',
-						name => 'catalog_type', schema => $schema, value => 0),			
+						name => 'catalog_type', schema => $schema, value => 0),
 			new App::Dialog::Field::Catalog::ID::New(caption => 'Fee Schedule ID (To)',
 						name => 'to_catalog_id', size => 14,
-						options => FLDFLAG_REQUIRED,),			
+						options => FLDFLAG_REQUIRED,),
 			);
 	$self->{activityLog} =
 	{
@@ -473,7 +476,7 @@ sub execute
 	my $fromCatalogId = $page->field('from_catalog_id');
 	my $toCatalogId = $page->field('to_catalog_id');
 	my $endFlag = 0;
-	
+
 	my $fromFeeSchedule = $STMTMGR_CATALOG->getRowAsHash($page, STMTMGRFLAG_NONE, 'selCatalogById', $fromCatalogId);
 
 	$page->schemaAction(
@@ -486,14 +489,14 @@ sub execute
 			parent_catalog_id => $fromFeeSchedule->{parent_catalog_id} || undef,
 			_debug => 0
 			);
-	
-	
+
+
 	my $fromFeeScheduleChild = $STMTMGR_CATALOG->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selChildrenCatalogs', $fromCatalogId);
 	if (defined $fromFeeScheduleChild)
 	{
-	
+
 	$page->addDebugStmt("fromFeeScheduleChild exists");
-	
+
 		$page->schemaAction(
 				'Offering_Catalog', 'add',
 				catalog_id => $fromFeeScheduleChild->{'catalog_id'} || undef,
@@ -506,7 +509,7 @@ sub execute
 				);
 		my $tempChild = $fromFeeScheduleChild->{'catalog_id'};
 		#getFeeScheduleGrandChildren($self, $page, $tempChild);
-		
+
 	}
 #
 	#	do
