@@ -268,14 +268,14 @@ sub getDiagnosis
 {
 	my ($self, $no) = @_;
 	$no = 0 + $no;
-	return $self->{diagnosis}->[$no] if defined;
+	return $self->{diagnosis}->[$no];
 }
 
 sub getProcedure
 {
 	my ($self, $no) = @_;
 	$no = 0 + $no ;
-	return $self->{procedures}->[$no] if defined;
+	return $self->{procedures}->[$no];
 }
 
 
@@ -283,35 +283,35 @@ sub getOtherItems
 {
 	my ($self, $no) = @_;
 	$no =  0 + $no ;
-	return $self->{otherItems}->[$no] if defined;
+	return $self->{otherItems}->[$no];
 }
 
 sub getCopayItems
 {
 	my ($self, $no) = @_;
 	$no =  0 + $no ;
-	return $self->{copayItems}->[$no] if defined;
+	return $self->{copayItems}->[$no];
 }
 
 sub getAdjItems
 {
 	my ($self, $no) = @_;
 	$no =  0 + $no ;
-	return $self->{adjItems}->[$no] if defined;
+	return $self->{adjItems}->[$no];
 }
 
 sub getPolicy
 {
 	my ($self, $no) = @_;
 	$no =  0 + $no ;
-	return $self->{policy}->[$no] if defined;
+	return $self->{policy}->[$no];
 }
 
 sub getInsured
 {
 	my ($self, $no) = @_;
 	$no = 0 + $no ;
-	return $self->{insured}->[$no] if defined;
+	return $self->{insured}->[$no];
 }
 
 sub setBCBSPlanCode
