@@ -39,6 +39,7 @@ use App::Page::Schedule;
 use App::Page::SDE;
 use App::Page::Report;
 use App::Page::WorkList;
+use App::Page::Collector;
 use App::Page::PatientBill;
 
 ##############################################################################
@@ -245,6 +246,7 @@ $SEARCH_CLASSES = {
 	'lookup' => $SEARCH_CLASSES,
 	'sde' => 'App::Page::SDE',
 	'worklist' => 'App::Page::WorkList',
+	'collector' => 'App::Page::Collector',
 	'patientbill' => 'App::Page::PatientBill',
 );
 
