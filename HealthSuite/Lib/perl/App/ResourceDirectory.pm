@@ -79,7 +79,6 @@ use App::Component::Navigate::FileSys;
 use App::Component::WorkList;
 use App::Component::ResourceSelector;
 use App::Component::FacilitySelector;
-use App::Component::SDE;
 
 ##############################################################################
 # Directory of all available Dialog Objects
@@ -157,13 +156,16 @@ use App::Dialog::Training;
 use App::Dialog::ResponsibleParty;
 use App::Dialog::Attribute::MiscNotes;
 use App::Dialog::Password;
+use App::Dialog::FeeScheduleMatrix;
+use App::Dialog::FeeScheduleDataEntry;
+
 
 ##############################################################################
 # Global variables that map (using a system-wide ID) unique text to specific
 # page and dialog objects
 ##############################################################################
 
-use vars qw(@CHANGELOG %PAGE_CLASSES $SEARCH_CLASSES %DIALOG_CLASSES %STATEMENTMGR_CLASSES %COMPONENT_CATALOG %COMPONENT_CATALOG_SOURCE %PAGE_FLAGS);
+use vars qw(@CHANGELOG %PAGE_CLASSES $SEARCH_CLASSES %DIALOG_CLASSES %STATEMENTMGR_CLASSES %COMPONENT_CATALOG %PAGE_FLAGS);
 
 %STATEMENTMGR_CLASSES = (
 	'catalog' => $STMTMGR_CATALOG,
@@ -560,6 +562,8 @@ $SEARCH_CLASSES = {
 	'misc-notes' => {_class => 'App::Dialog::Attribute::MiscNotes', valueType => App::Universal::ATTRTYPE_TEXT, heading => '$Command Misc Notes', _arl => ['person_id'] , _arl_modify => ['item_id'], _idSynonym => 'attr-' .App::Universal::ATTRTYPE_TEXT() },
 
 	'procedure' => 'App::Dialog::Procedure',
+	'feescheduleentry' => {_class => 'App::Dialog::FeeScheduleMatrix',heading => '$Command Fee Schedule Entry', _arl => ['feeschedules'], _arl_modify => ['feeschedules'], _idSynonym => 'FeeScheduleEntry'},
+        'feescheduledataentry' => {_class => 'App::Dialog::FeeScheduleDataEntry',heading => '$Command Fee Schedule Entry', _arl => ['feeschedules'], _arl_modify => ['feeschedules'], _idSynonym => 'FeeScheduleDataEntry'},
 	'adjustment' => 'App::Dialog::Adjustment',
 	'postgeneralpayment' => 'App::Dialog::PostGeneralPayment',
 	#'slot' => 'App::Dialog::Slot',
@@ -616,13 +620,6 @@ while(my ($dlgId, $dlgInfo) = each %CREATE_DLG_SYNONYMS)
 	],
 );
 
-#
-# the following hash is create to keep track of "how" components
-# are created or accessed (for logging, debugging, etc)
-#
-%COMPONENT_CATALOG_SOURCE = (
-);
-
 foreach (@{$COMPONENT_CATALOG{_autoCreate}})
 {
 	if(my $stmtMgr = $_->{stmtMgr})
@@ -636,7 +633,6 @@ foreach (@{$COMPONENT_CATALOG{_autoCreate}})
 			$compId = "$1-$2";
 			die "Statement '$key' creates a duplicate component ID" if exists $COMPONENT_CATALOG{$compId};
 			$COMPONENT_CATALOG{$compId} = $value;
-			$COMPONENT_CATALOG_SOURCE{$compId} = [App::Universal::COMPONENTTYPE_STATEMENT, $compId, $stmtMgr, $2];
 		}
 	}
 }
@@ -645,7 +641,6 @@ while(my($key, $value) = each %CGI::Component::DIRECTORY)
 {
 	die "Duplicate component ID '$key'" if exists $COMPONENT_CATALOG{$key};
 	$COMPONENT_CATALOG{$key} = $value;
-	$COMPONENT_CATALOG_SOURCE{$key} = [App::Universal::COMPONENTTYPE_CLASS, $key, $value];
 }
 
 ##############################################################################
@@ -730,5 +725,34 @@ sub handleARL
 		$page->printContents();
 	}
 }
+
+##############################################################################
+# Change-log management functions/declarations
+##############################################################################
+
+use constant DIRECTORY_SEARCH => 'Directory/Search';
+use constant DIRECTORY_DIALOGCLASSES => 'Directory/classes';
+
+@CHANGELOG =
+(
+	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_ADD, '01/05/1999', 'RK',
+		DIRECTORY_SEARCH,
+		'Added Catalogitem in $SEARCH_CLASSES. '],
+	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_ADD, '01/28/1999', 'RK',
+		DIRECTORY_DIALOGCLASSES,
+		'Added assoc-family in %DIALOG_CLASSES. And updated the dialog names ( ie, dialog path from App::Dialog::Encounter for claim to App::Dialog:: Encounter::Createcalim and so on) for  claim, checkin, checkout in %DIALOG_CLASSES.'],
+	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_UPDATE, '01/07/1999', 'RK',
+		DIRECTORY_SEARCH,
+		'Updated the _class names in %DIALOG_CLASSES for the association related dialogs like employment, caraprovider etc.'],
+	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_ADD, '01/07/1999', 'RK',
+		DIRECTORY_SEARCH,
+		'Added differnt types of alerts in %DIALOG_CLASSES according to the trans_type.'],
+	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_ADD, '03/24/2000', 'TVN',
+		DIRECTORY_SEARCH,
+		'Added Appointment Type in $SEARCH_CLASSES. '],
+	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_ADD, '04/01/2000', 'TVN',
+		DIRECTORY_SEARCH,
+		'Added ResourceSelector, WorkList components and WorkList page. '],
+);
 
 1;
