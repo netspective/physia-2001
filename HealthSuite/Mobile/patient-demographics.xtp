@@ -1,0 +1,17 @@
+
+<page heading="Demographics">
+
+<a href="index.xtp">Physia Home</a><br/>
+User: <active-user-org/><br/>
+Date: <active-date/><p/>
+
+<demographics/> <br/>
+
+Health Coverage(s): <br/>
+<insurance/> <br/>
+
+<p>
+<a href="person.xtp">Patient Summary</a><br/>
+
+</page>
+

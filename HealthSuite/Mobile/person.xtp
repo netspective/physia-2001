@@ -1,0 +1,38 @@
+
+<page heading="Patient Summary">
+
+<a href="index.xtp">Physia Home</a><br/>
+
+User: <active-user-org/><br/>
+Date: <active-date/><p/>
+
+<jsp:scriptlet>
+	if (request.getParameter("pid") != null) {
+		session.setAttribute("active-person-id", request.getParameter("pid"));
+	}
+
+	if (request.getParameter("name") != null) {
+		session.setAttribute("active-person-name", request.getParameter("name"));
+	}
+
+	out.print("<b>" + session.getAttribute("active-person-name") + "</b>");
+
+</jsp:scriptlet>
+
+<menu>
+	<menu-item caption="Demographics" href="patient-demographics"/>
+	<menu-item caption="Chart Summary" href="patient-chart"/>
+	<menu-item caption="RX Writer" href="prescribe"/>
+</menu>
+
+<p>Coming Soon</p>
+<menu>
+	<menu-item caption="Nursing Service" href="patient-nursing"/>
+	<menu-item caption="Visit" href="patient-visit"/>
+	<menu-item caption="Tests and Results" href="patient-tests-results"/>
+	<menu-item caption="Refills Meds" href="patient-refill-meds"/>
+	<menu-item caption="Add Meds" href="patient-add-meds"/>
+</menu>
+
+</page>
+

@@ -1,0 +1,11 @@
+
+<page heading="Checked-in Patients">
+
+<a href="index.xtp">Physia Home</a><br/>
+User: <active-user-org/><br/>
+Date: <active-date/><p/>
+
+<appointments status="in-progress"/>
+
+</page>
+

@@ -1,0 +1,20 @@
+<?xml version="1.0"?> 
+<?xml-stylesheet href="index.xsl"?>
+
+<page heading="Manage Patients">
+
+User: CLETO@CLMEDGRP<br/>
+Active: <b>Jones, Susan</b> (SJONES)<br/>
+Female, age 32<p/>
+
+<menu>
+	<menu-item caption="Physia Home" href="index"/>
+	<menu-item caption="Change Active Patient" href="set-active-patient"/>
+	<menu-item caption="Prescribe Med" href="prescribe-med"/>
+	<menu-item caption="Refill Med" href="refill-med"/>
+	<menu-item caption="Enter Office Charge" href="office-charge"/>
+	<menu-item caption="Enter Hospital Charge" href="hosp-charge"/>
+</menu>
+
+</page>
+

@@ -1,0 +1,29 @@
+
+<page heading="Histories">
+
+<a href="index.xtp">Physia Home</a><br/>
+User: <active-user-org/><br/>
+Date: <active-date/><p/>
+
+<jsp:scriptlet>
+	out.print("<b>" + (String) session.getAttribute("active-person-name") + "</b>");
+</jsp:scriptlet>
+<p>
+
+<b>Medical History</b><br><br>
+
+
+<b>Family History</b><br><br>
+
+
+<b>Social History</b><br><br>
+
+
+<b>Surgical History</b><br>
+<surgical-history/>
+
+<p>
+<a href="person.xtp">Patient Summary</a><br/>
+
+</page>
+

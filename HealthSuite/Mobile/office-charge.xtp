@@ -1,0 +1,18 @@
+<?xml version="1.0"?> 
+<?xml-stylesheet href="index.xsl"?>
+
+<page heading="Manage Patients">
+
+User: CLETO@CLMEDGRP<br/>
+Active: <b>Jones, Susan</b> (SJONES)<br/>
+Female, age 32<p/>
+
+<menu>
+	<menu-item caption="Manage Patients" href="index"/>
+	<menu-item caption="Labs" href="set-active-patient"/>
+	<menu-item caption="Office" href="prescribe-med"/>
+	<menu-item caption="Etc" href="refill-med"/>
+</menu>
+
+</page>
+

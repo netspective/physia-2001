@@ -1,0 +1,28 @@
+
+<page heading="Chart">
+
+<a href="index.xtp">Physia Home</a><br/>
+User: <active-user-org/><br/>
+Date: <active-date/><p/>
+
+<jsp:scriptlet>
+	out.print("<b>" + (String) session.getAttribute("active-person-name") + "</b>");
+</jsp:scriptlet>
+<p>
+
+<b>Allergies</b><br>
+<allergies/> <br/><br/>
+
+<b>Active Medications</b><br>
+<active-medication/> <br/><br/>
+
+<b>Active Problems</b><br>
+<active-problem/> <br/><br/>
+
+<b>Blood Type</b><br>
+<blood-type/> <br/><br/>
+
+<a href="patient-history.xtp">Histories</a><br/>
+
+</page>
+

@@ -1,0 +1,14 @@
+
+<page heading="Lookup Patient">
+
+	<a href="index.xtp">Physia Home</a><br/>
+	User: <active-user-org/><p/>
+
+	<p><b>Coming soon (not implemented yet):</b></p>
+	<dialog>
+		<field-text caption="Last Name"/>
+		<field-text caption="First Name"/>
+		<field-date caption="Date of birth"/>		
+	</dialog>
+
+</page>

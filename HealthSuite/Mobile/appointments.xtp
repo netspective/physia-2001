@@ -1,0 +1,26 @@
+
+<page heading="Appointments">
+
+<a href="index.xtp">Physia Home</a><br/>
+User: <active-user-org/><br/>
+Date: <active-date/><p/>
+
+<b>Appointments</b>:<br/>
+<appointments/>
+
+<!--
+<p/><b>Waiting</b>:<br/>
+<appointments status="waiting"/>
+
+<p/><b>Checked-in</b>:<br/>
+<appointments status="in-progress"/>
+
+<p/><b>Checked-out</b>:<br/>
+<appointments status="completed"/>
+
+<p/><b>Appointments (AXHAMILL)</b>:<br/>
+<appointments person-id="AXHAMILL"/>
+-->
+
+</page>
+

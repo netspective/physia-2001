@@ -1,0 +1,40 @@
+
+<page heading="Physia Mobile">
+
+<jsp:scriptlet>
+	session.setAttribute("user_id", "AXHAMILL");
+	session.setAttribute("org_id", "DRCLINIC");
+	session.setAttribute("org_internal_id", new Integer(25));
+	session.setAttribute("tz_gmt_offset_hours", new Integer(-5));
+	session.setAttribute("tz_gmt_offset_days", new Float(-5/24));
+
+	//if(session.getAttribute("active_date_str") == null)
+	//{
+		session.setAttribute("active_date_str", "11/30/2000");
+		session.setAttribute("active_date", dateFormatShort.parse((String) session.getAttribute("active_date_str")));
+	//}
+</jsp:scriptlet>
+
+<img src="app-main-graphic.gif"/><br/>
+User: <active-user-org/><p/>
+
+<menu>
+	<menu-item caption="Appointments List" href="appointments"/>
+	<menu-item caption="Checked-in Patients" href="checked-in"/>
+	<menu-item caption="Scheduled Patients" href="waiting"/>
+	<menu-item caption="Hospital Patients" href="hospital"/>
+	<menu-item caption="Lookup Patient" href="lookup-patient"/>
+</menu>
+
+<p>Coming soon</p>
+<menu>
+	<menu-item caption="Work with Patient" href="manage-patient"/>
+	<menu-item caption="Refills Worklist (##)" href="worklist-refill"/>
+	<menu-item caption="Messages Worklist (##)" href="worklist-messages"/>
+	<menu-item caption="Lab Results Worklist (##)" href="worklist-labs"/>
+	<menu-item caption="Signatures Worklist (##)" href="worklist-signatures"/>
+	<menu-item caption="References" href="references"/>
+</menu>
+
+</page>
+
