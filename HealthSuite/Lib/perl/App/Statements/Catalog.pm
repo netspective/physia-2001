@@ -150,6 +150,11 @@ $STMTMGR_CATALOG = new App::Statements::Catalog(
 		from HCFA1500_Service_Type_Code
 		where id = ?
 	},
+	'selGenericServiceTypeByAbbr' => q{
+			select id
+			from HCFA1500_Service_Type_Code
+			where abbrev = ?
+	},
 	'selGenericServiceType' => q{
 		select caption
 		from HCFA1500_Service_Type_Code
@@ -252,7 +257,21 @@ $STMTMGR_CATALOG = new App::Statements::Catalog(
 			and modifier is NULL
 			and catalog_id = ?
 	},
-
+	
+	'sel_catalogEntry_svcType_by_catalog' => qq{
+			select data_text,caption from Offering_Catalog_Entry, HCFA1500_Service_Type_Code 
+			where code = upper(?)
+				and modifier is NULL
+				and catalog_id = ?
+				and data_text = abbrev 				
+	},
+	'sel_catalogEntry_svcType_by_code_modifier_catalog' => qq{
+				select data_text,caption from Offering_Catalog_Entry, HCFA1500_Service_Type_Code 
+				where code = upper(?)
+					and (modifier = ? or modifier is NULL)
+					and catalog_id = ?
+					and data_text = abbrev 				
+	},
 );
 
 1;
