@@ -46,7 +46,7 @@ sub initialize
 	my $self = shift;
 
 	my $personId = $self->param('person_id');
-	my $userId = $self->session('user_id');	
+	my $userId = $self->session('user_id');
 	$self->SUPER::initialize(@_);
 
 	$STMTMGR_PERSON->createPropertiesFromSingleRow($self, STMTMGRFLAG_CACHE, ['selRegistry', 'person_'], $personId);
@@ -80,7 +80,7 @@ sub initialize
 
 	# Check user's permission to page
 	my $activeView = $self->param('_pm_view');
-	if ($activeView) 
+	if ($activeView)
 	{
 		if ($self->hasPermission("page/person/$activeView"))
 		{
@@ -89,19 +89,19 @@ sub initialize
 				$self->disable(
 						qq{
 							<br>
-							You do not have permission to view this information. 
+							You do not have permission to view this information.
 							Only the user $personId can view this page.
 
 							Click <a href='javascript:history.back()'>here</a> to go back.
 						});
 			}
 		}
-		else 
+		else
 		{
 			$self->disable(
 					qq{
 						<br>
-						You do not have permission to view this information. 
+						You do not have permission to view this information.
 						Permission page/person/$activeView is required.
 
 						Click <a href='javascript:history.back()'>here</a> to go back.
@@ -160,7 +160,7 @@ sub prepare_page_content_header
 	{
 		$profileLine .=  $self->property('person_responsible') eq 'Self' ? '&nbsp;Responsible Person: #property.person_responsible# ' : '&nbsp;Responsible Person: <A HREF="/person/#property.person_responsible#/profile">#property.person_responsible#</A> ';
 	}
-	
+
 	my $chooseAction = '';
 	$chooseAction = qq{
 				<TD ALIGN=RIGHT>
@@ -473,6 +473,7 @@ sub prepare_view_profile
 				<TD>
 					<font size=1 face=arial>
 					#component.stpt-person.contactMethodsAndAddresses#<BR>
+					#component.stpt-person.officeLocation#
 					#component.stpt-person.phoneMessage#<BR>
 					#component.stpt-person.insurance#<BR>
 					#component.stpt-person.careProviders#<BR>
