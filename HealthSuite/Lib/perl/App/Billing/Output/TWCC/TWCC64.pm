@@ -34,11 +34,11 @@ use constant SPC => " ";
 use constant BOX17_PADDING => 6;
 use constant BOX17_SPACING => 13.5;
 use constant BOX17_LINE_PADDING => 13;
-use constant BOX18_HEIGHT => 37;
-use constant BOX19_HEIGHT => 51;
-use constant BOX20_HEIGHT => 17;
+use constant BOX18_HEIGHT => 40;
+use constant BOX19_HEIGHT => 52;
+use constant BOX20_HEIGHT => 16;
 use constant BOX21_HEIGHT => 26;
-use constant BOX22_HEIGHT => 17;
+use constant BOX22_HEIGHT => 16;
 use constant BOX23_HEIGHT => 40;
 use constant BOX24_HEIGHT => 42;
 use constant DATA_LEFT_PADDING => 3;
@@ -872,7 +872,7 @@ sub drawForm
 #footer
 	$properties =
 	{
-		'text' =>"TXCC 64  (Rev. 4/92)",
+		'text' =>"TWCC 64  (Rev. 4/92)",
 		'x' => $mainBoxX,
 		'y' => $mainBoxY - 638, 
 		'fontWidth' => 7
@@ -892,7 +892,7 @@ sub drawForm
 	{
 		'text' =>"*Note If no additional treatment is necessary, physical therapy orders must be included in specific treatments to be performed, the frequency of",
 		'x' => $mainBoxX,
-		'y' => $mainBoxY - 581, 
+		'y' => $mainBoxY - 584, 
 		'fontWidth' => 8
 	};
 	$report->drawText($p, $properties);
@@ -901,7 +901,7 @@ sub drawForm
 	{
 		'text' =>"treatments: and if necessary for continued therapy past 30 days, a re-evaluation by the treating doctor.",
 		'x' => $mainBoxX,
-		'y' => $mainBoxY - 581 - LINE_SPACING, 
+		'y' => $mainBoxY - 584 - LINE_SPACING, 
 		'fontWidth' => 8
 	};
 	$report->drawText($p, $properties);
@@ -1112,7 +1112,7 @@ sub box9Data
 
 	$properties =
 			{
-				'text' => $claim->{careReceiver}->getSsn,
+				'text' => $claim->{insured}->[0]->getSsn,
 				'fontWidth' => DATA_FONT_SIZE,
 				'color' => DATA_FONT_COLOR,
 				'x' => $x + DATA_LEFT_PADDING,
@@ -1127,7 +1127,7 @@ sub box10Data
 
 	$properties =
 			{
-				'text' => $claim->{careReceiver}->getEmployerOrSchoolName,
+				'text' => $claim->{insured}->[0]->getEmployerOrSchoolName,
 				'fontWidth' => DATA_FONT_SIZE,
 				'color' => DATA_FONT_COLOR,
 				'x' => $x + DATA_LEFT_PADDING,
@@ -1142,7 +1142,7 @@ sub box11Data
 
 	$properties =
 			{
-				'text' => $claim->{careReceiver}->{employerAddress}->getAddress1,
+				'text' => $claim->{insured}->[0]->{employerAddress}->getAddress1,
 				'fontWidth' => DATA_FONT_SIZE,
 				'color' => DATA_FONT_COLOR,
 				'x' => $x + DATA_LEFT_PADDING,
@@ -1200,7 +1200,7 @@ sub boxEmployeeCityData
 sub boxEmployerCityData
 {
 	my($self, $p, $claim, $x, $y, $report) = @_;
-	my $employerAddress = $claim->{careReceiver}->getEmployerAddress;
+	my $employerAddress = $claim->{insured}->[0]->getEmployerAddress;
 
 	$properties =
 			{
@@ -1483,88 +1483,50 @@ sub box18Data
 {
 	my($self, $p, $claim, $x, $y, $report) = @_;
 
-	$properties =
-			{
-				'text' => $claim->{treatment}->getChangeInCondition,
-				'fontWidth' => DATA_FONT_SIZE,
-				'color' => DATA_FONT_COLOR,
-				'x' => $x + 298,
-				'y' => $y - DATA_TOP_PADDING2
-			};
-	$report->drawText($p, $properties);
+	my $data = $claim->{treatment}->getChangeInCondition;
+	$self->printMultiLine($p, $x, $y, $report, $data, 300, 3);
+	
 }
 
 sub box19Data
 {
 	my($self, $p, $claim, $x, $y, $report) = @_;
 
-	$properties =
-			{
-				'text' => $claim->{treatment}->getTreatmentPlan,
-				'fontWidth' => DATA_FONT_SIZE,
-				'color' => DATA_FONT_COLOR,
-				'x' => $x + 75,
-				'y' => $y - DATA_TOP_PADDING2
-			};
-	$report->drawText($p, $properties);
+	my $data = $claim->{treatment}->getTreatmentPlan;
+	$self->printMultiLine($p, $x, $y, $report, $data, 75, 4);
 }
 
 sub box20Data
 {
 	my($self, $p, $claim, $x, $y, $report) = @_;
 
-	$properties =
-			{
-				'text' => $claim->{treatment}->getReferralInfo,
-				'fontWidth' => DATA_FONT_SIZE,
-				'color' => DATA_FONT_COLOR,
-				'x' => $x + 60,
-				'y' => $y - 6
-			};
-	$report->drawText($p, $properties);
+	my $data = $claim->{treatment}->getReferralInfo;
+	$self->printMultiLine($p, $x, $y, $report, $data, 50, 1);
 }
 
 sub box21Data
 {
 	my($self, $p, $claim, $x, $y, $report) = @_;
 
-	$properties =
-			{
-				'text' => $claim->{treatment}->getMedications,
-				'fontWidth' => DATA_FONT_SIZE,
-				'color' => DATA_FONT_COLOR,
-				'x' => $x + 156,
-				'y' => $y - DATA_TOP_PADDING2
-			};
-	$report->drawText($p, $properties);
+	my $data = $claim->{treatment}->getMedications;
+	$self->printMultiLine($p, $x, $y, $report, $data, 156, 2);
 }
+
 sub box22Data
 {
 	my($self, $p, $claim, $x, $y, $report) = @_;
 
-	$properties =
-			{
-				'text' => $claim->{treatment}->getPrognosis,
-				'fontWidth' => DATA_FONT_SIZE,
-				'color' => DATA_FONT_COLOR,
-				'x' => $x + 60,
-				'y' => $y - 6
-			};
-	$report->drawText($p, $properties);
+	my $data = $claim->{treatment}->getPrognosis;
+	$self->printMultiLine($p, $x, $y, $report, $data, 50, 1);
+
 }
+
 sub box23Data
 {
 	my($self, $p, $claim, $x, $y, $report) = @_;
 
-	$properties =
-			{
-				'text' => $claim->{treatment}->getComplianceByEmployee,
-				'fontWidth' => DATA_FONT_SIZE,
-				'color' => DATA_FONT_COLOR,
-				'x' => $x + 222,
-				'y' => $y - DATA_TOP_PADDING2
-			};
-	$report->drawText($p, $properties);
+	my $data = $claim->{treatment}->getComplianceByEmployee;
+	$self->printMultiLine($p, $x, $y, $report, $data, 222, 3);
 }
 
 sub box24Data
@@ -1591,4 +1553,47 @@ sub box24Data
 			};
 	$report->drawText($p, $properties);
 }
+
+sub printMultiLine
+{
+	my($self, $p, $x, $y, $report, $data, $firstXPos, $numLines) = @_;
+
+	my $first;
+	my $last;	
+	my $i=0;
+	$rest = $data;
+	
+	while ($rest ne "" and $i < $numLines)
+	{
+		if ($i==0)
+		{
+			($first, $rest) = $report->textSplit($p, $rest, 500 - $firstXPos, FONT_NAME, DATA_FONT_SIZE);
+			$properties =
+			{
+				'text' => $first,
+				'fontWidth' => DATA_FONT_SIZE,
+				'color' => DATA_FONT_COLOR,
+				'x' => $x + $firstXPos,
+				'y' => $y - DATA_TOP_PADDING2
+			};
+			$report->drawText($p, $properties);
+		}
+		else
+		{
+			($first, $rest) = $report->textSplit($p, $rest, 490, FONT_NAME, DATA_FONT_SIZE);
+			$properties =
+				{
+					'text' => $first,
+					'fontWidth' => DATA_FONT_SIZE,
+					'color' => DATA_FONT_COLOR,
+					'x' => $x + 10,
+					'y' => $y - DATA_TOP_PADDING2 - 13 * $i
+				};
+			$report->drawText($p, $properties);
+		}
+		$i++;
+	};
+
+}
+
 1;

@@ -161,4 +161,31 @@ sub endPage
 	pdflib::PDF_end_page($p);
 }
 
+sub textSplit
+{
+	my($self, $p, $string, $clipWidth, $fontName, $fontWidth) = @_;
+
+	my $totalWidth = 0;
+	my $first;
+	my $rest;
+
+	my @words = split(" ", $string);
+	my $sp = pdflib::PDF_stringwidth($p, " ", $fontName, $fontWidth);
+	
+	foreach my $word (@words) 
+	{
+		$totalWidth = $totalWidth  + pdflib::PDF_stringwidth($p, $word, $fontName, $fontWidth) + $sp;
+		if ($totalWidth <= $clipWidth)
+		{
+			$first = join(" ", $first, $word);
+		}
+		else
+		{
+			$rest = join(" ", $rest, $word);
+		}
+	}
+	return ($first, $rest);
+}
+
+
 1;

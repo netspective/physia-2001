@@ -989,7 +989,7 @@ sub footer
 
 	my $properties =
 	{
-		'text' =>"TXCC 69  (Rev. 5/94)",
+		'text' =>"TWCC 69  (Rev. 5/94)",
 		'fontWidth' => 7,
 		'x' => $x,
 		'y' => $y 
@@ -1052,7 +1052,7 @@ sub box2Data
 	
 	my $properties =
 	{
-		'text' => $claim->{careReceiver}->getSsn,
+		'text' => $claim->{insured}->[0]->getSsn,
 		'fontWidth' => DATA_FONT_SIZE,
 		'color' => DATA_FONT_COLOR,
 		'x' => $x + DATA_LEFT_PADDING,
@@ -1146,7 +1146,7 @@ sub box6Data
 
 	my $properties =
 	{
-		'text' => $claim->{careReceiver}->getEmployerOrSchoolName,
+		'text' => $claim->{insured}->[0]->getEmployerOrSchoolName,
 		'fontWidth' => DATA_FONT_SIZE,
 		'color' => DATA_FONT_COLOR,
 		'x' => $x + DATA_LEFT_PADDING,
@@ -1176,7 +1176,7 @@ sub box8Data
 
 	my $properties =
 	{
-		'text' => $claim->{careReceiver}->{employerAddress}->getAddress1,
+		'text' => $claim->{insured}->[0]->{employerAddress}->getAddress1,
 		'fontWidth' => DATA_FONT_SIZE,
 		'color' => DATA_FONT_COLOR,
 		'x' => $x + DATA_LEFT_PADDING,
@@ -1186,7 +1186,7 @@ sub box8Data
 
 	$properties =
 	{
-		'text' => $claim->{careReceiver}->{employerAddress}->getCity,
+		'text' => $claim->{insured}->[0]->{employerAddress}->getCity,
 		'fontWidth' => DATA_FONT_SIZE,
 		'color' => DATA_FONT_COLOR,
 		'x' => $x + 216,
@@ -1196,7 +1196,7 @@ sub box8Data
 
 	$properties =
 	{
-		'text' => $claim->{careReceiver}->{employerAddress}->getState,
+		'text' => $claim->{insured}->[0]->{employerAddress}->getState,
 		'fontWidth' => DATA_FONT_SIZE,
 		'color' => DATA_FONT_COLOR,
 		'x' => $x + 300,
@@ -1206,7 +1206,7 @@ sub box8Data
 
 	$properties =
 	{
-		'text' => $claim->{careReceiver}->{employerAddress}->getZipCode,
+		'text' => $claim->{insured}->[0]->{employerAddress}->getZipCode,
 		'fontWidth' => DATA_FONT_SIZE,
 		'color' => DATA_FONT_COLOR,
 		'x' => $x + 353,
