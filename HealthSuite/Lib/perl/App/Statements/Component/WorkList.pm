@@ -31,7 +31,7 @@ $STMTMGR_COMPONENT_WORKLIST = new App::Statements::Component::WorkList(
 			from transaction
 			where trans_owner_id = :1 and					
 			trans_status = 2 and
-			trans_type = $ACCOUNT_NOTES
+			trans_type = $ACCOUNT_NOTES 			
 		    	},
 	sqlStmtBindParamDescr => ['Person ID for transaction table'],
 	publishDefn => {
@@ -80,24 +80,25 @@ $STMTMGR_COMPONENT_WORKLIST = new App::Statements::Component::WorkList(
 	publishComp_stpt => sub { my ($page, $flags, $personId,$sessionId) = @_; $personId ||= $page->param('person_id'); $sessionId||=$page->session('user_id');$STMTMGR_COMPONENT_WORKLIST->createHtml($page, $flags, 'worklist.account-notes', [$personId], 'panelTransp'); },
 },
 
-
 'worklist.group-account-notes' => {
 
 			sqlStmt => qq{
 				select simple_name, count (*) as count, min(trans_begin_stamp),max(trans_begin_stamp),
 				trans_owner_id
 				from transaction t, person
-				where 	trans_owner_id = person_id and
+				where 	trans_owner_id = person.person_id and
 				trans_status = $ACTIVE and
 				trans_type = $ACCOUNT_NOTES and
-				trans_owner_id in  
-				(SELECT trans_owner_id
-				 FROM 	transaction 
-				 WHERE 	trans_status= $ACTIVE
-				 	AND trans_type = $ACCOUNT_OWNER
-				 	AND trans_subtype = 'Owner'
-				 	AND provider_id = :1
-				 )				
+				EXISTS
+				(SELECT 1 FROM Invoice_Worklist iw
+				 WHERE
+					trans_owner_id = iw.person_id 
+					AND	worklist_status = 'Account In Collection'
+					AND	worklist_type = 'Collection'				
+					AND 	owner_id = :1
+					AND	responsible_id = :1
+					AND 	org_internal_id = :2
+				)
 				group by simple_name,trans_owner_id
 			},
 			sqlStmtBindParamDescr => ['Person ID for transaction table'],
@@ -129,10 +130,10 @@ $STMTMGR_COMPONENT_WORKLIST = new App::Statements::Component::WorkList(
 			},
 
 
-			publishComp_st => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->session('user_id'); $STMTMGR_COMPONENT_WORKLIST->createHtml($page, $flags, 'worklist.group-account-notes', [$personId] ); },
-			publishComp_stp => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->session('user_id'); $STMTMGR_COMPONENT_WORKLIST->createHtml($page, $flags, 'worklist.group-account-notes', [$personId], 'panel'); },
-			publishComp_stpe => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->session('user_id'); $STMTMGR_COMPONENT_WORKLIST->createHtml($page, $flags, 'worklist.group-account-notes', [$personId], 'panelEdit'); },
-			publishComp_stpt => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->session('user_id'); $STMTMGR_COMPONENT_WORKLIST->createHtml($page, $flags, 'worklist.group-account-notes', [$personId], 'panelTransp'); },
+			publishComp_st => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->session('user_id'); $STMTMGR_COMPONENT_WORKLIST->createHtml($page, $flags, 'worklist.group-account-notes', [$personId,$page->session('org_internal_id')] ); },
+			publishComp_stp => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->session('user_id'); $STMTMGR_COMPONENT_WORKLIST->createHtml($page, $flags, 'worklist.group-account-notes', [$personId,$page->session('org_internal_id')], 'panel'); },
+			publishComp_stpe => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->session('user_id'); $STMTMGR_COMPONENT_WORKLIST->createHtml($page, $flags, 'worklist.group-account-notes', [$personId,$page->session('org_internal_id')], 'panelEdit'); },
+			publishComp_stpt => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->session('user_id'); $STMTMGR_COMPONENT_WORKLIST->createHtml($page, $flags, 'worklist.group-account-notes', [$personId,$page->session('org_internal_id')], 'panelTransp'); },
 	},
 
 );
