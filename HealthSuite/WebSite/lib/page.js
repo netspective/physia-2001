@@ -30,6 +30,7 @@ var FLDFLAG_CUSTOMDRAW = 4096;
 var FLDFLAG_NOBRCAPTION = 8192;
 var FLDFLAG_PERSIST = 16384;
 var FLDFLAG_HOME = 32768;
+var FLDFLAG_SORT = 65536;
 
 //****************************************************************************
 // Create a list of all the URL parameters
@@ -176,9 +177,12 @@ function setDialogHome()
 	return true;
 }
 
-function validateOnSubmit()
+function validateOnSubmit(objForm)
 {
-	var field = searchDialogFlagNoValue(FLDFLAG_REQUIRED);
+	var objSelect;
+	var field;
+	
+	field = searchDialogFlagNoValue(FLDFLAG_REQUIRED);
 	if (field != null)
 	{
 		var fieldName = getDialogData(field, "name");
@@ -186,6 +190,22 @@ function validateOnSubmit()
 		validationError(field, fieldCaption+" required!");
 		return false;
 	}
+
+	// Select all items in multidual elements. If items aren't selected, they won't be posted.
+	var dialog = dialogFields['dialog'];
+	for (var i in dialog)
+	{
+		field = dialog[i];
+		if (field.style == "multidual")
+		{
+			objSelect = eval("document.forms.dialog."+i);
+			for (var j = 0; j < objSelect.options.length; j++) 
+			{
+				objSelect.options[j].selected = true;
+			}
+		}
+	}
+
 	return true;
 }
 
@@ -256,6 +276,11 @@ function processKeypress_float(event, flags)
 function processKeypress_integer(event, flags)
 {
 	keypressAcceptAny(event, flags, [numKeysRange]);
+}
+
+function processKeypress_alphaonly(event, flags)
+{
+	keypressAcceptAny(event, flags, [upperAlphaRange, lowAlphaRange]);
 }
 
 function processKeypress_integerdash(event, flags)
@@ -897,6 +922,89 @@ function chooseItem2(arlFmt, itemValue, inNewWin, features)
 	}
 	else
 		window.location.href = newArl;
+}
+
+//****************************************************************************
+// Multiselect field type support function
+//****************************************************************************
+
+/* 
+Description:
+	Moves items from one select box to another. 
+Input:
+	strFormName = Name of the form containing the <SELECT> elements
+	strFromSelect = Name of the left or "from" select list box.
+	strToSelect = Name of the right or "to" select list box
+	blnSort = Indicates whether list box should be sorted when an item(s) is added
+
+Return:	
+	none
+*/
+function MoveSelectItems(strFormName, strFromSelect, strToSelect, blnSort) {
+	var objSelectFrom, objSelectTo;
+
+	objSelectFrom = document.forms[0].elements(strFromSelect);
+	objSelectTo = document.forms[0].elements(strToSelect);
+
+	var intLength = objSelectFrom.options.length;
+
+	for (var i=0; i < intLength; i++) {
+		if(objSelectFrom.options[i].selected && objSelectFrom.options[i].value != "") {
+			var objNewOpt = new Option();
+			objNewOpt.value = objSelectFrom.options[i].value;
+			objNewOpt.text = objSelectFrom.options[i].text;
+			objSelectTo.options[objSelectTo.options.length] = objNewOpt;
+			objSelectFrom.options[i].value = "";
+			objSelectFrom.options[i].text = "";
+		}
+	}
+
+	if (blnSort) SimpleSort(objSelectTo);
+	RemoveEmpties(objSelectFrom, 0);
+}
+
+/* 
+Description:
+	Removes empty select items. This is a helper function for MoveSelectItems.
+Input:
+	objSelect = A <SELECT> object.
+	intStart = The start position (zero-based) search. Optimizes the recursion.
+Return:	
+	none
+*/
+function RemoveEmpties(objSelect, intStart)  {
+	for(var i=intStart; i<objSelect.options.length; i++) {
+		if (objSelect.options[i].value == "")  {
+			objSelect.options[i] = null;	// This removes item and reduces count
+			RemoveEmpties(objSelect, i);
+			break;
+		}
+	}
+}
+
+/* 
+Description:
+	Sorts a select box. Uses a simple sort. 
+Input:
+	objSelect = A <SELECT> object.
+Return:	
+	none
+*/
+function SimpleSort(objSelect)  {
+	var arrTemp = new Array();
+	var objTemp = new Object();
+	for(var i=0; i<objSelect.options.length; i++)  {
+		arrTemp[i] = objSelect.options[i];
+	}
+	for(var x=0; x<arrTemp.length-1; x++)  {
+		for(var y=(x+1); y<arrTemp.length; y++)  {
+			if(arrTemp[x].text > arrTemp[y].text)  {
+				objTemp = arrTemp[x].text;
+				arrTemp[x].text = arrTemp[y].text;
+				arrTemp[y].text = objTemp;
+			}
+		}
+	}
 }
 
 //****************************************************************************
