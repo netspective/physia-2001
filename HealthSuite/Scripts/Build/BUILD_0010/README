@@ -96,6 +96,7 @@ B162 - Added black icons and implement partial Insurance and Appointment verific
 
 [No Bug] - Updated the web server configuration to reduce memory usage and help performance
 
+B694 - Changed the Alerts component to display the Priority
 
 
 
