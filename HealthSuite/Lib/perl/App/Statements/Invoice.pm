@@ -157,23 +157,26 @@ $STMTMGR_INVOICE = new App::Statements::Invoice(
 		and i.invoice_status = iis.id
 		},
 	'selInvoiceItem' => qq{
-		select parent_id, item_id, item_type, hcfa_service_place, hcfa_service_type, emergency, comments, caption, code, modifier, data_text_b, flags, data_num_a,
-			unit_cost, quantity, rel_diags, data_num_c, to_char(service_begin_date, '$SQLSTMT_DEFAULTDATEFORMAT') as service_begin_date,
-			to_char(service_end_date, '$SQLSTMT_DEFAULTDATEFORMAT') as service_end_date, data_text_a, balance, total_adjust, extended_cost
+		select parent_id, item_id, item_type, hcfa_service_place, hcfa_service_type, emergency, comments, caption, code, code_type, modifier, flags, 
+			unit_cost, quantity, rel_diags, to_char(service_begin_date, '$SQLSTMT_DEFAULTDATEFORMAT') as service_begin_date,
+			to_char(service_end_date, '$SQLSTMT_DEFAULTDATEFORMAT') as service_end_date, balance, total_adjust, extended_cost,
+			data_text_a, data_text_b, data_text_c, data_num_a, data_num_b, data_num_c
 		from invoice_item
 		where item_id = ?
 		},
 	'selInvoiceItems' => qq{
-		select parent_id, item_id, item_type, hcfa_service_place, hcfa_service_type, emergency, comments, caption, code, modifier, data_text_b, flags, data_num_a,
-			unit_cost, quantity, rel_diags, data_num_c, to_char(service_begin_date, '$SQLSTMT_DEFAULTDATEFORMAT') as service_begin_date,
-			to_char(service_end_date, '$SQLSTMT_DEFAULTDATEFORMAT') as service_end_date, data_text_a, balance, total_adjust, extended_cost
+		select parent_id, item_id, item_type, hcfa_service_place, hcfa_service_type, emergency, comments, caption, code, code_type, modifier, flags, 
+			unit_cost, quantity, rel_diags, to_char(service_begin_date, '$SQLSTMT_DEFAULTDATEFORMAT') as service_begin_date,
+			to_char(service_end_date, '$SQLSTMT_DEFAULTDATEFORMAT') as service_end_date, balance, total_adjust, extended_cost,
+			data_text_a, data_text_b, data_text_c, data_num_a, data_num_b, data_num_c
 		from invoice_item
 		where parent_id = ?
 		},
 	'selInvoiceProcedureItems' => qq{
-		select parent_id, item_id, item_type, hcfa_service_place, hcfa_service_type, emergency, comments, caption, code, modifier, data_text_b, flags, data_num_a,
-			unit_cost, quantity, rel_diags, data_num_c, to_char(service_begin_date, '$SQLSTMT_DEFAULTDATEFORMAT') as service_begin_date,
-			to_char(service_end_date, '$SQLSTMT_DEFAULTDATEFORMAT') as service_end_date, data_text_a, balance, total_adjust, extended_cost
+		select parent_id, item_id, item_type, hcfa_service_place, hcfa_service_type, emergency, comments, caption, code, code_type, modifier, flags, 
+			unit_cost, quantity, rel_diags, to_char(service_begin_date, '$SQLSTMT_DEFAULTDATEFORMAT') as service_begin_date,
+			to_char(service_end_date, '$SQLSTMT_DEFAULTDATEFORMAT') as service_end_date, balance, total_adjust, extended_cost,
+			data_text_a, data_text_b, data_text_c, data_num_a, data_num_b, data_num_c
 		from invoice_item
 		where parent_id = ?
 			and item_type in (?,?)
@@ -407,8 +410,9 @@ $STMTMGR_INVOICE = new App::Statements::Invoice(
 		order by myorder
 		},
 	'selProcedure' => qq{
-		select item_type, code as procedure, modifier as procmodifier, unit_cost as proccharge,
-				quantity as procunits, emergency as emg, comments, flags, data_num_a,
+		select item_type, code as procedure, code_type, modifier as procmodifier, unit_cost as proccharge,
+				quantity as procunits, emergency as emg, comments, flags, 
+				data_text_a, data_text_b, data_text_c, data_num_a, data_num_b, data_num_c,
 				rel_diags as procdiags, hcfa_service_place as servplace, hcfa_service_type as servtype,
 				to_char(service_begin_date, '$SQLSTMT_DEFAULTDATEFORMAT') as service_begin_date,
 				to_char(service_end_date, '$SQLSTMT_DEFAULTDATEFORMAT') as service_end_date
