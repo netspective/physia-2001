@@ -2633,6 +2633,13 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 			and ea.value_type = @{[ App::Universal::EVENTATTRTYPE_APPOINTMENT ]}
 			and ea.value_text = ?
 			and e.start_time < sysdate
+			and 10 > (select count(*) from Event_Attribute ea2, Event e2
+				where ea2.parent_id = e2.event_id
+					and ea2.value_text = ea.value_text
+					and ea2.value_type = @{[ App::Universal::EVENTATTRTYPE_APPOINTMENT ]}
+					and e.start_time < e2.start_time
+					and e2.start_time < sysdate
+			)
 		ORDER by group_sort, apptdate DESC
 	},
 

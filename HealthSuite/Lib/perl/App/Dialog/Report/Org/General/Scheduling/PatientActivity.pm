@@ -75,27 +75,27 @@ sub execute
 		<td>
 			<b style="font-size:8pt; font-family:Tahoma">Appointments</b>
 			@{[$STMTMGR_REPORT_SCHEDULING->createHtml($page, STMTMGRFLAG_NONE, 'sel_appointments_byStatus',
-				[$internalFacilityId, $startDate, $endDate,$person_id]) ]}
+				[$internalFacilityId, $startDate, $endDate]) ]}
 		</td>
 		<td>
 			<b style="font-size:8pt; font-family:Tahoma">Patients Seen By Physician</b>
 			@{[$STMTMGR_REPORT_SCHEDULING->createHtml($page, STMTMGRFLAG_NONE, 'sel_patientsSeen',
-				[$internalFacilityId, $startDate, $endDate,$person_id]) ]}
+				[$internalFacilityId, $startDate, $endDate]) ]}
 		</td>
 		<td>
 			<b style="font-size:8pt; font-family:Tahoma">Patients Seen By Patient Type</b>
 			@{[$STMTMGR_REPORT_SCHEDULING->createHtml($page, STMTMGRFLAG_NONE, 'sel_patientsSeen_byPatientType',
-				[$internalFacilityId, $startDate, $endDate,$person_id]) ]}
+				[$internalFacilityId, $startDate, $endDate]) ]}
 		</td>
 		<td>
 			<b style="font-size:8pt; font-family:Tahoma">Appointments By Procedure Code</b>
 			@{[$STMTMGR_REPORT_SCHEDULING->createHtml($page, STMTMGRFLAG_NONE, 'sel_patientsCPT',
-				[$internalFacilityId, $startDate, $endDate,$person_id]) ]}
+				[$internalFacilityId, $startDate, $endDate]) ]}
 		</td>
 		<td>
 			<b style="font-size:8pt; font-family:Tahoma">Appointments By Product Type</b>
 			@{[$STMTMGR_REPORT_SCHEDULING->createHtml($page, STMTMGRFLAG_NONE, 'sel_patientsProduct',
-				[$internalFacilityId, $startDate, $endDate,$person_id]) ]}
+				[$internalFacilityId, $startDate, $endDate]) ]}
 		</td>		
 		</tr>							
 	</table>
@@ -122,7 +122,7 @@ sub prepare_detail_physician
 
 	$page->addContent("<b>Patients Seen by $physician</b><br><br>",
 		$STMTMGR_REPORT_SCHEDULING->createHtml($page, STMTMGRFLAG_NONE, 
-			'sel_detailPatientsSeenByPhysician', [$physician, $internalFacilityId, $startDate, $endDate,$person_id])
+			'sel_detailPatientsSeenByPhysician', [$physician, $internalFacilityId, $startDate, $endDate])
 	);
 }
 
@@ -139,7 +139,7 @@ sub prepare_detail_CPT
 
 	$page->addContent("<b>$cpt Procedures</b><br><br>",
 		$STMTMGR_REPORT_SCHEDULING->createHtml($page, STMTMGRFLAG_NONE, 
-			'sel_detailPatientsCPT', [$cpt, $internalFacilityId, $startDate, $endDate,$person_id])
+			'sel_detailPatientsCPT', [$cpt, $internalFacilityId, $startDate, $endDate])
 	);
 
 }
@@ -157,7 +157,7 @@ sub prepare_detail_product
 
 	$page->addContent("<b>$product</b><br><br>",
 		$STMTMGR_REPORT_SCHEDULING->createHtml($page, STMTMGRFLAG_NONE, 
-			'sel_detailPatientsProduct', [$product, $internalFacilityId, $startDate, $endDate,$person_id])
+			'sel_detailPatientsProduct', [$product, $internalFacilityId, $startDate, $endDate])
 	);
 
 }
@@ -175,7 +175,7 @@ sub prepare_detail_appointments
 		'selOrgId', $page->session('org_internal_id'), $facility_id);
 	$page->addContent("<b>'$caption' Appointments</b><br><br>",
 		$STMTMGR_REPORT_SCHEDULING->createHtml($page, STMTMGRFLAG_NONE, 'sel_DetailAppointmentStatus',
-			[$event_status,$internalFacilityId, $startDate, $endDate, $person_id],
+			[$event_status,$internalFacilityId, $startDate, $endDate],
 		),
 	);
 }
@@ -194,7 +194,7 @@ sub prepare_detail_patient_type
 
 	$page->addContent("<b>'$patient_type_caption' Appointments</b><br><br>",
 		$STMTMGR_REPORT_SCHEDULING->createHtml($page, STMTMGRFLAG_NONE, 'sel_detailPatientsSeenByPatientType',
-			[$patient_type_id,$internalFacilityId, $startDate, $endDate,$person_id])
+			[$patient_type_id,$internalFacilityId, $startDate, $endDate])
 	);
 }
 

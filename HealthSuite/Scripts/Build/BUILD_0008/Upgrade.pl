@@ -6,6 +6,9 @@ use App::Data::MDL::Module;
 use App::Universal;
 use App::Configuration;
 
+use DBI::StatementManager;
+use App::Statements::Scheduling;
+
 use vars qw($page $sqlPlusKey);
 
 &connectDB();
@@ -16,7 +19,7 @@ use vars qw($page $sqlPlusKey);
 ######## BEGIN UPGRADE SCRIPT #########
 
 
-
+update_for_scheduling();
 
 
 ######## END UPGRADE SCRIPT #########
@@ -24,6 +27,28 @@ use vars qw($page $sqlPlusKey);
 exit;
 
 # Subroutines
+
+sub update_for_scheduling
+{
+	my $count = $STMTMGR_SCHEDULING->getRowCount($page, STMTMGRFLAG_DYNAMICSQL,
+		q{select count(*) from Session_Action_Type where id > 6}
+	);
+
+	unless ($count)
+	{
+		my $sqlFile = 'BUILD_0008_scheduling.sql';
+		die "Missing required '$sqlFile'.  Aborted.\n" unless (-f $sqlFile);
+		
+		my $logFile = 'BUILD_008_scheduling.log';
+		
+		system(qq{
+			echo "---------------------------------------" >> $logFile
+			date >> $logFile
+			echo "---------------------------------------" >> $logFile
+			$ENV{ORACLE_HOME}/bin/sqlplus -s $sqlPlusKey < $sqlFile >> $logFile 2>&1
+		});
+	}
+}
 
 sub connectDB
 {

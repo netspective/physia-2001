@@ -147,7 +147,7 @@ sub findScheduleObjects
 	my @scheduleObjects = ();
 
 	$self->findResourceIds($page, \@{$self->{resource_ids}});
-	
+
 	unless (@{$self->{facility_ids}}) {
 		@{$self->{facility_ids}} = ();
 		$self->findFacilityIds($page, \@{$self->{facility_ids}});
@@ -214,20 +214,20 @@ sub handleEventSlots
 
 	my $eventsMinuteSet = new Set::IntSpan();
 	my $daysOffset = Date_to_Days(@{$self->{search_start_date}});
-	
+
 	my %apptTypeTracker = ();
-	
+
 	my $flags |= ANALYZEFETCHEVENTS_BYEVENTID;
 	my $events = $self->fetchEvents($page, $resource_id, $facility_id, $flags);
 
 	for my $event (@{$events})
 	{
 		next if $event->{event_id} == $eventId;
-		
+
 		my @start_day = split (/,/, $event->{start_day});
 		my $day = Date_to_Days(@start_day) - $daysOffset;
 		my $dayMinutes = $day * 24 *60;
-		
+
 		if ($event->{appt_type_id} && $event->{appt_type_id} != -1)
 		{
 			my $effectiveMinuteSet = $self->handleApptType($page, \%apptTypeTracker, $event, $day);
@@ -241,7 +241,7 @@ sub handleEventSlots
 			$eventsMinuteSet = $eventsMinuteSet->union("$startMinute-$endMinute");
 		}
 	}
-	
+
 	#for my $key (sort keys %apptTypeTracker)
 	#{
 	#	for my $subkey (sort keys %{$apptTypeTracker{$key}} )
@@ -249,21 +249,21 @@ sub handleEventSlots
 	#		$page->addDebugStmt( "$key:$subkey ==> $apptTypeTracker{$key}->{$subkey}" );
 	#	}
 	#}
-	
+
 	return $eventsMinuteSet;
 }
 
 sub handleApptType
 {
 	my ($self, $page, $apptTypeRef, $event, $day) = @_;
-	
+
 	$self->populateApptTypeTracker($page, $apptTypeRef, $event, $day);
 
-	my $apptType = $STMTMGR_SCHEDULING->getRowAsHash($page, STMTMGRFLAG_NONE, 'selApptTypeById', 
+	my $apptType = $STMTMGR_SCHEDULING->getRowAsHash($page, STMTMGRFLAG_NONE, 'selApptTypeById',
 		$event->{appt_type_id});
 
-	$page->property('apptType', $apptType);		
-	
+	$page->property('apptType', $apptType);
+
 	my $effectiveMinuteSet = new Set::IntSpan();
 	if ($self->{appt_type} && $self->{appt_type} != -1)
 	{
@@ -281,22 +281,22 @@ sub handleApptType
 
 		$effectiveMinuteSet = $effectiveMinuteSet->copy("$startMinute-$endMinute");
 	}
-	
+
 	return $effectiveMinuteSet;
 }
 
 sub processApptTypeRules
 {
 	my ($self, $page, $apptTypeRef, $event, $day) = @_;
-	
+
 	my $dayMinutes = $day * 24 *60;
 	my $apptTypeId = $event->{appt_type_id};
 	my $key = $day . '_' . $apptTypeId;
 	my $apptTime = $event->{start_minute};
-	
+
 	my $apptType = $page->property('apptType');
 	my ($low, $high);
-	
+
 	my $minuteSet = new Set::IntSpan();
 	my $effectiveMinuteSet = new Set::IntSpan();
 
@@ -309,9 +309,9 @@ sub processApptTypeRules
 		return new Set::IntSpan("$low-$high");
 	}
 
-	if ( $self->{appt_type} == $apptType->{appt_type_id} && 
+	if ( $self->{appt_type} == $apptType->{appt_type_id} &&
 			(
-				$apptTypeRef->{$key}->{amCount} >= $apptType->{am_limit} || 
+				$apptTypeRef->{$key}->{amCount} >= $apptType->{am_limit} ||
 				$apptTypeRef->{$key}->{pmCount} >= $apptType->{pm_limit}
 			)
 	)
@@ -331,7 +331,7 @@ sub processApptTypeRules
 			$minuteSet = $minuteSet->copy("$low-$high");
 			$effectiveMinuteSet = $effectiveMinuteSet->union($minuteSet)
 		}
-	
+
 		return $effectiveMinuteSet;
 	}
 
@@ -348,7 +348,7 @@ sub processApptTypeRules
 		#$endMinute += $apptType->{lag_time} if $apptType->{lag_time};
 
 		$effectiveMinuteSet = $effectiveMinuteSet->copy("$startMinute-$endMinute");
-	} 
+	}
 	else
 	{
 		$effectiveMinuteSet = $effectiveMinuteSet->copy("");
@@ -364,13 +364,13 @@ sub processApptTypeRules
 
 		$startMinute -= $apptType->{lead_time} if $apptType->{lead_time};
 		$endMinute += $apptType->{lag_time} if $apptType->{lag_time};
-		
+
 		if (! $apptType->{back_to_back})
 		{
 			my $effectiveDuration = $endMinute - $startMinute;
 			my $back2backStartMinute = $startMinute - $effectiveDuration;
 			my $back2backEndMinute = $endMinute + $effectiveDuration;
-		
+
 			$effectiveMinuteSet = $effectiveMinuteSet->union("$back2backStartMinute-$back2backEndMinute");
 		}
 		else
@@ -378,7 +378,7 @@ sub processApptTypeRules
 			$effectiveMinuteSet = $effectiveMinuteSet->union("$startMinute-$endMinute");
 		}
 
-		if ($apptTypeRef->{$key}->{$apptTime} < $apptType->{num_sim} || 
+		if ($apptTypeRef->{$key}->{$apptTime} < $apptType->{num_sim} ||
 			($apptType->{multiple} && ! $apptType->{num_sim})
 		)
 		{
@@ -387,18 +387,18 @@ sub processApptTypeRules
 			$effectiveMinuteSet = $effectiveMinuteSet->diff("$rawStartTime-$rawEndTime");
 		}
 	}
-	
+
 	return $effectiveMinuteSet;
 }
 
 sub populateApptTypeTracker
 {
 	my ($self, $page, $apptTypeRef, $event, $day) = @_;
-	
+
 	my $apptTypeId = $event->{appt_type_id};
 	my $key = $day . '_' . $apptTypeId;
 	my $apptTime = $event->{start_minute};
-	
+
 	$apptTypeRef->{$key}->{count}++;
 	$apptTypeRef->{$key}->{$apptTime}++;
 
@@ -417,7 +417,7 @@ sub findApptDuration
 	my ($page, $apptTypeId) = @_;
 	return APPT_DEFAULTDURATION if ($apptTypeId == -1 || ! $apptTypeId);
 
-	my $apptType = $STMTMGR_SCHEDULING->getRowAsHash($page, STMTMGRFLAG_NONE,	'selApptTypeById', 
+	my $apptType = $STMTMGR_SCHEDULING->getRowAsHash($page, STMTMGRFLAG_NONE,	'selApptTypeById',
 		$apptTypeId);
 
 	return $apptType->{duration};
@@ -428,7 +428,7 @@ sub findEventSlots
 	my ($self, $page, $eventSlotsRef, $resource_id, $facility_id, $eventId) = @_;
 
 	my $events = $self->fetchEvents($page, $resource_id, $facility_id);
-	
+
 	@{$eventSlotsRef} = ();
 
 	for my $event (@{$events})
@@ -437,9 +437,9 @@ sub findEventSlots
 
 		my @start_day = split (/,/, $event->{start_day});
 		my $day = Date_to_Days(@start_day);
-		
+
 		my $apptDuration = findApptDuration($page, $event->{appt_type_id});
-		
+
 		my $slot = new App::Schedule::Slot (day=>$day);
 		my $end_minute = hhmm2minutes($event->{start_minute}) + $apptDuration;
 		my $minute_range = hhmm2minutes($event->{start_minute}) . "-" . $end_minute;
@@ -460,15 +460,15 @@ sub findEventSlots
 			$slot->{attributes}->{checkinout_stamp} =	($event->{event_status} =~ /1/) ?
 				$event->{checkin_stamp} : $event->{checkout_stamp};
 		}
-	
+
 		push (@$eventSlotsRef, $slot);
 	}
 
 	# Find conflicts
 
-	my @slots = sort {$a->{attributes}->{event_id} <=> $b->{attributes}->{event_id}} 
+	my @slots = sort {$a->{attributes}->{event_id} <=> $b->{attributes}->{event_id}}
 		@$eventSlotsRef;
-	
+
 	for my $slot (@slots)
 	{
 		if ($slot->{attributes}->{parent_id})
@@ -480,12 +480,12 @@ sub findEventSlots
 			my $existingSlot = $slot->{minute_set};
 			$existingSlot = $existingSlot->diff($existingSlot->max());
 			$existingSlot = $existingSlot->diff($existingSlot->min());
-			
+
 			for (@$eventSlotsRef)
 			{
 				next if ($_->{attributes}->{event_id} == $slot->{attributes}->{event_id});
 				my $intersectSet = $_->{minute_set}->intersect($existingSlot);
-				
+
 				unless ($intersectSet->empty) {
 					if ($slot->{attributes}->{event_id} < $_->{attributes}->{event_id})
 					{
@@ -497,19 +497,19 @@ sub findEventSlots
 						$slot->{attributes}->{conflict} = $slot->{attributes}->{parent_id} ?
 							"On Waiting List" : "*** Over-Booked ***";
 					}
-					
+
 					last;
 				}
 			}
 		}
 	}
-	
+
 }
 
 sub fetchEvents
 {
 	my ($self, $page, $resource_id, $facility_id, $flags) = @_;
-	
+
 	my @start_Date = @{$self->{search_start_date}};
 	my @end_Date   = Add_Delta_Days (@start_Date, $self->{search_duration});
 
@@ -533,7 +533,7 @@ sub fetchEvents
 				'sel_events_any_facility', $startDate, $endDate, $resource_id);
 		}
 	}
-	
+
 	return $events;
 }
 
@@ -669,17 +669,17 @@ sub getTemplates
 
 	my $query2 = qq{
 		select to_char(nvl(effective_begin_date,SYSDATE - $ANALYZE_INFINITY_DAYS), 'yyyy,mm,dd') as effective_begin_date,
-			to_char(nvl(effective_end_date, SYSDATE + $ANALYZE_INFINITY_DAYS), 'yyyy,mm,dd') as effective_end_date,
+			to_char(nvl((effective_end_date), SYSDATE + $ANALYZE_INFINITY_DAYS), 'yyyy,mm,dd') as effective_end_date,
 			months, days_of_week, days_of_month,
-			to_char(nvl(start_time,trunc(sysdate)), 'hh24mi') as start_time,
-			to_char(nvl(end_time,trunc(sysdate)-1/24/3600), 'hh24mi') as end_time,
+			to_char(nvl(start_time, trunc(sysdate)), 'hh24mi') as start_time,
+			to_char(nvl(end_time, trunc(sysdate)-1/24/3600), 'hh24mi') as end_time,
 			available, facility_id, template_id, caption, patient_types, appt_types,
 			Sch_Template_R_Ids.member_name as attendee_id
 		from Sch_Template, Sch_Template_R_Ids
 		where upper(Sch_Template_R_Ids.member_name) = upper(?)
 			$facilityWhereClause
 			and status = 1
-			and nvl(effective_end_date, sysdate+1) > sysdate
+			--and nvl(effective_end_date, sysdate+1) >= trunc(sysdate)
 			and Sch_Template.template_id = Sch_Template_R_Ids.parent_id
 	};
 
@@ -721,10 +721,6 @@ sub findResourceIds
 
 	unless (@{$arrayRef})
 	{
-		#my $assocResources = $STMTMGR_COMPONENT_SCHEDULING->getRowsAsHashList($page, STMTMGRFLAG_NONE,
-		#	'sel_worklist_resources', $page->session('user_id'), $WORKLIST_ITEMNAME,
-		#	$page->session('org_internal_id'));
-
 		my $assocResources = $STMTMGR_SCHEDULING->getRowsAsHashList($page, STMTMGRFLAG_NONE,
 			'sel_resources_with_templates', $page->session('org_internal_id'));
 
@@ -737,9 +733,6 @@ sub findResourceIds
 sub findFacilityIds
 {
 	my ($self, $page, $arrayRef) = @_;
-
-	#my $assocFacilities = $STMTMGR_COMPONENT_SCHEDULING->getRowsAsHashList($page, STMTMGRFLAG_NONE,
-	#	'sel_worklist_facilities', $page->session('user_id'), $page->session('org_internal_id'));
 
 	my $assocFacilities = $STMTMGR_SCHEDULING->getRowsAsHashList($page, STMTMGRFLAG_NONE,
 		'sel_facilities_from_templates', $page->session('org_internal_id'));

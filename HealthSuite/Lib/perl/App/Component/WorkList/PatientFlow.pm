@@ -18,6 +18,8 @@ use Data::Publish;
 use Exporter;
 use CGI::ImageManager;
 
+use enum qw(BITMASK:VERIFYFLAG_ APPOINTMENT INSURANCE MEDICAL PERSONAL);
+
 use vars qw(@ISA %RESOURCE_MAP @EXPORT
 	@ITEM_TYPES
 	%PATIENT_URLS
@@ -229,6 +231,17 @@ sub getComponentHtml
 		my $orgTitle = $ORG_URLS{$page->session('orgOnSelect')}->{title};
 		my $apptTitle = $APPT_URLS{$page->session('apptOnSelect')}->{title};
 
+		my $flags = $_->{flags};
+		my $insVerifyIcon = $flags & VERIFYFLAG_INSURANCE ? $IMAGETAGS{'icons/verify-insurance-complete'}
+			: $IMAGETAGS{'icons/verify-insurance-incomplete'};
+		my $apptVerifyIcon = $flags & VERIFYFLAG_APPOINTMENT ? $IMAGETAGS{'icons/verify-appointment-complete'}
+			: $IMAGETAGS{'icons/verify-appointment-incomplete'};
+		my $medVerifyIcon = $flags & VERIFYFLAG_MEDICAL ? $IMAGETAGS{'icons/verify-medical-complete'}
+			: $IMAGETAGS{'icons/verify-medical-incomplete'};
+		my $perVerifyIcon = $flags & VERIFYFLAG_PERSONAL ? $IMAGETAGS{'icons/verify-personal-complete'}
+			: $IMAGETAGS{'icons/verify-personal-incomplete'};
+			
+		
 		my @rowData = (
 			qq{
 				<A HREF='/worklist/patientflow/dlg-reschedule-appointment/$_->{event_id}' TITLE='Reschedule Appointment'><IMG SRC='/resources/icons/square-lgray-hat-sm.gif' BORDER=0></A>
@@ -257,17 +270,17 @@ sub getComponentHtml
 			},
 
 			qq{<nobr>
-				<A HREF='javascript:alert("Confirm Appointment with $_->{patient_id}")'
-				TITLE='Confirm Appointment'>$IMAGETAGS{'icons/verify-appointment-incomplete'}</A>
+				<A HREF='/person/$_->{patient_id}/dlg-confirm-appointment/$_->{event_id}'
+				TITLE='Confirm Appointment'>$apptVerifyIcon</A>
 
-				<A HREF='javascript:alert("Verify Insurance for $_->{patient_id}")'
-				TITLE='Verify Insurance'>$IMAGETAGS{'icons/verify-insurance-incomplete'}</A>
+				<A HREF='/person/$_->{patient_id}/dlg-verify-insurance-records/$_->{event_id}/$_->{patient_id}'
+				TITLE='Verify Insurance Records'>$insVerifyIcon</A>
 
-				<A HREF='javascript:alert("Verify Medical Records for $_->{patient_id}")'
-				TITLE='Verify Medical Records'>$IMAGETAGS{'icons/verify-medical-incomplete'}</A>
+				<A HREF='/person/$_->{patient_id}/dlg-verify-medical/$_->{event_id}/$_->{patient_id}'
+				TITLE='Verify Medical Records'>$medVerifyIcon</A>
 
-				<A HREF='javascript:alert("Verify Prerequisites for $_->{patient_id}")'
-				TITLE='Verify Prerequisites'>$IMAGETAGS{'icons/verify-personal-incomplete'}</A>
+				<A HREF='/person/$_->{patient_id}/dlg-verify-personal-records/$_->{event_id}/$_->{patient_id}'
+				TITLE='Verify Personal Records'>$perVerifyIcon</A>
 				</nobr>
 			},
 

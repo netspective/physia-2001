@@ -25,11 +25,23 @@ use enum qw(BITMASK:TIME_ H24 H12 ONLY);
 	time2hhmm
 	stamp2minutes
 	cleanup
+	validateDate
 );
 
 use Date::Calc qw(:all);
 use Date::Manip;
 use App::Schedule::Slot;
+
+use DBI::StatementManager;
+use App::Statements::Scheduling;
+
+sub validateDate
+{
+	my ($date) = @_;
+
+	return ($date !~ /(\d\d)\/(\d\d)\/(\d\d\d\d)/) ? undef : $3 <= 1000 ? undef :
+		ParseDate($date) ? $date : undef;
+}
 
 sub cleanup
 {

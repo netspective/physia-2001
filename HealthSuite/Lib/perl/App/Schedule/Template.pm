@@ -24,6 +24,8 @@ sub findTemplateDays {
 	my $months = $self->{months};
 	my $days_of_week = $self->{days_of_week};
 	my $days_of_month = $self->{days_of_month};
+	
+	@{$self->{effective_end_date}} = Add_Delta_Days(@{$self->{effective_end_date}}, 1);
 
 	my $setofDays = new Set::IntSpan;
 

@@ -307,14 +307,16 @@ sub prepare_view_apptsheet
 	
 	if ($self->param('_seldate'))
 	{
-		my ($month, $day, $year) = split(/\//, $self->param('_seldate'));
-		$year = 1000 if $year < 1000;
+		#my ($month, $day, $year) = split(/\//, $self->param('_seldate'));
+		#$year = 1000 if $year < 1000;
 
-		eval{
-			check_date($year, $month, $day);
-		};
+		#eval{
+		#	check_date($year, $month, $day);
+		#};
+		
 		$selectedDate =  $@ ? 'today' : $self->param('_seldate');
-		$selectedDate = 'today' if $year < 1001;
+		#$selectedDate = 'today' if $year < 1001;
+		$selectedDate = 'today' unless validateDate($self->param('_seldate'));
 	}
 	else
 	{
@@ -577,7 +579,7 @@ sub getApptSheetHeaderHtml
 		<tr>
 			<FORM name='dateForm' method=POST onsubmit="updatePage(document.dateForm.selDate.value); return false;">
 			<td ALIGN=LEFT>
-					<SELECT onChange="document.dateForm.selDate.value = this.options[this.selectedIndex].value;
+					<SELECT onChange="document.dateForm.selDate.value = this.value;
 						updatePage(document.dateForm.selDate.value); return false;">
 						$chooseDateOptsHtml
 					</SELECT>
@@ -586,7 +588,7 @@ sub getApptSheetHeaderHtml
 
 					&nbsp
 					<input name=left  type=button value='<' onClick="updatePage('$prevDay')" title="Goto $pDay">
-					<INPUT size=13 name="selDate" type="text" value="$fmtDate">
+					<INPUT size=13 maxlength=10 name="selDate" type="text" value="$fmtDate">
 					<input name=right type=button value='>' onClick="updatePage('$nextDay')" title="Goto $nDay">
 			</td>
 			</FORM>

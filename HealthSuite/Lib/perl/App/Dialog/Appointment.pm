@@ -12,6 +12,7 @@ use App::Dialog::Field::Person;
 
 use DBI::StatementManager;
 use App::Statements::Scheduling;
+use App::Statements::Component::Scheduling;
 use App::Statements::Person;
 use vars qw(@ISA);
 use Date::Manip;
@@ -20,6 +21,8 @@ use Date::Calc qw(:all);
 use App::Dialog::Field::RovingResource;
 use App::Dialog::Field::Organization;
 use App::Dialog::Field::Scheduling;
+
+use App::Component::WorkList::PatientFlow;
 
 use App::Schedule::Utilities;
 use vars qw(@ISA %RESOURCE_MAP);
@@ -34,7 +37,8 @@ use vars qw(@ISA %RESOURCE_MAP);
 		_arl_cancel => ['event_id'],
 		_arl_noshow => ['event_id'],
 		_arl_reschedule => ['event_id'],
-		_modes => ['add', 'update', 'remove', 'noshow', 'cancel', 'reschedule'],
+		_arl_confirm => ['event_id'],
+		_modes => ['add', 'update', 'remove', 'noshow', 'cancel', 'reschedule', 'confirm'],
 	},
 );
 
@@ -78,6 +82,7 @@ sub new
 	$self->addContent(
 		# the following hidden fields are needed in the "execute" phase
 		new CGI::Dialog::Field(type => 'hidden', name => 'event_id'),
+		new CGI::Dialog::Field(type => 'hidden', name => 'parent_id'),
 
 		new App::Dialog::Field::Person::ID(caption => 'Patient ID',
 			name => 'attendee_id',
@@ -123,6 +128,12 @@ sub new
 					name => 'appt_time',
 					type => 'time',
 					options => FLDFLAG_REQUIRED,
+				),
+				new CGI::Dialog::Field(
+					name => 'find_avail_slot',
+					type => 'select',
+					selOptions => '',
+					style => 'radio',
 					postHtml => $findAvailSlotHint,
 				),
 			],
@@ -191,12 +202,26 @@ sub new
 			hints => $waitingListHint,
 		),
 
+		new App::Dialog::Field::Person::ID(caption => 'Confirmed By',
+			name => 'app_verified_by',
+			types => ['Staff', 'Physician'],
+			size => 20,
+			useShortForm => 1,
+			options => FLDFLAG_REQUIRED,
+		),
+		
+		new App::Dialog::Field::Scheduling::Date(caption => 'Confirm Date',
+			name => 'app_verify_date',
+			type => 'date',
+			futureOnly => 0,
+			options => FLDFLAG_REQUIRED,
+		),
 	);
 	$self->{activityLog} =
 	{
 		scope =>'event',
 		key => "#field.attendee_id#",
-		data => "appointment '#field.attendee_id#' <a href='/person/#field.attendee_id#/profile'>#field.attendee_id#</a>"
+		data => "appointment 'Event #field.event_id#' <a href='/person/#field.attendee_id#/profile'>#field.attendee_id#</a>"
 	};
 	$self->addFooter(new CGI::Dialog::Buttons);
 
@@ -214,6 +239,39 @@ sub setPhysicianFields
 }
 
 ###############################
+# getSupplementaryHtml
+###############################
+
+sub getSupplementaryHtml
+{
+	my ($self, $page, $command) = @_;
+	
+	return $self->SUPER::getSupplementaryHtml($page, $command) unless $command eq 'confirm';
+
+	if(my $personId = $page->field('attendee_id'))
+	{
+		return (CGI::Dialog::PAGE_SUPPLEMENTARYHTML_TOP, qq{
+			<TABLE CELLSPACING=0 BORDER=0 CELLPADDING=0>
+				<TR VALIGN=TOP>
+					<TD>
+						<font size=1 face=arial>
+						#component.stpt-person.contactMethodsAndAddresses#<BR>
+						#component.stp-person.patientAppointments#</BR>
+						</font>
+					</TD>
+					<TD WIDTH=10><FONT SIZE=1>&nbsp;</FONT></TD>
+					<TD>
+						#component.stpt-person.accountPanel#<BR>
+						#component.stpt-person.careProviders#<BR>
+					</TD>
+				</TR>
+			</TABLE>
+		});
+	}
+	return $self->SUPER::getSupplementaryHtml($page, $command);
+}
+
+###############################
 # makeStateChanges functions
 ###############################
 
@@ -223,13 +281,20 @@ sub makeStateChanges
 
 	$self->SUPER::makeStateChanges($page, $command, $dlgFlags);
 
-	$self->updateFieldFlags('discard_remarks', FLDFLAG_INVISIBLE, $command =~ m/^(add|update)$/);
-	$self->updateFieldFlags('rescheduled', FLDFLAG_INVISIBLE, $command =~ m/^(add|cancel|noshow|update)$/);
-	$self->updateFieldFlags('resource_id', FLDFLAG_READONLY, $command =~ m/^(cancel|noshow|update)$/);
-	$self->updateFieldFlags('conflict_check', FLDFLAG_INVISIBLE, $command =~ m/^(cancel|noshow)$/);
-	$self->updateFieldFlags('roving_physician', FLDFLAG_INVISIBLE, $command =~ m/^(cancel|noshow|update)$/);
-	$self->updateFieldFlags('waiting_patients', FLDFLAG_INVISIBLE, $command =~ m/^(add)$/);
-	$self->updateFieldFlags('attendee_id', FLDFLAG_READONLY, $command =~ m/^update$/);
+	$self->updateFieldFlags('discard_remarks', FLDFLAG_INVISIBLE, $command =~ m/^(add|update|confirm)$/);
+	$self->updateFieldFlags('rescheduled', FLDFLAG_INVISIBLE, $command =~ m/^(add|cancel|noshow|update|confirm)$/);
+	$self->updateFieldFlags('resource_id', FLDFLAG_READONLY, $command =~ m/^(cancel|noshow|update|confirm)$/);
+	$self->updateFieldFlags('conflict_check', FLDFLAG_INVISIBLE, $command =~ m/^(cancel|noshow|confirm)$/);
+	$self->updateFieldFlags('roving_physician', FLDFLAG_INVISIBLE, $command =~ m/^(cancel|noshow|update|confirm)$/);
+	$self->updateFieldFlags('waiting_patients', FLDFLAG_INVISIBLE, $command =~ m/^(add|confirm)$/);
+	$self->updateFieldFlags('attendee_id', FLDFLAG_READONLY, $command =~ m/^(update|confirm)$/);
+	
+	$self->updateFieldFlags('app_verified_by', FLDFLAG_INVISIBLE, $command !~ m/^(confirm)$/);
+	$self->updateFieldFlags('app_verify_date', FLDFLAG_INVISIBLE, $command !~ m/^(confirm)$/);
+	
+	my $fmap = $self->{fieldMap};
+	my $field = $self->{content}->[$fmap->{appt_date_time}]->{fields}->[2];
+	$field->{postHtml} = '' if $command =~ m/^(cancel|noshow|confirm)$/;
 }
 
 sub makeStateChanges_cancel
@@ -250,6 +315,12 @@ sub makeStateChanges_cancel
 }
 
 sub makeStateChanges_noshow
+{
+	my ($self, $page, $command, $activeExecMode, $dlgFlags) = @_;
+	$self->makeStateChanges_cancel($page, $command, $activeExecMode, $dlgFlags);
+}
+
+sub makeStateChanges_confirm
 {
 	my ($self, $page, $command, $activeExecMode, $dlgFlags) = @_;
 	$self->makeStateChanges_cancel($page, $command, $activeExecMode, $dlgFlags);
@@ -302,6 +373,7 @@ sub populateData_update
 		'selPopulateAppointmentDialog', $eventId);
 	$page->param('old_appt_date', $page->field('appt_date'));
 	$page->param('old_appt_time', $page->field('appt_time'));
+	#$page->param('_f_parent_id', $page->field('parent_id'));
 }
 
 sub populateData_cancel
@@ -324,6 +396,23 @@ sub populateData_reschedule
 	populateData_update(@_);
 }
 
+sub populateData_confirm
+{
+	my ($self, $page, $command, $activeExecMode, $flags) = @_;
+	
+	return unless $flags & CGI::Dialog::DLGFLAG_DATAENTRY_INITIAL;
+	
+	my $eventId = $page->param('event_id');
+	
+	$page->field('event_id', $eventId);
+	$page->field('app_verified_by', $page->session('user_id'));
+	
+	$page->param('_verified_', $STMTMGR_COMPONENT_SCHEDULING->createFieldsFromSingleRow($page, STMTMGRFLAG_NONE,
+		'sel_populateAppConfirmDialog', $eventId));
+	
+	populateData_update(@_);
+}
+
 sub customValidate
 {
 	my ($self, $page) = @_;
@@ -340,7 +429,7 @@ sub customValidate
 
 	if ($page->field('conflict_check'))
 	{
-		return if ($page->param('old_appt_date') eq $page->field('appt_date') && 
+		return 1 if ($page->param('old_appt_date') eq $page->field('appt_date') && 
 			$page->param('old_appt_time') eq $page->field('appt_time'));
 		
 		unless ($self->validateMultiAppts($page))
@@ -394,8 +483,6 @@ sub validateAvailTemplate
 	$availTimes = "None <br>" if $availTimes =~ /12:00 AM \- 12:00 AM/;
 	my $availSlot = $available_slots[0];
 	
-	#$availTimes = "None <br>" if $availSlot->{minute_set}->empty();
-
 	my $apptBeginMinutes = hhmmAM2minutes($page->field('appt_time'));
 	my $apptEndMinutes = $apptBeginMinutes + $page->field('duration');
 	my $apptMinutesRange = "$apptBeginMinutes-$apptEndMinutes";
@@ -434,12 +521,16 @@ sub validateMultiAppts
 			<u>Select action</u>: <br>
 				<input name=_f_whatToDo type=radio value="wl" CHECKED
 					onClick="document.dialog._f_whatToDo[0].checked=true"> Place $personId on Waiting List <br>
+				<input name=_f_whatToDo type=radio value="db"
+					onClick="document.dialog._f_whatToDo[1].checked=true"> Over-Book $personId <br>
 				<input name=_f_whatToDo type=radio value="cancel"
-					onClick="document.dialog._f_whatToDo[1].checked=true"> Cancel
+					onClick="document.dialog._f_whatToDo[2].checked=true"> Cancel
 
 				<input name=_f_processConflict type=hidden value=1>
-				<input name=_f_parent_id type=hidden value="$parentEventId">
+				
 			});
+			
+			$page->field('parent_id', $parentEventId);
 		}
 	}
 	else
@@ -447,9 +538,8 @@ sub validateMultiAppts
 		$page->delete('_f_parent_id');
 	}
 
-	#<input name=_f_whatToDo type=radio value="db"
-	#	onClick="document.dialog._f_whatToDo[1].checked=true"> Over-Book $personId <br>
-
+	#<input name=_f_parent_id type=hidden value="$parentEventId">
+	
 	return $parentEventId;
 }
 
@@ -537,14 +627,41 @@ sub handleWaitingList
 sub execute
 {
 	my ($self, $page, $command, $flags) = @_;
-
+	
 	my $eventId = $page->field('event_id');
-	my $timeStamp = $page->getTimeStamp();
+	
+	if ($command eq 'confirm')
+	{
+		my $eventAttribute = $STMTMGR_COMPONENT_SCHEDULING->getRowAsHash($page, STMTMGRFLAG_NONE,
+			'sel_EventAttribute', $eventId, App::Universal::EVENTATTRTYPE_APPOINTMENT);
 
+		my $itemId = $eventAttribute->{item_id};
+		my $verifyFlags = $eventAttribute->{value_intb};
+		$verifyFlags |= App::Component::WorkList::PatientFlow::VERIFYFLAG_APPOINTMENT;
+
+		$page->schemaAction(
+			'Event_Attribute', 'update',
+			item_id => $itemId,
+			value_intB => $verifyFlags,
+		);
+		
+	 	$page->schemaAction(
+			'Sch_Verify', $page->param('_verified_') ? 'update' : 'add',
+			event_id => $eventId,
+			person_id => $page->field('attendee_id'),
+			app_verified_by => $page->field('app_verified_by'),
+			app_verify_date => $page->field('app_verify_date'),
+			owner_org_id => $page->session('org_internal_id'),
+		);
+
+		$self->handlePostExecute($page, $command, $flags);
+	}
+
+	my $timeStamp = $page->getTimeStamp();
 	my $start_time = $page->field('appt_date') . ' '  . $page->field('appt_time');
 
-	my $parentId = $page->field('parent_id');
-	#undef $parentId if $page->field('whatToDo') eq 'db';
+	my $parentId = $page->param('_f_parent_id');
+	undef $parentId if defined $page->field('whatToDo') && $page->field('whatToDo') eq 'db';
 
 	my $apptDuration = App::Schedule::Analyze::findApptDuration($page, $page->field('appt_type'));
 

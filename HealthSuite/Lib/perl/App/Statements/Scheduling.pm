@@ -65,11 +65,21 @@ $STMTFMT_SEL_EVENTS = qq{
 		e.scheduled_by_id,
 		to_char(e.scheduled_stamp, '$SQLSTMT_DEFAULTSTAMPFORMAT') as scheduled_stamp,
 		at.caption as appt_type,
-		e.appt_type as appt_type_id
-	from Appt_Type at, Appt_Status stat, Appt_Attendee_type aat,
-		Person patient, Event_Attribute ea, Event e
-	where e.start_time between to_date(?, 'yyyy,mm,dd')
-			and to_date(?, 'yyyy,mm,dd')
+		e.appt_type as appt_type_id,
+		(SELECT value_text
+			FROM Person_Attribute  pa
+			WHERE pa.parent_id = patient.person_id
+				AND pa.item_name = 'Patient/Account Number'
+		) as account_number,
+		(SELECT value_text
+			FROM Person_Attribute  pa
+			WHERE pa.parent_id = patient.person_id
+				AND pa.item_name = 'Patient/Chart Number'
+		) as chart_number	
+	from Appt_Type at, Appt_Status stat, Appt_Attendee_type aat, Person patient, 
+		Event_Attribute ea, Event e
+	where e.start_time >= to_date(?, 'yyyy,mm,dd')
+		and e.start_time <= to_date(?, 'yyyy,mm,dd')
 		and e.discard_type is null
 		and e.event_status in (0,1,2)
 		%facility_clause%
@@ -124,7 +134,7 @@ $STMTMGR_SCHEDULING = new App::Statements::Scheduling(
 		facility_clause => undef,
 		orderByClause => 'order by e.start_time, nvl(e.parent_id, 0), e.event_id',
 	},
-	
+
 	'updSchedulingPref' => qq{
 		update Person_Attribute set value_int = value_int-1
 		where parent_id = ?
@@ -265,7 +275,7 @@ $STMTMGR_SCHEDULING = new App::Statements::Scheduling(
 			ea.value_text as attendee_id,
 			ea.value_int as patient_type,
 			ea.value_textB as resource_id,
-			e.appt_type
+			e.appt_type, e.parent_id
 		from Event_Attribute ea, event e
 		where event_id = :1
 			and ea.parent_id = e.event_id
@@ -388,7 +398,7 @@ $STMTMGR_SCHEDULING = new App::Statements::Scheduling(
 		where owner_org_id = :1
 		order by caption
 	},
-	
+
 	'sel_ApptTypesDropDown' => qq{
 		select appt_type_id, caption || ' (' || appt_type_id || ')' as caption
 		from Appt_Type
@@ -423,7 +433,7 @@ $STMTMGR_SCHEDULING = new App::Statements::Scheduling(
 	},
 
 	'updAssignResource' => qq{
-		update Event_Attribute set value_textB = ? 
+		update Event_Attribute set value_textB = ?
 		where upper(value_textB) = upper(?)
 		and parent_id in
 			(select event_id from Event
@@ -434,7 +444,7 @@ $STMTMGR_SCHEDULING = new App::Statements::Scheduling(
 	},
 
 	'updAssignResource_noFacility' => qq{
-		update Event_Attribute set value_textB = ? 
+		update Event_Attribute set value_textB = ?
 		where upper(value_textB) = upper(?)
 		and parent_id in
 			(select event_id from Event
@@ -462,19 +472,34 @@ $STMTMGR_SCHEDULING = new App::Statements::Scheduling(
 	'selRovingResources' => qq{
 		select distinct member_name from Sch_Template_R_Ids where upper(member_name) like ?
 	},
-	
+
 	'sel_resources_with_templates' => qq{
 		select distinct member_name as resource_id
 		from Sch_Template_R_Ids
 		where parent_id in (select template_id from Sch_Template where owner_org_id = ?)
 	},
-	
+
 	'sel_facilities_from_templates' => qq{
 		select distinct facility_id
 		from Sch_Template
 		where owner_org_id = ?
 	},
-
+	
+	'sel_resources_like' => qq{
+		select distinct member_name as person_id
+		from Sch_Template_R_Ids
+		where upper(member_name) like upper(?)
+			and parent_id in (select template_id from Sch_Template where owner_org_id = ?)
+	},
+	
+	'sel_facilities_like' => qq{
+		select distinct org_internal_id, org_id
+		from Org, Sch_Template
+		where upper(org_id) like upper(?)
+			and Org.org_internal_id = Sch_Template.facility_id	
+			and Sch_Template.owner_org_id = ?
+	},
+	
 # -- WAITING LIST -----------------------------------------------------------------------------
 
 	'selAppointmentConflictCheck' => qq{

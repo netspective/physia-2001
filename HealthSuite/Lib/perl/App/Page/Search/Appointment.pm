@@ -31,11 +31,11 @@ sub handleARL
 
 	unless ($self->param('searchAgain'))
 	{
-		my ($resource_id, $facility_id, $action, $fromDate, $toDate, $apptStatus, $eventId) =
+		my ($resource_ids, $facility_ids, $action, $fromDate, $toDate, $apptStatus, $eventId) =
 			@{$pathItems}[1..7];
 
-		$self->param('resource_id', $resource_id);
-		$self->param('facility_id', $facility_id);
+		$self->param('resource_ids', $resource_ids);
+		$self->param('facility_ids', $facility_ids);
 		$self->param('action', $action);
 		$self->param('appt_status', "$apptStatus,$apptStatus") if $apptStatus;
 		$self->param('event_id', $eventId);
@@ -126,14 +126,14 @@ sub getForm
 		</nobr>
 		<br>
 
-		Resource:
-		<input name='resource_id' size=17 maxlength=32 value="@{[$self->param('resource_id')]}" title='Resource ID'>
+		Resource(s):
+		<input name='resource_ids' size=17 maxlength=64 value="@{[$self->param('resource_ids')]}" title='Resource ID'>
 			<a href="javascript:doFindLookup(document.search_form, document.search_form.resource_id, '/lookup/physician/id');">
 		<img src='/resources/icons/arrow_down_blue.gif' border=0 title="Lookup Resource ID"></a>
 
-		Facility:
-		<input name='facility_id' size=17 maxlength=32 value="@{[$self->param('facility_id')]}" title='Facility ID'>
-			<a href="javascript:doFindLookup(document.search_form, document.search_form.facility_id, '/lookup/org/id');">
+		Facility(s):
+		<input name='facility_ids' size=17 maxlength=64 value="@{[$self->param('facility_ids')]}" title='Facility ID'>
+			<a href="javascript:doFindLookup(document.search_form, document.search_form.facility_ids, '/lookup/org/id');">
 		<img src='/resources/icons/arrow_down_blue.gif' border=0 title="Lookup Facility ID"></a>
 		<input type=submit name="execute" value="Go">
 		
@@ -159,55 +159,57 @@ sub execute
 {
 	my ($self) = @_;
 
-	$self->param('search_from_date', UnixDate('today', '%m/%d/%Y')) unless $self->param('search_from_date');
-	$self->param('search_to_date', UnixDate('nextweek', '%m/%d/%Y')) unless $self->param('search_to_date');
+	$self->param('search_from_date', UnixDate('today', '%m/%d/%Y')) 
+		unless validateDate($self->param('search_from_date'));
+		
+	$self->param('search_to_date', UnixDate('nextweek', '%m/%d/%Y')) 
+		unless validateDate($self->param('search_to_date'));
 
+	my @resource_ids = split(/\s*,\s*/, cleanup($self->param('resource_ids')));
+	my @facility_ids = split(/\s*,\s*/, cleanup($self->param('facility_ids')));
+	
 	if ($self->param('unAvailEventSearch'))
 	{
 		$self->param('action', 5) unless $self->param('action');
-
-		my @resource_ids = split(/,/, $self->param('resource_id'));
-		my @facility_ids = split(/,/, $self->param('facility_id'));
-		
-		my @internalOrgIds = ();
-		for (@facility_ids)
-		{
-			my $internalOrgId = $STMTMGR_ORG->getSingleValue($self, STMTMGRFLAG_NONE,
-				'selOrgId', $self->session('org_internal_id'), uc($_));
-			push(@internalOrgIds, $internalOrgId) if defined $internalOrgId;
-		}
-
-		unless (scalar @internalOrgIds >= 1)
-		{
-			my @orgIds = ();
+			my @internalOrgIds = ();
 			for (@facility_ids)
 			{
-				chomp;
-				if ($_ =~ /.*\D.*/)
-				{
-					$self->addError("Facility '$_' is NOT a valid Facility in this Org.  Please verify and try again.");
-					return;
-				}
-
-				my $orgId = $STMTMGR_ORG->getSingleValue($self, STMTMGRFLAG_NONE, 'selId', $_);
-				if ($orgId)
-				{
-					push(@orgIds, $orgId);
-					push(@internalOrgIds, $_);
-				}
-				$self->param('facility_id', join(',', @orgIds));
+				my $internalOrgId = $STMTMGR_ORG->getSingleValue($self, STMTMGRFLAG_NONE,
+					'selOrgId', $self->session('org_internal_id'), uc($_));
+				push(@internalOrgIds, $internalOrgId) if defined $internalOrgId;
 			}
-		}
-		
+
+			unless (scalar @internalOrgIds >= 1)
+			{
+				my @orgIds = ();
+				for (@facility_ids)
+				{
+					chomp;
+					if ($_ =~ /.*\D.*/)
+					{
+						$self->addError("Facility '$_' is NOT a valid Facility in this Org.  Please verify and try again.");
+						return;
+					}
+
+					my $orgId = $STMTMGR_ORG->getSingleValue($self, STMTMGRFLAG_NONE, 'selId', $_);
+					if ($orgId)
+					{
+						push(@orgIds, $orgId);
+						push(@internalOrgIds, $_);
+					}
+					$self->param('facility_ids', join(',', @orgIds));
+				}
+			}
+
 		my @search_start_date = Decode_Date_US($self->param('search_from_date'));
-		my @search_end_date = Decode_Date_US($self->param('search_to_date'));
+		my @search_end_date = Add_Delta_Days(Decode_Date_US($self->param('search_to_date')), 1);
 		my $search_duration = Delta_Days(@search_start_date, @search_end_date);
 
 		my $sa = new App::Schedule::Analyze (
 			resource_ids      => \@resource_ids,
 			facility_ids      => \@internalOrgIds,
 			search_start_date => \@search_start_date,
-			search_duration   => $search_duration,
+			search_duration   => $search_duration || 1,
 			patient_type      => App::Schedule::Analyze::ANALYZE_ALLTEMPLATES,
 			appt_type         => App::Schedule::Analyze::ANALYZE_ALLTEMPLATES,
 		);
@@ -245,75 +247,74 @@ sub execute
 		my $fromDate = $self->param('search_from_date');
 		my $toDate = $self->param('search_to_date');
 		
-		my $resourceId = $self->param('resource_id') || '*';
-		my $facilityId = $self->param('facility_id') || '*';
-		my ($apptStatusFrom, $apptStatusTo);
-
 		my $fromStamp = $fromDate;
 		my $toStamp   = $toDate;
-
 		$fromStamp =~ s/_/ /g;
 		$toStamp   =~ s/_/ /g;
-
 		$fromStamp .= " 12:00 AM" unless $fromStamp =~ / \d\d:\d\d[ ]*[AaPp][Mm]/;
 		$toStamp   .= " 11:59 PM" unless $toStamp   =~ / \d\d:\d\d[ ]*[AaPp][Mm]/;
 
+		my ($apptStatusFrom, $apptStatusTo);
 		if ($self->param('appt_status')) {
 			($apptStatusFrom, $apptStatusTo) = split(/,/, $self->param('appt_status'));
 		} else {
 			($apptStatusFrom, $apptStatusTo) = (0, 0);
 		}
 
-		$resourceId =~ s/\*/%/g;
-		$facilityId =~ s/\*/%/g;
-
-		my $appts;
-		if ($self->param('order_by') eq 'name')
-		{
-			#$html = $STMTMGR_APPOINTMENT_SEARCH->createHtml($self, STMTMGRFLAG_NONE, 'sel_appointment_orderbyName',
-			#	[$facilityId, "$fromStamp", "$toStamp", $resourceId, $apptStatusFrom, $apptStatusTo, $self->session('org_internal_id')]
-			#),
-			$appts = $STMTMGR_APPOINTMENT_SEARCH->getRowsAsHashList($self, STMTMGRFLAG_NONE, 'sel_appointment_orderbyName',
-				$facilityId, "$fromStamp", "$toStamp", $resourceId, $apptStatusFrom, $apptStatusTo, $self->session('org_internal_id')
-			);
-		}
-		else
-		{
-			#$html = $STMTMGR_APPOINTMENT_SEARCH->createHtml($self, STMTMGRFLAG_NONE, 'sel_appointment',
-			#	[$facilityId, "$fromStamp", "$toStamp", $resourceId, $apptStatusFrom, $apptStatusTo, $self->session('org_internal_id')]
-			#),
-			$appts = $STMTMGR_APPOINTMENT_SEARCH->getRowsAsHashList($self, STMTMGRFLAG_NONE, 'sel_appointment',
-				$facilityId, "$fromStamp", "$toStamp", $resourceId, $apptStatusFrom, $apptStatusTo, $self->session('org_internal_id')
-			);
-		}
-		
 		my @data = ();
-		for (@{$appts})
+		
+		push(@resource_ids, '*') unless @resource_ids;
+		push(@facility_ids, '*') unless @facility_ids;
+		
+		for my $resourceId (@resource_ids)
 		{
-			my @rowData = (
-				$_->{simple_name},
-				$_->{start_time},
-				$_->{resource_id},
-				$_->{patient_type},
-				$_->{subject},
-				$_->{home_phone},
-				$_->{caption},
-				$_->{org_id},
-				$_->{remarks},
-				$_->{event_id},
-				$_->{scheduled_by_id},
-				$_->{scheduled_stamp},
-				$_->{patient_id},
-				$_->{chart},
-				$_->{appt_type},
-			);
-			
-			push(@data, \@rowData);
+			$resourceId =~ s/\*/%/g;
+
+			for my $facilityId (@facility_ids)
+			{
+				$facilityId =~ s/\*/%/g;
+
+				my $appts;
+				if ($self->param('order_by') eq 'name')
+				{
+					$appts = $STMTMGR_APPOINTMENT_SEARCH->getRowsAsHashList($self, STMTMGRFLAG_NONE, 'sel_appointment_orderbyName',
+						$facilityId, "$fromStamp", "$toStamp", $resourceId, $apptStatusFrom, $apptStatusTo, $self->session('org_internal_id')
+					);
+				}
+				else
+				{
+					$appts = $STMTMGR_APPOINTMENT_SEARCH->getRowsAsHashList($self, STMTMGRFLAG_NONE, 'sel_appointment',
+						$facilityId, "$fromStamp", "$toStamp", $resourceId, $apptStatusFrom, $apptStatusTo, $self->session('org_internal_id')
+					);
+				}
+
+				for (@{$appts})
+				{
+					my @rowData = (
+						$_->{simple_name},
+						$_->{start_time},
+						$_->{resource_id},
+						$_->{patient_type},
+						$_->{subject},
+						$_->{home_phone},
+						$_->{caption},
+						$_->{org_id},
+						$_->{remarks},
+						$_->{event_id},
+						$_->{scheduled_by_id},
+						$_->{scheduled_stamp},
+						$_->{patient_id},
+						$_->{appt_type},
+						$_->{account_number},
+						$_->{chart_number},
+					);
+
+					push(@data, \@rowData);
+				}
+			}
 		}
 		
 		my $html = createHtmlFromData($self, 0, \@data, $App::Statements::Search::Appointment::STMTRPTDEFN_DEFAULT);
-		
-		
 		$self->addContent('<CENTER>', $html, '</CENTER>');
 	}
 

@@ -29,12 +29,8 @@ $STMTRPTDEFN_DEFAULT =
 			options => PUBLCOLFLAG_DONTWRAP,
 		},
 
-		{ head => 'Chart',
-			colIdx => 13,
-		},
-
-		{ head => 'Account',
-			colIdx => 13,
+		{ head => 'Account / Chart',
+			dataFmt => 'Account: #14#<br>Chart: #15#'
 		},
 
 		{
@@ -51,7 +47,7 @@ $STMTRPTDEFN_DEFAULT =
 				<a href="javascript:chooseItem('/search/appointment//#7#')" 
 					title='View #7# Appointments' style='text-decoration:none'>#7#</a>
 				<BR>
-				Appt Type: #14#<BR>
+				Appt Type: #13#<BR>
 				Reason for Visit: <b>#4#</b><BR>
 				#8# <br>
 				Scheduled by #10# <br>
@@ -75,8 +71,17 @@ my $APPOINTMENT_COLUMNS = qq
 	scheduled_by_id,
 	TO_CHAR(scheduled_stamp, '$SQLSTMT_DEFAULTSTAMPFORMAT') AS scheduled_stamp,
 	patient.person_id AS patient_id,
-	'TBD' as chart,
-	at.caption as appt_type
+	at.caption as appt_type,
+	(SELECT value_text
+		FROM Person_Attribute  pa
+		WHERE pa.parent_id = patient.person_id
+			AND pa.item_name = 'Patient/Account Number'
+	) as account_number,
+	(SELECT value_text
+		FROM Person_Attribute  pa
+		WHERE pa.parent_id = patient.person_id
+			AND pa.item_name = 'Patient/Chart Number'
+	) as chart_number	
 };
 
 my $APPOINTMENT_TABLES = qq{

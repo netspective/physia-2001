@@ -14,10 +14,11 @@ use App::Schedule::Utilities;
 use DBI::StatementManager;
 use App::Statements::Scheduling;
 use App::Statements::Org;
-use Devel::ChangeLog;
+use Set::IntSpan;
 
 use CGI::Dialog;
 use App::Dialog::Field::RovingResource;
+
 
 use vars qw(@ISA %RESOURCE_MAP);
 @ISA = qw(App::Page::Search);
@@ -140,6 +141,7 @@ sub getForm
 			$chooseDateOptsHtml
 		</SELECT>
 		
+		<SCRIPT SRC='/lib/calendar.js'></SCRIPT>
 		<input name='start_date' id='start_date' size=10 maxlength=10 title='Start Date'
 			value="@{[$self->param('start_date') || UnixDate ('today', '%m/%d/%Y')]}">
 		<A HREF="javascript: showCalendar(document.search_form.start_date);">
@@ -190,14 +192,67 @@ sub getForm
 	});
 }
 
-sub execute
+sub findResourceIds
 {
-	my ($self) = @_;
+	my ($self, $resourcesString) = @_;
 
-	my @resource_ids = split(/\s*,\s*/, $self->param('resource_ids'));
-	my @facility_ids = split(/\s*,\s*/, $self->param('facility_ids'));
+	my $orgInternalId = $self->session('org_internal_id');
+	my @resource_ids = ();
 	
+	if ($resourcesString =~ /(\*|\%)/)
+	{
+		for my $r (split(/\s*,\s*/, cleanup($resourcesString)))
+		{
+			$r =~ s/\*/\%/g;
+			my $resources = $STMTMGR_SCHEDULING->getRowsAsHashList($self, STMTMGRFLAG_NONE,
+			'sel_resources_like', $r, $orgInternalId);
+			
+			for (@{$resources}) {
+				push(@resource_ids, $_->{person_id});
+			}
+		}
+	}
+	else
+	{
+		@resource_ids = split(/\s*,\s*/, cleanup($resourcesString));
+	}
+
+	return @resource_ids;
+}
+
+sub findFacilityIds
+{
+	my ($self, $facilityString) = @_;
+	
+	my $orgInternalId = $self->session('org_internal_id');
+	my @facilities = split(/\s*,\s*/, cleanup($facilityString));
+	
+	my @facility_ids = ();
 	my @internalOrgIds = ();
+	
+	for my $f (@facilities)
+	{
+		if ($f =~ /(\%|\*)/)
+		{
+			my $f1 = $f;
+			$f1 =~ s/\*/\%/g;
+			my $fac = $STMTMGR_SCHEDULING->getRowsAsHashList($self, STMTMGRFLAG_NONE, 
+				'sel_facilities_like', $f1, $orgInternalId);
+			
+			for (@{$fac}) {
+				push(@internalOrgIds, $_->{org_internal_id});
+			}
+		}
+		elsif ($f =~ /^\d+$/)
+		{
+			push(@internalOrgIds, $f);
+		}
+		else
+		{
+			push(@facility_ids, $f);
+		}
+	}
+	
 	for (@facility_ids)
 	{
 		my $internalOrgId = $STMTMGR_ORG->getSingleValue($self, STMTMGRFLAG_NONE,
@@ -208,13 +263,13 @@ sub execute
 	unless (scalar @internalOrgIds >= 1)
 	{
 		my @orgIds = ();
-		for (@facility_ids)
+		for (@facilities)
 		{
 			chomp;
 			if ($_ =~ /.*\D.*/)
 			{
 				$self->addError("Facility '$_' is NOT a valid Facility in this Org.  Please verify and try again.");
-				return;
+				return (-1);
 			}
 			
 			my $orgId = $STMTMGR_ORG->getSingleValue($self, STMTMGRFLAG_NONE, 'selId', $_);
@@ -226,7 +281,21 @@ sub execute
 			$self->param('facility_ids', join(',', @orgIds));
 		}
 	}
+	
+	my $set = new Set::IntSpan(\@internalOrgIds);
+	
+	return $set->elements();
+}
 
+sub execute
+{
+	my ($self) = @_;
+
+	my @resource_ids = $self->findResourceIds($self->param('resource_ids'));
+	my @internalOrgIds = $self->findFacilityIds($self->param('facility_ids'));
+	
+	return if grep(/\-1/, @internalOrgIds);
+	
 	my $rIds;
 	if ($self->field('appt_type') > 0)
 	{
@@ -242,7 +311,10 @@ sub execute
 	
 	$self->param('appt_duration', 10) if $self->param('appt_duration') <= 0;
 
-	my @search_start_date = Decode_Date_US($self->param('start_date')) if $self->param('start_date');
+	$self->param('start_date', UnixDate('today', '%m/%d/%Y')) 
+		unless validateDate($self->param('start_date'));
+	
+	my @search_start_date = Decode_Date_US($self->param('start_date'));
 	eval {check_date(@search_start_date);};
 	@search_start_date = Today() if $@;
 

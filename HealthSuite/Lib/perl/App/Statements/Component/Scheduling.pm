@@ -48,7 +48,8 @@ my $STMTFMT_SEL_EVENTS_WORKLIST = qq{
 	e.event_id,
 	Appt_Type.caption as appt_type,
 	replace(Appt_Attendee_Type.caption, ' Patient', '') as patient_type,
-	Invoice_Status.caption as invoice_status
+	Invoice_Status.caption as invoice_status,
+	ea.value_intB as flags
 	from Invoice_Status, Appt_Attendee_Type, Appt_Type, Invoice, Transaction,
 		Person patient, Event_Attribute ea, Event e
 };
@@ -76,7 +77,7 @@ my $STMTFMT_SEL_EVENTS_WORKLIST_WHERECLAUSE = qq{
 		)
 	and Transaction.parent_event_id(+) = e.event_id
 	and Invoice.main_transaction(+) = Transaction.trans_id
-	and Appt_Type.appt_type_id = e.appt_type
+	and Appt_Type.appt_type_id (+) = e.appt_type
 	and Appt_Attendee_Type.id = ea.value_int
 	and Invoice_Status.id(+) = Invoice.invoice_status
 };
@@ -181,6 +182,31 @@ $STMTMGR_COMPONENT_SCHEDULING = new App::Statements::Component::Scheduling(
 			and parent_org_id = ?
 	},
 	
+	'sel_populateInsVerifyDialog' => qq{
+		select * from Sch_Verify where event_id = ?
+	},
+
+	'sel_MostRecentVerify' => qq{
+		select * from Sch_Verify where person_id = :1
+		and ins_verify_date = (select max(ins_verify_date) from Sch_Verify where person_id = :1)
+	},
+
+	'sel_populateAppConfirmDialog' => qq{
+		select app_verified_by, app_verify_date from Sch_Verify where event_id = ?
+	},
+
+	'sel_populateMedVerifyDialog' => qq{
+		select med_verified_by, med_verify_date from Sch_Verify where event_id = ?
+	},
+	
+	'sel_populatePersonalVerifyDialog' => qq{
+		select per_verified_by, per_verify_date from Sch_Verify where event_id = ?
+	},
+
+	'sel_EventAttribute' => qq{
+		select * from Event_Attribute where parent_id = :1
+			and value_type = :2
+	},
 );
 	
 1;

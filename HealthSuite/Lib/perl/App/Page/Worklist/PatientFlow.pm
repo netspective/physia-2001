@@ -13,6 +13,7 @@ use DBI::StatementManager;
 use App::Statements::Scheduling;
 use App::Statements::Page;
 use App::Statements::Search::Appointment;
+use App::Schedule::Utilities;
 
 use App::Dialog::WorklistSetup;
 use base 'App::Page::WorkList';
@@ -161,6 +162,8 @@ sub prepare_page_content_header
 
 	return 1 if $self->flagIsSet(App::Page::PAGEFLAG_ISPOPUP);
 	$self->SUPER::prepare_page_content_header(@_);
+
+	return 1 if $self->param('_stdAction') eq 'dialog';
 	push(@{$self->{page_content_header}}, $self->getControlBarHtml()) unless ($self->param('noControlBar'));
 	return 1;
 }
@@ -170,7 +173,9 @@ sub getControlBarHtml
 	my ($self) = @_;
 
 	my $selectedDate = $self->param('_seldate') || $self->session('selectedDate') || 'today';
-	$selectedDate = 'today' unless ParseDate($selectedDate);
+	#$selectedDate = 'today' unless ParseDate($selectedDate);
+
+	$selectedDate = 'today' unless validateDate($selectedDate);
 	my $fmtDate = UnixDate($selectedDate, '%m/%d/%Y');
 
 	$self->param('_seldate', $selectedDate);
@@ -241,7 +246,7 @@ sub getControlBarHtml
 			<SCRIPT>
 				function prefillDefaults(Form)
 				{
-					if (Form.showTimeSelect.options[Form.showTimeSelect.selectedIndex].value == 1)
+					if (Form.showTimeSelect.value == 1)
 					{
 						Form.time1.value = '12:00am';
 						Form.time2.value = '11:59pm';
@@ -264,8 +269,8 @@ sub getControlBarHtml
 				setSelectedValue(document.dateForm.showTimeSelect, '@{[$self->session('showTimeSelect')]}');
 			</script>
 
-			&nbsp;<input class='controlBar' name=time1 size=6 value=$time1 title="$title1">
-			&nbsp;<input class='controlBar' name=time2 size=6 value=$time2 title="$title2">
+			&nbsp;<input class='controlBar' name=time1 size=7 maxlength=7 value=$time1 title="$title1">
+			&nbsp;<input class='controlBar' name=time2 size=7 maxlength=7 value=$time2 title="$title2">
 
 			<INPUT TYPE=HIDDEN NAME="_f_action_change_controls" VALUE="1">
 			<input class='controlBar' type=submit value="Go">
@@ -313,9 +318,9 @@ sub getControlBarHtml
 		</STYLE>
 
 		<tr>
-			<FORM name='dateForm' method=POST>
+			<FORM name='dateForm' method=POST onSubmit="updatePage(document.dateForm.selDate.value)">
 				<td ALIGN=LEFT>
-					<SELECT class='controlBar' onChange="document.dateForm.selDate.value = this.options[this.selectedIndex].value;
+					<SELECT class='controlBar' onChange="document.dateForm.selDate.value = this.value;
 						updatePage(document.dateForm.selDate.value); return false;">
 						$chooseDateOptsHtml
 					</SELECT>
@@ -324,7 +329,7 @@ sub getControlBarHtml
 						<img src='/resources/icons/calendar2.gif' title='Show calendar' BORDER=0></A> &nbsp
 
 					<input name=left  type=button value='<' onClick="updatePage('$prevDay')" title="Goto $pDay">
-					<INPUT class='controlBar' size=13 name="selDate" type="text" value="$fmtDate" onChange="updatePage(this.value);">
+					<INPUT class='controlBar' size=13 maxlength=10 name="selDate" type="text" value="$fmtDate" onChange="updatePage(this.value);">
 					<input name=right type=button value='>' onClick="updatePage('$nextDay')" title="Goto $nDay">
 
 					$timeFieldsHtml
