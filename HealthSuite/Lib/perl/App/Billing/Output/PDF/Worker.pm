@@ -44,8 +44,8 @@ use constant FORM_HEIGHT => 661.5;
 use constant LINE_SPACING => 22.5;
 use constant MEDICARE_EXTRA_SPACE => 4.5;
 use constant STARTX_BOX3_SPACE => 205;    # DISTANCE B/W STARTING X AND BOX3
-use constant STARTX_BOX1A_SPACE => 351.5; # DISTANCE B/W STARTING X AND BOX1A 
-use constant STARTX_BOX24E_SPACE => 292; # DISTANCE B/W STARTING X AND BOX24E 
+use constant STARTX_BOX1A_SPACE => 351.5; # DISTANCE B/W STARTING X AND BOX1A
+use constant STARTX_BOX24E_SPACE => 292; # DISTANCE B/W STARTING X AND BOX24E
 use constant STARTX_BOX24ADATE_SPACE => 67; # DISTANCE B/W STARTING X AND BOX24AD
 use constant STARTX_BOX24B_SPACE => 127; # DISTANCE B/W STARTING X AND BOX24B
 use constant STARTX_BOX24C_SPACE => 149; # DISTANCE B/W STARTING X AND BOX24C
@@ -57,17 +57,17 @@ use constant STARTX_BOX24H_SPACE => 436; # DISTANCE B/W STARTING X AND BOX24H
 use constant STARTX_BOX24I_SPACE => 459; # DISTANCE B/W STARTING X AND BOX24I
 use constant STARTX_BOX24J_SPACE => 478; # DISTANCE B/W STARTING X AND BOX24I
 use constant STARTX_BOX24K_SPACE => 500; # DISTANCE B/W STARTING X AND BOX24J
-use constant STARTX_BOX26_SPACE => 156; # DISTANCE B/W STARTING X AND BOX2A 
-use constant STARTX_BOX29_SPACE => 430; # DISTANCE B/W STARTING X AND BOX1A 
-use constant STARTX_BOX27_SPACE => 261; # DISTANCE B/W STARTING X AND BOX1A 
-use constant BLACK_DASH => 4.5; # 
-use constant WHITE_DASH => 1.125; # 
-use constant CELL_PADDING_Y => 1.125; # 
-use constant CELL_PADDING_X => 2.25; # 
+use constant STARTX_BOX26_SPACE => 156; # DISTANCE B/W STARTING X AND BOX2A
+use constant STARTX_BOX29_SPACE => 430; # DISTANCE B/W STARTING X AND BOX1A
+use constant STARTX_BOX27_SPACE => 261; # DISTANCE B/W STARTING X AND BOX1A
+use constant BLACK_DASH => 4.5; #
+use constant WHITE_DASH => 1.125; #
+use constant CELL_PADDING_Y => 1.125; #
+use constant CELL_PADDING_X => 2.25; #
 use constant DATA_PADDING_X => 9;
 use constant BOX24_HEIGHT => 8;
 
-use constant STARTY_MID_SPACE => 374; # DISTANCE B/W STARTING Y AND MID THICK LINE 
+use constant STARTY_MID_SPACE => 374; # DISTANCE B/W STARTING Y AND MID THICK LINE
 
 use constant DATA_RED => 0.0;
 use constant DATA_GREEN => 0.0;
@@ -126,7 +126,8 @@ sub box1aClaimData
 	die "Couldn't set font"  if ($font == -1);
 	pdflib::PDF_setfont($p, $font, DATA_FONT_SIZE);
 	my $claimType = $claim->getClaimType();
-	my $data = ($claim->getInvoiceSubtype() == CLAIM_TYPE_WORKCOMP) ? $claim->{careReceiver}->getSsn() : $claim->{insured}->[$claimType]->getSsn();
+#	my $data = ($claim->getInvoiceSubtype() == CLAIM_TYPE_WORKCOMP) ? $claim->{careReceiver}->getSsn() : $claim->{insured}->[$claimType]->getSsn();
+	my $data = ($claim->getInvoiceSubtype() == CLAIM_TYPE_WORKCOMP) ? $claim->{insured}->[0]->getSsn() : $claim->{insured}->[$claimType]->getSsn();
 	pdflib::PDF_show_xy($p , $data , $box1aX + CELL_PADDING_X + DATA_PADDING_X, $box1Y - 3 * FORM_FONT_SIZE);
 	pdflib::PDF_stroke($p);
 }
@@ -141,7 +142,7 @@ sub box3ClaimData
 	my $font = pdflib::PDF_findfont($p, DATA_FONT_NAME, "default", 0);
 	die "Couldn't set font"  if ($font == -1);
 	pdflib::PDF_setfont($p, $font, DATA_FONT_SIZE);
-	my $date  = $self->returnDate($claim->{careReceiver}->getDateOfBirth()); 
+	my $date  = $self->returnDate($claim->{careReceiver}->getDateOfBirth());
 
 	my $temp =
 		 {
@@ -189,7 +190,7 @@ sub box7ClaimData
 	die "Couldn't set font"  if ($font == -1);
 	pdflib::PDF_setfont($p, $font, DATA_FONT_SIZE);
 	my $claimType = $claim->getClaimType();
-	my $data = ($claim->getInvoiceSubtype() == CLAIM_TYPE_WORKCOMP) ? $claim->{careReceiver}->getEmployerAddress : $claim->{insured}->[$claimType]->getAddress();
+	my $data = ($claim->getInvoiceSubtype() == CLAIM_TYPE_WORKCOMP) ? $claim->{insured}->[$claimType]->getEmployerAddress : $claim->{insured}->[$claimType]->getAddress();
 	pdflib::PDF_show_xy($p , $data->getAddress1(), $box7X + CELL_PADDING_X + DATA_PADDING_X, $box7Y  - 2.5 * FORM_FONT_SIZE);
 	pdflib::PDF_show_xy($p , $data->getAddress2(), $box7X + CELL_PADDING_X + DATA_PADDING_X, $box7Y  - 3.5 * FORM_FONT_SIZE);
 
@@ -208,7 +209,7 @@ sub box7aClaimData
 	die "Couldn't set font"  if ($font == -1);
 	pdflib::PDF_setfont($p, $font, DATA_FONT_SIZE);
 	my $claimType = $claim->getClaimType();
-	my $data = ($claim->getInvoiceSubtype() == CLAIM_TYPE_WORKCOMP) ? $claim->{careReceiver}->getEmployerAddress : $claim->{insured}->[$claimType]->getAddress();
+	my $data = ($claim->getInvoiceSubtype() == CLAIM_TYPE_WORKCOMP) ? $claim->{insured}->[$claimType]->getEmployerAddress : $claim->{insured}->[$claimType]->getAddress();
 
 	pdflib::PDF_show_xy($p , $data->getCity(),$box7aX + CELL_PADDING_X + DATA_PADDING_X, $box7aY - 3 * FORM_FONT_SIZE);
 	pdflib::PDF_show_xy($p , substr($data->getState(),0,7), $box7aX + CELL_PADDING_X + $stateSpace + 3, $box7aY - 3 * FORM_FONT_SIZE);
@@ -228,7 +229,7 @@ sub box7bClaimData
 	die "Couldn't set font"  if ($font == -1);
 	pdflib::PDF_setfont($p, $font, DATA_FONT_SIZE);
 	my $claimType = $claim->getClaimType();
-	my $data = ($claim->getInvoiceSubtype() == CLAIM_TYPE_WORKCOMP) ? $claim->{careReceiver}->getEmployerAddress : $claim->{insured}->[$claimType]->getAddress();
+	my $data = ($claim->getInvoiceSubtype() == CLAIM_TYPE_WORKCOMP) ? $claim->{insured}->[$claimType]->getEmployerAddress : $claim->{insured}->[$claimType]->getAddress();
 
 	pdflib::PDF_show_xy($p , $data->getZipCode, $box7bX + CELL_PADDING_X  + DATA_PADDING_X, $box7bY - 3.5 * FORM_FONT_SIZE);
 	pdflib::PDF_show_xy($p , substr($data->getTelephoneNo, 0, 3), $box7bX + $stateSpace + CELL_PADDING_X + 20, $box7bY - 3.5 * FORM_FONT_SIZE);
@@ -274,10 +275,10 @@ sub box29ClaimData
 	my $box29Y = $box29Cordinates->[1];
 	my $box29X = $box29Cordinates->[0];
 
-	my $font = pdflib::PDF_findfont($p, DATA_FONT_NAME, "default", 0); 
+	my $font = pdflib::PDF_findfont($p, DATA_FONT_NAME, "default", 0);
 	die "Couldn't set font"  if ($font == -1);
 	pdflib::PDF_setfont($p, $font, DATA_FONT_SIZE);
-	
+
 	pdflib::PDF_show_xy($p , "0", $box29X + 45 - pdflib::PDF_stringwidth($p ,"0", $font, DATA_FONT_SIZE) , $box29Y - 3 * FORM_FONT_SIZE);
 	pdflib::PDF_show_xy($p , "00", $box29X + 55, $box29Y - 3 * FORM_FONT_SIZE);
 	pdflib::PDF_stroke($p);
@@ -287,7 +288,7 @@ sub box29ClaimData
 sub carrierData
 {
 	my ($self, $p, $claim, $cordinates)  = @_;
-	my $font = pdflib::PDF_findfont($p, DATA_FONT_NAME, "default", 0); 
+	my $font = pdflib::PDF_findfont($p, DATA_FONT_NAME, "default", 0);
 	die "Couldn't set font"  if ($font == -1);
 	pdflib::PDF_setfont($p, $font, DATA_FONT_SIZE);
 	my $address = $claim->{payer}->getAddress;
@@ -299,10 +300,10 @@ sub carrierData
 		pdflib::PDF_show_xy($p , $address->getCity . " " . $address->getState . " " . $address->getZipCode , START_X + 250, START_Y + FORM_HEIGHT + 51 - 2 * FORM_FONT_SIZE);
 		pdflib::PDF_stroke($p);
 	}
-}	
+}
 
 @CHANGELOG =
-( 
+(
     # [FLAGS, DATE, ENGINEER, CATEGORY, NOTE]
 
 #	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '12/16/1999', 'SSI', 'Billing Interface/PDF Claim', 'Name of PDF object fixed. Now it is PDF rather than pdflib.'],

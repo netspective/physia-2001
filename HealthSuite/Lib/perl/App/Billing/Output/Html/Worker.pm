@@ -40,11 +40,11 @@ sub populatePatient
 	$data->{patientDateOfBirth} = $patient->getDateOfBirth(DATEFORMAT_USA);
 	$data->{patientSexM} = $patient->getSex() eq 'M' ? "Checked" : "";
 	$data->{patientSexF} = $patient->getSex() eq 'F' ? "Checked" : "";
-	$data->{patientAddress} = $patientAddress->getAddress1() . " " . $patientAddress->getAddress2();		
+	$data->{patientAddress} = $patientAddress->getAddress1() . " " . $patientAddress->getAddress2();
 	$data->{patientAddressCity} = $patientAddress->getCity();
-	$data->{patientAddressState} = $patientAddress->getState();		
-	$data->{patientAddressTelephone} = $patientAddress->getTelephoneNo();		
-	$data->{patientAddressZipCode} = $patientAddress->getZipCode();	
+	$data->{patientAddressState} = $patientAddress->getState();
+	$data->{patientAddressTelephone} = $patientAddress->getTelephoneNo();
+	$data->{patientAddressZipCode} = $patientAddress->getZipCode();
 	$data->{signaturePatient} = uc($patient->getSignature()) =~ /C|S|B|P/ ? 'Signature on File' : "Signature on File";
 #	$data->{signaturePatientDate} = uc(uc($patient->getSignature()) =~ /C|S|B|P/ ? $patient->getSignatureDate(): "")
 	$data->{signaturePatientDate} = uc($claim->getInvoiceDate);
@@ -59,14 +59,15 @@ sub populateInsured
 	my $insuredAddress = $insured->getAddress();
 	my $data = $self->{data};
 
-	$data->{insuredName} = $claim->{careReceiver}->getEmployerOrSchoolName;
-	my $dataA = $claim->{careReceiver}->getEmployerAddress;
-	$data->{insuredAddressCity} = $dataA->getCity;	
+	$data->{insuredName} = $claim->{insured}->[0]->getEmployerOrSchoolName;
+	my $dataA = $claim->{insured}->[0]->getEmployerAddress;
+	$data->{insuredAddressCity} = $dataA->getCity;
 	$data->{insuredAddressState} = $dataA->getState;
 	$data->{insuredAddressTelephone} = $dataA->getTelephoneNo;
 	$data->{insuredAddressZipCode} = $dataA->getZipCode;
 	$data->{insuredAddress} = $dataA->getAddress1 . " " . $dataA->getAddress2;
-	$data->{insuredId} = $claim->{careReceiver}->getSsn();
+#	$data->{insuredId} = $claim->{careReceiver}->getSsn();
+	$data->{insuredId} = $claim->{insured}->[0]->getSsn();
 #	$data->{insuredPolicyGroupName} = $insured->getPolicyGroupOrFECANo;
 	$data->{insuredPolicyGroupName} = "N/A";
 	$data->{signatureInsured} = uc($claim->{careReceiver}->getSignature()) =~ /M|B/ ? 'Signature on File' : "Signature on File";
@@ -89,7 +90,7 @@ sub populatePhysician
 	my $physicianAddress = $physician->getAddress();
 	my $data = $self->{data};
 
-	$data->{physicianAddress} = $physicianAddress->getAddress1 . " " . $physicianAddress->getAddress2;	
+	$data->{physicianAddress} = $physicianAddress->getAddress1 . " " . $physicianAddress->getAddress2;
 	$data->{physicianCityStateZipCode} = $physicianAddress->getCity . " " . $physicianAddress->getState . " " . $physicianAddress->getZipCode;
 	$data->{physicianFederalTaxId} = $physician->getFederalTaxId;
 	$data->{physicianName} = $physician->getName;
@@ -142,8 +143,8 @@ sub populateClaim
 
 @CHANGELOG =
 (
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '02/16/2000', 'SSI', 'Billing Interface/PDF Claim','Procedure are displayed on descending order of charges. '],   
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '04/19/2000', 'SSI', 'Billing Interface/PDF Claim','transFacilityId is added to reflect the box31 of HCFA. '],   
+	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '02/16/2000', 'SSI', 'Billing Interface/PDF Claim','Procedure are displayed on descending order of charges. '],
+	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '04/19/2000', 'SSI', 'Billing Interface/PDF Claim','transFacilityId is added to reflect the box31 of HCFA. '],
 
 );
 
