@@ -97,12 +97,20 @@ sub prepare
 						<a href="/search/cpt">CPT</a>,
 						<a href="/search/hcpcs">HCPCS</a>,
 						<a href="/search/epsdt">EPSDT</a>,
+						<a href="/search/miscprocedure">Misc Procedure Code</a>,
 						<a href="/search/serviceplace">Service Place</a>,
 						<a href="/search/servicetype">Service Type</a>,
 						<a href="/search/gpci">GPCI</a>, or
 						<a href="/search/epayer">E-Remit Payer</a>
 					</TD>
 				</TR>
+				<TR VALIGN=TOP BGCOLOR=WHITE>
+					<TD><IMG SRC='/resources/icons/arrow_right_red.gif'></TD>
+					<TD><FONT FACE="Arial,Helvetica" SIZE=2>
+						<b>Add</b> a new
+						<a href="/org/#session.org_id#/dlg-add-misc-procedure">Misc Procedure Code</a>
+					</TD>
+				</TR>												
 			</TABLE>
 			</TD>
 			<TD>
