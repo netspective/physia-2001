@@ -156,6 +156,7 @@ sub prepare_page_content_header
 			$showHome ? ['Home', "$urlPrefix/home",'home'] : undef,
 			$showSummary ? ['Summary', "$urlPrefix/profile", 'summary']: undef,
 			$showChart ? ['Chart', "$urlPrefix/chart", 'chart']: undef,
+			$showChart ? ['Clinical Note', "$urlPrefix/cnote", 'cnote']: undef,
 			$showAccount ? ['Account', "$urlPrefix/account", 'account'] : undef,
 			$showBilling ? ['Billing', "$urlPrefix/billing", 'billing'] : undef,
 			$showActivity ? ['Activity', "$urlPrefix/activity", 'activity'] : undef,
