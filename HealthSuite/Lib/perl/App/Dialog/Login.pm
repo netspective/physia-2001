@@ -164,9 +164,11 @@ sub execute
 	$ENV{TZ} = $timezone;
 	`date` =~ /.*\d\d:\d\d:\d\d\s(.*?)\s.*/;
 	my $TZ = $1;
+	my $hackTZ = $TZ;
+	$hackTZ =~ s/(.).(.)/$1D$2/;
 
 	my $now = ParseDate('today');
-	my $gmtTime = Date_ConvTZ($now, 'GMT', $TZ);
+	my $gmtTime = Date_ConvTZ($now, 'GMT', $hackTZ);
 	my $gmtDayOffset = Delta_Format(DateCalc($gmtTime, $now), 10, '%dt');
 
 	$page->createSession($personId, $defaultOrgIntId, {
