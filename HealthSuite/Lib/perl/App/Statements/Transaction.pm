@@ -24,10 +24,10 @@ $STMTMGR_TRANSACTION = new App::Statements::Transaction(
 				and transaction.related_to = rel.id
 	},
 	'selTransactionById' => qq{
-		select trans_id, trans_owner_type, trans_owner_id, parent_event_id, parent_trans_id, 
+		select trans_id, trans_owner_type, trans_owner_id, parent_event_id, parent_trans_id,
 			trans_type, trans_subtype, trans_status, caption, detail, code, billing_facility_id,
 			service_facility_id, provider_id, care_provider_id, consult_id, initiator_id,
-			receiver_type, receiver_id, processor_id, trans_seq, bill_type, related_to, 
+			receiver_type, receiver_id, processor_id, trans_seq, bill_type, related_to,
 			data_text_a, data_text_b, data_text_c, data_num_a, data_num_b, data_num_c,
 			to_char(trans_begin_stamp, '$SQLSTMT_DEFAULTSTAMPFORMAT') AS trans_begin_stamp,
 			to_char(trans_end_stamp, '$SQLSTMT_DEFAULTSTAMPFORMAT') AS trans_end_stamp,
@@ -40,6 +40,12 @@ $STMTMGR_TRANSACTION = new App::Statements::Transaction(
 	'selTransactionByData_num_a' => qq{
 		select * from transaction
 		where data_num_a = ?
+	},
+	'selTransactionByUserAndData_num_a' => qq{
+			SELECT *
+			FROM transaction
+			WHERE data_num_a = ?
+			AND trans_owner_id = ?
 	},
 	'selTransAndICDNameByTransId' => qq{
 		select code, curr_onset_date, trans_id, trans_type, r.name as icdname
@@ -201,9 +207,9 @@ $STMTMGR_TRANSACTION = new App::Statements::Transaction(
 		set trans_status = 3
 		where parent_trans_id = ?
 	},
-		
-		
-	####################################################################	
+
+
+	####################################################################
 	#SQL STATEMENTS FOR MISC PROCEDURE CODES
 	####################################################################
 	'sel4MiscProcedureById' =>qq{
@@ -212,7 +218,7 @@ $STMTMGR_TRANSACTION = new App::Statements::Transaction(
 		FROM transaction t, trans_attribute ta
 		WHERE t.trans_id = :1
 		and trans_status=$ACTIVE
-		and ta.parent_id (+) = t.trans_id	
+		and ta.parent_id (+) = t.trans_id
 		and rownum <5
 		order by ta.item_id asc
 	},
@@ -222,25 +228,25 @@ $STMTMGR_TRANSACTION = new App::Statements::Transaction(
 		ta.value_int as nextId, t.trans_id as trans_id
 		from Transaction t, trans_attribute ta
 		where trans_status = $ACTIVE
-		and ta.parent_id = t.trans_id 
+		and ta.parent_id = t.trans_id
 		and ta.item_id = :1
-	},	
+	},
 	'selMiscProcedureNameById' => qq{
-		select  t.caption as name ,t.detail as description ,t.code as proc_code				
+		select  t.caption as name ,t.detail as description ,t.code as proc_code
 		from transaction t
-		where trans_status = $ACTIVE				
+		where trans_status = $ACTIVE
 		and t.trans_id = :1
-	},	
-		
+	},
+
 	'selNextProcedureSeq' => qq{
 		select max(value_int)+1
 		FROM trans_attribute ta where ta.parent_id = ?
 		and trans_stauts = $ACTIVE
 	},
-	'selMiscProcedureByCode' =>qq{	
+	'selMiscProcedureByCode' =>qq{
 		select distinct code
 		FROM transaction
-		WHERE code = :1			
+		WHERE code = :1
 		and trans_type = @{[App::Universal::TRANSTYPEPROC_REGULAR]}
 		and trans_subtype = '@{[App::Universal::TRANSSUBTYPE_MISC_PROC_TEXT]}'
 		and trans_status = $ACTIVE
@@ -248,13 +254,13 @@ $STMTMGR_TRANSACTION = new App::Statements::Transaction(
 	'selMiscProcedureByTransId' =>qq{
 		select  code
 		FROM transaction t
-		WHERE  trans_id = :1						     
+		WHERE  trans_id = :1
 	},
-	####################################################################	
+	####################################################################
 	#END SQL STATEMENTS FOR MISC PROCEDURE CODES
 	####################################################################
 
-	
+
 	# expects bind parameters:
 	#   1: user_id
 	#   2: user_id (same as 1)
