@@ -34,6 +34,7 @@ use constant CONFIGGROUP_PRO => 'production';
 use constant CONFIGGROUP_SWDEV => 'development';
 use constant CONFIGGROUP_TEST => 'testing';
 use constant CONFIGGROUP_DEMO => 'demonstration';
+use constant CONFIGGROUP_SOLO => 'solo';
 
 use constant PATH_APPROOT    => File::Spec->catfile(defined $ENV{HS_HOME} ? $ENV{HS_HOME} : 'HealthSuite');
 use constant PATH_APPLIB     => File::Spec->catfile(PATH_APPROOT, 'Lib', 'perl', 'App');
@@ -92,6 +93,7 @@ sub getDefaultConfig
 	'TOKYO' => getDefaultConfig('Tokyo Main Configuration', CONFIGGROUP_PRO, 'prod_01/prod01@dbi:Oracle:SDEDBS02'),
 	'MEDINA' => getDefaultConfig('Medina Configuration', CONFIGGROUP_PRO, 'prod_01/prod01@dbi:Oracle:SDEDBS02'),
 	'LIMA' => getDefaultConfig('Lima Configuration', CONFIGGROUP_DEMO, 'demo01/demo@dbi:Oracle:SDEDBS02'),
+	'TITAN' => getDefaultConfig('Thai Home PC Configuration', CONFIGGROUP_SOLO, 'hs/hs@dbi:Oracle:HealthSuiteIvory'),
 
 	# other keyed configurations go here
 	# if a particular UNIX user needs a special configuration, use 'account-username'
@@ -109,7 +111,7 @@ if($^O ne 'MSWin32')
 {
 	my $userName = getpwuid($>) || '';
 	my $groupName = getgrgid($)) || '';
-	
+
 	$CONFDATA_SERVER = $AVAIL_CONFIGS{"account-$userName"};
 	$CONFDATA_SERVER = $AVAIL_CONFIGS{"group-$groupName"} unless $CONFDATA_SERVER;
 }
