@@ -989,18 +989,19 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 'person.alerts' => {
 	sqlStmt => qq{
 			SELECT
-				caption,
+				t.caption,
 				detail,
 				trans_type,
 				trans_id,
 				trans_type,
 				trans_subtype
-			FROM 	transaction
+			FROM 	transaction t, alert_priority a
 			WHERE	trans_type between 8000 and 8999
 			AND	trans_owner_type = 0
 			AND 	trans_owner_id = ?
 			AND	trans_status = 2
-			ORDER BY trans_subtype, trans_begin_stamp desc
+			AND     a.caption = t.trans_subtype
+			ORDER BY a.id desc, trans_begin_stamp desc
 		},
 	sqlStmtBindParamDescr => ['Person ID for Transaction Table'],
 	publishDefn => {
