@@ -713,6 +713,7 @@
 		<column name="statement_id" type="autoinc" primarykey="yes" descr="Uniq ID (in entire system) for the invoice statement record"/>
 		<column name="payto_id" lookupref="org.org_internal_id" descr="Pay To Billing Org ID"/>
 		<column name="billto_id" type="text" size="16" descr="Org ID or Person ID who's paying for this Statement"/>
+		<column name="billto_type" lookupref="Invoice_Bill_Party_Type" descr="The party that should be billed for this item"/>
 		<column name="patient_id" lookupref="person.person_id" descr="Patient person ID"/>
 		<column name="statement_source" lookupref="electronic_payer_source.id"  descr="Source of Statement"/>
 		<column name="transmission_stamp" type="stamp" descr="Date Statement was sent " />
