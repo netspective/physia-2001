@@ -81,6 +81,7 @@ sub prepare_detail_payment
 	my $pub = {
 		columnDefn =>
 		[
+			{colIdx => 16,head => 'Batch Date', dAlign => 'left',},
 			{colIdx => 0, groupBy=>'#0#',head => 'Invoice', dAlign => 'left',url => q{javascript:chooseItemForParent('/invoice/#0#/summary') }, },					
 			{colIdx => 1,head => 'Physican', dAlign => 'left',},
 			{colIdx => 2,,head => 'Patient',dAlign =>'left' , hAlign =>'left'},
@@ -123,7 +124,8 @@ sub prepare_detail_payment
 			$_->{insurance_pay},								
 			$_->{person_pay},
 			$_->{refund},
-			$_->{pay_type}
+			$_->{pay_type},
+			$_->{invoice_batch_date}
 		);
 		push(@data, \@rowData);
 	}
