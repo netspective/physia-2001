@@ -459,7 +459,7 @@ sub execute_update
 {
 	my ($self, $page, $command, $flags) = @_;
 
-	my $member = 'physician';
+	my $member = 'Physician';
 
 	$self->SUPER::handleRegistry($page, $command, $flags, $member);
 
