@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 
-<accesscontrol name="roles">
-	<permissions root="role">
-		<permission id="superuser">
+<accesscontrol name="groups">
+	<permissions root="group">
+		<permission id="Superuser">
 			<allow permission="comp"/>
 			<allow permission="dlg"/>
 			<allow permission="page"/>
@@ -57,12 +57,36 @@
 			<allow permission="dlg/org-dept/update" />
 			<allow permission="dlg/misc-procedure/update" />
 			<allow permission="dlg/misc-procedure-item/update" />
-			<allow permission="dlg/appttype/update" />
 			<allow permission="dlg/template/update" />
 		</permission>
+		<permission id="sde">
+			<allow permission="page/sde/acl" />
+			<allow permission="page/sde/imagetags" />
+			<allow permission="page/sde/resources" />
+			<allow permission="page/sde/source" />
+			<allow permission="page/sde/stats" />
+			<allow permission="page/sde/stmgrs" />
+			<allow permission="page/sde/tables" />
+		</permission>
 		<permission id="normal-user">
-			<allow permission="role/superuser"/>
-			<deny permission="role/data-admin"/>
+			<allow permission="group/Superuser"/>
+			<deny permission="group/data-admin"/>
+			<deny permission="group/sde" />
+		</permission>
+		<permission id="Physician">
+			<allow permission="group/Superuser"/>
+			<deny permission="group/data-admin"/>
+			<deny permission="group/sde" />
+		</permission>
+		<permission id="Nurse">
+			<allow permission="group/Superuser"/>
+			<deny permission="group/data-admin"/>
+			<deny permission="group/sde" />
+		</permission>
+		<permission id="Staff">
+			<allow permission="group/Superuser"/>
+			<deny permission="group/data-admin"/>
+			<deny permission="group/sde" />
 		</permission>
 	</permissions>
 </accesscontrol>
