@@ -101,12 +101,13 @@
 		</deliverable>		
 
 		<deliverable id="1192">
-			Report :  New bill cycle report.  The report is at the patient statement level.  It does not drill down to invoice level data, because we are currently not storing static invoice level data per  patient statement sent ,
-			Database : Needs new Statement tables 
+			Report:  New bill cycle report.  This report serves as a preview of Statements that
+			will be generated for a billing cycle.<br>
+			Database: Needs new Statement tables 
 		</deliverable>		
 
 		<deliverable id="1226">
-			UI: Under 'Care Provider' component, the 'Schedule Appointment' link shows up only for Ohysicians but not for 'Referring Doctors'.
+			UI: Under 'Care Provider' component, the 'Schedule Appointment' link shows up only for Physicians but not for 'Referring Doctors'.
 		</deliverable>		
 		
 		<deliverable id="1250">
