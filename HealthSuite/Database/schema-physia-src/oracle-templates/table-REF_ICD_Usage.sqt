@@ -18,15 +18,15 @@ prompt -----------------------------------------------------------------------;
 	$processor->addTriggerCode(table => $tableName, scope => 'master', type => 'table', action => 'insert', time => 'after',
 		code => 
 		[
-			"insert into REF_ICDStem_Usage (icd_stem, person_id, org_id, read_count) values (getLeadingToken(:new.parent_id, '.'), :new.person_id, :new.org_id, 1);",
+			"insert into REF_ICDStem_Usage (icd_stem, person_id, org_internal_id, read_count) values (getLeadingToken(:new.parent_id, '.'), :new.person_id, :new.org_internal_id, 1);",
 		]);
 	$processor->addTriggerCode(table => $tableName, scope => 'master', type => 'table', action => 'update', time => 'after',
 		code => 
 		[
 			"if :new.person_id is NULL then",
-			"update REF_ICDStem_Usage set read_count = read_count + 1 where icd_stem = getLeadingToken(:new.parent_id, '.') and person_id is NULL and org_id = :new.org_id;",
+			"update REF_ICDStem_Usage set read_count = read_count + 1 where icd_stem = getLeadingToken(:new.parent_id, '.') and person_id is NULL and org_internal_id = :new.org_internal_id;",
 			"else",
-			"update REF_ICDStem_Usage set read_count = read_count + 1 where icd_stem = getLeadingToken(:new.parent_id, '.') and person_id = :new.person_id and org_id = :new.org_id;",
+			"update REF_ICDStem_Usage set read_count = read_count + 1 where icd_stem = getLeadingToken(:new.parent_id, '.') and person_id = :new.person_id and org_internal_id = :new.org_internal_id;",
 			"end if;",
 		]);
 }
