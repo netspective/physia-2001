@@ -86,7 +86,6 @@ sub execute
 						i.main_transaction = t.trans_id
 						and t.care_provider_id = p.person_id
 						and i.invoice_status <> 16
-						and i.data_text_b is null
 						and i.client_id = '$patientID'
 						and i.invoice_id = ii.parent_id
 						and ii.service_begin_date >= to_date('$serviceBeginDate', 'mm/dd/yyyy')
@@ -277,37 +276,64 @@ sub execute
 #		push(@data, \@rowData);
 	}
 
-	$sqlStmt = qq{ select * from agedpatientdata where patient = '$patientID'};
-	my $rowsF = $STMTMGR_RPT_CLAIM_STATUS->getRowsAsHashList($page,STMTMGRFLAG_DYNAMICSQL,$sqlStmt);
-	my ($total, $current, $period1, $period2, $period3, $period4, $period5, $period6, $copay, $insurance);
+	$sqlStmt = qq
+	{
+		select
+			mod(trunc((sysdate - i.invoice_date) / 30), 30) age,
+			sum(i.balance) balance
+		from invoice i
+		where i.client_id = '$patientID'
+		and i.invoice_type = 0
+		and i.invoice_status <> 16
+		group by mod(trunc((sysdate - i.invoice_date) / 30), 30)
+	};
 
-	my $formatter = new Number::Format('INT_CURR_SYMBOL' => '$');
+	my $rowsF = $STMTMGR_RPT_CLAIM_STATUS->getRowsAsHashList($page,STMTMGRFLAG_DYNAMICSQL,$sqlStmt);
+	my ($total, $period1, $period2, $period3, $period4, $period5, $period6, $insurance) = (0, 0, 0, 0, 0, 0, 0, 0);
 
 	foreach my $rowF (@$rowsF)
 	{
-		$total += $rowF->{total};
-		$current = $formatter->format_price($rowF->{ageperiod1}) if ($rowF->{ageperiod1} != 0);
-		$period2 = $formatter->format_price($rowF->{ageperiod2}) if ($rowF->{ageperiod2} != 0);
-		$period3 = $formatter->format_price($rowF->{ageperiod3}) if ($rowF->{ageperiod3} != 0);
-		$period4 = $formatter->format_price($rowF->{ageperiod4}) if ($rowF->{ageperiod4} != 0);
-		$period5 = $formatter->format_price($rowF->{ageperiod5}) if ($rowF->{ageperiod5} != 0);
-		$period6 = $formatter->format_price($rowF->{ageperiod6}) if ($rowF->{ageperiod6} != 0);
-		$copay = $formatter->format_price($rowF->{copay}) if ($rowF->{copay} != 0);
-		$insurance = $rowF->{insurance} if ($rowF->{insurance} != 0);
+		$total += $rowF->{balance};
+		$period1 = $rowF->{balance} if ($rowF->{age} == 0);
+		$period2 = $rowF->{balance} if ($rowF->{age} == 1);
+		$period3 = $rowF->{balance} if ($rowF->{age} == 2);
+		$period4 = $rowF->{balance} if ($rowF->{age} == 3);
+		$period5 = $rowF->{balance} if ($rowF->{age} == 4);
+		$period6 = $rowF->{balance} if ($rowF->{age} == 5);
 	}
 
+	$sqlStmt = qq
+	{
+		select sum(i.balance) balance
+		from invoice i
+		where i.client_id = '$patientID'
+		and i.invoice_type = 0
+		and i.invoice_subtype not in (0, 7)
+		and i.invoice_status <> 16
+	};
+
+	$insurance = $STMTMGR_RPT_CLAIM_STATUS->getSingleValue($page,STMTMGRFLAG_DYNAMICSQL,$sqlStmt);
 	my $patientBalance = $total - $insurance;
+
+	my $formatter = new Number::Format('INT_CURR_SYMBOL' => '$');
+
+	$period1 = $formatter->format_price($period1);
+	$period2 = $formatter->format_price($period2);
+	$period3 = $formatter->format_price($period3);
+	$period4 = $formatter->format_price($period4);
+	$period5 = $formatter->format_price($period5);
+	$period6 = $formatter->format_price($period6);
 	$insurance = $formatter->format_price($insurance);
 	$patientBalance = $formatter->format_price($patientBalance);
 	$total = $formatter->format_price($total);
+
 	my $footer = qq{<BR><table style='border: solid navy 1px' bgcolor='beige' border=0 cellspacing=0 cellpadding=1 width='30%'>};
-	$footer .= qq{<tr><td><font face='verdana,arial,helvetica' size='2' color='navy'>Current</td><td align=right><font face='verdana,arial,helvetica' size='2' color='navy'>$current</td></tr>} if ($current ne '');
-	$footer .= qq{<tr><td><font face='verdana,arial,helvetica' size='2' color='navy'>30-60 days</td><td align=right><font face='verdana,arial,helvetica' size='2' color='navy'>$period2</td></tr>} if ($period2 ne '');
-	$footer .= qq{<tr><td><font face='verdana,arial,helvetica' size='2' color='navy'>61-90 days</td><td align=right><font face='verdana,arial,helvetica' size='2' color='navy'>$period3</td></tr>} if ($period3 ne '');
-	$footer .= qq{<tr><td><font face='verdana,arial,helvetica' size='2' color='navy'>91-120 days</td><td align=right><font face='verdana,arial,helvetica' size='2' color='navy'>$period4</td></tr>} if ($period4 ne '');
-	$footer .= qq{<tr><td><font face='verdana,arial,helvetica' size='2' color='navy'>121-150 days</td><td align=right><font face='verdana,arial,helvetica' size='2' color='navy'>$period5</td></tr>} if ($period5 ne '');
-	$footer .= qq{<tr><td><font face='verdana,arial,helvetica' size='2' color='navy'>151-180 days</td><td align=right><font face='verdana,arial,helvetica' size='2' color='navy'>$period6</td></tr>} if ($period6 ne '');
-	$footer .= qq{<tr><td><font face='verdana,arial,helvetica' size='2' color='navy'>Copay</td><td align=right><font face='verdana,arial,helvetica' size='2' color='navy'>$copay</td></tr>} if ($copay ne '');
+	$footer .= qq{<tr><td><font face='verdana,arial,helvetica' size='2' color='navy'>Current</td><td align=right><font face='verdana,arial,helvetica' size='2' color='navy'>$period1</td></tr>}; # if ($current ne '');
+	$footer .= qq{<tr><td><font face='verdana,arial,helvetica' size='2' color='navy'>30-60 days</td><td align=right><font face='verdana,arial,helvetica' size='2' color='navy'>$period2</td></tr>}; # if ($period2 ne '');
+	$footer .= qq{<tr><td><font face='verdana,arial,helvetica' size='2' color='navy'>61-90 days</td><td align=right><font face='verdana,arial,helvetica' size='2' color='navy'>$period3</td></tr>}; # if ($period3 ne '');
+	$footer .= qq{<tr><td><font face='verdana,arial,helvetica' size='2' color='navy'>91-120 days</td><td align=right><font face='verdana,arial,helvetica' size='2' color='navy'>$period4</td></tr>}; # if ($period4 ne '');
+	$footer .= qq{<tr><td><font face='verdana,arial,helvetica' size='2' color='navy'>121-150 days</td><td align=right><font face='verdana,arial,helvetica' size='2' color='navy'>$period5</td></tr>}; # if ($period5 ne '');
+	$footer .= qq{<tr><td><font face='verdana,arial,helvetica' size='2' color='navy'>151-180 days</td><td align=right><font face='verdana,arial,helvetica' size='2' color='navy'>$period6</td></tr>}; # if ($period6 ne '');
 	$footer .= qq{<tr><td><font face='verdana,arial,helvetica' size='2' color='navy'><B>Total Balance</B></td><td align=right><font face='verdana,arial,helvetica' size='2' color='navy'><B>$total</B></td></table>};
 
 	$footer .= qq{<table style='border: solid navy 1px' bgcolor='beige' border=0 cellspacing=0 cellpadding=1 width='30%'};
