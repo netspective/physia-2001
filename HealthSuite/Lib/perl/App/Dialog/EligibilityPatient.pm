@@ -32,17 +32,7 @@ sub new
 	croak 'schema parameter required' unless $schema;
 
 	$self->addContent(
-
-		new CGI::Dialog::Field(name => 'valid_flag', type => 'hidden'),
-
 		new CGI::Dialog::Subhead(heading => 'Carrier', name => 'carrier_plan_heading'),
-		new CGI::Dialog::Field(caption => 'Insurance Organization', name => 'org_name', type => 'text', size => 40), #, options => FLDFLAG_REQUIRED),
-		new App::Dialog::Field::Organization::ID(caption => 'Insurance Org Id', name => 'ins_org_id', options => FLDFLAG_REQUIRED),
-		new App::Dialog::Field::Insurance::Product(caption => 'Product Name', name => 'product_name', options => FLDFLAG_REQUIRED,
-			findPopup => '/lookup/insproduct/insorgid/itemValue', findPopupControlField => '_f_ins_org_id'),
-#		new App::Dialog::Field::Insurance::Product(caption => 'Product Name', name => 'product_name', options => FLDFLAG_REQUIRED,
-#			findPopup => '/lookup/insproduct/insorgid', findPopupControlField => '_f_ins_org_id')
-
 	);
 
 	$self->addFooter(new CGI::Dialog::Buttons);
@@ -50,13 +40,6 @@ sub new
 	return $self;
 }
 
-sub makeStateChanges
-{
-	my ($self, $page, $command, $activeExecMode, $flags) = @_;
-
-	$self->SUPER::makeStateChanges($page, $command, $flags);
-
-}
 
 sub populateData
 {
@@ -64,25 +47,16 @@ sub populateData
 
 	if($flags & CGI::Dialog::DLGFLAG_DATAENTRY_INITIAL)
 	{
-		$self->updateFieldFlags('org_name', FLDFLAG_INVISIBLE, 1);
-	}
-	else
-	{
-		my $ins_org_id = $page->field('ins_org_id');
-		my $product_name = $page->field('product_name');
+		my $product_name = $page->param('product_name');
+		my $ins_org_id = $page->param('org_id');
 
-		$self->updateFieldFlags('org_name', FLDFLAG_INVISIBLE, 0);
-		$self->updateFieldFlags('org_name', FLDFLAG_READONLY, 1);
-		$self->updateFieldFlags('ins_org_id', FLDFLAG_READONLY, 1);
-		$self->updateFieldFlags('product_name', FLDFLAG_READONLY, 1);
 
-		my $orgData = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_NONE, 'selRegistry', $ins_org_id);
-
-		$page->field('org_name', $orgData->{name_primary});
-		$page->field('valid_flag', 1);
+		my $org = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_NONE, 'selRegistry', $ins_org_id);
+		my $orgName = $org->{name_primary};
 
 		$self->addContent(
-			new CGI::Dialog::Subhead(heading => 'Patient', name => 'patient_heading'),
+			new CGI::Dialog::Field(caption => "$orgName -- $product_name", options => FLDFLAG_READONLY),
+			new CGI::Dialog::Subhead(heading => "Patient Details", name => 'patient_heading'),
 		);
 
 		my $eligibilityFields = $STMTMGR_ORG->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'selOrgEligibilityInput', $product_name, $ins_org_id);
@@ -97,17 +71,6 @@ sub populateData
 	}
 }
 
-sub customValidate
-{
-	my ($self, $page) = @_;
-
-	unless($page->field('valid_flag') == 1)
-	{
-		my $productField = $self->getField('product_name');
-		$productField->invalidate($page, '');
-	}
-}
-
 
 ###############################
 # execute function
@@ -119,7 +82,7 @@ sub execute
 
 	if ($page->field('whatToDo') ne 'cancel')
 	{
-		$page->param('_dialogreturnurl', "/org/@{[$page->param('org_id')]}/personnel");
+		$page->param('_dialogreturnurl', "/person/RHACKETT/profile");
 	}
 
 	$self->handlePostExecute($page, $command, $flags);
