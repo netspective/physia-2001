@@ -36,6 +36,7 @@ use vars qw(@ISA %RESOURCE_MAP);
 			{caption => 'Personnel', name => 'personnel',},
 			{caption => 'Catalog', name => 'catalog',},
 			{caption => 'Account', name => 'account',},
+			{caption => 'Superbills', name => 'superbills',},
 			],
 		},
 	);
