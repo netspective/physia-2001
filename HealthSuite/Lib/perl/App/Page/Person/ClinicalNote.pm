@@ -24,23 +24,18 @@ sub prepare_view
 	my $templateFile = $self->param ('template');
 	my $dictionaryFile = $self->param ('dictionary');
 	my $html;
-	
+
 	if ($templateFile) {
 		$html = qq{
+			<script src="/lib/dynamic-config.js" language="JavaScript1.2"></script>
 			<script src="/lib/dynamic-page.js" language="JavaScript1.2"></script>
 			<link rel="stylesheet" type="text/css" href="/lib/dynamic-page.css">
 	
 			<script>
-				if(loadSource('/resources/data/$dictionaryFile', '/resources/data/$templateFile'))
+				if(loadSource(dataPrefix + '$dictionaryFile', dataPrefix + '$templateFile'))
 				{
 					var html = createTemplateHtml(activeTemplate);
 					document.write(html);
-					var srcWin = window.open("", "source", "location,status,scrollbars,width=800,height=600");
-					var srcHtml = html.replace (/</g, '&lt;');
-					srcHtml = srcHtml.replace (/>/g, '&gt;');
-					srcHtml = srcHtml.replace (/&lt;/g, '<font color="blue">&lt;</font>');
-					srcHtml = srcHtml.replace (/&gt;/g, '<font color="blue">&gt;</font>');
-					srcWin.document.write('<pre>' + srcHtml + '</pre>');				
 				}
 				else
 				{
