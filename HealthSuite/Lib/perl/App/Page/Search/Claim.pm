@@ -57,6 +57,7 @@ sub getForm
 		Find:
 		<select name="search_status" style="color: darkred">
 			<option value="all">All</option>
+			<option value="14">Appealed</option>
 			<option value="0">Created</option>
 			<!-- <option value="2">Pending</option> -->
 			<option value="3">On Hold</option>
