@@ -20,6 +20,7 @@ use App::Statements::Insurance;
 use App::Statements::IntelliCode;
 use App::Statements::Invoice;
 use App::Statements::Org;
+use App::Statements::Page;
 use App::Statements::Person;
 use App::Statements::Scheduling;
 use App::Statements::Transaction;
@@ -592,6 +593,7 @@ while(my ($dlgId, $dlgInfo) = each %CREATE_DLG_SYNONYMS)
 	_autoCreate => [
 		{ type => 'stmtMgr', stmtMgr => $STMTMGR_COMPONENT_PERSON },
 		{ type => 'stmtMgr', stmtMgr => $STMTMGR_COMPONENT_ORG },
+		{ type => 'stmtMgr', stmtMgr => $STMTMGR_PAGE },
 	],
 );
 
