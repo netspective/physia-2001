@@ -342,6 +342,7 @@ sub execute_add
 			item_name => 'UPIN',
 			value_type => App::Universal::ATTRTYPE_LICENSE,
 			value_text => $page->field('upin') || undef,
+			value_textB => 'UPIN' || undef,
 			value_dateEnd => $page->field('upin_exp_date') || undef,
 			_debug => 0
 	) if $page->field('upin') ne '';
@@ -352,6 +353,7 @@ sub execute_add
 			item_name => 'Medicaid',
 			value_type => App::Universal::ATTRTYPE_LICENSE,
 			value_text => $page->field('medicaid') || undef,
+			value_textB => 'Medicaid' || undef,
 			value_dateEnd => $page->field('medicaid_exp_date') || undef,
 			_debug => 0
 	) if $page->field('medicaid') ne '';
@@ -362,19 +364,19 @@ sub execute_add
 			item_name => 'Medicare',
 			value_type => App::Universal::ATTRTYPE_LICENSE,
 			value_text => $page->field('medicare') || undef,
+			value_textB => 'Medicare' || undef,
 			value_dateEnd => $page->field('medicare_exp_date') || undef,
 			_debug => 0
 	) if $page->field('medicare') ne '';
 
 
-	my $taxIdType = $page->field('tax_id_type');
 	$page->schemaAction(
 			'Person_Attribute', $command,
 			parent_id => $personId || undef,
 			item_name => 'Tax ID',
 			value_type => App::Universal::ATTRTYPE_LICENSE,
 			value_text => $page->field('tax_id') || undef,
-			value_textB => defined $taxIdType ? $taxIdType : undef,
+			value_textB => 'Tax ID' || undef,
 			value_dateEnd => $page->field('taxid_exp_date') || undef,
 			_debug => 0
 	) if $page->field('tax_id') ne '';
@@ -385,6 +387,7 @@ sub execute_add
 			item_name => 'IRS',
 			value_type => App::Universal::ATTRTYPE_LICENSE,
 			value_text => $page->field('irs') || undef,
+			value_textB => 'IRS' || undef,
 			value_dateEnd => $page->field('irs_exp_date') || undef,
 			_debug => 0
 	) if $page->field('irs') ne '';
@@ -395,6 +398,7 @@ sub execute_add
 			item_name => 'DEA',
 			value_type => App::Universal::ATTRTYPE_LICENSE,
 			value_text => $page->field('dea') || undef,
+			value_textB => 'DEA' || undef,
 			value_dateEnd => $page->field('dea_exp_date') || undef,
 			_debug => 0
 	) if $page->field('dea') ne '';
@@ -405,6 +409,7 @@ sub execute_add
 			item_name => 'DPS',
 			value_type => App::Universal::ATTRTYPE_LICENSE,
 			value_text => $page->field('dps') || undef,
+			value_textB => 'DPS' || undef,
 			value_dateEnd => $page->field('dps_exp_date') || undef,
 			_debug => 0
 	) if $page->field('dps') ne '';
