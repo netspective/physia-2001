@@ -77,18 +77,21 @@ sub fixupStatements
 			# performance penalty
 			#
 			my $stmt = $value->{_stmtFmt} || $value->{sqlStmt};
-			$stmt =~ s!\%(\w+:)?(.*?)\%!
-				if($1 eq 'simpleDate:')
-				{
-					"decode(to_char($2, 'YYYY'), to_char(sysdate, 'YYYY'), to_char($2, 'Mon DD'), to_char($2, 'MM/DD/YY'))"
-				}
-				elsif ($1 eq 'simpleStamp:')
-				{
-					"decode(to_char($2, 'YYYYMMDD'), to_char(sysdate, 'YYYYMMDD'), to_char($2, 'hh:miam'), to_char($2, 'MM/DD/YYYY hh:miam'))"
-				}
-				else { $value->{$2} }
-				!ge;
-			$self->{$key} = $stmt;
+			if (defined $stmt)
+			{
+				$stmt =~ s!\%(\w+:)?(.*?)\%!
+					if(defined $1 and $1 eq 'simpleDate:')
+					{
+						"decode(to_char($2, 'YYYY'), to_char(sysdate, 'YYYY'), to_char($2, 'Mon DD'), to_char($2, 'MM/DD/YY'))"
+					}
+					elsif (defined $1 and $1 eq 'simpleStamp:')
+					{
+						"decode(to_char($2, 'YYYYMMDD'), to_char(sysdate, 'YYYYMMDD'), to_char($2, 'hh:miam'), to_char($2, 'MM/DD/YYYY hh:miam'))"
+					}
+					else { $value->{$2} || "" }
+					!ge;
+			}
+			$self->{$key} = defined $stmt ? $stmt : undef;
 
 			# see if any Data::Publish definitions (DPD) exist
 			#
