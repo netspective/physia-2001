@@ -19,10 +19,16 @@ my $SEL_CATALOG_ENTRY = qq{
 };
 
 $STMTMGR_CATALOG = new App::Statements::Catalog(
+	'selInternalIdByCatalog' => qq
+	{
+		SELECT org_internal_id
+		FROM offering_catalog
+		WHERE catalog_id = ?
+	},
 	'selInternalCatalogIdById' => qq
 	{
 		select * from Offering_catalog
-		where org_internal_id = ? 
+		where org_internal_id = ?
 		and catalog_id = ?
 	},
 	'selCatalogById' => qq{
@@ -31,9 +37,11 @@ $STMTMGR_CATALOG = new App::Statements::Catalog(
 		where internal_catalog_id = ?
 	},
 	'sel_internalCatId_orgId' => qq{
-		select * from Offering_Catalog
-		where internal_catalog_id = ?
-			and org_internal_id = ?
+		SELECT *
+		FROM Offering_Catalog
+		WHERE
+			internal_catalog_id = ?
+			AND org_internal_id = ?
 	},
 	'sel_catalog_by_id_orgId' => qq{
 		select * from Offering_catalog
@@ -96,7 +104,7 @@ $STMTMGR_CATALOG = new App::Statements::Catalog(
 						oce.unit_cost, oce.data_text,
 						oc.catalog_id as catalog_id,oce.code,oce.modifier
 						from offering_catalog oc, offering_catalog_entry oce
-						where oce.entry_id = ?						
+						where oce.entry_id = ?
 			and oc.internal_catalog_id = oce.catalog_id
 	},
 	'selGenericCPT_LikeCode' => q{
@@ -257,17 +265,17 @@ $STMTMGR_CATALOG = new App::Statements::Catalog(
 		select id
 		from HCFA1500_Service_Type_Code
 	},
-	
+
 	'sel_catalogEntry_by_catalogTypeCodeModifier' => {
 		sqlStmt => $SEL_CATALOG_ENTRY,
 		modifierWhereClause => 'and modifier = ?',
 	},
-	
+
 	'sel_catalogEntry_by_catalogTypeCode' => {
 		sqlStmt => $SEL_CATALOG_ENTRY,
 		modifierWhereClause => 'and modifier is null',
 	},
-	
+
 	'sel_Catalog_Attribute' => qq{
 		select * from OfCatalog_Attribute
 		where parent_id = ?
@@ -286,26 +294,26 @@ $STMTMGR_CATALOG = new App::Statements::Catalog(
 			and modifier is NULL
 			and catalog_id = ?
 	},
-	
+
 	'sel_catalogEntry_svcType_by_catalog' => qq{
-			select oc.INTERNAL_CATALOG_ID ,entry_type,oc.catalog_id,data_text,h.caption 
+			select oc.INTERNAL_CATALOG_ID ,entry_type,oc.catalog_id,data_text,h.caption
 			from Offering_Catalog_Entry oce, HCFA1500_Service_Type_Code h,
 			Offering_Catalog oc
 			where oce.code = upper(?)
 			and oce.modifier is NULL
 			and oce.catalog_id = ?
-			and oce.data_text (+) = h.abbrev 	
+			and oce.data_text (+) = h.abbrev
 			and oc.internal_catalog_id = oce.catalog_id
 	},
 	'sel_catalogEntry_svcType_by_code_modifier_catalog' => qq{
-				select oc.INTERNAL_CATALOG_ID,entry_type,oc.catalog_id,data_text,h.caption 
+				select oc.INTERNAL_CATALOG_ID,entry_type,oc.catalog_id,data_text,h.caption
 				from Offering_Catalog_Entry oce, HCFA1500_Service_Type_Code h,
 				Offering_Catalog oc
 				where oce.code = upper(?)
 				and (modifier = ? or modifier is NULL)
 				and oce.catalog_id = ?
-				and oce.data_text (+) = h.abbrev 	
-				and oc.internal_catalog_id = oce.catalog_id	
+				and oce.data_text (+) = h.abbrev
+				and oc.internal_catalog_id = oce.catalog_id
 	},
 );
 
