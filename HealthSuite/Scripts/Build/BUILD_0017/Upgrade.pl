@@ -25,8 +25,10 @@ system(qq{
 });
 
 runSQL('BUILD_0017_alter_schema.sql');
+runSQL('BUILD_0017_creating_new_frank_tables.sql');
+runSQL('BUILD_0017_new_dml.sql');
 runSQL('BUILD_0017_compile_invalid_and_disabled.sql');
-runSQL('BUILD_0017_populate_invoice_history.sql');
+runSQL('BUILD_0017_analyze_schema.sql ?????schema_name?????');
 
 ######## END UPGRADE SCRIPT #########
 
