@@ -80,7 +80,7 @@ sub processBatch
 	$self->{bXXX}=0;
 	$self->{yXXX}=0;
 	
-		
+	
 	$self->prepareBatchHeader($tempClaims,$params{outArray}, $params{nsfType});
 		
 	$self->{nsfClaimObjs} = new App::Billing::Output::File::Batch::Claim::NSF();

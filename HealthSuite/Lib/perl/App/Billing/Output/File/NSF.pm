@@ -50,6 +50,7 @@ sub processFile
 	
 	$self->{nsfType} = $params{nsfType};
 	
+	# creating claims collection object for medicare, medicaid and workerscomp
 	$self->{medicareClaimsList} = new App::Billing::Claims;
 	$self->{medicaidClaimsList} = new App::Billing::Claims;
 	$self->{workerscompClaimsList} = new App::Billing::Claims;
@@ -62,37 +63,46 @@ sub processFile
 	
 	$self->makeBatches($tempClaims);
 	$self->makeSelectedClaimsList($tempClaims);
+	
+	
 	my $st =$params{claimList}->getStatistics;
-
 
 	
 	$confData = $self->readFile();
 	
 
+	# preparing the File header
 	$self->prepareFileHeader($confData, $tempClaims,$params{outArray}, $params{nsfType});
 
+	# reference of claims collection array in which each collection represent a batch
 	my $tempBatchList =   $self->{batchWiseClaims};
 	
 		 	
 	$self->{nsfBatchObjs} = new App::Billing::Output::File::Batch::NSF();
 
-		
+
+	# taking out collection of claims one by one		
+	
 	for $batchWiseClaimsCollection (0..$#$tempBatchList)
 	{
+		# getting array of claim from a collection for testing
 		my $test = $tempBatchList->[$batchWiseClaimsCollection]->getClaim();
-			
+		
 		$self->{nsfBatchObjs}->processBatch(batchSequenceNo => $self->generateBatchSequenceNo(),claimList => $tempBatchList->[$batchWiseClaimsCollection], outArray => $params{outArray}, nsfType => $params{nsfType});
 		$self->{fileServiceLineCount} +=	$self->{nsfBatchObjs}->{batchServiceLineCount}; 
 		$self->{fileRecordCount} += $self->{nsfBatchObjs}->{batchRecorCount};
 		$self->{fileClaimCount} += $self->{nsfBatchObjs}->{batchClaimCount};
 		$self->{batchCount}++;
 		$self->{fileTotalCharges} += $self->{nsfBatchObjs}->{batchTotalCharges};
-	}
+	} # end of for loop
 
+	
+	# preparing File Trailer
 	$self->prepareFileTrailer($confData, $tempClaims,$params{outArray}, $params{nsfType});
 
 }
 
+# to generate sequence of batch
 sub generateBatchSequenceNo
 {
 	my $self = shift;
@@ -100,6 +110,7 @@ sub generateBatchSequenceNo
 	return $self->numToStr(4,0,$self->{batchSequenceNo});
 }
 
+# responsible to create file header object and getting formatted string of record
 sub prepareFileHeader
 {
 	my ($self, $confData, $tempClaims, $outArray, $nsfType) = @_;
@@ -108,6 +119,7 @@ sub prepareFileHeader
 	push(@$outArray,$self->{fileHeaderObj}->formatData($confData,$self,'0',$tempClaims, $nsfType));
 }
 
+# responsible to create file trailer object and getting formatted string of record
 sub prepareFileTrailer
 {
 	my ($self,$confData, $tempClaims,$outArray, $nsfType) = @_;	
@@ -132,17 +144,20 @@ sub makeBatches
 	# fetch each element i.e. claim from claims array one by one
 	my @payerCodes = (MEDICARE, MEDICAID, WORKERSCOMP);
 	
+	
 	for $claimValue (0..$#$claims)
 	{
     	my $claimType = $claims->[$claimValue]->getInsType();
     	
 	   if ($self->{nsfType} == NSF_HALLEY)
 	   {
-	 
-			 if( grep{$_ eq $claimType} @payerCodes)
+	   		# if a claim belongs to a medicare, medicaid or workerscomp then it is
+	   		# added in its respective batch	   		
+	 		 if( grep{$_ eq $claimType} @payerCodes)
 			 {
 				 $self->{payerClaimsBatch}->{$claimType}->addClaim($claims->[$claimValue]);
 			 }
+			 # otherwise it get provider id 
 			 else
 			 {
 				# get the providerID from claim
@@ -160,6 +175,7 @@ sub makeBatches
 				{
 					$self->{batches}->[$self->{batchesIndex}++] = $providerID;
 				}
+			
 			 } 
 	  }		 
 	  elsif ($self->{nsfType} == NSF_ENVOY)
@@ -172,9 +188,29 @@ sub makeBatches
 		{
 			$self->{batches}->[$self->{batchesIndex}++] = $providerID;
 		}
-	  } # end of NSF type checking		 
+	  } 
+	  	elsif ($self->{nsfType} == NSF_THIN)
+		{
+				$providerID = $claims->[$claimValue]->getEMCId();
+				
+
+				$providerID =~ s/ //g;
+				if ($providerID eq '')
+				{
+					$providerID = 'BLANK';
+				}
+			
+				# add it in array without duplication
+				if ($self->checkForDuplicate($providerID) eq 0) 
+				{
+					$self->{batches}->[$self->{batchesIndex}++] = $providerID;
+				}
+		}# end of NSF type checking		
+
 
 	} # end of claims list loop
+	
+
 	
 	
 }
@@ -186,7 +222,7 @@ sub makeBatches
 sub makeSelectedClaimsList
 {
 	my ($self,$claims) = @_;
-	my ($batchValue,$claim,$selectedClaims,$providerID);
+	my ($batchValue,$claim,$selectedClaims,$providerID, $counter);
 	
 	# get reference of batches array
 	my $tempBatches = $self->{batches};
@@ -194,7 +230,7 @@ sub makeSelectedClaimsList
 	my @payerCodes = (MEDICARE, MEDICAID, WORKERSCOMP);
 	
 
-	# Following lines will add batches which were made on the basis of payers	
+	# Following lines will add batches which were made on the basis of medicare, medicaid etc.
 	foreach my $payerKey(keys %{$self->{payerClaimsBatch}})
 	{
 	   if($self->{payerClaimsBatch}->{$payerKey}->getStatistics()->{count} > 0)
@@ -231,7 +267,6 @@ sub makeSelectedClaimsList
 	# get element from batches one by one
 		foreach $batchValue (@$tempBatches)
 		{
-		
 			# create a new Claims object
 			$selectedClaims = new App::Billing::Claims;
 
@@ -254,23 +289,49 @@ sub makeSelectedClaimsList
 				{
 					$providerID = $claim->{payToProvider}->getFederalTaxId();
 				}
+				elsif($self->{nsfType} == NSF_THIN)
+				{
+					$counter++;
+					$providerID = $claim->getEMCId();
+					
+					$providerID =~ s/ //g;
+					if ($providerID eq "")
+					{
+						$providerID = 'BLANK';
+					}
+				}
 		
+				# We are getting it to check it in next if condition
 				my $claimType = $claim->getInsType();
 	 
 			 		
 				# check it against batch element value
-				if (($providerID eq $batchValue) && (!(grep{$_ eq $claimType} @payerCodes)))
-
+				# To add claim in a collection we make sure that it is not previously included in 
+				# Payers batch i.e. in batches of medicare, medicaid or workerscomp
+				if ($self->{nsfType} == NSF_HALLEY)
 				{
-					# if it is then add that claim in selected list
-					$selectedClaims->addClaim($claim);
+					if (($providerID eq $batchValue) && (!(grep{$_ eq $claimType} @payerCodes)))
+					{
+						# if it is then add that claim in selected list
+						$selectedClaims->addClaim($claim);
+					}
 				}
-			}
-		
+				else
+				{
+					if ($providerID eq $batchValue)
+					{
+						# if it is then add that claim in selected list
+						$selectedClaims->addClaim($claim);
+					}
+				}						
+			}	
+			
 			# when list of selected claims is complete add its reference in array
 			$self->{batchWiseClaims}->[$self->{batchWiseClaimsIndex}++] = $selectedClaims;
 		} # loop back to create another selected claims list and store it in array
+	
 	}
+	
 }
 
 sub checkForDuplicate
