@@ -36,6 +36,8 @@ sub initialize
 		new CGI::Dialog::Field(type => 'hidden', name => 'blood_item_id'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'job_item_id'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'driver_license_item_id'),
+		new CGI::Dialog::Field(type => 'hidden', name => 'nurse_emp_item_id'),
+
 		#GENERAL INFORMATION
 
 		#new App::Dialog::Field::Person::ID::New(caption => 'Person ID',
@@ -277,6 +279,12 @@ sub populateData
 	$page->field('driver_license_item_id', $driverLicenseData->{'item_id'});
 	$page->field('license_number', $driverLicenseData->{'value_text'});
 	$page->field('license_state', $driverLicenseData->{'value_textb'});
+
+	my $nurseEmp = 'Employee';
+	my $nurseEmpData =  $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_NONE, 'selAttribute', $personId, $nurseEmp);
+	$page->field('nurse_emp_item_id', $nurseEmpData->{'item_id'});
+	$page->field('emp_id', $nurseEmpData->{'value_text'});
+	$page->field('emp_exp_date', $nurseEmpData->{'value_datea'});
 }
 
 sub handleContactInfo
@@ -579,6 +587,19 @@ sub handleAttrs
 				value_textB => $page->field('license_state') || undef,
 				_debug => 0
 	) if $member eq 'Patient';
+
+	my $commandNurseEMp = $command eq 'update' &&  $page->field('nurse_emp_item_id') eq '' ? 'add' : $command;
+
+	$page->schemaAction(
+				'Person_Attribute', $commandNurseEMp,
+				parent_id => $page->field('person_id')  || undef,
+				item_name => 'Employee',
+				item_id   =>  $page->field('nurse_emp_item_id') || undef,
+				value_type => App::Universal::ATTRTYPE_LICENSE,
+				value_text => $page->field('emp_id')  || undef,
+				value_dateA=> $page->field('emp_exp_date') || undef,
+				_debug => 0
+	) if ($page->field('emp_id') ne '' && $member eq 'Nurse');
 }
 
 sub customValidate
