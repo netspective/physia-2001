@@ -164,7 +164,7 @@
 		<column name="trans_id" type="autoinc" primarykey="yes" descr="Uniqe ID for a specific transaction"/>
 		<column name="trans_owner" indexed="yes" type="entity" descr="The owner of this transaction (like a patient or organization)"/>
 		<column name="parent_event_id" indexed="yes" lookupref="Event.event_id" descr="Any parent event (like an appointment) that this transaction may belong to (as a child)"/>
-		<column name="parent_trans_id" selfref="Transaction.trans_id" descr="Any parent transaction that this transaction may belong to (as a child)"/>
+		<column name="parent_trans_id" indexed="yes" selfref="Transaction.trans_id" descr="Any parent transaction that this transaction may belong to (as a child)"/>
 		<column name="trans_type" indexed="yes" lookupref="Transaction_Type.id" required="yes" descr="Type of transaction"/>
 		<column name="trans_subtype" type="text" descr="Any other type information specific to Trans_Type"/>
 		<column name="trans_status" lookupref="Transaction_Status.id" required="yes" default="0" descr="The current status of this transaction (inactive, active, other, etc)"/>
@@ -673,84 +673,84 @@
 		<column name="reck_date" type="date" descr="The date the payment was made "/>
 		<column name="invoice_id" indexed="yes" lookupref="Invoice.invoice_id" descr="Invoice id for invoice that is in collection "/>
 	</table>
-	
-	
+
+
 	<table name="TEMP_FKM" abbrev="TempFM" >
-		<column name="person_id"  indexed="yes" type="text" size="16"/>		
-		<column name="fName" type="text" size="30"/>		
-		<column name="lName" type="text" size="30"/>				
-		<column name="mName" type="text" size="30"/>	
-		<column name="Suffix" type="text" size="30"/>					
-		<column name="phone" type="text" size="50"/>	
-		<column name="oFName" type="text" size="30"/>		
-		<column name="oLName" type="text" size="30"/>				
-		<column name="oMName" type="text" size="30"/>			
-		<column name="oSuffix" type="text" size="30"/>					
-		<column name="oFName2" type="text" size="30"/>		
-		<column name="oLName2" type="text" size="30"/>				
-		<column name="oMName2" type="text" size="30"/>	
-		<column name="oSuffix2" type="text" size="30"/>			
-		<column name="ssn" type="text" indexed="yes" size="26"/>						
-		<column name="DOB" type="text" indexed="yes" size ="20"/>				
-		<column name="line1" type="text" size="50"/>								
-		<column name="city" type="text" size="50"/>										
-		<column name="state" type="text" size="50"/>												
-		<column name="zip" type="text" size="50"/>														
-		<column name="responsible_id" indexed="yes" type="text" size="16"/>				
-		<column name="rpFName" type="text" size="50"/>		
-		<column name="rpLName" type="text" size="50"/>				
-		<column name="rpMName" type="text" size="50"/>	
-		<column name="rpSuffix" type="text" size="30"/>					
-		<column name="rpPhone" type="text" size="50"/>		
-		<column name="rpSSN" type="text" indexed="yes" size="50"/>		
-		<column name="rpDOB" type="text" indexed="yes"  size = "20"/>		
-		<column name="gender" type="text" size="4"/>				
-		<column name="policyNumber" type="text" size="26"/>						
-		<column name="plan_id" type="text" size="26"/>	
-		<column name="plan_id2" type="text" size="26"/>												
-		<column name="group_num" type="text" size="26"/>								
-		<column name="policyHolder" type="text" size="26"/>										
-		<column name="policyNumber2" type="text" size="26"/>						
-		<column name="group_num2" type="text" size="26"/>								
-		<column name="policyHolder2" type="text" size="26"/>										
-		<column name="medicare" type="text" size="26"/>								
-		<column name="medicaid" type="text" size="26"/>														
-		<column name="rel" type="text" size="26"/>																
-	</table>	
-	
+		<column name="person_id"  indexed="yes" type="text" size="16"/>
+		<column name="fName" type="text" size="30"/>
+		<column name="lName" type="text" size="30"/>
+		<column name="mName" type="text" size="30"/>
+		<column name="Suffix" type="text" size="30"/>
+		<column name="phone" type="text" size="50"/>
+		<column name="oFName" type="text" size="30"/>
+		<column name="oLName" type="text" size="30"/>
+		<column name="oMName" type="text" size="30"/>
+		<column name="oSuffix" type="text" size="30"/>
+		<column name="oFName2" type="text" size="30"/>
+		<column name="oLName2" type="text" size="30"/>
+		<column name="oMName2" type="text" size="30"/>
+		<column name="oSuffix2" type="text" size="30"/>
+		<column name="ssn" type="text" indexed="yes" size="26"/>
+		<column name="DOB" type="text" indexed="yes" size ="20"/>
+		<column name="line1" type="text" size="50"/>
+		<column name="city" type="text" size="50"/>
+		<column name="state" type="text" size="50"/>
+		<column name="zip" type="text" size="50"/>
+		<column name="responsible_id" indexed="yes" type="text" size="16"/>
+		<column name="rpFName" type="text" size="50"/>
+		<column name="rpLName" type="text" size="50"/>
+		<column name="rpMName" type="text" size="50"/>
+		<column name="rpSuffix" type="text" size="30"/>
+		<column name="rpPhone" type="text" size="50"/>
+		<column name="rpSSN" type="text" indexed="yes" size="50"/>
+		<column name="rpDOB" type="text" indexed="yes"  size = "20"/>
+		<column name="gender" type="text" size="4"/>
+		<column name="policyNumber" type="text" size="26"/>
+		<column name="plan_id" type="text" size="26"/>
+		<column name="plan_id2" type="text" size="26"/>
+		<column name="group_num" type="text" size="26"/>
+		<column name="policyHolder" type="text" size="26"/>
+		<column name="policyNumber2" type="text" size="26"/>
+		<column name="group_num2" type="text" size="26"/>
+		<column name="policyHolder2" type="text" size="26"/>
+		<column name="medicare" type="text" size="26"/>
+		<column name="medicaid" type="text" size="26"/>
+		<column name="rel" type="text" size="26"/>
+	</table>
+
 	<table name="TEMP_FKM_DOC" >
-		<column name="person_id" type="text" size="16"/>		
-		<column name="fName" type="text" size="30"/>		
-		<column name="lName" type="text" size="30"/>				
-		<column name="mName" type="text" size="30"/>	
-		<column name="Suffix" type="text" size="30"/>			
-		<column name="phone" type="text" size="26"/>				
-		<column name="ssn" type="text" size="26"/>						
-		<column name="upin" type="text" size="26"/>								
-		<column name="DOB" type="text" size ="20"/>				
-		<column name="line1" type="text" size="50"/>								
-		<column name="city" type="text" size="50"/>										
-		<column name="state" type="text" size="50"/>												
-		<column name="zip" type="text" size="20"/>														
-		<column name="responsible_id" type="text" size="16"/>				
-		<column name="rpFName" type="text" size="30"/>		
-		<column name="rpLName" type="text" size="30"/>				
-		<column name="rpMName" type="text" size="30"/>				
-		<column name="rpPhone" type="text" size="26"/>		
-		<column name="rpSSN" type="text" size="26"/>		
-		<column name="rpDOB" type="text" size = "20"/>		
-		<column name="gender" type="text" size="4"/>				
-		<column name="policyNumber" type="text" size="26"/>						
-		<column name="plan_id" type="text" size="26"/>								
-		<column name="group_num" type="text" size="26"/>								
-		<column name="policyHolder" type="text" size="26"/>										
-		<column name="policyNumber2" type="text" size="26"/>						
-		<column name="group_num2" type="text" size="26"/>								
-		<column name="policyHolder2" type="text" size="26"/>										
-		<column name="medicare" type="text" size="26"/>								
-		<column name="medicaid" type="text" size="26"/>														
-		<column name="rel" type="text" size="26"/>																
-	</table>	
+		<column name="person_id" type="text" size="16"/>
+		<column name="fName" type="text" size="30"/>
+		<column name="lName" type="text" size="30"/>
+		<column name="mName" type="text" size="30"/>
+		<column name="Suffix" type="text" size="30"/>
+		<column name="phone" type="text" size="26"/>
+		<column name="ssn" type="text" size="26"/>
+		<column name="upin" type="text" size="26"/>
+		<column name="DOB" type="text" size ="20"/>
+		<column name="line1" type="text" size="50"/>
+		<column name="city" type="text" size="50"/>
+		<column name="state" type="text" size="50"/>
+		<column name="zip" type="text" size="20"/>
+		<column name="responsible_id" type="text" size="16"/>
+		<column name="rpFName" type="text" size="30"/>
+		<column name="rpLName" type="text" size="30"/>
+		<column name="rpMName" type="text" size="30"/>
+		<column name="rpPhone" type="text" size="26"/>
+		<column name="rpSSN" type="text" size="26"/>
+		<column name="rpDOB" type="text" size = "20"/>
+		<column name="gender" type="text" size="4"/>
+		<column name="policyNumber" type="text" size="26"/>
+		<column name="plan_id" type="text" size="26"/>
+		<column name="group_num" type="text" size="26"/>
+		<column name="policyHolder" type="text" size="26"/>
+		<column name="policyNumber2" type="text" size="26"/>
+		<column name="group_num2" type="text" size="26"/>
+		<column name="policyHolder2" type="text" size="26"/>
+		<column name="medicare" type="text" size="26"/>
+		<column name="medicaid" type="text" size="26"/>
+		<column name="rel" type="text" size="26"/>
+	</table>
 
 	<include file="reference.xml"/>
 	<!-- <include file="tabledata.xml" ifdefined="generating_schema"/> -->
