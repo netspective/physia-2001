@@ -181,7 +181,6 @@ sub definePermissions
 				my $aliasId = $permissionList->[$permId]->[PERMISSIONINFOIDX_ID];
 				my $aliasChildPerms = $permissionIds->{$aliasId}->[PERMISSIONINFOIDX_CHILDPERMISSIONS];
 				$aliasId =~ s/^$alias/$myParents/;
-				print "  aliasId $aliasId\n";
 				$permissionIds->{$aliasId} = [$permId, $aliasId, new Set::IntSpan];
 				$permissionIds->{$aliasId}->[PERMISSIONINFOIDX_CHILDPERMISSIONS] = $permissionIds->{$aliasId}->[PERMISSIONINFOIDX_CHILDPERMISSIONS]->union($aliasChildPerms);
 			}
