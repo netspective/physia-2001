@@ -3,7 +3,7 @@ package App::Dialog::Medication;
 ##############################################################################
 
 use strict;
-use SDE::CVS ('$Id: Medication.pm,v 1.4 2000-12-18 14:36:07 radha_kotagiri Exp $', '$Name:  $');
+use SDE::CVS ('$Id: Medication.pm,v 1.5 2000-12-18 19:32:03 robert_jenks Exp $', '$Name:  $');
 use CGI::Validator::Field;
 use CGI::Dialog;
 use base qw(CGI::Dialog);
@@ -195,6 +195,11 @@ sub new
 			name => 'printer',
 			caption => 'Printer',
 		),
+		new CGI::Dialog::Field(
+			name => 'status',
+			type => 'hidden',
+			defaultValue => 0,
+		),
 	);
 
 	$self->{activityLog} =
@@ -239,8 +244,20 @@ sub new
 
 		</script>
 	});
-
+	
 	return $self;
+}
+
+
+sub getSupplementaryHtml
+{
+	my ($self, $page, $command) = @_;
+
+	return (CGI::Dialog::PAGE_SUPPLEMENTARYHTML_RIGHT, qq{
+		#component.stp-person.allergies#<BR>
+		#component.stp-person.careProviders#<BR>
+		#component.stp-person.diagnosisSummary#
+	});
 }
 
 
@@ -248,9 +265,9 @@ sub makeStateChanges
 {
 	my ($self, $page, $command, $activeExecMode, $dlgFlags) = @_;
 	$self->SUPER::makeStateChanges($page, $command, $activeExecMode, $dlgFlags);
-
-	#my $buttonsField = $self->{_buttons_field};
-
+	
+	my $buttonsField = $self->{_buttons_field};
+	
 	my $isNurse = grep {$_ eq 'Nurse'} @{$page->session('categories')};
 	my $isPhysician = grep {$_ eq 'Physician'} @{$page->session('categories')};
 
@@ -262,7 +279,7 @@ sub makeStateChanges
 		$self->setFieldFlags('pharmacy_id', FLDFLAG_INVISIBLE);
 		$self->setFieldFlags('printer', FLDFLAG_INVISIBLE);
 	}
-	elsif ($command eq 'prescribe' || $command eq 'refill' || $command eq 'update')
+	elsif ($command eq 'prescribe' || $command eq 'refill')
 	{
 		unless ($isNurse || $isPhysician)
 		{
@@ -275,17 +292,23 @@ sub makeStateChanges
 		{
 			$self->setFieldFlags('get_approval_from', FLDFLAG_INVISIBLE);
 			$self->setFieldFlags('approved_by', FLDFLAG_READONLY);
-			$page->field('approved_by', $page->session('person_id'));
-			#$buttonsField->addActionButtons({caption => 'Save & Approve'});
+			$buttonsField->addActionButtons({caption => 'Save & Approve'});
 		}
 		else
 		{
 			$self->setFieldFlags('approved_by', FLDFLAG_INVISIBLE);
-			#$page->field('approved_by', '');
+			$page->field('approved_by', '');
 			$self->setFieldFlags('get_approval_from', FLDFLAG_REQUIRED);
-			#$buttonsField->addActionButtons({caption => 'Submit For Approval'});
+			$buttonsField->addActionButtons({caption => 'Submit For Approval'});
 		}
-		$self->setFieldFlags('get_approval_from', FLDFLAG_INVISIBLE) if $command eq 'update';
+	}
+	elsif ($command eq 'update')
+	{
+		$self->setFieldFlags('get_approval_from', FLDFLAG_INVISIBLE);
+		$self->setFieldFlags('approved_by', FLDFLAG_READONLY);		
+		$self->setFieldFlags('destination', FLDFLAG_INVISIBLE);
+		$self->setFieldFlags('pharmacy_id', FLDFLAG_INVISIBLE);
+		$self->setFieldFlags('printer', FLDFLAG_INVISIBLE);
 	}
 	elsif ($command eq 'approve')
 	{
@@ -295,8 +318,20 @@ sub makeStateChanges
 			my $approvedBy = $self->getField('approved_by');
 			$approvedBy->{type} = 'hidden';
 			$page->field('approved_by', $page->session('person_id'));
-			#$buttonsField->addActionButtons({caption => 'Save & Approve'});
-			#$buttonsField->addActionButtons({caption => 'Save & Deny'});
+			$buttonsField->addActionButtons({
+				caption => 'Save & Approve',
+				onClick => q{
+					document.forms.dialog._f_status.value = 1;
+					if (validateOnSubmit()) document.forms.dialog.submit();
+				},
+			});
+			$buttonsField->addActionButtons({
+				caption => 'Save & Deny',
+				onClick => q{
+					document.forms.dialog._f_status.value = 0;
+					if (validateOnSubmit()) document.forms.dialog.submit();
+				},
+			});
 		}
 		else
 		{
@@ -306,8 +341,8 @@ sub makeStateChanges
 			$self->setFieldFlags('get_approval_from', FLDFLAG_INVISIBLE);
 			$self->setFieldFlags('approved_by', FLDFLAG_INVISIBLE);
 			$self->setDialogViewOnly($dlgFlags);
-			#$buttonsField->addActionButtons({caption => 'Close'});
-			#$buttonsField->{noCancelButton} = 1;
+			$buttonsField->addActionButtons({caption => 'Close'});
+			$buttonsField->{noCancelButton} = 1;
 		}
 
 	}
@@ -319,8 +354,8 @@ sub makeStateChanges
 		$self->setFieldFlags('get_approval_from', FLDFLAG_INVISIBLE);
 		$self->setFieldFlags('approved_by', FLDFLAG_INVISIBLE);
 		$self->setDialogViewOnly($dlgFlags);
-		#$buttonsField->addActionButtons({caption => 'Close'});
-		#$buttonsField->{noCancelButton} = 1;
+		$buttonsField->addActionButtons({caption => 'Close'});
+		$buttonsField->{noCancelButton} = 1;
 
 	}
 }
@@ -330,6 +365,8 @@ sub populateData
 {
 	my ($self, $page, $command, $activeExecMode, $flags) = @_;
 	return unless $flags & CGI::Dialog::DLGFLAG_DATAENTRY_INITIAL;
+	
+	my $isPhysician = grep {$_ eq 'Physician'} @{$page->session('categories')};
 
 	if (my $permedId = $page->param('permed_id'))
 	{
@@ -340,6 +377,7 @@ sub populateData
 	{
 		$page->field('start_date'. UnixDate('today', '%m/%d/%Y'));
 		$page->field('end_date', '');
+		$page->field('approved_by', $page->session('person_id')) if $isPhysician;
 	}
 
 	if ($command eq 'add' || $command eq 'prescribe')
@@ -358,10 +396,15 @@ sub populateData
 			unless ($field->{name} eq 'dates_multi')
 			{
 				$field->setFlag(FLDFLAG_READONLY);
-			}
-			$self->clearFieldFlags('approved_by', FLDFLAG_INVISIBLE);
+			}	
 		}
+		#$self->clearFieldFlags('approved_by', FLDFLAG_INVISIBLE);
 	}
+	elsif ($command eq 'update' && $isPhysician)
+	{
+		$page->field('approved_by', $page->session('person_id'));
+	}
+
 }
 
 
@@ -390,6 +433,7 @@ sub execute_add
 		notes => $page->field('notes') || undef,
 		approved_by => $page->field('approved_by') || undef,
 		pharmacy_id => $page->field('pharmacy_id') || undef,
+		status => $page->field('status'),
 		_debug => 0,
 	);
 	$page->param('permed_id', $permedId);
@@ -459,6 +503,10 @@ sub execute_approve
 	my $results = $self->execute_update(@_);
 
 	my $relatedMessages = $STMTMGR_DOCUMENT->getSingleValueList($page, STMTMGRFLAG_NONE, 'selMessagesByPerMedId', $page->param('permed_id'));
+	
+	my $status = $page->field('status');
+	my $message = $status ? 'This medication/prescription has been approved.' : 'This medication/prescription has been denied';
+	
 	foreach my $doc_id (@$relatedMessages)
 	{
 		$page->schemaAction(
@@ -468,7 +516,7 @@ sub execute_approve
 			item_name => 'Notes',
 			person_id => $page->session('person_id'),
 			value_int => 0,
-			value_text => 'I have approved this medication/prescription.',
+			value_text => $message,
 		);
 	}
 
