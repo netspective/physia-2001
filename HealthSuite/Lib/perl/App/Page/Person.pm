@@ -12,6 +12,7 @@ use App::ImageManager;
 use DBI::StatementManager;
 use App::Statements::Person;
 use App::Statements::Invoice;
+use App::Statements::Page;
 
 use App::Dialog::Person;
 use App::Dialog::Person::Patient;
@@ -32,13 +33,20 @@ use vars qw(@ISA @CHANGELOG);
 sub initialize
 {
 	my $self = shift;
-	$self->SUPER::initialize(@_);
 
 	my $personId = $self->param('person_id');
+	my $userId = $self->session('user_id');	
+	
+	$self->SUPER::initialize(@_);
 
 	$STMTMGR_PERSON->createPropertiesFromSingleRow($self, STMTMGRFLAG_CACHE, ['selRegistry', 'person_'], $personId);
 	$self->property('person_complete_name', "Unknown ID: $personId") unless $self->property('person_complete_name');
 	$self->property('person_categories', $STMTMGR_PERSON->getSingleValueList($self, STMTMGRFLAG_CACHE, 'selCategory', $personId, $self->session('org_id')));
+
+	unless ($personId eq $userId)
+	{
+		$self->incrementViewCount($self->property('person_complete_name'), "/person/$personId/profile");
+	}
 
 	my $guarantor = 'Guarantor';
 	my $guarantorName =  $STMTMGR_PERSON->getRowAsHash($self, STMTMGRFLAG_NONE, 'selAttribute', $personId, $guarantor);
@@ -57,7 +65,7 @@ sub initialize
 				});
 	}
 
-	unless($personId eq $self->session('user_id'))
+	unless($personId eq $userId)
 	{
 		$self->addLocatorLinks(
 				['Person Summary', '/search/person'],
