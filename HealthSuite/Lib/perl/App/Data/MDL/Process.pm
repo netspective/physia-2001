@@ -15,6 +15,7 @@ use App::Data::MDL::Invoice;
 use App::Data::MDL::FeeSchedule;
 use App::Data::MDL::HealthMaintenance;
 
+
 use vars qw(%PHONE_TYPE_MAP %ASSOC_EMPLOYMENT_TYPE_MAP);
 
 sub processFile
@@ -30,15 +31,20 @@ sub processFile
 		$schema->connectDB($options->{connectStr}) if exists $options->{connectStr};
 	}
 
-	my $person = new App::Data::MDL::Person(schema => $schema, db => $schema->{dbh});
-	my $org = new App::Data::MDL::Organization(schema => $schema, db => $schema->{dbh});
-	my $invoice = new App::Data::MDL::Invoice(schema => $schema, db => $schema->{dbh});
-	my $feeSchedule = new App::Data::MDL::FeeSchedule(schema => $schema, db => $schema->{dbh});
-	my $healthmaintenance = new App::Data::MDL::HealthMaintenance(schema => $schema, db => $schema->{dbh});
+	my $schemaFlags = SCHEMAAPIFLAG_LOGSQL | SCHEMAAPIFLAG_EXECSQL;
+	#my $schemaFlags = SCHEMAAPIFLAG_LOGSQL;
+	#my $schemaFlags = SCHEMAAPIFLAG_EXECSQL;
+
+	my $person = new App::Data::MDL::Person(schema => $schema, db => $schema->{dbh}, schemaFlags => $schemaFlags);
+	my $org = new App::Data::MDL::Organization(schema => $schema, db => $schema->{dbh}, schemaFlags => $schemaFlags);
+	my $invoice = new App::Data::MDL::Invoice(schema => $schema, db => $schema->{dbh}, schemaFlags => $schemaFlags);
+	my $feeSchedule = new App::Data::MDL::FeeSchedule(schema => $schema, db => $schema->{dbh}, schemaFlags => $schemaFlags);
+	my $healthmaintenance = new App::Data::MDL::HealthMaintenance(schema => $schema, db => $schema->{dbh}, schemaFlags => $schemaFlags);
 	my $flags = exists $options->{flags} ? $options->{flags} : MDLFLAGS_DEFAULT;
 
-	$schema->setFlag(SCHEMAAPIFLAG_LOGSQL);
+	#$schema->setFlag(SCHEMAAPIFLAG_LOGSQL);
 	#$schema->clearFlag(SCHEMAAPIFLAG_EXECSQL);
+	my @completeLog = ();
 
 	foreach my $xmlFile (@srcFile)
 	{
@@ -53,6 +59,9 @@ sub processFile
 			{
 				$person->importStruct($flags, $_);
 				$person->printErrors();
+				my $log = $person->getSqlLog();
+				push(@completeLog, @$log) if @$log;
+				$person->clearSqlLog();
 			}
 		}
 		if(my $list = $struct->{org})
@@ -62,6 +71,9 @@ sub processFile
 			{
 				$org->importStruct($flags, $_);
 				$org->printErrors();
+				my $log = $org->getSqlLog();
+				push(@completeLog, @$log) if @$log;
+				$org->clearSqlLog();
 			}
 		}
 		if(my $list = $struct->{event})
@@ -71,6 +83,9 @@ sub processFile
 			{
 				$invoice->importStruct($flags, $_);
 				$invoice->printErrors();
+				my $log = $invoice->getSqlLog();
+				push(@completeLog, @$log) if @$log;
+				$invoice->clearSqlLog();
 			}
 		}
 		if(my $list = $struct->{'offering-catalogs'})
@@ -80,6 +95,9 @@ sub processFile
 			{
 				$feeSchedule->importStruct($flags, $_);
 				$feeSchedule->printErrors();
+				my $log = $feeSchedule->getSqlLog();
+				push(@completeLog, @$log) if @$log;
+				$feeSchedule->clearSqlLog();
 			}
 		}
 		if(my $list = $struct->{'health-maintenance'})
@@ -89,18 +107,20 @@ sub processFile
 			{
 				$healthmaintenance->importStruct($flags, $_);
 				$healthmaintenance->printErrors();
+				my $log = $healthmaintenance->getSqlLog();
+				push(@completeLog, @$log) if @$log;
+				$healthmaintenance->clearSqlLog();
 			}
 		}
 
-		my $log = $schema->getSqlLog();
-		if(@$log)
+		if(@completeLog)
 		{
 			my $errorsCount = 0;
 			$xmlFile =~ s/\..*$/.log/;
 			my $logFile = File::Spec->catfile($options->{sqlLogDestPath}, $xmlFile);
 			if(open(SQLLOG, ">$logFile"))
 			{
-				foreach (@$log)
+				foreach (@completeLog)
 				{
 					my ($sql, $errors) = @$_;
 					$sql = "prompt $sql" if $sql =~ m/^\[DATA\]/;
@@ -119,7 +139,6 @@ sub processFile
 			{
 				warn "Unable to write SQL Log to $logFile: $!\n";
 			}
-			$schema->clearSqlLog();
 		}
 	}
 }
