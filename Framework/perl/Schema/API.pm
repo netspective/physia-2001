@@ -112,14 +112,15 @@ sub schemaAction
 {
 	my ($self, $page, $table, $action, %data) = @_;
 
-	#print 'Data: ' . colDataAsStr(\%data) . "\n";
+	#$page->addDebugStmt (colDataAsStr('DATA',\%data));
 	if(my $table = $self->getTable($table))
 	{
 		return $table->dbCommand($page, $action, \%data);
 	}
 	else
 	{
-		$page->addError("table $table not found in schemaAction");
+		$page->addError("table $table not found in schemaAction") if $page && $page->can('unitWork') && ! $page->unitWork();		
+		$page->storeSql('',[],["table $table not found in schemaAction"]) if $page && $page->can('unitWork') && $page->unitWork();		
 		return 0;
 	}
 }
@@ -219,11 +220,13 @@ sub Table::insertRec
 	}
 
 	my $flags = $page->{schemaFlags};
-	my ($sql, $errors) = $self->createInsertSql($colDataRef);
-	$sql = $page->replaceVars($sql) if $page && $page->can('replaceVars');
-	push(@{$page->{sqlLog}}, [$sql || colDataAsStr("[DATA] Insert ($self->{name}): ", $colDataRef), $errors]) if $flags & SCHEMAAPIFLAG_LOGSQL;
-	$page->addDebugStmt($sql) if $colDataRef->{_debug} && $page;
-#	$page->storeSql($sql,$errors) if ($page) && ($page->unitWork());	
+	my ($sql,$colValue, $errors) = $self->createInsertSql($colDataRef);
+	$sql = $page->replaceVars($sql) if $page && $page->can('replaceVars');	
+	my $sqlCol = $sql || colDataAsStr("[DATA] Update ($self->{name}): ", $colDataRef);
+	$sqlCol .= "  " . join ',',@$colValue;
+	push(@{$page->{sqlLog}}, [$sqlCol, $errors]) if $flags & SCHEMAAPIFLAG_LOGSQL;			
+	#$page->addDebugStmt($sql) if $colDataRef->{_debug} && $page;	
+	$page->storeSql($sql,$colValue,$errors) if $page && $page->can('unitWork') &&$page->unitWork();		
 	return 1 unless $flags & SCHEMAAPIFLAG_EXECSQL;
 
 	if(scalar(@{$errors}) == 0)
@@ -231,7 +234,8 @@ sub Table::insertRec
 		my $rowsInserted = 0;
 		eval
 		{
-			$rowsInserted = $schema->{dbh}->do($sql) or die $DBI::errstr;
+			$rowsInserted = $schema->{dbh}->do($sql,undef,@{$colValue}) or die $DBI::errstr;
+			
 		};
 		if($rowsInserted == 0 || $@)
 		{
@@ -265,18 +269,21 @@ sub Table::updateRec
 	die "no database connected" if ! $schema->{dbh};
 
 	my $flags = $page->{schemaFlags};
-	my ($sql, $errors) = $self->createUpdateSql($colDataRef);
+	my ($sql, $colValue,$errors) = $self->createUpdateSql($colDataRef);
 	$sql = $page->replaceVars($sql) if $page && $page->can('replaceVars');
-	push(@{$page->{sqlLog}}, [$sql || colDataAsStr("[DATA] Update ($self->{name}): ", $colDataRef), $errors]) if $flags & SCHEMAAPIFLAG_LOGSQL;
-	$page->addDebugStmt($sql) if $colDataRef->{_debug} && $page;
-#	$page->storeSql($sql,$errors) if ($page) && ($page->unitWork());	
+	my $sqlCol = $sql || colDataAsStr("[DATA] Update ($self->{name}): ", $colDataRef);
+	$sqlCol .= "  " . join ',',@$colValue;
+	push(@{$page->{sqlLog}}, [$sqlCol, $errors]) if $flags & SCHEMAAPIFLAG_LOGSQL;			
+	#push(@{$page->{sqlLog}}, [$sql || colDataAsStr("[DATA] Update ($self->{name}): ", $colDataRef), $errors]) if $flags & SCHEMAAPIFLAG_LOGSQL;	
+	#$page->addDebugStmt($sql) if $colDataRef->{_debug} && $page;
+	$page->storeSql($sql,$colValue,$errors) if $page && $page->can('unitWork') &&$page->unitWork();		
 	return 1 unless $flags & SCHEMAAPIFLAG_EXECSQL;
 
 	if(scalar(@{$errors}) == 0)
 	{
 		eval
 		{
-			$schema->{dbh}->do($sql) or die $DBI::errstr;
+			 $schema->{dbh}->do($sql,undef,@{$colValue}) or die $DBI::errstr;
 		};
 		if($@)
 		{
@@ -309,18 +316,19 @@ sub Table::deleteRec
 	die "no database connected" if ! $schema->{dbh};
 
 	my $flags = $page->{schemaFlags};
-	my ($sql, $errors) = $self->createDeleteSql($colDataRef);
+	my ($sql, $colValue,$errors) = $self->createDeleteSql($colDataRef);
 	$sql = $page->replaceVars($sql) if $page && $page->can('replaceVars');
-	push(@{$page->{sqlLog}}, [$sql || colDataAsStr("[DATA] Delete ($self->{name}): ", $colDataRef), $errors]) if $flags & SCHEMAAPIFLAG_LOGSQL;
-	$page->addDebugStmt($sql) if $colDataRef->{_debug} && $page;
-#	$page->storeSql($sql,$errors) if ($page) && ($page->unitWork());	
+	my $sqlCol = $sql || colDataAsStr("[DATA] Update ($self->{name}): ", $colDataRef);
+	$sqlCol .= "  " . join ',',@$colValue;
+	push(@{$page->{sqlLog}}, [$sqlCol, $errors]) if $flags & SCHEMAAPIFLAG_LOGSQL;			
+	#$page->addDebugStmt($sql) if $colDataRef->{_debug} && $page;
+	$page->storeSql($sql,$colValue,$errors) if $page && $page->can('unitWork') &&$page->unitWork();	
 	return 1 unless $flags & SCHEMAAPIFLAG_EXECSQL;
-
 	if(scalar(@{$errors}) == 0)
 	{
 		eval
 		{
-			$schema->{dbh}->do($sql) or die $DBI::errstr;
+			 $schema->{dbh}->do($sql,undef,@{$colValue}) or die $DBI::errstr;
 		};
 		if($@)
 		{
