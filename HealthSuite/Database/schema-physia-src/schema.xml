@@ -712,8 +712,8 @@
 	<table name="Statement" abbrev="Stmt" type="Secure,Audit">
 		<column name="statement_id" type="autoinc" primarykey="yes" descr="Uniq ID (in entire system) for the invoice statement record"/>
 		<column name="statement_source" lookupref="electronic_payer_source.id"  descr="Source of Statement"/>
-		<column name="tranmission_stamp" type="stamp" descr="Date Statement was sent " />
-		<column name="tranmission_status" lookupref="transmission_status.id" type="integer" descr="Transmission Status"/>
+		<column name="transmission_stamp" type="stamp" descr="Date Statement was sent " />
+		<column name="transmission_status" lookupref="transmission_status.id" type="integer" descr="Transmission Status"/>
 		<column name="ack_stamp" type="stamp" descr="Date statement was acknowledge"/>
 		<column name="int_statement_id" type="autoinc" descr="Physia Internal Statement ID"/>
 		<column name="ext_statement_id" type="text" size="30" descr="External Statement ID"/>
