@@ -56,12 +56,23 @@ sub populateData
 	return unless $flags & CGI::Dialog::DLGFLAG_UPDORREMOVE_DATAENTRY_INITIAL;	
 }
 
+sub customValidate
+{
+	my ($self, $page) = @_;
+	unless ($page->param('trans_id'))
+	{
+		my $field = $self->getField('person_id');	
+		$field->invalidate($page,"Make sure you are a collector for this account.  Transfer account only from 'today' worklist"); 		
+	}
+}
+
 sub execute
 {
 	my ($self, $page, $command,$flags) = @_;	
 	$command = 'update';
 	my $new_owner = $page->field('transfer_id');
-	$STMTMGR_WORKLIST_COLLECTION->execute($page,STMTMGRFLAG_NONE,'TranCollectionById', $page->param('person_id'),$page->session('user_id'),$new_owner);
+	$STMTMGR_WORKLIST_COLLECTION->execute($page,STMTMGRFLAG_NONE,'TranCollectionById', $page->param('person_id'),$page->session('user_id'),$new_owner,
+	$page->session('_session_id'), $page->session('user_id'),$page->session('org_internal_id'),"Account Transfer From $page->session('user_id')" );
 	$page->schemaAction(   'Transaction', $command,                        
 		                trans_owner_id => $page->param('person_id') || undef,
 		                provider_id => $page->session('user_id') ||undef,
