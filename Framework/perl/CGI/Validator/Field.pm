@@ -17,7 +17,7 @@ use enum qw(BITMASK:FLDFLAG_
 	IDENTIFIER UPPERCASE UCASEINITIAL LOWERCASE TRIM
 	FORMATVALUE CUSTOMVALIDATE
 	CUSTOMDRAW NOBRCAPTION PERSIST
-	HOME
+	HOME SORT
 	);
 
 use constant FLDFLAGS_DEFAULT => FLDFLAG_TRIM;
@@ -26,6 +26,7 @@ use constant FLDFLAGS_REQUIRING_VALIDATION => FLDFLAG_REQUIRED | FLDFLAG_IDENTIF
 
 #
 # export only those flags that should be called from the outside
+# note: If any flag are changed, please update page.js for mirror image. 
 #
 @ISA = qw(Exporter);
 @EXPORT = qw(
@@ -41,11 +42,13 @@ use constant FLDFLAGS_REQUIRING_VALIDATION => FLDFLAG_REQUIRED | FLDFLAG_IDENTIF
 	FLDFLAG_NOBRCAPTION
 	FLDFLAG_PERSIST
 	FLDFLAG_HOME
+	FLDFLAG_SORT
 	);
 
 use constant ONKEYPRESSJS_DEFAULT    => 'processKeypress_default(event)';
 use constant ONKEYPRESSJS_FLOATNUM   => 'processKeypress_float(event)';
 use constant ONKEYPRESSJS_INTNUM     => 'processKeypress_integer(event)';
+use constant ONKEYPRESSJS_ALPHAONLY  => 'processKeypress_alphaonly(event)';
 use constant ONKEYPRESSJS_INTDASH    => 'processKeypress_integerdash(event)';
 use constant ONKEYPRESSJS_IDENTIFIER => 'processKeypress_identifier(event)';
 use constant ONBLUR_SSN              => 'validateChange_SSN(event)';
@@ -129,6 +132,13 @@ use constant ONBLUR_UCASEINITIAL   => 'validateChange_UCaseInitial(event)';
 					onKeyPressJS => ONKEYPRESSJS_DEFAULT,
 					onBlurJS => ONBLUR_DATE,
 					# we don't have a onKeyPressJS because dates/times can be text (like today, tomorrow, etc)
+				},
+			'alphaonly' =>
+				{
+					regExp => '^[a-zA-Z]+$',
+					message => "accepts only letters.",
+					onValidate => \&validateAlphaOnly,
+					onKeyPressJS => ONKEYPRESSJS_ALPHAONLY,
 				},
 			'time' =>
 				{
@@ -367,6 +377,15 @@ sub validateMinMax
 		push(@errors, "$self->{caption} must be less than or equal to $self->{maxValue}.")
 			if $value > $self->{maxValue};
 	}
+	return @errors;
+}
+
+sub validateAlphaOnly
+{
+	my ($self, $page, $validator, $value) = @_;
+	return () if ! $value;
+
+	my @errors = ();
 	return @errors;
 }
 
