@@ -18,8 +18,7 @@ use App::Statements::Invoice;
 use Date::Manip;
 use Date::Calc qw(:all);
 use App::IntelliCode;
-use Devel::ChangeLog;
-use vars qw(@ISA @CHANGELOG);
+use vars qw(@ISA);
 
 @ISA = qw(CGI::Dialog::Field);
 
@@ -157,19 +156,21 @@ sub isValid
 	push(@insFeeSchedules, $list) if $list;	
 
 	#Set up default FS
-	my @fsIntIds = ();
+	$list ='';
+	#my @fsIntIds = ();
 	my @fsText = split(/\s*,\s*/, $page->param('_f_proc_default_catalog'));
 	foreach (@fsText)
 	{
 		my $catalog = $STMTMGR_CATALOG->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInternalCatalogIdByIdType',
 					$page->session('org_internal_id'), $_, App::Universal::CATALOGTYPE_FEESCHEDULE);
 		
-		push(@fsIntIds, $catalog->{internal_catalog_id});
+		$list .= $list ? ",$catalog->{internal_catalog_id}" : $catalog->{internal_catalog_id} ;
+		#push(@fsIntIds, $catalog->{internal_catalog_id});
 		#$page->addError("FS Names: $_");
 		#$page->addError("FS Ids: $catalog->{internal_catalog_id}");
 	}
 
-	push ( @defaultFeeSchedules, @fsIntIds ) if $page->param('_f_proc_default_catalog');
+	push ( @defaultFeeSchedules, $list) if $page->param('_f_proc_default_catalog');
 	
 	# ------------------------------------------------------------------------------------------------------------------------	
 	#munir's old icd validation for checking if the same icd code is entered in twice
@@ -235,15 +236,7 @@ sub isValid
 		
 		if($modifier ne '')
 		{
-			#if($modifier =~ m/^(\d+)$/)
-		 	#{
-				# $1 is the check to see if it is an integer
-				$self->invalidate($page, "[<B>P$line</B>] The modifier code $modifier is not valid. Please verify.") unless $STMTMGR_CATALOG->recordExists($page, STMTMGRFLAG_NONE, 'selGenericModifierCodeId', $modifier);
-			#}
-		 	#else
-		 	#{
-			#	$self->invalidate($page, "[<B>P$line</B>] The modifier code $modifier should be an integer. Please verify");
-		 	#}
+			$self->invalidate($page, "[<B>P$line</B>] The modifier code $modifier is not valid. Please verify.") unless $STMTMGR_CATALOG->recordExists($page, STMTMGRFLAG_NONE, 'selGenericModifierCodeId', $modifier);
 		}
 
 		my @actualDiagCodes = ();
@@ -293,7 +286,7 @@ sub isValid
 		#App::IntelliCode::incrementUsage($page, 'Cpt', \@cptCodes, $sessUser, $sessOrgIntId);
 		#App::IntelliCode::incrementUsage($page, 'Icd', \@diagCodes, $sessUser, $sessOrgIntId);
 		#App::IntelliCode::incrementUsage($page, 'Hcpcs', \@cptCodes, $sessUser, $sessOrgIntId);
-		
+
 		my @listFeeSchedules = @defaultFeeSchedules ? @defaultFeeSchedules : @insFeeSchedules;
 		$page->param("_f_proc_active_catalogs", join(',', @listFeeSchedules));		
 		my $fsDate = $chkBegin ? $servicedatebegin :undef  ;
@@ -301,26 +294,27 @@ sub isValid
 		my $count_type = scalar(@$fs_entry);
 		my $count=0;
 		if ( ($servicetype eq '' || $charges eq '') && length($page->field('payer')) >0)
-		{			
+		{
+			#$page->addError("Count Type: $count_type");
 			if ($count_type==1 || ($use_fee ne '' && $count_type >=1) )
-			{		
+			{
 				foreach(@$fs_entry)
 				{
 					if($count_type==1||$use_fee eq $count)
 					{
-
 						#Fail Safe To make sure service type is set. 
 						#Still FS entries in database that do not have a service type
-						if(length($_->[$INTELLICODE_FS_SERV_TYPE])>0)
-						{ 	
+						if(length($_->[$INTELLICODE_FS_SERV_TYPE]) > 0)
+						{
 							$page->param("_f_proc_$line\_service_type",$_->[$INTELLICODE_FS_SERV_TYPE]);
 							$page->param("_f_proc_$line\_code_type",$_->[$INTELLICODE_FS_CODE_TYPE]); 	
 							$page->param("_f_proc_$line\_charges", $_->[$INTELLICODE_FS_COST]) if $charges eq '';
-							$page->param("_f_proc_$line\_ffs_flag",$_->[$INTELLICODE_FS_FFS_CAP]);						
+							$page->param("_f_proc_$line\_ffs_flag",$_->[$INTELLICODE_FS_FFS_CAP]);
+							$page->param("_f_proc_$line\_fs_used",$_->[$INTELLICODE_FS_ID_NUMERIC]);
 						}
 						else
 						{
-							$self->invalidate($page,"[<B>P$line</B>]Check that Service Type is set for Fee Schedule Entry '$procedure' in fee schedule $_->[$INTELLICODE_FS_ID_NUMERIC]" );								
+							$self->invalidate($page,"[<B>P$line</B>]Check that Service Type is set for Fee Schedule Entry '$procedure' in fee schedule $_->[$INTELLICODE_FS_ID_TEXT]" );
 						}
 					}
 					$count++;
@@ -414,7 +408,7 @@ sub getMultiSvcTypesHtml
 	my $count=0;
 	foreach (@$fsResults)
 	{
-		my $svc_name=$_->[$INTELLICODE_FS_ID_NUMERIC];
+		my $svc_name=$_->[$INTELLICODE_FS_ID_TEXT];
 		$html .= qq{
 			<input onClick="document.dialog._f_proc_$line\_use_fee.value=this.value" 
 				type=radio name='_f_multi_svc_type_$line' value=$count>$svc_name
@@ -535,6 +529,7 @@ sub getHtml
 		}
 
 		$linesHtml .= qq{
+			<INPUT TYPE="HIDDEN" NAME="_f_proc_$line\_fs_used" VALUE='@{[ $page->param("_f_proc_$line\_fs_used")]}'/>
 			<INPUT TYPE="HIDDEN" NAME="_f_proc_$line\_item_id" VALUE='@{[ $page->param("_f_proc_$line\_item_id")]}'/>
 			<INPUT TYPE="HIDDEN" NAME="_f_proc_$line\_actual_diags" VALUE='@{[ $page->param("_f_proc_$line\_actual_diags")]}'/>
 			<INPUT TYPE="HIDDEN" NAME="_f_proc_$line\_ffs_flag" VALUE='@{[ $page->param("_f_proc_$line\_ffs_flag")]}'/>			
