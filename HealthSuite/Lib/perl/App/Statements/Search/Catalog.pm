@@ -49,7 +49,6 @@ $STMTFMT_SEL_CATALOGENTRY = qq{
 			decode(flags, 0, null, 1, '(FFS)')
 		from catalog_entry_type, offering_catalog_entry
 		where 	catalog_id = ?
-			and offering_catalog_entry.cr_org_id = ?
 			and	offering_catalog_entry.entry_type = catalog_entry_type.id
 		order by entry_type, code, modifier
 };
