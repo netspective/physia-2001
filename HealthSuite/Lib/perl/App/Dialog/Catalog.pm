@@ -117,9 +117,9 @@ sub new
 	};
 	$self->addFooter(new CGI::Dialog::Buttons(
 		nextActions_add => [
-			['Add Another Fee Schedule', "/org/#session.org_id#/dlg-add-catalog", 1],
-			['Show Current Fee Schedule', '/search/catalog/detail/%field.catalog_id%'],
-			['Show List of Fee Schedules', '/search/catalog']
+			['Add Another Fee Schedule', '/org/#session.org_id#/dlg-add-catalog', 1],
+			['Show Current Fee Schedule', '/org/#session.org_id#/catalog/%field.internal_catalog_id%/%field.catalog_id%'],
+			['Show List of Fee Schedules', '/org/#session.org_id#/catalog']
 			],
 		cancelUrl => $self->{cancelUrl} || undef));
 
@@ -210,6 +210,8 @@ sub execute
 		_debug => 0
 	);
 
+	$page->field('internal_catalog_id', $newId);
+	
 	saveAttribute($page, 'OfCatalog_Attribute', $internalCatalogId || $newId , 'Capitated Contract', 
 		App::Universal::ATTRTYPE_BOOLEAN, $STMTMGR_CATALOG, 'sel_Catalog_Attribute',
 		value_int => defined $page->field('capitated_contract') ? 1 : 0,
