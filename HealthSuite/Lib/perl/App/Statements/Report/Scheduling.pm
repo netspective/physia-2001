@@ -105,7 +105,8 @@ $STMTMGR_REPORT_SCHEDULING = new App::Statements::Report::Scheduling(
 				invoice i,
 				invoice_item ii
 			WHERE	ea.value_type = @{[ App::Universal::EVENTATTRTYPE_APPOINTMENT ]}
-				AND (ii.data_text_b != 'void' OR ii.item_type != @{[ App::Universal::INVOICEITEMTYPE_VOID ]})
+				AND ((ii.data_text_b is NOT NULL AND ii.data_text_b != 'void') 
+					OR (ii.data_text_b is NULL AND ii.item_type != @{[ App::Universal::INVOICEITEMTYPE_VOID ]}) )
 				AND (:1 is NULL or e.facility_id = :1)
 				AND (:6 is NULL or ea.value_textb = :6)
 				AND EXISTS
@@ -146,7 +147,8 @@ $STMTMGR_REPORT_SCHEDULING = new App::Statements::Report::Scheduling(
 		},
 		whereCond => qq{ii.parent_id = i.invoice_id
 			AND ii.code = :1
-			AND (ii.data_text_b != 'void' OR ii.item_type != @{[ App::Universal::INVOICEITEMTYPE_VOID ]})
+			AND ((ii.data_text_b is NOT NULL AND ii.data_text_b != 'void') 
+				OR (ii.data_text_b is NULL AND ii.item_type != @{[ App::Universal::INVOICEITEMTYPE_VOID ]}) )
 			AND i.main_transaction = t.trans_id
 			AND e.event_id = t.parent_event_id
 			AND i.parent_invoice_id is NULL
