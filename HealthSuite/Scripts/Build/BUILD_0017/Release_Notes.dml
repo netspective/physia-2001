@@ -63,6 +63,10 @@
 			Added all remaining invoice statuses to claim search.
 		</deliverable>
 
+		<deliverable id="1537">
+			Changed Envoy NSF to THINNet NSF.
+		</deliverable>
+
 		<deliverable id="1553">
 			UI: Administrators can now update main org profiles
 		</deliverable>
