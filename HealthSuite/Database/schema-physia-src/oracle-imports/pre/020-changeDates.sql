@@ -13,7 +13,7 @@ create or replace procedure changeDates(p_days in number,
 	v_operation char := '+';
 	v_days_nmbr number := p_days;
 
-   	output_file UTL_FILE.FILE_TYPE;
+/*   	output_file UTL_FILE.FILE_TYPE; */
    	
     	
         cursor c_tbl_colmn is select table_name, column_name from user_tab_columns u 
@@ -28,7 +28,7 @@ begin
         	v_days_nmbr := -p_days;
         end if;
 
-   	output_file := UTL_FILE.FOPEN(p_logfiledir, 'chng_date__'||TO_CHAR(SYSDATE, 'MMDDYY_HH:MI_AM')||'.log', 'w');
+ /*  	output_file := UTL_FILE.FOPEN(p_logfiledir, 'chng_date__'||TO_CHAR(SYSDATE, 'MMDDYY_HH:MI_AM')||'.log', 'w');  */
                   
 /*	if p_continue > 0
 	then
@@ -44,8 +44,9 @@ begin
 		then
 			if i > 0
 			then
-				UTL_FILE.PUT_LINE (output_file, v_sql_stmt);
+/*				UTL_FILE.PUT_LINE (output_file, v_sql_stmt);
 				UTL_FILE.FFLUSH (output_file);
+*/
 				
 				execute immediate v_sql_stmt;
 /*			
@@ -78,8 +79,9 @@ begin
 			v_sql_stmt := v_sql_stmt||v_column_name||' = '||v_column_name||v_operation||v_days_nmbr;
 			
 		else
-			UTL_FILE.PUT_LINE (output_file, v_sql_stmt);
+/*			UTL_FILE.PUT_LINE (output_file, v_sql_stmt);
 			UTL_FILE.FFLUSH (output_file);
+*/
 			execute immediate v_sql_stmt;
 /*
 			v_ins_stmt := 'insert into change_date values ('''||v_table_name_old||''' )';
@@ -99,7 +101,7 @@ begin
 	
 	commit;
 	
-   	UTL_FILE.FCLOSE(output_file);
+/*   	UTL_FILE.FCLOSE(output_file);   */
    	
 end;
 /
