@@ -18,20 +18,19 @@ $STMTMGR_REPORT_REFERRING_DOCTOR = new App::Statements::Report::ReferringDoctor
 	{
 		sqlStmt => qq
 		{
-			select sum(count(distinct i.client_id))
+			select count(i.client_id) patientCount
 			from person p, transaction t, invoice i
 			where i.invoice_date between to_date(:1, '$SQLSTMT_DEFAULTDATEFORMAT') and to_date(:2, '$SQLSTMT_DEFAULTDATEFORMAT')
 			and t.trans_id = i.main_transaction
 			and p.person_id = t.data_text_a
-			group by p.complete_name
-		},
+		}
 	},
 
 	'patientCount' =>
 	{
 		sqlStmt => qq
 		{
-			select p.complete_name name, p.person_id, count(distinct i.client_id) patientCount
+			select p.complete_name name, p.person_id, count(i.client_id) patientCount
 			from person p, transaction t, invoice i
 			where i.invoice_date between to_date(:1, '$SQLSTMT_DEFAULTDATEFORMAT') and to_date(:2, '$SQLSTMT_DEFAULTDATEFORMAT')
 			and t.trans_id = i.main_transaction
@@ -67,7 +66,7 @@ $STMTMGR_REPORT_REFERRING_DOCTOR = new App::Statements::Report::ReferringDoctor
 	{
 		sqlStmt => qq
 		{
-			select p.complete_name name, p.person_id, o.name_primary, count(distinct i.client_id) patientCount
+			select p.complete_name name, p.person_id, o.name_primary, count(i.client_id) patientCount
 			from person p, transaction t, invoice i, org o, invoice_billing ib, insurance ins
 			where i.invoice_date between to_date(:1, '$SQLSTMT_DEFAULTDATEFORMAT') and to_date(:2, '$SQLSTMT_DEFAULTDATEFORMAT')
 			and t.trans_id = i.main_transaction
@@ -80,7 +79,7 @@ $STMTMGR_REPORT_REFERRING_DOCTOR = new App::Statements::Report::ReferringDoctor
 
 			union
 
-			select p.complete_name name, p.person_id, null, count(distinct i.client_id) patientCount
+			select p.complete_name name, p.person_id, null, count(i.client_id) patientCount
 			from person p, transaction t, invoice i, invoice_billing ib
 			where i.invoice_date between to_date(:1, '$SQLSTMT_DEFAULTDATEFORMAT') and to_date(:2, '$SQLSTMT_DEFAULTDATEFORMAT')
 			and t.trans_id = i.main_transaction

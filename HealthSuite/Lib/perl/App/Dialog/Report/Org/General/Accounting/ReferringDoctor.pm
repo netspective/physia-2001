@@ -194,7 +194,7 @@ sub execute
 		}
 	}
 
-	my $patientTotalPercent = '100.00%';
+	my $patientTotalPercent = '100.00%' if ($totalPatients !=0);
 	my $html;
 	
 	if($page->field('insurance_select') ne '')
