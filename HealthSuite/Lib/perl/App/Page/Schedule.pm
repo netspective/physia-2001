@@ -6,19 +6,16 @@ use strict;
 use Date::Manip;
 use Date::Calc qw(:all);
 
-use App::Page;
 use App::Schedule::Analyze;
 use App::Schedule::ApptSheet;
 use App::Schedule::Utilities;
 use App::ImageManager;
-use Devel::ChangeLog;
 
 use DBI::StatementManager;
 use App::Statements::Scheduling;
 use App::Statements::Search::Appointment;
 
-use vars qw(@ISA @CHANGELOG);
-@ISA = qw(App::Page);
+use base 'App::Page';
 
 # ------------------------------------------------------------------------------------------
 
@@ -424,16 +421,6 @@ sub prepare_dialog_encounterCheckin
 {
 	my ($self) = @_;
 
-	#my $content = qq{
-	#	<script>
-	#		alert("YO");
-	#		history.back();
-	#	</script>
-	#};
-
-	#$self->addContent($content);
-	#return 1;
-
 	use App::Dialog::Encounter;
 	my $dialog = new App::Dialog::Encounter::Checkin(schema => $self->getSchema());
 	$dialog->handle_page($self);
@@ -825,38 +812,5 @@ sub getJavascripts
 		</SCRIPT>
 	};
 }
-
-#
-# change log is an array whose contents are arrays of
-# 0: one or more CHANGELOGFLAG_* values
-# 1: the date the change/update was made
-# 2: the person making the changes (usually initials)
-# 3: the category in which change should be shown (user-defined) - can have '/' for hiearchies
-# 4: any text notes about the actual change/action
-#
-# ALL OF THE CHANGELOGFLAG_* values are specified in Devel::ChangeLog
-#
-@CHANGELOG =
-(
-	[	CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '01/25/2000', 'TVN',
-		'Page/Schedule',
-		'Added /schedule/apptcol to pop up a single column of the appointment sheet.'],
-	[	CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '01/16/2000', 'TVN',
-		'Page/Schedule',
-		'Developed sub to auto-create preferences of associated Resources in no preferences found.'],
-	[	CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '12/16/1999', 'TVN',
-			'Page/Schedule',
-		'Developed sub initialize to incorporate new security features.'],
-	[	CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '12/11/1999', 'TVN',
-		'Schedule/Analyze',
-		'Completed modifications for finding slots for multiple resources.'],
-	[	CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '12/11/1999', 'TVN',
-		'Schedule/Analyze',
-		'Finished Finding available slots for Facility, not knowing resources.  The resulting available slots are times when ALL resources who have templates at that facility are available at that facility at the same time. No attempt is made to handle inconsistent data, like having templates defining availability at 2 different facilities at the same time, or having appointments in the "red zone" (the unavailable times) or the no-template-info times, etc...  But appointments are properly taken into account when computing available slots. '],
-	[	CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '12/13/1999', 'TVN',
-		'Schedule/Analyze2',
-		'Begin developing Analyze version 2, capable of more robust slot search.'],
-);
-
 
 1;
