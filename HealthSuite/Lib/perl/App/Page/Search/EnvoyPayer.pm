@@ -8,8 +8,11 @@ use App::Universal;
 use DBI::StatementManager;
 use App::Statements::Search::EnvoyPayer;
 use Devel::ChangeLog;
-use vars qw(@ISA @CHANGELOG);
+use vars qw(@ISA %RESOURCE_MAP);
 @ISA = qw(App::Page::Search);
+%RESOURCE_MAP = (
+	'search/envoypayer' => {},
+	);
 
 sub getForm
 {
@@ -56,11 +59,5 @@ sub execute
 
 	return 1;
 }
-@CHANGELOG =
-(
-	
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_ADD, '01/19/2000', 'RK',
-		'Search/EnvoyPayer',
-		'Created simple reports instead of using createOutput function.'],
-);
+
 1;

@@ -6,8 +6,11 @@ use strict;
 use App::Page::Search;
 use LWP::Simple;
 
-use vars qw(@ISA);
+use vars qw(@ISA %RESOURCE_MAP);
 @ISA = qw(App::Page::Search);
+%RESOURCE_MAP = (
+	'search/drug' => {},
+	);
 
 sub getForm
 {

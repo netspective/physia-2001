@@ -7,10 +7,12 @@ use App::Page::Search;
 use App::Universal;
 use DBI::StatementManager;
 use App::Statements::Search::Code;
-use Devel::ChangeLog;
 
-use vars qw(@ISA  @CHANGELOG);
+use vars qw(@ISA %RESOURCE_MAP);
 @ISA = qw(App::Page::Search);
+%RESOURCE_MAP = (
+	'search/serviceplace' => {},
+	);
 
 sub handleARL
 {
@@ -81,13 +83,5 @@ sub execute
 
 	return 1;
 }
-
-@CHANGELOG =
-(
-	[	CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '01/12/2000', 'MAF',
-			'Search/Service Place',
-		'Created Service Place search for procedure dialog.'],
-);
-
 
 1;

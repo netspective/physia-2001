@@ -4,8 +4,11 @@ package App::Page::Search::Home;
 
 use strict;
 use App::Page::Search;
-use vars qw(@ISA);
+use vars qw(@ISA %RESOURCE_MAP);
 @ISA = qw(App::Page::Search);
+%RESOURCE_MAP = (
+	'search/_default' => {},
+	);
 
 sub getForm
 {

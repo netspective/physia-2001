@@ -8,8 +8,11 @@ use App::Universal;
 use DBI::StatementManager;
 use App::Statements::Search::Claim;
 use Date::Manip qw(ParseDate UnixDate);
-use vars qw(@ISA);
+use vars qw(@ISA %RESOURCE_MAP);
 @ISA = qw(App::Page::Search);
+%RESOURCE_MAP = (
+	'search/claim' => {},
+	);
 
 sub getForm
 {

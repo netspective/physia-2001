@@ -9,8 +9,11 @@ use DBI::StatementManager;
 use App::Statements::Search::Gpci;
 use Data::Publish;
 use Date::Manip;
-
+use vars qw(%RESOURCE_MAP);
 use base 'App::Page::Search';
+%RESOURCE_MAP = (
+	'search/gpci' => {},
+	);
 
 sub getForm
 {

@@ -5,8 +5,11 @@ package App::Page::Search::Auto;
 use strict;
 use App::Page::Search;
 
-use vars qw(@ISA);
+use vars qw(@ISA %RESOURCE_MAP);
 @ISA = qw(App::Page::Search);
+%RESOURCE_MAP = (
+	'search/auto' => {},
+	);
 
 sub getForm
 {

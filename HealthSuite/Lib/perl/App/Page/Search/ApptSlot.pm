@@ -18,8 +18,11 @@ use Devel::ChangeLog;
 use CGI::Dialog;
 use App::Dialog::Field::RovingResource;
 
-use vars qw(@ISA  @CHANGELOG);
+use vars qw(@ISA %RESOURCE_MAP);
 @ISA = qw(App::Page::Search);
+%RESOURCE_MAP = (
+	'search/apptslot' => {},
+	);
 
 sub handleARL
 {
@@ -294,12 +297,5 @@ sub getSlotsHtml
 
 	return $html;
 }
-
-@CHANGELOG =
-(
-	[	CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '12/16/1999', 'TVN',
-			'Page/Search/ApptSlot',
-		'Developed sub getSlotsHtml to display available slots data using the new data structure.'],
-);
 
 1;

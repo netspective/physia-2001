@@ -8,8 +8,13 @@ use App::Universal;
 use DBI::StatementManager;
 use App::Statements::Search::Insurance;
 
-use vars qw(@ISA);
+use vars qw(@ISA %RESOURCE_MAP);
 @ISA = qw(App::Page::Search);
+%RESOURCE_MAP = (
+	'search/insurance' => {},
+	'search/insproduct' => {},
+	'search/insplan' => {},
+	);
 
 sub getForm
 {

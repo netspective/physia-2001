@@ -8,8 +8,16 @@ use App::Universal;
 use DBI::StatementManager;
 use App::Statements::Search::Person;
 
-use vars qw(@ISA);
+use vars qw(@ISA %RESOURCE_MAP);
 @ISA = qw(App::Page::Search);
+%RESOURCE_MAP = (
+	'search/person' => {},
+	'search/patient' => {},
+	'search/physician' => {},
+	'search/staff' => {},
+	'search/nurse' => {},
+	'search/associate' => {},
+	);
 
 sub getForm
 {

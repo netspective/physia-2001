@@ -7,10 +7,13 @@ use App::Page::Search;
 use App::Universal;
 use DBI::StatementManager;
 use App::Statements::Search::Code;
-use Devel::ChangeLog;
 
-use vars qw(@ISA  @CHANGELOG);
+use vars qw(@ISA %RESOURCE_MAP);
 @ISA = qw(App::Page::Search);
+%RESOURCE_MAP = (
+	'search/cpt' => {},
+	'search/100' => {},
+	);
 
 sub handleARL
 {
@@ -210,13 +213,5 @@ sub execute_detail
 
 	return 1;
 }
-
-@CHANGELOG =
-(
-	[	CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '01/05/2000', 'TVN',
-			'Search/CPT',
-		'Completed Detailed CPT Search.'],
-);
-
 
 1;

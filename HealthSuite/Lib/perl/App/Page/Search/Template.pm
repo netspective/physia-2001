@@ -8,8 +8,11 @@ use App::Universal;
 use DBI::StatementManager;
 use App::Statements::Scheduling;
 
-use vars qw(@ISA);
+use vars qw(@ISA %RESOURCE_MAP);
 @ISA = qw(App::Page::Search);
+%RESOURCE_MAP = (
+	'search/template' => {},
+	);
 
 sub handleARL
 {

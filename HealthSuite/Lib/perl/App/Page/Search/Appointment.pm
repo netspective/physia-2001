@@ -15,8 +15,11 @@ use App::Schedule::Analyze;
 use App::Schedule::Utilities;
 use Data::Publish;
 
-use vars qw(@ISA);
+use vars qw(@ISA %RESOURCE_MAP);
 @ISA = qw(App::Page::Search);
+%RESOURCE_MAP = (
+	'search/appointment' => {},
+	);
 
 sub handleARL
 {
