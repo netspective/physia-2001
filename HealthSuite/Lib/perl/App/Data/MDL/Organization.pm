@@ -223,7 +223,7 @@ sub importContactInfo
 			$self->schemaAction($flags, "Org_Attribute", 'add',
 				parent_id => $orgId,
 				item_name => 'Contact Information',
-				value_type => App::Universal::ATTRTYPE_TEXT,
+				value_type => App::Universal::ATTRTYPE_BILLING_PHONE,
 				value_textB => $item->{_text},
 				value_text => $item->{phone});
 		}
