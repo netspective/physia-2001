@@ -34,7 +34,7 @@ sub new
 	$self->{champusSponsorStatus} = undef;
 	$self->{billSequence} = undef;
 	$self->{payerId} = undef; # envoy id for payer
-
+	$self->{type} = undef;
 	
 	return bless $self, $type;
 }
@@ -46,6 +46,19 @@ sub property
 	return $self->{$name};
 }
 
+sub getType
+{
+	my ($self) = @_;
+	
+	return $self->{type};
+}
+
+sub setType
+{
+	my ($self,$value) = @_;
+
+	$self->{type} = $value;
+}
 
 sub getBillSequence
 {

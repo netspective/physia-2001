@@ -25,6 +25,7 @@ sub new
 	$self->{federalTaxId} = undef;	
 	$self->{specialityId} = undef;
 	$self->{organizationType} = undef;
+	$self->{type} = undef;
 
 	return bless $self, $type;
 }
@@ -34,6 +35,20 @@ sub property
 	my ($self, $name, $value) = @_;
 	$self->{$name} = $value if defined $value;
 	return $self->{$name};
+}
+
+sub getType
+{
+	my ($self) = @_;
+	
+	return $self->{type};
+}
+
+sub setType
+{
+	my ($self,$value) = @_;
+
+	$self->{type} = $value;
 }
 
 sub setOrganizationType

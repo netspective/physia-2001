@@ -35,6 +35,7 @@ sub new
 	$self->{ident} = undef;
 	$self->{status} = undef;
 	$self->{ssn} = undef;
+	$self->{type} = undef;
 
 	return bless $self, $type;
 }
@@ -44,6 +45,20 @@ sub property
 	my ($self, $name, $value) = @_;
 	$self->{$name} = $value if defined $value;
 	return $self->{$name};
+}
+
+sub getType
+{
+	my ($self) = @_;
+	
+	return $self->{type};
+}
+
+sub setType
+{
+	my ($self,$value) = @_;
+
+	$self->{type} = $value;
 }
 
 sub getStatus
@@ -59,7 +74,6 @@ sub setSsn
 
 	$self->{ssn} = $value;
 }
-
 
 sub getSsn
 {
@@ -326,6 +340,8 @@ sub convertDateToMMDDYYYYFromCCYYMMDD
 	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '12/21/1999', 'SSI', 'Billing Interface/Claim Person','setDateOfBirth,setDateOfDeath use convertDateToCCYYMMDD  to change the date formats'],
 	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '01/11/2000', 'SSI', 'Billing Interface/Claim Person','convertDateToMMDDYYYYFromCCYYMMDD implemented here. its basic function is to convert the date format from  CCYYMMDD to mmddyyyy'],
 	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '01/11/2000', 'SSI', 'Billing Interface/Claim Person','getDateOfBirth, getDateOfDeath can be provided with argument of DATEFORMAT_USA(constant 1) to get the date in mmddyyyy format'],
+	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '05/05/2000', 'SSI', 'Billing Interface/Claim Person','New property type is added to reflect the person type '],
+	
 );
 
 1;
