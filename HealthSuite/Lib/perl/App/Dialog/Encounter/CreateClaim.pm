@@ -65,7 +65,7 @@ sub initialize
 
 	$self->addFooter(new CGI::Dialog::Buttons(
 						nextActions_add => [
-							#['Add a Procedure', NEXTACTION_ADDPROC],
+							['Add a Procedure', NEXTACTION_ADDPROC],
 							['Go to Claim Summary', NEXTACTION_CLAIMSUMM, 1],
 							['Go to Patient Account', NEXTACTION_PATIENTACCT],
 							['Add Another Claim', NEXTACTION_CREATECLAIM],
