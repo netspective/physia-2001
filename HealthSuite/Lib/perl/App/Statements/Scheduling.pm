@@ -596,12 +596,13 @@ $STMTMGR_SCHEDULING = new App::Statements::Scheduling(
 	'sel_futureAppointments' => {
 		sqlStmt => qq{
 			select to_char(e.start_time - ?, '$SQLSTMT_DEFAULTSTAMPFORMAT') appt_time,
-				ea.value_textB as physician, e.subject
+				ea.value_textB as physician, e.subject, e.event_id
 			from Event_Attribute ea, Event e
 			where e.start_time > sysdate
 				and ea.parent_id = e.event_id
 				and upper(ea.value_text) = upper(?)
 				and e.owner_id = ?
+				and e.event_id > ?
 			order by e.start_time
 		},
 	},
