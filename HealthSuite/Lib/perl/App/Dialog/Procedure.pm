@@ -381,6 +381,7 @@ sub storeAuthorizations
 			value_type => defined $textValueType ? $textValueType : undef,
 			value_text => $patSignature->{value_text} || undef,
 			value_textB => $patSignature->{value_textb} || undef,
+			value_date => $patSignature->{value_date} || undef,
 			_debug => 0
 		);
 
