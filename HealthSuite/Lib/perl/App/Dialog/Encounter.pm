@@ -1086,7 +1086,6 @@ sub handleInvoiceAttrs
 
 
 	## Check if creation batch id already exists. If not, create it and add history item.
-	my $batchId = $page->field('batch_id');
 	my $creationBatchInfo = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoiceAttr', $invoiceId, 'Invoice/Creation/Batch ID');
 	if($creationBatchInfo->{item_id} eq '' && $batchId)
 	{
