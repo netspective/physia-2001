@@ -9,7 +9,7 @@ package Schema::API;
 use strict;
 use DBI;
 use Schema;
-use enum qw(BITMASK:SCHEMAAPIFLAG_ LOGSQL EXECSQL);
+use enum qw(BITMASK:SCHEMAAPIFLAG_ LOGSQL EXECSQL UNITSQL);
 use constant DEFAULT_SCHEMAAPIFLAGS => SCHEMAAPIFLAG_EXECSQL;
 
 use vars qw(@ISA @EXPORT $cachedDbHdls $cachedSchemaFiles $cachedSchemaNames);
@@ -19,6 +19,7 @@ use vars qw(@ISA @EXPORT $cachedDbHdls $cachedSchemaFiles $cachedSchemaNames);
 	DEFAULT_SCHEMAAPIFLAGS
 	SCHEMAAPIFLAG_EXECSQL
 	SCHEMAAPIFLAG_LOGSQL
+	SCHEMAAPIFLAG_UNITSQL
 );
 
 $cachedDbHdls = {};        # useful in Velocigen/mod_perl environment
@@ -222,6 +223,7 @@ sub Table::insertRec
 	$sql = $page->replaceVars($sql) if $page && $page->can('replaceVars');
 	push(@{$page->{sqlLog}}, [$sql || colDataAsStr("[DATA] Insert ($self->{name}): ", $colDataRef), $errors]) if $flags & SCHEMAAPIFLAG_LOGSQL;
 	$page->addDebugStmt($sql) if $colDataRef->{_debug} && $page;
+	$page->storeSql($sql,$errors) if ($page->unitWork());	
 	return 1 unless $flags & SCHEMAAPIFLAG_EXECSQL;
 
 	if(scalar(@{$errors}) == 0)
@@ -267,6 +269,7 @@ sub Table::updateRec
 	$sql = $page->replaceVars($sql) if $page && $page->can('replaceVars');
 	push(@{$page->{sqlLog}}, [$sql || colDataAsStr("[DATA] Update ($self->{name}): ", $colDataRef), $errors]) if $flags & SCHEMAAPIFLAG_LOGSQL;
 	$page->addDebugStmt($sql) if $colDataRef->{_debug} && $page;
+	$page->storeSql($sql,$errors) if ($page->unitWork());	
 	return 1 unless $flags & SCHEMAAPIFLAG_EXECSQL;
 
 	if(scalar(@{$errors}) == 0)
@@ -310,6 +313,7 @@ sub Table::deleteRec
 	$sql = $page->replaceVars($sql) if $page && $page->can('replaceVars');
 	push(@{$page->{sqlLog}}, [$sql || colDataAsStr("[DATA] Delete ($self->{name}): ", $colDataRef), $errors]) if $flags & SCHEMAAPIFLAG_LOGSQL;
 	$page->addDebugStmt($sql) if $colDataRef->{_debug} && $page;
+	$page->storeSql($sql,$errors) if ($page->unitWork());	
 	return 1 unless $flags & SCHEMAAPIFLAG_EXECSQL;
 
 	if(scalar(@{$errors}) == 0)
