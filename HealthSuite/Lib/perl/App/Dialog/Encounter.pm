@@ -1306,16 +1306,24 @@ sub handleInvoiceAttrs
 			_debug => 0
 		);
 
-	$page->schemaAction(
-			'Invoice_Attribute', $command,
-			item_id => $page->field('resub_number_item_id') || undef,
-			parent_id => $invoiceId,
-			item_name => 'Medicaid/Resubmission',
-			value_type => defined $textValueType ? $textValueType : undef,
-			value_text => $page->field('resub_number') || undef,
-			#value_textB => (reference),
-			_debug => 0
-		);
+	if($page->field('claim_type') == App::Universal::CLAIMTYPE_MEDICAID)
+	{
+		my $resubCommand = 'add';
+		if($page->field('resub_number_item_id'))
+		{
+			$resubCommand = 'update';
+		}
+		$page->schemaAction(
+				'Invoice_Attribute', $resubCommand,
+				item_id => $page->field('resub_number_item_id') || undef,
+				parent_id => $invoiceId,
+				item_name => 'Medicaid/Resubmission',
+				value_type => defined $textValueType ? $textValueType : undef,
+				value_text => $page->field('resub_number') || undef,
+				#value_textB => (reference),
+				_debug => 0
+			);
+	}
 
 	$page->schemaAction(
 			'Invoice_Attribute', $command,
