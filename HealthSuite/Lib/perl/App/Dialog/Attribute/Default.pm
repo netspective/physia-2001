@@ -256,9 +256,10 @@ sub customValidate
 	my $command = $self->getActiveCommand($page);
 	my $billing = $self->getField('attr_name');
 	my $parentId = $page->param('org_id');
-	my $valueType = App::Universal::ATTRTYPE_BILLING_PHONE;
-	my $billingExists = $STMTMGR_ORG->recordExists($page,STMTMGRFLAG_NONE, 'selAttributeByValueType', $parentId, $valueType);
-	if($command eq 'add' && $billingExists eq 1)
+	my $valueType = $self->{valueType};
+	my $billType = App::Universal::ATTRTYPE_BILLING_PHONE;
+	my $billingExists = $STMTMGR_ORG->recordExists($page,STMTMGRFLAG_NONE, 'selAttributeByValueType', $parentId, $billType);
+	if($command eq 'add' && $billingExists eq 1 && $valueType eq $billType)
 	{
 
 		$billing->invalidate($page, "'Billing Contact Phone' already exists for this Org");
