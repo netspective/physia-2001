@@ -620,6 +620,7 @@ sub storeFacilityInfo
 
 	my $textValueType = App::Universal::ATTRTYPE_TEXT;
 	my $credentialsValueType = App::Universal::ATTRTYPE_CREDENTIALS;
+	my $phoneValueType = App::Universal::ATTRTYPE_PHONE;
 
 	##billing facility information
 	my $billFacilityId = $mainTransData->{billing_facility_id};
@@ -627,6 +628,7 @@ sub storeFacilityInfo
 	#my $billingFacilityPayAddr = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selOrgAddressByAddrName', $billFacilityId, 'Billing');
 	my $billingFacilityInfo = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_NONE, 'selRegistry', $billFacilityId);
 
+	my $phoneNo = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selAttributeByItemNameAndValueTypeAndParent', $billFacilityId, 'Primary', $phoneValueType);
 	my $employerNo = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selAttributeByItemNameAndValueTypeAndParent', $billFacilityId, 'Employer#', $credentialsValueType);
 	my $stateNo = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selAttributeByItemNameAndValueTypeAndParent', $billFacilityId, 'State#', $credentialsValueType);
 	my $medicaidNo = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selAttributeByItemNameAndValueTypeAndParent', $billFacilityId, 'Medicaid#', $credentialsValueType);
@@ -654,6 +656,18 @@ sub storeFacilityInfo
 			item_name => 'Billing Facility/Tax ID',
 			value_type => defined $textValueType ? $textValueType : undef,
 			value_text => $billingFacilityInfo->{tax_id} || undef,
+			value_textB => $billingFacilityInfo->{org_id} || undef,
+			value_int => $billFacilityId || undef,
+			value_intB => 1,
+			_debug => 0
+		);
+
+	$page->schemaAction(
+			'Invoice_Attribute', $command,
+			parent_id => $invoiceId,
+			item_name => 'Billing Facility/Phone',
+			value_type => defined $phoneValueType ? $phoneValueType : undef,
+			value_text => $phoneNo->{value_text} || undef,
 			value_textB => $billingFacilityInfo->{org_id} || undef,
 			value_int => $billFacilityId || undef,
 			value_intB => 1,
@@ -1058,6 +1072,18 @@ sub storeServiceProviderInfo
 	my $providerId = $mainTransData->{care_provider_id};
 	my $providerInfo = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selRegistry', $providerId);
 
+	my $servFacilityId = $mainTransData->{service_facility_id};
+	my $serviceFacilityAddr = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selOrgAddressByAddrName', $servFacilityId, 'Mailing');
+	my $providerStateLicense = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selAttrByItemNameParentNameSort', $providerId, $serviceFacilityAddr->{state}, $servFacilityId);
+	my $stateLicense = $providerStateLicense->{value_text};
+	my $state = $providerStateLicense->{item_name};
+	if($stateLicense eq '')
+	{
+		$providerStateLicense = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selAttrByItemNameParentNameSort', $providerId, $serviceFacilityAddr->{state}, $sessOrgId);
+		$stateLicense = $providerStateLicense->{value_text};
+		$state = $providerStateLicense->{item_name};
+	}
+
 	$page->schemaAction(
 			'Invoice_Attribute', $command,
 			parent_id => $invoiceId,
@@ -1098,6 +1124,17 @@ sub storeServiceProviderInfo
 			value_type => defined $textValueType ? $textValueType : undef,
 			value_text => $providerInfo->{name_last} || undef,
 			value_textB => $providerId || undef,
+			value_intB => 1,
+			_debug => 0
+		);
+
+	$page->schemaAction(
+			'Invoice_Attribute', $command,
+			parent_id => $invoiceId,
+			item_name => 'Service Provider/State License',
+			value_type => defined $textValueType ? $textValueType : undef,
+			value_text => $stateLicense || undef,
+			value_textB => $state || undef,
 			value_intB => 1,
 			_debug => 0
 		);
