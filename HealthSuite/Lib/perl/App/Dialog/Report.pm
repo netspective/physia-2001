@@ -25,4 +25,36 @@ sub description
 {
 }
 
+sub getFilePageCount
+{
+	my ($self, $filename) = @_;
+
+	my $pages = 0;
+	my $buffer;
+
+	open(FILE, $filename) or return 0;  # die "Can't open '$filename': $!";
+	while (sysread FILE, $buffer, 4096)
+	{
+		$pages += ($buffer =~ tr/\f//);
+	}
+	close FILE;
+	return $pages + 1;
+}
+
+sub getFileLineCount
+{
+	my ($self, $filename) = @_;
+
+	my $lines = 0;
+	my $buffer;
+
+	open(FILE, $filename) or return 0;  # die "Can't open '$filename': $!";
+	while (sysread FILE, $buffer, 4096)
+	{
+		$lines += ($buffer =~ tr/\n//);
+	}
+	close FILE;
+	return $lines + 1;
+}
+
 1;
