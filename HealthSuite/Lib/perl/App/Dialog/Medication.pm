@@ -3,7 +3,7 @@ package App::Dialog::Medication;
 ##############################################################################
 
 use strict;
-use SDE::CVS ('$Id: Medication.pm,v 1.10 2000-12-22 21:34:25 radha_kotagiri Exp $', '$Name:  $');
+use SDE::CVS ('$Id: Medication.pm,v 1.11 2000-12-26 18:17:48 thai_nguyen Exp $', '$Name:  $');
 use CGI::Validator::Field;
 use CGI::Dialog;
 use base qw(CGI::Dialog);
@@ -13,6 +13,8 @@ use DBI::StatementManager;
 use App::Statements::Person;
 use App::Statements::Document;
 use App::Dialog::Message::Prescription;
+use App::Dialog::Field::Scheduling;
+use Date::Calc qw(:all);
 
 use vars qw(%RESOURCE_MAP);
 %RESOURCE_MAP = (
@@ -24,6 +26,7 @@ use vars qw(%RESOURCE_MAP);
 	},
 );
 
+my $UNIT_SELOPTIONS = 'cl;ml;mg;ug;gm;kg;pills;caps;tabs;supp;cc;ggts;mm;oz;tsp;tbls;liter;gallon;applicator;inhalation;puff;spray;packets;patch';
 
 sub new
 {
@@ -44,12 +47,13 @@ sub new
 				new CGI::Dialog::Field(caption => 'Dose',
 					name => 'dose',
 					size => 4,
+					type => 'integer',
 					options => FLDFLAG_REQUIRED,
 				),
 				new CGI::Dialog::Field(caption => 'Units',
 					name => 'dose_units',
 					type => 'select',
-					selOptions => 'cl;ml;mg;ug;gm;kg;pills;caps;tabs;supp;cc;ggts;mm;oz;tsp;tbls;liter;gallon;applicator;inhalation;puff;spray;packets;patch',
+					selOptions => $UNIT_SELOPTIONS,
 					options => FLDFLAG_PREPENDBLANK | FLDFLAG_REQUIRED,
 				),
 				new CGI::Dialog::Field(caption => 'Route',
@@ -80,12 +84,12 @@ sub new
 		new CGI::Dialog::MultiField(
 			name => 'dates_multi',
 			fields => [
-				new CGI::Dialog::Field(caption => 'Start',
+				new App::Dialog::Field::Scheduling::Date(caption => 'Start Date',
 					name => 'start_date',
 					type => 'date',
 					options => FLDFLAG_REQUIRED,
 				),
-				new CGI::Dialog::Field(caption => 'End Date',
+				new App::Dialog::Field::Scheduling::Date(caption => 'End Date',
 					name => 'end_date',
 					type => 'date',
 					defaultValue => '',
@@ -98,6 +102,7 @@ sub new
 				new CGI::Dialog::Field(caption => 'Duration',
 					name => 'duration',
 					size => 4,
+					type => 'integer',
 					#options => FLDFLAG_INLINECAPTION,
 				),
 				new CGI::Dialog::Field(caption => '',
@@ -113,18 +118,20 @@ sub new
 				new CGI::Dialog::Field(caption => 'Quantity',
 					name => 'quantity',
 					size => 4,
+					type => 'integer',
 					options => FLDFLAG_REQUIRED,
 				),
 				new CGI::Dialog::Field(
 					name => 'sale_units',
 					caption => 'Units',
 					type => 'select',
-					selOptions => 'cl;ml;mg;ug;gm;kg;pills;caps;tabs;supp;cc;ggts;mm;oz;tsp;tbls;liter;gallon;applicator;inhalation;puff;spray;packets;patch',
+					selOptions => $UNIT_SELOPTIONS,
 					options => FLDFLAG_PREPENDBLANK | FLDFLAG_REQUIRED,
 				),
 				new CGI::Dialog::Field(caption => '# of Refills',
 					name => 'num_refills',
 					size => 4,
+					type => 'integer',
 					options => FLDFLAG_REQUIRED,
 				),
 			],
@@ -346,6 +353,25 @@ sub makeStateChanges
 		$buttonsField->addActionButtons({caption => 'Close'});
 		$buttonsField->{noCancelButton} = 1;
 
+	}
+}
+
+sub customValidate
+{
+	my ($self, $page) = @_;
+	
+	if ($page->field('start_date') && $page->field('end_date'))
+	{
+		my $startDate = Date_to_Days(Decode_Date_US($page->field('start_date')));
+		my $endDate   = Date_to_Days(Decode_Date_US($page->field('end_date')));
+		
+		if ($endDate < $startDate)
+		{
+			my $field = $self->getField('dates_multi')->{fields}->[0];
+			$field->invalidate($page, qq{
+				End Date must be later than or equal Start Date.
+			});
+		}
 	}
 }
 
