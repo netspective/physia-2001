@@ -3,7 +3,7 @@ package App::Dialog::Medication;
 ##############################################################################
 
 use strict;
-use SDE::CVS ('$Id: Medication.pm,v 1.21 2001-01-10 22:59:28 munir_faridi Exp $', '$Name:  $');
+use SDE::CVS ('$Id: Medication.pm,v 1.22 2001-01-11 05:14:15 thai_nguyen Exp $', '$Name:  $');
 use CGI::Validator::Field;
 use CGI::Dialog;
 use base qw(CGI::Dialog);
@@ -173,7 +173,7 @@ sub new
 
 
 				#new CGI::Dialog::Field(caption => 'Sale Units',
-				#	name => 'sale_units',					
+				#	name => 'sale_units',
 				#	type => 'select',
 				#	selOptions => $UNIT_SELOPTIONS,
 				#	options => FLDFLAG_PREPENDBLANK,
@@ -538,13 +538,12 @@ sub populateData
 		else
 		{
 			$page->field('dose_units', 'other');
-			$self->updateFieldFlags('other_dose_units', FLDFLAG_INVISIBLE, 0);			
+			$self->updateFieldFlags('other_dose_units', FLDFLAG_INVISIBLE, 0);
 			$page->field('other_dose_units', $doseUnits);
 		}
-		
+
 
 		my $frequency = $medInfo->{frequency};
-		my $inList;
 		my @freqOptions = split(';', $FREQ_SELOPTIONS);
 		foreach (@freqOptions)
 		{
@@ -558,13 +557,12 @@ sub populateData
 		else
 		{
 			$page->field('frequency', 'other');
-			$self->updateFieldFlags('other_frequency', FLDFLAG_INVISIBLE, 0);			
+			$self->updateFieldFlags('other_frequency', FLDFLAG_INVISIBLE, 0);
 			$page->field('other_frequency', $frequency);
 		}
 
 
 		my $prn = $medInfo->{prn};
-		my $inList;
 		my @prnOptions = split(';', $PRN_SELOPTIONS);
 		foreach (@prnOptions)
 		{
@@ -578,7 +576,7 @@ sub populateData
 		else
 		{
 			$page->field('prn', 'other');
-			$self->updateFieldFlags('other_prn', FLDFLAG_INVISIBLE, 0);			
+			$self->updateFieldFlags('other_prn', FLDFLAG_INVISIBLE, 0);
 			$page->field('other_prn', $prn);
 		}
 
@@ -607,7 +605,7 @@ sub populateData
 		#else
 		#{
 		#	$page->field('sale_units', 'other');
-		#	$self->updateFieldFlags('other_sale_units', FLDFLAG_INVISIBLE, 0);			
+		#	$self->updateFieldFlags('other_sale_units', FLDFLAG_INVISIBLE, 0);
 		#	$page->field('other_sale_units', $saleUnits);
 		#}
 
@@ -702,7 +700,7 @@ sub customValidate
 			});
 		}
 	}
-	
+
 	if($page->field('dose_units') eq 'other' && $page->field('other_dose_units') eq '')
 	{
 		$self->getField('other_dose_units')->invalidate($page, 'Please enter other units');
@@ -913,7 +911,7 @@ sub sendApprovalRequest
 {
 	my $self = shift;
 	my ($page, $command, $flags) = @_;
-	
+
 	return if $command eq 'add';
 
 	my $med_name = $page->field('med_name');
