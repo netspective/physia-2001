@@ -5,15 +5,11 @@
 		<dialog name="wl_collection_setup" heading="wl_collection_setup">
 			<field.separator heading="Physicians" name="text_field"/>
 			<field.select  name="physician_list" choices="query:worklist.collection.sel_worklist_available_physicians" size="5" style="multidual"/>
-			<!--  -->
 			<field.separator heading="Service Facilities" name="text_field"/>
 			<field.select  name="facility_list" choices="query:dialog.stmt20" size="5" style="multidual"/>
-			<!--  numPackages="0" pkgList="" stmtNum="20" -->
 			<field.separator heading="Insurance Providers" name="text_field"/>
 			<field.select caption="Products"  name="product_select" choices="Selected=0;All=1"/>
-			<!--  -->
 			<field.select  name="products" choices="query:worklist.collection.sel_worklist_available_products" size="5" style="multidual"/>
-			<!--  -->
 			<field.separator heading="Patients Last Name" name="text_field"/>
 			<field.composite caption="Enter range - "  hint="Enter only the first letter of the last name." name="LastNameRange">
 				<!-- Unimplemented field type=alphaonly -->
@@ -34,39 +30,27 @@
 
 		<dialog name="wl_credit_setup" heading="wl_credit_setup">
 			<field.separator heading="Date Range" name="text_field"/>
-			<field.composite caption="Start Date / End Date"  name="invoice">
-				<field.date caption="invoice_begin_date" name="invoice_begin_date" size="12"/>
-				<field.date caption="invoice_end_date" name="invoice_end_date" size="12"/>
-			</field.composite>
+			<field.duration caption="Start Date / End Date" max-length="-1" name="invoice" />
 			<field.separator heading="Physicians" name="text_field"/>
 			<field.select  name="physician_list" choices="query:person.selResourceAssociations" size="5" style="multidual"/>
-			<!--  -->
 			<field.separator heading="Facilities" name="text_field"/>
 			<field.select  name="facility_list" choices="query:dialog.stmt21" size="5" style="multidual"/>
-			<!--  numPackages="0" pkgList="" stmtNum="21" -->
 			<field.separator heading="Insurance Providers" name="text_field"/>
 			<field.select caption="Products"  name="product_select" choices="Selected=0;All=1"/>
-			<!--  -->
 			<field.select  name="products" choices="query:worklist.credit.sel_worklist_credit_available_products" size="5" style="multidual"/>
-			<!--  -->
 			<field.separator heading="Sort Order" name="text_field"/>
 			<field.select  name="sorting" choices="Patients Alphabetically=1;Oldest Refund Due First=2" style="radio"/>
-			<!--  -->
 
 		</dialog>
 
 		<dialog name="wl_claim_setup" heading="wl_claim_setup">
 			<field.separator heading="Physicians" name="text_field"/>
 			<field.select  name="physician_list" choices="query:worklist.collection.sel_worklist_available_physicians" size="5" style="multidual"/>
-			<!--  -->
 			<field.separator heading="Service Facilities" name="text_field"/>
 			<field.select  name="facility_list" choices="query:dialog.stmt22" size="5" style="multidual"/>
-			<!--  numPackages="0" pkgList="" stmtNum="22" -->
 			<field.separator heading="Insurance Providers" name="text_field"/>
 			<field.select caption="Products"  name="product_select" choices="Selected=0;All=1"/>
-			<!--  -->
 			<field.select  name="products" choices="query:worklist.collection.sel_worklist_available_products" size="5" style="multidual"/>
-			<!--  -->
 			<field.separator heading="Patients Last Name" name="text_field"/>
 			<field.composite caption="Enter range - "  hint="Enter only the first letter of the last name." name="LastNameRange">
 				<!-- Unimplemented field type=alphaonly -->
@@ -84,22 +68,17 @@
 			</field.composite>
 			<field.separator heading="Claims Status" name="text_field"/>
 			<field.select  name="claim_status_list" choices="query:worklist.collection.sel_claim_statuses" size="5" style="multidual"/>
-			<!--  -->
 			<field.separator heading="Sort Order" name="text_field"/>
 			<field.select  name="sorting" choices="Patient Last Name=1;Claim Status=2;Claim Balance=3" style="radio"/>
-			<!--  -->
 
 		</dialog>
 
 		<dialog name="wl_referral_setup" heading="wl_referral_setup">
 			<field.separator heading="Physicians" name="text_field"/>
 			<field.select  name="physician_list" choices="query:person.selResourceAssociations" size="5" style="multidual"/>
-			<!--  -->
 			<field.separator heading="Insurance Providers" name="text_field"/>
 			<field.select caption="Products"  name="product_select" choices="Selected=0;All=1"/>
-			<!--  -->
 			<field.select  name="products" choices="query:worklist.credit.sel_worklist_credit_available_products" size="5" style="multidual"/>
-			<!--  -->
 			<field.separator heading="Patients Last Name" name="text_field"/>
 			<field.composite caption="Enter range - "  hint="Enter only the first letter of the last name." name="LastNameRange">
 				<!-- Unimplemented field type=alphaonly -->
@@ -109,7 +88,6 @@
 			<field.integer caption="No. of Days"  max-length="5" name="expiryDays" size="5"/>
 			<field.separator heading="Sort Order" name="text_field"/>
 			<field.select  name="sorting" choices="Insurance Org=1;Product=2;Speciality=3;Request Date=4" style="radio"/>
-			<!--  -->
 
 		</dialog>
 

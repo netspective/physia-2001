@@ -9,94 +9,9 @@
 				<field.text caption="From"  name="from"/>
 				<field.text caption="send_on"  name="send_on"/>
 			</field.composite>
-			<field.person.id name="to" caption="To" required="yes" style="text"/>
-			<!-- Total Field contents:
-				_spacerWidth => 0
-				addPopup => NONE
-				addPopupControlField => _f_person_id
-				caption => To
-				findPopup => /lookup/person/id
-				findPopupAppendValue => ,
-				flags => 528
-				hint => 
-				hints => 
-				idEntryStyle => 0
-				incSimpleName => 0
-				lengthInvalidMsg => To is too long (can be at most 255 characters).
-				maxLength => 255
-				message => 
-				name => to
-				onKeyPressJS => return processKeypress_identifier(event)
-				options => 48
-				popup => HASH(0xba4f194)
-				postHtml => 
-				preHtml => 
-				priKey => 0
-				readOnly => 0
-				regExpInvalidMsg => 
-				requiredInvalidMsg => To is required (can not be blank).
-				size => 40
-				type => not_an_identifier
-			-->
-			<field.person.id name="cc" caption="CC"  style="text"/>
-			<!-- Total Field contents:
-				_spacerWidth => 0
-				addPopup => NONE
-				addPopupControlField => _f_person_id
-				caption => CC
-				findPopup => /lookup/person/id
-				findPopupAppendValue => ,
-				flags => 512
-				hint => 
-				hints => 
-				idEntryStyle => 0
-				incSimpleName => 0
-				lengthInvalidMsg => CC is too long (can be at most 255 characters).
-				maxLength => 255
-				message => 
-				name => cc
-				onKeyPressJS => return processKeypress_identifier(event)
-				options => 32
-				popup => HASH(0xba621e4)
-				postHtml => 
-				preHtml => 
-				priKey => 0
-				readOnly => 0
-				regExpInvalidMsg => 
-				requiredInvalidMsg => CC is required (can not be blank).
-				size => 40
-				type => not_an_identifier
-			-->
-			<field.person.id name="patient_id" caption="Regarding Patient"  style="text" types="Patient"/>
-			<!-- Total Field contents:
-				_spacerWidth => 0
-				addPopup => /org/#session.org_id#/dlg-add-Patient
-				addPopupControlField => _f_person_id
-				caption => Regarding Patient
-				findPopup => /lookup/patient/id
-				findPopupAppendValue => 
-				flags => 544
-				hint => 
-				hints => 
-				idEntryStyle => 0
-				incSimpleName => 1
-				lengthInvalidMsg => Regarding Patient is too long (can be at most 16 characters).
-				maxLength => 16
-				message => 
-				name => patient_id
-				onKeyPressJS => return processKeypress_identifier(event)
-				options => 32
-				popup => HASH(0xba72ea4)
-				postHtml => 
-				preHtml => 
-				priKey => 0
-				readOnly => 0
-				regExpInvalidMsg => 
-				requiredInvalidMsg => Regarding Patient is required (can not be blank).
-				size => 16
-				type => text
-				types => ARRAY(0xba69ca0)
-			-->
+			<field.person.id caption="To" max-length="255" name="to" size="40" required="yes"/>
+			<field.person.id caption="CC" max-length="255" name="cc" size="40" />
+			<field.person.id caption="Regarding Patient" max-length="16" name="patient_id" size="16" />
 			<field.text hidden="yes" name="patient_name" caption="patient_name"/>
 			<field.text hidden="yes" name="saved_patient_id" caption="saved_patient_id"/>
 			<field.text caption="Caller if Other than Patient"  name="doc_source_system" size="40"/>
@@ -112,36 +27,11 @@
 				<field.text caption="Other"  name="return_phone5" size="13"/>
 			</field.composite>
 			<field.select caption="Priority"  name="priority" choices="Normal;ASAP;Emergency"/>
-			<!--  -->
 			<field.text caption="Subject" required="yes" max-length="255" name="subject" size="70"/>
 			<field.select caption="Message"  name="common_message" choices="; 				Medication Question = medication_question; 				Medication Problem  = medication_problem; 				Wants Lab Results   = want_lab_results; 				Has Question About Lab Results = has_question_about_lab_results; 				Doesn't Feel Well   = does_not_feel_well; 				Complains Of        = complains_of; 				Continue Same Treatment = continue_same_treatment; 				Schedule Appointment = schedule_appointment; 				Follow Up in = follow_up_in; 				Stop Medication = stop_medication; 				Start New Medication = start_new_medication; 				Change Medication Dose = change_medication_dose; 				Refill Medication = refill_medication; 				Call 			"/>
-			<!--  -->
 			<field.memo name="message" rows="5" cols="70" size="24"/>
 			<field.separator heading="Notes" name="notes_subhead"/>
-			<field.message.notes name="existing_notes" caption="*" />
-			<!-- Total Field contents:
-				_spacerWidth => 0
-				addPopup => 
-				caption => 
-				findPopup => 
-				findPopupAppendValue => 
-				flags => 512
-				hint => 
-				hints => 
-				lengthInvalidMsg =>  is too long (can be at most -1 characters).
-				maxLength => -1
-				message => 
-				name => existing_notes
-				onKeyPressJS => return processKeypress_default(event)
-				popup => HASH(0xc029bf4)
-				postHtml => 
-				preHtml => 
-				priKey => 0
-				regExpInvalidMsg => 
-				requiredInvalidMsg =>  is required (can not be blank).
-				size => 24
-				type => text
-			-->
+			<field.message.notes max-length="-1" name="existing_notes" />
 			<field.memo caption="Add Notes" name="notes" rows="5" cols="70" size="24"/>
 			<field.boolean caption="Keep notes private?" visible="no" name="notes_private" style="check"/>
 
@@ -154,94 +44,9 @@
 				<field.text caption="From"  name="from"/>
 				<field.text caption="send_on"  name="send_on"/>
 			</field.composite>
-			<field.person.id name="to" caption="To" required="yes" style="text"/>
-			<!-- Total Field contents:
-				_spacerWidth => 0
-				addPopup => NONE
-				addPopupControlField => _f_person_id
-				caption => To
-				findPopup => /lookup/person/id
-				findPopupAppendValue => ,
-				flags => 528
-				hint => 
-				hints => 
-				idEntryStyle => 0
-				incSimpleName => 0
-				lengthInvalidMsg => To is too long (can be at most 255 characters).
-				maxLength => 255
-				message => 
-				name => to
-				onKeyPressJS => return processKeypress_identifier(event)
-				options => 48
-				popup => HASH(0xba63890)
-				postHtml => 
-				preHtml => 
-				priKey => 0
-				readOnly => 0
-				regExpInvalidMsg => 
-				requiredInvalidMsg => To is required (can not be blank).
-				size => 40
-				type => not_an_identifier
-			-->
-			<field.person.id name="cc" caption="CC"  style="text"/>
-			<!-- Total Field contents:
-				_spacerWidth => 0
-				addPopup => NONE
-				addPopupControlField => _f_person_id
-				caption => CC
-				findPopup => /lookup/person/id
-				findPopupAppendValue => ,
-				flags => 512
-				hint => 
-				hints => 
-				idEntryStyle => 0
-				incSimpleName => 0
-				lengthInvalidMsg => CC is too long (can be at most 255 characters).
-				maxLength => 255
-				message => 
-				name => cc
-				onKeyPressJS => return processKeypress_identifier(event)
-				options => 32
-				popup => HASH(0xc026078)
-				postHtml => 
-				preHtml => 
-				priKey => 0
-				readOnly => 0
-				regExpInvalidMsg => 
-				requiredInvalidMsg => CC is required (can not be blank).
-				size => 40
-				type => not_an_identifier
-			-->
-			<field.person.id name="patient_id" caption="Regarding Patient"  style="text" types="Patient"/>
-			<!-- Total Field contents:
-				_spacerWidth => 0
-				addPopup => /org/#session.org_id#/dlg-add-Patient
-				addPopupControlField => _f_person_id
-				caption => Regarding Patient
-				findPopup => /lookup/patient/id
-				findPopupAppendValue => 
-				flags => 544
-				hint => 
-				hints => 
-				idEntryStyle => 0
-				incSimpleName => 1
-				lengthInvalidMsg => Regarding Patient is too long (can be at most 16 characters).
-				maxLength => 16
-				message => 
-				name => patient_id
-				onKeyPressJS => return processKeypress_identifier(event)
-				options => 32
-				popup => HASH(0xc027738)
-				postHtml => 
-				preHtml => 
-				priKey => 0
-				readOnly => 0
-				regExpInvalidMsg => 
-				requiredInvalidMsg => Regarding Patient is required (can not be blank).
-				size => 16
-				type => text
-				types => ARRAY(0xba48690)
-			-->
+			<field.person.id caption="To" max-length="255" name="to" size="40" required="yes"/>
+			<field.person.id caption="CC" max-length="255" name="cc" size="40" />
+			<field.person.id caption="Regarding Patient" max-length="16" name="patient_id" size="16" />
 			<field.text hidden="yes" name="patient_name" caption="patient_name"/>
 			<field.text hidden="yes" name="saved_patient_id" caption="saved_patient_id"/>
 			<field.text caption="Caller if Other than Patient"  name="doc_source_system" size="40"/>
@@ -255,36 +60,11 @@
 				<field.text caption="Other"  name="return_phone5" size="13"/>
 			</field.composite>
 			<field.select caption="Priority"  name="priority" choices="Normal;ASAP;Emergency"/>
-			<!--  -->
 			<field.text caption="Subject" required="yes" max-length="255" name="subject" size="70"/>
 			<field.select caption="Message"  name="common_message" choices="; 				Medication Question = medication_question; 				Medication Problem  = medication_problem; 				Wants Lab Results   = want_lab_results; 				Has Question About Lab Results = has_question_about_lab_results; 				Doesn't Feel Well   = does_not_feel_well; 				Complains Of        = complains_of; 				Continue Same Treatment = continue_same_treatment; 				Schedule Appointment = schedule_appointment; 				Follow Up in = follow_up_in; 				Stop Medication = stop_medication; 				Start New Medication = start_new_medication; 				Change Medication Dose = change_medication_dose; 				Refill Medication = refill_medication; 				Call 			"/>
-			<!--  -->
 			<field.memo name="message" rows="5" cols="70" size="24"/>
 			<field.separator heading="Notes" name="notes_subhead"/>
-			<field.message.notes name="existing_notes" caption="*" />
-			<!-- Total Field contents:
-				_spacerWidth => 0
-				addPopup => 
-				caption => 
-				findPopup => 
-				findPopupAppendValue => 
-				flags => 512
-				hint => 
-				hints => 
-				lengthInvalidMsg =>  is too long (can be at most -1 characters).
-				maxLength => -1
-				message => 
-				name => existing_notes
-				onKeyPressJS => return processKeypress_default(event)
-				popup => HASH(0x8ac0470)
-				postHtml => 
-				preHtml => 
-				priKey => 0
-				regExpInvalidMsg => 
-				requiredInvalidMsg =>  is required (can not be blank).
-				size => 24
-				type => text
-			-->
+			<field.message.notes max-length="-1" name="existing_notes" />
 			<field.memo caption="Add Notes" name="notes" rows="5" cols="70" size="24"/>
 			<field.boolean caption="Keep notes private?" visible="no" name="notes_private" style="check"/>
 

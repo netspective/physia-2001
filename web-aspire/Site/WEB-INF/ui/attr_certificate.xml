@@ -4,175 +4,52 @@
 	<dialogs package="attr_certificate">
 		<dialog name="certificate_specialty" heading="create-data-cmd-heading:Specialty">
 			<field.select caption="Specialty"  name="value_text" choices="query:person.selMedicalSpeciality"/>
-			<!--  -->
 			<field.select caption="Specialty Sequence"  name="value_int" choices="Unknown=5;Primary=1;Secondary=2;Tertiary=3;Quaternary=4"/>
-			<!--  -->
 
 		</dialog>
 
 		<dialog name="certificate_accreditation" heading="create-data-cmd-heading:Accreditation">
-			<field.attribute.name name="value_text" caption="Accreditation" required="yes"/>
-			<!-- Total Field contents:
-				_spacerWidth => 0
-				addPopup => 
-				attrNameFmt => #field.value_text#
-				caption => Accreditation
-				fKeyStmtMgr => App::Statements::Person=HASH(0x89bd518)
-				findPopup => 
-				findPopupAppendValue => 
-				flags => 528
-				hint => 
-				hints => 
-				lengthInvalidMsg => Accreditation is too long (can be at most 1024 characters).
-				maxLength => 1024
-				message => 
-				name => value_text
-				onKeyPressJS => return processKeypress_default(event)
-				options => 16
-				popup => HASH(0xba3f778)
-				postHtml => 
-				preHtml => 
-				priKey => 0
-				readOnly => 0
-				regExpInvalidMsg => 
-				requiredInvalidMsg => Accreditation is required (can not be blank).
-				selAttrNameStmtName => selAttributeByItemNameAndValueTypeAndParent
-				size => 24
-				type => text
-				valueType => 
-			-->
+			<field.attribute.name caption="Accreditation" name="value_text" required="yes"/>
 			<field.date caption="Effective Date" name="value_date" size="12"/>
 			<field.date caption="Expiration Date" name="value_dateend" size="12"/>
 
 		</dialog>
 
 		<dialog name="certificate_board" heading="create-data-cmd-heading:Board Certification">
-			<field.attribute.name name="value_text" caption="Board Certification Name" required="yes"/>
-			<!-- Total Field contents:
-				_spacerWidth => 0
-				addPopup => 
-				attrNameFmt => #field.value_text#
-				caption => Board Certification Name
-				fKeyStmtMgr => App::Statements::Person=HASH(0x89bd518)
-				findPopup => 
-				findPopupAppendValue => 
-				flags => 528
-				hint => 
-				hints => 
-				lengthInvalidMsg => Board Certification Name is too long (can be at most 1024 characters).
-				maxLength => 1024
-				message => 
-				name => value_text
-				onKeyPressJS => return processKeypress_default(event)
-				options => 16
-				popup => HASH(0xba19674)
-				postHtml => 
-				preHtml => 
-				priKey => 0
-				readOnly => 0
-				regExpInvalidMsg => 
-				requiredInvalidMsg => Board Certification Name is required (can not be blank).
-				selAttrNameStmtName => selAttributeByItemNameAndValueTypeAndParent
-				size => 24
-				type => text
-				valueType => 
-			-->
+			<field.attribute.name caption="Board Certification Name" name="value_text" required="yes"/>
 			<field.date caption="Effective Date" name="value_date" size="12"/>
 			<field.date caption="Expiration Date" name="value_dateend" size="12"/>
 
 		</dialog>
 
 		<dialog name="affiliation" heading="create-data-cmd-heading:Affiliation">
-			<field.attribute.name name="value_text" caption="Affiliation" required="yes"/>
-			<!-- Total Field contents:
-				_spacerWidth => 0
-				addPopup => 
-				attrNameFmt => #field.value_text#
-				caption => Affiliation
-				fKeyStmtMgr => App::Statements::Person=HASH(0x89bd518)
-				findPopup => 
-				findPopupAppendValue => 
-				flags => 536
-				hint => 
-				hints => 
-				lengthInvalidMsg => Affiliation is too long (can be at most 1024 characters).
-				maxLength => 1024
-				message => 
-				name => value_text
-				onKeyPressJS => return processKeypress_default(event)
-				options => 16
-				popup => HASH(0xb9d7c7c)
-				postHtml => 
-				preHtml => 
-				priKey => 0
-				readOnly => 0
-				readOnlyWhen => 1024
-				regExpInvalidMsg => 
-				requiredInvalidMsg => Affiliation is required (can not be blank).
-				selAttrNameStmtName => selAttributeByItemNameAndValueTypeAndParent
-				size => 24
-				type => text
-				valueType => 
-			-->
+			<field.attribute.name caption="Affiliation" name="value_text" required="yes"/>
 			<field.date caption="Date" name="value_dateend" size="12"/>
 
 		</dialog>
 
 		<dialog name="certificate_license" heading="create-data-cmd-heading:License">
 			<field.select caption="License" required="yes" name="value_textb" choices="DEA;DPS;IRS"/>
-			<!--  -->
 			<field.text caption="Number" required="yes" name="value_text"/>
 			<field.date caption="Effective Date" name="value_date" size="12"/>
 			<field.date caption="Expiration Date" name="value_dateend" size="12"/>
 			<field.select caption="Facility ID" prepend-blank="yes" name="name_sort" choices="query:org.selChildFacilityOrgs"/>
-			<!--  -->
 			<field.boolean caption="License Required"  name="value_int" style="check"/>
 
 		</dialog>
 
 		<dialog name="certificate_provider_number" heading="create-data-cmd-heading:Provider Number">
 			<field.select caption="Name" required="yes" name="value_textb" choices="BCBS;Memorial Sisters Charity;EPSDT;Medicaid;Medicare;UPIN;Tax ID;Railroad Medicare;Champus;WC#;National Provider Identification"/>
-			<!--  -->
 			<field.text caption="Number" required="yes" name="value_text"/>
 			<field.date caption="Effective Date" name="value_date" size="12"/>
 			<field.date caption="Expiration Date" name="value_dateend" size="12"/>
 			<field.select caption="Facility ID" prepend-blank="yes" name="name_sort" choices="query:org.selChildFacilityOrgs"/>
-			<!--  -->
 			<field.boolean caption="Required"  name="value_int" style="check"/>
 
 		</dialog>
 
 		<dialog name="certificate_state" heading="create-data-cmd-heading:State License">
-			<field.attribute.name name="value_textb" caption="State" required="yes"/>
-			<!-- Total Field contents:
-				_spacerWidth => 0
-				addPopup => 
-				attrNameFmt => #field.value_textb#
-				caption => State
-				fKeyStmtMgr => App::Statements::Person=HASH(0x89bd518)
-				findPopup => 
-				findPopupAppendValue => 
-				flags => 528
-				hint => 
-				hints => 
-				lengthInvalidMsg => State is too long (can be at most 2 characters).
-				maxLength => 2
-				message => 
-				name => value_textb
-				onKeyPressJS => return processKeypress_default(event)
-				options => 16
-				popup => HASH(0xba56ae8)
-				postHtml => 
-				preHtml => 
-				priKey => 0
-				readOnly => 0
-				regExpInvalidMsg => 
-				requiredInvalidMsg => State is required (can not be blank).
-				selAttrNameStmtName => selAttributeByItemNameAndValueTypeAndParent
-				size => 2
-				type => text
-				valueType => 
-			-->
+			<field.attribute.name caption="State" max-length="2" name="value_textb" size="2" required="yes"/>
 			<field.text caption="Number" required="yes" name="value_text"/>
 			<field.date caption="Effective Date" name="value_date" size="12"/>
 			<field.date caption="Expiration Date" name="value_dateend" size="12"/>

@@ -4,80 +4,23 @@
 	<dialogs package="attr_associated_resource">
 		<dialog name="resource_org" heading="create-data-cmd-heading:Associated Organization">
 			<field.text hidden="yes" name="attr_path" caption="attr_path"/>
-			<field.organization.id name="value_text" caption="Org ID" required="yes"/>
-			<!-- Total Field contents:
-				_spacerWidth => 0
-				addPopup => /org/#session.org_id#/dlg-add-org-main
-				addPopupControlField => _f_org_id
-				caption => Org ID
-				findPopup => /lookup/org/id
-				findPopupAppendValue => 
-				flags => 560
-				hint => 
-				hints => 
-				lengthInvalidMsg => Org ID is too long (can be at most 16 characters).
-				maxLength => 16
-				message => 
-				name => value_text
-				onKeyPressJS => return processKeypress_identifier(event)
-				options => 48
-				popup => HASH(0xba485c4)
-				postHtml => 
-				preHtml => 
-				priKey => 0
-				readOnly => 0
-				regExpInvalidMsg => 
-				requiredInvalidMsg => Org ID is required (can not be blank).
-				size => 16
-				type => text
-			-->
+			<field.organization.id caption="Org ID" max-length="16" name="value_text" size="16" required="yes"/>
 
 		</dialog>
 
 		<dialog name="resource_orgemp" heading="create-data-cmd-heading:Associated Employee">
-			<field.person.id name="emp_id" caption="Employee ID"  style="text"/>
-			<!-- Total Field contents:
-				_spacerWidth => 0
-				addPopup => /org/#session.org_id#/dlg-add-
-				addPopupControlField => _f_person_id
-				caption => Employee ID
-				findPopup => /lookup/person/id
-				findPopupAppendValue => 
-				flags => 544
-				hint => 
-				hints => 
-				idEntryStyle => 0
-				incSimpleName => 0
-				lengthInvalidMsg => Employee ID is too long (can be at most 16 characters).
-				maxLength => 16
-				message => 
-				name => emp_id
-				onKeyPressJS => return processKeypress_identifier(event)
-				options => 32
-				popup => HASH(0xba4b000)
-				postHtml => 
-				preHtml => 
-				priKey => 0
-				readOnly => 0
-				regExpInvalidMsg => 
-				requiredInvalidMsg => Employee ID is required (can not be blank).
-				size => 16
-				type => text
-				types => ARRAY(0xba2b4f4)
-			-->
+			<field.person.id caption="Employee ID" max-length="16" name="emp_id" size="16" />
 
 		</dialog>
 
 		<dialog name="resource_session_physicians" heading="create-data-cmd-heading:Session Set Of Physicians">
 			<field.select caption="Physician"  name="physician_list" choices="query:person.selResourceAssociations" size="5" style="multicheck"/>
-			<!--  -->
 
 		</dialog>
 
 		<dialog name="resource_nurse" heading="create-data-cmd-heading:Associated Physician">
 			<field.text hidden="yes" name="attr_path" caption="attr_path"/>
 			<field.select caption="Physician Name" required="yes" name="value_text" choices="query:person.selResourceAssociations"/>
-			<!--  -->
 
 		</dialog>
 

@@ -4,10 +4,8 @@
 	<dialogs package="admin">
 		<dialog name="role_permission" heading="create-data-cmd-heading:Role Permission">
 			<field.select caption="Role" required="yes" name="roleID" choices="query:admin.selRoleIDs"/>
-			<!--  -->
 			<field.text caption="Permission" required="yes" name="permissionName" size="35"/>
-			<field.select caption="Access" required="yes" name="permissionAccess"/>
-			<!--  -->
+			<field.select caption="Access" required="yes" name="permissionAccess" choices="schema-enum:Role_Activity"/>
 			<field.text hidden="yes" name="roleIDOrg" caption="roleIDOrg"/>
 			<field.text hidden="yes" name="permissionNameOrg" caption="permissionNameOrg"/>
 

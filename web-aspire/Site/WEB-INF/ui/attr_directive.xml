@@ -3,78 +3,13 @@
 <xaf>
 	<dialogs package="attr_directive">
 		<dialog name="directive_patient" heading="directive_patient">
-			<field.attribute.name name="directive" caption="Directive" required="yes"/>
-			<!-- Total Field contents:
-				_spacerWidth => 0
-				addPopup => 
-				attrNameFmt => #field.directive#
-				caption => Directive
-				choiceDelim => ;
-				choiceReadOnlyDelim => , 
-				fKeyStmtMgr => App::Statements::Person=HASH(0x89bd518)
-				findPopup => 
-				findPopupAppendValue => 
-				flags => 536
-				hint => 
-				hints => 
-				lengthInvalidMsg => Directive is too long (can be at most 1024 characters).
-				maxLength => 1024
-				message => 
-				name => directive
-				onKeyPressJS => return processKeypress_default(event)
-				options => 16
-				popup => HASH(0xba0ae70)
-				postHtml => 
-				preHtml => 
-				priKey => 0
-				readOnly => 0
-				readOnlyWhen => 1024
-				regExpInvalidMsg => 
-				requiredInvalidMsg => Directive is required (can not be blank).
-				selAttrNameStmtName => selAttributeByItemNameAndValueTypeAndParent
-				selOptions => ;Living Will-Advanced Directive;Will;Durable Power of Attorney;Medical Power of Attorney;Triage Status-Do Not Resuscitate;Organ Donation;
-				size => 1
-				style => combo
-				type => select
-				valueDelim => :
-				valueType => 
-			-->
+			<field.attribute.name caption="Directive" name="directive" size="1" required="yes"/>
 			<field.date caption="Date" name="value_date" size="12"/>
 
 		</dialog>
 
 		<dialog name="directive_physician" heading="directive_physician">
-			<field.attribute.name name="directive" caption="Directive" required="yes"/>
-			<!-- Total Field contents:
-				_spacerWidth => 0
-				addPopup => 
-				attrNameFmt => #field.directive#
-				caption => Directive
-				fKeyStmtMgr => App::Statements::Person=HASH(0x89bd518)
-				findPopup => 
-				findPopupAppendValue => 
-				flags => 536
-				hint => 
-				hints => 
-				lengthInvalidMsg => Directive is too long (can be at most 1024 characters).
-				maxLength => 1024
-				message => 
-				name => directive
-				onKeyPressJS => return processKeypress_default(event)
-				options => 16
-				popup => HASH(0xba4358c)
-				postHtml => 
-				preHtml => 
-				priKey => 0
-				readOnly => 0
-				readOnlyWhen => 1024
-				regExpInvalidMsg => 
-				requiredInvalidMsg => Directive is required (can not be blank).
-				selAttrNameStmtName => selAttributeByItemNameAndValueTypeAndParent
-				size => 24
-				type => text
-				valueType => 
-			-->
+			<field.attribute.name caption="Directive" name="directive" required="yes"/>
 			<field.date caption="Date" name="value_date" size="12"/>
 
 		</dialog>

@@ -3,71 +3,13 @@
 <xaf>
 	<dialogs package="transaction_referral_work_flow">
 		<dialog name="referral_intake" heading="Show Followup Worklist">
-			<field.person.id name="person_id" caption="Intake Coordinator ID" required="yes" style="text"/>
-			<!-- Total Field contents:
-				_spacerWidth => 0
-				addPopup => /org/#session.org_id#/dlg-add-
-				addPopupControlField => _f_person_id
-				caption => Intake Coordinator ID
-				findPopup => /lookup/person/id
-				findPopupAppendValue => 
-				flags => 560
-				hint => 
-				hints => 
-				idEntryStyle => 0
-				incSimpleName => 0
-				lengthInvalidMsg => Intake Coordinator ID is too long (can be at most 16 characters).
-				maxLength => 16
-				message => 
-				name => person_id
-				onKeyPressJS => return processKeypress_identifier(event)
-				options => 48
-				popup => HASH(0xc00e824)
-				postHtml => 
-				preHtml => 
-				priKey => 0
-				readOnly => 0
-				regExpInvalidMsg => 
-				requiredInvalidMsg => Intake Coordinator ID is required (can not be blank).
-				size => 16
-				type => text
-				types => ARRAY(0xba7b6b0)
-			-->
+			<field.person.id caption="Intake Coordinator ID" max-length="16" name="person_id" size="16" required="yes"/>
 
 		</dialog>
 
 		<dialog name="referral_person" heading="create-data-cmd-heading:Service Request">
 			<field.separator heading="Patient Information" name="patient_info_heading"/>
-			<field.person.id name="person_id" caption="Person/Patient ID" required="yes" style="text" types="Patient"/>
-			<!-- Total Field contents:
-				_spacerWidth => 0
-				addPopup => /org/#session.org_id#/dlg-add-Patient
-				addPopupControlField => _f_person_id
-				caption => Person/Patient ID
-				findPopup => /lookup/patient/id
-				findPopupAppendValue => 
-				flags => 560
-				hint => 
-				hints => 
-				idEntryStyle => 0
-				incSimpleName => 0
-				lengthInvalidMsg => Person/Patient ID is too long (can be at most 16 characters).
-				maxLength => 16
-				message => 
-				name => person_id
-				onKeyPressJS => return processKeypress_identifier(event)
-				options => 48
-				popup => HASH(0xba1fa20)
-				postHtml => 
-				preHtml => 
-				priKey => 0
-				readOnly => 0
-				regExpInvalidMsg => 
-				requiredInvalidMsg => Person/Patient ID is required (can not be blank).
-				size => 16
-				type => text
-				types => ARRAY(0xba77f4c)
-			-->
+			<field.person.id caption="Person/Patient ID" max-length="16" name="person_id" size="16" required="yes"/>
 
 		</dialog>
 
@@ -76,67 +18,9 @@
 			<field.text hidden="yes" name="provider_item_id" caption="provider_item_id"/>
 			<field.text hidden="yes" name="prev_intake_form" caption="prev_intake_form"/>
 			<field.text caption="Service Request ID"  name="ref_id" size="6"/>
-			<field.person.id name="person_id" caption="Person/Patient ID" required="yes" style="text" types="Patient"/>
-			<!-- Total Field contents:
-				_spacerWidth => 0
-				addPopup => /org/#session.org_id#/dlg-add-Patient
-				addPopupControlField => _f_person_id
-				caption => Person/Patient ID
-				findPopup => /lookup/patient/id
-				findPopupAppendValue => 
-				flags => 560
-				hint => 
-				hints => 
-				idEntryStyle => 0
-				incSimpleName => 0
-				lengthInvalidMsg => Person/Patient ID is too long (can be at most 16 characters).
-				maxLength => 16
-				message => 
-				name => person_id
-				onKeyPressJS => return processKeypress_identifier(event)
-				options => 48
-				popup => HASH(0xc02d38c)
-				postHtml => 
-				preHtml => &lt;a href="
-				priKey => 0
-				readOnly => 0
-				regExpInvalidMsg => 
-				requiredInvalidMsg => Person/Patient ID is required (can not be blank).
-				size => 16
-				type => text
-				types => ARRAY(0xc029c6c)
-			-->
+			<field.person.id caption="Person/Patient ID" max-length="16" name="person_id" size="16" required="yes"/>
 			<field.separator heading="Tracking" name="text_field"/>
-			<field.person.id name="coordinator" caption="Intake Coordinator "  style="text"/>
-			<!-- Total Field contents:
-				_spacerWidth => 0
-				addPopup => /org/#session.org_id#/dlg-add-
-				addPopupControlField => _f_person_id
-				caption => Intake Coordinator 
-				findPopup => /lookup/person/id
-				findPopupAppendValue => 
-				flags => 544
-				hint => 
-				hints => 
-				idEntryStyle => 0
-				incSimpleName => 0
-				lengthInvalidMsg => Intake Coordinator  is too long (can be at most 16 characters).
-				maxLength => 16
-				message => 
-				name => coordinator
-				onKeyPressJS => return processKeypress_identifier(event)
-				options => 32
-				popup => HASH(0xba7cb48)
-				postHtml => 
-				preHtml => 
-				priKey => 0
-				readOnly => 0
-				regExpInvalidMsg => 
-				requiredInvalidMsg => Intake Coordinator  is required (can not be blank).
-				size => 16
-				type => text
-				types => ARRAY(0xba10b0c)
-			-->
+			<field.person.id caption="Intake Coordinator " max-length="16" name="coordinator" size="16" />
 			<field.date caption="Referral Date" name="ref_date" size="12"/>
 			<field.currency caption="Source of Service Request" read-only="yes" max-length="1024" name="source_referral" size="7"/>
 			<field.separator heading="Assign provider" name="text_field"/>
@@ -152,18 +36,15 @@
 			<field.text caption="Percent of Usual Customary"  name="percent_usual" size="3"/>
 			<field.text caption="Percent of Fee Schedule"  name="percent_actual" size="3"/>
 			<field.select caption="Referral Result" prepend-blank="yes" name="ref_result" choices="query:org.selReferralResult"/>
-			<!--  -->
 			<field.separator heading="Service" name="text_field"/>
 			<field.composite caption="Service Begin/End Date"  name="begin_end_date">
 				<field.date caption="Begin Date" name="begin_date" size="12"/>
 				<field.date caption="End Date" name="end_date" size="12"/>
 			</field.composite>
 			<field.select caption="Service" prepend-blank="yes" name="service" choices="query:transaction.selReferralServiceDesc"/>
-			<!--  -->
 			<field.composite caption="*"  name="text_field">
 				<field.text caption="Units"  name="units" size="4"/>
 				<field.select caption="Unit Detail" prepend-blank="yes" name="unit_detail" choices="query:org.selReferralUnitType"/>
-				<!--  -->
 			</field.composite>
 			<field.text caption="Code" read-only="yes" name="code" size="7"/>
 			<field.memo caption="Description" name="code_description" size="24"/>
@@ -173,7 +54,6 @@
 			<field.separator heading="Authorization" name="text_field"/>
 			<field.composite caption="*"  name="clientid_num">
 				<field.select caption="Client" prepend-blank="yes" name="client" choices="query:transaction.selIntakeClient"/>
-				<!--  -->
 				<field.text caption="Case #"  name="claim_num" size="7"/>
 			</field.composite>
 			<field.text caption="Auth Num"  name="auth_num"/>
@@ -188,7 +68,6 @@
 			<field.separator heading="Follow Up" name="text_field"/>
 			<field.composite caption="*"  name="text_field">
 				<field.select caption="Follow Up" prepend-blank="yes" name="follow_up" choices="query:transaction.selReferralFollowStatus"/>
-				<!--  -->
 				<field.date caption="Date" name="followup_date" size="12"/>
 			</field.composite>
 			<field.composite caption="*"  name="text_field">
@@ -200,36 +79,7 @@
 		</dialog>
 
 		<dialog name="referral_enquiry" heading="Referral Inquiry">
-			<field.person.id name="auth_ref" caption="Authorization Number " read-only="yes" style="text"/>
-			<!-- Total Field contents:
-				_spacerWidth => 0
-				addPopup => /org/#session.org_id#/dlg-add-
-				addPopupControlField => _f_person_id
-				caption => Authorization Number 
-				findPopup => /lookup/person/id
-				findPopupAppendValue => 
-				flags => 548
-				hint => 
-				hints => 
-				idEntryStyle => 0
-				incSimpleName => 0
-				lengthInvalidMsg => Authorization Number  is too long (can be at most 16 characters).
-				maxLength => 16
-				message => 
-				name => auth_ref
-				onKeyPressJS => return processKeypress_identifier(event)
-				options => 36
-				popup => HASH(0xc02d1b8)
-				postHtml => 
-				preHtml => 
-				priKey => 0
-				readOnly => 0
-				regExpInvalidMsg => 
-				requiredInvalidMsg => Authorization Number  is required (can not be blank).
-				size => 16
-				type => text
-				types => ARRAY(0xba4c354)
-			-->
+			<field.person.id caption="Authorization Number " max-length="16" name="auth_ref" size="16" read-only="yes"/>
 			<field.memo caption="Comments" name="comments" size="24"/>
 
 		</dialog>

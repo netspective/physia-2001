@@ -4,136 +4,19 @@
 	<dialogs package="insurance_plan">
 		<dialog name="ins_exists" heading="ins_exists">
 			<field.composite caption="Insurance Plan ID/Employer Plan ID"  name="ins_plan">
-				<field.insurance.product name="ins_id" caption="Insurance Plan ID" />
-				<!-- Total Field contents:
-					_spacerWidth => 0
-					addPopup => /org/#session.org_id#/dlg-add-ins-product
-					addPopupControlField => _f_product_name
-					caption => Insurance Plan ID
-					findPopup => /lookup/insproduct
-					findPopupAppendValue => 
-					flags => 512
-					hint => 
-					hints => 
-					idEntryStyle => 0
-					lengthInvalidMsg => Insurance Plan ID is too long (can be at most 32 characters).
-					maxLength => 32
-					message => 
-					name => ins_id
-					onKeyPressJS => return processKeypress_default(event)
-					options => 0
-					popup => HASH(0xba73e74)
-					postHtml => 
-					preHtml => 
-					priKey => 0
-					readOnly => 0
-					regExpInvalidMsg => 
-					requiredInvalidMsg => Insurance Plan ID is required (can not be blank).
-					size => 16
-					type => text
-				-->
+				<field.insurance.product caption="Insurance Plan ID" max-length="32" name="ins_id" size="16" />
 				<field.select caption="Employee Plans"  name="emp_plan" choices="query:insurance.selEmpExistPlan"/>
-				<!--  -->
 			</field.composite>
-			<field.select caption="Insurance Sequence"  name="bill_sequence"/>
-			<!--  -->
+			<field.select caption="Insurance Sequence"  name="bill_sequence" choices="schema-enum:Bill_Sequence"/>
 			<field.separator heading="General Plan Information" name="gen_plan_heading"/>
 			<field.text caption="Member Number"  max-length="32" name="member_number"/>
 			<field.text caption="Policy Number"  max-length="32" name="policy_number"/>
 			<field.composite caption="Insured/Guarantor ID"  name="insured_guarantor_ids">
-				<field.person.id name="insured_id" caption="Insured ID" required="yes" style="text" types="Patient"/>
-				<!-- Total Field contents:
-					_spacerWidth => 0
-					addPopup => /org/#session.org_id#/dlg-add-Patient
-					addPopupControlField => _f_person_id
-					caption => Insured ID
-					findPopup => /lookup/patient/id
-					findPopupAppendValue => 
-					flags => 560
-					hint => 
-					hints => 
-					idEntryStyle => 0
-					incSimpleName => 0
-					lengthInvalidMsg => Insured ID is too long (can be at most 16 characters).
-					maxLength => 16
-					message => 
-					name => insured_id
-					onKeyPressJS => return processKeypress_identifier(event)
-					options => 48
-					popup => HASH(0xba4daec)
-					postHtml => 
-					preHtml => 
-					priKey => 0
-					readOnly => 0
-					regExpInvalidMsg => 
-					requiredInvalidMsg => Insured ID is required (can not be blank).
-					size => 16
-					type => text
-					types => ARRAY(0xba59b80)
-				-->
-				<field.person.id name="guarantor_id" caption="Guarantor ID" required="yes" style="text" types="Patient"/>
-				<!-- Total Field contents:
-					_spacerWidth => 0
-					addPopup => /org/#session.org_id#/dlg-add-Patient
-					addPopupControlField => _f_person_id
-					caption => Guarantor ID
-					findPopup => /lookup/patient/id
-					findPopupAppendValue => 
-					flags => 560
-					hint => 
-					hints => 
-					idEntryStyle => 0
-					incSimpleName => 0
-					lengthInvalidMsg => Guarantor ID is too long (can be at most 16 characters).
-					maxLength => 16
-					message => 
-					name => guarantor_id
-					onKeyPressJS => return processKeypress_identifier(event)
-					options => 48
-					popup => HASH(0xba5c36c)
-					postHtml => 
-					preHtml => 
-					priKey => 0
-					readOnly => 0
-					regExpInvalidMsg => 
-					requiredInvalidMsg => Guarantor ID is required (can not be blank).
-					size => 16
-					type => text
-					types => ARRAY(0xba22344)
-				-->
+				<field.person.id caption="Insured ID" max-length="16" name="insured_id" size="16" required="yes"/>
+				<field.person.id caption="Guarantor ID" max-length="16" name="guarantor_id" size="16" required="yes"/>
 			</field.composite>
-			<field.person.id name="insured_id" caption="Insured ID"  style="text" types="Patient"/>
-			<!-- Total Field contents:
-				_spacerWidth => 0
-				addPopup => /org/#session.org_id#/dlg-add-Patient
-				addPopupControlField => _f_person_id
-				caption => Insured ID
-				findPopup => /lookup/patient/id
-				findPopupAppendValue => 
-				flags => 544
-				hint => 
-				hints => 
-				idEntryStyle => 0
-				incSimpleName => 0
-				lengthInvalidMsg => Insured ID is too long (can be at most 16 characters).
-				maxLength => 16
-				message => 
-				name => insured_id
-				onKeyPressJS => return processKeypress_identifier(event)
-				options => 32
-				popup => HASH(0xba6495c)
-				postHtml => 
-				preHtml => 
-				priKey => 0
-				readOnly => 0
-				regExpInvalidMsg => 
-				requiredInvalidMsg => Insured ID is required (can not be blank).
-				size => 16
-				type => text
-				types => ARRAY(0xba5d148)
-			-->
+			<field.person.id caption="Insured ID" max-length="16" name="insured_id" size="16" />
 			<field.select caption="Relationship to Insured"  name="rel_to_insured" choices="query:insurance.selInsuredRelation"/>
-			<!--  -->
 			<field.composite caption="Indiv/Family Deductible Remaining"  name="deduct_remain">
 				<field.currency caption="indiv_deduct_remain"  name="indiv_deduct_remain" size="10"/>
 				<field.currency caption="family_deduct_remain"  name="family_deduct_remain" size="10"/>
@@ -160,130 +43,25 @@
 			<field.text hidden="yes" name="fax_item_id" caption="fax_item_id"/>
 			<field.text hidden="yes" name="fee_item_id" caption="fee_item_id"/>
 			<field.text hidden="yes" name="item_id" caption="item_id"/>
-			<field.organization.id name="ins_org_id" caption="Insurance Organization ID" required="yes"/>
-			<!-- Total Field contents:
-				_spacerWidth => 0
-				addPopup => /org/#session.org_id#/dlg-add-org-main
-				addPopupControlField => _f_org_id
-				caption => Insurance Organization ID
-				findPopup => /lookup/org/id
-				findPopupAppendValue => 
-				flags => 560
-				hint => 
-				hints => 
-				lengthInvalidMsg => Insurance Organization ID is too long (can be at most 16 characters).
-				maxLength => 16
-				message => 
-				name => ins_org_id
-				onKeyPressJS => return processKeypress_identifier(event)
-				options => 48
-				popup => HASH(0xba558e8)
-				postHtml => 
-				preHtml => 
-				priKey => 0
-				readOnly => 0
-				regExpInvalidMsg => 
-				requiredInvalidMsg => Insurance Organization ID is required (can not be blank).
-				size => 16
-				type => text
-			-->
-			<field.insurance.product.new name="ins_id" caption="Insurance Plan ID" required="yes"/>
-			<!-- Total Field contents:
-				_spacerWidth => 0
-				addPopup => 
-				caption => Insurance Plan ID
-				findPopup => 
-				findPopupAppendValue => 
-				flags => 528
-				hint => 
-				hints => 
-				lengthInvalidMsg => Insurance Plan ID is too long (can be at most 32 characters).
-				maxLength => 32
-				message => 
-				name => ins_id
-				onKeyPressJS => return processKeypress_default(event)
-				options => 16
-				popup => HASH(0xba64b90)
-				postHtml => 
-				preHtml => 
-				priKey => 0
-				readOnly => 0
-				regExpInvalidMsg => 
-				requiredInvalidMsg => Insurance Plan ID is required (can not be blank).
-				size => 16
-				type => text
-			-->
-			<field.organization.id name="ipa_org_id" caption="IPA" />
-			<!-- Total Field contents:
-				_spacerWidth => 0
-				addPopup => /org/#session.org_id#/dlg-add-org-main
-				addPopupControlField => _f_org_id
-				caption => IPA
-				findPopup => /lookup/org/id
-				findPopupAppendValue => 
-				flags => 544
-				hint => 
-				hints => 
-				lengthInvalidMsg => IPA is too long (can be at most 16 characters).
-				maxLength => 16
-				message => 
-				name => ipa_org_id
-				onKeyPressJS => return processKeypress_identifier(event)
-				options => 32
-				popup => HASH(0xba6b1e4)
-				postHtml => 
-				preHtml => 
-				priKey => 0
-				readOnly => 0
-				regExpInvalidMsg => 
-				requiredInvalidMsg => IPA is required (can not be blank).
-				size => 16
-				type => text
-			-->
+			<field.organization.id caption="Insurance Organization ID" max-length="16" name="ins_org_id" size="16" required="yes"/>
+			<field.insurance.product.new caption="Insurance Plan ID" max-length="32" name="ins_id" size="16" required="yes"/>
+			<field.organization.id caption="IPA" max-length="16" name="ipa_org_id" size="16" />
 			<field.text caption="Fee Schedules"  name="fee_schedules"/>
-			<field.address name="billing_addr" caption="Billing Address" required="yes"/>
-			<!-- Total Field contents:
-				_spacerWidth => 0
-				addPopup => 
-				caption => Billing Address
-				fields => ARRAY(0xba77fdc)
-				findPopup => 
-				findPopupAppendValue => 
-				flags => 528
-				hint => 
-				hints => 
-				lengthInvalidMsg => Billing Address is too long (can be at most 1024 characters).
-				maxLength => 1024
-				message => 
-				name => billing_addr
-				namePrefix => addr_
-				onKeyPressJS => return processKeypress_default(event)
-				options => 16
-				popup => HASH(0xba56b54)
-				postHtml => 
-				preHtml => 
-				priKey => 0
-				readOnly => 0
-				regExpInvalidMsg => 
-				requiredInvalidMsg => Billing Address is required (can not be blank).
-				size => 24
-				type => text
-			-->
+			<field.address caption="Billing Address" name="billing_addr" required="yes"/>
 			<field.composite caption="Phone/Fax"  name="phone_fax">
-				<field.phone caption="Phone" required="yes" max-length="1024" name="phone"/>
-				<field.phone caption="Fax"  max-length="1024" name="fax"/>
+				<field.phone caption="Phone" required="yes" max-length="1024" name="phone">
+				  <conditional action="invisible-when-data-cmd" data-cmd="edit"/>
+				</field.phone>
+				<field.phone caption="Fax"  max-length="1024" name="fax">
+				  <conditional action="invisible-when-data-cmd" data-cmd="edit"/>
+				</field.phone>
 			</field.composite>
 			<field.select caption="Insurance Type" required="yes" name="ins_type"/>
-			<!--  -->
 			<field.select caption="Insurance Type Code" required="yes" name="insurance_type_code" choices="query:insurance.selInsTypeCode"/>
-			<!--  -->
 			<field.select caption="PPO-HMO Indicator" required="yes" name="ppo_hmo_indicator" choices="query:insurance.selPpoHmoIndicator"/>
-			<!--  -->
 			<field.composite caption="Champus Branch/Status/Grade"  hint="(For 'Champus' Insurance Type only)" name="champus_fields">
 				<field.select caption="Champus Branch"  name="champus_branch" choices=";Army;Navy;Air Force;Marines;Coast Guard"/>
-				<!--  -->
 				<field.select caption="Champus Status"  name="champus_status" choices=";Active;Retired;Reserves"/>
-				<!--  -->
 				<field.text caption="Champus Grade"  name="champus_grade"/>
 			</field.composite>
 			<field.text caption="BCBS Plan Code"  hint="(For 'BCBS' Insurance Type only)" name="bcbs_code"/>
@@ -293,7 +71,6 @@
 				<field.text caption="Group Number"  max-length="32" name="group_number"/>
 			</field.composite>
 			<field.select caption="Remittance Type"  name="remit_type"/>
-			<!--  -->
 			<field.text caption="E-Remittance Payer ID"  hint="(Only for non-Paper types)" name="remit_payer_id"/>
 			<field.separator heading="Coverage Information" name="coverage_heading"/>
 			<field.composite caption="Coverage Begin/End Dates"  name="dates">
@@ -317,135 +94,29 @@
 			<field.text hidden="yes" name="fax_item_id" caption="fax_item_id"/>
 			<field.text hidden="yes" name="fee_item_id" caption="fee_item_id"/>
 			<field.text hidden="yes" name="item_id" caption="item_id"/>
-			<field.organization.id name="ins_org_id" caption="Insurance Organization ID" required="yes"/>
-			<!-- Total Field contents:
-				_spacerWidth => 0
-				addPopup => /org/#session.org_id#/dlg-add-org-main
-				addPopupControlField => _f_org_id
-				caption => Insurance Organization ID
-				findPopup => /lookup/org/id
-				findPopupAppendValue => 
-				flags => 560
-				hint => 
-				hints => 
-				lengthInvalidMsg => Insurance Organization ID is too long (can be at most 16 characters).
-				maxLength => 16
-				message => 
-				name => ins_org_id
-				onKeyPressJS => return processKeypress_identifier(event)
-				options => 48
-				popup => HASH(0xba1448c)
-				postHtml => 
-				preHtml => 
-				priKey => 0
-				readOnly => 0
-				regExpInvalidMsg => 
-				requiredInvalidMsg => Insurance Organization ID is required (can not be blank).
-				size => 16
-				type => text
-			-->
-			<field.insurance.product.new name="ins_id" caption="Insurance Plan ID" required="yes"/>
-			<!-- Total Field contents:
-				_spacerWidth => 0
-				addPopup => 
-				caption => Insurance Plan ID
-				findPopup => 
-				findPopupAppendValue => 
-				flags => 528
-				hint => 
-				hints => 
-				lengthInvalidMsg => Insurance Plan ID is too long (can be at most 32 characters).
-				maxLength => 32
-				message => 
-				name => ins_id
-				onKeyPressJS => return processKeypress_default(event)
-				options => 16
-				popup => HASH(0xba52e6c)
-				postHtml => 
-				preHtml => 
-				priKey => 0
-				readOnly => 0
-				regExpInvalidMsg => 
-				requiredInvalidMsg => Insurance Plan ID is required (can not be blank).
-				size => 16
-				type => text
-			-->
-			<field.organization.id name="ipa_org_id" caption="IPA" />
-			<!-- Total Field contents:
-				_spacerWidth => 0
-				addPopup => /org/#session.org_id#/dlg-add-org-main
-				addPopupControlField => _f_org_id
-				caption => IPA
-				findPopup => /lookup/org/id
-				findPopupAppendValue => 
-				flags => 544
-				hint => 
-				hints => 
-				lengthInvalidMsg => IPA is too long (can be at most 16 characters).
-				maxLength => 16
-				message => 
-				name => ipa_org_id
-				onKeyPressJS => return processKeypress_identifier(event)
-				options => 32
-				popup => HASH(0xba7b824)
-				postHtml => 
-				preHtml => 
-				priKey => 0
-				readOnly => 0
-				regExpInvalidMsg => 
-				requiredInvalidMsg => IPA is required (can not be blank).
-				size => 16
-				type => text
-			-->
+			<field.organization.id caption="Insurance Organization ID" max-length="16" name="ins_org_id" size="16" required="yes"/>
+			<field.insurance.product.new caption="Insurance Plan ID" max-length="32" name="ins_id" size="16" required="yes"/>
+			<field.organization.id caption="IPA" max-length="16" name="ipa_org_id" size="16" />
 			<field.text caption="Fee Schedules"  name="fee_schedules"/>
-			<field.address name="billing_addr" caption="Billing Address" required="yes"/>
-			<!-- Total Field contents:
-				_spacerWidth => 0
-				addPopup => 
-				caption => Billing Address
-				fields => ARRAY(0xba6222c)
-				findPopup => 
-				findPopupAppendValue => 
-				flags => 528
-				hint => 
-				hints => 
-				lengthInvalidMsg => Billing Address is too long (can be at most 1024 characters).
-				maxLength => 1024
-				message => 
-				name => billing_addr
-				namePrefix => addr_
-				onKeyPressJS => return processKeypress_default(event)
-				options => 16
-				popup => HASH(0xba0add4)
-				postHtml => 
-				preHtml => 
-				priKey => 0
-				readOnly => 0
-				regExpInvalidMsg => 
-				requiredInvalidMsg => Billing Address is required (can not be blank).
-				size => 24
-				type => text
-			-->
+			<field.address caption="Billing Address" name="billing_addr" required="yes"/>
 			<field.composite caption="Phone/Fax"  name="phone_fax">
-				<field.phone caption="Phone" required="yes" max-length="1024" name="phone"/>
-				<field.phone caption="Fax"  max-length="1024" name="fax"/>
+				<field.phone caption="Phone" required="yes" max-length="1024" name="phone">
+				  <conditional action="invisible-when-data-cmd" data-cmd="edit"/>
+				</field.phone>
+				<field.phone caption="Fax"  max-length="1024" name="fax">
+				  <conditional action="invisible-when-data-cmd" data-cmd="edit"/>
+				</field.phone>
 			</field.composite>
 			<field.select caption="Insurance Type" required="yes" name="ins_type"/>
-			<!--  -->
 			<field.select caption="Insurance Type Code" required="yes" name="insurance_type_code" choices="query:insurance.selInsTypeCode"/>
-			<!--  -->
 			<field.select caption="PPO-HMO Indicator" required="yes" name="ppo_hmo_indicator" choices="query:insurance.selPpoHmoIndicator"/>
-			<!--  -->
 			<field.composite caption="Champus Branch/Status/Grade"  hint="(For 'Champus' Insurance Type only)" name="champus_fields">
 				<field.select caption="Champus Branch"  name="champus_branch" choices=";Army;Navy;Air Force;Marines;Coast Guard"/>
-				<!--  -->
 				<field.select caption="Champus Status"  name="champus_status" choices=";Active;Retired;Reserves"/>
-				<!--  -->
 				<field.text caption="Champus Grade"  name="champus_grade"/>
 			</field.composite>
 			<field.text caption="BCBS Plan Code"  hint="(For 'BCBS' Insurance Type only)" name="bcbs_code"/>
-			<field.select caption="Insurance Sequence"  name="bill_sequence"/>
-			<!--  -->
+			<field.select caption="Insurance Sequence"  name="bill_sequence" choices="schema-enum:Bill_Sequence"/>
 			<field.separator heading="General Plan Information" name="gen_plan_heading"/>
 			<field.text caption="Member Number"  max-length="32" name="member_number"/>
 			<field.composite caption="Policy Name/Number"  name="policy_name_number">
@@ -457,105 +128,16 @@
 				<field.text caption="Group Number"  max-length="32" name="group_number"/>
 			</field.composite>
 			<field.composite caption="Insured/Guarantor ID"  name="insured_guarantor_ids">
-				<field.person.id name="insured_id" caption="Insured ID" required="yes" style="text" types="Patient"/>
-				<!-- Total Field contents:
-					_spacerWidth => 0
-					addPopup => /org/#session.org_id#/dlg-add-Patient
-					addPopupControlField => _f_person_id
-					caption => Insured ID
-					findPopup => /lookup/patient/id
-					findPopupAppendValue => 
-					flags => 560
-					hint => 
-					hints => 
-					idEntryStyle => 0
-					incSimpleName => 0
-					lengthInvalidMsg => Insured ID is too long (can be at most 16 characters).
-					maxLength => 16
-					message => 
-					name => insured_id
-					onKeyPressJS => return processKeypress_identifier(event)
-					options => 48
-					popup => HASH(0xba77da8)
-					postHtml => 
-					preHtml => 
-					priKey => 0
-					readOnly => 0
-					regExpInvalidMsg => 
-					requiredInvalidMsg => Insured ID is required (can not be blank).
-					size => 16
-					type => text
-					types => ARRAY(0xba7196c)
-				-->
-				<field.person.id name="guarantor_id" caption="Guarantor ID" required="yes" style="text" types="Patient"/>
-				<!-- Total Field contents:
-					_spacerWidth => 0
-					addPopup => /org/#session.org_id#/dlg-add-Patient
-					addPopupControlField => _f_person_id
-					caption => Guarantor ID
-					findPopup => /lookup/patient/id
-					findPopupAppendValue => 
-					flags => 560
-					hint => 
-					hints => 
-					idEntryStyle => 0
-					incSimpleName => 0
-					lengthInvalidMsg => Guarantor ID is too long (can be at most 16 characters).
-					maxLength => 16
-					message => 
-					name => guarantor_id
-					onKeyPressJS => return processKeypress_identifier(event)
-					options => 48
-					popup => HASH(0xba70704)
-					postHtml => 
-					preHtml => 
-					priKey => 0
-					readOnly => 0
-					regExpInvalidMsg => 
-					requiredInvalidMsg => Guarantor ID is required (can not be blank).
-					size => 16
-					type => text
-					types => ARRAY(0xba2b500)
-				-->
+				<field.person.id caption="Insured ID" max-length="16" name="insured_id" size="16" required="yes"/>
+				<field.person.id caption="Guarantor ID" max-length="16" name="guarantor_id" size="16" required="yes"/>
 			</field.composite>
-			<field.person.id name="insured_id" caption="Insured ID"  style="text" types="Patient"/>
-			<!-- Total Field contents:
-				_spacerWidth => 0
-				addPopup => /org/#session.org_id#/dlg-add-Patient
-				addPopupControlField => _f_person_id
-				caption => Insured ID
-				findPopup => /lookup/patient/id
-				findPopupAppendValue => 
-				flags => 544
-				hint => 
-				hints => 
-				idEntryStyle => 0
-				incSimpleName => 0
-				lengthInvalidMsg => Insured ID is too long (can be at most 16 characters).
-				maxLength => 16
-				message => 
-				name => insured_id
-				onKeyPressJS => return processKeypress_identifier(event)
-				options => 32
-				popup => HASH(0xba2b458)
-				postHtml => 
-				preHtml => 
-				priKey => 0
-				readOnly => 0
-				regExpInvalidMsg => 
-				requiredInvalidMsg => Insured ID is required (can not be blank).
-				size => 16
-				type => text
-				types => ARRAY(0xba3cd50)
-			-->
+			<field.person.id caption="Insured ID" max-length="16" name="insured_id" size="16" />
 			<field.select caption="Relationship to Insured"  name="rel_to_insured" choices="query:insurance.selInsuredRelation"/>
-			<!--  -->
 			<field.composite caption="Indiv/Family Deductible Remaining"  name="deduct_remain">
 				<field.currency caption="indiv_deduct_remain"  name="indiv_deduct_remain" size="10"/>
 				<field.currency caption="family_deduct_remain"  name="family_deduct_remain" size="10"/>
 			</field.composite>
 			<field.select caption="Remittance Type"  name="remit_type"/>
-			<!--  -->
 			<field.text caption="E-Remittance Payer ID"  hint="(Only for non-Paper types)" name="remit_payer_id"/>
 			<field.separator heading="Coverage Information" name="coverage_heading"/>
 			<field.composite caption="Coverage Begin/End Dates"  name="dates">
@@ -577,158 +159,16 @@
 		<dialog name="ins_coverage" heading="create-data-cmd-heading:Personal Insurance Coverage">
 			<field.text hidden="yes" name="injury_item_id" caption="injury_item_id"/>
 			<field.text hidden="yes" name="owner_org_id" caption="owner_org_id"/>
-			<field.person.id name="person_id" caption="Patient ID" required="yes" style="text" types="Patient"/>
-			<!-- Total Field contents:
-				_spacerWidth => 0
-				addPopup => /org/#session.org_id#/dlg-add-Patient
-				addPopupControlField => _f_person_id
-				caption => Patient ID
-				findPopup => /lookup/patient/id
-				findPopupAppendValue => 
-				flags => 560
-				hint => 
-				hints => 
-				idEntryStyle => 0
-				incSimpleName => 0
-				lengthInvalidMsg => Patient ID is too long (can be at most 16 characters).
-				maxLength => 16
-				message => 
-				name => person_id
-				onKeyPressJS => return processKeypress_identifier(event)
-				options => 48
-				popup => HASH(0xba6c660)
-				postHtml => 
-				preHtml => 
-				priKey => 0
-				readOnly => 0
-				regExpInvalidMsg => 
-				requiredInvalidMsg => Patient ID is required (can not be blank).
-				size => 16
-				type => text
-				types => ARRAY(0xba544b4)
-			-->
-			<field.insurance.product name="product_name" caption="Insurance Product" />
-			<!-- Total Field contents:
-				_spacerWidth => 0
-				addPopup => /org/#session.org_id#/dlg-add-ins-product
-				addPopupControlField => _f_product_name
-				caption => Insurance Product
-				findPopup => /lookup/insproduct/insorgid
-				findPopupAppendValue => 
-				flags => 512
-				hint => 
-				hints => 
-				idEntryStyle => 0
-				lengthInvalidMsg => Insurance Product is too long (can be at most 32 characters).
-				maxLength => 32
-				message => 
-				name => product_name
-				onKeyPressJS => return processKeypress_default(event)
-				options => 0
-				popup => HASH(0xba2dd6c)
-				postHtml => 
-				preHtml => 
-				priKey => 0
-				readOnly => 0
-				regExpInvalidMsg => 
-				requiredInvalidMsg => Insurance Product is required (can not be blank).
-				size => 16
-				type => text
-			-->
-			<field.insurance.plan name="plan_name" caption="Insurance Plan" />
-			<!-- Total Field contents:
-				_spacerWidth => 0
-				addPopup => /org/#session.org_id#/dlg-add-ins-plan
-				addPopupControlField => _f_plan_name
-				caption => Insurance Plan
-				findPopup => /lookup/insplan/product/itemValue
-				findPopupAppendValue => 
-				findPopupControlField => _f_product_name
-				flags => 512
-				hint => 
-				hints => 
-				idEntryStyle => 0
-				lengthInvalidMsg => Insurance Plan is too long (can be at most 32 characters).
-				maxLength => 32
-				message => 
-				name => plan_name
-				onKeyPressJS => return processKeypress_default(event)
-				options => 0
-				popup => HASH(0xba0d58c)
-				postHtml => 
-				preHtml => 
-				priKey => 0
-				readOnly => 0
-				regExpInvalidMsg => 
-				requiredInvalidMsg => Insurance Plan is required (can not be blank).
-				size => 16
-				type => text
-			-->
-			<field.select caption="Insurance Sequence" required="yes" name="bill_sequence"/>
-			<!--  -->
+			<field.person.id caption="Patient ID" max-length="16" name="person_id" size="16" required="yes"/>
+			<field.insurance.product caption="Insurance Product" max-length="32" name="product_name" size="16" />
+			<field.insurance.plan caption="Insurance Plan" max-length="32" name="plan_name" size="16" />
+			<field.select caption="Insurance Sequence" required="yes" name="bill_sequence" choices="schema-enum:Bill_Sequence"/>
 			<field.boolean caption="Confirm?" visible="no" name="do_anyway" style="check"/>
 			<field.separator heading="General Plan Information" name="gen_plan_heading"/>
 			<field.select caption="Patient's Relationship to Insured" required="yes" prepend-blank="yes" name="rel_to_insured" choices="query:insurance.selInsuredRelation"/>
-			<!--  -->
 			<field.text caption="Other Relationship"  name="extra"/>
-			<field.person.id name="insured_id" caption="Insured Person ID"  style="text" types="Insured-Person"/>
-			<!-- Total Field contents:
-				_spacerWidth => 0
-				addPopup => /org/#session.org_id#/dlg-add-Insured-Person
-				addPopupControlField => _f_person_id
-				caption => Insured Person ID
-				findPopup => /lookup/insured-Person/id
-				findPopupAppendValue => 
-				flags => 544
-				hint => 
-				hints => 
-				idEntryStyle => 0
-				incSimpleName => 1
-				lengthInvalidMsg => Insured Person ID is too long (can be at most 16 characters).
-				maxLength => 16
-				message => 
-				name => insured_id
-				onKeyPressJS => return processKeypress_identifier(event)
-				options => 32
-				popup => HASH(0xc00e71c)
-				postHtml => 
-				preHtml => 
-				priKey => 0
-				readOnly => 0
-				regExpInvalidMsg => 
-				requiredInvalidMsg => Insured Person ID is required (can not be blank).
-				size => 16
-				type => text
-				types => ARRAY(0x8616a4c)
-			-->
-			<field.organization.id name="employer_org_id" caption="Insured Person's Employer" />
-			<!-- Total Field contents:
-				_spacerWidth => 0
-				addPopup => /org/#session.org_id#/dlg-add-org-employer
-				addPopupControlField => _f_org_id
-				addType => employer
-				caption => Insured Person's Employer
-				findPopup => /lookup/org/id
-				findPopupAppendValue => 
-				flags => 544
-				hint => 
-				hints => 
-				lengthInvalidMsg => Insured Person's Employer is too long (can be at most 16 characters).
-				maxLength => 16
-				message => 
-				name => employer_org_id
-				onKeyPressJS => return processKeypress_identifier(event)
-				options => 32
-				popup => HASH(0xba57cc4)
-				postHtml => 
-				preHtml => 
-				priKey => 0
-				readOnly => 0
-				regExpInvalidMsg => 
-				requiredInvalidMsg => Insured Person's Employer is required (can not be blank).
-				size => 16
-				type => text
-			-->
+			<field.person.id caption="Insured Person ID" max-length="16" name="insured_id" size="16" />
+			<field.organization.id caption="Insured Person's Employer" max-length="16" name="employer_org_id" size="16" />
 			<field.composite caption="*"  name="group_info">
 				<field.text caption="Group Name"  max-length="32" name="group_name"/>
 				<field.text caption="Number"  max-length="32" name="group_number"/>
@@ -760,11 +200,14 @@
 			<field.composite caption="Payer for Today ID/Type"  name="other_payer_fields">
 				<field.text caption="Payer for Today ID" required="yes" name="guarantor_id"/>
 				<field.select caption="Payer for Today Type"  name="guarantor_type" choices="Person=person;Organization=org"/>
-				<!--  -->
 			</field.composite>
 			<field.date caption="Begin Date" name="coverage_begin_date" size="12"/>
-			<field.date caption="End Date" name="coverage_end_date" size="12"/>
-			<field.boolean caption="Inactive Payer"  name="inactive_payer" style="check"/>
+			<field.date caption="End Date" name="coverage_end_date" size="12">
+			  <conditional action="invisible-when-data-cmd" data-cmd="add"/>
+			</field.date>
+			<field.boolean caption="Inactive Payer"  name="inactive_payer" style="check">
+			  <conditional action="invisible-when-data-cmd" data-cmd="add"/>
+			</field.boolean>
 
 		</dialog>
 
@@ -774,148 +217,18 @@
 			<field.text hidden="yes" name="item_id" caption="item_id"/>
 			<field.text hidden="yes" name="ins_type" caption="ins_type"/>
 			<field.text hidden="yes" name="owner_org_id" caption="owner_org_id"/>
-			<field.organization.id name="ins_org_id" caption="Insurance Org Id" required="yes"/>
-			<!-- Total Field contents:
-				_spacerWidth => 0
-				addPopup => /org/#session.org_id#/dlg-add-org-insurance
-				addPopupControlField => _f_org_id
-				addType => insurance
-				caption => Insurance Org Id
-				findPopup => /lookup/org/id
-				findPopupAppendValue => 
-				flags => 560
-				hint => 
-				hints => 
-				lengthInvalidMsg => Insurance Org Id is too long (can be at most 16 characters).
-				maxLength => 16
-				message => 
-				name => ins_org_id
-				onKeyPressJS => return processKeypress_identifier(event)
-				options => 48
-				popup => HASH(0xba66284)
-				postHtml => 
-				preHtml => 
-				priKey => 0
-				readOnly => 0
-				regExpInvalidMsg => 
-				requiredInvalidMsg => Insurance Org Id is required (can not be blank).
-				size => 16
-				type => text
-			-->
-			<field.insurance.product name="product_name" caption="Product Name" required="yes"/>
-			<!-- Total Field contents:
-				_spacerWidth => 0
-				addPopup => /org/#session.org_id#/dlg-add-ins-product
-				addPopupControlField => _f_product_name
-				caption => Product Name
-				findPopup => /lookup/insproduct/insorgid/itemValue
-				findPopupAppendValue => 
-				findPopupControlField => _f_ins_org_id
-				flags => 528
-				hint => 
-				hints => 
-				idEntryStyle => 0
-				lengthInvalidMsg => Product Name is too long (can be at most 32 characters).
-				maxLength => 32
-				message => 
-				name => product_name
-				onKeyPressJS => return processKeypress_default(event)
-				options => 16
-				popup => HASH(0xba68eb0)
-				postHtml => 
-				preHtml => 
-				priKey => 0
-				readOnly => 0
-				regExpInvalidMsg => 
-				requiredInvalidMsg => Product Name is required (can not be blank).
-				size => 30
-				type => text
-			-->
-			<field.insurance.plan.new name="plan_name" caption="Plan Name" required="yes"/>
-			<!-- Total Field contents:
-				_spacerWidth => 0
-				addPopup => 
-				caption => Plan Name
-				findPopup => /lookup/insplan/product/itemValue
-				findPopupAppendValue => 
-				findPopupControlField => _f_product_name
-				flags => 528
-				hint => 
-				hints => 
-				lengthInvalidMsg => Plan Name is too long (can be at most 32 characters).
-				maxLength => 32
-				message => 
-				name => plan_name
-				onKeyPressJS => return processKeypress_default(event)
-				options => 16
-				popup => HASH(0xba61098)
-				postHtml => 
-				preHtml => 
-				priKey => 0
-				readOnly => 0
-				regExpInvalidMsg => 
-				requiredInvalidMsg => Plan Name is required (can not be blank).
-				size => 30
-				type => text
-			-->
-			<field.catalog.id name="fee_schedules" caption="Fee Schedule ID" />
-			<!-- Total Field contents:
-				_spacerWidth => 0
-				addPopup => /org/#session.org_id#/dlg-add-catalog
-				addPopupControlField => _f_catalog_id
-				caption => Fee Schedule ID
-				findPopup => /lookup/catalog
-				findPopupAppendValue => 
-				flags => 544
-				hint => 
-				hints => 
-				lengthInvalidMsg => Fee Schedule ID is too long (can be at most 32 characters).
-				maxLength => 32
-				message => 
-				name => fee_schedules
-				onKeyPressJS => return processKeypress_identifier(event)
-				options => 32
-				popup => HASH(0xba4968c)
-				postHtml => 
-				preHtml => 
-				priKey => 0
-				readOnly => 0
-				regExpInvalidMsg => 
-				requiredInvalidMsg => Fee Schedule ID is required (can not be blank).
-				size => 16
-				type => text
-			-->
-			<field.address name="billing_addr" caption="Billing Address" required="yes"/>
-			<!-- Total Field contents:
-				_spacerWidth => 0
-				addPopup => 
-				caption => Billing Address
-				fields => ARRAY(0xba31a0c)
-				findPopup => 
-				findPopupAppendValue => 
-				flags => 528
-				hint => 
-				hints => 
-				lengthInvalidMsg => Billing Address is too long (can be at most 1024 characters).
-				maxLength => 1024
-				message => 
-				name => billing_addr
-				namePrefix => addr_
-				onKeyPressJS => return processKeypress_default(event)
-				options => 16
-				popup => HASH(0xba56e6c)
-				postHtml => 
-				preHtml => 
-				priKey => 0
-				readOnly => 0
-				regExpInvalidMsg => 
-				requiredInvalidMsg => Billing Address is required (can not be blank).
-				size => 24
-				type => text
-			-->
+			<field.organization.id caption="Insurance Org Id" max-length="16" name="ins_org_id" size="16" required="yes"/>
+			<field.insurance.product caption="Product Name" max-length="32" name="product_name" size="30" required="yes"/>
+			<field.insurance.plan.new caption="Plan Name" max-length="32" name="plan_name" size="30" required="yes"/>
+			<field.catalog.id caption="Fee Schedule ID" max-length="32" name="fee_schedules" size="16" />
+			<field.address caption="Billing Address" name="billing_addr" required="yes"/>
 			<field.composite caption="Phone/Fax"  name="phone_fax">
-				<field.phone caption="Phone"  max-length="1024" name="phone"/>
-				<field.phone caption="Fax"  max-length="1024" name="fax"/>
+				<field.phone caption="Phone"  max-length="1024" name="phone">
+				  <conditional action="invisible-when-data-cmd" data-cmd="edit"/>
+				</field.phone>
+				<field.phone caption="Fax"  max-length="1024" name="fax">
+				  <conditional action="invisible-when-data-cmd" data-cmd="edit"/>
+				</field.phone>
 			</field.composite>
 			<field.separator heading="Coverage Information" name="coverage_heading"/>
 			<field.composite caption="Plan Begin/End Dates"  name="dates">
@@ -933,7 +246,6 @@
 			<field.currency caption="Office Visit Co-pay"  hint="Co-pay is required when 'Insurance Type' is 'HMO (cap)'" name="copay_amt" size="10"/>
 			<field.separator heading="Remittance Information" name="remittance_heading"/>
 			<field.select caption="Remittance Type"  name="remit_type" choices="Paper=0,Electronic=1"/>
-			<!--  -->
 			<field.text caption="E-Remittance Payer ID"  hint="(Only for non-Paper types)" name="remit_payer_id"/>
 			<field.text caption="Remit Payer Name"  name="remit_payer_name"/>
 
@@ -948,126 +260,22 @@
 			<field.text hidden="yes" name="pre_org_id" caption="pre_org_id"/>
 			<field.text hidden="yes" name="owner_org_id" caption="owner_org_id"/>
 			<field.text hidden="yes" name="medigap_number_id" caption="medigap_number_id"/>
-			<field.organization.id name="ins_org_id" caption="Insurance Company Id" required="yes"/>
-			<!-- Total Field contents:
-				_spacerWidth => 0
-				addPopup => /org/#session.org_id#/dlg-add-org-insurance
-				addPopupControlField => _f_org_id
-				addType => insurance
-				caption => Insurance Company Id
-				findPopup => /lookup/org/id
-				findPopupAppendValue => 
-				flags => 560
-				hint => 
-				hints => 
-				lengthInvalidMsg => Insurance Company Id is too long (can be at most 16 characters).
-				maxLength => 16
-				message => 
-				name => ins_org_id
-				onKeyPressJS => return processKeypress_identifier(event)
-				options => 48
-				popup => HASH(0xba69018)
-				postHtml => 
-				preHtml => 
-				priKey => 0
-				readOnly => 0
-				regExpInvalidMsg => 
-				requiredInvalidMsg => Insurance Company Id is required (can not be blank).
-				size => 16
-				type => text
-			-->
-			<field.insurance.product.new name="product_name" caption="Product Name" required="yes"/>
-			<!-- Total Field contents:
-				_spacerWidth => 0
-				addPopup => 
-				caption => Product Name
-				findPopup => /lookup/insproduct/insorgid/itemValue
-				findPopupAppendValue => 
-				findPopupControlField => _f_ins_org_id
-				flags => 528
-				hint => 
-				hints => 
-				lengthInvalidMsg => Product Name is too long (can be at most 32 characters).
-				maxLength => 32
-				message => 
-				name => product_name
-				onKeyPressJS => return processKeypress_default(event)
-				options => 16
-				popup => HASH(0xba704ac)
-				postHtml => 
-				preHtml => 
-				priKey => 0
-				readOnly => 0
-				regExpInvalidMsg => 
-				requiredInvalidMsg => Product Name is required (can not be blank).
-				size => 24
-				type => text
-			-->
+			<field.organization.id caption="Insurance Company Id" max-length="16" name="ins_org_id" size="16" required="yes"/>
+			<field.insurance.product.new caption="Product Name" max-length="32" name="product_name" required="yes"/>
 			<field.select caption="Product Type" required="yes" name="ins_type"/>
-			<!--  -->
-			<field.catalog.id name="fee_schedules" caption="Fee Schedule ID" />
-			<!-- Total Field contents:
-				_spacerWidth => 0
-				addPopup => /org/#session.org_id#/dlg-add-catalog
-				addPopupControlField => _f_catalog_id
-				caption => Fee Schedule ID
-				findPopup => /lookup/catalog
-				findPopupAppendValue => 
-				flags => 544
-				hint => 
-				hints => 
-				lengthInvalidMsg => Fee Schedule ID is too long (can be at most 32 characters).
-				maxLength => 32
-				message => 
-				name => fee_schedules
-				onKeyPressJS => return processKeypress_identifier(event)
-				options => 32
-				popup => HASH(0xac099e4)
-				postHtml => 
-				preHtml => 
-				priKey => 0
-				readOnly => 0
-				regExpInvalidMsg => 
-				requiredInvalidMsg => Fee Schedule ID is required (can not be blank).
-				size => 16
-				type => text
-			-->
-			<field.address name="billing_addr" caption="Billing Address" required="yes"/>
-			<!-- Total Field contents:
-				_spacerWidth => 0
-				addPopup => 
-				caption => Billing Address
-				fields => ARRAY(0xba7a2c8)
-				findPopup => 
-				findPopupAppendValue => 
-				flags => 528
-				hint => 
-				hints => 
-				lengthInvalidMsg => Billing Address is too long (can be at most 1024 characters).
-				maxLength => 1024
-				message => 
-				name => billing_addr
-				namePrefix => addr_
-				onKeyPressJS => return processKeypress_default(event)
-				options => 16
-				popup => HASH(0xc026348)
-				postHtml => 
-				preHtml => 
-				priKey => 0
-				readOnly => 0
-				regExpInvalidMsg => 
-				requiredInvalidMsg => Billing Address is required (can not be blank).
-				size => 24
-				type => text
-			-->
+			<field.catalog.id caption="Fee Schedule ID" max-length="32" name="fee_schedules" size="16" />
+			<field.address caption="Billing Address" name="billing_addr" required="yes"/>
 			<field.composite caption="Phone/Fax"  name="phone_fax">
-				<field.phone caption="Phone" required="yes" max-length="1024" name="phone"/>
-				<field.phone caption="Fax"  max-length="1024" name="fax"/>
+				<field.phone caption="Phone" required="yes" max-length="1024" name="phone">
+				  <conditional action="invisible-when-data-cmd" data-cmd="edit"/>
+				</field.phone>
+				<field.phone caption="Fax"  max-length="1024" name="fax">
+				  <conditional action="invisible-when-data-cmd" data-cmd="edit"/>
+				</field.phone>
 			</field.composite>
 			<field.text caption="Medigap Number"  max-length="7" name="medigap_number" size="7"/>
 			<field.separator heading="Remittance Information" name="remittance_heading"/>
 			<field.select caption="Remittance Type"  name="remit_type" choices="Paper=0,Electronic=1"/>
-			<!--  -->
 			<field.text caption="E-Remittance Payer ID"  hint="(Only for non-Paper types)" name="remit_payer_id"/>
 			<field.text caption="Remit Payer Name"  name="remit_payer_name"/>
 

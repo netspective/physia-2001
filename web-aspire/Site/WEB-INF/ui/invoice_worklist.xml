@@ -3,66 +3,8 @@
 <xaf>
 	<dialogs package="invoice_worklist">
 		<dialog name="transfer_collection" heading="Transfer Invoice">
-			<field.person.id name="person_id" caption="Person ID" read-only="yes" style="text"/>
-			<!-- Total Field contents:
-				_spacerWidth => 0
-				addPopup => /org/#session.org_id#/dlg-add-
-				addPopupControlField => _f_person_id
-				caption => Person ID
-				findPopup => /lookup/person/id
-				findPopupAppendValue => 
-				flags => 548
-				hint => 
-				hints => 
-				idEntryStyle => 0
-				incSimpleName => 1
-				lengthInvalidMsg => Person ID is too long (can be at most 16 characters).
-				maxLength => 16
-				message => 
-				name => person_id
-				onKeyPressJS => return processKeypress_identifier(event)
-				options => 36
-				popup => HASH(0xba69d0c)
-				postHtml => 
-				preHtml => 
-				priKey => 0
-				readOnly => 0
-				regExpInvalidMsg => 
-				requiredInvalidMsg => Person ID is required (can not be blank).
-				size => 16
-				type => text
-				types => ARRAY(0xba766e4)
-			-->
-			<field.person.id name="transfer_id" caption="Transfer To" required="yes" style="text"/>
-			<!-- Total Field contents:
-				_spacerWidth => 0
-				addPopup => /org/#session.org_id#/dlg-add-
-				addPopupControlField => _f_person_id
-				caption => Transfer To
-				findPopup => /lookup/person/id
-				findPopupAppendValue => 
-				flags => 560
-				hint => 
-				hints => Collector to Transfer Account
-				idEntryStyle => 0
-				incSimpleName => 1
-				lengthInvalidMsg => Transfer To is too long (can be at most 16 characters).
-				maxLength => 16
-				message => 
-				name => transfer_id
-				onKeyPressJS => return processKeypress_identifier(event)
-				options => 48
-				popup => HASH(0xba47448)
-				postHtml => 
-				preHtml => 
-				priKey => 0
-				readOnly => 0
-				regExpInvalidMsg => 
-				requiredInvalidMsg => Transfer To is required (can not be blank).
-				size => 16
-				type => text
-				types => ARRAY(0xba72d6c)
-			-->
+			<field.person.id caption="Person ID" max-length="16" name="person_id" size="16" read-only="yes"/>
+			<field.person.id caption="Transfer To" hint="Collector to Transfer Account" max-length="16" name="transfer_id" size="16" required="yes"/>
 			<field.memo caption="Reason For Transfer" name="detail" size="24"/>
 			<field.date caption="Date" name="date_data_b" size="12"/>
 

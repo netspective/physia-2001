@@ -4,102 +4,15 @@
 	<dialogs package="referral_ppms_worklist">
 		<dialog name="referral_reck_date" heading="Referral Recheck Date">
 			<field.text caption="Referral ID" read-only="yes" name="referral_id"/>
-			<field.person.id name="person_id" caption="Patient ID" read-only="yes" style="text"/>
-			<!-- Total Field contents:
-				_spacerWidth => 0
-				addPopup => /org/#session.org_id#/dlg-add-
-				addPopupControlField => _f_person_id
-				caption => Patient ID
-				findPopup => /lookup/person/id
-				findPopupAppendValue => 
-				flags => 548
-				hint => 
-				hints => 
-				idEntryStyle => 0
-				incSimpleName => 0
-				lengthInvalidMsg => Patient ID is too long (can be at most 16 characters).
-				maxLength => 16
-				message => 
-				name => person_id
-				onKeyPressJS => return processKeypress_identifier(event)
-				options => 36
-				popup => HASH(0xc0261b0)
-				postHtml => 
-				preHtml => 
-				priKey => 0
-				readOnly => 0
-				regExpInvalidMsg => 
-				requiredInvalidMsg => Patient ID is required (can not be blank).
-				size => 16
-				type => text
-				types => ARRAY(0xba769c0)
-			-->
+			<field.person.id caption="Patient ID" max-length="16" name="person_id" size="16" read-only="yes"/>
 			<field.text caption="Requesting Physician" read-only="yes" name="requester_id"/>
-			<field.scheduling.date name="recheck_date" caption="Recheck Date" required="yes"/>
-			<!-- Total Field contents:
-				_spacerWidth => 0
-				addPopup => 
-				caption => Recheck Date
-				defaultValue => 11/14/2001
-				findPopup => 
-				findPopupAppendValue => 
-				flags => 3600
-				formatValue => CODE(0x8617e68)
-				hint => 
-				hints => 
-				lengthInvalidMsg => Recheck Date is too long (can be at most 10 characters).
-				maxLength => 10
-				message => 
-				name => recheck_date
-				onBlurJS => validateChange_Date(event)
-				onKeyPressJS => return processKeypress_default(event)
-				onValidate => CODE(0x8617a48)
-				options => 16
-				popup => HASH(0xba7b6e0)
-				postHtml => 
-				preHtml => 
-				priKey => 0
-				readOnly => 0
-				regExpInvalidMsg => Recheck Date has an invalid date (format is 'MM/DD/YYYY').
-				requiredInvalidMsg => Recheck Date is required (can not be blank).
-				size => 10
-				type => date
-			-->
+			<field.scheduling.date caption="Recheck Date" max-length="10" name="recheck_date" size="10" required="yes"/>
 
 		</dialog>
 
 		<dialog name="referral_notes" heading="create-data-cmd-heading:Referral Notes">
 			<field.text caption="Referral ID" read-only="yes" name="referral_id"/>
-			<field.person.id name="person_id" caption="Patient ID" read-only="yes" style="text"/>
-			<!-- Total Field contents:
-				_spacerWidth => 0
-				addPopup => /org/#session.org_id#/dlg-add-
-				addPopupControlField => _f_person_id
-				caption => Patient ID
-				findPopup => /lookup/person/id
-				findPopupAppendValue => 
-				flags => 548
-				hint => 
-				hints => 
-				idEntryStyle => 0
-				incSimpleName => 0
-				lengthInvalidMsg => Patient ID is too long (can be at most 16 characters).
-				maxLength => 16
-				message => 
-				name => person_id
-				onKeyPressJS => return processKeypress_identifier(event)
-				options => 36
-				popup => HASH(0xc00e890)
-				postHtml => 
-				preHtml => 
-				priKey => 0
-				readOnly => 0
-				regExpInvalidMsg => 
-				requiredInvalidMsg => Patient ID is required (can not be blank).
-				size => 16
-				type => text
-				types => ARRAY(0xc026120)
-			-->
+			<field.person.id caption="Patient ID" max-length="16" name="person_id" size="16" read-only="yes"/>
 			<field.text caption="Requesting Physician" read-only="yes" name="requester_id"/>
 			<field.memo caption="Notes" name="note" size="24"/>
 			<field.date caption="Date" name="note_date" size="12"/>
@@ -108,103 +21,16 @@
 
 		<dialog name="transfer_referral" heading="Transfer Referral">
 			<field.text caption="Referral ID" read-only="yes" name="referral_id"/>
-			<field.person.id name="person_id" caption="Patient ID" read-only="yes" style="text"/>
-			<!-- Total Field contents:
-				_spacerWidth => 0
-				addPopup => /org/#session.org_id#/dlg-add-
-				addPopupControlField => _f_person_id
-				caption => Patient ID
-				findPopup => /lookup/person/id
-				findPopupAppendValue => 
-				flags => 548
-				hint => 
-				hints => 
-				idEntryStyle => 0
-				incSimpleName => 1
-				lengthInvalidMsg => Patient ID is too long (can be at most 16 characters).
-				maxLength => 16
-				message => 
-				name => person_id
-				onKeyPressJS => return processKeypress_identifier(event)
-				options => 36
-				popup => HASH(0xba7ddc8)
-				postHtml => 
-				preHtml => 
-				priKey => 0
-				readOnly => 0
-				regExpInvalidMsg => 
-				requiredInvalidMsg => Patient ID is required (can not be blank).
-				size => 16
-				type => text
-				types => ARRAY(0xba77d9c)
-			-->
+			<field.person.id caption="Patient ID" max-length="16" name="person_id" size="16" read-only="yes"/>
 			<field.text caption="Requesting Physician" read-only="yes" name="requester_id"/>
-			<field.person.id name="transfer_id" caption="Transfer To" required="yes" style="text" types="Staff"/>
-			<!-- Total Field contents:
-				_spacerWidth => 0
-				addPopup => /org/#session.org_id#/dlg-add-Staff
-				addPopupControlField => _f_person_id
-				caption => Transfer To
-				findPopup => /lookup/staff/id
-				findPopupAppendValue => 
-				flags => 560
-				hint => 
-				hints => Person to Transfer Referral
-				idEntryStyle => 0
-				incSimpleName => 1
-				lengthInvalidMsg => Transfer To is too long (can be at most 16 characters).
-				maxLength => 16
-				message => 
-				name => transfer_id
-				onKeyPressJS => return processKeypress_identifier(event)
-				options => 48
-				popup => HASH(0xc030994)
-				postHtml => 
-				preHtml => 
-				priKey => 0
-				readOnly => 0
-				regExpInvalidMsg => 
-				requiredInvalidMsg => Transfer To is required (can not be blank).
-				size => 16
-				type => text
-				types => ARRAY(0xba7b5fc)
-			-->
+			<field.person.id caption="Transfer To" hint="Person to Transfer Referral" max-length="16" name="transfer_id" size="16" required="yes"/>
 			<field.memo caption="Reason For Transfer" name="detail" size="24"/>
 
 		</dialog>
 
 		<dialog name="close_referral" heading="Close Referral">
 			<field.text caption="Referral ID" read-only="yes" name="referral_id"/>
-			<field.person.id name="person_id" caption="Person ID" read-only="yes" style="text"/>
-			<!-- Total Field contents:
-				_spacerWidth => 0
-				addPopup => /org/#session.org_id#/dlg-add-
-				addPopupControlField => _f_person_id
-				caption => Person ID
-				findPopup => /lookup/person/id
-				findPopupAppendValue => 
-				flags => 548
-				hint => 
-				hints => 
-				idEntryStyle => 0
-				incSimpleName => 0
-				lengthInvalidMsg => Person ID is too long (can be at most 16 characters).
-				maxLength => 16
-				message => 
-				name => person_id
-				onKeyPressJS => return processKeypress_identifier(event)
-				options => 36
-				popup => HASH(0xba52fb0)
-				postHtml => 
-				preHtml => 
-				priKey => 0
-				readOnly => 0
-				regExpInvalidMsg => 
-				requiredInvalidMsg => Person ID is required (can not be blank).
-				size => 16
-				type => text
-				types => ARRAY(0xba26170)
-			-->
+			<field.person.id caption="Person ID" max-length="16" name="person_id" size="16" read-only="yes"/>
 			<field.text caption="Requesting Physician" read-only="yes" name="requester_id"/>
 
 		</dialog>

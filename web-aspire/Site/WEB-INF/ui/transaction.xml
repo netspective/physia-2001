@@ -4,7 +4,6 @@
 	<dialogs package="transaction">
 		<dialog name="medication_current" heading="create-data-cmd-heading:Current Medication">
 			<field.select caption="Medication Type" required="yes" name="trans_type"/>
-			<!--  -->
 			<field.date caption="Start Date" max-length="50" name="trans_begin_stamp" size="12"/>
 			<field.memo caption="Name of Medication" name="caption" size="24"/>
 			<field.memo caption="Dosage" name="data_text_a" size="24"/>
@@ -15,171 +14,26 @@
 
 		<dialog name="alert_person" heading="create-data-cmd-heading:Alert">
 			<field.composite caption="*"  name="text_field">
-				<field.scheduling.date name="trans_begin_stamp" caption="Begin Alert" required="yes"/>
-				<!-- Total Field contents:
-					_spacerWidth => 0
-					addPopup => 
-					caption => Begin Alert
-					defaultValue => 11/14/2001
-					findPopup => 
-					findPopupAppendValue => 
-					flags => 3600
-					formatValue => CODE(0x8617e68)
-					futureOnly => 0
-					hint => 
-					hints => 
-					lengthInvalidMsg => Begin Alert is too long (can be at most 10 characters).
-					maxLength => 10
-					message => 
-					name => trans_begin_stamp
-					onBlurJS => validateChange_Date(event)
-					onKeyPressJS => return processKeypress_default(event)
-					onValidate => CODE(0x8617a48)
-					options => 16
-					popup => HASH(0xba30bc4)
-					postHtml => 
-					preHtml => 
-					priKey => 0
-					readOnly => 0
-					regExpInvalidMsg => Begin Alert has an invalid date (format is 'MM/DD/YYYY').
-					requiredInvalidMsg => Begin Alert is required (can not be blank).
-					size => 10
-					type => date
-				-->
-				<field.scheduling.date name="trans_end_stamp" caption="End Alert" />
-				<!-- Total Field contents:
-					_spacerWidth => 0
-					addPopup => 
-					caption => End Alert
-					defaultValue => 
-					findPopup => 
-					findPopupAppendValue => 
-					flags => 3584
-					formatValue => CODE(0x8617e68)
-					hint => 
-					hints => 
-					lengthInvalidMsg => End Alert is too long (can be at most 10 characters).
-					maxLength => 10
-					message => 
-					name => trans_end_stamp
-					onBlurJS => validateChange_Date(event)
-					onKeyPressJS => return processKeypress_default(event)
-					onValidate => CODE(0x8617a48)
-					popup => HASH(0xba57c70)
-					postHtml => 
-					preHtml => 
-					priKey => 0
-					readOnly => 0
-					regExpInvalidMsg => End Alert has an invalid date (format is 'MM/DD/YYYY').
-					requiredInvalidMsg => End Alert is required (can not be blank).
-					size => 10
-					type => date
-				-->
+				<field.scheduling.date caption="Begin Alert" max-length="10" name="trans_begin_stamp" size="10" required="yes"/>
+				<field.scheduling.date caption="End Alert" max-length="10" name="trans_end_stamp" size="10" />
 			</field.composite>
 			<field.select caption="Type" required="yes" name="trans_type"/>
-			<!--  -->
 			<field.select caption="Accounting Alert"  name="data_text_a" choices="	Bad Address='Bad Address', 				Returned Check='Returned Check', 				Dismissed='Dismissed', 				Collection Agency='Collection Agency', 				Bankruptcy='Bankruptcy', 				In House Collections='In House Collections', 				Incorrect Insurance='Incorrect Insurance', 				Payment Plan='Payment Plan',"/>
-			<!--  -->
-			<field.select caption="Priority" required="yes" name="trans_subtype"/>
-			<!--  -->
+			<field.select caption="Priority" required="yes" name="trans_subtype" choices="schema-enum:Alert_Priority"/>
 			<field.text caption="Caption" required="yes" name="caption"/>
 			<field.memo caption="Details" name="detail" size="24"/>
-			<field.person.id name="initiator_id" caption="Staff Member" required="yes" style="text" types="Physician,Staff,Nurse"/>
-			<!-- Total Field contents:
-				_spacerWidth => 0
-				addPopup => /org/#session.org_id#/dlg-add-Physician
-				addPopupControlField => _f_person_id
-				caption => Staff Member
-				findPopup => /lookup/associate/id
-				findPopupAppendValue => 
-				flags => 560
-				hint => 
-				hints => 
-				idEntryStyle => 0
-				incSimpleName => 0
-				lengthInvalidMsg => Staff Member is too long (can be at most 16 characters).
-				maxLength => 16
-				message => 
-				name => initiator_id
-				onKeyPressJS => return processKeypress_identifier(event)
-				options => 48
-				popup => HASH(0xc03e870)
-				postHtml => 
-				preHtml => 
-				priKey => 0
-				readOnly => 0
-				regExpInvalidMsg => 
-				requiredInvalidMsg => Staff Member is required (can not be blank).
-				size => 16
-				type => text
-				types => ARRAY(0xc034470)
-			-->
+			<field.person.id caption="Staff Member" max-length="16" name="initiator_id" size="16" required="yes"/>
 			<field.select caption="Alert Status" required="yes" name="trans_status" choices="Active=2, InActive=3" style="radio"/>
-			<!--  -->
 
 		</dialog>
 
 		<dialog name="close_date" heading="Close Date">
-			<field.organization.id name="org_id" caption="Organization ID" required="yes"/>
-			<!-- Total Field contents:
-				_spacerWidth => 0
-				addPopup => /org/#session.org_id#/dlg-add-org-main
-				addPopupControlField => _f_org_id
-				caption => Organization ID
-				findPopup => /lookup/org/id
-				findPopupAppendValue => 
-				flags => 560
-				hint => 
-				hints => 
-				lengthInvalidMsg => Organization ID is too long (can be at most 16 characters).
-				maxLength => 16
-				message => 
-				name => org_id
-				onKeyPressJS => return processKeypress_identifier(event)
-				options => 48
-				popup => HASH(0xba704c4)
-				postHtml => 
-				preHtml => 
-				priKey => 0
-				readOnly => 0
-				regExpInvalidMsg => 
-				requiredInvalidMsg => Organization ID is required (can not be blank).
-				size => 16
-				type => text
-			-->
-			<field.scheduling.date name="close_date" caption="Close Date" required="yes"/>
-			<!-- Total Field contents:
-				_spacerWidth => 0
-				addPopup => 
-				caption => Close Date
-				defaultValue => 
-				findPopup => 
-				findPopupAppendValue => 
-				flags => 3600
-				formatValue => CODE(0x8617e68)
-				hint => 
-				hints => Only batch date(s) greater than the Close Date will be valid
-				lengthInvalidMsg => Close Date is too long (can be at most 10 characters).
-				maxLength => 10
-				message => 
-				name => close_date
-				onBlurJS => validateChange_Date(event)
-				onKeyPressJS => return processKeypress_default(event)
-				onValidate => CODE(0x8617a48)
-				options => 16
-				popup => HASH(0xba72db4)
-				postHtml => 
-				preHtml => 
-				priKey => 0
-				readOnly => 0
-				regExpInvalidMsg => Close Date has an invalid date (format is 'MM/DD/YYYY').
-				requiredInvalidMsg => Close Date is required (can not be blank).
-				size => 10
-				type => date
-			-->
-			<field.boolean caption="Set Close Date"  name="create_record" style="check"/>
+			<field.organization.id caption="Organization ID" max-length="16" name="org_id" size="16" required="yes"/>
+			<field.scheduling.date caption="Close Date" hint="Only batch date(s) greater than the Close Date will be valid" max-length="10" name="close_date" size="10" required="yes"/>
+			<field.boolean caption="Set Close Date"  name="create_record" style="check">
+			  <conditional action="invisible-when-data-cmd" data-cmd="add"/>
+			</field.boolean>
 			<field.select caption="Apply to Child Organizations" required="yes" name="children" choices="Yes=1;No=0" style="radio"/>
-			<!--  -->
 			<field.boolean caption="Run Close Date Report"  name="run_report" style="check"/>
 
 		</dialog>
@@ -187,7 +41,6 @@
 		<dialog name="close_account" heading="Close Account">
 			<field.text caption="Person ID" read-only="yes" name="person_id"/>
 			<field.select caption="notes"  name="notes" choices="Retain Notes=0;Delete Notes=1" style="radio"/>
-			<!--  -->
 
 		</dialog>
 
@@ -204,283 +57,43 @@
 		<dialog name="refill_request" heading="create-data-cmd-heading:Refill Request">
 			<field.memo caption="Refill" name="refill" size="24"/>
 			<field.date caption="Date" name="refilldate" size="12"/>
-			<field.person.id name="provider" caption="Physician" required="yes" style="text" types="Physician"/>
-			<!-- Total Field contents:
-				_spacerWidth => 0
-				addPopup => /org/#session.org_id#/dlg-add-Physician
-				addPopupControlField => _f_person_id
-				caption => Physician
-				findPopup => /lookup/physician/id
-				findPopupAppendValue => 
-				flags => 560
-				hint => 
-				hints => Physician approving the refill.
-				idEntryStyle => 0
-				incSimpleName => 1
-				lengthInvalidMsg => Physician is too long (can be at most 16 characters).
-				maxLength => 16
-				message => 
-				name => provider
-				onKeyPressJS => return processKeypress_identifier(event)
-				options => 48
-				popup => HASH(0xc00edf4)
-				postHtml => 
-				preHtml => 
-				priKey => 0
-				readOnly => 0
-				regExpInvalidMsg => 
-				requiredInvalidMsg => Physician is required (can not be blank).
-				size => 16
-				type => text
-				types => ARRAY(0xc02f708)
-			-->
-			<field.person.id name="filler" caption="Refill Processor" required="yes" style="text"/>
-			<!-- Total Field contents:
-				_spacerWidth => 0
-				addPopup => /org/#session.org_id#/dlg-add-nurse
-				addPopupControlField => _f_person_id
-				addType => nurse
-				caption => Refill Processor
-				findPopup => /lookup/person/id
-				findPopupAppendValue => 
-				flags => 560
-				hint => 
-				hints => Person processing the refill.
-				idEntryStyle => 0
-				incSimpleName => 1
-				lengthInvalidMsg => Refill Processor is too long (can be at most 16 characters).
-				maxLength => 16
-				message => 
-				name => filler
-				onKeyPressJS => return processKeypress_identifier(event)
-				options => 48
-				popup => HASH(0xc039a60)
-				postHtml => 
-				preHtml => 
-				priKey => 0
-				readOnly => 0
-				regExpInvalidMsg => 
-				requiredInvalidMsg => Refill Processor is required (can not be blank).
-				size => 16
-				type => text
-			-->
+			<field.person.id caption="Physician" hint="Physician approving the refill." max-length="16" name="provider" size="16" required="yes"/>
+			<field.person.id caption="Refill Processor" hint="Person processing the refill." max-length="16" name="filler" size="16" required="yes"/>
 			<field.memo caption="Comments" name="comments" size="24"/>
 			<field.select caption="Status"  name="status" choices="Pending;Filled;Denied" style="radio"/>
-			<!--  -->
 
 		</dialog>
 
 		<dialog name="hospitalization" heading="create-data-cmd-heading:Hospitalization">
-			<field.person.id name="patient_id" caption="Patient ID" required="yes" style="text"/>
-			<!-- Total Field contents:
-				_spacerWidth => 0
-				addPopup => /org/#session.org_id#/dlg-add-
-				addPopupControlField => _f_person_id
-				caption => Patient ID
-				findPopup => /lookup/person/id
-				findPopupAppendValue => 
-				flags => 560
-				hint => 
-				hints => 
-				idEntryStyle => 0
-				incSimpleName => 0
-				lengthInvalidMsg => Patient ID is too long (can be at most 16 characters).
-				maxLength => 16
-				message => 
-				name => patient_id
-				onKeyPressJS => return processKeypress_identifier(event)
-				options => 48
-				popup => HASH(0xba7c8fc)
-				postHtml => 
-				preHtml => 
-				priKey => 0
-				readOnly => 0
-				regExpInvalidMsg => 
-				requiredInvalidMsg => Patient ID is required (can not be blank).
-				size => 16
-				type => text
-				types => ARRAY(0xc03d52c)
-			-->
+			<field.person.id caption="Patient ID" max-length="16" name="patient_id" size="16" required="yes"/>
 			<field.select caption="Type" required="yes" name="trans_type"/>
-			<!--  -->
 			<field.composite caption="Admission/Discharge Dates"  name="hosp_dates">
 				<field.date caption="Admission Date" name="trans_begin_stamp" size="12"/>
 				<field.date caption="Discharge Date" name="trans_end_stamp" size="12"/>
 			</field.composite>
 			<field.integer caption="Duration of Stay" required="yes" hint="Days" max-length="4" name="data_num_a" size="4"/>
 			<field.select caption="Hospital"  name="service_facility_id" choices="query:dialog.stmt19"/>
-			<!--  numPackages="0" pkgList="" stmtNum="19" -->
 			<field.text caption="Room Number"  name="caption"/>
-			<field.person.id name="provider_id" caption="Physician ID"  style="text" types="Physician"/>
-			<!-- Total Field contents:
-				_spacerWidth => 0
-				addPopup => /org/#session.org_id#/dlg-add-Physician
-				addPopupControlField => _f_person_id
-				caption => Physician ID
-				findPopup => /lookup/physician/id
-				findPopupAppendValue => 
-				flags => 544
-				hint => 
-				hints => 
-				idEntryStyle => 0
-				incSimpleName => 1
-				lengthInvalidMsg => Physician ID is too long (can be at most 16 characters).
-				maxLength => 16
-				message => 
-				name => provider_id
-				onKeyPressJS => return processKeypress_identifier(event)
-				options => 32
-				popup => HASH(0xba5d2e0)
-				postHtml => 
-				preHtml => 
-				priKey => 0
-				readOnly => 0
-				regExpInvalidMsg => 
-				requiredInvalidMsg => Physician ID is required (can not be blank).
-				size => 16
-				type => text
-				types => ARRAY(0xba611ac)
-			-->
+			<field.person.id caption="Physician ID" max-length="16" name="provider_id" size="16" />
 			<field.select caption="In/Out Patient"  name="data_text_a" choices="In;Out"/>
-			<!--  -->
 			<field.text caption="Procedures"  hint="Enter CPT codes in a comma separated list" name="data_text_c"/>
 			<field.text caption="ICD-9 Codes"  hint="Enter ICD-9 codes in a comma separated list" name="detail"/>
 			<field.text caption="Prior Authorization"  name="auth_ref"/>
-			<field.person.id name="consult_id" caption="Consulting Physician ID"  style="text" types="Physician"/>
-			<!-- Total Field contents:
-				_spacerWidth => 0
-				addPopup => /org/#session.org_id#/dlg-add-Physician
-				addPopupControlField => _f_person_id
-				caption => Consulting Physician ID
-				findPopup => /lookup/physician/id
-				findPopupAppendValue => 
-				flags => 544
-				hint => 
-				hints => 
-				idEntryStyle => 0
-				incSimpleName => 1
-				lengthInvalidMsg => Consulting Physician ID is too long (can be at most 16 characters).
-				maxLength => 16
-				message => 
-				name => consult_id
-				onKeyPressJS => return processKeypress_identifier(event)
-				options => 32
-				popup => HASH(0xba0fa2c)
-				postHtml => 
-				preHtml => 
-				priKey => 0
-				readOnly => 0
-				regExpInvalidMsg => 
-				requiredInvalidMsg => Consulting Physician ID is required (can not be blank).
-				size => 16
-				type => text
-				types => ARRAY(0xc0331f0)
-			-->
-			<field.person.id name="data_text_b" caption="Referring Physician ID"  style="text" types="Referring-Doctor"/>
-			<!-- Total Field contents:
-				_spacerWidth => 0
-				addPopup => /org/#session.org_id#/dlg-add-Referring-Doctor
-				addPopupControlField => _f_person_id
-				caption => Referring Physician ID
-				findPopup => /lookup/referring-Doctor/id
-				findPopupAppendValue => 
-				flags => 544
-				hint => 
-				hints => 
-				idEntryStyle => 0
-				incSimpleName => 1
-				lengthInvalidMsg => Referring Physician ID is too long (can be at most 16 characters).
-				maxLength => 16
-				message => 
-				name => data_text_b
-				onKeyPressJS => return processKeypress_identifier(event)
-				options => 32
-				popup => HASH(0xc037290)
-				postHtml => 
-				preHtml => 
-				priKey => 0
-				readOnly => 0
-				regExpInvalidMsg => 
-				requiredInvalidMsg => Referring Physician ID is required (can not be blank).
-				size => 16
-				type => text
-				types => ARRAY(0xba5581c)
-			-->
+			<field.person.id caption="Consulting Physician ID" max-length="16" name="consult_id" size="16" />
+			<field.person.id caption="Referring Physician ID" max-length="16" name="data_text_b" size="16" />
 
 		</dialog>
 
 		<dialog name="phone_message" heading="create-data-cmd-heading:Phone Message">
 			<field.text hidden="yes" name="patient_phone_message" caption="patient_phone_message"/>
-			<field.person.id name="person_called" caption="Call From" required="yes" style="text"/>
-			<!-- Total Field contents:
-				_spacerWidth => 0
-				addPopup => /org/#session.org_id#/dlg-add-patient
-				addPopupControlField => _f_person_id
-				addType => patient
-				caption => Call From
-				findPopup => /lookup/person/id
-				findPopupAppendValue => 
-				flags => 568
-				hint => 
-				hints => 
-				idEntryStyle => 0
-				incSimpleName => 1
-				lengthInvalidMsg => Call From is too long (can be at most 16 characters).
-				maxLength => 16
-				message => 
-				name => person_called
-				onKeyPressJS => return processKeypress_identifier(event)
-				options => 48
-				popup => HASH(0xc03d61c)
-				postHtml => 
-				preHtml => 
-				priKey => 0
-				readOnly => 0
-				readOnlyWhen => 1024
-				regExpInvalidMsg => 
-				requiredInvalidMsg => Call From is required (can not be blank).
-				size => 16
-				type => text
-			-->
-			<field.person.id name="provider" caption="Call For" required="yes" style="text"/>
-			<!-- Total Field contents:
-				_spacerWidth => 0
-				addPopup => /org/#session.org_id#/dlg-add-patient
-				addPopupControlField => _f_person_id
-				addType => patient
-				caption => Call For
-				findPopup => /lookup/person/id
-				findPopupAppendValue => 
-				flags => 568
-				hint => 
-				hints => 
-				idEntryStyle => 0
-				incSimpleName => 1
-				lengthInvalidMsg => Call For is too long (can be at most 16 characters).
-				maxLength => 16
-				message => 
-				name => provider
-				onKeyPressJS => return processKeypress_identifier(event)
-				options => 48
-				popup => HASH(0xc037eac)
-				postHtml => 
-				preHtml => 
-				priKey => 0
-				readOnly => 0
-				readOnlyWhen => 1024
-				regExpInvalidMsg => 
-				requiredInvalidMsg => Call For is required (can not be blank).
-				size => 16
-				type => text
-			-->
+			<field.person.id caption="Call From" max-length="16" name="person_called" size="16" required="yes"/>
+			<field.person.id caption="Call For" max-length="16" name="provider" size="16" required="yes"/>
 			<field.text caption="Date and Time of Calling" required="yes" name="time"/>
 			<field.memo caption="Phone Message" name="phone_message" size="24"/>
 			<field.memo caption="Comments" name="responsemessage" size="24"/>
 			<field.select caption="Status"  name="status" choices="Not Read;Read" style="radio"/>
-			<!--  -->
 			<field.boolean caption="Deliver With Medical Record"  name="data_num_b" style="check"/>
 			<field.select caption="Printer" prepend-blank="yes" name="printerQueue" choices="query:device.sel_org_devices"/>
-			<!--  -->
 
 		</dialog>
 
@@ -499,7 +112,6 @@
 
 		<dialog name="medication_prescribe" heading="create-data-cmd-heading:Prescription">
 			<field.select caption="Medication Type" required="yes" name="trans_type"/>
-			<!--  -->
 			<field.date caption="Start Date" max-length="50" name="trans_begin_stamp" size="12"/>
 			<field.memo caption="Name of Medication" name="caption" size="24"/>
 			<field.memo caption="Dosage" name="data_text_a" size="24"/>
@@ -509,247 +121,36 @@
 		</dialog>
 
 		<dialog name="account_notes" heading="create-data-cmd-heading:Account Notes">
-			<field.person.id name="person_id" caption="Person ID" read-only="yes" style="text" types="Patient"/>
-			<!-- Total Field contents:
-				_spacerWidth => 0
-				addPopup => /org/#session.org_id#/dlg-add-Patient
-				addPopupControlField => _f_person_id
-				caption => Person ID
-				findPopup => /lookup/patient/id
-				findPopupAppendValue => 
-				flags => 548
-				hint => 
-				hints => 
-				idEntryStyle => 0
-				incSimpleName => 0
-				lengthInvalidMsg => Person ID is too long (can be at most 16 characters).
-				maxLength => 16
-				message => 
-				name => person_id
-				onKeyPressJS => return processKeypress_identifier(event)
-				options => 36
-				popup => HASH(0xc037da4)
-				postHtml => 
-				preHtml => 
-				priKey => 0
-				readOnly => 0
-				regExpInvalidMsg => 
-				requiredInvalidMsg => Person ID is required (can not be blank).
-				size => 16
-				type => text
-				types => ARRAY(0xc032f74)
-			-->
+			<field.person.id caption="Person ID" max-length="16" name="person_id" size="16" read-only="yes"/>
 			<field.memo caption="Notes" name="detail" size="24"/>
 			<field.date caption="Date" name="trans_begin_stamp" size="12"/>
 
 		</dialog>
 
 		<dialog name="on_call" heading="create-data-cmd-heading:On Call Note">
-			<field.person.id name="person_id" caption="Patient ID" required="yes" style="text" types="Patient"/>
-			<!-- Total Field contents:
-				_spacerWidth => 0
-				addPopup => /org/#session.org_id#/dlg-add-Patient
-				addPopupControlField => _f_person_id
-				caption => Patient ID
-				findPopup => /lookup/patient/id
-				findPopupAppendValue => 
-				flags => 568
-				hint => 
-				hints => 
-				idEntryStyle => 0
-				incSimpleName => 0
-				lengthInvalidMsg => Patient ID is too long (can be at most 16 characters).
-				maxLength => 16
-				message => 
-				name => person_id
-				onKeyPressJS => return processKeypress_identifier(event)
-				options => 48
-				popup => HASH(0xc02d2d8)
-				postHtml => 
-				preHtml => 
-				priKey => 0
-				readOnly => 0
-				readOnlyWhen => 1024
-				regExpInvalidMsg => 
-				requiredInvalidMsg => Patient ID is required (can not be blank).
-				size => 16
-				type => text
-				types => ARRAY(0xba2b524)
-			-->
-			<field.person.id name="physician_id" caption="On Call Physician ID" required="yes" style="text" types="Physician,Referring-Doctor"/>
-			<!-- Total Field contents:
-				_spacerWidth => 0
-				addPopup => /org/#session.org_id#/dlg-add-Physician
-				addPopupControlField => _f_person_id
-				caption => On Call Physician ID
-				findPopup => /lookup/physician-ref/id
-				findPopupAppendValue => 
-				flags => 562
-				hint => 
-				hints => 
-				idEntryStyle => 0
-				incSimpleName => 0
-				invisibleWhen => 1024
-				lengthInvalidMsg => On Call Physician ID is too long (can be at most 16 characters).
-				maxLength => 16
-				message => 
-				name => physician_id
-				onKeyPressJS => return processKeypress_identifier(event)
-				options => 48
-				popup => HASH(0xb9dd98c)
-				postHtml => 
-				preHtml => 
-				priKey => 0
-				readOnly => 0
-				regExpInvalidMsg => 
-				requiredInvalidMsg => On Call Physician ID is required (can not be blank).
-				size => 16
-				type => text
-				types => ARRAY(0xba7a328)
-			-->
-			<field.person.id name="reg_physician_id" caption="Patient's Regular Physician ID"  style="text" types="Physician,Referring-Doctor"/>
-			<!-- Total Field contents:
-				_spacerWidth => 0
-				addPopup => /org/#session.org_id#/dlg-add-Physician
-				addPopupControlField => _f_person_id
-				caption => Patient's Regular Physician ID
-				findPopup => /lookup/physician-ref/id
-				findPopupAppendValue => 
-				flags => 544
-				hint => 
-				hints => 
-				idEntryStyle => 0
-				incSimpleName => 0
-				lengthInvalidMsg => Patient's Regular Physician ID is too long (can be at most 16 characters).
-				maxLength => 16
-				message => 
-				name => reg_physician_id
-				onKeyPressJS => return processKeypress_identifier(event)
-				options => 32
-				popup => HASH(0xc03544c)
-				postHtml => 
-				preHtml => 
-				priKey => 0
-				readOnly => 0
-				regExpInvalidMsg => 
-				requiredInvalidMsg => Patient's Regular Physician ID is required (can not be blank).
-				size => 16
-				type => text
-				types => ARRAY(0xc031c44)
-			-->
+			<field.person.id caption="Patient ID" max-length="16" name="person_id" size="16" required="yes"/>
+			<field.person.id caption="On Call Physician ID" max-length="16" name="physician_id" size="16" required="yes"/>
+			<field.person.id caption="Patient's Regular Physician ID" max-length="16" name="reg_physician_id" size="16" />
 			<field.datetime caption="Date and Time of encounter" name="begin_stamp" size="20"/>
 			<field.select caption="Reason" prepend-blank="yes" name="reason" choices="Needs refill;Problem with medication;Having pain"/>
-			<!--  -->
 			<field.memo caption="Reason Details" name="other_reason" size="24"/>
 			<field.select caption="Action" prepend-blank="yes" name="action" choices="Call Office in AM;Follow up in office on (date or day of week);Go to ER;Stop present medications;Take Over the Counter Medication"/>
-			<!--  -->
 			<field.memo caption="Action Details" name="other_action" size="24"/>
 
 		</dialog>
 
 		<dialog name="alert_org" heading="create-data-cmd-heading:Alert">
 			<field.composite caption="*"  name="text_field">
-				<field.scheduling.date name="trans_begin_stamp" caption="Begin Alert" required="yes"/>
-				<!-- Total Field contents:
-					_spacerWidth => 0
-					addPopup => 
-					caption => Begin Alert
-					defaultValue => 11/14/2001
-					findPopup => 
-					findPopupAppendValue => 
-					flags => 3600
-					formatValue => CODE(0x8617e68)
-					futureOnly => 0
-					hint => 
-					hints => 
-					lengthInvalidMsg => Begin Alert is too long (can be at most 10 characters).
-					maxLength => 10
-					message => 
-					name => trans_begin_stamp
-					onBlurJS => validateChange_Date(event)
-					onKeyPressJS => return processKeypress_default(event)
-					onValidate => CODE(0x8617a48)
-					options => 16
-					popup => HASH(0xba73d54)
-					postHtml => 
-					preHtml => 
-					priKey => 0
-					readOnly => 0
-					regExpInvalidMsg => Begin Alert has an invalid date (format is 'MM/DD/YYYY').
-					requiredInvalidMsg => Begin Alert is required (can not be blank).
-					size => 10
-					type => date
-				-->
-				<field.scheduling.date name="trans_end_stamp" caption="End Alert" />
-				<!-- Total Field contents:
-					_spacerWidth => 0
-					addPopup => 
-					caption => End Alert
-					defaultValue => 
-					findPopup => 
-					findPopupAppendValue => 
-					flags => 3584
-					formatValue => CODE(0x8617e68)
-					hint => 
-					hints => 
-					lengthInvalidMsg => End Alert is too long (can be at most 10 characters).
-					maxLength => 10
-					message => 
-					name => trans_end_stamp
-					onBlurJS => validateChange_Date(event)
-					onKeyPressJS => return processKeypress_default(event)
-					onValidate => CODE(0x8617a48)
-					popup => HASH(0xc026084)
-					postHtml => 
-					preHtml => 
-					priKey => 0
-					readOnly => 0
-					regExpInvalidMsg => End Alert has an invalid date (format is 'MM/DD/YYYY').
-					requiredInvalidMsg => End Alert is required (can not be blank).
-					size => 10
-					type => date
-				-->
+				<field.scheduling.date caption="Begin Alert" max-length="10" name="trans_begin_stamp" size="10" required="yes"/>
+				<field.scheduling.date caption="End Alert" max-length="10" name="trans_end_stamp" size="10" />
 			</field.composite>
 			<field.select caption="Type" required="yes" name="trans_type"/>
-			<!--  -->
 			<field.select caption="Accounting Alert"  name="data_text_a" choices="	Bad Address='Bad Address', 				Returned Check='Returned Check', 				Dismissed='Dismissed', 				Collection Agency='Collection Agency', 				Bankruptcy='Bankruptcy', 				In House Collections='In House Collections', 				Incorrect Insurance='Incorrect Insurance', 				Payment Plan='Payment Plan',"/>
-			<!--  -->
-			<field.select caption="Priority" required="yes" name="trans_subtype"/>
-			<!--  -->
+			<field.select caption="Priority" required="yes" name="trans_subtype" choices="schema-enum:Alert_Priority"/>
 			<field.text caption="Caption" required="yes" name="caption"/>
 			<field.memo caption="Details" name="detail" size="24"/>
-			<field.person.id name="initiator_id" caption="Staff Member" required="yes" style="text" types="Physician,Staff,Nurse"/>
-			<!-- Total Field contents:
-				_spacerWidth => 0
-				addPopup => /org/#session.org_id#/dlg-add-Physician
-				addPopupControlField => _f_person_id
-				caption => Staff Member
-				findPopup => /lookup/associate/id
-				findPopupAppendValue => 
-				flags => 560
-				hint => 
-				hints => 
-				idEntryStyle => 0
-				incSimpleName => 0
-				lengthInvalidMsg => Staff Member is too long (can be at most 16 characters).
-				maxLength => 16
-				message => 
-				name => initiator_id
-				onKeyPressJS => return processKeypress_identifier(event)
-				options => 48
-				popup => HASH(0xc03e96c)
-				postHtml => 
-				preHtml => 
-				priKey => 0
-				readOnly => 0
-				regExpInvalidMsg => 
-				requiredInvalidMsg => Staff Member is required (can not be blank).
-				size => 16
-				type => text
-				types => ARRAY(0xba143fc)
-			-->
+			<field.person.id caption="Staff Member" max-length="16" name="initiator_id" size="16" required="yes"/>
 			<field.select caption="Alert Status" required="yes" name="trans_status" choices="Active=2, InActive=3" style="radio"/>
-			<!--  -->
 
 		</dialog>
 
@@ -759,36 +160,7 @@
 
 		<dialog name="transfer_account" heading="Transfer Account">
 			<field.text caption="Person ID" read-only="yes" name="person_id"/>
-			<field.person.id name="transfer_id" caption="Transfer To" required="yes" style="text"/>
-			<!-- Total Field contents:
-				_spacerWidth => 0
-				addPopup => /org/#session.org_id#/dlg-add-
-				addPopupControlField => _f_person_id
-				caption => Transfer To
-				findPopup => /lookup/person/id
-				findPopupAppendValue => 
-				flags => 560
-				hint => 
-				hints => Collector to Transfer Account
-				idEntryStyle => 0
-				incSimpleName => 0
-				lengthInvalidMsg => Transfer To is too long (can be at most 16 characters).
-				maxLength => 16
-				message => 
-				name => transfer_id
-				onKeyPressJS => return processKeypress_identifier(event)
-				options => 48
-				popup => HASH(0xba77f4c)
-				postHtml => 
-				preHtml => 
-				priKey => 0
-				readOnly => 0
-				regExpInvalidMsg => 
-				requiredInvalidMsg => Transfer To is required (can not be blank).
-				size => 16
-				type => text
-				types => ARRAY(0xac09b4c)
-			-->
+			<field.person.id caption="Transfer To" hint="Collector to Transfer Account" max-length="16" name="transfer_id" size="16" required="yes"/>
 			<field.memo caption="Reason For Transfer" name="detail" size="24"/>
 			<field.date caption="Date" name="trans_begin_stamp" size="12"/>
 
