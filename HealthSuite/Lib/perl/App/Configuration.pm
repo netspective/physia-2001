@@ -152,6 +152,7 @@ sub getDefaultConfig
 	'MEDINA' => getDefaultConfig('Medina Configuration', CONFIGGROUP_PRO, 'prod_01/prod01@dbi:Oracle:SDEDBS02'),
 	'LIMA' => getDefaultConfig('Lima Configuration', CONFIGGROUP_DEMO, 'demo01/demo@dbi:Oracle:SDEDBS02'),
 	'TITAN' => getDefaultConfig('Thai Home PC Configuration', CONFIGGROUP_SOLO, 'hs/hs@dbi:Oracle:HealthSuiteIvory'),
+	'PSLINUX' => getDefaultConfig('ProSys Configuration', CONFIGGROUP_SOLO, 'physia/physia@dbi:Oracle:physia'),
 
 	# other keyed configurations go here
 	# if a particular UNIX user needs a special configuration, use 'account-username'
