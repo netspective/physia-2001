@@ -75,7 +75,10 @@
 			UI: Added the appointments component in the summary page and changed the default next action for
 			Patient/Person Lookup to show the 'Summary Page'.
 		</deliverable>
-
+		<deliverable id="1557">
+			UI: Added the 'Blood Type' component in the Chart page to update the bloodtype and the blood type cannot be 
+			    edited any more from the 'Edit Profile' 
+		</deliverable>
 		<deliverable id="1560">
 			Changed claim dialog next action post personal payment to send user to personal payment dialog for claims.
 		</deliverable>
