@@ -60,7 +60,7 @@ sub initialize
 		new CGI::Dialog::Field(type => 'hidden', name => 'invoiceFieldsAreSet'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'invoice_flags'),	#to check if this claim has been submitted already
 		new CGI::Dialog::Field(type => 'hidden', name => 'old_invoice_id'),	#the invoice id of the claim that is being modified after submission
-		
+
 		new CGI::Dialog::Field(type => 'hidden', name => 'current_status'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'submission_order'),
 
@@ -75,11 +75,11 @@ sub initialize
 		new CGI::Dialog::Field(type => 'hidden', name => 'copay_amt'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'claim_type'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'dupCheckin_returnUrl'),
-		new CGI::Dialog::Field(type => 'hidden', name => 'ins_ffs'), # Contains the insurance FFS 
+		new CGI::Dialog::Field(type => 'hidden', name => 'ins_ffs'), # Contains the insurance FFS
 		new CGI::Dialog::Field(type => 'hidden', name => 'work_ffs'), # Contains the works comp
-		new CGI::Dialog::Field(type => 'hidden', name => 'org_ffs'), # Contains the Org FFS 
+		new CGI::Dialog::Field(type => 'hidden', name => 'org_ffs'), # Contains the Org FFS
 		new CGI::Dialog::Field(type => 'hidden', name => 'prov_ffs'), # Contains the Provider FFS
-		
+
 		#BatchDateId Needs the name of the Org.  So it can check if the org has a close date.
 		#Batch Date must be > then close Date to pass validation
 		new App::Dialog::Field::BatchDateID(caption => 'Batch ID Date', name => 'batch_fields',orgInternalIdFieldName=>'service_facility_id'),
@@ -100,14 +100,14 @@ sub initialize
 			schema => $schema,
 			column => 'Transaction.trans_type',
 			typeRange => '2000..2999'),
-			
+
 		new CGI::Dialog::Field::TableColumn(
 			name => 'appt_type',
 			options => FLDFLAG_READONLY,
 			caption => 'Appointment Type',
 			schema => $schema,
 			column => 'Event.appt_type'),
-			
+
 		new CGI::Dialog::Field(caption => 'Reason for Visit', name => 'subject', options => FLDFLAG_REQUIRED),
 		new CGI::Dialog::Field(type => 'memo', caption => 'Symptoms', name => 'remarks'),
 
@@ -124,9 +124,9 @@ sub initialize
 		new CGI::Dialog::MultiField(caption => 'Payer for Today ID/Type', name => 'other_payer_fields',
 			fields => [
 				new CGI::Dialog::Field(
-						caption => 'Payer for Today ID', 
-						name => 'other_payer_id', 
-						findPopup => '/lookup/itemValue', 
+						caption => 'Payer for Today ID',
+						name => 'other_payer_id',
+						findPopup => '/lookup/itemValue',
 						findPopupControlField => '_f_other_payer_type'),
 				new CGI::Dialog::Field(type => 'select', selOptions => 'Person:person;Organization:org', caption => 'Payer for Today Type', name => 'other_payer_type'),
 			]),
@@ -194,7 +194,7 @@ sub initialize
 		new App::Dialog::Field::Person::ID(caption => 'Referring Physician ID', name => 'ref_id', types => ['Physician']),
 
 		new CGI::Dialog::MultiField(caption =>'Current/Similar Illness Dates', name => 'illness_dates',
-			fields => [				
+			fields => [
 				new CGI::Dialog::Field(name => 'illness_end_date', type => 'date', defaultValue => ''),
 				new CGI::Dialog::Field(name => 'illness_begin_date', type => 'date', defaultValue => '')
 			]),
@@ -323,10 +323,10 @@ sub makeStateChanges
 sub populateData
 {
 	my ($self, $page, $command, $activeExecMode, $flags) = @_;
-	
-	$page->field('dupCheckin_returnUrl', $self->getReferer($page)) 
+
+	$page->field('dupCheckin_returnUrl', $self->getReferer($page))
 		if $flags & CGI::Dialog::DLGFLAG_DATAENTRY_INITIAL;
-		
+
 	my $invoiceId = $page->param('invoice_id');
 	my $eventId = $page->param('event_id') || $page->field('parent_event_id');
 
@@ -335,7 +335,7 @@ sub populateData
 		$page->field('checkin_stamp', $page->getTimeStamp());
 		$page->field('checkout_stamp', $page->getTimeStamp());
 		$page->field('parent_event_id', $eventId);
-		$STMTMGR_SCHEDULING->createFieldsFromSingleRow($page, STMTMGRFLAG_NONE, 
+		$STMTMGR_SCHEDULING->createFieldsFromSingleRow($page, STMTMGRFLAG_NONE,
 			'selEncountersCheckIn/Out', $eventId);
 		my $careProvider = $page->field('care_provider_id');
 		$page->field('provider_id', $careProvider); 	#default billing 'provider_id' to the 'care_provider_id'
@@ -361,19 +361,19 @@ sub populateData
 		$page->field('copay_amt', $invoiceCopayItem->{extended_cost});
 
 		my $procedures = $STMTMGR_INVOICE->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'selInvoiceProcedureItems', $invoiceId, App::Universal::INVOICEITEMTYPE_SERVICE, App::Universal::INVOICEITEMTYPE_LAB);
-		
+
 		#taken off the UI
 		#my $servPlaceCode = $STMTMGR_CATALOG->getSingleValue($page, STMTMGRFLAG_CACHE, 'selGenericServicePlaceById', $procedures->[0]->{hcfa_service_place});
 		#$page->param('_f_proc_service_place', $servPlaceCode);
-		
+
 		my $totalProcs = scalar(@{$procedures});
 		foreach my $idx (0..$totalProcs-1)
 		{
 			#NOTE: data_text_a stores the indexes of the rel_diags (which are actual codes, not pointers)
-			
+
 			my $servTypeCode = $STMTMGR_CATALOG->getSingleValue($page, STMTMGRFLAG_CACHE, 'selGenericServiceTypeById', $procedures->[$idx]->{hcfa_service_type});
 
-			my $line = $idx + 1;			
+			my $line = $idx + 1;
 			$page->param("_f_proc_$line\_item_id", $procedures->[$idx]->{item_id});
 			$page->param("_f_proc_$line\_dos_begin", $procedures->[$idx]->{service_begin_date});
 			$page->param("_f_proc_$line\_dos_end", $procedures->[$idx]->{service_end_date});
@@ -475,32 +475,32 @@ sub getFS
 		#
 		#Get Parent Id for Plan
 		my $insurance = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selInsuranceData', $id);
-		
+
 		#Get Parent record for coverage could be a plan or a product
 		my $coverage_id = $insurance->{'parent_ins_id'};
 		my $coverage_parent = $STMTMGR_INSURANCE->getRowAsHash($page,STMTMGRFLAG_NONE,'selInsuranceData',$coverage_id);
-		
+
 		#If record type is product then a plan does not exist
 		if ($coverage_parent->{'record_type'} eq App::Universal::RECORDTYPE_INSURANCEPRODUCT)
 		{
 			$product_id = $coverage_parent->{'ins_internal_id'};
 			$plan_id=undef;
-		}		
+		}
 		#Otherwise get the product info
 		else
 		{
-	
+
 			$plan_id = $coverage_parent->{'ins_internal_id'};
 			#Get Parent of Plan which will be the product
 			my $product_info =$STMTMGR_INSURANCE->getRowAsHash($page,STMTMGRFLAG_NONE,'selInsuranceData',$coverage_parent->{'parent_ins_id'});
-			$product_id = $product_info->{'ins_internal_id'};		
-		}		
-		
+			$product_id = $product_info->{'ins_internal_id'};
+		}
+
 		#Get Fee Schedule Internal ID for the Insurance
-		my $getFeeScheds = $STMTMGR_CATALOG->getRowsAsHashList($page, STMTMGRFLAG_NONE,'selFSLinkedProductPlan', $plan_id,$product_id);			
+		my $getFeeScheds = $STMTMGR_CATALOG->getRowsAsHashList($page, STMTMGRFLAG_NONE,'selFSLinkedProductPlan', $plan_id,$product_id);
 		foreach my $fs (@{$getFeeScheds})
-		{			
-			$fsList .= $fsList ? ",$fs->{'catalog_id'}" : $fs->{'catalog_id'} ;	
+		{
+			$fsList .= $fsList ? ",$fs->{'catalog_id'}" : $fs->{'catalog_id'} ;
 		}
 	}
 	#Store FS internal id(s)
@@ -538,11 +538,11 @@ sub setPayerFields
 			{
 				$badSeq = 1;
 			}
-			
+
 			#Get Insurance Fee Schedule if insurance is primary
-			#This code should match the code in Procedures.pm that also gets FFS for insurance 
-			$insurance = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 
-			'selInsuranceByBillSequence', App::Universal::INSURANCE_PRIMARY, $personId);					
+			#This code should match the code in Procedures.pm that also gets FFS for insurance
+			$insurance = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE,
+			'selInsuranceByBillSequence', App::Universal::INSURANCE_PRIMARY, $personId);
 			$ins_type="$ins->{bill_seq}";
 
 			#Added to store plan internal Ids for getFS
@@ -552,14 +552,14 @@ sub setPayerFields
 		{
 			push(@wkCompPlans, "Work Comp($ins->{plan_name}):$ins->{ins_internal_id}");
 			#Get Work Comp Insurance Fee Schedule
-			#This code should match the code in Procedures.pm that also gets FFS for insurance 
-			$insurance = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 
+			#This code should match the code in Procedures.pm that also gets FFS for insurance
+			$insurance = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE,
 			'selInsuranceByPlanNameAndPersonAndInsType', $ins->{plan_name}, $personId,
 			App::Universal::CLAIMTYPE_WORKERSCOMP);
 			$ins_type = "Work Comp";
-			
+
 			#Added to store plan internal Ids for getFS
-			push(@planIds,$insurance->{'ins_internal_id'});			
+			push(@planIds,$insurance->{'ins_internal_id'});
 		}
 		elsif($ins->{group_name} eq 'Third-Party')
 		{
@@ -571,7 +571,7 @@ sub setPayerFields
 				$thirdPartyId = $org->{org_id};
 			}
 			push(@thirdParties, "$ins->{group_name}($thirdPartyId):$ins->{ins_internal_id}");
-		}		
+		}
 	}
 
 	unless($badSeq)
@@ -600,7 +600,7 @@ sub setPayerFields
 
 	my $selfPay = 'Self-Pay';
 	push(@payerList, $selfPay);
-	
+
 	@payerList = join(';', @payerList);
 
 	$self->getField('payer')->{selOptions} = "@payerList";
@@ -715,7 +715,7 @@ sub voidInvoicePostSubmit
 		);
 	}
 
-	#add old invoice's billing records	
+	#add old invoice's billing records
 	my $billingInfo = $STMTMGR_INVOICE->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'selInvoiceBillingRecs', $oldInvoiceId);
 	foreach my $billingRec (@{$billingInfo})
 	{
@@ -790,9 +790,9 @@ sub handlePayers
 	my $personId = $page->field('attendee_id');
 
 	#CONSTANTS -------------------------------------------
-	
+
 	my $phoneAttrType = App::Universal::ATTRTYPE_PHONE;
-	
+
 	#bill sequences
 	my $primary = App::Universal::INSURANCE_PRIMARY;
 	my $secondary = App::Universal::INSURANCE_SECONDARY;
@@ -840,7 +840,7 @@ sub handlePayers
 			$insPhone = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_NONE, 'selAttributeByItemNameAndValueTypeAndParent', $orgIntId, 'Primary', $phoneAttrType);
 			$otherPayerId = $orgIntId; #convert value of otherPayerId to orgIntId because this is an org
 		}
-		
+
 		my $recordType = App::Universal::RECORDTYPE_PERSONALCOVERAGE;
 		my $insIntId = $page->schemaAction(
 				'Insurance', 'add',
@@ -851,7 +851,7 @@ sub handlePayers
 				guarantor_type => defined $guarantorType ? $guarantorType : undef,
 				_debug => 0
 		);
-	
+
 		$page->schemaAction(
 				'Insurance_Address', 'add',
 				parent_id => $insIntId || undef,
@@ -865,7 +865,7 @@ sub handlePayers
 				country => $addr->{country} || undef,
 				_debug => 0
 			);
-		
+
 		$page->schemaAction(
 				'Insurance_Attribute', 'add',
 				parent_id => $insIntId || undef,
@@ -874,7 +874,7 @@ sub handlePayers
 				value_text => $insPhone->{value_text} || undef,
 				_debug => 0
 			);
-		
+
 		$page->field('primary_payer', $fakeProdNameThirdParty);
 		$page->field('third_party_payer_ins_id', $insIntId);
 		$page->field('claim_type', $typeClient);
@@ -927,9 +927,9 @@ sub handlePayers
 				my $wcOrThirdPartyPlanInfo = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInsuranceData', $nonInsPayer[0]);
 				my $claimType = $wcOrThirdPartyPlanInfo->{ins_type};
 				$page->field('claim_type', $claimType);
-				
+
 				if($claimType == $typeClient)
-				{				
+				{
 					$page->field('primary_payer', $fakeProdNameThirdParty);
 					$page->field('third_party_payer_ins_id', $wcOrThirdPartyPlanInfo->{ins_internal_id});
 				}
@@ -1673,7 +1673,7 @@ sub handleBillingInfo
 			voidProcedureItem($self, $page, $command, $flags, $invoiceId, $copayItemId);
 		}
 	}
-	
+
 	if($copayAmt && $claimType == App::Universal::CLAIMTYPE_HMO && ($copayItemId eq '' || $copayItem->{data_text_b} eq 'void'))
 	{
 		my $lineCount = $page->param('_f_line_count');
@@ -1681,11 +1681,11 @@ sub handleBillingInfo
 		for(my $line = 1; $line <= $lineCount; $line++)
 		{
 			if( $STMTMGR_INVOICE->getSingleValue($page, STMTMGRFLAG_NONE, 'checkOfficeVisitCPT', $page->param("_f_proc_$line\_procedure")) )
-			{			
+			{
 				$existsOfficeVisitCPT = 1;
-			}		
+			}
 		}
-		
+
 		if($existsOfficeVisitCPT)
 		{
 			billCopay($self, $page, 'add', $flags, $invoiceId);
@@ -1697,7 +1697,14 @@ sub handleBillingInfo
 	}
 	elsif( $command eq 'update' || ($command eq 'add' && ($invoiceFlags & $attrDataFlag)) )
 	{
-		$page->redirect("/invoice/$invoiceId/summary");
+		if ($page->param('encounterDialog') eq 'checkout')
+		{
+			$self->handlePostExecute($page, $command, $flags);
+		}
+		else
+		{
+			$page->redirect("/invoice/$invoiceId/summary");
+		}
 	}
 	elsif($command eq 'add')
 	{
@@ -1708,7 +1715,7 @@ sub handleBillingInfo
 sub setCurrentPayer
 {
 	my ($self, $page, $invoiceId, $billId) = @_;
-	
+
 	$page->schemaAction(
 		'Invoice', 'update',
 		invoice_id => $invoiceId || undef,
@@ -1931,9 +1938,9 @@ sub customValidate
 	{
 		$accident->invalidate($page, "Must select 'Auto Accident' when indicating a '$state->{caption}'");
 	}
-	
-	
-	
+
+
+
 	#VALIDATION FOR THIRD PARTY PERSON OR ORG
 	my $payer = $page->field('payer');
 	if($payer eq 'Third-Party Payer')
@@ -1986,19 +1993,19 @@ sub customValidate
 sub checkEventStatus
 {
 	my ($self, $page, $eventId) = @_;
-	
+
 	my $checkStatus = $STMTMGR_SCHEDULING->getRowAsHash($page, STMTMGRFLAG_NONE,
 		'sel_eventInfo', $eventId);
 
 	my ($status, $person, $stamp);
-	
+
 	if ($checkStatus->{event_status} == 2)
 	{
 		$status = 'out';
 		$person = $checkStatus->{checkout_by_id};
 		$stamp  = $checkStatus->{checkout_stamp};
 
-	} 
+	}
 	elsif ($checkStatus->{event_status} == 1)
 	{
 		$status = 'in';

@@ -13,10 +13,10 @@ use vars qw(@ISA %RESOURCE_MAP);
 
 %RESOURCE_MAP = (
 	'checkin' => {
-		_arl => ['event_id'] 
+		_arl => ['event_id']
 		},
 	);
-	
+
 use DBI::StatementManager;
 use App::Statements::Scheduling;
 use App::Statements::Org;
@@ -72,7 +72,7 @@ sub makeStateChanges
 	$self->updateFieldFlags('procedures_heading', FLDFLAG_INVISIBLE, 1);
 	$self->updateFieldFlags('procedures_list', FLDFLAG_INVISIBLE, 1);
 	$self->setFieldFlags('attendee_id', FLDFLAG_READONLY);
-	
+
 	$page->session('dupCheckin_returnUrl', $page->referer());
 }
 
@@ -83,7 +83,7 @@ sub execute
 
 	## First, update original event record to checkin status, and any changes
 	#my $timeStamp = $page->getTimeStamp();
-	
+
 	my $eventId = $page->field('parent_event_id') || $page->param('event_id');
 	my $returnUrl = $page->field('dupCheckin_returnUrl');
 	my ($status, $person, $stamp) = $self->checkEventStatus($page, $eventId);
@@ -92,11 +92,11 @@ sub execute
 	{
 		return (qq{
 			<b style="color:red">This patient has been checked-$status by $person at $stamp.</b>
-			Click <a href='javascript:location.href="$returnUrl"'>here</a> to go back.		
+			Click <a href='javascript:location.href="$returnUrl"'>here</a> to go back.
 		});
 
 	}
-	
+
 	my $eventStatus = App::Universal::EVENTSTATUS_INPROGRESS;
 	if ($page->schemaAction(
 			'Event', 'update',
@@ -105,7 +105,7 @@ sub execute
 			checkin_stamp => $page->field('checkin_stamp'),
 			checkin_by_id => $page->session('user_id'),
 			remarks => $page->field('remarks') || undef,
-			subject => $page->field('subject') || undef,
+			subject => $page->field('subject'),
 			facility_id => $page->field('service_facility_id'),
 			_debug => 0
 		) == 0)

@@ -19,7 +19,7 @@ use vars qw(@ISA %RESOURCE_MAP);
 
 %RESOURCE_MAP = (
 	'checkout' => {
-		_arl => ['event_id'] 
+		_arl => ['event_id']
 		},
 	);
 
@@ -49,14 +49,14 @@ sub initialize
 	};
 
 	$self->addFooter(new CGI::Dialog::Buttons(
-						nextActions => [
-							['Go to Claim Summary', NEXTACTION_CLAIMSUMM],
-							['Go to Patient Account', NEXTACTION_PATIENTACCT],
-							#['Print Patient Receipt', NEXTACTION_PRINTRECEIPT],
-							['Go to Appointments', NEXTACTION_APPOINTMENTS],
-							['Return to Work List', NEXTACTION_WORKLIST],
-							],
-						cancelUrl => $self->{cancelUrl} || undef));
+		nextActions => [
+			['Go to Claim Summary', NEXTACTION_CLAIMSUMM],
+			['Go to Patient Account', NEXTACTION_PATIENTACCT],
+			['Go to Appointments', NEXTACTION_APPOINTMENTS],
+			['Return to Work List', NEXTACTION_WORKLIST],
+		],
+		cancelUrl => $self->{cancelUrl} || undef)
+	);
 
 	return $self;
 }
@@ -99,7 +99,7 @@ sub execute
 	#$page->beginUnitWork("Unable to checkout patient");
 
 	my $eventId = $page->field('parent_event_id') || $page->param('event_id');
-	
+
 	my $returnUrl = $page->field('dupCheckin_returnUrl');
 	my ($status, $person, $stamp) = $self->checkEventStatus($page, $eventId);
 
@@ -107,7 +107,7 @@ sub execute
 	{
 		return (qq{
 			<b style="color:red">This patient has been checked-$status by $person at $stamp.</b>
-			Click <a href='javascript:location.href="$returnUrl"'>here</a> to go back.		
+			Click <a href='javascript:location.href="$returnUrl"'>here</a> to go back.
 		});
 
 	}
@@ -122,7 +122,7 @@ sub execute
 			checkout_stamp => $page->field('checkout_stamp'),
 			checkout_by_id => $page->session('user_id'),
 			remarks => $page->field('remarks') || undef,
-			subject => $page->field('subject') || undef,
+			subject => $page->field('subject'),
 			facility_id => $page->field('service_facility_id'),
 			_debug => 0
 		) == 0)
@@ -133,16 +133,18 @@ sub execute
 
 	my $invoiceId = $page->param('invoice_id');
 	my $copay = $page->field('copay');
+
+	$page->param('encounterDialog', 'checkout');
 	if(! $invoiceId)
 	{
 		App::Dialog::Encounter::handlePayers($self, $page, $command, $flags);
-		
+
 		#$page->endUnitWork();
 	}
 	elsif($invoiceId)
 	{
 		App::Dialog::Encounter::handlePayers($self, $page, 'update', $flags);
-		
+
 		#$page->endUnitWork();
 	}
 }
