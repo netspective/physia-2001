@@ -1121,6 +1121,7 @@ sub getHtml
 			<TD colspan=2>
 				<TABLE CELLSPACING=0 CELLPADDING=2>
 					<INPUT TYPE="HIDDEN" NAME="_f_line_count" VALUE="$totalItems"/>
+					<INPUT TYPE="HIDDEN" NAME="_f_invoice_balance" VALUE="$totalInvoiceBalance"/>
 					<TR VALIGN=TOP BGCOLOR=#DDDDDD>
 						<TD ALIGN=CENTER><FONT $textFontAttrs>&nbsp;</FONT></TD>
 						$suppressHd
