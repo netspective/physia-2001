@@ -187,7 +187,7 @@ sub populateData_update
 	return unless $flags & CGI::Dialog::DLGFLAG_UPDORREMOVE_DATAENTRY_INITIAL;
 	$page->field('entry_id',$page->param('entry_id'));
 
-	#Get the first 4 created CPT codes for a Procedure based on entry_id order
+	#Get the first 6 created CPT codes for a Procedure based on entry_id order
 	my $proc = $STMTMGR_CATALOG->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'selMiscProcedureById', $page->param('entry_id'))
 		if ($page->param('entry_id'));
 	my $loop=1;
