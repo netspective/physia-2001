@@ -206,9 +206,18 @@ sub populateData
 	}
 }
 
+#sub customValidate
+#{
+#	my ($self, $page) = @_;
+
+#	my $payType = $page->field('pay_type');
+
+#}
+
 sub execute
 {
 	my ($self, $page, $command, $flags) = @_;
+	my $sessOrg = $page->session('org_id');
 	my $textValueType = App::Universal::ATTRTYPE_TEXT;
 	my $historyValueType = App::Universal::ATTRTYPE_HISTORY;
 
@@ -335,8 +344,14 @@ sub execute
 		App::Dialog::Procedure::execAction_submit($page, 'add', $invoiceId);
 	}
 
-
-	$page->redirect("/invoice/$invoiceId/summary");
+	if(my $paramBatchId = $page->param('_p_batch_id'))
+	{
+		$page->redirect("/org/$sessOrg/dlg-add-batch?_p_batch_id=$paramBatchId&_p_batch_type=$paidBy");
+	}
+	else
+	{
+		$page->redirect("/invoice/$invoiceId/summary");
+	}
 }
 
 1;
