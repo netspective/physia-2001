@@ -49,6 +49,7 @@ sub initialize
 		new CGI::Dialog::Field(type => 'hidden', name => 'cntrl_num_item_id'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'bill_contact_item_id'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'pay_to_org_item_id'),
+		new CGI::Dialog::Field(type => 'hidden', name => 'pay_to_org_tax_item_id'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'pay_to_org_phone_item_id'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'pay_to_org_addr_item_id'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'claim_filing_item_id'),
@@ -394,6 +395,9 @@ sub populateData
 
 		my $payToOrgAddr = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoiceAddr', $invoiceId, 'Pay To Org');
 		$page->field('pay_to_org_addr_item_id', $payToOrgAddr->{item_id});
+
+		my $payToOrgTaxId = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoiceAttr', $invoiceId, 'Pay To Org/Tax ID');
+		$page->field('pay_to_org_tax_item_id', $payToOrgTaxId->{item_id});
 
 		my $payToOrgPhone = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoiceAttr', $invoiceId, 'Pay To Org/Phone');
 		$page->field('pay_to_org_phone_item_id', $payToOrgPhone->{item_id});
@@ -1013,9 +1017,9 @@ sub handleInvoiceAttrs
 		);
 
 	my $payToOrgId = $page->field('pay_to_org_id');
-	my $payToFacility = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selOrgAddressByAddrName', $payToOrgId, 'Mailing');
-	my $payToFacilityName = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgSimpleNameById', $payToOrgId);
+	my $payToFacilityInfo = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_NONE, 'selRegistry', $payToOrgId);
 	my $payToFacilityPhone = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_NONE, 'selAttributeByItemNameAndValueTypeAndParent', $payToOrgId, 'Primary', App::Universal::ATTRTYPE_PHONE);
+	my $payToFacilityAddr = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selOrgAddressByAddrName', $payToOrgId, 'Mailing');
 
 	$page->schemaAction(
 			'Invoice_Attribute', $command,
@@ -1023,7 +1027,18 @@ sub handleInvoiceAttrs
 			parent_id => $invoiceId,
 			item_name => 'Pay To Org/Name',
 			value_type => defined $textValueType ? $textValueType : undef,
-			value_text => $payToFacilityName || undef,
+			value_text => $payToFacilityInfo->{name_primary} || undef,
+			value_textB => $payToOrgId || undef,
+			_debug => 0
+	);
+
+	$page->schemaAction(
+			'Invoice_Attribute', $command,
+			item_id => $page->field('pay_to_org_tax_item_id') || undef,
+			parent_id => $invoiceId,
+			item_name => 'Pay To Org/Tax ID',
+			value_type => defined $textValueType ? $textValueType : undef,
+			value_text => $payToFacilityInfo->{tax_id} || undef,
 			value_textB => $payToOrgId || undef,
 			_debug => 0
 	);
@@ -1044,11 +1059,11 @@ sub handleInvoiceAttrs
 			item_id => $page->field('pay_to_org_addr_item_id') || undef,
 			parent_id => $invoiceId,
 			address_name => 'Pay To Org',
-			line1 => $payToFacility->{line1},
-			line2 => $payToFacility->{line2} || undef,
-			city => $payToFacility->{city},
-			state => $payToFacility->{state},
-			zip => $payToFacility->{zip},
+			line1 => $payToFacilityAddr->{line1},
+			line2 => $payToFacilityAddr->{line2} || undef,
+			city => $payToFacilityAddr->{city},
+			state => $payToFacilityAddr->{state},
+			zip => $payToFacilityAddr->{zip},
 			_debug => 0
 		);
 

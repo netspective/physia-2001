@@ -513,6 +513,10 @@ sub storeProviderInfo
 	my $providerInfo = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selRegistry', $providerId);
 	my $providerTaxId = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selAttributeByItemNameAndValueTypeAndParent', $providerId, 'Tax ID', $licenseValueType);
 	my $providerUpin = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selAttributeByItemNameAndValueTypeAndParent', $providerId, 'UPIN', $licenseValueType);
+	my $providerBcbs = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selAttributeByItemNameAndValueTypeAndParent', $providerId, 'BCBS', $licenseValueType);
+	my $providerMedicare = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selAttributeByItemNameAndValueTypeAndParent', $providerId, 'Medicare', $licenseValueType);
+	my $providerMedicaid = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selAttributeByItemNameAndValueTypeAndParent', $providerId, 'Medicaid', $licenseValueType);
+	my $providerChampus = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selAttributeByItemNameAndValueTypeAndParent', $providerId, 'Champus', $licenseValueType);
 	my $providerSpecialty = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selAttributeByItemNameAndValueTypeAndParent', $providerId, 'Primary', App::Universal::ATTRTYPE_SPECIALTY);
 
 	$page->schemaAction(
@@ -561,6 +565,42 @@ sub storeProviderInfo
 			item_name => 'Provider/UPIN',
 			value_type => defined $licenseValueType ? $licenseValueType : undef,
 			value_text => $providerUpin->{value_text} || undef,
+			_debug => 0
+		);
+
+	$page->schemaAction(
+			'Invoice_Attribute', $command,
+			parent_id => $invoiceId,
+			item_name => 'Provider/BCBS',
+			value_type => defined $licenseValueType ? $licenseValueType : undef,
+			value_text => $providerBcbs->{value_text} || undef,
+			_debug => 0
+		);
+
+	$page->schemaAction(
+			'Invoice_Attribute', $command,
+			parent_id => $invoiceId,
+			item_name => 'Provider/Medicare',
+			value_type => defined $licenseValueType ? $licenseValueType : undef,
+			value_text => $providerMedicare->{value_text} || undef,
+			_debug => 0
+		);
+
+	$page->schemaAction(
+			'Invoice_Attribute', $command,
+			parent_id => $invoiceId,
+			item_name => 'Provider/Medicaid',
+			value_type => defined $licenseValueType ? $licenseValueType : undef,
+			value_text => $providerMedicaid->{value_text} || undef,
+			_debug => 0
+		);
+
+	$page->schemaAction(
+			'Invoice_Attribute', $command,
+			parent_id => $invoiceId,
+			item_name => 'Provider/Champus',
+			value_type => defined $licenseValueType ? $licenseValueType : undef,
+			value_text => $providerChampus->{value_text} || undef,
 			_debug => 0
 		);
 
