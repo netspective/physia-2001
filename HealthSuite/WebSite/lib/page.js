@@ -677,6 +677,7 @@ function validationError(fieldName, fmtMessage)
 
 function setFocus(fieldName)
 {
+	if (!document.forms.dialog) return;
 	var field = "document.forms.dialog."+fieldName;
 	if(eval(field))
 	{
