@@ -195,7 +195,8 @@ $STMTMGR_REPORT_BILLING = new App::Statements::Report::Billing(
 		where rel_diags is NOT NULL
 			and Invoice.invoice_date between to_date(? || ' 12:00 AM', '$SQLSTMT_DEFAULTSTAMPFORMAT')
 				and to_date(? || ' 11:59 PM', '$SQLSTMT_DEFAULTSTAMPFORMAT')
-			and Invoice.cr_org_internal_id = ?
+			and Invoice.owner_id = ?
+			and Invoice.owner_type = $typeOrg
 			and Invoice_Item.parent_id = Invoice.invoice_id
 	},
 
