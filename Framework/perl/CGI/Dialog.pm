@@ -1470,6 +1470,7 @@ sub handlePostExecute
 					$activityLog->{scope}, $activityLog->{key},
 					exists $activityLog->{level} ? $activityLog->{level} : App::Universal::ACTIVITY_LEVEL_HIGH,
 					$activityLog->{data},
+					$page->session('user_id'),
 				);
 	}
 	if($page->flagIsSet(App::Page::PAGEFLAG_ISPOPUP))
