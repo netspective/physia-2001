@@ -64,6 +64,7 @@ sub isValid
 	my $charges = '';
 	my $emergency = '';
 	my %diagsSeen = ();
+	my @feeSchedules = $page->param('_f_proc_default_catalog');
 
 	my @diagCodes = split(/\s*,\s*/, $page->field('proc_diags'));
 
@@ -209,6 +210,8 @@ sub isValid
 		#for intellicode
 		push(@procs, [$procedure, $modifier || undef, @actualDiagCodes]);
 		my @cptCodes = ($procedure);
+
+		#App::IntelliCode::getItemCost($page, $procedure, \@feeSchedules);
 		#App::IntelliCode::incrementUsage($page, 'Cpt', \@cptCodes, $sessUser, $sessOrg);
 		#App::IntelliCode::incrementUsage($page, 'Icd', \@diagCodes, $sessUser, $sessOrg);
 	}
