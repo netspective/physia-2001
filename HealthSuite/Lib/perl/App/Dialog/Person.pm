@@ -144,7 +144,7 @@ sub makeStateChanges
 	my $orgId = $page->param('org_id') ? $page->param('org_id') : $page->session('org_id');
 	my $orgIntId = $page->session('org_internal_id');
 	$orgIntId = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgId', $orgIntId, $orgId) if $page->param('org_id');
-	
+
 	my $delRec = $self->getField('delete_record');
 	if ($page->field('delete_record'))
 	{
@@ -165,8 +165,11 @@ sub makeStateChanges
 	my $firstName = $self->getField('person_id')->{fields}->[1];
 	my $lastName = $self->getField('person_id')->{fields}->[0];
 	my $createRecField = $self->getField('create_record');
-
+	my $itemLastName = 'Person/Name/LastFirst';
 	my $names = $STMTMGR_PERSON->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'selFirstLastName', $orgIntId);
+	my $attrflag = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_NONE, 'selAttribute', $personId, $itemLastName);
+	$page->field('create_record', 1) if $attrflag->{value_int} ne '';
+
 	foreach my $nameFirstLast (@{$names})
 	{
 		my $checkfirst = $nameFirstLast->{'name_first'};
@@ -175,11 +178,8 @@ sub makeStateChanges
 		my $nameFirst = $page->field('name_first');
 		my $nameLast = $page->field('name_last');
 		my $perId = $nameFirstLast->{person_id};
-		my $itemLastName = 'Person/Name/LastFirst';
-		my $attrflag = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_NONE, 'selAttribute', $personId, $itemLastName);
-		$page->field('create_record', 1) if $attrflag->{value_int} ne '';
 
-		if ($nameFirst eq $checkfirst && $nameLast eq $checklast && $personId ne $perId && $attrflag->{value_int} eq '' && $command eq 'add')
+		if ($nameFirst eq $checkfirst && $nameLast eq $checklast && $personId ne $perId && $attrflag->{value_int} eq '')
 		{
 			$self->updateFieldFlags('create_record', FLDFLAG_INVISIBLE, 0);
 			unless ($page->field('create_record'))
@@ -197,6 +197,7 @@ sub makeStateChanges
 			$self->updateFieldFlags('create_record', FLDFLAG_INVISIBLE, 1);
 		}
 	}
+
 
 	if($personId && $command eq 'add')
 	{
@@ -226,7 +227,7 @@ sub populateData
 	{
 		$page->field('delete_record', 1);
 	}
-	
+
 	my $itemName = 'Patient/Account Number';
 	my $acctNum = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_NONE, 'selAttribute', $personId, $itemName);
 	$page->field('acct_number', $acctNum->{'value_text'});
@@ -539,8 +540,9 @@ sub handleAttrs
 			_debug => 0
 			);
 
+	my $commandBloodType = $command eq 'update' &&  $page->field('blood_item_id') eq '' ? 'add' : $command;
 	$page->schemaAction(
-			'Person_Attribute', $command,
+			'Person_Attribute', $commandBloodType,
 			parent_id => $personId || undef,
 			item_id => $page->field('blood_item_id') || undef,
 			item_name => 'BloodType' || undef,
@@ -632,7 +634,6 @@ sub customValidate
 		my $personId = $page->field('person_id');
 
 		my $personssn = $STMTMGR_PERSON->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'selssn', $orgIntId);
-		#my $name = $STMTMGR_PERSON->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'selFirstLastName',$orgId );
 		foreach my $perssn (@{$personssn})
 		{
 			my $ssn = $perssn->{ssn};
@@ -653,11 +654,11 @@ sub execute_remove
 	my $personId = $page->field('person_id');
 	my $orgId = $page->param('org_id') ? $page->param('org_id') : $page->session('org_id');
 	my $orgIntId = $page->session('org_internal_id');
-	
+
 	# Disabled remove
 	$self->handlePostExecute($page, $command, $flags);
 	return '';
-	
+
 	$orgIntId = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgId', $orgIntId, $orgId) if $page->param('org_id');
 
 	$page->schemaAction(
