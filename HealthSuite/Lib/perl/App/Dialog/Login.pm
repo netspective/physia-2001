@@ -40,7 +40,6 @@ sub new
 				options => FLDFLAG_INVISIBLE
 				),
 		new CGI::Dialog::Field(name => 'start_sep', type => 'separator'),
-		new CGI::Dialog::Field(name => 'start_arl_use', type => 'hidden'),
 		new CGI::Dialog::Field(caption => 'Start Page', name => 'nextaction_redirecturl', type => 'select', selOptions => 'Worklist:/worklist;Home:/home;Search:/search;Schedule:/schedule', options => FLDFLAG_PERSIST),
 	);
 	$self->addFooter(new CGI::Dialog::Buttons);
@@ -127,10 +126,15 @@ sub makeStateChanges
 	# show the "start" selection box if the destination page is the home page or the
 	# logout page
 	#
-	my $hideStartInfo = ($page->param('arl_resource') =~ m/^(search|logout)$/) ? 0 : 1;
+	my $hideStartInfo = 0;
+	if($page->param('arl'))
+	{
+		my $resource = $page->param('arl_resource');
+		$hideStartInfo = 1 unless($resource eq 'logout' || $resource eq 'search');
+	}
 	$self->updateFieldFlags('start_sep', FLDFLAG_INVISIBLE, $hideStartInfo);
-	$self->updateFieldFlags('start_arl', FLDFLAG_INVISIBLE, $hideStartInfo);
-	$page->field('start_arl_use', ! $hideStartInfo);
+	$self->updateFieldFlags('nextaction_redirecturl', FLDFLAG_INVISIBLE, $hideStartInfo);
+	$page->field('nextaction_redirecturl', $page->param('arl')) if $hideStartInfo;
 }
 
 sub execute
@@ -154,12 +158,6 @@ sub execute
 	$page->clearFlag(App::Page::PAGEFLAG_IGNORE_BODYHEAD | App::Page::PAGEFLAG_IGNORE_BODYFOOT);
 
 	$self->handlePostExecute($page, $command, $flags);
-	#if($page->field('start_arl_use'))
-	#{
-	#	my $arl = $page->field('start_arl');
-	#	$arl =~ s/\$(\w+)\$/$page->param($1)/ge;
-	#	$page->redirect($arl);
-	#}
 	return 'Welcome to Physia.com, ' . $page->session('user_id');
 }
 
