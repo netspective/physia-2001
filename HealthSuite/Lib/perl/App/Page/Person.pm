@@ -495,7 +495,6 @@ sub prepare_view_home
 					<TD>
 						#component.lookup-records#<BR>
 						#component.navigate-reports-root#<BR>
-						TO-DO List will go here
 					</TD>
 					<TD WIDTH=10><FONT SIZE=1>&nbsp;</FONT></TD>
 					<TD>
