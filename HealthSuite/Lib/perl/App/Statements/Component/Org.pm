@@ -258,7 +258,7 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 			],			},
 			stdIcons =>
 			{
-				delUrlFmt => '/org/#session.org_id#/dlg-remove-catalog/#5#',
+#				delUrlFmt => '/org/#session.org_id#/dlg-remove-catalog/#5#',
 			},
 		},
 	publishDefn_panel =>
@@ -348,7 +348,7 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 			],			},
 			stdIcons =>
 			{
-				delUrlFmt => '/org/#session.org_id#/dlg-remove-catalog/#5#',
+#				delUrlFmt => '/org/#session.org_id#/dlg-remove-catalog/#5#',
 			},
 		},
 	publishDefn_panel =>
@@ -1250,7 +1250,8 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 			],
 		},
 		stdIcons =>	{
-			updUrlFmt => '/org/#param.org_id#/stpe-#my.stmtId#/dlg-update-catalog/#0#?home=#homeArl#', delUrlFmt => '/org/#param.org_id#/stpe-#my.stmtId#/dlg-remove-catalog/#0#?home=#homeArl#',
+			updUrlFmt => '/org/#param.org_id#/stpe-#my.stmtId#/dlg-update-catalog/#0#?home=#homeArl#',
+			delUrlFmt => '/org/#param.org_id#/stpe-#my.stmtId#/dlg-remove-catalog/#0#?home=#homeArl#',
 		},
 	},
 	publishComp_st => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_internal_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.feeSchedule', [$page->param('org_id'),$page->session('org_internal_id')]); },
@@ -1405,10 +1406,10 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 'org.superbills' => {
 	sqlStmt => qq{
 		select	oc.internal_catalog_id, oc.catalog_id, oc.caption, oc.description
-		from	Offering_Catalog oc, Org o
+		from	Offering_Catalog oc
 		where	oc.catalog_type = 4
-		and	oc.org_internal_id = o.org_internal_id
-		and	o.org_id = ?
+		and	oc.org_internal_id = ?
+		and	oc.flags = 1
 	},
 
 	sqlStmtBindParamDescr => ['Org ID for Electronic Billing Information'],
@@ -1445,7 +1446,7 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 			addUrl => '/org/#param.org_id#/superbills?action=new',
 		},
 		stdIcons =>	{
-			#delUrlFmt => '/org/#param.org_id#/superbills?action=delete&superbillid=#0#',
+			delUrlFmt => '/org/#param.org_id#/superbills?action=delete&superbillid=#0#',
 		},
 	},
 	publishDefn_panelTransp =>
@@ -1469,10 +1470,10 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 			delUrlFmt => '/org/#param.org_id#/superbills?action=delete&superbillid=#0#',
 		},
 	},
-	publishComp_st => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_internal_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.superbills', [$page->param('org_id')]); },
-	publishComp_stp => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_internal_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.superbills', [$page->param('org_id')], 'panel'); },
-	publishComp_stpt => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_internal_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.superbills', [$page->param('org_id')], 'panelTransp'); },
-	publishComp_stpe => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_internal_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.superbills', [$page->param('org_id')], 'panelEdit'); },
+	publishComp_st => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_internal_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.superbills', [$page->session('org_internal_id')]); },
+	publishComp_stp => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_internal_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.superbills', [$page->session('org_internal_id')], 'panel'); },
+	publishComp_stpt => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_internal_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.superbills', [$page->session('org_internal_id')], 'panelTransp'); },
+	publishComp_stpe => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_internal_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.superbills', [$page->session('org_internal_id')], 'panelEdit'); },
 },
 
 #----------------------------------------------------------------------------------------------------------------------
