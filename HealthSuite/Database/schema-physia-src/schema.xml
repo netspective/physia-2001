@@ -460,6 +460,9 @@
 	<table name="Insurance_Address" abbrev="InsAddr" type="Address">
 		<param name="parentref">insurance.ins_internal_id</param>
 	</table>
+	<table name="Trans_Address" abbrev="TransAddr" type="Address">
+		<param name="parentref">trans.trans_id</param>
+	</table>
 
 	<table name="Person_Attribute" abbrev="PerAttr" type="Attribute">
 		<param name="parentref">Person.person_id</param>
