@@ -28,7 +28,7 @@ use App::Dialog::PostGeneralPayment;
 use App::Dialog::PostInvoicePayment;
 use App::Dialog::PostRefund;
 use App::Dialog::PostTransfer;
-#use App::Billing::Output::tPdfCLaim;
+#use App::Billing::Universal;
 use App::Billing::Output::PDF;
 use App::Billing::Output::HTML;
 use App::IntelliCode;
@@ -1337,7 +1337,7 @@ sub prepare_view_history
 	return $self->prepare_view_summary();
 }
 
-sub prepare_view_nsf
+sub prepare_view_envoy_nsf
 {
 	my $self = shift;
 
@@ -1354,7 +1354,7 @@ sub prepare_view_nsf
 		$valMgr->validateClaim('Output', DEFAULT_VFLAGS, $claimList);
 
 		my @outArray = ();
-		$output->processClaims(destination => NSFDEST_ARRAY, outArray => \@outArray, claimList => $claimList, validationMgr => $valMgr);
+		$output->processClaims(destination => NSFDEST_ARRAY, outArray => \@outArray, claimList => $claimList, validationMgr => $valMgr, nsfType => App::Billing::Universal::NSF_ENVOY);
 
 		push(@{$self->{page_content}}, '<pre>', join("\n", @outArray), '</pre>');
 
@@ -1364,7 +1364,48 @@ sub prepare_view_nsf
 			push(@{$self->{page_content}}, '<li>', join(', ', @$error), '</li>');
 		}
 	};
-	$self->addError('Problem in sub prepare_view_nsf', $@) if $@;
+	$self->addError('Problem in sub prepare_view_envoy_nsf', $@) if $@;
+
+	return 1;
+}
+
+sub prepare_view_halley_nsf
+{
+	my $self = shift;
+
+	$self->addLocatorLinks(['NSF', 'nsf']);
+
+	# these values are set in "initialize()" method
+	my $claimList = $self->property('claimList');
+	my $valMgr = $self->property('valMgr');
+	my $invoiceId = $self->param('invoice_id');
+	my $fileName = "Perse_$invoiceId.edi";
+
+	eval
+	{
+		my $output = new App::Billing::Output::NSF();
+		my @outArray = ();
+		$output->processClaims(destination => NSFDEST_FILE, outArray => \@outArray, outFile => File::Spec->catfile($CONFDATA_SERVER->path_PDFOutput, $fileName), claimList => $claimList, nsfType => App::Billing::Universal::NSF_HALLEY);
+	};
+
+	eval
+	{
+		my $output = new App::Billing::Output::NSF();
+		$output->registerValidators($valMgr);
+		$valMgr->validateClaim('Output', DEFAULT_VFLAGS, $claimList);
+
+		my @outArray = ();
+		$output->processClaims(destination => NSFDEST_ARRAY, outArray => \@outArray, claimList => $claimList, validationMgr => $valMgr, nsfType => App::Billing::Universal::NSF_HALLEY);
+
+		push(@{$self->{page_content}}, '<pre>', join("\n", @outArray), '</pre>');
+
+		my $errors = $valMgr->getErrors();
+		foreach my $error (@$errors)
+		{
+			push(@{$self->{page_content}}, '<li>', join(', ', @$error), '</li>');
+		}
+	};
+	$self->addError('Problem in sub prepare_view_halley_nsf', $@) if $@;
 
 	return 1;
 }
@@ -1570,7 +1611,8 @@ sub prepare_page_content_header
 			['1500 PDF', "/invoice-f/$invoiceId/1500pdf", '1500pdf'],
 			['Errors', "$urlPrefix/errors", 'errors'],
 			['History', "$urlPrefix/history", 'history'],
-			['NSF', "$urlPrefix/nsf", 'nsf'],
+			['Envoy NSF', "$urlPrefix/envoy_nsf", 'envoy_nsf'],
+			['Halley NSF', "$urlPrefix/halley_nsf", 'halley_nsf'],
 		], ' | ');
 
 	my $view = $self->param('_pm_view');
@@ -1593,8 +1635,8 @@ sub prepare_page_content_header
 						@{[ $allDiags[0] eq '' && $invStatus < $submitted && $invStatus != $void && $invType == $hcfaInvoiceType ? "<option value='/invoice/$invoiceId/dialog/diagnoses/add'>Add Diagnoses</option>" : '' ]}
 						@{[ $allDiags[0] ne '' && $invStatus < $submitted && $invStatus != $void && $invType == $hcfaInvoiceType ? "<option value='/invoice/$invoiceId/dialog/diagnoses/update'>Update Diagnoses</option>" : '' ]}
 						@{[ $claimType != $selfPay && $invStatus >= $submitted && $invStatus != $void && $invType == $hcfaInvoiceType ? "<option value='/invoice/$invoiceId/dialog/postinvoicepayment/insurance'>Post Insurance Payment</option>" : '' ]}
-						<option value="/person/$clientId/dlg-add-postbatchpayment">Post Batch Personal Payments</option>
-						<option value="/invoice/$invoiceId/dlg-add-postpayment">Post Personal Payment</option>
+						<!-- <option value="/person/$clientId/dlg-add-postbatchpayment?_p_isBatch=1">Post Batch Personal Payments</option> -->
+						<option value="/person/$clientId/dlg-add-postpayment">Post Personal Payment</option>
 						<option value="/person/$clientId/dlg-add-postrefund">Post Refund</option>
 						<option value="/person/$clientId/dlg-add-posttransfer">Post Transfer</option>
 						<option value="/person/$clientId/account">View All Claims for the Patient</option>
