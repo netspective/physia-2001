@@ -21,7 +21,7 @@ my $SEL_CATALOG_ENTRY = qq{
 $STMTMGR_CATALOG = new App::Statements::Catalog(
 	'selInternalIdByCatalog' => qq
 	{
-		SELECT org_internal_id
+		SELECT internal_catalog_id
 		FROM offering_catalog
 		WHERE catalog_id = ?
 	},
