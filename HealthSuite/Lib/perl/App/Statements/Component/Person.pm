@@ -1049,7 +1049,7 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 
 'person.preventiveCare' => {
 	sqlStmt => qq{
-			select 	value_type, item_id, item_name, %simpleDate:value_date%, %simpleDate:value_dateend%
+			select 	value_type, item_id, item_name, %simpleDate:value_date%, %simpleDate:value_dateend%, value_text, value_textb
 			from 	person_attribute
 			where 	parent_id = ?
 			and 	value_type = @{[ App::Universal::PREVENTIVE_CARE ]}
@@ -1057,7 +1057,7 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 	sqlStmtBindParamDescr => ['Person ID for Attribute Table'],
 	publishDefn => {
 		columnDefn => [
-			{ head => 'Preventive Care', dataFmt => '&{fmt_stripLeadingPath:2} (#4#)' },
+			{ head => 'Preventive Care', dataFmt => '&{fmt_stripLeadingPath:2} : #6# (CPT #5#, #4#)' },
 			#{ colIdx => 1, head => 'Type', dataFmt => '&{fmt_stripLeadingPath:1}:' },
 			#{ colIdx => 2, head => 'Dates', dataFmt => '#2# - #3#', options => PUBLCOLFLAG_DONTWRAP },
 		],
