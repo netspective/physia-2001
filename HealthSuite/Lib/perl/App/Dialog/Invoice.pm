@@ -17,7 +17,7 @@ use CGI::Validator::Field;
 use App::Dialog::Field::Invoice;
 use App::Dialog::Field::Organization;
 use App::Universal;
-use App::InvoiceUtilities;
+use App::Utilities::Invoice;
 use App::Dialog::Field::BatchDateID;
 use Date::Manip;
 use vars qw(@ISA %RESOURCE_MAP);
@@ -65,7 +65,8 @@ sub new
 				options => FLDFLAG_REQUIRED),
 		new App::Dialog::Field::OrgType(
 				caption => 'Pay To Org',
-				name => 'owner_id'),
+				name => 'owner_id',
+				types => "'PRACTICE', 'CLINIC','FACILITY/SITE'"),
 		new App::Dialog::Field::InvoiceItems(caption => 'Items', name => 'invoice_items'),
 	);
 
@@ -195,12 +196,7 @@ sub execute_remove
 			_debug => 0
 		);
 
-		$page->schemaAction(
-			'Invoice_Item', 'update',
-			item_id => $itemId || undef,
-			data_text_b => 'void',
-			_debug => 0
-		);
+		$page->schemaAction('Invoice_Item', 'update', item_id => $itemId || undef, data_text_b => 'void', _debug => 0);
 	}
 
 	my $invoiceStatus = App::Universal::INVOICESTATUS_VOID;
@@ -225,13 +221,7 @@ sub execute_remove
 		_debug => 0
 	);
 
-
-	#ADD HISTORY ITEM
-	my $todaysDate = UnixDate('today', $page->defaultUnixDateFormat());
-	addHistoryItem($page, $invoiceId,
-		value_text => 'Voided invoice',
-		value_date => $todaysDate,
-	);
+	addHistoryItem($page, $invoiceId, value_text => 'Voided invoice');
 
 	$page->redirect("/invoice/$invoiceId/summary");
 }
@@ -461,11 +451,7 @@ sub addTransactionAndInvoice
 	## Add history and reset session batch id with batch id in field
 	$page->session('batch_id', $batchId);
 	my $description = $command eq 'add' ? 'Created' : 'Modified';
-	addHistoryItem($page, $invoiceId,
-		value_text => $description,
-		value_textB => "Batch ID: $batchId",
-		value_date => $todaysDate,
-	);
+	addHistoryItem($page, $invoiceId, value_text => $description, value_textB => "Batch ID: $batchId");
 
 	handleBillingInfo($self, $page, $command, $flags, $invoiceId);
 }
