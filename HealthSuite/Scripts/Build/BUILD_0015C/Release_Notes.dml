@@ -21,7 +21,17 @@
 		<deliverable id="1382">
 			UI:  Remove Waiting List appointments from Patient Flow Worklist.
 		</deliverable>	
-		
+
+		<deliverable id="758">
+			Converted the following reports to allow printing ASCII equivalents through CUPS:
+			Daily Audit Recap, Monthly Audit Recap, Revenue/Collection, Claim Status (Billing),
+			Aged Insurance Recv, Aged Patient Recv, Receipt Analysis.
+			UI:  All these reports now have a combobox on their Dialogs which has a list of all
+			the printers for that Org that the user belongs to.  It also has a checkbox which,
+			when checked, sends an ASCII copy of the report to the selected printer while
+			simultaneously displaying the regular onscreen report.
+		</deliverable>	
+
 	</deliverables>
 </release-notes>
 
