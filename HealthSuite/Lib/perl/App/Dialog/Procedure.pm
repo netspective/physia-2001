@@ -634,6 +634,7 @@ sub storeFacilityInfo
 	my $bcbsNo = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selAttributeByItemNameAndValueTypeAndParent', $billFacilityId, 'BCBS#', $credentialsValueType);
 	my $medicareNo = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selAttributeByItemNameAndValueTypeAndParent', $billFacilityId, 'Medicare#', $credentialsValueType);
 	my $cliaNo = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selAttributeByItemNameAndValueTypeAndParent', $billFacilityId, 'CLIA#', $credentialsValueType);
+	my $rrMedicareNo = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selAttributeByItemNameAndValueTypeAndParent', $billFacilityId, 'Railroad Medicare#', $credentialsValueType);
 
 	$page->schemaAction(
 			'Invoice_Attribute', $command,
@@ -744,6 +745,18 @@ sub storeFacilityInfo
 		);
 
 	$page->schemaAction(
+			'Invoice_Attribute', $command,
+			parent_id => $invoiceId,
+			item_name => 'Billing Facility/Railroad Medicare',
+			value_type => defined $textValueType ? $textValueType : undef,
+			value_text => $rrMedicareNo->{value_text} || undef,
+			value_textB => $billingFacilityInfo->{org_id} || undef,
+			value_int => $billFacilityId || undef,
+			value_intB => 1,
+			_debug => 0
+		);
+
+	$page->schemaAction(
 			'Invoice_Address', $command,
 			parent_id => $invoiceId,
 			address_name => 'Billing',
@@ -755,17 +768,6 @@ sub storeFacilityInfo
 			_debug => 0
 		);
 
-	#$page->schemaAction(
-	#		'Invoice_Address', $command,
-	#		parent_id => $invoiceId,
-	#		address_name => 'Pay To Org',
-	#		line1 => $billingFacilityPayAddr->{line1},
-	#		line2 => $billingFacilityPayAddr->{line2} || undef,
-	#		city => $billingFacilityPayAddr->{city},
-	#		state => $billingFacilityPayAddr->{state},
-	#		zip => $billingFacilityPayAddr->{zip},
-	#		_debug => 0
-	#);
 
 
 	##SERVICE FACILITY INFORMATION
