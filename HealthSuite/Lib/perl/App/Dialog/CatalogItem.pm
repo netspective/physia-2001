@@ -95,6 +95,9 @@ sub populateData_add
 	my ($self, $page, $command, $activeExecMode, $flags) = @_;
 	$page->field('catalog_id', $page->param('catalog_id'));
 	$page->field('parent_entry_id', $page->param('parent_entry_id'));
+	$page->field('entry_type', 100);
+	$page->field('status', 1);
+	$page->field('cost_type', 1);
 }
 
 sub populateData_update
