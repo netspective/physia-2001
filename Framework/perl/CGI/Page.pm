@@ -329,9 +329,23 @@ sub addCookies
 
 sub redirect
 {
-	my $self = shift;
-	$self->{page_redirect} = shift;
-	#die $self->{page_redirect};
+	my ($self, $redirect, $acceptDup) = @_;
+
+	if(my $curRedirect = $self->{page_redirect})
+	{
+		unless(defined $acceptDup && $acceptDup == 1)
+		{
+			my ($package, $filename, $line, $subroutine) = caller();
+		    $self->addError(qq{
+				Duplicate call to CGI::Page::redirect detected in $filename line $line.
+				Current value is '$curRedirect', new value is '$redirect'.
+				Pass \$acceptDup == 1 to accept	the duplicate.
+			});
+			return '';
+		}
+	}
+
+	$self->{page_redirect} = $redirect;
 	return '';
 }
 
@@ -384,11 +398,11 @@ sub send_http_header
 {
 	my $self = shift;
 
-	if($self->{page_redirect})
-	{
-		$self->addDebugStmt("Redirect Before: $self->{page_redirect}");
-		$self->addDebugStmt("Redirect After: " . $self->replaceRedirectVars($self->{page_redirect}));
-	}
+	#if($self->{page_redirect})
+	#{
+	#	$self->addDebugStmt("Redirect Before: $self->{page_redirect}");
+	#	$self->addDebugStmt("Redirect After: " . $self->replaceRedirectVars($self->{page_redirect}));
+	#}
 
 	my %HEADER = (-expires => '-1d');
 	$HEADER{-cookie} = $self->{page_cookies} if scalar(@{$self->{page_cookies}});
