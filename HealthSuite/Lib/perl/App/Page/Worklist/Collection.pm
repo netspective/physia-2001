@@ -101,14 +101,15 @@ sub collectionQuery
 	my $date=  UnixDate('tomorrow','%d-%b-%y');
 	my $sqlGen = new SQL::GenerateQuery(file => $QDL);
 
-	my $cond1 = $sqlGen->WHERE('owner_id', 'is', $self->session('person_id'));
+	my $cond1 = $sqlGen->WHERE('owner_id', 'is', $self->session('person_id'));	
 	my $cond2 = $sqlGen->WHERE('worklist_status', 'is','Account In Collection' );
 	my $cond3 = $sqlGen->WHERE('worklist_type', 'is','Collection' );
 	my $cond4 = $sqlGen->WHERE('responsible_id', 'is',$self->session('person_id') );
 	my $cond5 = $sqlGen->WHERE('reck_date','lessthan',$date);
 	my $cond6 = $sqlGen->WHERE('reck_date', 'isnotdefined');
+	my $cond8 = $sqlGen->WHERE('org_internal_id','is', $self->session('org_internal_id'));	
 	my $cond7 = $sqlGen->OR($cond5,$cond6);
-	my $query = $sqlGen->AND($cond1,$cond2,$cond3,$cond4,$cond7);
+	my $query = $sqlGen->AND($cond1,$cond2,$cond3,$cond4,$cond7,$cond8);
 	$query->outColumns(
 		'owner_id',
 		'person_id',
