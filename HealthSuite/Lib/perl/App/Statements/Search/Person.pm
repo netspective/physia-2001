@@ -57,10 +57,10 @@ $STMTRPTDEFN_DEFAULT =
 {
 	columnDefn =>
 			[
-				{ head => 'ID', 
+				{ head => 'ID',
 					url => q{javascript:setSimpleName('#9#', '#10#', '/popup/alerts/#0#');
 						chooseEntry('#&{?}#', null, null, '#8#','#9#');
-					}, 
+					},
 				},
 				{ head => 'Last Name' },
 				{ head => 'First Name' },
@@ -208,7 +208,7 @@ foreach my $category (@categories)
 
 		if ($category eq 'associate')
 		{
-			$sqlData{catCond} =  "and cat.category in ('Physician', 'Nurse', 'Staff', 'Referring-Doctor')";
+			$sqlData{catCond} =  "and cat.category in ('Physician', 'Nurse', 'Staff')";
 		}
 		elsif ($category eq 'physician-ref')
 		{
