@@ -152,18 +152,21 @@ sub isValid
 				{
 					$dlgName = $personType if grep { $_ eq $personType } @$types;
 				}
-				my $createPersonHref = "javascript:doActionPopup('/org-p/#session.org_id#/dlg-add-" . lc($dlgName) . "/$value');";
-				$dlgName = "Responsible Party" if $dlgName eq "Guarantor";
-				$self->invalidate($page, qq{
-					$self->{caption} '$value' does not exist.<br>
-					<img src="/resources/icons/arrow_right_red.gif">
-					<a href="$createPersonHref">Add $dlgName ID '$value' now</a>
-					})
-					unless $STMTMGR_PERSON->recordExists($page, STMTMGRFLAG_NONE,'selRegistry', $value);
+				my $invMsg = qq{$self->{caption} '$value' does not exist.<BR> Do you want to add '$value' as a };
+				foreach $types (@$types)
+				{
+					my $createPersonHref = "javascript:doActionPopup('/org-p/#session.org_id#/dlg-add-" . lc($types) . "/$value');";
+					$types = "Responsible Party" if $types eq "Guarantor";
+					unless ($STMTMGR_PERSON->recordExists($page, STMTMGRFLAG_NONE,'selRegistry', $value))
+					{
+						$invMsg .= qq{<a href="$createPersonHref">$types</a> }
+					}
+				}
+				$self->invalidate($page, $invMsg)unless ($STMTMGR_PERSON->recordExists($page, STMTMGRFLAG_NONE,'selRegistry', $value));
 			}
 
 			my $orgId = ($page->param('org_id') ne '') ? $page->param('org_id') : $page->session('org_id');
-			$self->invalidate($page, "You do not have permission to modify people outside of your organization.")
+			$self->invalidate($page, "You do not have permission to select people outside of your organization.")
 				unless $STMTMGR_PERSON->recordExists($page, STMTMGRFLAG_NONE,'selCategory', $value, $orgId);
 		}
 	}
