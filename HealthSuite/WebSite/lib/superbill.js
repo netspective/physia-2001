@@ -139,7 +139,7 @@ function _parseRange (cptRange) {
 }
 
 function _parseCPT (cptWidget) {
-	var splitRegExp = /(,\s*|\\n\s*)/;
+	var splitRegExp = /(,\s*|[\r\n]+\s*)/;
 	var cptList = cptWidget.value;
 	cptList.toUpperCase ();
 	
@@ -149,6 +149,7 @@ function _parseCPT (cptWidget) {
 	
 	for (var i = 0; i < cptTempArray.length; i ++) {
 		var tempArrayValue = cptTempArray [i];
+//		tempArrayValue = tempArrayValue.replace (/[\n\r]+$/, '');
 		if (_debugFlag) {
 			alert (i + " = " + tempArrayValue);
 		}
