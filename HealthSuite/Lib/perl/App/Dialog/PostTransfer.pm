@@ -133,21 +133,18 @@ sub handleTransferFromInvoice
 	my $itemType = App::Universal::INVOICEITEMTYPE_ADJUST;
 	my $historyValueType = App::Universal::ATTRTYPE_HISTORY;
 
-	my $transferAmt = $page->field('trans_from_amt');
+	my $transferAmt = 0 - $page->field('trans_from_amt');
 	my $fromInvoiceId = $page->field('trans_from_invoice_id');
 
 	my $itemId = $page->schemaAction(
 			'Invoice_Item', 'add',
 			parent_id => $fromInvoiceId,
 			item_type => defined $itemType ? $itemType : undef,
-			total_adjust => defined $transferAmt ? $transferAmt : undef,
-			balance => defined $transferAmt ? $transferAmt : undef,
 			_debug => 0
 	);
 
 
 	# Create adjustment for the item
-
 	my $adjType = App::Universal::ADJUSTMENTTYPE_TRANSFER;
 	my $comments = $page->field('from_comments');
 	$page->schemaAction(
@@ -156,27 +153,9 @@ sub handleTransferFromInvoice
 			adjustment_amount => defined $transferAmt ? $transferAmt : undef,
 			parent_id => $itemId || undef,
 			pay_date => $todaysDate || undef,
-			#net_adjust => defined $transferAmt ? $transferAmt : undef,
 			comments => $comments || undef,
 			_debug => 0
 	);
-
-
-
-	#Update the invoice
-
-	#my $invoice = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selInvoice', $fromInvoiceId);
-
-	#my $totalAdjustForInvoice = $invoice->{total_adjust} + $transferAmt;
-	#my $invoiceBalance = $invoice->{total_cost} + $totalAdjustForInvoice;
-
-	#$page->schemaAction(
-		#	'Invoice', 'update',
-		#	invoice_id => $fromInvoiceId || undef,
-		#	total_adjust => defined $totalAdjustForInvoice ? $totalAdjustForInvoice : undef,
-		#	balance => defined $invoiceBalance ? $invoiceBalance : undef,
-		#	_debug => 0
-	#);
 
 
 
@@ -204,15 +183,12 @@ sub handleTransferToInvoice
 	my $historyValueType = App::Universal::ATTRTYPE_HISTORY;
 
 	my $transferAmt = $page->field('trans_from_amt');
-	my $totalAdjust = 0 - $transferAmt;
 	my $toInvoiceId = $page->field('trans_to_invoice_id');
 
 	my $itemId = $page->schemaAction(
 			'Invoice_Item', 'add',
 			parent_id => $toInvoiceId,
 			item_type => defined $itemType ? $itemType : undef,
-			total_adjust => defined $totalAdjust ? $totalAdjust : undef,
-			#balance => defined $totalAdjust ? $totalAdjust : undef,
 			_debug => 0
 	);
 
@@ -227,27 +203,9 @@ sub handleTransferToInvoice
 			adjustment_amount => defined $transferAmt ? $transferAmt : undef,
 			parent_id => $itemId || undef,
 			pay_date => $todaysDate || undef,
-			#net_adjust => defined $totalAdjust ? $totalAdjust : undef,
 			comments => $comments || undef,
 			_debug => 0
 	);
-
-
-
-	#Update the invoice
-
-	#my $invoice = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selInvoice', $toInvoiceId);
-
-	#my $totalAdjustForInvoice = $invoice->{total_adjust} + $totalAdjust;
-	#my $invoiceBalance = $invoice->{total_cost} + $totalAdjustForInvoice;
-
-	#$page->schemaAction(
-	#		'Invoice', 'update',
-	#		invoice_id => $toInvoiceId || undef,
-	#		total_adjust => defined $totalAdjustForInvoice ? $totalAdjustForInvoice : undef,
-	#		balance => defined $invoiceBalance ? $invoiceBalance : undef,
-	#		_debug => 0
-	#);
 
 
 
