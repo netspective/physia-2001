@@ -71,6 +71,14 @@
 		<deliverable id="460">
 			Report for patient account history created.
 		</deliverable>		
+                <deliverable id="1142">
+                        UI : Added fiscal date to the Org Dialog.
+                        Report : Changed Procedure Analysis and Recipt Analysis  to use the fiscal year.  IF the same begin and end
+date are provide then a batch date column will appear in the report otherwise this column will be hidden.  Year to date data is base
+d on fiscal year(month).  If the fiscal year for an org is Jan and the report end date is Oct the year to date data will be from Jan
+ to Oct.  If a month before the fiscal month is used , example if the fiscal month is Oct/2000 and the end date for the report is Se
+pt/2000 then the year to data date from Oct-1999 to Sept-2000.
+                </deliverable>
 
 	</deliverables>
 </release-notes>
