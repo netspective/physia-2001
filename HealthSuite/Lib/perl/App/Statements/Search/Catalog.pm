@@ -35,7 +35,7 @@ $STMTFMT_SEL_CATALOG = qq{
 			offering_catalog_entry oce
 		WHERE
 			oce.catalog_id (+) = oc.internal_catalog_id
-			AND oc_a.parent_id (+) = oc.internal_catalog_id 
+			AND oc_a.parent_id (+) = oc.internal_catalog_id
 			AND oc.catalog_type = $FS_TYPE
 			AND (oc.org_internal_id IS NULL OR oc.org_internal_id = :1)
 			%whereCond%
@@ -94,7 +94,7 @@ $STMTFMT_SEL_CATENTRYBYID = qq{
 		catalog_entry_type,
 		offering_catalog_entry oce,
 		offering_catalog oc
-	WHERE 	
+	WHERE
 		oc.org_internal_id =  :1
 		AND oc.catalog_id = :2
 		AND oce.catalog_id = oc.internal_catalog_id
@@ -126,10 +126,10 @@ $STMTRPTDEFN_NAME_DEFAULT =
 	columnDefn =>
 	[
 		{
-			head => 'ID', hint => 'Fee Schedule ID #5#', 			
+			head => 'ID', hint => 'Fee Schedule ID #5#',
 			url => q{javascript:chooseItem('/search/catalog/name/#0#', '#0#', false)},
-			#dataFmt => '&{level_indent:0}#0#', 
-			tDataFmt => '&{count:0} Schedules', 
+			#dataFmt => '&{level_indent:0}#0#',
+			tDataFmt => '&{count:0} Schedules',
 			options => PUBLCOLFLAG_DONTWRAP,
 			hVAlign => 'BOTTOM',
 		},
@@ -144,9 +144,9 @@ $STMTRPTDEFN_NAME_DEFAULT =
 			hVAlign => 'BOTTOM',
 		},
 		{
-			head => 'Entries', 
-			colIdx => 1, 
-			dAlign => 'CENTER', 
+			head => 'Entries',
+			colIdx => 1,
+			dAlign => 'CENTER',
 			tAlign=>'CENTER',
 			summarize => 'sum',
 			hVAlign => 'BOTTOM',
@@ -178,11 +178,11 @@ $STMTRPTDEFN_DEFAULT =
 	[
 		{
 			head => 'ID',
-			hint => 'Fee Schedule ID #5#', 
+			hint => 'Fee Schedule ID #5#',
 			url => q{javascript:chooseItem('/search/catalog/detail/#5#','#0#',false)},
 			#q{javascript:chooseItem('/search/catalog/detail/#5#', '#0#', false)},
-			#dataFmt => '&{level_indent:0}#0#', 
-			tDataFmt => '&{count:0} Schedules', 
+			#dataFmt => '&{level_indent:0}#0#',
+			tDataFmt => '&{count:0} Schedules',
 			options => PUBLCOLFLAG_DONTWRAP,
 			hVAlign => 'BOTTOM',
 		},
@@ -197,12 +197,19 @@ $STMTRPTDEFN_DEFAULT =
 			hVAlign => 'BOTTOM',
 		},
 		{
-			head => 'Entries', 
-			colIdx => 1, 
-			dAlign => 'CENTER', 
+			head => 'Entries',
+			colIdx => 1,
+			dAlign => 'CENTER',
 			tAlign=>'CENTER',
 			summarize => 'sum',
 			hVAlign => 'BOTTOM',
+		},
+		{
+			head => 'Action',
+			hVAlign => 'BOTTOM',
+			dAlign => 'CENTER',
+			dataFmt => "<img src=\"/resources/images/icons/hand-pointing-to-folder-sm.gif\" border=0></a>",
+			url => q{javascript:doActionPopup('/search/catalog/detail/#5#')},
 		},
 	],
 	bullets => '/org/#session.org_id#/dlg-update-catalog/#5#',
@@ -233,10 +240,10 @@ my $STMTRPTDEFN_ORG =
 	columnDefn =>
 	[
 		{
-			head => 'ID', hint => 'Fee Schedule ID #5#', 
-			url => '/org/#session.org_id#/catalog/#5#/#0#', 
-			dataFmt => '&{level_indent:0}#0#', 
-			tDataFmt => '&{count:0} Schedules', 
+			head => 'ID', hint => 'Fee Schedule ID #5#',
+			url => '/org/#session.org_id#/catalog/#5#/#0#',
+			dataFmt => '&{level_indent:0}#0#',
+			tDataFmt => '&{count:0} Schedules',
 			options => PUBLCOLFLAG_DONTWRAP,
 			hVAlign => 'BOTTOM'
 		},
@@ -249,19 +256,19 @@ my $STMTRPTDEFN_ORG =
 			head => 'Contract',
 			dataFmt => '#7#',
 			hVAlign => 'BOTTOM',
-		},		
+		},
 		{
 			head => 'Entries',
 			colIdx => 1,
 			dAlign => 'CENTER',
-			tAlign=>'CENTER', 
+			tAlign=>'CENTER',
 			summarize => 'sum',
 			hVAlign => 'BOTTOM',
 		},
 		{
 			head => '',
 			colIdx => 6,
-			hint => 'Add Child Schedule', 
+			hint => 'Add Child Schedule',
 			url => '/org/#session.org_id#/dlg-add-catalog/#5#',
 			hVAlign => 'BOTTOM',
 		},
@@ -295,7 +302,7 @@ $STMTRPTDEFN_DEFAULT_ITEM =
 		{
 			head => 'Price',
 			dformat => 'currency',
-			tAlign => 'RIGHT', 
+			tAlign => 'RIGHT',
 			tDataFmt => '&{avg_currency:&{?}}<BR>&{sum_currency:&{?}}',
 		},
 		{
@@ -350,14 +357,14 @@ my $STMTRPTDEFN_DEFAULT_ITEM_ORG =
 		{ head => 'Code' },
 		{ head => 'Modifier' },
 		{ head => 'Description' },
-		{ head => 'Price', dformat => 'currency', tAlign => 'RIGHT', 
-			tDataFmt => '&{avg_currency:&{?}}<BR>&{sum_currency:&{?}}' 
+		{ head => 'Price', dformat => 'currency', tAlign => 'RIGHT',
+			tDataFmt => '&{avg_currency:&{?}}<BR>&{sum_currency:&{?}}'
 		},
 		{ head => 'UOH', hint => 'Units', dAlign => 'CENTER' },
-		{ head => '', hint => 'Add Child Entry', 
-			url => '/org/#session.org_id#/dlg-add-catalog-item/#param.internal_catalog_id#/#0#' 
+		{ head => '', hint => 'Add Child Entry',
+			url => '/org/#session.org_id#/dlg-add-catalog-item/#param.internal_catalog_id#/#0#'
 		},
-		{ head => '', colIdx => 10, dAlign => 'center'},		
+		{ head => '', colIdx => 10, dAlign => 'center'},
 	],
 };
 
@@ -392,7 +399,7 @@ $STMTMGR_CATALOG_SEARCH = new App::Statements::Search::Catalog(
 			whereCond => 'AND UPPER(oc.catalog_id) LIKE :2',
 			publishDefn => $STMTRPTDEFN_DEFAULT,
 		},
-	'sel_name_catalog_id' =>		
+	'sel_name_catalog_id' =>
 		{
 			_stmtFmt => $STMTFMT_SEL_CATALOG,
 			whereCond => 'AND UPPER(oc.catalog_id) = :2',
@@ -496,12 +503,12 @@ $STMTMGR_CATALOG_SEARCH = new App::Statements::Search::Catalog(
 			publishDefn => $STMTRPTDEFN_DEFAULT_ITEM,
 		},
 	'sel_catalog_detail' =>
-	
+
 		{
 			_stmtFmt => $STMTFMT_SEL_CATALOGENTRY,
 			publishDefn => $STMTRPTDEFN_DEFAULT_ITEM,
 		},
-		
+
 	'sel_catalog_detailname' =>
 		{
 			_stmtFmt => $STMTFMT_SEL_CATENTRYBYID,
