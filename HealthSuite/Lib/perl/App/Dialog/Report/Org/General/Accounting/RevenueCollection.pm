@@ -143,7 +143,7 @@ sub execute
 
 	my $collPub =
 	{
-		reportTitle => 'Collection Information',
+		reportTitle => 'Production Information',
 		columnDefn =>
 			[
 			{ colIdx => 0, head => 'Physican ID',  dAlign => 'LEFT' },
@@ -161,7 +161,7 @@ sub execute
 	};
 	my $prodPub =
 		{
-			reportTitle => 'Production Information',
+			reportTitle => 'Collection Information',
 			columnDefn =>
 				[
 				{ colIdx => 0, head => 'Physican ID',  dAlign => 'LEFT' },
@@ -262,8 +262,8 @@ sub execute
 		$html .="<BR><BR><b>COLLECTION INFORMATION<b>";
 		$html .= createHtmlFromData($page, 0, \@data2,$prodPub);
 		$prodFilename = createTextRowsFromData($page, 0, \@data2, $prodPub);
-		$html = ($prodFilename ? qq{<a href="/temp$prodFilename">Production Information (Printable version)</a> <br>} : "" ) . $html;
-		$html = ($collFilename ? qq{<a href="/temp$collFilename">Collection Information (Printable version)</a> <br>} : "" ) . $html;
+		$html = ($prodFilename ? qq{<a href="/temp$prodFilename">Collection Information (Printable version)</a> <br>} : "" ) . $html;
+		$html = ($collFilename ? qq{<a href="/temp$collFilename">Production Information (Printable version)</a> <br>} : "" ) . $html;
 		$self->heading("Revenue / Collection Report");
 
 		if ($hardCopy == 1 and $printerAvailable) {
