@@ -303,7 +303,15 @@
 
 		<deliverable id="1630">
 			 Removed readonly flag from symptoms field in appointment dialog.
-		</deliverable>			
+		</deliverable>
+
+		<deliverable id="1633">
+			 Fixed editing problem with referring physician id in claim dialog.
+		</deliverable>
+
+		<deliverable id="1637">
+			 Fixed My Associated Resources in Patients component by correcting the dialog it calls and the query to display data.
+		</deliverable>
 
 	</deliverables>
 </release-notes>
