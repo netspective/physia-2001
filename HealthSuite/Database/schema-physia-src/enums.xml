@@ -294,6 +294,7 @@
 		<enum>Service Type</enum>
 		<enum>Misc Procedure</enum>
 		<enum>Contract Schedule</enum>
+		<enum>Superbill</enum>
 	</table>
 
 	<table name="Catalog_Entry_Status" abbrev="CatItmSt" type="Enumeration">
