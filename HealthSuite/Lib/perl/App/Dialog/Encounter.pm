@@ -53,7 +53,7 @@ sub initialize
 		new CGI::Dialog::Field(type => 'hidden', name => 'claim_filing_item_id'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'fee_schedules_item_id'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'batch_item_id'),
-		new CGI::Dialog::Field(type => 'hidden', name => 'event_id'),
+		new CGI::Dialog::Field(type => 'hidden', name => 'parent_event_id'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'insuranceIsSet'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'eventFieldsAreSet'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'invoiceFieldsAreSet'),
@@ -72,8 +72,8 @@ sub initialize
 		new CGI::Dialog::Field(type => 'hidden', name => 'copay_amt'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'claim_type'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'dupCheckin_returnUrl'),
-		new CGI::Dialog::Field(type=>'hidden',name => 'ins_ffs'), # Contains the insurance FFS 
-		new CGI::Dialog::Field(type=>'hidden',name => 'work_ffs'), # Contains the works comp
+		new CGI::Dialog::Field(type => 'hidden', name => 'ins_ffs'), # Contains the insurance FFS 
+		new CGI::Dialog::Field(type => 'hidden', name => 'work_ffs'), # Contains the works comp
 
 		new CGI::Dialog::MultiField(caption => 'Batch ID/Date', name => 'batch_fields', readOnlyWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
 			fields => [
@@ -333,13 +333,13 @@ sub populateData
 		if $flags & CGI::Dialog::DLGFLAG_DATAENTRY_INITIAL;
 		
 	my $invoiceId = $page->param('invoice_id');
-	my $eventId = $page->param('event_id');
+	my $eventId = $page->param('event_id') || $page->field('parent_event_id');
 
 	if(! $page->field('eventFieldsAreSet') && $eventId)
 	{
 		$page->field('checkin_stamp', $page->getTimeStamp());
 		$page->field('checkout_stamp', $page->getTimeStamp());
-		#$page->field('event_id', $eventId);
+		$page->field('parent_event_id', $eventId);
 		$STMTMGR_SCHEDULING->createFieldsFromSingleRow($page, STMTMGRFLAG_NONE, 'selEncountersCheckIn/Out', $eventId);
 		my $careProvider = $page->field('care_provider_id');
 		$page->field('provider_id', $careProvider); 	#default billing 'provider_id' to the 'care_provider_id'
@@ -942,7 +942,7 @@ sub addTransactionAndInvoice
 		trans_id => $editTransId || undef,
 		trans_type => $page->field('trans_type'),
 		trans_status => defined $transStatus ? $transStatus : undef,
-		parent_event_id => $page->param('event_id') || undef,
+		parent_event_id => $page->field('parent_event_id') || $page->param('event_id') || undef,
 		caption => $page->field('subject') || undef,
 		service_facility_id => $page->field('service_facility_id') || undef,
 		billing_facility_id => $billingFacility || undef,
