@@ -164,7 +164,7 @@ sub new
 		signaturePatientDate => undef,
 		payerName => undef,
 		payerAddress => undef,
-
+		comments => undef,
 	};
 	return bless \%params, $type;
 }
@@ -432,6 +432,7 @@ sub populateClaim
 	my $physician = $claim->getPayToProvider();
 	$data->{transProviderName} = $physician->{completeName};
 	$data->{providerSignatureDate} = uc($claim->getInvoiceDate);
+	$data->{comments} = $self->getComments($claim);
 
 }
 
@@ -589,6 +590,23 @@ sub populateFinalCharges
 	$data->{claimAmountPaid} = abs($claim->getTotalChargePaid);
 	$data->{claimBalance} = abs(abs($claim->getTotalCharge) - abs($claim->getTotalChargePaid));
 
+}
+
+sub getComments
+{
+	my ($self, $claim) = @_;
+
+	my $procedures = $claim->{procedures};
+	my $procedure;
+	my $comments = '';
+
+	foreach my $i (0..$#$procedures)
+	{
+		$procedure = $procedures->[$i];
+		$comments = $procedure->{comments};
+		last if ($procedure->{comments} ne '')
+	}
+	return $comments;
 }
 
 1;

@@ -1661,6 +1661,7 @@ sub populatePDF
 		$self->box17ClaimData($p, $Claim, $cordinates);
 		$self->box17aClaimData($p, $Claim, $cordinates);
 		$self->box18ClaimData($p, $Claim, $cordinates);
+		$self->box19ClaimData($p, $Claim, $cordinates);
 		$self->box20ClaimData($p, $Claim, $cordinates);
 		$self->box22ClaimData($p, $Claim, $cordinates);
 		$self->box23ClaimData($p, $Claim, $cordinates);
@@ -2427,6 +2428,24 @@ sub box18ClaimData
 	pdflib::PDF_stroke($p);
 }
 
+sub box19ClaimData
+{
+	my ($self, $p, $claim, $cordinates)  = @_;
+	my $box19Cordinates = $cordinates->{box19};
+	my $box19Y = $box19Cordinates->[1];
+	my $box19X = $box19Cordinates->[0];
+
+	my $font = pdflib::PDF_findfont($p, DATA_FONT_NAME, "default", 0);
+	die "Couldn't set font"  if ($font == -1);
+	pdflib::PDF_setfont($p, $font, DATA_FONT_SIZE);
+
+	my $comments = $self->getComments($claim);
+
+	pdflib::PDF_show_xy($p , $comments, $box19X + CELL_PADDING_X + DATA_PADDING_X, $box19Y - 3 * FORM_FONT_SIZE);
+	pdflib::PDF_stroke($p);
+
+}
+
 sub box20ClaimData
 {
 	my ($self, $p, $claim, $cordinates)  = @_;
@@ -2999,6 +3018,27 @@ sub reversePrimaryProcedure
 		$claim->{procedures}->[0] = $procedure;
 	}
 }
+
+sub getComments
+{
+	my ($self, $claim) = @_;
+
+	my $procedures = $claim->{procedures};
+	my $procedure;
+	my $comments = '';
+
+	foreach my $i (0..$#$procedures)
+	{
+		$procedure = $procedures->[$i];
+		$comments = $procedure->{comments};
+		last if ($procedure->{comments} ne '')
+	}
+
+	return $comments;
+
+}
+
+
 
 1;
 
