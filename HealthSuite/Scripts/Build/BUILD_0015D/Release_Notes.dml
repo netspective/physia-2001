@@ -56,6 +56,9 @@
 		<deliverable id="1425">
 			Corrected Patient Activity Report
 		</deliverable>
+		<deliverable id="1144">
+			Converted all 1144-affected reports to short_name to eliminate titles
+		</deliverable>
 
 	</deliverables>
 </release-notes>
