@@ -241,7 +241,7 @@ function createFieldOptionsHtml(controlId, fieldNode, style, extraAttrs)
 
 function createTemplateHtml(template)
 {
-	__nodebug = confirm ('Press Cancel to allow some debugging popups or OK to disable all debugging popups');
+//	__nodebug = confirm ('Press Cancel to allow some debugging popups or OK to disable all debugging popups');
 	var html = '';
 	var fieldCount = template.childNodes.length;
 	for (var i = 0; i < fieldCount; i++)
