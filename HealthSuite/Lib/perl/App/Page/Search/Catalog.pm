@@ -9,8 +9,11 @@ use DBI::StatementManager;
 use App::Statements::Search::Catalog;
 use Data::Publish;
 
-use vars qw(@ISA);
+use vars qw(@ISA %RESOURCE_MAP);
 @ISA = qw(App::Page::Search);
+%RESOURCE_MAP = (
+	'search/catalog' => {},
+	);
 
 sub getForm
 {
