@@ -376,6 +376,7 @@ sub copyInvoice
 			unit_cost => $item->{unit_cost} || undef,
 			rel_diags => $item->{rel_diags} || undef,
 			data_text_a => $item->{data_text_a} || undef,
+			data_text_c => $item->{data_text_c} || undef,
 			data_num_a => $item->{data_num_a} || undef,
 			data_num_b => $item->{data_num_b} || undef,
 			extended_cost => $item->{extended_cost} || undef,
@@ -1021,7 +1022,7 @@ sub storePatientEmployment
 	my $ptEmployAttr = App::Universal::ATTRTYPE_EMPLOYEDPART;	#221
 	my $selfEmployAttr = App::Universal::ATTRTYPE_SELFEMPLOYED;	#222
 	my $retiredAttr = App::Universal::ATTRTYPE_RETIRED;			#223
-	my $ftStudentAttr = App::Universal::ATTRTYPE_STUDENTFULL;	#224
+	my $ftStudentAttr = App::Universal::ATTRTYPE_STUDENTFULL;		#224
 	my $ptStudentAttr = App::Universal::ATTRTYPE_STUDENTPART;	#225
 	my $unknownAttr = App::Universal::ATTRTYPE_EMPLOYUNKNOWN;	#226
 
@@ -2518,6 +2519,7 @@ sub createExplosionItems
 				extended_cost => $extCost || undef,
 				rel_diags => join(', ', @relDiags) || undef,									#the actual icd (diag) codes
 				data_text_a => join(', ', @diagCodePointers) || undef,						#the diag code pointers
+				data_text_c => 'explosion',												#indicates this procedure comes from an explosion (misc) code
 				data_num_a => $ffsFlag || undef,										#flag indicating if item is ffs
 			);
 		}
@@ -2589,6 +2591,7 @@ sub voidProcedure
 			service_begin_date => $invItem->{service_begin_date} || undef,
 			service_end_date => $invItem->{service_end_date} || undef,
 			data_text_a => $invItem->{data_text_a} || undef,
+			data_text_c => $invItem->{data_text_c} || undef,
 			data_num_a => $invItem->{data_num_a} || undef,
 			#data_num_b => $invItem->{data_num_b} || undef,
 			_debug => 0

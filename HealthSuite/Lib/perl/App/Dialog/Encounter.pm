@@ -749,6 +749,7 @@ sub voidInvoicePostSubmit
 			unit_cost => $item->{unit_cost} || undef,
 			rel_diags => $item->{rel_diags} || undef,
 			data_text_a => $item->{data_text_a} || undef,
+			data_text_c => $item->{data_text_c} || undef,
 			data_num_a => $item->{data_num_a} || undef,
 			data_num_b => $item->{data_num_b} || undef,
 			extended_cost => $extCost || undef,
@@ -2037,6 +2038,7 @@ sub createExplosionItems
 				extended_cost => $extCost || undef,
 				rel_diags => $page->param("_f_proc_$line\_actual_diags") || undef,			#the actual icd (diag) codes
 				data_text_a => $page->param("_f_proc_$line\_diags") || undef,				#the diag code pointers
+				data_text_c => 'explosion',												#indicates this procedure comes from an explosion (misc) code
 				data_num_a => $ffsFlag || undef,										#flag indicating if item is ffs
 			);
 		}
@@ -2077,6 +2079,7 @@ sub voidProcedureItem
 			service_begin_date => $invItem->{service_begin_date} || undef,
 			service_end_date => $invItem->{service_end_date} || undef,
 			data_text_a => $invItem->{data_text_a} || undef,
+			data_text_c => $invItem->{data_text_c} || undef,
 			data_num_a => $invItem->{data_num_a} || undef,
 			#data_num_b => $invItem->{data_num_b} || undef,
 			_debug => 0
