@@ -145,34 +145,36 @@ $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
 	{	sqlStmt=>
 		qq{
 			SELECT	p.simple_name as provider,
-				payer_type,
-				payer_id,
-				pay_type,
+				ic.payer_type,
+				ic.payer_id,
+				pm.caption as pay_type,
 				sum(nvl(insurance_pay,0)+nvl(person_pay,0)) as year_rcpt,
 				sum(decode(
-					   trunc(invoice_date,'MM'),
+					   trunc(ic.invoice_date,'MM'),
 					    trunc(to_date(:5,'$SQLSTMT_DEFAULTDATEFORMAT'),'MM'),
 				     		(nvl(insurance_pay,0)+nvl(person_pay,0)),
 				     	 0)
 				     ) as month_rcpt,
 				sum(decode(
-						invoice_date,
+						ic.invoice_date,
 						 to_date(:5,'$SQLSTMT_DEFAULTDATEFORMAT'),
 							(nvl(insurance_pay,0)+nvl(person_pay,0)),
 					 0)
 				     ) as batch_rcpt
-			FROM 	invoice_charges ic, person p
-			WHERE 	(:1 IS NULL OR provider = :1)
-			AND	(:2 IS NULL OR upper(pay_type) = upper(:2))
+			FROM 	invoice_charges ic, person p, invoice_item_adjust iia, payment_method pm
+			WHERE 	(:1 IS NULL OR provider = :1)			
 			AND	(:3 IS NULL OR batch_id = :3)
-			AND	invoice_date between to_date(:4,'$SQLSTMT_DEFAULTDATEFORMAT')
+			AND	ic.invoice_date between to_date(:4,'$SQLSTMT_DEFAULTDATEFORMAT')
 			AND 	to_date(:5,'$SQLSTMT_DEFAULTDATEFORMAT')
-			AND	payer_type is not null
-			AND	owner_org_id = :6
+			AND	ic.payer_type is not null
+			AND	ic.owner_org_id = :6
 			AND	p.person_id (+)= ic.provider
-			GROUP BY p.simple_name,
-				payer_type,	payer_id,
-				pay_type
+			AND	iia.adjustment_id  (+) = ic.adjustment_id
+			AND	pm.id (+)= iia.pay_method
+			AND	(:2 IS NULL OR upper(pm.caption) = upper(:2))
+			GROUP BY p.simple_name,pm.caption,
+				ic.payer_type,	ic.payer_id,
+				ic.pay_type
 			UNION
 			SELECT	p.simple_name as provider,
 				max(-1) as payer_type,
