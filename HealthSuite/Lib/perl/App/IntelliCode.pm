@@ -573,7 +573,7 @@ sub isLabProc
 #Info includes: Price, Service Type (Lab,X-Ray,etc), Code Type (EPSDT,CPT,etc), flag (cap, ffs),Fee used
 sub getFSEntry
 {
-	my ($page, $cpt, $modifier, $fsRef, $flags) = @_;
+	my ($page, $cpt, $modifier,$serviceDate, $fsRef, $flags) = @_;
 
 	my @buffer = ();
 	
@@ -587,31 +587,31 @@ sub getFSEntry
 		my @fsArray = split(/\s*,\s*/,$fsList);		
 		foreach my $fs (@fsArray)							
 		{			
-			getEntry($page, $cpt, $modifier, \@buffer, $fs);		
+			getEntry($page, $cpt, $modifier,$serviceDate, \@buffer, $fs);		
 		}	
 	}
 	#Try FFS FS if procedure is not found
-	getFFS($page, $cpt, $modifier, \@buffer) unless scalar(@buffer);
+	getFFS($page, $cpt, $modifier,$serviceDate, \@buffer) unless scalar(@buffer);
 	return \@buffer;	
 }
 
 #Attempts to find procedure in  default FS 'FFS'
 sub getFFS
 {
-	my ($page, $cpt, $modifier, $bufferRef) = @_;
+	my ($page, $cpt, $modifier, $serviceDate,$bufferRef) = @_;
 	my $orgId = $page->session('org_internal_id');
 	my $ffs = $STMTMGR_CATALOG->getRowAsHash($page, STMTMGRFLAG_NONE,
 		'sel_catalog_by_id_orgId', 'FFS', $orgId);
-	getEntry($page, $cpt, $modifier, $bufferRef, $ffs->{internal_catalog_id} , 1) if $ffs->{internal_catalog_id};
+	getEntry($page, $cpt, $modifier, $serviceDate,$bufferRef, $ffs->{internal_catalog_id} , 1) if $ffs->{internal_catalog_id};
 }
 
 #Attempts to find procedure information in Fee Schedule
 sub getEntry
 {
-	my ($page, $cpt, $modifier, $bufferRef, $fs,$ffsFlag) = @_;	
+	my ($page, $cpt, $modifier,$serviceDate, $bufferRef, $fs,$ffsFlag) = @_;	
 	my $orgId = $page->session('org_internal_id');
 
-	my $entry = $STMTMGR_CATALOG->getRowAsHash($page, STMTMGRFLAG_NONE,'sel_ProcedureInfoByCodeMod', $cpt, $modifier, $fs);	
+	my $entry = $STMTMGR_CATALOG->getRowAsHash($page, STMTMGRFLAG_NONE,'selProcedureInfoByCodeModDate', $cpt, $modifier, $fs,$serviceDate);	
 	push(@{$bufferRef}, [$fs, sprintf("%.2f", $entry->{unit_cost}), $entry->{data_text},$entry->{caption} ,$entry->{entry_type},
 			     $entry->{catalog_id},$ffsFlag || $entry->{flags} ]) if exists $entry->{internal_catalog_id};
 }
