@@ -8,7 +8,7 @@ use File::Spec;
 use Class::Struct;
 use File::Path;
 
-use vars qw(@ISA @EXPORT %AVAIL_CONFIGS %ENV $CONFDATA_SERVER);
+use vars qw(@ISA @EXPORT %AVAIL_CONFIGS %ENV $CONFDATA_SERVER $DEBUG);
 @ISA    = qw(Exporter);
 @EXPORT = qw($CONFDATA_SERVER);
 
@@ -52,6 +52,26 @@ use constant PATH_OUTPUTPDF  => File::Spec->catfile(PATH_TEMP, 'invoices');
 use constant PATH_CONF       => File::Spec->catfile(PATH_APPROOT, 'Conf');
 use constant PATH_APPCONF    => File::Spec->catfile(PATH_CONF, 'app');
 
+
+# Returns true if debug mode is on
+sub debugMode
+{
+	$DEBUG = shift if defined $_[1];
+	unless (defined $DEBUG)
+	{
+		$DEBUG = 0;
+		my $group = $CONFDATA_SERVER->name_Group();
+		$DEBUG = 1 if $group eq CONFIGGROUP_SWDEV || $group eq CONFIGGROUP_TEST;
+		if (exists $ENV{HS_DEBUG} && defined $ENV{HS_DEBUG})
+		{
+			$DEBUG = $ENV{HS_DEBUG} ? 1 : 0;
+		}
+	}
+	return $DEBUG;
+}
+
+
+# Require that specified directory path(s) already exists
 sub requirePath
 {
 	foreach (@_)
@@ -60,6 +80,8 @@ sub requirePath
 	}
 }
 
+
+# Create specified directory path(s) if they don't already exist
 sub createPath
 {
 	foreach (@_)
@@ -71,6 +93,8 @@ sub createPath
 	}
 }
 
+
+# Populate the config with some default values
 sub getDefaultConfig
 {
 	my ($name, $group, $dbConnectKey) = @_;
@@ -102,6 +126,7 @@ sub getDefaultConfig
 	return $config;
 }
 
+
 %AVAIL_CONFIGS =
 (
 	# per-machine configurations go here
@@ -118,6 +143,12 @@ sub getDefaultConfig
 	'account-vusr_demo01' => getDefaultConfig('Demo01 Configuration', CONFIGGROUP_DEMO, 'demo01/demo@dbi:Oracle:SDEDBS02'),
 	'account-vusr_test01' => getDefaultConfig('Testing Configuration', CONFIGGROUP_TEST, 'demo01/demo@dbi:Oracle:SDEDBS02'),
 	'account-alex_hillman' => getDefaultConfig('Alex Hillman Configuration', CONFIGGROUP_SWDEV, 'sde_prime/sde@dbi:Oracle:SDEDBS02'),
+	
+	# configs specifically for use with $ENV{HS_CONFIG}
+	'db-sde_prime' => getDefaultConfig('SWDev Group Configuration', CONFIGGROUP_SWDEV, 'sde_prime/sde@dbi:Oracle:SDEDBS02'),
+	'db-sde_prime2' => getDefaultConfig('SWDev Group Configuration', CONFIGGROUP_SWDEV, 'sde_prime2/sde@dbi:Oracle:SDEDBS02'),
+	'db-demo01' => getDefaultConfig('Demo01 Configuration', CONFIGGROUP_DEMO, 'demo01/demo@dbi:Oracle:SDEDBS02'),
+	'db-pro01' => getDefaultConfig('Medina Configuration', CONFIGGROUP_PRO, 'prod_01/prod01@dbi:Oracle:SDEDBS02'),
 );
 
 my $userName = '';
@@ -157,4 +188,5 @@ requirePath(
 	$CONFDATA_SERVER->path_BillingTemplate,
 	$CONFDATA_SERVER->path_OrgReports,
 	);
+	
 1;
