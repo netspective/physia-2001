@@ -212,6 +212,33 @@ $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
 
 		},
 	},
+	
+	'selDeposit'=>
+	{
+		sqlStmt=>
+		qq
+		{
+                      SELECT    to_char(aic.invoice_date,'$SQLSTMT_DEFAULTDATEFORMAT') as batch_date,
+                                aic.payer_id,
+                                aic.payer_type,
+                                iia.pay_ref,
+                                aic.invoice_id,
+                                sum(nvl(aic.insurance_pay,0)+nvl(aic.person_pay,0)) as amount,
+                                pm.caption as pay_type
+                        FROM    invoice_charges aic,invoice_item_adjust iia,
+                        	payment_method pm
+                        WHERE        iia.adjustment_id = aic.adjustment_id
+                        AND        invoice_date between to_date(:1,'MM/DD/YYYY')
+                        AND        to_date(:2,'MM/DD/YYYY')
+                        AND        (:3 IS NULL OR facility = :3)
+                        AND        (:4 IS NULL OR provider = :4)
+                        AND        owner_org_id = :5	
+                        AND	   pm.id = aic.pay_type
+                        GROUP BY aic.invoice_date , pm.caption,aic.payer_id,iia.pay_ref,aic.payer_type,aic.invoice_id
+                        ORDER BY aic.invoice_date , pm.caption,aic.payer_id,iia.pay_ref                        
+		},
+		
+	},
 
 
 
