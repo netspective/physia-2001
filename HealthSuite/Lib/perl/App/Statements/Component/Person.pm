@@ -1083,7 +1083,9 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 				WHERE guarantor_type = @{[App::Universal::GUARANTOR_ORG]}
 				AND  g.org_internal_id = i.guarantor_id
 
-			)
+			),
+			i.coverage_begin_date,
+			i.coverage_end_date
 		FROM insurance i
 		WHERE record_type = 3
 		AND owner_person_id = ?
@@ -1099,7 +1101,7 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 				dataFmt => {
 					'0' => '<A HREF = "/person/#14#/profile">#12#</A> (Third Party)',
 					'1' => '<A HREF = "/org/#17#/profile">#12#</A> (Third Party)',
-					''  => '<A HREF = "/org/#16#/profile">#16#</A>(#5# #13#): #4#, #2#',
+					''  => '<A HREF = "/org/#16#/profile">#16#</A>(#5# #13#): #4#, #2#, Begin Date: #18#, End Date: #19#',
 				},
 			},
 		],
@@ -1206,7 +1208,8 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 				WHERE guarantor_type = @{[App::Universal::GUARANTOR_ORG]}
 				AND  g.org_internal_id = i.guarantor_id
 
-			)
+			),
+			i.coverage_begin_date
 			FROM 	insurance i
 			WHERE 	owner_person_id = ?
 			ORDER BY bill_sequence
@@ -1219,7 +1222,7 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 					dataFmt => {
 						'0' => '<b>Client Billing (</b><A HREF = "/person/#12#/profile">#13#</A>, Third Party)',
 						'1' => '<A HREF = "/org/#15#/profile">#13#</A> (Third Party)',
-						''  => '<b>#0#</b> (#1#, <b>#11#</b>, #10#, End Date: #8#)<BR><b> Policy Name: </b>#5# (#6#) <BR><b>  Member Num: </b>#2#, <b>Co-Pay:</b> $#7#',
+						''  => '<b>#0#</b> (#1#, <b>#11#</b>, #10#)<BR><b> Policy Name: </b>#5# (#6#) <BR><b>  Member Num: </b>#2#, <b>Co-Pay:</b> $#7#, Begin Date: #17#, End Date: #8#',
 					},
 				},
 		],
