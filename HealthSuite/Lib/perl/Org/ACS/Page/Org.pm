@@ -27,9 +27,9 @@ use vars qw(@ISA %RESOURCE_MAP);
 	'org' => {
 		_views => [
 			{caption => 'Summary', name => 'profile',},
-			{caption => 'Departments', name => 'departments',},
-			{caption => 'Personnel', name => 'personnel',},
-			{caption => 'Catalog', name => 'catalog',},
+#			{caption => 'Departments', name => 'departments',},
+#			{caption => 'Personnel', name => 'personnel',},
+#			{caption => 'Catalog', name => 'catalog',},
 #			{caption => 'Account', name => 'account',},
 			],
 		},
@@ -110,9 +110,9 @@ sub prepare_page_content_header
 	$self->{page_menu_sibling} = [
 			['Summary', "$urlPrefix/profile", 'profile'],
 			#['Insurance', "$urlPrefix/insurance", 'insurance'],
-			['Departments', "$urlPrefix/departments", 'departments'],
-			['Personnel', "$urlPrefix/personnel?home=$urlPrefix/profile", 'personnel'],
-			['Catalog', "$urlPrefix/catalog", 'catalog'],
+			#['Departments', "$urlPrefix/departments", 'departments'],
+			#['Personnel', "$urlPrefix/personnel?home=$urlPrefix/profile", 'personnel'],
+			#['Catalog', "$urlPrefix/catalog", 'catalog'],
 			#['Account', "$urlPrefix/account", 'account'],
 		];
 	$self->{page_menu_siblingSelectorParam} = '_pm_view';
