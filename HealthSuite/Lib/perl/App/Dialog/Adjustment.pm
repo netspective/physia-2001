@@ -149,7 +149,8 @@ sub populateData
 	my $itemId = $page->param('item_id');
 
 	my $invoiceInfo = $STMTMGR_INVOICE->getRowAsHash($page,STMTMGRFLAG_NONE, 'selInvoice', $invoiceId);
-	$page->param('payment') eq 'insurance' ? $page->field('payer_id', $invoiceInfo->{bill_to_id}) : $page->field('payer_id', $invoiceInfo->{client_id});
+	my $primaryPayer = $STMTMGR_INVOICE->getRowAsHash($page,STMTMGRFLAG_NONE, 'selInvoiceBillingPrimary', $invoiceId);
+	$page->param('payment') eq 'insurance' ? $page->field('payer_id', $primaryPayer->{bill_to_id}) : $page->field('payer_id', $invoiceInfo->{client_id});
 
 
 	return unless $itemId;
