@@ -70,7 +70,7 @@ sub initialize
 	unless($personId eq $userId)
 	{
 		$self->addLocatorLinks(
-				['Person Summary', '/search/person'],
+				['Person Look-up', '/search/person'],
 				[$personId, "/person/$personId/profile"],
 			);
 	}
