@@ -227,16 +227,17 @@ sub makeStateChanges
 	{
 		$self->updateFieldFlags('bill_provider', FLDFLAG_INVISIBLE, 1);
 	}
-	elsif ($providerId eq '' && $command ne 'add')
+	if ($providerId eq '')
 	{
 		$self->updateFieldFlags('bill_provider', FLDFLAG_INVISIBLE, 1);
-
 	}
+
 	my $billRecField = $self->getField('bill_provider');
 		my $personType = $page->field('physician_type');
 
 	if ($page->field('physician_type') eq "Other Clinical Services Provider (alternate billing)" && $page->field('bill_provider') eq '')
 	{
+		$self->updateFieldFlags('bill_provider', FLDFLAG_INVISIBLE, 0);
 		$billRecField->invalidate($page, "'$billRecField->{caption}' is a required field when the 'Person Type' is '$personType'");
 	}
 }
@@ -676,8 +677,9 @@ sub handleAttrs
 		item_name => 'Bill Provider',
 		value_type => 0,
 		value_text => $page->field('bill_provider') || undef,
+		value_textB => $page->field('physician_type') || undef,
 		_debug => 0
-	) if $page->field('bill_provider') ne '';
+	);
 }
 
 sub customValidate
