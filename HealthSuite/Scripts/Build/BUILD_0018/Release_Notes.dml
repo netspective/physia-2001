@@ -233,6 +233,10 @@
 			Reopened: New component created called Inactive Medications under pt chart.
 		</deliverable>		
 
+		<deliverable id="1773">
+			Added anew Organization type called 'Pharmacy' in the Main-Menu.
+		</deliverable>	
+		
 		<deliverable id="1776">
 			The medication dialog now show the allergy component (and others) while adding a new med
 		</deliverable>
