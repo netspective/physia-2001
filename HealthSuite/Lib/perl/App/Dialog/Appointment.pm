@@ -602,7 +602,8 @@ sub findConflictEvent
 		'selApptTypeById', $page->field('appt_type')) if $page->field('appt_type');
 	$page->property('apptTypeInfo', $apptType);
 
-	$page->field('duration', $apptType->{duration} || 10);
+	$page->field('duration', $apptType->{duration} ? 
+		($apptType->{duration} == 1 ? 2 : $apptType->{duration}) : 10);
 
 	my $start_time = $page->field("appt_date_$ordinal") . ' '  . $page->field("appt_time_$ordinal");
 	my ($startDate, $startTime, $am) = split(/ /, $start_time);
@@ -613,7 +614,7 @@ sub findConflictEvent
 	my $dayMinutes = $day * 24 * 60;
 
 	my $startMinutes = hhmmAM2minutes("$startTime $am") + $dayMinutes +1;
-	my $endMinutes   = $startMinutes + $page->field('duration') -2;
+	my $endMinutes = $startMinutes + $page->field('duration') -2;
 	my $minuteRange  = "$startMinutes-$endMinutes";
 	my $apptSlot     = new Set::IntSpan($minuteRange);
 

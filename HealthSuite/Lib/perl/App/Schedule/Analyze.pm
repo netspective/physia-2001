@@ -420,7 +420,7 @@ sub findApptDuration
 	my $apptType = $STMTMGR_SCHEDULING->getRowAsHash($page, STMTMGRFLAG_NONE,	'selApptTypeById',
 		$apptTypeId);
 
-	return $apptType->{duration};
+	return $apptType->{duration} == 1 ? 2 : $apptType->{duration};
 }
 
 sub findEventSlots
