@@ -282,7 +282,11 @@
 			This deliverable also includes the addition of a new Query for Lab Results which was necessary for the
 			worklist to operate.
 		</deliverable>
-
+		
+		<deliverable id="1524">
+			Fixed the 'Personnel' component to add and edit persons of type physician, Nurse, staff, admistrator and superuser
+			in the Personnel dialog
+		</deliverable>
 	</deliverables>
 </release-notes>
 
