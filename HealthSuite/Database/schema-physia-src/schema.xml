@@ -677,11 +677,8 @@
 		<column name="role_activity_id" lookupref="Role_Activity" default="0" descr="How the role is used (e.g., grant or revoke)."/>
 	</table>
 
-	<table name="Invoice_Worklist" abbrev="InvWrk" type="Secure">
+	<table name="Invoice_Worklist" abbrev="InvWrk" type="Secure,Creation_Track">
 		<column name="invoice_worklist_id" type="autoinc" primarykey="yes" descr="Uniq ID (in entire system) Invoice Worklist entry"/>
-		<column name="cr_stamp" type="stamp" default="sysdate" descr="Date/time record was created"/>
-		<column name="cr_user_id" type="entity_id" descr="The user that created the record"/>
-		<column name="cr_org_internal_id" type="longint" descr="The org that created the record (the one the cr_user_id was logged-into)"/>
 		<column name="owner_id" lookupref="person.person_id" descr="Person whose worklist Invoice is attached)"/>
 		<column name="person_id" lookupref="person.person_id" descr="Person ID of patient on the invoice"/>
 		<column name="responsible_id" indexed="yes" lookupref="person.person_id" descr="Responsible party ID for action on the invoice (collector,etc)"/>
@@ -695,6 +692,25 @@
 		<column name="worklist_type" type="text" size="30" descr="Type of Worklist Invoice will appear  on(collection,claims,etc)" />
 		<column name="comments" type="text" size="512" descr="Comment about invoice"/>
 	</table>
+
+
+
+	<table name="Statement" abbrev="Stmt" type="Secure,Audit">
+		<column name="statement_id" type="autoinc" primarykey="yes" descr="Uniq ID (in entire system) for the invoice statement record"/>
+		<column name="statement_source" lookupref="electronic_payer_source.id"  descr="Source of Statement"/>										
+		<column name="tranmission_date" type="stamp" descr="Date Statement was sent " />
+		<column name="tranmission_status" lookupref="Transmission_Status.id" type="integer" descr="Transmission Status"/>						
+		<column name="ack_date" type="stamp" descr="Date statement was acknowledge"/>		
+		<column name="int_statement_id" type="text" size="30" descr="Physia Internal Statement ID"/>						
+		<column name="ext_statement_id" type="text" size="30" descr="External Statement ID"/>			
+	</table>
+	
+	<table name="Statement_Invoice" abbrev="StmtInv" type="Secure,Audit">
+		<column name="invoice_stmt_id" type="autoinc" primarykey="yes" descr="Uniq ID (in entire system) for the invoice statement record"/>
+		<column name="parent_id" indexed="yes" parentref="Statement.statement_id" descr="The Statement invoice is included on"/>
+		<column name="invoice_id" indexed="yes" lookupref="Invoice.invoice_id" descr="Invoice id for invoice on the worklist"/>		
+	</table>
+	
 
 	<table name="TEMP_FKM" abbrev="TempFM" >
 		<column name="person_id"  indexed="yes" type="text" size="16"/>
