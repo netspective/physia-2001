@@ -61,21 +61,21 @@ $STMTMGR_COMPONENT_REFERRAL = new App::Statements::Component::Referral(
 	},
 	'sel_referrals_open' => qq{
 		select
-			trans_id as referral_id,
-			initiator_id as org_id,
-			consult_id as patient,
+			t.trans_id as referral_id,
+			t.initiator_id as org_id,
+			t.consult_id as patient,
 			rd.name as referral_type,
 			aa.value_int as claim_number,
 			t.trans_substatus_reason as requested_service,
 			--%simpleDate:trans_end_stamp%,
-			decode(to_char(trans_end_stamp, 'YYYY'),
+			decode(to_char(t.trans_end_stamp, 'YYYY'),
 			to_char(sysdate, 'YYYY'),
-			to_char(trans_end_stamp, 'Mon DD'),
-			to_char(trans_end_stamp, 'MM/DD/YY')) as trans_end_stamp,
+			to_char(t.trans_end_stamp, 'Mon DD'),
+			to_char(t.trans_end_stamp, 'MM/DD/YY')) as trans_end_stamp,
 			NVL((select tt.trans_id from transaction tt where tt.trans_type = 6010 and tt.parent_trans_id = t.trans_id
-				and rownum < 2 and trans_status = 2), t.trans_id) as trans_id_mod,
-			trans_subtype as intake_coordinator,
-			trans_substatus_reason as ref_status,
+				and rownum < 2 and t.trans_status = 2), t.trans_id) as trans_id_mod,
+			t.trans_subtype as intake_coordinator,
+			t.trans_substatus_reason as ref_status,
 			p.ssn as ssn
 		from transaction t, trans_attribute aa, person p, person_org_category po, ref_service_category rd
 		where
@@ -87,7 +87,15 @@ $STMTMGR_COMPONENT_REFERRAL = new App::Statements::Component::Referral(
 		and po.person_id = p.person_id
 		and rd.serv_category = t.trans_expire_reason
 		and po.org_internal_id = ?
-		order by trans_id DESC
+		and exists
+				(
+					select tn.trans_id
+					from transaction tn, transaction tp
+					where tp.parent_trans_id = t.trans_id
+					and   tn.parent_trans_id = tp.trans_id	
+					and   (tn.trans_status_reason NOT IN ('7', '13', '14', '15', '16', '17', '18', '19') or tn.trans_status_reason IS NULL)
+				)
+		order by t.trans_id DESC
 	},
 
 	'sel_referrals_physician' => qq{
@@ -142,7 +150,7 @@ $STMTMGR_COMPONENT_REFERRAL = new App::Statements::Component::Referral(
 		AND      t.consult_id = p.person_id
 		AND      po.person_id = p.person_id
 		AND      po.org_internal_id = ?
-		AND 		t.trans_status_reason NOT IN ('7', '13', '14', '15', '16', '17', '18', '19')
+		AND 		(t.trans_status_reason NOT IN ('7', '13', '14', '15', '16', '17', '18', '19') or t.trans_status_reason IS NULL)
 		ORDER BY trans_id DESC
 	},
 
