@@ -3,7 +3,7 @@
 
 <schema name="physia-lookups">
 
-	<table name="Referral_Source_Type" abbrev="RefSrTp" type="Org_Lookup">
+	<table name="Referral_Source_Type" abbrev="RefSouTp" type="Org_Lookup">
 		<enum id="0">Dr.Office</enum>
 		<enum id="1">Patient</enum>
 		<enum id="2">Adjuster</enum>
