@@ -1547,23 +1547,22 @@ sub initialize
 	$input->registerValidators($valMgr);
 
 	my $invoiceId = $self->param('invoice_id');
-	eval
+
+	$input->populateClaims($claimList, dbiHdl => $self->getSchema()->{dbh},
+		invoiceIds => [$invoiceId], valMgr => $valMgr);
+	my $st = $claimList->getStatistics;
+
+	if($valMgr->haveErrors())
 	{
-		$input->populateClaims($claimList, dbiHdl => $self->getSchema()->{dbh},
-					invoiceIds => [$invoiceId], valMgr => $valMgr);
-		my $st = $claimList->getStatistics;
-		if($valMgr->haveErrors())
-		{
-			my $errors = $valMgr->getErrors();
-			push(@{$self->{page_content}}, join('<li>', @$errors));
-		}
-		else
-		{
-			my $claim = $claimList->{claims}->[0];
-			$self->property('activeClaim', $claim);
-		}
-	};
-	$self->addError($@) if $@;
+		my $errors = $valMgr->getErrors();
+		#for (@$errors)
+		#{
+		#	$self->addError($_->[0], $_->[1], $_->[2]);
+		#}
+	}
+
+	my $claim = $claimList->{claims}->[0];
+	$self->property('activeClaim', $claim);
 
 	$self->addLocatorLinks(
 			['Claims', '/search/claim'],
