@@ -79,6 +79,9 @@
 		<deliverable id="1358">
 			Added statuses to condition that shows resubmit to current payer link.
 		</deliverable>
+		<deliverable id="1024">
+			On collection worklist account notes replaced Complete Name with Simple Names
+		</deliverable>
 
 	</deliverables>
 </release-notes>
