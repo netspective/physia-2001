@@ -70,6 +70,11 @@ sub populateData
 
 	return unless $flags & CGI::Dialog::DLGFLAG_UPDORREMOVE_DATAENTRY_INITIAL;
 
+	my $personId = $page->param('person_id');
+	my $orgId = $page->param('org_id');
+
+	my $data = $STMTMGR_PERSON->createFieldsFromSingleRow($page, STMTMGRFLAG_NONE, 'selLoginOrg', $personId, $orgId);
+
 	if($command eq 'remove')
 	{
 		$page->field('delete_record', 1);
@@ -79,19 +84,20 @@ sub populateData
 
 sub execute
 {
-	my ($self, $page, $command, $flags, $member) = @_;
-
+	my ($self, $page, $command, $flags) = @_;
+	my $personId = $command eq 'add' ? $page->field('person_id') : $page->param('person_id');
+	my $orgId = $command eq 'add' ? $page->field('org_id') : $page->param('org_id');
 	$page->schemaAction(
 			'Person_Login', $command,
-			person_id => $page->field('person_id') || undef,
-			org_id => $page->field('org_id') || undef,
+			person_id => $personId || undef,
+			org_id => $orgId || undef,
 			password => $page->field('password') || undef,
 			quantity => $page->field('quantity') || undef,
-			_debug => 1
+			_debug => 0
 	);
 
 	$self->handlePostExecute($page, $command, $flags);
-	return '';
+	return "\u$command completed.";
 }
 
 1;
