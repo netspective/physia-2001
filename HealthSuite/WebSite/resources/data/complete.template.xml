@@ -1,0 +1,26 @@
+<?xml version="1.0" ?>
+<mdl>
+	<clinical-documentation>
+		<templates id="physia">
+			<template id="visit" caption="Visit Note">
+			<field-defn idref="vital_signs"/>
+			<field-defn idref="past_medical_history"/>
+			<field-defn idref="family_hx"/>
+			<field-defn idref="social_personal_hx"/>
+			<field-defn idref="travel_exposure_hx"/>
+			<field-defn idref="pediatric_hx"/>
+			<field-defn idref="immunization_history"/>
+			<field-defn idref="hpi"/>
+			<field-defn idref="ros"/>
+			<field-defn idref="habits"/>
+			<field-defn idref="current_medications"/>
+			<field-defn idref="family_planning"/>
+			<field-defn idref="physical_exam"/>
+			<field-defn idref="laboratory_results"/>
+			<field-defn idref="assessment"/>
+			<field-defn idref="procedures"/>
+		<field-defn idref="plan"/>
+			</template>
+		</templates>
+	</clinical-documentation>
+</mdl>
