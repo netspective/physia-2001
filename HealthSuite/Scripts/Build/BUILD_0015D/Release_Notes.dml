@@ -65,6 +65,15 @@
 			Populate DA2 records of the NSF file with the Insured address.  Bug left open pending test results.
 		</deliverable>
 
+		<deliverable id="1296">
+			Price for just code is being looked up when the code/modifier price is not found.
+		</deliverable>
+		<deliverable id="1375">
+			Fixed display of created invoices under the claim status report.
+		</deliverable>
+		<deliverable id="1414">
+			Validation for invalid date formats in claim lookup fixed.
+		</deliverable>
 	</deliverables>
 </release-notes>
 
