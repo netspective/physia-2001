@@ -289,20 +289,23 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 		FROM
 			ofcatalog_Attribute oc_a,
 			offering_catalog oc,
-			offering_catalog_entry oce,
-			insurance i, org o,
-			insurance_attribute ia
+			offering_catalog_entry oce
 		WHERE
 			oce.catalog_id (+) = oc.internal_catalog_id
 			AND oc_a.parent_id (+) = oc.internal_catalog_id
 			AND oc.catalog_type = 0
 			AND (oc.org_internal_id IS NULL OR oc.org_internal_id = :1)
-			AND ia.value_text = oc.internal_catalog_id
-			AND ia.parent_id = i.ins_internal_id
-			AND ia.item_name = 'Fee Schedule'
-			AND i.owner_org_id = :1
-			AND i.ins_org_id = o.org_internal_id
-			AND o.org_id = :2
+			AND EXISTS
+				(
+					SELECT unique ia.value_text
+					FROM 	insurance i, org o,	insurance_attribute ia
+					WHERE ia.value_text = oc.internal_catalog_id
+					AND ia.parent_id = i.ins_internal_id
+					AND ia.item_name = 'Fee Schedule'
+					AND i.owner_org_id = :1
+					AND i.ins_org_id = o.org_internal_id
+					AND o.org_id = :2
+				)
 		GROUP BY
 			oc.catalog_id,
 			oc.internal_catalog_id,
