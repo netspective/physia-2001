@@ -29,7 +29,7 @@ use vars qw(@ISA %RESOURCE_MAP);
 			{caption => 'Summary', name => 'profile',},
 			{caption => 'Insurance', name => 'insurance',},
 			{caption => 'Personnel', name => 'personnel',},
-			{caption => 'Catalog', name => 'catalog',},			
+			{caption => 'Catalog', name => 'catalog',},
 			{caption => 'Account', name => 'account',},
 			],
 		},
@@ -243,8 +243,9 @@ sub prepare_view_profile
 					<font size=1 face=arial>
 					#component.stp-org.alerts#<BR>
 					#component.stp-org.insurancePlans#<BR>
-					#component.stpt-org.healthMaintenanceRule#<BR>
-					#component.stpt-org.associatedResourcesStats#<BR>
+					#component.stp-org.healthMaintenanceRule#<BR>
+					#component.stp-org.associatedResourcesStats#<BR>
+					#component.stp-org.billingEvents#<BR>
 					</font>
 				</TD>
 			</TR>
@@ -331,9 +332,9 @@ sub prepare_view_catalog
 	my $viewMenuHtml = $self->getMenu_Tabs(App::Page::MENUFLAGS_DEFAULT, '_query_view', $viewMenu, {
 				selColor => '#CCCCCC', selTextColor => 'black', unselColor => '#EEEEEE', unselTextColor => '#555555', highColor => 'navy',
 				leftImage => 'images/design/tab-top-left-corner-white', rightImage => 'images/design/tab-top-right-corner-white'} );
-	$html =qq{<br><table align="center" border="0" cellspacing="0" cellpadding="0" bgcolor="white"><tr><td>&nbsp;<font face="tahoma,helvetica" size="2" color="Navy"><b>Catalog Type:</b></font>&nbsp;</td>$viewMenuHtml</tr></table>};	
-	
-	
+	$html =qq{<br><table align="center" border="0" cellspacing="0" cellpadding="0" bgcolor="white"><tr><td>&nbsp;<font face="tahoma,helvetica" size="2" color="Navy"><b>Catalog Type:</b></font>&nbsp;</td>$viewMenuHtml</tr></table>};
+
+
 	#Show Fee Schedule Catalog
 	if ($self->param('catalog') eq "fee_schedule")
 	{
