@@ -284,13 +284,13 @@ sub selfHiddenFormFields
 		@value = $self->param($param);
 		foreach (@value)
 		{
-			push(@hiddens, "<INPUT TYPE='HIDDEN' NAME='$param' VALUE='$_'>");
+			push(@hiddens, qq{<INPUT TYPE="HIDDEN" NAME="$param" VALUE="$_">});
 		}
     }
 
     foreach (sort keys %replaceParams)
     {
-		push(@hiddens, "<INPUT TYPE='HIDDEN' NAME='$_' VALUE='$replaceParams{$_}'>") if defined $replaceParams{$_};
+		push(@hiddens, qq{<INPUT TYPE="HIDDEN" NAME="$_" VALUE="$replaceParams{$_}">}) if defined $replaceParams{$_};
 	}
 	
 	join("\n", @hiddens);
@@ -743,21 +743,24 @@ sub setupACL
     my $getPermsSth = $dbh->prepare(qq{
                 select rp.role_activity_id, rp.permission_name 
 				from person_org_role por, role_permission rp
-				where por.person_id = ? and por.org_internal_id = ? and 
-                por.role_name_id = rp.role_name_id
-                });                
-	$getPermsSth->execute($session->{user_id}, $session->{org_internal_id});
-	while(my $row = $getPermsSth->fetch())
-	{
-		if(my $permInfo = $permIds->{$row->[1]})
-		{	
-			# if activity type is 0 or null, we're granting otherwise we're revoking
-			$permissions = $row->[0] ? 
-				$permissions->diff($permInfo->[Security::AccessControl::PERMISSIONINFOIDX_CHILDPERMISSIONS]) :
-				$permissions->union($permInfo->[Security::AccessControl::PERMISSIONINFOIDX_CHILDPERMISSIONS]);
-		};
+				where rp.role_activity_id = ? and por.person_id = ? and por.org_internal_id = ? and 
+                por.role_name_id = rp.role_name_id and por.org_internal_id = rp.org_internal_id
+                });
+    for my $activity (0, 1)
+    {
+		$getPermsSth->execute($activity, $session->{user_id}, $session->{org_internal_id});
+		while(my $row = $getPermsSth->fetch())
+		{
+			if(my $permInfo = $permIds->{$row->[1]})
+			{	
+				# if activity type is 0 or null, we're granting otherwise we're revoking
+				$permissions = $row->[0] ? 
+					$permissions->diff($permInfo->[Security::AccessControl::PERMISSIONINFOIDX_CHILDPERMISSIONS]) :
+					$permissions->union($permInfo->[Security::AccessControl::PERMISSIONINFOIDX_CHILDPERMISSIONS]);
+			};
+		}
+		$getPermsSth->finish();
 	}
-	$getPermsSth->finish();
 	$session->{aclPermissions} = $permissions;
 }
 
