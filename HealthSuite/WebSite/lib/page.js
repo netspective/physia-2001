@@ -688,6 +688,43 @@ function validateChange_URL(event, flags)
 {
 }
 
+function validateChange_LowerCase(event, flags)
+{
+	var inText = event.srcElement.value;
+	var outText = inText.toLowerCase();
+	event.srcElement.value = outText;
+}
+
+function validateChange_UpperCase(event, flags)
+{
+	var inText = event.srcElement.value;
+	var outText = inText.toUpperCase();
+	event.srcElement.value = outText;
+}
+
+function validateChange_UCaseInitial(event, flags)
+{
+	var inText = event.srcElement.value;
+	var outText = new String;
+	ouText = "";
+
+	for(var i = 0; i < inText.length; i++) {
+		var ch = inText.charAt(i);
+		if((ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z')) {
+			if(i == 0) outText = ouText + ch.toUpperCase();
+			else {
+				var ch1 = inText.charAt(i-1);
+				if((ch1 >= 'a' && ch1 <= 'z') || (ch1 >= 'A' && ch1 <= 'Z'))
+					outText = outText +  ch.toLowerCase();
+				else outText = outText +  ch.toUpperCase();
+			}
+		}
+		else outText = outText +  ch;
+	}
+	event.srcElement.value = outText;
+}
+
+
 function setSelectedValue(selectObj, value)
 {
 	for(i = 0; i < selectObj.options.length; i++)

@@ -5,7 +5,6 @@ package CGI::Validator::Field;
 use strict;
 use Exporter;
 use Date::Manip;
-use Devel::ChangeLog;
 use vars qw(@ISA @CHANGELOG);
 
 use vars qw(@ISA %VALIDATE_TYPE_DATA @EXPORT);
@@ -48,8 +47,8 @@ use constant ONKEYPRESSJS_DEFAULT    => 'processKeypress_default(event)';
 use constant ONKEYPRESSJS_FLOATNUM   => 'processKeypress_float(event)';
 use constant ONKEYPRESSJS_INTNUM     => 'processKeypress_integer(event)';
 use constant ONKEYPRESSJS_INTDASH    => 'processKeypress_integerdash(event)';
-use constant ONKEYPRESSJS_IDENTIFIER=> 'processKeypress_identifier(event)';
-use constant ONBLUR_SSN	     	=> 'validateChange_SSN(event)';
+use constant ONKEYPRESSJS_IDENTIFIER => 'processKeypress_identifier(event)';
+use constant ONBLUR_SSN              => 'validateChange_SSN(event)';
 use constant ONBLUR_DATE           => 'validateChange_Date(event)';
 use constant ONBLUR_STAMP          => 'validateChange_Stamp(event)';
 use constant ONBLUR_TIME           => 'validateChange_Time(event)';
@@ -61,6 +60,9 @@ use constant ONBLUR_ZIP            => 'validateChange_Zip(event)';
 use constant ONBLUR_PAGER          => 'validateChange_Pager(event)';
 use constant ONBLUR_PHONE          => 'validateChange_Phone(event)';
 use constant ONBLUR_URL            => 'validateChange_URL(event)';
+use constant ONBLUR_LOWERCASE      => 'validateChange_LowerCase(event)';
+use constant ONBLUR_UPPERCASE      => 'validateChange_UpperCase(event)';
+use constant ONBLUR_UCASEINITIAL   => 'validateChange_UCaseInitial(event)';
 
 %VALIDATE_TYPE_DATA =
 		(
@@ -235,6 +237,18 @@ use constant ONBLUR_URL            => 'validateChange_URL(event)';
 			'identifier' =>
 				{
 					onKeyPressJS => ONKEYPRESSJS_IDENTIFIER
+				},
+			'lowercase' =>
+				{
+					onBlurJS => ONBLUR_LOWERCASE
+				},
+			'uppercase' =>
+				{
+					onBlurJS => ONBLUR_UPPERCASE
+				},
+			'ucaseinitial' =>
+				{
+					onBlurJS => ONBLUR_UCASEINITIAL
 				}
 		);
 
@@ -623,10 +637,4 @@ sub generateJavaScript
 }
 use constant DATE_FIELD => 'Dialog/AnyDate';
 
-@CHANGELOG =
-(
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_UPDATE, '12/29/1999', 'RK',
-		DATE_FIELD,
-		'Updated the error message in the sub routine "validateDateStamp".Added the date format that displays in the error message. '],
-);
 1;
