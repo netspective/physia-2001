@@ -48,8 +48,8 @@ sub new
 
 		new CGI::Dialog::Field(
 					name => 'pay_type',
-					caption => 'Payment Type', 
-					enum => 'Payment_Type', 
+					caption => 'Payment Type',
+					enum => 'Payment_Type',
 					fKeyWhere => "group_name is NULL or group_name = 'personal'"),
 
 		new CGI::Dialog::MultiField(caption =>'Payment Method/Check Number', name => 'pay_method_fields',
@@ -69,9 +69,9 @@ sub new
 	);
 	$self->{activityLog} =
 	{
-		scope =>'invoice',
-		key => "#param.invoice_id#",
-		data => "postpayment '#param.item_id#' claim <a href='/invoice/#param.invoice_id#/summary'>#param.invoice_id#</a>"
+		scope =>'transaction',
+		key => "#param.person_id#",
+		data => "personalpayment of '#field.total_amount#' to <a href='/person/#param.person_id#/profile'>#param.person_id#</a>"
 	};
 	$self->addFooter(new CGI::Dialog::Buttons(cancelUrl => $self->{cancelUrl} || undef));
 
@@ -99,7 +99,7 @@ sub makeStateChanges
 		$self->setFieldFlags('total_amount', FLDFLAG_INVISIBLE, 1);
 		$self->setFieldFlags('pay_type', FLDFLAG_INVISIBLE, 1);
 		$self->setFieldFlags('pay_method_fields', FLDFLAG_INVISIBLE, 1);
-		$self->setFieldFlags('auth_ref', FLDFLAG_INVISIBLE, 1);	
+		$self->setFieldFlags('auth_ref', FLDFLAG_INVISIBLE, 1);
 		$self->setFieldFlags('outstanding_heading', FLDFLAG_INVISIBLE, 1);
 		$self->setFieldFlags('outstanding_invoices_list', FLDFLAG_INVISIBLE, 1);
 	}
@@ -132,7 +132,7 @@ sub populateData
 sub customValidate
 {
 	my ($self, $page) = @_;
-	
+
 	my $payType = $page->field('pay_type');
 	my $payWasApplied;
 	my $lineCount = $page->param('_f_line_count');
@@ -141,7 +141,7 @@ sub customValidate
 	{
 		my $payAmt = $page->param("_f_invoice_$line\_payment");
 		my $invoiceId = $page->param("_f_invoice_$line\_invoice_id");
-		next if $payAmt eq '';		
+		next if $payAmt eq '';
 		$list .= $invoiceId.",";
 		$payWasApplied = 1;
 	}
@@ -170,6 +170,9 @@ sub execute
 		#$page->addError("Pre: $payType > 1");
 		executePostPayment($self, $page, $command, $flags);
 	}
+
+	$self->handlePostExecute($page, $command, $flags);
+
 }
 
 sub executePrePayment
@@ -416,7 +419,7 @@ sub executePostPayment
 			App::Dialog::Procedure::execAction_submit($page, 'add', $invoiceId);
 		}
 	}
-	
+
 	$page->redirect("/person/$payerId/account");
 }
 
