@@ -30,7 +30,10 @@ system(qq{
 runSQL('BUILD_0016_main_script.sql');
 runSQL('BUILD_0016_load_documents_schema.sql');
 runSQL('BUILD_0016_drop_duplicate_triggers.sql');
+runSQL('BUILD_0016_only_in_production.sql');
 runSQL('BUILD_0016_views_and_ref_cpt.sql');
+runSQL('BUILD_0016_alter_table_monitoring.sql');
+runSQL('BUILD_0016_create_new_indexes.sql');
 runSQL('BUILD_0016_compile_invalid_and_disabled.sql');
 
 ######## END UPGRADE SCRIPT #########
