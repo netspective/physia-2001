@@ -367,6 +367,12 @@ $STMTMGR_INSURANCE = new App::Statements::Insurance(
 					and bill_sequence > ?
 					and bill_sequence < 5
 		},
+	'selUpdateAndAddInsSeq' => qq{
+					update insurance
+					set bill_sequence = 99
+					where owner_person_id = ?
+					and bill_sequence = ?
+		},
 	#--------------------------------------------------------------------------------------------------------------------------------------
 	'sel_Person_Insurance' => {
 		sqlStmt => qq{
