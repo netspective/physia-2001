@@ -47,7 +47,7 @@ $STMTRPTDEFN_FEE_PROCEDURE =
 
 
 
-$STMTMGR_FEE_PROCEDURE_CODE_SEARCH = new App::Statements::Search::MiscProcedure(
+$STMTMGR_FEE_PROCEDURE_CODE_SEARCH = new App::Statements::Search::FeeProcedure(
 	'sel_fee_procedure_code' =>
 	{
 		_stmtFmt => $STMTFMT_SEL_FEE_PROCEDURE,
