@@ -20,6 +20,7 @@ use vars qw($page $sqlPlusKey);
 ######## BEGIN UPGRADE SCRIPT #########
 
 runSQL('BUILD_0011_person_attribute.sql');
+runSQL('BUILD_0011_add_trans_status.sql');
 runSQL('BUILD_0011_load_pre_post_code.sql');
 
 ######## END UPGRADE SCRIPT #########
