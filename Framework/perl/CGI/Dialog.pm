@@ -159,6 +159,7 @@ sub getHtml
 
 		# do some basic variable replacements
 		my $Command = "\u$command";
+		$Command =~ s/_(.)/" \u$1"/ge;
 		$caption =~ s/(\$\w+)/$1/eego;
 
 		my $popupHtml = $self->popup_as_html($page, $dialog, $command, $dlgFlags) || $self->findPopup_as_html($page, $dialog, $command, $dlgFlags) . $self->addPopup_as_html($page, $dialog, $command, $dlgFlags) if ! $readOnly;
@@ -1072,6 +1073,7 @@ sub getHtml
 
 	# do some basic variable replacements
 	my $Command = "\u$command";
+	$Command =~ s/_(.)/" \u$1"/ge;
 	$caption =~ s/(\$\w+)/$1/eego;
 
 	my $popupHtml = $self->popup_as_html($page, $dialog, $command, $dlgFlags) || $self->findPopup_as_html($page, $dialog, $command, $dlgFlags) if ! $readOnly;
@@ -1247,6 +1249,7 @@ sub getHtml
 
 	# do some basic variable replacements
 	my $Command = "\u$command";
+	$Command =~ s/_(.)/" \u$1"/ge;
 	$caption =~ s/(\$\w+)/$1/eego;
 
 	my $popupHtml = $self->popup_as_html($page, $dialog, $command, $dlgFlags) || $self->findPopup_as_html($page, $dialog, $command, $dlgFlags) if ! $readOnly;
@@ -2234,6 +2237,7 @@ sub getHtml
 
 	# do some simple variable replacements (just what's available here)
 	my $Command = "\u$command";
+	$Command =~ s/_(.)/" \u$1"/ge;
 	$heading =~ s/(\$\w+)/$1/eego;
 
 	my $errorsHtml = '';
