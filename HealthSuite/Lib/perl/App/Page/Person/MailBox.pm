@@ -21,7 +21,7 @@ sub setupTabs
 	my $personId = $self->session('person_id');
 
 	my @tabs = ();
-	foreach my $child (keys %$children)
+	foreach my $child (sort keys %$children)
 	{
 		my $childRes = $children->{$child};
 		my $id = $childRes->{_id};

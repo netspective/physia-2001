@@ -1,5 +1,5 @@
 ##############################################################################
-package App::Page::Person::MailBox::Inbox;
+package App::Page::Person::MailBox::InternalMessage;
 ##############################################################################
 
 use strict;
@@ -12,40 +12,33 @@ use CGI::Dialog::DataNavigator;
 use CGI::ImageManager;
 use Data::Publish;
 
-use vars qw(%RESOURCE_MAP $QDL %PUB_INBOX);
+use vars qw(%RESOURCE_MAP $QDL %PUBDEFN);
 %RESOURCE_MAP = (
-	'person/mailbox/inbox' => {
-		_idSynonym => ['_default'],
-		_tabCaption => 'Inbox',
+	'person/mailbox/internalMessages' => {
+		_tabCaption => 'Internal Messages',
 		},
 	);
 
-
 $QDL = File::Spec->catfile($CONFDATA_SERVER->path_Database(), 'QDL', 'Message.qdl');
 
-
-%PUB_INBOX = (
-	name => 'inbox',
+%PUBDEFN = (
+	name => 'internalMessages',
 	banner => {
 		actionRows => [
 			{caption => 'Send Message', url => '/person/#session.person_id#/dlg-send-message',},
 			{caption => 'Send Phone Message', url => '/person/#session.person_id#/dlg-send-phone_message',},
 		],
 	},
-	bodyRowAttr => {
-		class => 'message_status_#{recipient_status}#',
-	},
 	columnDefn => [
 		{head => '', colIdx => '#{priority}#', dataFmt => sub {return $IMAGETAGS{'widgets/mail/pri_' . $_[0]->[$_[1]]}},},
 		{head => '', colIdx => '#{doc_spec_subtype}#', dataFmt => \&iconCallback,},
-		{head => 'From', hAlign=> 'left', dataFmt => '#{from_id}#',},
+		{head => 'To', dataFmt => '#{to_ids}#',},
 		{head => 'Subject', hAlign=> 'left', dataFmt => '#{subject}#',},
 		{head => 'Regarding Patient', hAlign=> 'left', dataFmt => '#{repatient_name}# (#{repatient_id}#)',},
 		{head => 'Sent On', hAlign=> 'left', colIdx => '#{date_sent}#', dformat => 'stamp',},
 		{
 			head => 'Actions',
 			dataFmt => qq{
-				<a title="Reply" href="/person/#session.person_id#/dlg-reply_to-message_#{doc_spec_subtype}#/#{message_id}#?home=#homeArl#">$IMAGETAGS{'widgets/mail/reply'}</a>
 				<a title="Reply To All" href="/person/#session.person_id#/dlg-reply_to_all-message_#{doc_spec_subtype}#/#{message_id}#?home=#homeArl#">$IMAGETAGS{'widgets/mail/reply_all'}</a>
 				<a title="Forward" href="/person/#session.person_id#/dlg-forward-message_#{doc_spec_subtype}#/#{message_id}#?home=#homeArl#">$IMAGETAGS{'widgets/mail/forward'}</a>
 				<a title="Trash" href="/person/#session.person_id#/dlg-trash-message_#{doc_spec_subtype}#/#{message_id}#?home=#homeArl#">$IMAGETAGS{'icons/action-edit-remove-x'}</a>
@@ -53,10 +46,14 @@ $QDL = File::Spec->catfile($CONFDATA_SERVER->path_Database(), 'QDL', 'Message.qd
 			options => PUBLCOLFLAG_DONTWRAP,
 		},
 	],
-	dnSelectRowAction => '/person/#session.person_id#/dlg-read-message_#{doc_spec_subtype}#/#{message_id}#?home=#homeArl#',
-	dnQuery => \&inboxQuery,
-);
+	bodyRowAttr => {
+		class => 'message_status_#{recipient_status}#',
+	},
 
+	dnQuery => \&dnQuery,
+	dnSelectRowAction => '/person/#session.person_id#/dlg-read-message_#{doc_spec_subtype}#/#{message_id}#?home=#homeArl#',
+#	dnAncestorFmt => 'All Lab Results',
+);
 
 sub iconCallback
 {
@@ -79,34 +76,34 @@ sub iconCallback
 	}
 }
 
-
-sub inboxQuery
+sub dnQuery
 {
 	my $self = shift;
 	my $sqlGen = new SQL::GenerateQuery(file => $QDL);
 
 	my $cond1 = $sqlGen->WHERE('doc_spec_type', 'is', App::Universal::DOCSPEC_INTERNAL);
 	my $cond2 = $sqlGen->WHERE('recipient_id', 'is', $self->session('person_id'));
-	my $cond3 = $sqlGen->WHERE('recipient_status', 'isnot', 2);
+	my $cond3 = $sqlGen->WHERE('doc_spec_subtype', 'is', App::Universal::MSGSUBTYPE_MESSAGE);
+	my $cond4 = $sqlGen->WHERE('recipient_status', 'isnot', 2);
 
-	my $finalCond = $sqlGen->AND($cond1, $cond2, $cond3);
+	my $finalCond = $sqlGen->AND($cond1, $cond2, $cond3, $cond4);
 	$finalCond->outColumns(
+		'priority',
 		'message_id',
 		'doc_spec_subtype',
-		'recipient_status',
 		'from_id',
 		'subject',
 		'repatient_id',
 		'repatient_name',
 		'deliver_record',
 		"TO_CHAR({date_sent},'IYYYMMDDHH24MISS')",
-		'priority',
+		'to_ids',
+		'recipient_status',
 	);
 	$finalCond->orderBy({id => 'date_sent', order => 'Descending'});
 	$finalCond->distinct(1);
 	return $finalCond;
 }
-
 
 sub prepare_view
 {
@@ -116,7 +113,7 @@ sub prepare_view
 	my $tabsHtml = $self->setupTabs();
 
 	# Create the work list dialog
-	my $dlg = new CGI::Dialog::DataNavigator(publDefn => \%PUB_INBOX, topHtml => $tabsHtml, page => $self);
+	my $dlg = new CGI::Dialog::DataNavigator(publDefn => \%PUBDEFN, topHtml => $tabsHtml, page => $self);
 	my $dlgHtml = $dlg->getHtml($self, 'add');
 
 	$self->addContent(

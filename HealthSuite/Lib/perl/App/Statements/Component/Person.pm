@@ -1347,13 +1347,13 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 'person.careProviders' => {
 
 	sqlStmt => qq{
-			select	
+			select
 				p.value_type,
-				p.item_id, 
+				p.item_id,
 				p.item_name,
-				p.value_text, 
-				p.value_textb, 
-				p.parent_id, 
+				p.value_text,
+				p.value_textb,
+				p.parent_id,
 				decode(p.value_int,1,', Primary Physician', ''),
 				pc.category
 			from 	person_org_category pc, person_attribute p
@@ -2609,15 +2609,15 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 			#delUrlFmt => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-remove-attr-#0#/#1#?home=#param.home#',
 		},
 	},
-	publishComp_st => sub { my ($page, $flags, $personId) = @_; 
-		$personId ||= $page->param('person_id'); 
-		my $orgInternalId = $page->session('org_internal_id'); 
+	publishComp_st => sub { my ($page, $flags, $personId) = @_;
+		$personId ||= $page->param('person_id');
+		my $orgInternalId = $page->session('org_internal_id');
 		$STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.associatedSessionPhysicians', [$personId, $orgInternalId]);
 	},
-	publishComp_stp => sub { my ($page, $flags, $personId) = @_; 
-		$personId ||= $page->param('person_id'); 
-		my $orgInternalId = $page->session('org_internal_id'); 
-		$STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.associatedSessionPhysicians', [$personId, $orgInternalId], 'panel'); 
+	publishComp_stp => sub { my ($page, $flags, $personId) = @_;
+		$personId ||= $page->param('person_id');
+		my $orgInternalId = $page->session('org_internal_id');
+		$STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.associatedSessionPhysicians', [$personId, $orgInternalId], 'panel');
 	},
 	publishComp_stpe => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); my $orgInternalId = $page->session('org_internal_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.associatedSessionPhysicians', [$personId, $orgInternalId], 'panelEdit'); },
 	publishComp_stpt => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); my $orgInternalId = $page->session('org_internal_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.associatedSessionPhysicians', [$personId, $orgInternalId], 'panelTransp'); },
@@ -2751,7 +2751,7 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 		SELECT
 			%simpleDate:trans_begin_stamp - :1%,
 			initcap(simple_name) as simple_name,
-			provider_id, 
+			provider_id,
 			caption as room_number,
 			data_num_a as duration_days,
 			detail as diags,
@@ -2789,12 +2789,12 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 	publishDefn => {
 		columnDefn => [
 			{ head => 'My Associated Resources In Patients', dataFmt => '#0#' },
-			{ dataFmt => qq{<A HREF="/person/#11#/chart">#1#</A> <BR> 
+			{ dataFmt => qq{<A HREF="/person/#11#/chart">#1#</A> <BR>
 					<b>#12#</b> <BR>
 					(#2#) <br>
-					Room: #3#  <BR> 
-					Duration of Stay: #4# day(s)<BR> 
-					Diagnoses: #5# <BR> 
+					Room: #3#  <BR>
+					Duration of Stay: #4# day(s)<BR>
+					Diagnoses: #5# <BR>
 					Procedures: #6#
 				}
 			},
@@ -3761,7 +3761,7 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 				as simple_name, t.consult_id, o.name_primary, %simpleDate:t.trans_begin_stamp - :3%
 				as admit_date, data_num_a
 			FROM org o, person p, transaction t
-			WHERE 
+			WHERE
 				t.trans_type BETWEEN 11000 AND 11999
 				AND	t.provider_id = :1
 				AND p.person_id = t.trans_owner_id
@@ -3777,7 +3777,7 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 					{ head=> 'Patient ', colIdx=>2, url => "/person/#0#/profile",hint=>"#3#",
 						options => PUBLCOLFLAG_DONTWRAP,
 					},
-					{ head=> 'Hospital/Room', 
+					{ head=> 'Hospital/Room',
 						dataFmt => qq{#5# <br> <b>#4#</b> - Room #1# <br> Duration: #6# day(s)},
 						dAlign=>'left',hAlign=>'left'},
 				],
@@ -3804,12 +3804,62 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 	publishComp_stpt => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.inPatient', [$personId, $page->param('_date'), $page->session('GMT_DAYOFFSET')], 'panelTransp'); },
 },
 
+'person.messageCounts' => {
+	sqlStmt => qq{SELECT doc_spec_subtype, count(*)
+		FROM document, document_attribute
+		WHERE document_attribute.value_text = :1
+			AND document.doc_spec_type = @{[ App::Universal::DOCSPEC_INTERNAL ]}
+			AND document.doc_id = document_attribute.parent_id
+			AND document_attribute.item_name IN ('To', 'CC')
+			AND document_attribute.value_int = 0
+		GROUP BY document.doc_spec_subtype
+	},
 
+	publishDefn => {
+		columnDefn => [
+			{
+				colIdx => 0,
+				dataFmt => {
+					'0' => qq{<a href='/person/#param.person_id#/mailbox/internalMessages'>Internal Message</a>},
+					'1' => qq{<a href='/person/#param.person_id#/mailbox/phoneMessages'>Phone Message</a>},
+					'2' => qq{<a href='/person/#param.person_id#/mailbox/prescriptionRequests'>Prescription Approval Request</a>},
+				},
+			},
+			{
+				colIdx => 1,
+			},
+		],
+	},
+	publishDefn_panel =>
+	{
+		style => 'panel',
+		frame => {
+			heading => 'Unread Messages Count',
+		},
+	},
+	publishDefn_panelTransp =>
+	{
+		style => 'panel.transparent',
+		inherit => 'panel',
+	},
+	publishDefn_panelStatic =>
+	{
+		style => 'panel.static',
+		inherit => 'panel',
+	},
+	publishDefn_panelInDlg =>
+	{
+		style => 'panel.indialog',
+		inherit => 'panel',
+	},
 
-
-
-
-
+	publishComp_st => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.messageCounts', [$personId]); },
+	publishComp_stp => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.messageCounts', [$personId], 'panel'); },
+	publishComp_stpe => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.messageCounts', [$personId], 'panelEdit'); },
+	publishComp_stpt => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.messageCounts', [$personId], 'panelTransp'); },
+	publishComp_stps => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.messageCounts', [$personId], 'panelStatic'); },
+	publishComp_stpd => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.messageCounts', [$personId], 'panelInDlg'); },
+},
 
 
 'person.docResults' => {
@@ -4009,7 +4059,7 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 				frame => { heading => qq{ Date
 						<INPUT size=10	NAME="_date" value='#param._date#' onChange="validateChange_Date(event); updatePage(this.value)">
 						<A HREF="javascript:showCalendar(_date, 1);"> <img src='/resources/icons/calendar2.gif' title='Show calendar' BORDER=0></A>
-						&nbsp Appointments 
+						&nbsp Appointments
 						<INPUT name=person_id type=hidden value='#param.person_id#'>
 					}
 				},

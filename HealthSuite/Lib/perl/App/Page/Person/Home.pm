@@ -62,16 +62,13 @@ sub prepare_view
 				<TD>
 					#component.stp-person.scheduleAppts#</BR>
 					#component.stp-person.inPatient#<BR>
-					#component.lookup-records#<BR>
+					
 				</TD>
 
 				<TD WIDTH=10><FONT SIZE=1>&nbsp;</FONT></TD>
 				<TD>
-					 #component.stpt-person.docSign#<BR>
-					 #component.stpt-person.docPhone#<BR>
-					 #component.stpt-person.docRefill#<BR>
-					 #component.stpt-person.docResults#<BR>
-					 #component.stpt-person.clinical#<BR>
+					#component.stp-person.messageCounts#<BR>
+					#component.lookup-records#<BR>
 				</TD>
 			</TR>
 			<TR VALIGN=TOP>
@@ -94,6 +91,7 @@ sub prepare_view
 		<TABLE BORDER=0 CELLSPACING=0 CELLPADDING=0>
 				<TR VALIGN=TOP>
 				<TD>
+					#component.stp-person.messageCounts#<BR>
 					#component.lookup-records#<BR>
 					#component.navigate-reports-root#<BR>
 				</TD>

@@ -3,7 +3,7 @@ package App::Dialog::Message;
 ##############################################################################
 
 use strict;
-use SDE::CVS ('$Id: Message.pm,v 1.5 2000-12-22 23:48:26 thai_nguyen Exp $', '$Name:  $');
+use SDE::CVS ('$Id: Message.pm,v 1.6 2000-12-26 15:49:42 thai_nguyen Exp $', '$Name:  $');
 use CGI::Validator::Field;
 use CGI::Dialog;
 use base qw(CGI::Dialog);
@@ -28,7 +28,7 @@ use vars qw(%RESOURCE_MAP);
 sub new
 {
 	my $self = CGI::Dialog::new(@_, id => 'message', heading => '$Command Message');
-	
+
 	my $toField = new App::Dialog::Field::Person::ID(
 			name => 'to',
 			caption => 'To',
@@ -38,7 +38,7 @@ sub new
 			options => FLDFLAG_REQUIRED,
 	);
 	$toField->clearFlag(FLDFLAG_IDENTIFIER);
-	
+
 	my $ccField = new App::Dialog::Field::Person::ID(
 			name => 'cc',
 			caption => 'CC',
@@ -128,7 +128,7 @@ sub new
 sub addExtraFields
 {
 	my $self = shift;
-	
+
 	my @fields = ();
 	return @fields;
 }
@@ -139,21 +139,24 @@ sub makeStateChanges
 	my ($self, $page, $command, $activeExecMode, $dlgFlags) = @_;
 
 	$self->SUPER::makeStateChanges($page, $command, $activeExecMode, $dlgFlags);
-	
-	if ($command eq 'read')
+
+	if ($command eq 'read' || $command eq 'trash')
 	{
 		foreach (keys %{$self->{fieldMap}})
 		{
 			next if $_ eq 'notes';
 			next if $_ eq 'notes_private';
-			
+
 			$self->setFieldFlags($_, FLDFLAG_READONLY);
 		}
-		
-		$self->clearFieldFlags('message_subhead', FLDFLAG_INVISIBLE);
-		$self->clearFieldFlags('notes_subhead', FLDFLAG_INVISIBLE);
-		$self->clearFieldFlags('notes', FLDFLAG_INVISIBLE);
-		$self->clearFieldFlags('notes_private', FLDFLAG_INVISIBLE);		
+
+		unless ($command eq 'trash')
+		{
+			$self->clearFieldFlags('message_subhead', FLDFLAG_INVISIBLE);
+			$self->clearFieldFlags('notes_subhead', FLDFLAG_INVISIBLE);
+			$self->clearFieldFlags('notes', FLDFLAG_INVISIBLE);
+			$self->clearFieldFlags('notes_private', FLDFLAG_INVISIBLE);
+		}
 	}
 }
 
@@ -162,14 +165,14 @@ sub populateData
 {
 	my ($self, $page, $command, $activeExecMode, $flags) = @_;
 	return unless $flags & CGI::Dialog::DLGFLAG_DATAENTRY_INITIAL;
-	
+
 	my $existingMsg = {};
 	if ($command ne 'send')
 	{
 		# Load existing message data
 		my $messageId = $page->param('message_id');
 		die "Message ID Required" unless $messageId;
-		
+
 		$existingMsg = $STMTMGR_DOCUMENT->getRowAsHash($page, STMTMGRFLAG_NONE, 'selMessage', $messageId);
 		$existingMsg->{to} = $STMTMGR_DOCUMENT->getSingleValueList($page, STMTMGRFLAG_NONE, 'selMessageToList', $messageId);
 		$existingMsg->{cc} = $STMTMGR_DOCUMENT->getSingleValueList($page, STMTMGRFLAG_NONE, 'selMessageCCList', $messageId);
@@ -201,24 +204,24 @@ sub populateData
 	{
 		# We're creating a new message based on the existing message
 		$page->field('from', $page->session('person_id'));
-		
+
 		if ($command eq 'reply_to' || $command eq 'reply_to_all')
 		{
 			$page->field('to', $existingMsg->{'from_id'});
 		}
-		
+
 		if ($command eq 'reply_to_all')
 		{
 			$page->field('cc', join(',', @{$existingMsg->{'to'}}, @{$existingMsg->{'cc'}}));
 		}
-		
+
 		# We should be safe to assume that it's still regarding the same patient
 		$page->field('patient_id', $existingMsg->{'repatient_id'});
-		
+
 		# Create an appropriate new subject
 		my $prefix = $command eq 'forward' ? 'FW: ' : 'RE: ';
 		$page->field('subject', $prefix . $existingMsg->{subject});
-		
+
 		# Quote the existing message
 		my $quotedMsg = autoformat $self->quoteMsg($existingMsg->{'message'}, $existingMsg->{'from_id'});
 		$page->field('message', $quotedMsg);
@@ -230,10 +233,10 @@ sub quoteMsg
 {
 	my $self = shift;
 	my ($message, $from_id) = @_;
-	
+
 	$message =~ s/\n/\n\> /g;
 	$message = "> " . $message;
-	
+
 	return $message;
 }
 
@@ -242,12 +245,12 @@ sub execute
 {
 	my ($self, $page, $command, $flags, $messageData) = @_;
 	$messageData = {} unless defined $messageData;
-	
+
 	unless ($command eq 'send')
 	{
 		$self->updateRecipientFlags($page, $command, $flags);
 	}
-	
+
 	unless ($command eq 'trash' || $command eq 'read')
 	{
 		$messageData->{'priority'} = $page->field('priority') unless defined $messageData->{'priority'};
@@ -272,11 +275,11 @@ sub execute
 				value_int => $page->field('notes_private') ? 1 : 0,
 				value_text => $notes,
 			);
-		}		
+		}
 	}
-	
+
 	$self->handlePostExecute($page, $command, $flags);
-	
+
 	return '';
 }
 
@@ -286,9 +289,9 @@ sub sendMessage
 	my $self = shift;
 	my $page = shift;
 	my %messageData = @_;
-	
+
 	my $docDestIds = join(', ', split(/\s*,\s*/, $messageData{'docDestIds'}));
-	
+
 	my $messageId = $self->saveMessage($page, \%messageData,
 		doc_mime_type => 'text/plain',
 		doc_orig_stamp => $page->getTimeStamp(),
@@ -342,15 +345,16 @@ sub updateRecipientFlags
 {
 	my $self = shift;
 	my ($page, $command, $flags) = @_;
-	
+
 	my $messageId = $page->param('message_id');
 	my $personId = $page->session('person_id');
-	my $item_id = $STMTMGR_DOCUMENT->getSingleValue($page, STMTMGRFLAG_NONE, 'selMessageRecipientAttrId', $messageId, $personId);
+	my $item_id = $STMTMGR_DOCUMENT->getSingleValue($page, STMTMGRFLAG_NONE, 'selMessageRecipientAttrId',
+		$messageId, $personId);
 	if ($item_id) #otherwise we're reading someone else's mail
 	{
 		$page->schemaAction('Document_Attribute', 'update',
 			item_id => $item_id,
-			value_int => 1,
+			value_int => $command eq 'read' ? 1 : 2,
 			_debug => 0,
 		);
 	}
@@ -362,7 +366,7 @@ sub saveMessage
 	my $self = shift;
 	my $page = shift;
 	my $messageData = shift;
-	
+
 	return $page->schemaAction('Document', 'add', @_, _debug => 0);
 }
 
@@ -393,9 +397,9 @@ sub saveRegardingPatient
 	my $page = shift;
 	my $messageData = shift;
 	my %schemaActionData = @_;
-	
+
 	# Add the regarding patent
-	if (defined $schemaActionData{value_text})
+	if ($schemaActionData{value_text})
 	{
 		return $page->schemaAction('Document_Attribute', 'add', %schemaActionData, _debug => 0);
 	}
@@ -407,7 +411,7 @@ sub saveNotes
 	my $self = shift;
 	my $page = shift;
 	my $messageData = shift;
-	
+
 	return $page->schemaAction('Document_Attribute', 'add', @_, _debug => 0);
 }
 
@@ -417,7 +421,7 @@ package App::Dialog::Message::Notes;
 ##############################################################################
 
 use strict;
-use SDE::CVS ('$Id: Message.pm,v 1.5 2000-12-22 23:48:26 thai_nguyen Exp $', '$Name:  $');
+use SDE::CVS ('$Id: Message.pm,v 1.6 2000-12-26 15:49:42 thai_nguyen Exp $', '$Name:  $');
 use CGI::Dialog;
 use base qw(CGI::Dialog::ContentItem);
 
@@ -432,19 +436,19 @@ use vars qw(%RESOURCE_MAP);
 sub getHtml
 {
 	my ($self, $page, $dialog, $command, $dlgFlags, $mainData) = @_;
-	
+
 	return '' unless $command eq 'read';
-	
+
 	my $noteRows = $STMTMGR_DOCUMENT->getRowsAsArray($page, STMTMGRFLAG_NONE, 'selMessageNotes', $page->param('message_id'), $page->session('person_id'));
 	my $html = '';
 	foreach my $note (@$noteRows)
 	{
 		my $date = Data::Publish::fmt_stamp($page, $note->[0]);
 		my $private = $note->[3] ? '<b>(privately)</b>' : '';
-		
+
 		$html .= "<p><b>$note->[1]</b> on $date wrote: $private<br>$note->[2]</p>";
 	}
-	
+
 	return qq{<tr><td colspan="2">&nbsp;</td><td style="font-size: 10pt; font-family: Tahoma, Ariel, Helvetica;">$html<br></td><td>&nbsp;</td></tr>};
 }
 
