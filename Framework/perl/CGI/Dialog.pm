@@ -266,7 +266,7 @@ sub bool_as_html
 				<td align=right $required>
 					<input type='checkbox' name='$fieldName' align=right $checked value=1>
 				</td>
-				<td>$self->{caption}</td>
+				<td>$self->{preHtml}$self->{caption}$self->{postHtml}</td>
 				<td width=$self->{_spacerWidth}>&nbsp;</td>
 			</tr>
 			";
@@ -282,7 +282,7 @@ sub bool_as_html
 				$html = "
 				<tr valign=top $required>
 					<td width=$self->{_spacerWidth} colspan=2>&nbsp;</td>
-					<td><input type='checkbox' name='$fieldName' align=right value=1 $checked> $self->{caption}</td>
+					<td>$self->{preHtml}<input type='checkbox' name='$fieldName' align=right value=1 $checked> $self->{caption}$self->{postHtml}</td>
 					<td width=$self->{_spacerWidth}>&nbsp;</td>
 				</tr>
 				";
@@ -498,15 +498,14 @@ sub getHtml
 {
 	my ($self, $page, $dialog, $command, $dlgFlags) = @_;
 	my $html = '';
-	my $specialHdl;
 
-	#my $specialHdl = "$self->{type}_as_html";
-	#eval
-	#{
-	#	$html = $self->$specialHdl($page, $dialog, $command, $dlgFlags);
-	#};
+	my $specialHdl = "$self->{type}_as_html";
+	eval
+	{
+		$html = $self->$specialHdl($page, $dialog, $command, $dlgFlags);
+	};
 
-	unless($specialHdl = $self->can("$self->{type}_as_html"))
+	if($@)
 	{
 		# if there was an error running a special handler, then there was no
 		# special handler so just perform default html formatting
@@ -527,10 +526,6 @@ sub getHtml
 			$html = "<input type='hidden' name='$fieldName' value='$value'>";
 			$html .= $self->SUPER::getHtml($page, $dialog, $command, $dlgFlags, $value);
 		}
-	}
-	else
-	{
-		$html = $self->$specialHdl($page, $dialog, $command, $dlgFlags);
 	}
 
 	return $html;
