@@ -30,6 +30,7 @@ system(qq{
 my $schemaName = uc($sqlPlusKey);
 $schemaName =~ s/\/.*//;
 
+App::External::runSQL('BUILD_0020_ddl.sql');
 App::External::runSQL('BUILD_0020_analyze_schema.sql', $schemaName);
 App::External::runSQL('BUILD_0020_compile_invalid_and_disabled.sql');
 
