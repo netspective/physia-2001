@@ -100,8 +100,8 @@ sub execute
 	);
 
 	my $sampleLink = File::Spec->catfile($CONFDATA_SERVER->path_PDFSuperBillOutputHREF, $theFilename);
-	$page->addContent (qq {<b>SuperBill Generated: </b><i><a href="$sampleLink">Click here to view</a></i>});
-
+	
+	return (qq {<b>SuperBill Generated: </b><a href="$sampleLink">Click here to view</a>});
 }
 
 # create a new instance which will automatically add it to the directory of
