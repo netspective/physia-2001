@@ -88,6 +88,17 @@ sub drawBox
 
 }
 
+
+sub getLength
+{
+	my ($self, $pdf, $properties) = @_;
+	my $font = pdflib::PDF_findfont($pdf, $properties->{'fontName'} eq "" ? TWCC_FORM_FONT_NAME : $properties->{'fontName'}, "default", 0);
+	die "Couldn't set font"  if ($font == -1);
+	pdflib::PDF_setfont($pdf, $font, $properties->{'fontWidth'} eq "" ? TWCC_FORM_FONT_WIDTH : $properties->{'fontWidth'});
+	my $length = pdflib::PDF_stringwidth($pdf, $properties->{'text'}, $font, $properties->{'fontWidth'} eq "" ? TWCC_FORM_FONT_WIDTH : $properties->{'fontWidth'});
+	return $length;
+}
+
 sub drawText
 {
 	my ($self, $pdf, $properties) = @_;
