@@ -107,6 +107,9 @@
 			Corrected error  with Fee schedules not pulling correct entry if Modifier was included in the invoice
 		</deliverable>
 
+		<deliverable id="2043">
+			Implement "Select Date" Capability for Hand-Held App.
+		</deliverable>
 
 	</deliverables>
 </release-notes>
