@@ -562,7 +562,8 @@ sub getHtml
 		# special handler so just perform default html formatting
 
 		my $fieldName = $page->fieldPName($self->{name});
-		my $value = $page->field($self->{name}) || $self->{hint};
+		#my $value = $page->field($self->{name}) || $self->{hint};
+		my $value = (defined $page->field($self->{name})) ? $page->field($self->{name}) : $self->{hint};
 		my $readOnly = ($self->{flags} & FLDFLAG_READONLY);
 		my $required = ($self->{flags} & FLDFLAG_REQUIRED) ? 'class="required"' : "";
 
