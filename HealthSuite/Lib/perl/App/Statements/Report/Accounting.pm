@@ -34,7 +34,7 @@ $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
 			{
 			columnDefn => 
 				[
-				{ colIdx => 0, head => 'Insurance', dataFmt => '<A HREF = "/org/#0#/profile">#0#</A>' },
+				{ colIdx => 0, head => 'Insurance', dataFmt => '<A HREF = "/org/#0#/account">#0#</A>' },
 				{ colIdx => 1, head => 'Total Invoices', dataFmt => '#1#',dAlign =>'center' },
 				{ colIdx => 2, head => '0 - 30', dataFmt => '#2#', dformat => 'currency' },
 				{ colIdx => 3, head => '31 - 60', dataFmt => '#3#', dformat => 'currency' },
