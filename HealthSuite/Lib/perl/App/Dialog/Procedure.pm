@@ -1085,6 +1085,14 @@ sub storeInsuranceInfo
 					_debug => 0
 				);
 
+			$page->schemaAction(
+					'Invoice_Attribute', $command,
+					parent_id => $invoiceId,
+					item_name => "Insurance/$payerBillSeq/Insured/Member Number",
+					value_type => defined $textValueType ? $textValueType : undef,
+					value_text => $personInsur->{member_number} || undef,
+					_debug => 0
+				);
 
 
 
