@@ -4,7 +4,7 @@ END;
 /
 
 BEGIN
-	execArbitrarySql('drop index PER_ATRR_VALUE_TEXT_UPP_IND;');
+	execArbitrarySql('drop index PER_ATRR_VALUE_TEXT_UPP_IND');
 END;
 /
 
