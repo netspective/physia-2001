@@ -1594,6 +1594,7 @@ sub prepare_page_content_header
 	my $onHold = App::Universal::INVOICESTATUS_ONHOLD;
 	my $pending = App::Universal::INVOICESTATUS_PENDING;
 	my $submitted = App::Universal::INVOICESTATUS_SUBMITTED;
+	my $void = App::Universal::INVOICESTATUS_VOID;
 	my $selfPay = App::Universal::CLAIMTYPE_SELFPAY;
 	my $hcfaInvoiceType = App::Universal::INVOICETYPE_HCFACLAIM;
 	my $genericInvoiceType = App::Universal::INVOICETYPE_SERVICE;
@@ -1666,23 +1667,23 @@ sub prepare_page_content_header
 					<FONT FACE="Arial,Helvetica" SIZE=2>
 					<SELECT style="font-family: tahoma,arial,helvetica; font-size: 8pt" onchange="if(this.selectedIndex > 0) window.location.href = this.options[this.selectedIndex].value">
 						<OPTION>Choose Action</OPTION>
-						@{[ $allDiags[0] ne '' && $invStatus < $submitted && $invType == $hcfaInvoiceType ? "<option value='/invoice/$invoiceId/dialog/procedure/add'>Add Procedure</option>" : '' ]}
-						@{[ $allDiags[0] eq '' && $invStatus < $submitted && $invType == $hcfaInvoiceType ? "<option value='/invoice/$invoiceId/dialog/diagnoses/add'>Add Diagnoses</option>" : '' ]}
-						@{[ $allDiags[0] ne '' && $invStatus < $submitted && $invType == $hcfaInvoiceType ? "<option value='/invoice/$invoiceId/dialog/diagnoses/update'>Update Diagnoses</option>" : '' ]}
-						@{[ $claimType != $selfPay && $invStatus >= $submitted && $invType == $hcfaInvoiceType ? "<option value='/invoice/$invoiceId/dialog/postinspayment'>Post Insurance Payment</option>" : '' ]}
-						<!-- @{[ $claimType != $selfPay && $invStatus >= $submitted && $invType == $hcfaInvoiceType ? "<option value='/invoice/$invoiceId/dialog/adjustment/insurance'>Post Insurance Payment</option>" : '' ]} -->
+						@{[ $allDiags[0] ne '' && $invStatus < $submitted && $invStatus != $void && $invType == $hcfaInvoiceType ? "<option value='/invoice/$invoiceId/dialog/procedure/add'>Add Procedure</option>" : '' ]}
+						@{[ $allDiags[0] eq '' && $invStatus < $submitted && $invStatus != $void && $invType == $hcfaInvoiceType ? "<option value='/invoice/$invoiceId/dialog/diagnoses/add'>Add Diagnoses</option>" : '' ]}
+						@{[ $allDiags[0] ne '' && $invStatus < $submitted && $invStatus != $void && $invType == $hcfaInvoiceType ? "<option value='/invoice/$invoiceId/dialog/diagnoses/update'>Update Diagnoses</option>" : '' ]}
+						@{[ $claimType != $selfPay && $invStatus >= $submitted && $invStatus != $void && $invType == $hcfaInvoiceType ? "<option value='/invoice/$invoiceId/dialog/postinspayment'>Post Insurance Payment</option>" : '' ]}
+						<!-- @{[ $claimType != $selfPay && $invStatus >= $submitted && $invStatus != $void && $invType == $hcfaInvoiceType ? "<option value='/invoice/$invoiceId/dialog/adjustment/insurance'>Post Insurance Payment</option>" : '' ]} -->
 						<option value="/person/$clientId/dialog/postpayment/payment,$invoiceId">Post Personal Payment</option>
 						<option value="/person/$clientId/dialog/postrefund/refund">Post Refund</option>
 						<option value="/person/$clientId/dialog/posttransfer/transfer">Post Transfer</option>
 						<option value="/person/$clientId/account">View All Claims for the Patient</option>
-						@{[ $invType == $hcfaInvoiceType ? "<option value='/invoice/$invoiceId/dialog/claim/update'>Edit Claim</option>" : '' ]}
-						@{[ $invType == $genericInvoiceType ? "<option value='/invoice/$invoiceId/dialog/invoice/update'>Edit Invoice</option>" : '' ]}
-						@{[ $invStatus < $submitted && $totalItems > 0 && $invType == $hcfaInvoiceType ? "<option value='/invoice/$invoiceId/submit'>Submit Claim for Transfer</option>" : '' ]}
-						<!-- @{[ $invStatus != $pending && $invStatus < $submitted && $totalItems > 0 && $invType == $hcfaInvoiceType ? "<option value='/invoice/$invoiceId/review'>Submit Claim for Review</option>" : '' ]} -->
-						@{[ $invStatus != $onHold && $invStatus < $submitted ? "<option value='/invoice/$invoiceId/dialog/hold'>Place Claim On Hold</option>" : '' ]}
-						@{[ $invStatus < $submitted && $invType == $hcfaInvoiceType ? "<option value='/invoice/$invoiceId/dialog/claim/remove'>Delete Claim</option>" : '' ]}
-						@{[ $invStatus < $submitted && $invType == $genericInvoiceType ? "<option value='/invoice/$invoiceId/dialog/invoice/remove'>Delete Invoice</option>" : '' ]}
-						@{[ $invStatus >= $submitted && $invType == $hcfaInvoiceType ? "<option value='/invoice/$invoiceId/dialog/problem'>Report Problems with this Claim</option>" : '' ]}
+						@{[ $invType == $hcfaInvoiceType && $invStatus != $void ? "<option value='/invoice/$invoiceId/dialog/claim/update'>Edit Claim</option>" : '' ]}
+						@{[ $invType == $genericInvoiceType && $invStatus != $void ? "<option value='/invoice/$invoiceId/dialog/invoice/update'>Edit Invoice</option>" : '' ]}
+						@{[ $invStatus < $submitted && $invStatus != $void && $totalItems > 0 && $invType == $hcfaInvoiceType ? "<option value='/invoice/$invoiceId/submit'>Submit Claim for Transfer</option>" : '' ]}
+						<!-- @{[ $invStatus != $pending && $invStatus < $submitted && $invStatus != $void && $totalItems > 0 && $invType == $hcfaInvoiceType ? "<option value='/invoice/$invoiceId/review'>Submit Claim for Review</option>" : '' ]} -->
+						@{[ $invStatus != $onHold && $invStatus < $submitted && $invStatus != $void ? "<option value='/invoice/$invoiceId/dialog/hold'>Place Claim On Hold</option>" : '' ]}
+						@{[ $invStatus < $submitted && $invStatus != $void && $invType == $hcfaInvoiceType ? "<option value='/invoice/$invoiceId/dialog/claim/remove'>Void Claim</option>" : '' ]}
+						@{[ $invStatus < $submitted && $invStatus != $void && $invType == $genericInvoiceType ? "<option value='/invoice/$invoiceId/dialog/invoice/remove'>Void Invoice</option>" : '' ]}
+						@{[ $invStatus >= $submitted && $invStatus != $void && $invType == $hcfaInvoiceType ? "<option value='/invoice/$invoiceId/dialog/problem'>Report Problems with this Claim</option>" : '' ]}
 						@{[ $invStatus >= $submitted ? qq{<option value='javascript:doActionPopup("/patientbill/$invoiceId")'>Print Patient Bill</option>} : '' ]}
 						<option value="/invoice/$invoiceId/summary">View Claim</option>
 					</SELECT>
