@@ -152,13 +152,30 @@ $STMTMGR_SCHEDULING = new App::Statements::Scheduling(
 			and UPPER(oc.MEMBER_NAME) in ('FACILITY','CLINIC')
 	},
 	'sel_eventInfo' => {
-		_stmtFmt => qq{
-			select event_status, checkin_by_id, checkout_by_id, 
+		sqlStmt => qq{
+			select event_status, checkin_by_id, checkout_by_id, discard_by_id,
 				to_char(checkin_stamp - :1, '$SQLSTMT_DEFAULTSTAMPFORMAT') as checkin_stamp,
-				to_char(checkout_stamp - :1, '$SQLSTMT_DEFAULTSTAMPFORMAT') as checkout_stamp
-			from Event
+				to_char(checkout_stamp - :1, '$SQLSTMT_DEFAULTSTAMPFORMAT') as checkout_stamp,
+				to_char(discard_stamp - :1, '$SQLSTMT_DEFAULTSTAMPFORMAT') as discard_stamp,
+				Appt_Discard_type.caption as discard_type
+			from Appt_Discard_type, Event
 			where event_id = :2
+				and Appt_Discard_type.id(+) = Event.discard_type
 		}
+	},
+	
+	'sel_voidInvoice' => qq{
+		select Invoice.invoice_id, to_char(value_date - :1, '$SQLSTMT_DEFAULTSTAMPFORMAT')
+			as void_stamp, Invoice_Attribute.cr_user_id
+		from Invoice_Attribute, Invoice, Transaction, Event
+		where Event.event_id = :2
+			and Transaction.parent_event_id = Event.event_id
+			and Invoice.main_transaction = Transaction.trans_id
+			and Invoice.invoice_status = @{[ App::Universal::INVOICESTATUS_VOID ]}
+			and Invoice_Attribute.parent_id = Invoice.invoice_id
+			and Invoice_Attribute.item_name = 'Invoice/History/Item'
+			and Invoice_Attribute.value_type = @{[ App::Universal::ATTRTYPE_HISTORY ]}
+			and Invoice_Attribute.value_text = 'Voided claim'
 	},
 
 	# --------------------------------------------------------------------------------------------

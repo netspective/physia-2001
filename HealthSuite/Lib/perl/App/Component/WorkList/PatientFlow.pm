@@ -320,7 +320,8 @@ sub getComponentHtml
 			$_->{checkin_time} || $_->{checkout_time} ?
 				($_->{checkout_time} ? qq{<strong>$_->{checkout_time}</strong><br>
 				<strong title="Visit time in minutes" style="color:#999999">($visitMinutes)</strong>} :
-					qq{<a href='$arlPrefix/dlg-add-checkout/$_->{event_id}' TITLE='CheckOut $_->{patient_id}' class=today>CheckOut</a>}
+					$_->{invoice_status} ne 'Void' ? qq{<a href='$arlPrefix/dlg-add-checkout/$_->{event_id}' TITLE='CheckOut $_->{patient_id}' class=today>CheckOut</a>} 
+					: undef
 				)
 				: undef ,
 

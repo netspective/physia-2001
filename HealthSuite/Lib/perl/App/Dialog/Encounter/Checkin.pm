@@ -46,9 +46,10 @@ sub initialize
 
 	$self->addFooter(new CGI::Dialog::Buttons(
 						nextActions => [
+							['Return to Previous Screen', '', 1],
+							['Go to Patient Flow Work List', NEXTACTION_PATIENTWORKLIST],
 							['Post Payment for this Patient', NEXTACTION_POSTPAYMENT],
-							['Return to Patient Flow Work List', NEXTACTION_PATIENTWORKLIST],
-							],
+						],
 						cancelUrl => $self->{cancelUrl} || undef));
 
 	return $self;
@@ -88,7 +89,39 @@ sub makeStateChanges
 	$self->updateFieldFlags('procedures_list', FLDFLAG_INVISIBLE, 1);
 	$self->setFieldFlags('attendee_id', FLDFLAG_READONLY);
 
-	$page->session('dupCheckin_returnUrl', $page->referer());
+	#$page->session('dupCheckin_returnUrl', $page->referer());
+}
+
+sub handle_page
+{
+	my ($self, $page, $command) = @_;
+	
+	my $eventId = $page->field('parent_event_id') || $page->param('event_id');
+	my $returnUrl = $self->getReferer($page);
+	my ($status, $person, $stamp) = $self->checkEventStatus($page, $eventId);
+	
+	if ($status =~ /in|out/i) 
+	{
+		$page->addContent(qq{
+			<font face=Verdana size=3>
+			This Patient was checked-$status by <b>$person</b> on <b>$stamp</b>.<br>
+			Click <a href='$returnUrl'>here</a> to go back.
+			</font>
+		});
+	}
+	elsif ($status =~ /ed$/) 
+	{
+		$page->addContent(qq{
+			<font face=Verdana size=3>
+			This Appointment was $status by <b>$person</b> on <b>$stamp</b>. <br>
+			Click <a href='$returnUrl'>here</a> to go back.
+			</font>
+		});
+	}
+	else
+	{
+		$self->SUPER::handle_page($page, $command);
+	}
 }
 
 sub execute
@@ -97,18 +130,8 @@ sub execute
 	#$page->beginUnitWork("Unable to checkin patient");
 
 	my $eventId = $page->field('parent_event_id') || $page->param('event_id');
-	my $returnUrl = $page->field('dupCheckin_returnUrl');
-	my ($status, $person, $stamp) = $self->checkEventStatus($page, $eventId);
-	
-	if (defined $status)
-	{
-		return (qq{
-			<b style="color:red">This patient has been checked-$status by $person on $stamp.</b>
-			Click <a href='javascript:location.href="$returnUrl"'>here</a> to go back.
-		});
-	}
-	
 	my $eventStatus = App::Universal::EVENTSTATUS_INPROGRESS;
+
 	if ($page->schemaAction(
 			'Event', 'update',
 			event_id => $eventId || undef,

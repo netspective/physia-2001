@@ -2229,28 +2229,27 @@ sub customValidate
 
 sub checkEventStatus
 {
-	my ($self, $page, $eventId) = @_;
+  my ($self, $page, $eventId) = @_;
 
-	my $checkStatus = $STMTMGR_SCHEDULING->getRowAsHash($page, STMTMGRFLAG_NONE,
-		'sel_eventInfo', $page->session('GMT_DAYOFFSET'), $eventId);
+  my $checkStatus = $STMTMGR_SCHEDULING->getRowAsHash($page, STMTMGRFLAG_NONE,
+    'sel_eventInfo', $page->session('GMT_DAYOFFSET'), $eventId);
 
-	my ($status, $person, $stamp);
+  my ($status, $person, $stamp);
 
-	if ($checkStatus->{event_status} == 2)
-	{
-		$status = 'out';
-		$person = $checkStatus->{checkout_by_id};
-		$stamp  = $checkStatus->{checkout_stamp};
-
-	}
-	elsif ($checkStatus->{event_status} == 1)
-	{
-		$status = 'in';
-		$person = $checkStatus->{checkin_by_id};
-		$stamp  = $checkStatus->{checkin_stamp};
-	}
-
-	return ($status, $person, $stamp);
+  if ($checkStatus->{event_status} == 2) {
+    $status = 'out';
+    $person = $checkStatus->{checkout_by_id};
+    $stamp  = $checkStatus->{checkout_stamp};
+  } elsif ($checkStatus->{event_status} == 1) {
+    $status = 'in';
+    $person = $checkStatus->{checkin_by_id};
+    $stamp  = $checkStatus->{checkin_stamp};
+  } elsif ($checkStatus->{event_status} == 3) {
+    $status = $checkStatus->{discard_type} . '-ed';
+    $person = $checkStatus->{discard_by_id};
+    $stamp  = $checkStatus->{discard_stamp};
+  }
+  return ($status, $person, $stamp);
 }
 
 1;

@@ -53,11 +53,12 @@ sub initialize
 
 	$self->addFooter(new CGI::Dialog::Buttons(
 		nextActions => [
+			['Return to Previous Screen', '', 1],
+			['Go to Work List', NEXTACTION_WORKLIST],
 			['Go to Claim Summary', NEXTACTION_CLAIMSUMM],
 			['Go to Patient Account', NEXTACTION_PATIENTACCT],
 			['Post Transfer for this Patient', NEXTACTION_POSTTRANSFER],
 			['Go to Appointments', NEXTACTION_APPOINTMENTS],
-			['Return to Work List', NEXTACTION_WORKLIST],
 		],
 		cancelUrl => $self->{cancelUrl} || undef)
 	);
@@ -98,25 +99,58 @@ sub makeStateChanges
 	$self->setFieldFlags('attendee_id', FLDFLAG_READONLY);
 }
 
+sub handle_page
+{
+	my ($self, $page, $command) = @_;
+	
+	my $eventId = $page->field('parent_event_id') || $page->param('event_id');
+
+	my $returnUrl = $self->getReferer($page);
+	my ($status, $person, $stamp) = $self->checkEventStatus($page, $eventId);
+
+	if ($status eq 'out') 
+	{
+		$page->addContent(qq{
+			<font face=Verdana size=3>
+			This Patient was checked-$status by <b>$person</b> on <b>$stamp</b>.<br>
+			Click <a href='$returnUrl'>here</a> to go back.
+			</font>
+		});
+	}
+	elsif ($status =~ /ed$/) 
+	{
+		$page->addContent(qq{
+			<font face=Verdana size=3>
+			This Appointment was $status by <b>$person</b> on <b>$stamp</b>. <br>
+			Click <a href='$returnUrl'>here</a> to go back.
+			</font>
+		});
+	}
+	elsif (my $claim = $STMTMGR_SCHEDULING->getRowAsHash($page, STMTMGRFLAG_NONE, 
+		'sel_voidInvoice', $page->session('GMT_DAYOFFSET'), $eventId))
+	{
+		$page->addContent(qq{
+			<font face=Verdana size=3>
+			Claim <b>$claim->{invoice_id}</b> was Voided by <b>$claim->{cr_user_id}</b>
+			on <b>$claim->{void_stamp}</b>. <br>
+			Click <a href='$returnUrl'>here</a> to go back.
+			</font>
+		});
+	}
+	else 
+	{
+		$self->SUPER::handle_page($page, $command);
+	}
+}
+
 sub execute
 {
 	my ($self, $page, $command, $flags) = @_;
 	#$page->beginUnitWork("Unable to checkout patient");
 
 	my $eventId = $page->field('parent_event_id') || $page->param('event_id');
-
-	my $returnUrl = $page->field('dupCheckin_returnUrl');
-	my ($status, $person, $stamp) = $self->checkEventStatus($page, $eventId);
-
-	if ($status eq 'out')
-	{
-		return (qq{
-			<b style="color:red">This patient has been checked-$status by $person on $stamp.</b>
-			Click <a href='javascript:location.href="$returnUrl"'>here</a> to go back.
-		});
-	}
-
 	my $eventStatus = App::Universal::EVENTSTATUS_COMPLETE;
+	
 	if ($page->schemaAction(
 			'Event', 'update',
 			event_id => $eventId || undef,
@@ -128,10 +162,10 @@ sub execute
 			facility_id => $page->field('service_facility_id'),
 			_debug => 0
 		) == 0)
-		{
-			$page->addDebugStmt('Fatal Check Out Error.<br>Event not updated; Copay not recorded.');
-			return 0;
-		}
+	{
+		$page->addDebugStmt('Fatal Check Out Error.<br>Event not updated; Copay not recorded.');
+		return 0;
+	}
 
 	my $invoiceId = $page->param('invoice_id');
 	my $copay = $page->field('copay');
