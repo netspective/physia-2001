@@ -14,6 +14,7 @@ use CGI::Validator::Field;
 use App::Dialog::Field::Invoice;
 use App::Dialog::Field::BatchDateID;
 use App::Universal;
+use App::InvoiceUtilities;
 use Date::Manip;
 
 use vars qw(@ISA %RESOURCE_MAP);
@@ -35,7 +36,7 @@ sub new
 
 	$self->addContent(
 		new App::Dialog::Field::BatchDateID(caption => 'Batch ID Date', name => 'batch_fields',listInvoiceFieldName=>'list_invoices'),		
-		new App::Dialog::Field::CreditInvoices(name =>'credit_invoices_list'),
+		new App::Dialog::Field::RefundInvoices(name =>'refund_invoices_list'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'list_invoices'),
 	);
 	$self->{activityLog} =
@@ -80,7 +81,6 @@ sub execute
 
 	my $todaysDate = $page->getDate();
 	my $itemType = App::Universal::INVOICEITEMTYPE_ADJUST;
-	my $historyValueType = App::Universal::ATTRTYPE_HISTORY;
 	my $textValueType = App::Universal::ATTRTYPE_TEXT;
 	my $batchId = $page->field('batch_id');
 	my $batchDate = $page->field('batch_date');
@@ -104,14 +104,11 @@ sub execute
 				_debug => 0
 			);
 
-			$page->schemaAction(
-				'Invoice_Attribute', 'add',
-				parent_id => $invoiceId || undef,
-				item_name => 'Invoice/History/Item',
-				value_type => defined $historyValueType ? $historyValueType : undef,
+
+			## Add history item
+			addHistoryItem($page, $invoiceId,
 				value_text => 'Reopened due to refund',
 				value_date => $todaysDate,
-				_debug => 0
 			);
 		}
 
@@ -164,16 +161,11 @@ sub execute
 		$page->session('batch_id', $batchId);
 
 
-		#Create history attribute for this adjustment
-		$page->schemaAction(
-			'Invoice_Attribute', 'add',
-			parent_id => $invoiceId || undef,
-			item_name => 'Invoice/History/Item',
-			value_type => defined $historyValueType ? $historyValueType : undef,
+		#Create history item for this adjustment
+		addHistoryItem($page, $invoiceId,
 			value_text => "Refunded \$$refundAmt to $refundToId",
-			value_textB => "$comments " . "Batch ID: $batchId" || undef,
+			value_textB => "$comments " . "Batch ID: $batchId",
 			value_date => $todaysDate,
-			_debug => 0
 		);
 	}
 
