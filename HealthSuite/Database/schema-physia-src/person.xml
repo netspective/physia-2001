@@ -9,6 +9,7 @@
 		<column name="referral_id" type="autoinc" primarykey="yes" descr="Unique Referral ID"/>
 		<column name="request_date" type="stamp" descr="Date of Request"/>
 		<column name="referral_urgency" lookupref="Referral_Urgency.id" descr="Referral Urgency"/>
+		<column name="user_id"  parentref="Person.person_id" descr="Person who has created this referral or to whom this referral is transferred"/>
 		<column name="person_id"  parentref="Person.person_id" descr="Person ID of patient"/>
 		<column name="requester_id" parentref="Person.person_id" descr="Person ID of Requesting Physician"/>
 		<column name="product_internal_id" lookupref="Insurance.ins_internal_id"  abbrev="prdIntId" descr="Insurance Product Internal ID"/>
