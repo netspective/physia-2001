@@ -39,6 +39,10 @@
 			Fixed code to uppercase the states while adding them to the database through the 'State Licenses' 
 			of the Physician dialog and the 'Certification' component.
 		</deliverable>
+
+		<deliverable id="1445">
+			In the main menu under Utilities / Functions, added links to Accounting, Billing, Scheduling .
+		</deliverable>
 		
 		<deliverable id="1447">
 			Added activity logs to showup in the 'My Recent Activity (today)' component in the user's home page.
@@ -107,6 +111,10 @@
 
 		<deliverable id="1744">
 			In the Claims WorkList, when you click the OrgID link, it will show up the Summmary page of that Org.
+		</deliverable>
+		
+		<deliverable id="1745">
+			Added activity log for claims notes.
 		</deliverable>
 		
 		<deliverable id="1799">
