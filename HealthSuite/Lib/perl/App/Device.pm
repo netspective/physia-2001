@@ -66,6 +66,15 @@ sub openPrintHandle {
 	return $printHandle;
 }
 
+# Create and open a printerhandle for a device previously obtained from getPrinter()
+sub openRawPrintHandle {
+	my ($deviceName) = @_;
+	
+	my $printHandle = IO::File->new ("| lpr -P $deviceName -o raw");
+	
+	return $printHandle;
+}
+
 # Close a printhandle previously opened from openPrintHandle()
 sub closePrintHandle {
 	my ($printHandle) = @_;
