@@ -31,11 +31,6 @@ sub new
 			options => FLDFLAG_REQUIRED | FLDFLAG_NOBRCAPTION | FLDFLAG_UPPERCASE | FLDFLAG_PERSIST | FLDFLAG_HOME,
 		),
 		new CGI::Dialog::Field(
-			name => 'org_id', caption => 'Organization ID',
-			onValidate => \&validateOrg, onValidateData => $self,
-			options => FLDFLAG_REQUIRED | FLDFLAG_NOBRCAPTION | FLDFLAG_UPPERCASE | FLDFLAG_PERSIST | FLDFLAG_HOME,
-		),
-		new CGI::Dialog::Field(
 			name => 'password', caption => 'Password', type => 'password',
 			onValidate => \&validatePassword, onValidateData => $self,
 			options => FLDFLAG_REQUIRED | FLDFLAG_HOME,
@@ -73,23 +68,16 @@ sub validateUser
 		() : ("$dialogItem->{caption} '$value' not found.");
 }
 
-sub validateOrg
-{
-	my ($dialogItem, $page, $dialog, $value, $extraData) = @_;
-	return () unless $value;
-	$dialog->{org_internal_id} = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE,'selOwnerOrgId', $value);
-	return defined $dialog->{org_internal_id} ? () : ("$dialogItem->{caption} '$value' not found.");
-}
-
 sub validatePassword
 {
 	my ($dialogItem, $page, $dialog, $value, $extraData) = @_;
 	my $personId = uc($page->field('person_id'));
 	my $orgId = uc($page->field('org_id'));
 	my $orgIntId = uc($dialog->{org_internal_id});
-	my $info = $orgIntId ?
-		$STMTMGR_PERSON->getRowAsArray($page, STMTMGRFLAG_NONE, 'selLoginOrg', $personId, $orgIntId) :
-		$STMTMGR_PERSON->getRowAsArray($page, STMTMGRFLAG_NONE, 'selLogin', $personId);
+	#my $info = $orgIntId ?
+	#	$STMTMGR_PERSON->getRowAsArray($page, STMTMGRFLAG_NONE, 'selLoginOrg', $personId, $orgIntId) :
+	#	$STMTMGR_PERSON->getRowAsArray($page, STMTMGRFLAG_NONE, 'selLogin', $personId);
+	my $info = $STMTMGR_PERSON->getRowAsArray($page, STMTMGRFLAG_NONE, 'selLoginAnyOrg', $personId);
 
 	if($info)
 	{
@@ -157,8 +145,9 @@ sub makeStateChanges
 sub execute
 {
 	my ($self, $page, $command, $flags) = @_;
-	my ($personId, $orgId) = ($page->field('person_id'), $page->field('org_id'));
-	my $categories = $STMTMGR_PERSON->getSingleValueList($page, STMTMGRFLAG_NONE, 'selCategory', $personId, $self->{org_internal_id});
+	my $personId = $page->field('person_id');
+	my ($validOrgs, $defaultOrg, $defaultOrgIntId) = $self->getOrgProfile($page, $personId);
+	my $categories = $STMTMGR_PERSON->getSingleValueList($page, STMTMGRFLAG_NONE, 'selCategory', $personId, $defaultOrgIntId);
 	my $personFlags = App::Universal::PERSONFLAG_ISPATIENT;
 
 	foreach (@$categories)
@@ -180,9 +169,10 @@ sub execute
 	my $gmtTime = Date_ConvTZ($now, 'GMT', $TZ);
 	my $gmtDayOffset = Delta_Format(DateCalc($gmtTime, $now), 10, '%dt');
 
-	$page->createSession($personId, $self->{org_internal_id}, {
-		org_id => $orgId, categories => $categories, personFlags => $personFlags,
+	$page->createSession($personId, $defaultOrgIntId, {
+		org_id => $defaultOrg, categories => $categories, personFlags => $personFlags,
 		timezone => $timezone, TZ => $TZ, GMT_DAYOFFSET => $gmtDayOffset,
+		validOrgs => join(',',@$validOrgs), defaultOrg => $defaultOrg,
 	});
 
 	$page->property('login_status', App::Page::LOGINSTATUS_SUCCESS);
@@ -190,6 +180,16 @@ sub execute
 
 	$self->handlePostExecute($page, $command, $flags);
 	return 'Welcome to Physia.com, ' . $page->session('user_id');
+}
+
+sub getOrgProfile
+{
+	my ($self, $page, $personId) = @_;
+
+	my $orgs = $STMTMGR_PERSON->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'selValidOrgs', $personId);
+	my $defaultOrg = $page->cookie('defaultOrg') || $orgs->[0]->{org_id};
+	my $defaultOrgIntId = $orgs->[0]->{org_internal_id};
+	return ([map {$_->{org_id}} @$orgs], $defaultOrg, $defaultOrgIntId);
 }
 
 sub handle_page
