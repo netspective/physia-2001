@@ -248,9 +248,20 @@ sub refreshInvoiceWorkList
 		    	my @date= Add_Delta_Days (@start_Date,"-".$maxRange);
 		 	$minDate = sprintf("%02d/%02d/%04d", $date[1],$date[2],$date[0]);		
 		}		
-		$STMTMGR_WORKLIST_COLLECTION->execute($self, STMTMGRFLAG_NONE,'pullCollectorRecords',
+		
+		my $product = $STMTMGR_WORKLIST_COLLECTION ->getRowAsHash($self, STMTMGRFLAG_NONE, 'selPersonAttribute',$collector_id,'WorkList-Collection-Setup-Product',$org_internal_id);		
+		if($product->{value_int}==-1)
+		{
+			$STMTMGR_WORKLIST_COLLECTION->execute($self, STMTMGRFLAG_NONE,'pullCollectorRecordsNoProducts',
 			$minLastName,$maxLastName,$minAmount,$maxAmount,$minDate,$maxDate,$org_internal_id,
-			$collector_id,$fmtDate,$pullNumber) if $pullNumber >0;	
+			$collector_id,$fmtDate,$pullNumber) if $pullNumber >0;			
+		}
+		else
+		{
+			$STMTMGR_WORKLIST_COLLECTION->execute($self, STMTMGRFLAG_NONE,'pullCollectorRecords',
+				$minLastName,$maxLastName,$minAmount,$maxAmount,$minDate,$maxDate,$org_internal_id,
+				$collector_id,$fmtDate,$pullNumber) if $pullNumber >0;	
+		}
 }
 
 
