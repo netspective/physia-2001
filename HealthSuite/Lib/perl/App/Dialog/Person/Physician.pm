@@ -232,19 +232,19 @@ sub initialize
 		#		]),
 		new CGI::Dialog::MultiField(caption =>'1. State/License/Exp Date', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
 			fields => [
-				new CGI::Dialog::Field(caption => 'State', name => 'state1'),
+				new CGI::Dialog::Field(caption => 'State', name => 'state1', size => 2, maxLength => 2),
 				new CGI::Dialog::Field(caption => 'License', name => 'license1'),
 				new CGI::Dialog::Field(type=> 'date', caption => 'Date of Expiration', name => 'state1_exp_date', futureOnly => 1, defaultValue => ''),
 				]),
 		new CGI::Dialog::MultiField(caption =>'2. State/License/Exp Date', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
 			fields => [
-				new CGI::Dialog::Field(caption => 'State', name => 'state2'),
+				new CGI::Dialog::Field(caption => 'State', name => 'state2', size => 2, maxLength => 2),
 				new CGI::Dialog::Field(caption => 'License', name => 'license2'),
 				new CGI::Dialog::Field(type=> 'date', caption => 'Date of Expiration', name => 'state2_exp_date', futureOnly => 1, defaultValue => ''),
 				]),
 		new CGI::Dialog::MultiField(caption =>'3. State/License/Exp Date', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
 			fields => [
-				new CGI::Dialog::Field(caption => 'State', name => 'state3'),
+				new CGI::Dialog::Field(caption => 'State', name => 'state3', size => 2, maxLength => 2),
 				new CGI::Dialog::Field(caption => 'License', name => 'license3'),
 				new CGI::Dialog::Field(type=> 'date', caption => 'Date of Expiration', name => 'state3_exp_date', futureOnly => 1, defaultValue => ''),
 				]),
@@ -284,6 +284,12 @@ sub initialize
 							],
 						cancelUrl => $self->{cancelUrl} || undef)
 	);
+
+	$self->{activityLog} = {
+		scope =>'person',
+		key => "#field.person_id#",
+		data => "Person '#field.person_id#' <a href='/person/#field.person_id#/profile'>#field.name_first# #field.name_last#</a> as a Physician"
+	};
 
 	return $self;
 }
@@ -533,7 +539,7 @@ sub execute_add
 
 	#State Licenses
 
-	my $state1 = $page->field('state1');
+	my $state1 = uc($page->field('state1'));
 	$page->schemaAction(
 			'Person_Attribute', $command,
 			parent_id => $personId || undef,
@@ -546,7 +552,7 @@ sub execute_add
 	) if $state1 ne '' && $page->field('license1') ne '';
 
 
-	my $state2 = $page->field('state2');
+	my $state2 = uc($page->field('state2'));
 	$page->schemaAction(
 			'Person_Attribute', $command,
 			parent_id => $personId || undef,
@@ -558,7 +564,7 @@ sub execute_add
 			_debug => 0
 	) if $state2 ne '' && $page->field('license2') ne '';
 
-	my $state3 = $page->field('state3');
+	my $state3 = uc($page->field('state3'));
 	$page->schemaAction(
 			'Person_Attribute', $command,
 			parent_id => $personId || undef,
