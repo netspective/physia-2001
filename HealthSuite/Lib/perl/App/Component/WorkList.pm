@@ -38,7 +38,8 @@ sub initialize
 				&nbsp
 				<SELECT onChange='location.href=this.options[selectedIndex].value'>
 					<option value='#'>Select Action</option>
-					<option value='$arlPrefix/dlg-add-ins-newplan/'>Create Insurance Plan</option>
+					<option value='$arlPrefix/dlg-add-ins-product/'>Create Insurance Product</option>
+					<option value='$arlPrefix/dlg-add-ins-plan/'>Create Insurance Plan</option>
 					<option value='$arlPrefix/dlg-add-assign/'>Reassign Physician</option>
 					<option value='#'>Print Encounter Form</option>
 					<option value='#'>Print Face Sheet</option>
