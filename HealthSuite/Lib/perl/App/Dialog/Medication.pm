@@ -3,7 +3,7 @@ package App::Dialog::Medication;
 ##############################################################################
 
 use strict;
-use SDE::CVS ('$Id: Medication.pm,v 1.2 2000-12-06 17:52:41 robert_jenks Exp $', '$Name:  $');
+use SDE::CVS ('$Id: Medication.pm,v 1.3 2000-12-07 18:23:34 robert_jenks Exp $', '$Name:  $');
 use CGI::Validator::Field;
 use CGI::Dialog;
 use base qw(CGI::Dialog);
@@ -197,7 +197,8 @@ sub new
 		),
 	);
 	
-	$self->addFooter(new CGI::Dialog::Buttons());
+	$self->{_buttons_field} = new CGI::Dialog::Buttons();
+	$self->addFooter($self->{_buttons_field});
 	
 	$self->addPostHtml(q{
 		<script language="JavaScript1.2">
@@ -240,6 +241,8 @@ sub makeStateChanges
 	my ($self, $page, $command, $activeExecMode, $dlgFlags) = @_;
 	$self->SUPER::makeStateChanges($page, $command, $activeExecMode, $dlgFlags);
 	
+	#my $buttonsField = $self->{_buttons_field};
+	
 	my $isNurse = grep {$_ eq 'Nurse'} @{$page->session('categories')};
 	my $isPhysician = grep {$_ eq 'Physician'} @{$page->session('categories')};
 	
@@ -251,7 +254,7 @@ sub makeStateChanges
 		$self->setFieldFlags('pharmacy_id', FLDFLAG_INVISIBLE);
 		$self->setFieldFlags('printer', FLDFLAG_INVISIBLE);
 	}
-	if ($command eq 'prescribe' || $command eq 'refill' || $command eq 'update')
+	elsif ($command eq 'prescribe' || $command eq 'refill' || $command eq 'update')
 	{
 		unless ($isNurse || $isPhysician)
 		{
@@ -259,17 +262,22 @@ sub makeStateChanges
 			$self->setFieldFlags('pharmacy_id', FLDFLAG_INVISIBLE);
 			$self->setFieldFlags('printer', FLDFLAG_INVISIBLE);
 		}
+		
 		if ($isPhysician)
 		{
 			$self->setFieldFlags('get_approval_from', FLDFLAG_INVISIBLE);
 			$self->setFieldFlags('approved_by', FLDFLAG_READONLY);
 			$page->field('approved_by', $page->session('person_id'));
+			#$buttonsField->addActionButtons({caption => 'Save & Approve'});
 		}
 		else
 		{
 			$self->setFieldFlags('approved_by', FLDFLAG_INVISIBLE);
-			$page->field('approved_by', '');
+			#$page->field('approved_by', '');
+			$self->setFieldFlags('get_approval_from', FLDFLAG_REQUIRED);
+			#$buttonsField->addActionButtons({caption => 'Submit For Approval'});
 		}
+		$self->setFieldFlags('get_approval_from', FLDFLAG_INVISIBLE) if $command eq 'update';
 	}
 	elsif ($command eq 'approve')
 	{
@@ -279,6 +287,8 @@ sub makeStateChanges
 			my $approvedBy = $self->getField('approved_by');
 			$approvedBy->{type} = 'hidden';
 			$page->field('approved_by', $page->session('person_id'));
+			#$buttonsField->addActionButtons({caption => 'Save & Approve'});
+			#$buttonsField->addActionButtons({caption => 'Save & Deny'});
 		}
 		else
 		{
@@ -288,6 +298,8 @@ sub makeStateChanges
 			$self->setFieldFlags('get_approval_from', FLDFLAG_INVISIBLE);
 			$self->setFieldFlags('approved_by', FLDFLAG_INVISIBLE);
 			$self->setDialogViewOnly($dlgFlags);
+			#$buttonsField->addActionButtons({caption => 'Close'});
+			#$buttonsField->{noCancelButton} = 1;
 		}
 		
 	}
@@ -299,6 +311,9 @@ sub makeStateChanges
 		$self->setFieldFlags('get_approval_from', FLDFLAG_INVISIBLE);
 		$self->setFieldFlags('approved_by', FLDFLAG_INVISIBLE);
 		$self->setDialogViewOnly($dlgFlags);
+		#$buttonsField->addActionButtons({caption => 'Close'});
+		#$buttonsField->{noCancelButton} = 1;
+
 	}
 }
 
@@ -327,6 +342,18 @@ sub populateData
 			$self->setFieldFlags('parent_id', FLDFLAG_READONLY);
 		}
 	}
+	
+	if ($command eq 'update' && $page->field('approved_by'))
+	{
+		foreach my $field (@{$self->{content}})
+		{
+			unless ($field->{name} eq 'dates_multi')
+			{
+				$field->setFlag(FLDFLAG_READONLY);
+			}
+			$self->clearFieldFlags('approved_by', FLDFLAG_INVISIBLE);
+		}
+	}
 }
 
 
@@ -349,7 +376,7 @@ sub execute_add
 		duration => $page->field('duration') || undef,
 		duration_units => $page->field('duration_units') || undef,
 		quantity => $page->field('quantity') || undef,
-		num_refills => $page->field('num_refills') || undef,
+		num_refills => defined $page->field('num_refills') ? $page->field('num_refills') : undef,
 		allow_generic => $page->field('allow_generic') || undef,
 		allow_substitutions => $page->field('allow_substitutions') || undef,
 		notes => $page->field('notes') || undef,
@@ -388,41 +415,28 @@ sub execute_update
 	my $self = shift;
 	my ($page, $command, $flags) = @_;
 
-	## Once a prescription is approved the only thing they can change is the end_date
-	#if (! $page->field('approved_by'))
-	#{
-	#	$page->schemaAction(
-	#		'Person_Medication', 'update',
-	#		permed_id => $page->param('permed_id'),
-	#		end_date => $page->field('end_date'),
-	#	);
-	#}
-	# Else it hasn't been approved yet, we can update anything
-	#else
-	#{
-		$page->schemaAction(
-			'Person_Medication', 'update',
-			permed_id => $page->param('permed_id'),
-			med_name => $page->field('med_name') || undef,
-			dose => $page->field('dose') || undef,
-			dose_units => $page->field('dose_units') || undef,
-			route => $page->field('route') || undef,
-			frequency => $page->field('frequency') || undef,
-			prn => $page->field('prn') || undef,
-			start_date => $page->field('start_date') || undef,
-			end_date => $page->field('end_date') || undef,
-			duration => $page->field('duration') || undef,
-			duration_units => $page->field('duration_units') || undef,
-			quantity => $page->field('quantity') || undef,
-			num_refills => $page->field('num_refills') || undef,
-			allow_generic => $page->field('allow_generic') || undef,
-			allow_substitutions => $page->field('allow_substitutions') || undef,
-			notes => $page->field('notes') || undef,
-			approved_by => $page->field('approved_by') || undef,
-			pharmacy_id => $page->field('pharmacy_id') || undef,
-			_debug => 0,
-		);
-	#}
+	$page->schemaAction(
+		'Person_Medication', 'update',
+		permed_id => $page->param('permed_id'),
+		med_name => $page->field('med_name') || undef,
+		dose => $page->field('dose') || undef,
+		dose_units => $page->field('dose_units') || undef,
+		route => $page->field('route') || undef,
+		frequency => $page->field('frequency') || undef,
+		prn => $page->field('prn') || undef,
+		start_date => $page->field('start_date') || undef,
+		end_date => $page->field('end_date') || undef,
+		duration => $page->field('duration') || undef,
+		duration_units => $page->field('duration_units') || undef,
+		quantity => $page->field('quantity') || undef,
+		num_refills => $page->field('num_refills') || undef,
+		allow_generic => $page->field('allow_generic') || undef,
+		allow_substitutions => $page->field('allow_substitutions') || undef,
+		notes => $page->field('notes') || undef,
+		approved_by => $page->field('approved_by') || undef,
+		pharmacy_id => $page->field('pharmacy_id') || undef,
+		_debug => 0,
+	);
 
 	$self->handlePostExecute($page, $command, $flags | CGI::Dialog::DLGFLAG_IGNOREREDIRECT);
 	return "\u$command completed.";
