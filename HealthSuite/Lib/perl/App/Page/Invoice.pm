@@ -1219,9 +1219,9 @@ sub prepare_view_summary
 
 	my $claim = $self->property('activeClaim');
 	my $patient = $self->getPersonHtml($claim->{careReceiver});
-	my $provider = $self->getPersonHtml($claim->{payToProvider});
 	my $serviceProvider = "$claim->{renderingProvider}->{firstName} $claim->{renderingProvider}->{middleInitial} $claim->{renderingProvider}->{lastName} ($claim->{renderingProvider}->{id})";
 	my $serviceOrg = $self->getOrgHtml($claim->{renderingOrganization});
+	my $billingProvider = "$claim->{payToProvider}->{firstName} $claim->{payToProvider}->{middleInitial} $claim->{payToProvider}->{lastName} ($claim->{payToProvider}->{id})";
 	my $billingOrg = $self->getOrgHtml($claim->{payToOrganization});
 	my $payer = $self->getPayerHtml($claim->{payer}, $claim->{insured}->[0]->{insurancePlanOrProgramName});
 	my $invStatus = $claim->getStatus();
@@ -1389,7 +1389,7 @@ sub prepare_view_summary
 			</TR>
 			<TR VALIGN=TOP>
 				<TD><FONT FACE="Arial,Helvetica" SIZE=2>$patient</TD>
-				<TD><FONT FACE="Arial,Helvetica" SIZE=2>$serviceProvider<br><br>$provider<br><br>$serviceOrg</TD>
+				<TD><FONT FACE="Arial,Helvetica" SIZE=2>Billing:<br>$billingProvider<br>$billingOrg<br><br>Service:<br>$serviceProvider<br>$serviceOrg</TD>
 				@{[ $claimType != $selfPay ? $payerPane : '' ]}
 			</TR>
 		</TABLE>
