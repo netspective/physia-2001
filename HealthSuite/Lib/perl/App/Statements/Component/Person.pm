@@ -488,7 +488,7 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 	{
 		# automatically inherites columnDefn and other items from publishDefn
 		style => 'panel',
-		frame => { heading => 'Emergency' },
+		frame => { heading => 'Emergency Contacts' },
 	},
 	publishDefn_panelTransp =>
 	{
@@ -500,7 +500,7 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 	{
 		# automatically inherites columnDefn and other items from publishDefn
 		style => 'panel.edit',
-		frame => { heading => 'Edit Emergency' },
+		frame => { heading => 'Edit Emergency Contacts' },
 		banner => {
 			actionRows =>
 			[
@@ -767,7 +767,7 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 			select ins_internal_id, parent_ins_id, product_name,  decode(record_type, 3, 'coverage') as record_type,
 					plan_name, decode(bill_sequence,1,'Primary',2,'Secondary',3,'Tertiary',4,'Quaternary',5,'W. Comp', 98, 'Terminated', 99, 'InActive'),
 					owner_person_id, ins_org_id, indiv_deductible_amt, family_deductible_amt, percentage_pay,
-					copay_amt
+					copay_amt, guarantor_name, decode(ins_type, 7, 'Third-Party Payer') as ins_type
 			from insurance
 			where record_type = 3
 			and owner_person_id = ?
@@ -783,7 +783,7 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 	sqlStmtBindParamDescr => ['Person ID for Insurance Table'],
 	publishDefn => {
 		columnDefn => [
-			{ colIdx => 2, head => 'ID', dataFmt => '<A HREF = "/org/#7#/profile">#7#</A>(#5#): #4#, #2#' },
+			{ colIdx => 2, head => 'ID', dataFmt => '<A HREF = "/org/#7#/profile">#7#</A>#12# (#5# #13#): #4#, #2#' },
 			#{ dataFmt => '&{fmt_stripLeadingPath:0} #5#'}
 			#{ colIdx => 0, head => 'Type', dataFmt => '&{fmt_stripLeadingPath:0}:' },
 			#{ colIdx => 1, head => 'Employer', dataFmt => '#1#' },
@@ -1720,11 +1720,13 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 
 'person.certification' => {
 	sqlStmt => qq{
-			select 	value_type, item_id, item_name, value_text, %simpleDate:value_dateend%, decode(value_int,5,'Unknown',1,'Primary',2,'Secondary',3,'Tertiary',4,'Quaternary')
-			from 	person_attribute
+			select 	value_type, item_id, item_name, value_text, %simpleDate:value_dateend%,
+				(select (decode(a.value_int,5,'Unknown',1,'Primary',2,'Secondary',3,'Tertiary',4,'Quaternary'))
+					from person_attribute a where  a.value_type in (@{[ App::Universal::ATTRTYPE_SPECIALTY ]}) and a.item_id = b.item_id)value_int
+			from 	person_attribute b
 			where 	parent_id = ?
 			and 	value_type in (@{[ App::Universal::ATTRTYPE_LICENSE ]}, @{[ App::Universal::ATTRTYPE_STATE ]}, @{[ App::Universal::ATTRTYPE_ACCREDITATION ]}, @{[ App::Universal::ATTRTYPE_SPECIALTY ]})
-			and     item_name not in('Nurse/Title', 'RN', 'Nursing/License', 'Driver/License', 'Employee')
+			and     item_name not in('Nurse/Title', 'RN', 'Driver/License', 'Employee')
 			order by value_int
 		},
 	sqlStmtBindParamDescr => ['Person ID for Certification'],
