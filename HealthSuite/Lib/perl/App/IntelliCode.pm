@@ -585,6 +585,38 @@ sub isLabProc
 
 sub getItemCost
 {
+	my ($page, $cpt, $modifier, $fsRef) = @_;
+	my @buffer = ();
+
+	for my $i (0..(@$fsRef -1))
+	{
+		my $fs = $fsRef->[$i];
+		
+		my $entries = $STMTMGR_CATALOG->getRowsAsHashList($page, STMTMGRFLAG_NONE,
+			'sel_catalogEntryByCpt_Catalog', $cpt, $modifier, $fs);
+	
+		for my $entry (@{$entries})
+		{
+			push(@buffer, [$fs, $entry->{unit_cost}]);
+		}
+	}
+	
+	if (scalar @buffer == 0)
+	{
+		return (2, "No price found for this Code/Modifier/Fee_Schedule combination.");		
+	}
+	elsif (scalar @buffer == 1)
+	{
+		return (0, $buffer[0]->[1]);
+	}
+	else 
+	{
+		return (1, \@buffer);
+	}
+}
+
+sub __getItemCost
+{
 	my ($page, $codesRef, $orgId, $insId) = @_;
 
 	my $itemGrpType = App::Universal::CATALOGENTRYTYPE_ITEMGRP;

@@ -17,7 +17,6 @@ $STMTMGR_CATALOG = new App::Statements::Catalog(
 		where catalog_id = ?
 		},
 
-
 	'selParentCatalogByOrgId' => q{
 		select *
 		from offering_catalog
@@ -46,8 +45,6 @@ $STMTMGR_CATALOG = new App::Statements::Catalog(
 		where code = ?
 			and entry_type = ?
 		},
-
-
 
 	'selCatalogItemsByOrgIdAndCode' => q{
 		select oce.catalog_id, oce.parent_entry_id, oce.entry_type, oce.code, oce.modifier, oce.default_units,
@@ -169,7 +166,12 @@ $STMTMGR_CATALOG = new App::Statements::Catalog(
 		order by typ.caption, parent_entry_id, code, modifier, name, unit_cost
 		},
 
-
+	'sel_catalogEntryByCpt_Catalog' => qq{
+		select * from Offering_Catalog_Entry
+		where code = ?
+			and (modifier = ? or modifier is NULL)
+			and catalog_id = ?
+	},
 );
 
 1;
