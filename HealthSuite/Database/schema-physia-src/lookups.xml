@@ -1394,6 +1394,24 @@
 				<col name="abbrev">L3</col>
 				<col name="result">2</col>
 			</row>
+			<row>
+				<col name="id">113</col>
+				<col name="caption">TWCC 73 form</col>
+				<col name="abbrev">73</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">114</col>
+				<col name="caption">TWCC 73 form when requested by the carrier</col>
+				<col name="abbrev">RR</col>
+				<col name="result">2</col>
+			</row>
+			<row>
+				<col name="id">115</col>
+				<col name="caption">TWCC 73 form re-requested by the carrier</col>
+				<col name="abbrev">EC</col>
+				<col name="result">2</col>
+			</row>
 		</data>
 	</table>
 
