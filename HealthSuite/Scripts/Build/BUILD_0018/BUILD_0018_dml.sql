@@ -51,4 +51,10 @@ insert into Catalog_Entry_Type (id, caption) values (999, 'Other');
 insert into Offering_Catalog_Type (id, caption) values (5, 'Lab Test');
 
 
+--bug 1843
+
+insert into Org_Type (id, caption, group_name) values (12, 'Lab', 'Lab');
+
+
+
 commit;
