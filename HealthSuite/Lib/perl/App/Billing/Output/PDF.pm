@@ -2645,12 +2645,12 @@ sub box25ClaimData
 	die "Couldn't set font"  if ($font == -1);
 	pdflib::PDF_setfont($p, $font, DATA_FONT_SIZE);
 
-	pdflib::PDF_show_xy($p , $claim->{payToOrganization}->getFederalTaxId eq "" ?  $claim->{payToOrganization}->getTaxId : $claim->{payToOrganization}->getFederalTaxId, $box25X + CELL_PADDING_X + DATA_PADDING_X, $box25Y - 3 * FORM_FONT_SIZE );
+	pdflib::PDF_show_xy($p , $claim->{payToOrganization}->getTaxId eq "" ?  $claim->{payToOrganization}->getTaxId : $claim->{payToOrganization}->getTaxId, $box25X + CELL_PADDING_X + DATA_PADDING_X, $box25Y - 3 * FORM_FONT_SIZE );
 	my $temp = {
 			'S' => $box25X + CELL_PADDING_X + 112.5 + CHECKED_BOX_X,
 			'E' => $box25X + CELL_PADDING_X + 126 + CHECKED_BOX_X,
 			};
-	pdflib::PDF_show_xy($p , 'X', $box25X + CELL_PADDING_X + 126 + CHECKED_BOX_X, $cordinates->{box31}->[1] + 1 + CHECKED_BOX_Y) if (uc($claim->{payToOrganization}->getFederalTaxId) ne "");
+	pdflib::PDF_show_xy($p , 'X', $box25X + CELL_PADDING_X + 126 + CHECKED_BOX_X, $cordinates->{box31}->[1] + 1 + CHECKED_BOX_Y) if (uc($claim->{payToOrganization}->getTaxId) ne "");
 	pdflib::PDF_stroke($p);
 }
 
@@ -2788,15 +2788,15 @@ sub box33ClaimData
 	my $font = pdflib::PDF_findfont($p, DATA_FONT_NAME, "default", 0);
 	die "Couldn't set font"  if ($font == -1);
 	pdflib::PDF_setfont($p, $font, DATA_FONT_SIZE);
-	my $physician = $claim->{payToOrganization};
-	my $add = $physician->getAddress();
+	my $facility = $claim->{payToOrganization};
+	my $physician = $claim->{payToProvider};
+	my $add = $facility->getAddress();
 
-	pdflib::PDF_show_xy($p ,$physician->getName() , $box33X + CELL_PADDING_X + 10, $box33Y - 4 * FORM_FONT_SIZE );
+	pdflib::PDF_show_xy($p ,$facility->getName() , $box33X + CELL_PADDING_X + 10, $box33Y - 4 * FORM_FONT_SIZE );
 	pdflib::PDF_show_xy($p ,$add->getAddress1() , $box33X + CELL_PADDING_X + 10, $box33Y - 5.2 * FORM_FONT_SIZE);
-#	pdflib::PDF_show_xy($p ,$add->getAddress1() , $box33X + CELL_PADDING_X + 10, $box33Y - 6.3 * FORM_FONT_SIZE);
 	pdflib::PDF_show_xy($p , $add->getCity() . "    " . $add->getState() . "    " . $add->getZipCode(), $box33X + CELL_PADDING_X + 10, $box33Y - 7.4 * FORM_FONT_SIZE);
-#	pdflib::PDF_show_xy($p , $physician->getPIN(), $box33X + CELL_PADDING_X + 25, START_Y + 2);
-#	pdflib::PDF_show_xy($p ,$physician->getGRP() , $box33X + CELL_PADDING_X + 130, START_Y + 2);
+	pdflib::PDF_show_xy($p , $physician->getPIN(), $box33X + CELL_PADDING_X + 25, START_Y + 2);
+	pdflib::PDF_show_xy($p ,$facility->getGRP() , $box33X + CELL_PADDING_X + 130, START_Y + 2);
 	pdflib::PDF_stroke($p);
 
 }

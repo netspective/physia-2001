@@ -323,18 +323,19 @@ sub populateOtherInsured
 sub populatePhysician
 {
 	my ($self, $claim) = @_;
-	my $physician = $claim->getPayToOrganization();
-	my $physicianAddress = $physician->getAddress();
+	my $billingFacility = $claim->getPayToOrganization();
+	my $billingPhysician = $claim->getPayToProvider();
+	my $billingFacilityAddress = $billingFacility->getAddress();
 	my $data = $self->{data};
 
-	$data->{physicianAddress} = $physicianAddress->getAddress1 . " " . $physicianAddress->getAddress2;
-	$data->{physicianCityStateZipCode} = $physicianAddress->getCity . " " . $physicianAddress->getState . " " . $physicianAddress->getZipCode;
-	$data->{physicianFederalTaxId} = $physician->getFederalTaxId eq "" ? $physician->getTaxId : $physician->getFederalTaxId;
-	$data->{physicianName} = $physician->getName;
-	$data->{physicianTaxTypeIdEin} = $physician->getFederalTaxId ne '' ? "Checked" : "";
+	$data->{physicianAddress} = $billingFacilityAddress->getAddress1 . " " . $billingFacilityAddress->getAddress2;
+	$data->{physicianCityStateZipCode} = $billingFacilityAddress->getCity . " " . $billingFacilityAddress->getState . " " . $billingFacilityAddress->getZipCode;
+	$data->{physicianFederalTaxId} = $billingFacility->getTaxId eq "" ? $billingFacility->getTaxId : $billingFacility->getTaxId;
+	$data->{physicianName} = $billingFacility->getName;
+	$data->{physicianTaxTypeIdEin} = $billingFacility->getTaxId ne '' ? "Checked" : "";
 #	$data->{physicianTaxTypeIdSsn} = uc($physician->getTaxTypeId) eq 'S' ? "Checked" : "";
-#	$data->{physicianPin} = $physician->getPIN;
-#	$data->{physicianGrp} = $physician->getGRP;
+	$data->{physicianPin} = $billingPhysician->getPIN;
+	$data->{physicianGrp} = $billingFacility->getGRP;
 }
 
 sub populateOrganization
@@ -363,7 +364,6 @@ sub populateTreatment
 	$data->{treatmentHospitilizationDateTo} = $treatment->getHospitilizationDateTo(DATEFORMAT_USA);
 	$data->{treatmentIdOfReferingPhysician} = $treatment->getIDOfReferingPhysician;
 	$data->{treatmentMedicaidResubmission} = $treatment->getMedicaidResubmission;
-#	$data->{nameOfReferingPhysicianOrOther} = $treatment->getNameOfReferingPhysicianOrOther;
 	if ($treatment->getRefProviderLastName ne "")
 	{
 		$data->{nameOfReferingPhysicianOrOther} = $treatment->getRefProviderLastName . ", " . $treatment->getRefProviderFirstName  . " " . $treatment->getRefProviderMiName;
