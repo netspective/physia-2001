@@ -641,7 +641,7 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 'person.insurance' => {
 	sqlStmt => qq{
 			select ins_internal_id, parent_ins_id, product_name,  decode(record_type, 3, 'coverage') as record_type,
-					plan_name, decode(bill_sequence,1,'Primary',2,'Secondary',3,'Tertiary',4,'Quaternary',5,'W. Comp', 99, 'InActive'),
+					plan_name, decode(bill_sequence,1,'Primary',2,'Secondary',3,'Tertiary',4,'Quaternary',5,'W. Comp', 98, 'Terminated', 99, 'InActive'),
 					owner_person_id, ins_org_id, indiv_deductible_amt, family_deductible_amt, percentage_pay,
 					copay_amt
 			from insurance
@@ -733,7 +733,7 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 #----------------------------------------------------------------------------------------------------------------------
 'person.extendedHealthCoverage' => {
 	sqlStmt => qq{
-			select 	decode(bill_sequence,0,'Inactive',1,'Primary',2,'Secondary',3,'Tertiary',4,'W. Comp'),
+			select 	decode(bill_sequence, 1,'Primary',2,'Secondary',3,'Tertiary',4,'Quaternary',5,'W. Comp', 98, 'Terminated', 99, 'InActive'),
 				decode(ins_type,0,'Self-Pay',1,'Insurance',2,'HMO',3,'PPO',4,'Medicare',5,'Medicaid',6,'W.Comp',7,'Client Billing',8,'Champus',9,'ChampVA',10,
 					'FECA Blk Lung',11,'BCBS'), member_number, ins_internal_id, record_type, plan_name, policy_number, copay_amt, coverage_end_date, ins_org_id, product_name
 			from 	insurance
