@@ -1506,7 +1506,8 @@ sub getHtml
 		my $activeAction = $page->param(NEXTACTION_PARAMNAME);
 		foreach(@$actionsList)
 		{
-			push(@nextActions, qq{ <OPTION VALUE="$_->[1]" @{[ $activeAction ? ($activeAction eq $_->[1] ? ' SELECTED' : '') : ($_->[2] ? ' SELECTED' : '') ]}>$_->[0]</OPTION> });
+			my $replaceData = $page->replaceVars($_->[1]);			
+			push(@nextActions, qq{ <OPTION VALUE="$_->[1]" @{[ $activeAction ? ($activeAction eq $replaceData ? ' SELECTED' : '') : ($_->[2] ? ' SELECTED' : '') ]}>$_->[0]</OPTION> });
 		}
 	}
 	my $nextActions = @nextActions ? qq{ <FONT FACE=Arial,Helvetica SIZE=2 STYLE="font-size:8pt; font-family: tahoma,arial"><B>Next Action:</B> </FONT><SELECT NAME='_f_nextaction_redirecturl' style='font-size:8pt; font-family: tahoma,arial,helvetica'>@{[ join('', @nextActions) ]}</SELECT> } : '';
