@@ -74,8 +74,6 @@ B713 - Alert Staff members on patients with alerts.
 
 B954 - Display Org ID instead of internal Org ID on Available Slots Search.
 
-Special Enhancements:  Allow making multiple appointments using Robert's cool dynamic HTML.
-
 B966 - Closed this bug as it works
 
 B892 - Changed the url in the 'Outstanding Balances' component in the checkin and checkout dialog page
@@ -90,7 +88,7 @@ B768, 857, 769,522 -  Minor Report fixes more information can be found in bugzil
 
 B515 - Changed the 'Associated Physician' field in Nurse dialog to a checkbox instead of a drop down list
 
-  
+B470 - Print Patients Face Sheet from the Patient Flow Work List  
 
 
 
