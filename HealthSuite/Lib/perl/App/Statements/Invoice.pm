@@ -278,6 +278,18 @@ $STMTMGR_INVOICE = new App::Statements::Invoice(
 		select rel_diags from invoice_item
 		where item_id = ?
 		},
+	'delAutoWriteoffAdjustmentsForItem' => q{
+		delete
+		from invoice_item_adjust
+		where parent_id = ?
+			and adjustment_type = 3
+		},
+	'selAutoWriteoffAdjustmentsForItem' => q{
+		select *
+		from invoice_item_adjust
+		where parent_id = ?
+			and adjustment_type = 3
+		},
 	'selItemAdjustments' => q{
 		select 	iia.adjustment_id, iia.adjustment_amount,	iia.payer_id, iia.plan_allow, iia.plan_paid, iia.deductible, iia.copay,
 			iia.submit_date, iia.pay_date, comments, pay_ref, pay_method as pay_method_id, writeoff_amount,
