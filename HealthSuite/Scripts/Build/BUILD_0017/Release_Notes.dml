@@ -285,7 +285,7 @@
 		</deliverable>
 
 		<deliverable id="1578">
-			Populating default fee schedule field in Add Claim with fee schedules associated with payer.
+			Populating default fee schedule field in Add Claim with fee schedules associated with payer. FIX: corrected process for secondary claim
 		</deliverable>
 
 		<deliverable id="1583">
@@ -380,7 +380,10 @@
 		</deliverable>
 
 		<deliverable id="1663">
-			Report (aged pt recv) :  Corrected SQL to pull co-pay information and not multi count patient that have more then one role
+			Report (aged pt recv) :  Corrected SQL to pull co-pay information and not multi count patient that have more then one role.  FIX : fixed detail report also
+		</deliverable>
+		<deliverable id="1676">
+			Report (total recv) :  Corrected SQL to not multi count patient that have more then one role.  FIX : fixed detail report also
 		</deliverable>
 
 	</deliverables>
