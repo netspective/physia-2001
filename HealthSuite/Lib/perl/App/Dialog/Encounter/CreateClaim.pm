@@ -140,6 +140,34 @@ sub execute_update
 
 	App::Dialog::Encounter::handlePayers($self, $page, $command, $flags);
 
+	my $historyValueType = App::Universal::ATTRTYPE_HISTORY;
+	my $todaysDate = $page->getDate();
+	my $invoiceId = $page->param('invoice_id');
+	if($command eq 'update')
+	{
+	#	$page->schemaAction(
+	#		'Invoice_Attribute', 'add',
+	#		item_id => $page->field('batch_item_id') || undef,
+	#		parent_id => $invoiceId || undef,
+	#		item_name => 'Invoice/Edit/Batch ID',
+	#		value_type => defined $textValueType ? $textValueType : undef,
+	#		value_text => $batchId || undef,
+	#		value_date => $page->field('batch_date') || undef,
+	#		_debug => 0
+	#	);
+
+		$page->schemaAction(
+			'Invoice_Attribute', 'add',
+			parent_id => $invoiceId || undef,
+			item_name => 'Invoice/History/Item',
+			value_type => defined $historyValueType ? $historyValueType : undef,
+			value_text => 'Updated',
+			#value_textB => "Edit Batch ID: $batchId",
+			value_date => $todaysDate,
+			_debug => 0
+		);
+	}
+
 	#$page->endUnitWork();
 }
 
