@@ -50,7 +50,7 @@ use vars qw(
 $STMTFMT_SEL_MISC_PROCEDURE = qq{
 	SELECT code,caption,detail
 	FROM Transaction
-	WHERE 
+	WHERE
 		%whereCond%
 		AND trans_subtype = 'Misc Procedure Code'
 		AND rownum < $LIMIT
@@ -58,7 +58,7 @@ $STMTFMT_SEL_MISC_PROCEDURE = qq{
 
 
 $STMTFMT_SEL_EPSDT_CODE = qq{
-	SELECT epsdt,name,description 
+	SELECT epsdt,name,description
 	FROM ref_epsdt
 	WHERE
 		%whereCond%
@@ -89,7 +89,7 @@ $STMTFMT_SEL_CPT_CODE = qq{
 };
 
 $STMTFMT_SEL_HCPCS_CODE = qq{
-	SELECT hcpcs, name, description 
+	SELECT hcpcs, name, description
 	FROM REF_HCPCS
 	WHERE
 		%whereCond%
@@ -129,9 +129,9 @@ $STMTRPTDEFN_ICD =
 	#},
 	columnDefn =>
 	[
-		{ head => 'Code', url => q{javascript:chooseItem2('/lookup/icd/detail/#&{?}#', '#&{?}#', true)}, hint => 'Lookup Detailed Data' },
-		{ head => 'Name' },
-		{ head => 'Description' },
+		{ head => 'Code', url => q{javascript:chooseItem('/lookup/icd/detail/#&{?}#', '#&{?}#', true, '#2#')}, hint => 'Lookup Detailed Data' },
+		{ head => 'Name'},
+		{ head => 'Description', },
 		{ head => 'Sex' },
 		{ head => 'Age' },
 	],
@@ -147,9 +147,9 @@ $STMTRPTDEFN_CPT =
 	#},
 	columnDefn =>
 	[
-		{ head => 'Code', url => q{javascript:chooseItem2('/lookup/cpt/detail/#&{?}#', '#&{?}#', true)}, hint => 'Lookup Detailed Data' },
+		{ head => 'Code', url => q{javascript:chooseItem('/lookup/cpt/detail/#&{?}#', '#&{?}#', true, '#2#')}, hint => 'Lookup Detailed Data' },
 		{ head => 'Name' },
-		{ head => 'Description' },
+		{ head => 'Description', },
 	],
 	#rowSepStr => '',
 };
@@ -164,8 +164,8 @@ $STMTRPTDEFN_HCPCS =
 	columnDefn =>
 	[
 		{ head => 'Code', url => q{javascript:chooseEntry('#&{?}#')}, },
-		{ head => 'Name' },
-		{ head => 'Description' },
+		{ head => 'Name'},
+		{ head => 'Description', },
 	],
 	#rowSepStr => '',
 };
@@ -189,20 +189,20 @@ $STMTRPTDEFN_EPSDT =
 {
 	columnDefn =>
 	[
-		{ head => 'Code', url => q{javascript:chooseEntry('#&{?}#')}, },	
+		{ head => 'Code', url => q{javascript:chooseEntry('#&{?}#')}, },
 		#{ head => 'Name' },
 		{ head => 'Description' },
-	],	
+	],
 };
 
 $STMTRPTDEFN_MISC_PROCEDURE =
 {
 	columnDefn =>
 	[
-		{ head => 'Code', url => q{javascript:chooseEntry('#&{?}#')}, },	
+		{ head => 'Code', url => q{javascript:chooseEntry('#&{?}#')}, },
 		{ head => 'Name' },
 		{ head => 'Description' },
-	],	
+	],
 };
 
 
@@ -441,7 +441,7 @@ $STMTMGR_EPSDT_CODE_SEARCH = new App::Statements::Search::Code(
 		_stmtFmt => $STMTFMT_SEL_EPSDT_CODE,
 		whereCond => 'upper(desciption) = ?',
 		publishDefn => $STMTRPTDEFN_EPSDT,
-	}, 
+	},
 	'sel_epsdt_code_like' =>
 	{
 		_stmtFmt => $STMTFMT_SEL_EPSDT_CODE,
@@ -473,13 +473,13 @@ $STMTMGR_MISC_PROCEDURE_CODE_SEARCH = new App::Statements::Search::Code(
 		_stmtFmt => $STMTFMT_SEL_MISC_PROCEDURE,
 		whereCond => 'upper(detail) = ?',
 		publishDefn => $STMTRPTDEFN_MISC_PROCEDURE,
-	}, 
+	},
 	'sel_misc_procedure_name' =>
 	{
 		_stmtFmt => $STMTFMT_SEL_MISC_PROCEDURE,
 		whereCond => 'upper(caption) = ?',
 		publishDefn => $STMTRPTDEFN_MISC_PROCEDURE,
-	}, 
+	},
 	'sel_misc_procedure_code_like' =>
 	{
 		_stmtFmt => $STMTFMT_SEL_MISC_PROCEDURE,
