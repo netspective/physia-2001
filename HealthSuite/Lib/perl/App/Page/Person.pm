@@ -210,7 +210,7 @@ sub prepare_page_content_header
 			<OPTION value="/person/$personId/account?home=$homeArl&viewall=1">View All Claims</OPTION>
 			<<OPTION value="/person/$personId/dlg-setup-payment_plan?home=$homeArl">Setup Payment Plan</OPTION>
 			<OPTION value="/person/$personId/dlg-prescribe-medication?home=$homeArl">Prescribe Medication</OPTION>
-			<OPTION value="/person/$personId/dlg-add-refill-request?home=$homeArl">Refills</OPTION>
+			<OPTION value="/person/$personId/stpe-person.activeMedications?home=$homeArl">Refills</OPTION>
 			<OPTION value="/person/$personId/dlg-send-phone_message?home=$homeArl">Voice Msgs</OPTION>
 			<!-- <OPTION value="/person/$personId/dlg-add-">Add Note</OPTION> -->
 			<OPTION value="/person/$personId/dlg-add-postpersonalpayment?home=$homeArl">Apply Personal Payment</OPTION>
