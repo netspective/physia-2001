@@ -18,6 +18,7 @@ use enum qw(BITMASK:FLDFLAG_
 	FORMATVALUE CUSTOMVALIDATE
 	CUSTOMDRAW NOBRCAPTION PERSIST
 	HOME SORT
+	PREPENDBLANK DEFAULTCAPTION
 	);
 
 use constant FLDFLAGS_DEFAULT => FLDFLAG_TRIM;
@@ -26,7 +27,7 @@ use constant FLDFLAGS_REQUIRING_VALIDATION => FLDFLAG_REQUIRED | FLDFLAG_IDENTIF
 
 #
 # export only those flags that should be called from the outside
-# note: If any flag are changed, please update page.js for mirror image. 
+# note: If any flag are changed, please update page.js for mirror image.
 #
 @ISA = qw(Exporter);
 @EXPORT = qw(
@@ -43,6 +44,8 @@ use constant FLDFLAGS_REQUIRING_VALIDATION => FLDFLAG_REQUIRED | FLDFLAG_IDENTIF
 	FLDFLAG_PERSIST
 	FLDFLAG_HOME
 	FLDFLAG_SORT
+	FLDFLAG_PREPENDBLANK
+	FLDFLAG_DEFAULTCAPTION
 	);
 
 use constant ONKEYPRESSJS_DEFAULT    => 'processKeypress_default(event)';
@@ -269,7 +272,11 @@ sub new
 
 	$params{type} = 'text' unless $params{type};
 	$params{name} = "$params{type}_field" unless $params{name};
-	$params{caption} = $params{name} unless exists $params{caption};
+	unless (exists $params{caption})
+	{
+		$params{caption} = $params{name};
+		$params{flags} |= FLDFLAG_DEFAULTCAPTION;
+	}
 	$params{message} = '' unless $params{message};
 	$params{maxLength} = -1 unless exists $params{maxLength};
 	$params{flags} = FLDFLAGS_DEFAULT unless exists $params{flags};
