@@ -17,13 +17,16 @@ use App::Statements::Search::Appointment;
 
 use App::Dialog::CollectionSetup;
 
-use vars qw(@ISA @CHANGELOG);
+use vars qw(@ISA %RESOURCE_MAP);
 @ISA = qw(App::Page);
+%RESOURCE_MAP = (
+	'worklist/collection' => {},
+	);
 
 sub prepare_view_date
 {
 	my ($self) = @_;
-	
+
 	$self->addContent(qq{
 		<TABLE BORDER=0 CELLSPACING=1 CELLPADDING=0>
 			<TR VALIGN=TOP>
@@ -96,7 +99,7 @@ sub prepare_view_recentActivity
 sub prepare_view_setup
 {
 	my ($self) = @_;
-	
+
 	my $dialog = new App::Dialog::CollectionSetup(schema => $self->{schema});
 	$self->addContent('<br>');
 	$dialog->handle_page($self, 'add');
@@ -117,11 +120,11 @@ sub prepare_page_content_footer
 sub decodeDate
 {
 	my ($date) = @_;
-	
+
 	$date = 'today' unless ParseDate($date);
 	my @date_ = Decode_Date_US(UnixDate($date, '%m/%d/%Y'));
 	my @today = Today();
-	
+
 	if (Delta_Days(@date_, @today) == 0)
 	{
 		return "Today";
@@ -147,7 +150,7 @@ sub prepare_page_content_header
 
 	my $heading = "Work List";
 	my $dateTitle = decodeDate($self->param('_seldate'));
-	
+
 	my $urlPrefix = "/worklist";
 	my $functions = $self->getMenu_Simple(App::Page::MENUFLAG_SELECTEDISLARGER,
 		'_pm_view',
@@ -156,7 +159,7 @@ sub prepare_page_content_header
 			['Recent Activity', "/worklist/recentActivity", 'recentActivity'],
 			['Setup', "/worklist/collection/setup", 'setup', ],
 			#['Setup', "#SETUP", 'setup'],
-			
+
 		], ' | ');
 
 	push(@{$self->{page_content_header}},
@@ -179,7 +182,7 @@ sub prepare_page_content_header
 		</TABLE>
 	}, @{[ $self->param('dialog') ? '<p>' : '' ]});
 
-	push(@{$self->{page_content_header}}, $self->getControlBarHtml()) 
+	push(@{$self->{page_content_header}}, $self->getControlBarHtml())
 		unless ($self->param('noControlBar'));
 
 	return 1;
@@ -212,7 +215,7 @@ sub getControlBarHtml
 
 	my @dateSelected = Decode_Date_US($fmtDate);
 	my $timeFieldsHtml;
-	
+
 	if (Delta_Days(@dateSelected, Today()) == 0)
 	{
 		$self->param('Today', 1);
@@ -234,7 +237,7 @@ sub getControlBarHtml
 			} else {
 				$time2 = $self->session('time2');
 			}
-			
+
 			#$time1 = $self->session('time1') || '12:00am';
 			#$time2 = $self->session('time2') || '11:59pm';
 		}
@@ -253,7 +256,7 @@ sub getControlBarHtml
 			} else {
 				$time2 = $self->session('time2');
 			}
-			
+
 			#$time1 = $self->session('time1') || 30;
 			#$time2 = $self->session('time2') || 120;
 		}
@@ -309,7 +312,7 @@ sub getControlBarHtml
 		} else {
 			$time2 = $self->session('time2');
 		}
-		
+
 
 		$timeFieldsHtml = qq{
 			&nbsp; &nbsp;
@@ -322,7 +325,7 @@ sub getControlBarHtml
 			<INPUT TYPE=HIDDEN NAME="_f_action_change_controls" VALUE="1">
 			<input type=submit value="Go">
 		};
-		
+
 	}
 
 	#<FORM name='dateForm' method=POST onsubmit="updatePage(document.dateForm.selDate.value); return false;">
@@ -484,12 +487,5 @@ sub getJavascripts
 		</SCRIPT>
 	};
 }
-
-@CHANGELOG =
-(
-	[	CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '04/01/2000', 'TVN',
-		'Page/WorkList',
-		'Convert Today to Work List.'],
-);
 
 1;

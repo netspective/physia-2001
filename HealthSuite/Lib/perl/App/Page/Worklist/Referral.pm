@@ -8,7 +8,6 @@ use Date::Calc qw(:all);
 
 use App::Page;
 use App::ImageManager;
-use Devel::ChangeLog;
 
 use DBI::StatementManager;
 use App::Statements::Scheduling;
@@ -19,8 +18,11 @@ use App::Statements::Component::Referral;
 
 use App::Dialog::CollectionSetup;
 
-use vars qw(@ISA @CHANGELOG);
+use vars qw(@ISA %RESOURCE_MAP);
 @ISA = qw(App::Page);
+%RESOURCE_MAP = (
+	'worklist/referral' => {},
+	);
 
 sub prepare_view_date
 {

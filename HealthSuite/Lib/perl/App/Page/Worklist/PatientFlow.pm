@@ -15,11 +15,12 @@ use App::Statements::Page;
 use App::Statements::Search::Appointment;
 
 use App::Dialog::WorklistSetup;
-
-#use vars qw(@ISA);
-#@ISA = qw(App::Page);
-
 use base 'App::Page::WorkList';
+use vars qw(%RESOURCE_MAP);
+%RESOURCE_MAP = (
+	'worklist/_default' => {},
+	'worklist/patientflow' => {},
+	);
 
 my $baseArl = '/worklist/patientflow';
 
