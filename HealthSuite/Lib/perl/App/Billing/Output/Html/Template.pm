@@ -22,9 +22,6 @@ sub new
 		insuredId => undef,
 		patientName => undef,
 		patientDateOfBirth => undef,
-#		patientDateOfBirthMonth => undef,
-#		patientDateOfBirthDay => undef,
-#		patientDateOfBirthYear => undef,
 		patientSexM => undef,
 		patientSexF => undef,
 		insuredName => undef,
@@ -51,18 +48,12 @@ sub new
 		otherInsuredName => undef,
 		otherInsuredPolicyGroupName => undef,
 		otherInsuredDateOfBirth => undef,
-#		insuredDateOfBirthMonth => undef,
-#		insuredDateOfBirthDay => undef,
-#		insuredDateOfBirthYear => undef,
 		otherInsuredSexM => undef,
 		otherInsuredSexF => undef,
 		otherInsuredEmployerOrSchoolName => undef,
 		otherInsuredInsurancePlanOrProgramName => undef,
 		insuredPolicyGroupName => undef,
 		insuredDateOfBirth => undef,
-#		insuredDateOfBirthMonth => undef,
-#		insuredDateOfBirthDay => undef,
-#		insuredDateOfBirthYear => undef,
 		insuredSexM => undef,
 		insuredSexF => undef,
 		insuredEmployerOrSchoolName => undef,
@@ -70,31 +61,13 @@ sub new
 		insuredAnotherHealthBenefitPlanY => undef,
 		insuredAnotherHealthBenefitPlanN => undef,
 		treatmentDateOfIllnessInjuryPregnancy => undef,
-#		treatmentDateOfIllnessInjuryPregnancyMonth => undef,
-#		treatmentDateOfIllnessInjuryPregnancyDay => undef,
-#		treatmentDateOfIllnessInjuryPregnancyYear => undef,
 		treatmentDateOfSameOrSimilarIllness => undef,
-#		treatmentDateOfSameOrSimilarIllnessMonth => undef,
-#		treatmentDateOfSameOrSimilarIllnessDay => undef,
-#		treatmentDateOfSameOrSimilarIllnessYear => undef,
 		datePatientUnableToWorkFrom => undef,
-#		datePatientUnableToWorkFromMonth => undef,
-#		datePatientUnableToWorkFromDay => undef,
-#		datePatientUnableToWorkFromYear => undef,
 		datePatientUnableToWorkTo => undef,
-#		datePatientUnableToWorkToMonth => undef,
-#		datePatientUnableToWorkToDay => undef,
-#		datePatientUnableToWorkToYear => undef,
 		nameOfReferingPhysicianOrOther => undef,
 		treatmentIdOfReferingPhysician => undef,
 		treatmentHospitilizationDateFrom => undef,
-#		treatmentHospitilizationDateFromMonth => undef,
-#		treatmentHospitilizationDateFromDay => undef,
-#		treatmentHospitilizationDateFromYear => undef,
 		treatmentHospitilizationDateTo => undef,
-#		treatmentHospitilizationDateToMonth => undef,
-#		treatmentHospitilizationDateToDay => undef,
-#		treatmentHospitilizationDateToYear => undef,
 		treatmentDiagnosisPrimary => undef,
 		treatmentDiagnosisSecondary => undef,
 		treatmentDiagnosisTertiary => undef,
@@ -105,13 +78,7 @@ sub new
 		treatmentResubmissionReference => undef,
 		treatmentPriorAuthorizationNo => undef,
 		procedure1DateOfServiceFrom => undef,
-#		procedure1DateOfServiceFromMonth => undef,
-#		procedure1DateOfServiceFromDay => undef,
-#		procedure1DateOfServiceFromYear => undef,
 		procedure1DateOfServiceTo => undef,
-#		procedure1DateOfServiceToMonth => undef,
-#		procedure1DateOfServiceToDay => undef,
-#		procedure1DateOfServiceToYear => undef,
 		procedure1PlaceOfService => undef,
 		procedure1TypeOfService => undef,
 		procedure1Cpt => undef,
@@ -121,12 +88,7 @@ sub new
 		procedure1DaysOrUnits => undef,
 		procedure1Emergency => undef,
 		procedure2DateOfServiceFrom => undef,
-#		procedure2DateOfServiceFromMonth => undef,
-#		procedure2DateOfServiceFromDay => undef,
-#		procedure2DateOfServiceFromYear => undef,
 		procedure2DateOfServiceTo => undef,
-#		procedure2DateOfServiceToDay => undef,
-#		procedure2DateOfServiceToYear => undef,
 		procedure2PlaceOfService => undef,
 		procedure2TypeOfService => undef,
 		procedure2Cpt => undef,
@@ -136,12 +98,7 @@ sub new
 		procedure2DaysOrUnits => undef,
 		procedure2Emergency => undef,
 		procedure3DateOfServiceFrom => undef,
-#		procedure3DateOfServiceFromMonth => undef,
-#		procedure3DateOfServiceFromDay => undef,
-#		procedure3DateOfServiceFromYear => undef,
 		procedure3DateOfServiceTo => undef,
-#		procedure3DateOfServiceToDay => undef,
-#		procedure3DateOfServiceToYear => undef,
 		procedure3PlaceOfService => undef,
 		procedure3TypeOfService => undef,
 		procedure3Cpt => undef,
@@ -151,12 +108,7 @@ sub new
 		procedure3DaysOrUnits => undef,
 		procedure3Emergency => undef,
 		procedure4DateOfServiceFrom => undef,
-#		procedure4DateOfServiceFromMonth => undef,
-#		procedure4DateOfServiceFromDay => undef,
-#		procedure4DateOfServiceFromYear => undef,
 		procedure4DateOfServiceTo => undef,
-#		procedure4DateOfServiceToDay => undef,
-#		procedure4DateOfServiceToYear => undef,
 		procedure4PlaceOfService => undef,
 		procedure4TypeOfService => undef,
 		procedure4Cpt => undef,
@@ -166,12 +118,7 @@ sub new
 		procedure4DaysOrUnits => undef,
 		procedure4Emergency => undef,
 		procedure5DateOfServiceFrom => undef,
-#		procedure5DateOfServiceFromMonth => undef,
-#		procedure5DateOfServiceFromDay => undef,
-#		procedure5DateOfServiceFromYear => undef,
 		procedure5DateOfServiceTo => undef,
-#		procedure5DateOfServiceToDay => undef,
-#		procedure5DateOfServiceToYear => undef,
 		procedure5PlaceOfService => undef,
 		procedure5TypeOfService => undef,
 		procedure5Cpt => undef,
@@ -181,12 +128,7 @@ sub new
 		procedure5DaysOrUnits => undef,
 		procedure5Emergency => undef,
 		procedure6DateOfServiceFrom => undef,
-#		procedure6DateOfServiceFromMonth => undef,
-#		procedure6DateOfServiceFromDay => undef,
-#		procedure6DateOfServiceFromYear => undef,
 		procedure6DateOfServiceTo => undef,
-#		procedure6DateOfServiceToDay => undef,
-#		procedure6DateOfServiceToYear => undef,
 		procedure6PlaceOfService => undef,
 		procedure6TypeOfService => undef,
 		procedure6Cpt => undef,
@@ -212,6 +154,9 @@ sub new
 		physicianCityStateZipCode => undef,
 		physicianGrp => undef,
 		physicianPin => undef,
+		transProviderName => undef,
+		signatureInsured => undef,
+		signaturePatient => undef,
 	};
 
 	return bless \%params, $type;
@@ -264,8 +209,6 @@ sub populatePatient
 
 	$data->{patientName} = $patient->getLastName() . " " . $patient->getFirstName() . " " . $patient->getMiddleInitial();
 	$data->{patientDateOfBirth} = $patient->getDateOfBirth(DATEFORMAT_USA);
-#	$data->{patientDateOfBirthDay} = substr(4, 2, $patient->getDateOfBirth());
-#	$data->{patientDateOfBirthYear} = substr(0, 4, $patient->getDateOfBirth());
 	$data->{patientSexM} = $patient->getSex() eq 'M' ? "Checked" : "";
 	$data->{patientSexF} = $patient->getSex() eq 'F' ? "Checked" : "";
 	$data->{patientAccountNo} = $patient->getAccountNo();	
@@ -284,6 +227,7 @@ sub populatePatient
 	$data->{patientStatusOther} = uc($patient->getStatus) =~ /U|D|W|X|P/ ? "checked" : "";	
 	$data->{patientStatusStudentFullTime} = uc($patient->getStudentStatus)  =~ /STUDENT \(FULL-TIME\)|F|0/ ? "checked" : "";
 	$data->{patientStatusStudentPartTime} = uc($patient->getStudentStatus)  =~ /STUDENT \(PART-TIME\)|P|1/ ? "checked" : "";
+	$data->{signaturePatient} = uc($patient->getSignature()) =~ /C|S|B|P/ ? 'Signature on File' : "";
 };
 
 sub populateInsured
@@ -296,9 +240,6 @@ sub populateInsured
 
 	$data->{insuredName} = $insured->getLastName() . " " . $insured->getFirstName() . " " . $insured->getMiddleInitial();
 	$data->{insuredDateOfBirth} = $insured->getDateOfBirth(DATEFORMAT_USA);
-#	$data->{insuredDateOfBirthMonth} = substr(6, 2, $insured->getDateOfBirth());
-#	$data->{insuredDateOfBirthDay} = substr(4, 2, $insured->getDateOfBirth());
-#	$data->{insuredDateOfBirthYear} = substr(0, 4, $insured->getDateOfBirth());
 	$data->{insuredSexM} = $insured->getSex() eq 'M' ? "Checked" : "";
 	$data->{insuredSexF} = $insured->getSex() eq 'F' ? "Checked" : "";
 	$data->{insuredAddressCity} = $insuredAddress->getCity;	
@@ -308,12 +249,11 @@ sub populateInsured
 	$data->{insuredAddress} = $insuredAddress->getAddress1 . " " . $insuredAddress->getAddress2;
 	$data->{insuredId} = $insured->getSsn;
 	$insured = $claim->{insured}->[0];
-#	$data->{insuredAnotherHealthBenefitPlanY} = uc($insured->getAnotherHealthBenefitPlan) eq 'Y' ? "Checked" : "";
-#	$data->{insuredAnotherHealthBenefitPlanN} = uc($insured->getAnotherHealthBenefitPlan) eq 'N' ? "Checked" : "";
 	$data->{insuredEmployerOrSchoolName} = $insured->getEmployerOrSchoolName;
 	$data->{insuredInsurancePlanOrProgramName} = $insured->getInsurancePlanOrProgramName;	
 	$data->{insuredPolicyGroupName} = $insured->getPolicyGroupName;
 	$data->{insuredPolicyGroupName} = $insured->getPolicyGroupOrFECANo;
+	$data->{signatureInsured} = uc($claim->{careReceiver}->getSignature()) =~ /M|B/ ? 'Signature on File' : "";
 };
 
 sub populateOtherInsured
@@ -354,7 +294,7 @@ sub populateOtherInsured
 sub populatePhysician
 {
 	my ($self, $claim) = @_;
-	my $physician = $claim->getRenderingProvider();
+	my $physician = $claim->getPayToProvider();
 	my $physicianAddress = $physician->getAddress();
 	my $data = $self->{data};
 
@@ -366,7 +306,6 @@ sub populatePhysician
 	$data->{physicianTaxTypeIdSsn} = uc($physician->getTaxTypeId) eq 'S' ? "Checked" : "";
 	$data->{physicianPin} = $physician->getPIN;
 	$data->{physicianGrp} = $physician->getGRP;
-
 }
 
 sub populateOrganization
@@ -379,7 +318,6 @@ sub populateOrganization
 	$data->{organizationAddress} = $organizationAddress->getAddress1 . " " . $organizationAddress->getAddress2;
 	$data->{organizationCityStateZipCode} = $organizationAddress->getCity . " " . $organizationAddress->getState . " " . $organizationAddress->getZipCode;
 	$data->{organizationName} = $organization->getName;
-
 }
 
 sub populateTreatment
@@ -389,23 +327,11 @@ sub populateTreatment
 	my $data = $self->{data};
 
 	$data->{treatmentDateOfIllnessInjuryPregnancy} = $treatment->getDateOfIllnessInjuryPregnancy(DATEFORMAT_USA);
-#	$data->{treatmentDateOfIllnessInjuryPregnancyDay} = substr(4, 2, $treatment->getDateOfIllnessInjuryPregnancy);
-#	$data->{treatmentDateOfIllnessInjuryPregnancyYear} = substr(0, 4, $treatment->getDateOfIllnessInjuryPregnancy);
 	$data->{treatmentDateOfSameOrSimilarIllness} = $treatment->getDateOfSameOrSimilarIllness(DATEFORMAT_USA);
-#	$data->{treatmentDateOfSameOrSimilarIllnessDay} = substr(4, 2, $treatment->getDateOfSameOrSimilarIllness);
-#	$data->{treatmentDateOfSameOrSimilarIllnessYear} = substr(0, 4, $treatment->getDateOfSameOrSimilarIllness);
-#	$data->{datePatientUnableToWorkFromMonth} = substr(6, 2, $treatment->getDatePatientUnableToWorkFrom);
 	$data->{datePatientUnableToWorkFrom} = $treatment->getDatePatientUnableToWorkFrom(DATEFORMAT_USA);
-#	$data->{datePatientUnableToWorkFromYear} = substr(0, 4, $treatment->getDatePatientUnableToWorkFrom);
 	$data->{datePatientUnableToWorkTo} = $treatment->getDatePatientUnableToWorkTo(DATEFORMAT_USA);
-#	$data->{datePatientUnableToWorkToDay} = substr(4, 2, $treatment->getDatePatientUnableToWorkTo);	
-#	$data->{datePatientUnableToWorkToYear} = substr(0, 4, $treatment->getDatePatientUnableToWorkTo);
 	$data->{treatmentHospitilizationDateFrom} = $treatment->getHospitilizationDateFrom(DATEFORMAT_USA);
-#	$data->{treatmentHospitilizationDateFromDay} = substr(4, 2, $treatment->getHospitilizationDateFrom);	
-#	$data->{treatmentHospitilizationDateFromYear} = substr(0, 4, $treatment->getHospitilizationDateFrom);
 	$data->{treatmentHospitilizationDateTo} = $treatment->getHospitilizationDateTo(DATEFORMAT_USA);
-#	$data->{treatmentHospitilizationDateToDay} = substr(4, 2, $treatment->getHospitilizationDateTo);
-#	$data->{treatmentHospitilizationDateToYear} = substr(0, 4, $treatment->getHospitilizationDateTo);
 	$data->{treatmentIdOfReferingPhysician} = $treatment->getIDOfReferingPhysician;
 	$data->{treatmentMedicaidResubmission} = $treatment->getMedicaidResubmission;	
 	$data->{nameOfReferingPhysicianOrOther} = $treatment->getNameOfReferingPhysicianOrOther;
@@ -414,12 +340,7 @@ sub populateTreatment
 	$data->{treatmentOutsideLabCharges} = $treatment->getOutsideLabCharges;
 	$data->{treatmentPriorAuthorizationNo} = $treatment->getPriorAuthorizationNo;
 	$data->{treatmentResubmissionReference} = $treatment->getResubmissionReference;
-	
-#	$data->{treatmentDiagnosisPrimary} = $claim->{diagnosis}->[0]->getDiagnosis if defined $claim->{diagnosis}->[0];
-#	$data->{treatmentDiagnosisSecondary} = $claim->{diagnosis}->[1]->getDiagnosis if defined $claim->{diagnosis}->[1];
-#	$data->{treatmentDiagnosisTertiary} = $claim->{diagnosis}->[2]->getDiagnosis if defined $claim->{diagnosis}->[2];
-#	$data->{treatmentDiagnosisOther} = $claim->{diagnosis}->[3]->getDiagnosis if defined $claim->{diagnosis}->[3];
-	
+
 }
 
 sub populateDiagnosis
@@ -469,6 +390,7 @@ sub populateClaim
 	$data->{claimProgramNameOther} = uc($claim->getProgramName) eq 'OTHER' ? "Checked" : "";
 	$data->{claimProgramNameFECA} = uc($claim->getProgramName) eq 'FECA' ? "Checked" : "";
 	$data->{claimTotalCharge} = $claim->getTotalCharge;
+	$data->{transProviderName} = $claim->getTransProviderName();
 }
 
 sub populateProcedurespre
@@ -541,11 +463,7 @@ sub populateProcedure
 	my $data = $self->{data};
 	$i ++;
 	$data->{'procedure' . $i . 'DateOfServiceFrom'} = $procedure->getDateOfServiceFrom(DATEFORMAT_USA);
-#	$data->{'procedure' . $i . 'DateOfServiceFromDay'} = substr(4, 2, $procedure->getDateOfServiceFrom);	
-#	$data->{'procedure' . $i . 'DateOfServiceFromYear'} = substr(0, 4, $procedure->getDateOfServiceFrom);
 	$data->{'procedure' . $i . 'DateOfServiceTo'} = $procedure->getDateOfServiceTo(DATEFORMAT_USA);
-#	$data->{'procedure' . $i . 'DateOfServiceToDay'} = substr(4, 2, $procedure->getDateOfServiceTo);	
-#	$data->{'procedure' . $i . 'DateOfServiceToYear'} = substr(4, 2, $procedure->getDateOfServiceTo);
 	$data->{'procedure' . $i . 'PlaceOfService'} = $procedure->getPlaceOfService;
 	$data->{'procedure' . $i . 'TypeOfService'}	= $procedure->getTypeOfService;
 	$data->{'procedure' . $i . 'Cpt'} = $procedure->getCPT;
@@ -572,11 +490,7 @@ sub populateProcedurePre
 	my $data = $self->{data};
 	$i ++;
 	$data->{'procedure' . $i . 'DateOfServiceFrom'} = $procedure->getDateOfServiceFrom(DATEFORMAT_USA);
-#	$data->{'procedure' . $i . 'DateOfServiceFromDay'} = substr(4, 2, $procedure->getDateOfServiceFrom);	
-#	$data->{'procedure' . $i . 'DateOfServiceFromYear'} = substr(0, 4, $procedure->getDateOfServiceFrom);
 	$data->{'procedure' . $i . 'DateOfServiceTo'} = $procedure->getDateOfServiceTo(DATEFORMAT_USA);
-#	$data->{'procedure' . $i . 'DateOfServiceToDay'} = substr(4, 2, $procedure->getDateOfServiceTo);	
-#	$data->{'procedure' . $i . 'DateOfServiceToYear'} = substr(4, 2, $procedure->getDateOfServiceTo);
 	$data->{'procedure' . $i . 'PlaceOfService'} = $procedure->getPlaceOfService;
 	$data->{'procedure' . $i . 'TypeOfService'}	= $procedure->getTypeOfService;
 	$data->{'procedure' . $i . 'Cpt'} = $procedure->getCPT;
@@ -656,6 +570,8 @@ sub diagnosisTable
 @CHANGELOG =
 (
 	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '02/16/2000', 'SSI', 'Billing Interface/PDF Claim','Procedure are displayed on descending order of charges. '],   
+	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '04/19/2000', 'SSI', 'Billing Interface/PDF Claim','transFacilityId is added to reflect the box31 of HCFA. '],   
+
 );
 
 1;

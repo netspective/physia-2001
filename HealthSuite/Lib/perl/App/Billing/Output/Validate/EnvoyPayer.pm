@@ -40,9 +40,9 @@ use constant CHECK_CHARACTERS => 60;
 			my @spaces = (' ');
 			
 			# check for Insured Id Number
-			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS, '1','9',$claim->{insured}->[$claim->getClaimType()]->getId(),$claim,'Insured ID Number',@numbers);
-			$self->checkValidValues(NOT_CONTAINS,CHECK_EXACT_VALUES,'1','9',$claim->{insured}->[$claim->getClaimType()]->getId(),$claim,'Insured ID Number',@selectiveNumbers);
-			$self->checkValidValues(NOT_CONTAINS,CHECK_EXACT_VALUES,'10','17',$claim->{insured}->[$claim->getClaimType()]->getId(),$claim,'Insured ID Number',(' '));
+			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS, '1','9',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured ID Number',@numbers);
+			$self->checkValidValues(NOT_CONTAINS,CHECK_EXACT_VALUES,'1','9',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured ID Number',@selectiveNumbers);
+			$self->checkValidValues(NOT_CONTAINS,CHECK_EXACT_VALUES,'10','17',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured ID Number',(' '));
 		}
 	],
 
@@ -69,8 +69,8 @@ use constant CHECK_CHARACTERS => 60;
 			$self->checkValidValues(CONTAINS,CHECK_EXACT_VALUES,'','',$claim->getSourceOfPayment(),$claim,'Source of Payment',('H'));
 			
 			# check for Insured Id Number
-			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'1','9',$claim->{insured}->[$claim->getClaimType()]->getId(),$claim,'Insured ID Number',@numbers);
-			$self->checkValidValues(NOT_CONTAINS,'1','9',$claim->{insured}->[$claim->getClaimType()]->getId(),$claim,'Insured ID Number',@selectiveNumbers);
+			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'1','9',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured ID Number',@numbers);
+			$self->checkValidValues(NOT_CONTAINS,'1','9',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured ID Number',@selectiveNumbers);
 			
 			# checks for Rendering Provider Tax ID
 			$self->isRequired($claim->{renderingProvider}->getProviderId(),$claim,'Rendering Provider Tax Id');
@@ -92,8 +92,8 @@ use constant CHECK_CHARACTERS => 60;
 			my ($self,$valMgr, $claim) = ($_[0],$_[1], $_[4]);
 			
 			 # checks for Insured ID			
-			 $self->checkLength(GREATER,'','',$claim->{insured}->[$claim->getClaimType()]->getId(),11,$claim,"Insured Id");
-			 $self->checkAlphanumeric(CONTAINS,'','',$claim->{insured}->[$claim->getClaimType()]->getId(),$claim,"Insured Id");
+			 $self->checkLength(GREATER,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),11,$claim,"Insured Id");
+			 $self->checkAlphanumeric(CONTAINS,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,"Insured Id");
 		}
 	],
 
@@ -145,8 +145,8 @@ use constant CHECK_CHARACTERS => 60;
 			my @federalTaxId = ($claim->{payToProvider}->getFederalTaxId());
 			
 			# check for Insured Id Number
-			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'1','9',$claim->{insured}->[$claim->getClaimType()]->getId(),$claim,'Insured ID Number',(0..9));
-			$self->checkValidValues(CONTAINS,CHECK_EXACT_VALUES,'','',$claim->{insured}->[$claim->getClaimType()]->getId(),$claim,'Insured ID Number',@federalTaxId);
+			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'1','9',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured ID Number',(0..9));
+			$self->checkValidValues(CONTAINS,CHECK_EXACT_VALUES,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured ID Number',@federalTaxId);
 			$self->checkValidValues(CONTAINS,CHECK_EXACT_VALUES,'','',$claim->{payToProvider}->getTaxTypeId(),$claim,'Tax Type Id',('S'));
 		}
 	],
@@ -203,37 +203,37 @@ use constant CHECK_CHARACTERS => 60;
 			$self->checkValidValues(NOT_CONTAINS,CHECK_EXACT_VALUES,'','',$claim->{careReceiver}->getRelationshipToInsured(),$claim,'Patient Relationship to Insured',('99'));
 						
 			# checks for Insured ID Number
-			$self->checkLength(LESS,'','',$claim->{insured}->[$claim->getClaimType()]->getId(),$claim,'Insured ID Number',9);
-			$self->checkLength(GREATER,'','',$claim->{insured}->[$claim->getClaimType()]->getId(),$claim,'Insured ID Number',12);
+			$self->checkLength(LESS,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured ID Number',9);
+			$self->checkLength(GREATER,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured ID Number',12);
 			
-			if (length($claim->{insured}->[$claim->getClaimType()]->getId()) == 10)
+			if (length($claim->{insured}->[$claim->getClaimType()]->getSsn()) == 10)
 			{
-				$self->checkValidValues(CONTAINS,CHECK_EXACT_VALUES,'1','1',$claim->{insured}->[$claim->getClaimType()]->getId(),$claim,'Insured ID Number',(0..9,'N'));
-				$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'2','10',$claim->{insured}->[$claim->getClaimType()]->getId(),$claim,'Insured ID Number',(0..9));
+				$self->checkValidValues(CONTAINS,CHECK_EXACT_VALUES,'1','1',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured ID Number',(0..9,'N'));
+				$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'2','10',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured ID Number',(0..9));
 			}
-			if (length($claim->{insured}->[$claim->getClaimType()]->getId()) == 11)
+			if (length($claim->{insured}->[$claim->getClaimType()]->getSsn()) == 11)
 			{
-				$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'1','9',$claim->{insured}->[$claim->getClaimType()]->getId(),$claim,'Insured ID Number',(0..9));
-				$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'10','10',$claim->{insured}->[$claim->getClaimType()]->getId(),$claim,'Insured ID Number',('A'..'Z'));
-				$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'11','11',$claim->{insured}->[$claim->getClaimType()]->getId(),$claim,'Insured ID Number',(0..9));
+				$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'1','9',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured ID Number',(0..9));
+				$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'10','10',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured ID Number',('A'..'Z'));
+				$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'11','11',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured ID Number',(0..9));
 			}		
-			my $val = substr($claim->{insured}->[$claim->getClaimType()]->getId(),0,1);
+			my $val = substr($claim->{insured}->[$claim->getClaimType()]->getSsn(),0,1);
 			
-			if ((length($claim->{insured}->[$claim->getClaimType()]->getId()) == 12) && ($val =~ m/[0..9]/))
+			if ((length($claim->{insured}->[$claim->getClaimType()]->getSsn()) == 12) && ($val =~ m/[0..9]/))
 			{
-				$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'2','10',$claim->{insured}->[$claim->getClaimType()]->getId(),$claim,'Insured ID Number',(0..9));
-				$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'11','11',$claim->{insured}->[$claim->getClaimType()]->getId(),$claim,'Insured ID Number',('A'..'Z'));
-				$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'12','12',$claim->{insured}->[$claim->getClaimType()]->getId(),$claim,'Insured ID Number',(0..9));
+				$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'2','10',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured ID Number',(0..9));
+				$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'11','11',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured ID Number',('A'..'Z'));
+				$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'12','12',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured ID Number',(0..9));
 			}		
-			if ((length($claim->{insured}->[$claim->getClaimType()]->getId()) == 12) && ($val =~ m/[A..Z]/))
+			if ((length($claim->{insured}->[$claim->getClaimType()]->getSsn()) == 12) && ($val =~ m/[A..Z]/))
 			{
-				$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'2','3',$claim->{insured}->[$claim->getClaimType()]->getId(),$claim,'Insured ID Number',('A'..'Z'));
-				$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'4','12',$claim->{insured}->[$claim->getClaimType()]->getId(),$claim,'Insured ID Number',(0..9));
+				$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'2','3',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured ID Number',('A'..'Z'));
+				$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'4','12',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured ID Number',(0..9));
 			}
-			if (length($claim->{insured}->[$claim->getClaimType()]->getId()) == 9)
+			if (length($claim->{insured}->[$claim->getClaimType()]->getSsn()) == 9)
 			{
-				$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'1','1',$claim->{insured}->[$claim->getClaimType()]->getId(),$claim,'Insured ID Number',(0..9,'R'));
-				$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'2','9',$claim->{insured}->[$claim->getClaimType()]->getId(),$claim,'Insured ID Number',(0..9));
+				$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'1','1',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured ID Number',(0..9,'R'));
+				$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'2','9',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured ID Number',(0..9));
 			}
 						
 			# checks for Insured Last Name
@@ -315,14 +315,14 @@ use constant CHECK_CHARACTERS => 60;
  			$self->checkValidValues(NOT_CONTAINS,CHECK_EXACT_VALUES,'','',$claim->{careReceiver}->getRelationshipToInsured(),('99'));
 							
 			# checks for Insured ID Number
-			$self->checkLength(LESS,'','',$claim->{insured}->[$claim->getClaimType()]->getId(),8,$claim,'Insured Id');
-			$self->checkLength(GREATER,'','',$claim->{insured}->[$claim->getClaimType()]->getId(),12,$claim,'Insured Id');
-			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'','',$claim->{insured}->[$claim->getClaimType()]->getId(),$claim,'Insurd Id',(0..9,'A'..'Z'));
-			$self->checkValidValues(NOT_CONTAINS,CHECK_EXACT_VALUES,'1','2',$claim->{insured}->[$claim->getClaimType()]->getId(),$claim,'Insured Id',('XE','XL'));
+			$self->checkLength(LESS,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),8,$claim,'Insured Id');
+			$self->checkLength(GREATER,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),12,$claim,'Insured Id');
+			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insurd Id',(0..9,'A'..'Z'));
+			$self->checkValidValues(NOT_CONTAINS,CHECK_EXACT_VALUES,'1','2',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured Id',('XE','XL'));
 			
-			if (substr($claim->{insured}->[$claim->getClaimType()]->getId(),0,1) eq 'R')
+			if (substr($claim->{insured}->[$claim->getClaimType()]->getSsn(),0,1) eq 'R')
 			{
-				$self->checkValidValues(NOT_CONTAINS,CHECK_CHARACTERS,'2','2',$claim->{insured}->[$claim->getClaimType()]->getId(),$claim,'Insured Id',(0..9));	
+				$self->checkValidValues(NOT_CONTAINS,CHECK_CHARACTERS,'2','2',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured Id',(0..9));	
 			}	
 			
 			# checks for Rendering Provider Network ID
@@ -490,8 +490,8 @@ use constant CHECK_CHARACTERS => 60;
 			
 			# checks for Insured Id Number
 
-			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'','',$claim->{insured}->[$claim->getClaimType()]->getId(),$claim,'Insured ID Number',(0..9));
-			$self->checkValidValues(CONTAINS,CHECK_EXACT_VALUES,'','',$claim->{insured}->[$claim->getClaimType()]->getId(),$claim,'Insured ID Number',@federalTaxId);
+			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured ID Number',(0..9));
+			$self->checkValidValues(CONTAINS,CHECK_EXACT_VALUES,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured ID Number',@federalTaxId);
 			$self->checkValidValues(CONTAINS,CHECK_EXACT_VALUES,'','',$claim->{payToProvider}->getTaxTypeId(),$claim,'Tax Type Id',('S'));
 			
 
@@ -507,8 +507,8 @@ use constant CHECK_CHARACTERS => 60;
 			my @federalTaxId = ($claim->{payToProvider}->getFederalTaxId());
 			
 			# checks for Insured Id Number
-			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'1','9',$claim->{insured}->[$claim->getClaimType()]->getId(),$claim,'Insured ID Number',(0..9));
-			$self->checkValidValues(CONTAINS,CHECK_EXACT_VALUES,'','',$claim->{insured}->[$claim->getClaimType()]->getId(),$claim,'Insured ID Number',@federalTaxId);
+			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'1','9',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured ID Number',(0..9));
+			$self->checkValidValues(CONTAINS,CHECK_EXACT_VALUES,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured ID Number',@federalTaxId);
 			$self->checkValidValues(CONTAINS,CHECK_EXACT_VALUES,'','',$claim->{payToProvider}->getTaxTypeId(),$claim,'Tax Type Id',('S'));
 	
 		}
@@ -522,7 +522,7 @@ use constant CHECK_CHARACTERS => 60;
 			my ($self,$valMgr, $claim) = ($_[0],$_[1], $_[4]);
 			
 			# checks for Insured Id Number
-			$self->checkLength(EQUAL,'','',$claim->{insured}->[$claim->getClaimType()]->getId(),9,$claim,'Insured ID Number');
+			$self->checkLength(EQUAL,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),9,$claim,'Insured ID Number');
 
 		}
 	],
@@ -551,9 +551,9 @@ use constant CHECK_CHARACTERS => 60;
 			 $self->checkValidValues(NOT_CONTAINS,CHECK_EXACT_VALUES,1,5,$claim->{insured}->[$claim->getClaimType()]->getPolicyGroupOrFECANo,$claim,'Policy Group or FECA No',@groupValues);
 			
 			# checks for Insured ID Number
-			 $self->checkValidValues(CONTAINS,CHECK_CHARACTERS,1,9,$claim->{insured}->[$claim->getClaimType()]->getId(),$claim,'Insured Id',@numbers);
+			 $self->checkValidValues(CONTAINS,CHECK_CHARACTERS,1,9,$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured Id',@numbers);
 			 #$self->checkValidValues(CONTAINS,10,17,$claim->{insured}->[$claim->getClaimType()]->getId(),$claim,'Insured Id',@spaces);
-			 $self->checkSameCharacter(NOT_CONTAINS,'','',$claim->{insured}->[$claim->getClaimType()]->getId(),$claim,'Insured Id',@characters);
+			 $self->checkSameCharacter(NOT_CONTAINS,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured Id',@characters);
 			
 			# check for Insured Last Name
 			 $self->isRequired($claim->{insured}->[$claim->getClaimType()]->getLastName(),$claim,'Insured Last Name');
@@ -649,8 +649,8 @@ use constant CHECK_CHARACTERS => 60;
 			my ($self,$valMgr, $claim) = ($_[0],$_[1], $_[4]);
 
 			# checks for Insured Id number			
-			$self->checkLength(EQUAL,'','',$claim->{insured}->[$claim->getClaimType()]->getId(),9,$claim,'Insured ID Number');
-			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'','',$claim->{insured}->[$claim->getClaimType()]->getId(),$claim,'Insured ID Number',(0..9));
+			$self->checkLength(EQUAL,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),9,$claim,'Insured ID Number');
+			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured ID Number',(0..9));
 	
 			
 		}
@@ -664,8 +664,8 @@ use constant CHECK_CHARACTERS => 60;
 			my ($self,$valMgr, $claim) = ($_[0],$_[1], $_[4]);
 			
 			# checks for Insured Id number
-			$self->checkLength(EQUAL,'','',$claim->{insured}->[$claim->getClaimType()]->getId(),9,$claim,'Insured ID Number');			
-			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'','',$claim->{insured}->[$claim->getClaimType()]->getId(),$claim,'Insured ID Number',(0..9));
+			$self->checkLength(EQUAL,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),9,$claim,'Insured ID Number');			
+			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured ID Number',(0..9));
 			
 			# checks for Refering provider network id
 			$self->checkLength(EQUAL,'','',$claim->{payToProvider}->getNetworkId(),5,$claim,'Referring Provider Network Id');
@@ -757,16 +757,16 @@ use constant CHECK_CHARACTERS => 60;
 			}
 			
 			# checks for Insured ID
-			$self->isRequired($claim->{insured}->[$claim->getClaimType()]->getId(),$claim,'Insured ID Number');
+			$self->isRequired($claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured ID Number');
 			
 			my @federalTaxId = ($claim->{payToProvider}->getFederalTaxId());
 			
-			$self->checkValidValues(CONTAINS,CHECK_EXACT_VALUES,'','',$claim->{insured}->[$claim->getClaimType()]->getId(),$claim,'Insured ID Number',@federalTaxId);
+			$self->checkValidValues(CONTAINS,CHECK_EXACT_VALUES,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured ID Number',@federalTaxId);
 			$self->checkValidValues(CONTAINS,CHECK_EXACT_VALUES,'','',$claim->{payToProvider}->getTaxTypeId(),$claim,'Tax Type Id',('S'));
 	
 			### checking for only Social Security Number
-			$self->checkLength(EQUAL,'','',$claim->{insured}->[$claim->getClaimType()]->getId(),9,$claim,'Insured ID');
-			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'','',$claim->{insured}->[$claim->getClaimType()]->getId(),$claim,'Insured ID Number',(0..9));
+			$self->checkLength(EQUAL,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),9,$claim,'Insured ID');
+			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured ID Number',(0..9));
 					
 		}
 	],
@@ -836,10 +836,10 @@ use constant CHECK_CHARACTERS => 60;
 			$self->checkValidValues(NOT_CONTAINS,CHECK_EXACT_VALUES,'1','5',$claim->{insured}->getPolicyGroupOrFECANo(),$claim,'Group Number',@groupNumbers);
 			
 			# checks for Insured ID Number
-			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'1','9',$claim->{insured}->[$claim->getClaimType()]->getId(),$claim,'Insured Id',(0..9));
-			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'10','17',$claim->{insured}->[$claim->getClaimType()]->getId(),$claim,'Insured Id',(' '));
-			$self->checkValidValues(NOT_CONTAINS,CHECK_EXACT_VALUES,'','',$claim->{insured}->[$claim->getClaimType()]->getId(),$claim,'Insured Id',@insuredIdNumbers);
-			$self->checkSameCharacter(NOT_CONTAINS,'','',$claim->{insured}->[$claim->getClaimType()]->getId(),$claim,'Insured Id',(0..9));
+			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'1','9',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured Id',(0..9));
+			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'10','17',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured Id',(' '));
+			$self->checkValidValues(NOT_CONTAINS,CHECK_EXACT_VALUES,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured Id',@insuredIdNumbers);
+			$self->checkSameCharacter(NOT_CONTAINS,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured Id',(0..9));
 			
 			# checks for Insured Last Name
 			$self->isRequired($claim->{insured}->[$claim->getClaimType()]->getLastName(),$claim,'Insured Last Name');
@@ -927,12 +927,12 @@ use constant CHECK_CHARACTERS => 60;
 			my ($self,$valMgr, $claim) = ($_[0],$_[1], $_[4]);
 			
 			# checks for Insured Id Number
-			$self->checkLength(EQUAL,'','',$claim->{insured}->[$claim->getClaimType()]->getId(),9,$claim,'Insured ID');
-			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'','',$claim->{insured}->[$claim->getClaimType()]->getId(),$claim,'Insured ID',(0..9));
+			$self->checkLength(EQUAL,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),9,$claim,'Insured ID');
+			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured ID',(0..9));
 			
 			my @federalTaxId = ($claim->{payToProvider}->getFederalTaxId());
 			
-			$self->checkValidValues(CONTAINS,CHECK_EXACT_VALUES,'','',$claim->{insured}->[$claim->getClaimType()]->getId(),$claim,'Insured ID Number',@federalTaxId);
+			$self->checkValidValues(CONTAINS,CHECK_EXACT_VALUES,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured ID Number',@federalTaxId);
 			$self->checkValidValues(CONTAINS,CHECK_EXACT_VALUES,'','',$claim->{payToProvider}->getTaxTypeId(),$claim,'Tax Type Id',('S'));
 
 			
@@ -947,8 +947,8 @@ use constant CHECK_CHARACTERS => 60;
 			my ($self,$valMgr, $claim) = ($_[0],$_[1], $_[4]);
 	
 			# checks for Insured Id number
-			$self->checkLength(EQUAL,'','',$claim->{insured}->[$claim->getClaimType()]->getId(),11,$claim,'Insured ID');
-			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'','',$claim->{insured}->[$claim->getClaimType()]->getId(),$claim,'Insured ID',(0..9));
+			$self->checkLength(EQUAL,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),11,$claim,'Insured ID');
+			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured ID',(0..9));
 					
 		}
 	],
@@ -961,10 +961,10 @@ use constant CHECK_CHARACTERS => 60;
 			my ($self,$valMgr, $claim) = ($_[0],$_[1], $_[4]);
 	
 			# checks for Insured Id number
-			$self->checkLength(EQUAL,'','',$claim->{insured}->[$claim->getClaimType()]->getId(),9,$claim,'Insured ID');
-			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'','',$claim->{insured}->[$claim->getClaimType()]->getId(),$claim,'Insured ID',(0..9));
-			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'10','17',$claim->{insured}->[$claim->getClaimType()]->getId(),$claim,'Insured ID',(' '));
-			$self->checkSameCharacter(NOT_CONTAINS,'','',$claim->{insured}->[$claim->getClaimType()]->getId(),$claim,'Insured Id',(0..9));
+			$self->checkLength(EQUAL,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),9,$claim,'Insured ID');
+			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured ID',(0..9));
+			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'10','17',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured ID',(' '));
+			$self->checkSameCharacter(NOT_CONTAINS,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured Id',(0..9));
 			
 			# checks for Rendering Provider Qualifier
 			$self->isRequired($claim->getQualifier(),$claim,'Rendering Provider Name Qualifier');	
@@ -993,8 +993,8 @@ use constant CHECK_CHARACTERS => 60;
 			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'','',$claim->{payToProvider}->getId(),$claim,'Provider Id',(0..9,'A'..'Z'));
 						
 			# checks for Insured ID Number
-			$self->checkLength(EQUAL,'','',$claim->{insured}->[$claim->getClaimType()]->getId(),6,$claim,'Insured ID');
-			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'','',$claim->{insured}->[$claim->getClaimType()]->getId(),$claim,'Insured ID',(0..9));
+			$self->checkLength(EQUAL,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),6,$claim,'Insured ID');
+			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured ID',(0..9));
 		}
 	],
 	
@@ -1035,9 +1035,9 @@ use constant CHECK_CHARACTERS => 60;
 			$self->isRequired($claim->{payToProvider}->getId(),$claim,'Provider Id');
 			
 			# checks for Insured Id Number
-			$self->checkLength(EQUAL,'','',$claim->{insured}->[$claim->getClaimType()]->getId(),9,$claim,'Insured Id');
-			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'1','9',$claim->{insured}->[$claim->getClaimType()]->getId(),$claim,'Insured Id',(0..9));
-			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'10','17',$claim->{insured}->[$claim->getClaimType()]->getId(),$claim,'Insured Id',(' '));
+			$self->checkLength(EQUAL,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),9,$claim,'Insured Id');
+			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'1','9',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured Id',(0..9));
+			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'10','17',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured Id',(' '));
 			
 		}
 	],
@@ -1066,9 +1066,9 @@ use constant CHECK_CHARACTERS => 60;
 			my ($self,$valMgr, $claim) = ($_[0],$_[1], $_[4]);
 			
 			# checks for Insured Id number
-			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'1','9',$claim->{insured}->[$claim->getClaimType()]->getId(),$claim,'Insured Id',(0..9));
-			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'10','17',$claim->{insured}->[$claim->getClaimType()]->getId(),$claim,'Insured Id',(' '));
-			$self->checkSameCharacter(NOT_CONTAINS,'','',$claim->{insured}->[$claim->getClaimType()]->getId(),$claim,'Insured Id',(0..9));
+			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'1','9',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured Id',(0..9));
+			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'10','17',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured Id',(' '));
+			$self->checkSameCharacter(NOT_CONTAINS,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured Id',(0..9));
 		}
 	],
 
@@ -1081,8 +1081,8 @@ use constant CHECK_CHARACTERS => 60;
 			my ($self,$valMgr, $claim) = ($_[0],$_[1], $_[4]);
 
 			# checks for Insured Id number
-			$self->checkLength(EQUAL,'','',$claim->{insured}->[$claim->getClaimType()]->getId(),11,$claim,'Insured Id',(0..9));
-			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'','',$claim->{insured}->[$claim->getClaimType()]->getId(),$claim,'Insured Id',(0..9));
+			$self->checkLength(EQUAL,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),11,$claim,'Insured Id',(0..9));
+			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured Id',(0..9));
 			
 			# checks for Rendering Provider Network Id
 			$self->isRquired($claim->{renderingProvider}->getNetworkId(),$claim,'Rendering Provider Network Id');
@@ -1100,11 +1100,11 @@ use constant CHECK_CHARACTERS => 60;
 			my ($self,$valMgr, $claim) = ($_[0],$_[1], $_[4]);
 
 			# checks for Insured Id number
-			$self->checkSameCharacter(NOT_CONTAINS,'','',$claim->{insured}->[$claim->getClaimType()]->getId(),$claim,'Insured Id',('0'));
-			$self->checkAlpha(NOT_ALL,'','',$claim->{insured}->[$claim->getClaimType()]->getId(),$claim,"Insured Id");
-			$self->checkAlphanumeric(CONTAINS,'','',$claim->{insured}->[$claim->getClaimType()]->getId(),$claim,"Insured Id");
-			$self->checkLength(LESS,'','',$claim->{insured}->[$claim->getClaimType()]->getId(),7,$claim,"Insured Id");
-			$self->checkLength(GREATER,'','',$claim->{insured}->[$claim->getClaimType()]->getId(),14,$claim,"Insured Id");
+			$self->checkSameCharacter(NOT_CONTAINS,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured Id',('0'));
+			$self->checkAlpha(NOT_ALL,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,"Insured Id");
+			$self->checkAlphanumeric(CONTAINS,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,"Insured Id");
+			$self->checkLength(LESS,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),7,$claim,"Insured Id");
+			$self->checkLength(GREATER,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),14,$claim,"Insured Id");
 		}
 	],
 
@@ -1116,11 +1116,11 @@ use constant CHECK_CHARACTERS => 60;
 			my ($self,$valMgr, $claim) = ($_[0],$_[1], $_[4]);
 			
 			# checks for Insured ID Number
-			$self->checkSameCharacter(NOT_CONTAINS,'','',$claim->{insured}->[$claim->getClaimType()]->getId(),$claim,'Insured Id',('0'));
-			$self->checkAlpha(NOT_ALL,'','',$claim->{insured}->[$claim->getClaimType()]->getId(),$claim,"Insured Id");
-			$self->checkAlphanumeric(CONTAINS,'','',$claim->{insured}->[$claim->getClaimType()]->getId(),$claim,"Insured Id");
-			$self->checkLength(LESS,'','',$claim->{insured}->[$claim->getClaimType()]->getId(),7,$claim,"Insured Id");
-			$self->checkLength(GREATER,'','',$claim->{insured}->[$claim->getClaimType()]->getId(),14,$claim,"Insured Id");
+			$self->checkSameCharacter(NOT_CONTAINS,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured Id',('0'));
+			$self->checkAlpha(NOT_ALL,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,"Insured Id");
+			$self->checkAlphanumeric(CONTAINS,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,"Insured Id");
+			$self->checkLength(LESS,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),7,$claim,"Insured Id");
+			$self->checkLength(GREATER,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),14,$claim,"Insured Id");
 			
 			# checks for Performing Provider Id
 			$self->isRequired($claim->{renderingProvider}->getProviderId(),$claim,'Performing Provider ID');
@@ -1571,9 +1571,9 @@ use constant CHECK_CHARACTERS => 60;
 			my ($self,$valMgr, $claim) = ($_[0],$_[1], $_[4]);
 			
 			# checks for Insured Id number
-			$self->checkLength(EQUAL,'','',$claim->{insured}->[$claim->getClaimType()]->getId(),9,$claim,'Insured Id');
-			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'1','9',$claim->{insured}->[$claim->getClaimType()]->getId(),$claim,'Insured Id',(0..9));
-			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'10','17',$claim->{insured}->[$claim->getClaimType()]->getId(),$claim,'Insured Id',(' '));
+			$self->checkLength(EQUAL,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),9,$claim,'Insured Id');
+			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'1','9',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured Id',(0..9));
+			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'10','17',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured Id',(' '));
 
 		}
 	],
@@ -1588,11 +1588,11 @@ use constant CHECK_CHARACTERS => 60;
 			
 			
 			# checks for Insured Id number
-			$self->checkLength(EQUAL,'','',$claim->{insured}->[$claim->getClaimType()]->getId(),8,$claim,'Insured Id');
-			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'1','7',$claim->{insured}->[$claim->getClaimType()]->getId(),$claim,'Insured Id',(0..9));
-			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'8','8',$claim->{insured}->[$claim->getClaimType()]->getId(),$claim,'Insured Id',('A'..'Z'));
-			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'1','1',$claim->{insured}->[$claim->getClaimType()]->getId(),$claim,'Insured Id',('A'..'Z',0..9));
-			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'2','11',$claim->{insured}->[$claim->getClaimType()]->getId(),$claim,'Insured Id',(0..9));
+			$self->checkLength(EQUAL,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),8,$claim,'Insured Id');
+			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'1','7',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured Id',(0..9));
+			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'8','8',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured Id',('A'..'Z'));
+			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'1','1',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured Id',('A'..'Z',0..9));
+			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'2','11',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured Id',(0..9));
 			
 			# checks for Rendering Provider Network ID
 			$self->isRequired($claim->{renderingProvider}->getNetworkId(),$claim,'Rendering Provider Network Id');
@@ -1676,8 +1676,8 @@ use constant CHECK_CHARACTERS => 60;
 			my ($self,$valMgr, $claim) = ($_[0],$_[1], $_[4]);
 			
 			# checks for Insured Id Number
-			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'1','9',$claim->{insured}->[$claim->getClaimType()]->getId(),$claim,'Insured Id',(0..9));
-			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'1','1',$claim->{insured}->[$claim->getClaimType()]->getId(),$claim,'Insured Id',('9'));
+			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'1','9',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured Id',(0..9));
+			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'1','1',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured Id',('9'));
 			
 			
 			# checks for Rendering Provider Network Id
@@ -1724,9 +1724,9 @@ use constant CHECK_CHARACTERS => 60;
 			my ($self,$valMgr, $claim) = ($_[0],$_[1], $_[4]);
 			
 			# checks for Insured Id number
-			$self->checkLength(LESS,'','',$claim->{insured}->[$claim->getClaimType()]->getId(),5,$claim,'Insured Id');
-			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'1','9',$claim->{insured}->[$claim->getClaimType()]->getId(),$claim,'Insured Id',(0..9));
-			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'10','17',$claim->{insured}->[$claim->getClaimType()]->getId(),$claim,'Insured Id',(' '));
+			$self->checkLength(LESS,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),5,$claim,'Insured Id');
+			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'1','9',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured Id',(0..9));
+			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'10','17',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured Id',(' '));
 			
 		}
 	],
@@ -1757,7 +1757,7 @@ use constant CHECK_CHARACTERS => 60;
 			my ($self,$valMgr, $claim) = ($_[0],$_[1], $_[4]);
 			
 			# checks for Insured Id number
-			$self->checkValidValues(NOT_CONTAINS,CHECK_EXACT_VALUES,'1','6',$claim->{insured}->[$claim->getClaimType()]->getId(),$claim,'Insured Id',('999999'));
+			$self->checkValidValues(NOT_CONTAINS,CHECK_EXACT_VALUES,'1','6',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured Id',('999999'));
 			
 		}
 	],
@@ -1804,7 +1804,7 @@ use constant CHECK_CHARACTERS => 60;
 			$self->checkValidValues(CONTAINS,CHECK_EXACT_VALUES,'','',$claim->{careReceiver}->getSex(),$claim,'Patient Sex',('M','F'));
 			
 			# checks for Insured Id
-			$self->checkLength(EQUAL,'','',$claim->{insured}->[$claim->getClaimType()]->getId(),9,$claim,'Insured Id');
+			$self->checkLength(EQUAL,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),9,$claim,'Insured Id');
 			
 						
 		}
@@ -2115,8 +2115,8 @@ use constant CHECK_CHARACTERS => 60;
 			my ($self,$valMgr, $claim) = ($_[0],$_[1], $_[4]);
 			
 			# checks for Insured Id Number
-			$self->checkLength(LESS,'','',$claim->{insured}->[$claim->getClaimType()]->getId(),8,$claim,'Insured Id');
-			$self->checkLength(GREATER,'','',$claim->{insured}->[$claim->getClaimType()]->getId(),9,$claim,'Insured Id');			
+			$self->checkLength(LESS,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),8,$claim,'Insured Id');
+			$self->checkLength(GREATER,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),9,$claim,'Insured Id');			
 			
 			# checks for Rendering Provider Tax Id
 			$self->isRequired($claim->{renderingProvider}->getProviderId(),$claim,'Rendering Provider Tax id');
@@ -2138,8 +2138,8 @@ use constant CHECK_CHARACTERS => 60;
 			my ($self,$valMgr, $claim) = ($_[0],$_[1], $_[4]);
 			
 			# checks for Insured Id Number
-			$self->checkLength(EQUAL,'','',$claim->{insured}->[$claim->getClaimType()]->getId(),9,$claim,'Insured Id Number');
-			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'','',$claim->{insured}->[$claim->getClaimType()]->getId(),$claim,'Insured Id Number',(0..9));
+			$self->checkLength(EQUAL,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),9,$claim,'Insured Id Number');
+			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured Id Number',(0..9));
 			
 		}
 	],
@@ -2170,11 +2170,11 @@ use constant CHECK_CHARACTERS => 60;
 			my ($self,$valMgr, $claim) = ($_[0],$_[1], $_[4]);
 			
 			# checks for Insured Id Number
-			$self->checkLength(LESS,'','',$claim->{insured}->[$claim->getClaimType()]->getId(),10,$claim,'Insured Id Number');
-			$self->checkLength(GREATER,'','',$claim->{insured}->[$claim->getClaimType()]->getId(),11,$claim,'Insured Id Number');
-			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'1','10',$claim->{insured}->[$claim->getClaimType()]->getId(),$claim,'Insured Id Number',(0..9));
-			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'11','11',$claim->{insured}->[$claim->getClaimType()]->getId(),$claim,'Insured Id Number',(0..9,' '));
-			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'12','17',$claim->{insured}->[$claim->getClaimType()]->getId(),$claim,'Insured Id Number',(' '));
+			$self->checkLength(LESS,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),10,$claim,'Insured Id Number');
+			$self->checkLength(GREATER,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),11,$claim,'Insured Id Number');
+			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'1','10',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured Id Number',(0..9));
+			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'11','11',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured Id Number',(0..9,' '));
+			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'12','17',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured Id Number',(' '));
 			
 			# checks for Rendering Provider Network Id
 			my @medicareProviderId = $claim->{renderingProvider}->getMedicareId();
@@ -2225,8 +2225,8 @@ use constant CHECK_CHARACTERS => 60;
 			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'','',$claim->{insured}->getPolicyGroupOrFECANo(),$claim,'Group Number',(0..9));
 						
 			# checks for Insured ID number
-			$self->checkLength(EQUAL,'','',$claim->{insured}->[$claim->getClaimType()]->getId(),9,$claim,'Insured Id number');
-			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'','',$claim->{insured}->[$claim->getClaimType()]->getId(),$claim,'Insured Id number',(0..9));
+			$self->checkLength(EQUAL,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),9,$claim,'Insured Id number');
+			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured Id number',(0..9));
 
 						
 		}
@@ -2240,10 +2240,10 @@ use constant CHECK_CHARACTERS => 60;
 			my ($self,$valMgr, $claim) = ($_[0],$_[1], $_[4]);
 			
 			# checks for Insured ID number
-			$self->isRequired($claim->{insured}->[$claim->getClaimType()]->getId(),$claim,'Insured Id number');
-			$self->checkLength(LESS,'','',$claim->{insured}->[$claim->getClaimType()]->getId(),9,$claim,'Insured Id number');
-			$self->checkLength(GREATER,'','',$claim->{insured}->[$claim->getClaimType()]->getId(),11,$claim,'Insured Id number');
-			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'','',$claim->{insured}->[$claim->getClaimType()]->getId(),$claim,'Insured Id number',(0..9));
+			$self->isRequired($claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured Id number');
+			$self->checkLength(LESS,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),9,$claim,'Insured Id number');
+			$self->checkLength(GREATER,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),11,$claim,'Insured Id number');
+			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured Id number',(0..9));
 			
 			# checks for Rendering Provider Network Id
 			$self->isRequired($claim->{renderingProvider}->getNetworkId(),$claim,'Rendering Provider Network Id');
@@ -2268,7 +2268,7 @@ use constant CHECK_CHARACTERS => 60;
 			# checks for Insured ID Number
 			my @insuredValue = $claim->payerId();
 			
-			$self->checkValidValues(CONTAINS,CHECK_EXACT_VALUES,'1','5',$claim->{insured}->[$claim->getClaimType()]->getId(),$claim,'Insured Id',@insuredValue);
+			$self->checkValidValues(CONTAINS,CHECK_EXACT_VALUES,'1','5',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured Id',@insuredValue);
 								
 			
 		}
@@ -2302,10 +2302,10 @@ use constant CHECK_CHARACTERS => 60;
 			$self->checkValidDate($claim->{careReceiver}->getDateOfBirth(),$claim,'Patient Date of Birth');
 			
 			# checks for  Insured Id number
-			$self->checkLength(LESS,'','',$claim->{insured}->[$claim->getClaimType()]->getId(),9,$claim,'Insured Id number');
-			$self->checkLength(GREATER,'','',$claim->{insured}->[$claim->getClaimType()]->getId(),11,$claim,'Insured Id number');
-			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'','',$claim->{insured}->[$claim->getClaimType()]->getId(),$claim,'Insured Id number',(0..9));
-			$self->checkValidValues(NOT_CONTAINS,CHECK_CHARACTERS,'','',$claim->{insured}->[$claim->getClaimType()]->getId(),$claim,'Insured Id number',(' '));
+			$self->checkLength(LESS,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),9,$claim,'Insured Id number');
+			$self->checkLength(GREATER,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),11,$claim,'Insured Id number');
+			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured Id number',(0..9));
+			$self->checkValidValues(NOT_CONTAINS,CHECK_CHARACTERS,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured Id number',(' '));
 			
 			# checks for Performing Provider Id
 			$self->isRequired($claim->{renderingProvider}->getProviderId(),$claim,'Performing Provider ID');
@@ -2324,10 +2324,10 @@ use constant CHECK_CHARACTERS => 60;
 			$self->checkValidDate($claim->{careReceiver}->getDateOfBirth(),$claim,'Patient Date of Birth');
 			
 			# checks for  Insured Id number
-			$self->checkLength(LESS,'','',$claim->{insured}->[$claim->getClaimType()]->getId(),9,$claim,'Insured Id number');
-			$self->checkLength(GREATER,'','',$claim->{insured}->[$claim->getClaimType()]->getId(),11,$claim,'Insured Id number');
-			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'','',$claim->{insured}->[$claim->getClaimType()]->getId(),$claim,'Insured Id number',(0..9));
-			$self->checkValidValues(NOT_CONTAINS,CHECK_CHARACTERS,'','',$claim->{insured}->[$claim->getClaimType()]->getId(),$claim,'Insured Id number',(' '));
+			$self->checkLength(LESS,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),9,$claim,'Insured Id number');
+			$self->checkLength(GREATER,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),11,$claim,'Insured Id number');
+			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured Id number',(0..9));
+			$self->checkValidValues(NOT_CONTAINS,CHECK_CHARACTERS,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured Id number',(' '));
 			
 			# checks for Performing Provider Id
 			$self->isRequired($claim->{renderingProvider}->getProviderId(),$claim,'Performing Provider ID');
@@ -2346,10 +2346,10 @@ use constant CHECK_CHARACTERS => 60;
 			$self->checkValidDate($claim->{careReceiver}->getDateOfBirth(),$claim,'Patient Date of Birth');
 			
 			# checks for  Insured Id number
-			$self->checkLength(LESS,'','',$claim->{insured}->[$claim->getClaimType()]->getId(),9,$claim,'Insured Id number');
-			$self->checkLength(GREATER,'','',$claim->{insured}->[$claim->getClaimType()]->getId(),11,$claim,'Insured Id number');
-			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'','',$claim->{insured}->[$claim->getClaimType()]->getId(),$claim,'Insured Id number',(0..9));
-			$self->checkValidValues(NOT_CONTAINS,CHECK_CHARACTERS,'','',$claim->{insured}->[$claim->getClaimType()]->getId(),$claim,'Insured Id number',(' '));
+			$self->checkLength(LESS,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),9,$claim,'Insured Id number');
+			$self->checkLength(GREATER,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),11,$claim,'Insured Id number');
+			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured Id number',(0..9));
+			$self->checkValidValues(NOT_CONTAINS,CHECK_CHARACTERS,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured Id number',(' '));
 			
 			# checks for Performing Provider Id
 			$self->isRequired($claim->{renderingProvider}->getProviderId(),$claim,'Performing Provider ID');
@@ -2369,10 +2369,10 @@ use constant CHECK_CHARACTERS => 60;
 			$self->checkValidDate($claim->{careReceiver}->getDateOfBirth(),$claim,'Patient Date of Birth');
 			
 			# checks for  Insured Id number
-			$self->checkLength(LESS,'','',$claim->{insured}->[$claim->getClaimType()]->getId(),9,$claim,'Insured Id number');
-			$self->checkLength(GREATER,'','',$claim->{insured}->[$claim->getClaimType()]->getId(),11,$claim,'Insured Id number');
-			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'','',$claim->{insured}->[$claim->getClaimType()]->getId(),$claim,'Insured Id number',(0..9));
-			$self->checkValidValues(NOT_CONTAINS,CHECK_CHARACTERS,'','',$claim->{insured}->[$claim->getClaimType()]->getId(),$claim,'Insured Id number',(' '));
+			$self->checkLength(LESS,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),9,$claim,'Insured Id number');
+			$self->checkLength(GREATER,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),11,$claim,'Insured Id number');
+			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured Id number',(0..9));
+			$self->checkValidValues(NOT_CONTAINS,CHECK_CHARACTERS,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured Id number',(' '));
 			
 			# checks for Performing Provider Id
 			$self->isRequired($claim->{renderingProvider}->getProviderId(),$claim,'Performing Provider ID');
@@ -2391,10 +2391,10 @@ use constant CHECK_CHARACTERS => 60;
 			$self->checkValidDate($claim->{careReceiver}->getDateOfBirth(),$claim,'Patient Date of Birth');
 			
 			# checks for  Insured Id number
-			$self->checkLength(LESS,'','',$claim->{insured}->[$claim->getClaimType()]->getId(),9,$claim,'Insured Id number');
-			$self->checkLength(GREATER,'','',$claim->{insured}->[$claim->getClaimType()]->getId(),11,$claim,'Insured Id number');
-			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'','',$claim->{insured}->[$claim->getClaimType()]->getId(),$claim,'Insured Id number',(0..9));
-			$self->checkValidValues(NOT_CONTAINS,CHECK_CHARACTERS,'','',$claim->{insured}->[$claim->getClaimType()]->getId(),$claim,'Insured Id number',(' '));
+			$self->checkLength(LESS,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),9,$claim,'Insured Id number');
+			$self->checkLength(GREATER,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),11,$claim,'Insured Id number');
+			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured Id number',(0..9));
+			$self->checkValidValues(NOT_CONTAINS,CHECK_CHARACTERS,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured Id number',(' '));
 			
 			# checks for Performing Provider Id
 			$self->isRequired($claim->{renderingProvider}->getProviderId(),$claim,'Performing Provider ID');
@@ -2413,10 +2413,10 @@ use constant CHECK_CHARACTERS => 60;
 			$self->checkValidDate($claim->{careReceiver}->getDateOfBirth(),$claim,'Patient Date of Birth');
 			
 			# checks for  Insured Id number
-			$self->checkLength(LESS,'','',$claim->{insured}->[$claim->getClaimType()]->getId(),9,$claim,'Insured Id number');
-			$self->checkLength(GREATER,'','',$claim->{insured}->[$claim->getClaimType()]->getId(),11,$claim,'Insured Id number');
-			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'','',$claim->{insured}->[$claim->getClaimType()]->getId(),$claim,'Insured Id number',(0..9));
-			$self->checkValidValues(NOT_CONTAINS,CHECK_CHARACTERS,'','',$claim->{insured}->[$claim->getClaimType()]->getId(),$claim,'Insured Id number',(' '));
+			$self->checkLength(LESS,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),9,$claim,'Insured Id number');
+			$self->checkLength(GREATER,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),11,$claim,'Insured Id number');
+			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured Id number',(0..9));
+			$self->checkValidValues(NOT_CONTAINS,CHECK_CHARACTERS,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured Id number',(' '));
 			
 			# checks for Performing Provider Id
 			$self->isRequired($claim->{renderingProvider}->getProviderId(),$claim,'Performing Provider ID');
@@ -2435,10 +2435,10 @@ use constant CHECK_CHARACTERS => 60;
 			$self->checkValidDate($claim->{careReceiver}->getDateOfBirth(),$claim,'Patient Date of Birth');
 			
 			# checks for  Insured Id number
-			$self->checkLength(LESS,'','',$claim->{insured}->[$claim->getClaimType()]->getId(),9,$claim,'Insured Id number');
-			$self->checkLength(GREATER,'','',$claim->{insured}->[$claim->getClaimType()]->getId(),11,$claim,'Insured Id number');
-			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'','',$claim->{insured}->[$claim->getClaimType()]->getId(),$claim,'Insured Id number',(0..9));
-			$self->checkValidValues(NOT_CONTAINS,CHECK_CHARACTERS,'','',$claim->{insured}->[$claim->getClaimType()]->getId(),$claim,'Insured Id number',(' '));
+			$self->checkLength(LESS,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),9,$claim,'Insured Id number');
+			$self->checkLength(GREATER,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),11,$claim,'Insured Id number');
+			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured Id number',(0..9));
+			$self->checkValidValues(NOT_CONTAINS,CHECK_CHARACTERS,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured Id number',(' '));
 			
 			# checks for Performing Provider Id
 			$self->isRequired($claim->{renderingProvider}->getProviderId(),$claim,'Performing Provider ID');
@@ -2457,10 +2457,10 @@ use constant CHECK_CHARACTERS => 60;
 			$self->checkValidDate($claim->{careReceiver}->getDateOfBirth(),$claim,'Patient Date of Birth');
 			
 			# checks for  Insured Id number
-			$self->checkLength(LESS,'','',$claim->{insured}->[$claim->getClaimType()]->getId(),9,$claim,'Insured Id number');
-			$self->checkLength(GREATER,'','',$claim->{insured}->[$claim->getClaimType()]->getId(),11,$claim,'Insured Id number');
-			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'','',$claim->{insured}->[$claim->getClaimType()]->getId(),$claim,'Insured Id number',(0..9));
-			$self->checkValidValues(NOT_CONTAINS,CHECK_CHARACTERS,'','',$claim->{insured}->[$claim->getClaimType()]->getId(),$claim,'Insured Id number',(' '));
+			$self->checkLength(LESS,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),9,$claim,'Insured Id number');
+			$self->checkLength(GREATER,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),11,$claim,'Insured Id number');
+			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured Id number',(0..9));
+			$self->checkValidValues(NOT_CONTAINS,CHECK_CHARACTERS,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured Id number',(' '));
 			
 			# checks for Performing Provider Id
 			$self->isRequired($claim->{renderingProvider}->getProviderId(),$claim,'Performing Provider ID');
@@ -2477,8 +2477,8 @@ use constant CHECK_CHARACTERS => 60;
 			my ($self,$valMgr, $claim) = ($_[0],$_[1], $_[4]);
 			
 			# checks for Insured Id Number
-			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'1','9',$claim->{insured}->[$claim->getClaimType()]->getId(),$claim,'Insured Id number',(0..9));
-			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'10','17',$claim->{insured}->[$claim->getClaimType()]->getId(),$claim,'Insured Id number',(' '));
+			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'1','9',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured Id number',(0..9));
+			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'10','17',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured Id number',(' '));
 
 			
 		}
@@ -2492,9 +2492,9 @@ use constant CHECK_CHARACTERS => 60;
 			my ($self,$valMgr, $claim) = ($_[0],$_[1], $_[4]);
 			
 			# checks for Insured Id Number
-			$self->isRequired($claim->{insured}->[$claim->getClaimType()]->getId(),$claim,'Insured Id number');
-			$self->checkLength(LESS,'','',$claim->{insured}->[$claim->getClaimType()]->getId(),9,$claim,'Insured Id number');
-			$self->checkLength(GREATER,'','',$claim->{insured}->[$claim->getClaimType()]->getId(),11,$claim,'Insured Id number');
+			$self->isRequired($claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured Id number');
+			$self->checkLength(LESS,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),9,$claim,'Insured Id number');
+			$self->checkLength(GREATER,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),11,$claim,'Insured Id number');
 			
 			# checks for Rendering Provider Network ID
 			$self->isRequired($claim->{renderingProvider}->getNetworkId(),$claim,'Rendering Provider Network Id');
@@ -2511,10 +2511,10 @@ use constant CHECK_CHARACTERS => 60;
 			my ($self,$valMgr, $claim) = ($_[0],$_[1], $_[4]);
 				
 			# checks for Insured Id Number
-			$self->isRequired($claim->{insured}->[$claim->getClaimType()]->getId(),$claim,'Insured Id number');
-			$self->checkLength(EQUAL,'','',$claim->{insured}->[$claim->getClaimType()]->getId(),11,$claim,'Insured Id number');
-			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'1','9',$claim->{insured}->[$claim->getClaimType()]->getId(),$claim,'Insured Id number',(0..9));
-			$self->checkValidValues(CONTAINS,CHECK_EXACT_VALUES,'10','11',$claim->{insured}->[$claim->getClaimType()]->getId(),$claim,'Insured Id number',('03','04'));
+			$self->isRequired($claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured Id number');
+			$self->checkLength(EQUAL,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),11,$claim,'Insured Id number');
+			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'1','9',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured Id number',(0..9));
+			$self->checkValidValues(CONTAINS,CHECK_EXACT_VALUES,'10','11',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured Id number',('03','04'));
 
 		}
 	],
@@ -2529,9 +2529,9 @@ use constant CHECK_CHARACTERS => 60;
 			# Insured ID Number
 			if ($claim->getSourceOfPayment() eq 'F')
 			{
-				$self->checkValidValues(CONTAINS,CHECK_EXACT_VALUES,'1','9',$claim->{insured}->[$claim->getClaimType()]->getId(),$claim,'Insured Id',(0..9));
-				$self->checkValidValues(NOT_CONTAINS,CHECK_EXACT_VALUES,'1','9',$claim->{insured}->[$claim->getClaimType()]->getId(),$claim,'Insured Id',('000000000','999999999','123456789'));
-				$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'10','17',$claim->{insured}->[$claim->getClaimType()]->getId(),$claim,'Insured Id',(' '));
+				$self->checkValidValues(CONTAINS,CHECK_EXACT_VALUES,'1','9',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured Id',(0..9));
+				$self->checkValidValues(NOT_CONTAINS,CHECK_EXACT_VALUES,'1','9',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured Id',('000000000','999999999','123456789'));
+				$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'10','17',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured Id',(' '));
 			}
 
 			# HCPCS Procedure Code
@@ -2597,12 +2597,12 @@ use constant CHECK_CHARACTERS => 60;
 			my ($self,$valMgr, $claim) = ($_[0],$_[1], $_[4]);
 			
 			# checks for insured id Number
-			$self->checkLength(EQUAL,'','',$claim->{insured}->[$claim->getClaimType()]->getId(),11,$claim,'Insured Id');
-			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'','',$claim->{insured}->getId,$claim,'Insured id',(0..9));
+			$self->checkLength(EQUAL,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),11,$claim,'Insured Id');
+			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'','',$claim->{insured}->getSsn,$claim,'Insured id',(0..9));
 			
 			my @federalTaxId = ($claim->{payToProvider}->getFederalTaxId());
 			
-			$self->checkValidValues(CONTAINS,CHECK_EXACT_VALUES,'','',$claim->{insured}->[$claim->getClaimType()]->getId(),$claim,'Insured ID Number',@federalTaxId);
+			$self->checkValidValues(CONTAINS,CHECK_EXACT_VALUES,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured ID Number',@federalTaxId);
 			$self->checkValidValues(CONTAINS,CHECK_EXACT_VALUES,'','',$claim->{payToProvider}->getTaxTypeId(),$claim,'Tax Type Id',('S'));
 
 			# checks for Rendering Provider Network Id
@@ -2622,7 +2622,7 @@ use constant CHECK_CHARACTERS => 60;
 			my ($self,$valMgr, $claim) = ($_[0],$_[1], $_[4]);
 			
 			# checks for Insured Id Number
-			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'1','9',$claim->{insured}->[$claim->getClaimType()]->getId(),$claim,'Insured Id',(0..9));
+			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'1','9',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured Id',(0..9));
 			
 			
 		}
@@ -2648,12 +2648,12 @@ use constant CHECK_CHARACTERS => 60;
 			$self->checkValidValues(NOT_CONTAINS,CHECK_EXACT_VALUES,'','',$claim->{careReceiver}->getRelationshipToInsured(),('99'));
 			
 			# checks for Insured ID Number
-			if (substr($claim->{insured}->[$claim->getClaimType()]->getId(),0,1) eq 'X')
+			if (substr($claim->{insured}->[$claim->getClaimType()]->getSsn(),0,1) eq 'X')
 			{
-				$self->checkValidValues(CONTAINS,CHECK_EXACT_VALUES,'2','2',$claim->{insured}->[$claim->getClaimType()]->getId(),$claim,'Insured Id',('D'));
-				$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'3','3',$claim->{insured}->[$claim->getClaimType()]->getId(),$claim,'Insured Id',('A'..'Z'));
-				$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'4','12',$claim->{insured}->[$claim->getClaimType()]->getId(),$claim,'Insured Id',(0..9));
-				$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'13','17',$claim->{insured}->[$claim->getClaimType()]->getId(),$claim,'Insured Id',(' '));
+				$self->checkValidValues(CONTAINS,CHECK_EXACT_VALUES,'2','2',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured Id',('D'));
+				$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'3','3',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured Id',('A'..'Z'));
+				$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'4','12',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured Id',(0..9));
+				$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'13','17',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured Id',(' '));
 			}
 			
 			# checks for HCPCS procedure code
@@ -2677,8 +2677,8 @@ use constant CHECK_CHARACTERS => 60;
 			my ($self,$valMgr, $claim) = ($_[0],$_[1], $_[4]);
 			
 			# checks for Insured Id Number
-			$self->checkLength(GREATER,'','',$claim->{insured}->[$claim->getClaimType()]->getId(),10,$claim,'Insured Id Number');
-			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'','',$claim->{insured}->[$claim->getClaimType()]->getId(),$claim,'Insured Id',(0..9));
+			$self->checkLength(GREATER,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),10,$claim,'Insured Id Number');
+			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'','',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured Id',(0..9));
 
 		}
 	],
@@ -2782,7 +2782,7 @@ use constant CHECK_CHARACTERS => 60;
 			my ($self,$valMgr, $claim) = ($_[0],$_[1], $_[4]);
 			
 			# checks for Insured Id Number
-			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'1','11',$claim->{insured}->[$claim->getClaimType()]->getId(),$claim,'Insured Id number',('A'..'Z'));
+			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'1','11',$claim->{insured}->[$claim->getClaimType()]->getSsn(),$claim,'Insured Id number',('A'..'Z'));
 			
 			# checks for Rendering Provider Network Id
 			$self->isRequired($claim->{renderingProvider}->getNetworkId(),$claim,'Rendering Network Id');
@@ -2901,7 +2901,11 @@ sub getCallSequences
 	', if no procedure exist then all procedures checks will be skipped'],
 	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '02/12/2000', 'AUF',
 	'Billing Interface/Envoy Payer Specific Editing Validation',
-	'A new parmeter has been added in checkValidValues method and its value could be either CHECK_EXACT_VALUES or CHECK_CHARACTERS']
+	'A new parmeter has been added in checkValidValues method and its value could be either CHECK_EXACT_VALUES or CHECK_CHARACTERS'],
+	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '04/18/2000', 'AUF',
+	'Billing Interface/Envoy Payer Specific Editing Validation',
+	'Function getId of Insured object has been replaced with getSsn of same object to reflect correct value']
+
 
 
 );

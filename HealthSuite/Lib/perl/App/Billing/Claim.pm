@@ -17,6 +17,11 @@ use constant DATEFORMAT_USA => 1;
 use vars qw(@CHANGELOG);
 use enum qw(:BILLRECEIVERTYPE_ PERSON ORGANIZATION);
 
+use constant PRIMARY => 0;
+use constant SECONDARY => 1;
+use constant TERTIARY => 2;
+use constant QUATERNARY => 3;
+
 
 sub new
 {
@@ -83,7 +88,9 @@ sub new
 	$params{historyCount} = 0;
 	$params{balance} = 0;
 	$params{claimType} = 0;
-
+	$params{billSeq} = 0;
+	$params{transProviderId} = undef;
+	$params{transProviderName} = undef;
 
 	return bless \%params, $type; #binding the param hash with class reference
 }
@@ -96,7 +103,32 @@ sub property
 }
 
 
+sub setTransProviderId
+{
+	my ($self, $value) = @_;
+	$self->{transProviderId} = $value;
+}
+
+sub getTransProviderId
+{
+	my $self = shift;
+	return $self->{transProviderId};
+}
+
+sub setTransProviderName
+{
+	my ($self, $value) = @_;
+	$self->{transProviderName} = $value;
+}
+
+sub getTransProviderName
+{
+	my $self = shift;
+	return $self->{transProviderName};
+}
+
 sub setBalance
+
 {
 	my ($self, $value) = @_;
 	$self->{balance} = $value;
@@ -877,9 +909,29 @@ sub getClaimType
 {
 	my ($self) = @_;
 	
-	return $self->{claimType} + 0;
+	my $billSeq = [ 
+			BILLSEQ_PRIMARY_PAYER => PRIMARY,
+			BILLSEQ_SECONDARY_PAYER => SECONDARY,
+			BILLSEQ_TERTIARY_PAYER =>  TERTIARY,
+			BILLSEQ_QUATERNARY_PAYER => QUATERNARY
+			];
+
+	return $billSeq->[$self->{claimType}] + 0;
 }
 
+sub getBillSeq
+{
+	my ($self) = @_;
+	
+	return $self->{billSeq} + 0;
+}
+
+sub setBillSeq
+{
+	my ($self,$value) = @_;
+
+	return $self->{billSeq} = $value;
+}
 
 sub setClaimType
 {
@@ -1051,6 +1103,8 @@ sub convertDateToMMDDYYYYFromCCYYMMDD
 	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '01/14/2000', 'SSI', 'Billing Interface/Main Claim Object','setInformationReleaseIndicator map Yes or No to Y or N'],
 	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '03/14/2000', 'SSI', 'Billing Interface/Main Claim Object','New field claim type is added which returns 0-Primary, 1-Secondary, 1-Tertiary'],
 	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '03/14/2000', 'SSI', 'Billing Interface/Main Claim Object','New field policy is added which returns 0-Primary, 1-Secondary, 1-Tertiary payers'],
+	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '04/17/2000', 'SSI', 'Billing Interface/Main Claim Object','New field transProviderId is added which reflect the transaction provider ID'],
+	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '04/17/2000', 'SSI', 'Billing Interface/Main Claim Object','New field billSeq is added which reflect the current submission order'],
 
 );
 

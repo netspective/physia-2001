@@ -85,9 +85,8 @@ sub processClaims
 	my $claimsList = $params{claimList};
 	my $claims = $params{claimList}->getClaim();
 	my $p = pdflib::PDF_new();
-	my $procesedProc = [];
 	die "PDF file name is required" unless exists $params{outFile};
-	die "Couldn't open PDF file: $params{outFile}"  if (pdflib::PDF_open_file($p, $params{outFile}) == -1);
+	die "Couldn't open PDF file"  if (pdflib::PDF_open_file($p, $params{outFile}) == -1);
 	pdflib::PDF_set_info($p, "Creator", "PHYSIA");
 	pdflib::PDF_set_info($p, "Author", "PHYSIA");
 	pdflib::PDF_set_info($p, "Title", "Claim Form Report");
@@ -95,9 +94,10 @@ sub processClaims
 #	$self->newPage($p);
 #	$cordinates = $self->drawForm($p);
 #	$self->endPage($p);
-	my $once=0;
 	foreach my $claim(@$claims)
 	{
+		my $once=0;
+		my $procesedProc = [];
 		if ($claim->haveErrors() == 1)
 		{
 			$self->newPage($p);
@@ -116,7 +116,6 @@ sub processClaims
 				$self->populatePDf($p,$claim, $cordinates, $procesedProc);
 				$self->endPage($p);
 				$once++;
-
 			}
 
 		$self->reversePrimaryProcedure($claim, $pp);
@@ -1626,7 +1625,7 @@ sub populatePDf
 	$self->box9bClaimData($p, $Claim, $cordinates);
 	$self->box9cClaimData($p, $Claim, $cordinates);
 	$self->box9dClaimData($p, $Claim, $cordinates);
-
+	$self->box12ClaimData($p, $Claim, $cordinates);
 	$self->box14ClaimData($p, $Claim, $cordinates);
 	$self->box15ClaimData($p, $Claim, $cordinates);
 	$self->box16ClaimData($p, $Claim, $cordinates);
@@ -1644,6 +1643,7 @@ sub populatePDf
 	$self->box28ClaimData($p, $Claim, $cordinates);
 	$self->box29ClaimData($p, $Claim, $cordinates);
 	$self->box30ClaimData($p, $Claim, $cordinates);
+	$self->box31ClaimData($p, $Claim, $cordinates);
 	$self->box32ClaimData($p, $Claim, $cordinates);
 	$self->box33ClaimData($p, $Claim, $cordinates);
 	
@@ -1656,14 +1656,14 @@ sub box1ClaimData
 	my ($self, $p, $claim, $cordinates)  = @_;
 	my $box1Cordinates = $cordinates->{box1};
 	my $box1Y = $box1Cordinates->[1];
-	my $box1X = $box1Cordinates->[1];
+	my $box1X = $box1Cordinates->[0];
 	my $xCoordinate = 
 		{
 			'MEDICARE' => $box1X + 1 + CHECKED_BOX_X,
 			'MEDICAID' => $box1X + 50 + CHECKED_BOX_X,
 			'CHAMPUS' => $box1X + 100 + CHECKED_BOX_X,
 			'CHAMPVA' => $box1X + 165 + CHECKED_BOX_X,
-			'GROUP' => $box1X + 214 + CHECKED_BOX_X,
+			'GROUP HEALTH PLAN' => $box1X + 214 + CHECKED_BOX_X,
 			'FECA' => $box1X + 272 + CHECKED_BOX_X,
 			'OTHER' => $box1X + 316 + CHECKED_BOX_X,
 		};
@@ -1672,8 +1672,8 @@ sub box1ClaimData
 	die "Couldn't set font"  if ($font == -1);
 	pdflib::PDF_setfont($p, $font, DATA_FONT_SIZE);
 	
-	my @temp = split (/ /,uc($claim->getProgramName()));
-	pdflib::PDF_show_xy($p, 'X', $xCoordinate->{$temp[0]} , $box1Y + CHECKED_BOX_Y) if exists $xCoordinate->{$temp[0]} ;
+	my $temp = uc($claim->getProgramName);
+	pdflib::PDF_show_xy($p, 'X', $xCoordinate->{$temp} , $box1Y + CHECKED_BOX_Y - 4 * FORM_FONT_SIZE) if (defined ($xCoordinate->{$temp}));
 	pdflib::PDF_stroke($p);
 }
 
@@ -1899,7 +1899,7 @@ sub box7bClaimData
 	my $claimType = $claim->getClaimType();
 	pdflib::PDF_show_xy($p , $claim->{insured}->[$claimType]->{address}->getZipCode, $box7bX + CELL_PADDING_X  + DATA_PADDING_X, $box7bY - 3.5 * FORM_FONT_SIZE);
 	pdflib::PDF_show_xy($p , substr($claim->{insured}->[$claimType]->{address}->getTelephoneNo, 0, 3), $box7bX + $stateSpace + CELL_PADDING_X + 20, $box7bY - 3.5 * FORM_FONT_SIZE);
-	pdflib::PDF_show_xy($p , substr($claim->{insured}->[$claimType]->{address}->getTelephoneNo, 3, 25), $box7bX + $stateSpace + CELL_PADDING_X + 50, $box7bY - 3.5 * FORM_FONT_SIZE) if (length($claim->{insured}->[0]->{address}->getTelephoneNo) > 3);
+	pdflib::PDF_show_xy($p , substr($claim->{insured}->[$claimType]->{address}->getTelephoneNo, 3, 25), $box7bX + $stateSpace + CELL_PADDING_X + 50, $box7bY - 3.5 * FORM_FONT_SIZE) if (length($claim->{insured}->[$claimType]->{address}->getTelephoneNo) > 3);
 	pdflib::PDF_stroke($p);
 }
 
@@ -2204,6 +2204,34 @@ sub box11dClaimData
 			pdflib::PDF_show_xy($p , 'X', $temp->{'1'}, $cordinates->{box12}->[1] + 1 + CHECKED_BOX_Y);
 		}
 	}
+	pdflib::PDF_stroke($p);
+}
+
+sub box12ClaimData
+{
+	my ($self, $p, $claim, $cordinates)  = @_;
+	my $box12Cordinates = $cordinates->{box12};
+	my $box12Y = $box12Cordinates->[1];
+	my $box12X = $box12Cordinates->[0];
+	my $capAlign = 10;
+	my $font = pdflib::PDF_findfont($p, DATA_FONT_NAME, "default", 0);
+	die "Couldn't set font"  if ($font == -1);
+	pdflib::PDF_setfont($p, $font, DATA_FONT_SIZE);
+	pdflib::PDF_show_xy($p , uc($claim->{careReceiver}->getSignature()) =~ /C|S|B|P/ ? 'Signature on File' : "", $box12X + CELL_PADDING_X + $capAlign + 50, $box12Y - 7 * FORM_FONT_SIZE);
+	pdflib::PDF_stroke($p);
+}
+
+sub box13ClaimData
+{
+	my ($self, $p, $claim, $cordinates)  = @_;
+	my $box13Cordinates = $cordinates->{box12};
+	my $box13Y = $box13Cordinates->[1];
+	my $box13X = $box13Cordinates->[0] + STARTX_BOX1A_SPACE;
+	my $capAlign = 10;
+	my $font = pdflib::PDF_findfont($p, DATA_FONT_NAME, "default", 0);
+	die "Couldn't set font"  if ($font == -1);
+	pdflib::PDF_setfont($p, $font, DATA_FONT_SIZE);
+	pdflib::PDF_show_xy($p , uc($claim->{careReceiver}->getSignature()) =~ /M|B/ ? 'Signature on File' : "", $box13X + CELL_PADDING_X + $capAlign + 30, $box13Y - 7 * FORM_FONT_SIZE);
 	pdflib::PDF_stroke($p);
 }
 
@@ -2725,13 +2753,13 @@ sub box25ClaimData
 	die "Couldn't set font"  if ($font == -1);
 	pdflib::PDF_setfont($p, $font, DATA_FONT_SIZE);
 
-	pdflib::PDF_show_xy($p , $claim->{renderingProvider}->getFederalTaxId, $box25X + CELL_PADDING_X + DATA_PADDING_X, $box25Y - 3 * FORM_FONT_SIZE );
+	pdflib::PDF_show_xy($p , $claim->{payToProvider}->getFederalTaxId, $box25X + CELL_PADDING_X + DATA_PADDING_X, $box25Y - 3 * FORM_FONT_SIZE );
 	my $temp = {
 			'S' => $box25X + CELL_PADDING_X + 112.5 + CHECKED_BOX_X,
 			'E' => $box25X + CELL_PADDING_X + 126 + CHECKED_BOX_X,
 			};
 	
-	pdflib::PDF_show_xy($p , 'X', $temp->{uc($claim->{renderingProvider}->getTaxTypeId)}, $cordinates->{box31}->[1] + 1 + CHECKED_BOX_Y) if defined ($temp->{uc($claim->{renderingProvider}->getTaxTypeId)});
+	pdflib::PDF_show_xy($p , 'X', $temp->{uc($claim->{payToProvider}->getTaxTypeId)}, $cordinates->{box31}->[1] + 1 + CHECKED_BOX_Y) if defined ($temp->{uc($claim->{payToProvider}->getTaxTypeId)});
 	pdflib::PDF_stroke($p);
 }
 
@@ -2823,6 +2851,20 @@ sub box30ClaimData
 	pdflib::PDF_stroke($p);
 }
 
+sub box31ClaimData 
+{
+	my ($self, $p, $claim, $cordinates)  = @_;
+	my $box31Cordinates = $cordinates->{box31};
+	my $box31Y = $box31Cordinates->[1];
+	my $box31X = $box31Cordinates->[0];
+
+	my $font = pdflib::PDF_findfont($p, FORM_FONT_NAME , "default", 0);
+	die "Couldn't set font"  if ($font == -1);
+	pdflib::PDF_setfont($p, $font, FORM_FONT_SIZE);
+	pdflib::PDF_show_xy($p , $claim->getTransProviderName(), $box31X + CELL_PADDING_X + 30, START_Y + 6);
+	pdflib::PDF_stroke($p);
+}
+
 sub box32ClaimData
 {
 	my ($self, $p, $claim, $cordinates)  = @_;
@@ -2852,7 +2894,7 @@ sub box33ClaimData
 	my $font = pdflib::PDF_findfont($p, DATA_FONT_NAME, "default", 0); 
 	die "Couldn't set font"  if ($font == -1);
 	pdflib::PDF_setfont($p, $font, DATA_FONT_SIZE);
-	my $physician = $claim->{renderingProvider};
+	my $physician = $claim->{payToProvider};
 	my $add = $physician->getAddress();
 
 	pdflib::PDF_show_xy($p ,$physician->getName() , $box33X + CELL_PADDING_X + 10, $box33Y - 4 * FORM_FONT_SIZE );
@@ -3043,7 +3085,7 @@ sub reversePrimaryProcedure
 	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '02/16/2000', 'SSI', 'Billing Interface/PDF Claim','Procedure are displayed on descending order of charges. '],
 #	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '12/18/1999', 'SSI', 'PDF Claim', 'Patient Relationship to insured has domain from (0,1,3,4) or (self,child,spouse,other)'],
 	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '03/01/2000', 'SSI', 'Billing Interface/PDF Claim','More than 6 procedure and more than 4 diagnosis implemented.'],
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '03/01/2000', 'SSI', 'Billing Interface/PDF Claim',''],
+	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '04/19/2000', 'SSI', 'Billing Interface/PDF Claim',' Patient signature on file is set to default'],
 
 );
 

@@ -1,4 +1,4 @@
-##############################################################################
+
 package App::Billing::Output::Validate::NSF;
 ##############################################################################
 
@@ -12,6 +12,8 @@ use Benchmark;
 
 
 use vars qw(@CHANGELOG);
+use vars qw(@ISA %VALIDCODES);
+
 @ISA = qw(App::Billing::Validator);
 
 
@@ -34,6 +36,27 @@ use constant CHECK_CHARACTERS => 60;
 
 
 
+%VALIDCODES = (
+			'time' => ['00','01','02','03','04','05','06','07','08','09',
+					  '10','11','12','13','14','15','16','17','18','19',
+					  '20','21','22','23','99'],
+			'specialProgram' => ['02','03','05','06','07','08','09','10', 
+								'A', 'B', 'D', 'W', 'CA', 'CZ', 'C0', 'C9'],
+			'speciality' => ['079', '003', '005', '078', '006', '035', '081', '028',
+							'007', '030', '093', '046', '008', '010', '001', '002',
+							'038', '009', '040', '082', '083', '044', '011', '094',
+							'085', '090', '070', '039', '013', '086', '014', '036', 
+							'015', '016', '018', '017', '019', '020', '012', '004', 
+							'021', '022', '037', '076', '023', '025', '024', '084', 
+							'026', '027', '029', '092', '032', '066', '031', '091',
+							'033', '099', '034', '077',	'089', '042', '043', '068',
+							'064', '062', '067', '065',	'080', '050', '041', '097',
+							'048', '072', '071', '074', '075', '073', '087', '059', 
+							'049', '095', '069', '055', '056', '057', '058', '045',
+							'051', '052', '053', '054', '063', '060', '088', '061',
+							'N04', 'N06', 'N07', 'N02', 'N03', 'N05', 'N01', '301', 
+							'308', '303', '302', '307', '304', '305', '306']
+			);
 
 
 sub validateA
@@ -50,28 +73,35 @@ sub validateB
 	my $i;
 	
 		
-	my @validTimeCodes = ('00','01','02','03','04','05','06','07','08','09',
-						  '10','11','12','13','14','15','16','17','18','19',
-						  '20','21','22','23','99');
-	my @validSpecialProgramCodes = ('02','03','05','06','07','08','09','10', 
-									'A', 'B', 'D', 'W', 'CA', 'CZ', 'C0', 'C9');						  
+	my @validTimeCodes = @{$VALIDCODES{'time'}};
+		
+	#my @validTimeCodes = ('00','01','02','03','04','05','06','07','08','09',
+	#					  '10','11','12','13','14','15','16','17','18','19',
+	#					  '20','21','22','23','99');
+	my @validSpecialProgramCodes =  @{$VALIDCODES{'specialProgram'}};
+	
+	#my @validSpecialProgramCodes = ('02','03','05','06','07','08','09','10', 
+	#								'A', 'B', 'D', 'W', 'CA', 'CZ', 'C0', 'C9');						  
 	my $tempProcedures = $tempClaim->{procedures};
-	my @validSpecilityCodes =  (
-								'079', '003', '005', '078', '006', '035', '081', '028',
-								'007', '030', '093', '046', '008', '010', '001', '002',
-								'038', '009', '040', '082', '083', '044', '011', '094',
-								'085', '090', '070', '039', '013', '086', '014', '036', 
-								'015', '016', '018', '017', '019', '020', '012', '004', 
-								'021', '022', '037', '076', '023', '025', '024', '084', 
-								'026', '027', '029', '092', '032', '066', '031', '091',
-								'033', '099', '034', '077',	'089', '042', '043', '068',
-								'064', '062', '067', '065',	'080', '050', '041', '097',
-								'048', '072', '071', '074', '075', '073', '087', '059', 
-								'049', '095', '069', '055', '056', '057', '058', '045',
-								'051', '052', '053', '054', '063', '060', '088', '061',
-								'N04', 'N06', 'N07', 'N02', 'N03', 'N05', 'N01', '301', 
-								'308', '303', '302', '307', '304', '305', '306'
-								);
+	
+	my @validSpecilityCodes = @{$VALIDCODES{'speciality'}};
+	
+	#my @validSpecilityCodes =  (
+	#							'079', '003', '005', '078', '006', '035', '081', '028',
+	#							'007', '030', '093', '046', '008', '010', '001', '002',
+	#							'038', '009', '040', '082', '083', '044', '011', '094',
+	#							'085', '090', '070', '039', '013', '086', '014', '036', 
+	#							'015', '016', '018', '017', '019', '020', '012', '004', 
+	#							'021', '022', '037', '076', '023', '025', '024', '084', 
+	#							'026', '027', '029', '092', '032', '066', '031', '091',
+	#							'033', '099', '034', '077',	'089', '042', '043', '068',
+	#							'064', '062', '067', '065',	'080', '050', '041', '097',
+	#							'048', '072', '071', '074', '075', '073', '087', '059', 
+	#							'049', '095', '069', '055', '056', '057', '058', '045',
+	#							'051', '052', '053', '054', '063', '060', '088', '061',
+	#							'N04', 'N06', 'N07', 'N02', 'N03', 'N05', 'N01', '301', 
+	#							'308', '303', '302', '307', '304', '305', '306'
+	#							);
 								 						
 
 #*******************************************************************************************	
@@ -389,8 +419,8 @@ sub validateD
 	for my $payerLoop(0..$payerCount)
 	{
 	
-		$self->isRequired($tempClaim->{policy}->[$payerLoop]->getFilingIndicator(),$tempClaim,'DA0:Claim Filing Indicator');
-		$self->checkValidValues(CONTAINS,CHECK_EXACT_VALUES, '','',$tempClaim->{policy}->[$payerLoop]->getFilingIndicator(),$tempClaim,'DA0:Claim Filing Indicator',('P','M','I'));
+		$self->isRequired($tempClaim->getFilingIndicator(),$tempClaim,'DA0:Claim Filing Indicator');
+		$self->checkValidValues(CONTAINS,CHECK_EXACT_VALUES, '','',$tempClaim->getFilingIndicator(),$tempClaim,'DA0:Claim Filing Indicator',('P','M','I'));
 
 		# checks for Source of Payment
 		$self->isRequired($tempClaim->{policy}->[$payerLoop]->getSourceOfPayment(),$tempClaim,'DA0:Source of Payment');
@@ -399,7 +429,7 @@ sub validateD
 		{
 			 $self->isRequired($tempClaim->{policy}->[$payerLoop]->getSourceOfPayment(),$tempClaim,'DA0:Source of Payment');	
 			 $self->checkValidValues(CONTAINS,CHECK_EXACT_VALUES,'','',$tempClaim->{policy}->[$payerLoop]->getSourceOfPayment(),$tempClaim,'DA0:Source of Payment',('A'..'N','P','T','V','X','Z'));
-			 $self->checkValidValues(CONTAINS,CHECK_EXACT_VALUES, '','',$tempClaim->{policy}->[$payerLoop]->getFilingIndicator(),$tempClaim,'DA0:Claim Filing Indicator',('P','M'));
+			 $self->checkValidValues(CONTAINS,CHECK_EXACT_VALUES, '','',$tempClaim->getFilingIndicator(),$tempClaim,'DA0:Claim Filing Indicator',('P','M'));
 		}		
 	
 		# checks for Insurance Type Code
@@ -425,15 +455,15 @@ sub validateD
 		$self->isRequired($tempClaim->{insured}->[$payerLoop]->getInsurancePlanOrProgramName(),$tempClaim,'DA0:Payer Name');
 	
 		# checks for Group Number
-		if (($tempClaim->{policy}->[$payerLoop]->getSourceOfPayment() =~ m/['D','F','H','I','X']/) && ($tempClaim->{policy}->[$payerLoop]->getFilingIndicator() =~ m/['P','M']/))
+		if (($tempClaim->{policy}->[$payerLoop]->getSourceOfPayment() =~ m/['D','F','H','I','X']/) && ($tempClaim->getFilingIndicator() =~ m/['P','M']/))
 		{
 			$self->isRequired($tempClaim->{insured}->[$payerLoop]->getPolicyGroupOrFECANo(),$tempClaim,'DA0:Group Number');
 			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS,'','',$tempClaim->{insured}->[$payerLoop]->getPolicyGroupOrFECANo(),$tempClaim,'DA0:Group Number',('A'..'Z',0..9,'/',' ','-'));
 			$self->checkSameCharacter(NOT_CONTAINS,'','',$tempClaim->{insured}->[$payerLoop]->getPolicyGroupOrFECANo(),$tempClaim,'DA0:Group Number',('0'));
 			$self->checkValidValues(NOT_CONTAINS,CHECK_EXACT_VALUES, '','',$tempClaim->{insured}->[$payerLoop]->getPolicyGroupOrFECANo(),$tempClaim,'DA0:Group Number',('123456789','NONE','UNKNOWN','INDIVIDUAL','SELF'));
-			if ($tempClaim->{insured}->[$payerLoop]->getId() ne '')
+			if ($tempClaim->{insured}->[$payerLoop]->getSsn() ne '')
 			{
-				$self->checkValidValues(NOT_CONTAINS,CHECK_EXACT_VALUES, '','',$tempClaim->{insured}->[$payerLoop]->getPolicyGroupOrFECANo(),$tempClaim,'DA0:Group Number',($tempClaim->{insured}->[$tempClaim->getClaimType()]->getId()));
+				$self->checkValidValues(NOT_CONTAINS,CHECK_EXACT_VALUES, '','',$tempClaim->{insured}->[$payerLoop]->getPolicyGroupOrFECANo(),$tempClaim,'DA0:Group Number',($tempClaim->{insured}->[$tempClaim->getClaimType()]->getSsn()));
 			}
 			
 			
@@ -458,7 +488,8 @@ sub validateD
 	
 	
 		#PPO/HMO Id
-		if (not($tempClaim->{insured}->[$payerLoop]->getHMOIndicator() =~ m/['Y','N']/))
+		
+		if ((not($tempClaim->{insured}->[$payerLoop]->getHMOIndicator() =~ m/['Y','N']/)) && ($tempClaim->{insured}->[$payerLoop]->getHMOIndicator() ne ''))
 		{
 			$self->isRequired($tempClaim->{insured}->[$payerLoop]->getHMOId(),$tempClaim,'DA0:PPO/HMO Id');
 		}
@@ -503,21 +534,28 @@ sub validateD
 		}	
 	
 		#Insured ID Number
-		if($tempClaim->{policy}->[$payerLoop]->getFilingIndicator() =~ m/['P','M']/)
+		if($tempClaim->getFilingIndicator() =~ m/['P','M']/)
 		{
-			$self->isRequired($tempClaim->{insured}->[$payerLoop]->getId(),$tempClaim,'DA0:Insured ID');
+			$self->isRequired($tempClaim->{insured}->[$payerLoop]->getSsn(),$tempClaim,'DA0:Insured ID');
 		}	
 	
 			
-		if($tempClaim->{policy}->[$payerLoop]->getSourceOfPayment() ne 'C')
+		if($tempClaim->{policy}->[$payerLoop]->getSourceOfPayment() eq 'C')
 		{
-			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS, '','',$tempClaim->{insured}->[$payerLoop]->getId(),$tempClaim,'DA0:Insured ID May only contain A-Z,0-9',('A'..'Z',0..9));
+			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS, '','',$tempClaim->{insured}->[$payerLoop]->getSsn(),$tempClaim,'DA0:Insured ID May only contain A-Z,0-9',('A'..'Z',0..9));
 		}
 		else
 		{
-			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS, '','',$tempClaim->{insured}->[$payerLoop]->getId(),$tempClaim,'DA0:Insured ID May only contain A-Z,0-9,/,-',('A'..'Z',0..9,'/','-'));	
+			$self->checkValidValues(CONTAINS,CHECK_CHARACTERS, '','',$tempClaim->{insured}->[$payerLoop]->getSsn(),$tempClaim,'DA0:Insured ID May only contain A-Z,0-9,/,-',('A'..'Z',0..9,'/','-'));	
 		}
-	
+		
+		$self->checkSameCharacter(NOT_CONTAINS,'','',$tempClaim->{insured}->[$payerLoop]->getSsn(),$tempClaim,'DA0:Insured ID',('1','2','3','4','5','6','7','8','9','0')); 
+		
+		if ($tempClaim->{insured}->[$payerLoop]->getSsn() =~ /(1234567890|NONE|UNKNOWN|INDIVIDUAL|SELF|123456789)+/)
+		{
+			$valMgr->addError($self->getId() . "  " .$tempClaim->getPayerId()."  ". $tempClaim->getId(),' 1006 ', ' DA0:Insured ID cannnot contain 1234567890, NONE, UNKNOWN, INDIVIDUAL, SELF, 123456789' ,$self->{claim})		
+		}
+
 		# Insured Last Name and First Name
 		if(($tempClaim->{insured}->[$payerLoop]->getRelationshipToInsured() ne '01') && ($tempClaim->{insured}->[$payerLoop]->getRelationshipToInsured() ne '1'))
 		{
@@ -531,7 +569,7 @@ sub validateD
 		#group number checking
 		if ($tempClaim->{insured}->[$payerLoop]->getPolicyGroupOrFECANo() ne "")
 		{
-			$self->checkValidValues(NOT_CONTAINS,CHECK_EXACT_VALUES,'','',$tempClaim->{insured}->[$payerLoop]->getId(),$tempClaim,'DA0:Insured ID May not  contain Policy Group or FECA No.',($tempClaim->{insured}->[$payerLoop]->getPolicyGroupOrFECANo()));
+			$self->checkValidValues(NOT_CONTAINS,CHECK_EXACT_VALUES,'','',$tempClaim->{insured}->[$payerLoop]->getSsn(),$tempClaim,'DA0:Insured ID May not  contain Policy Group or FECA No.',($tempClaim->{insured}->[$payerLoop]->getPolicyGroupOrFECANo()));
 		}
 	
 	
@@ -541,13 +579,13 @@ sub validateD
 		if($tempClaim->{policy}->[$payerLoop]->getPayerId() ne "")
 		{
 
-			$self->checkValidValues(NOT_CONTAINS,CHECK_EXACT_VALUES, '','',$tempClaim->{insured}->[$payerLoop]->getId(),$tempClaim,'DA0:Insured ID May not contain Payer Id',($tempClaim->{policy}->[$payerLoop]->getPayerId()));
+			$self->checkValidValues(NOT_CONTAINS,CHECK_EXACT_VALUES, '','',$tempClaim->{insured}->[$payerLoop]->getSsn(),$tempClaim,'DA0:Insured ID May not contain Payer Id',($tempClaim->{policy}->[$payerLoop]->getPayerId()));
 		}
 	
 		# check same numbers
-		$self->checkSameCharacter(NOT_CONTAINS,'','',$tempClaim->{insured}->[$payerLoop]->getId(),$tempClaim,'DA0:Insured ID',('1','2','3','4','5','6','7','8','9','0'));
+		$self->checkSameCharacter(NOT_CONTAINS,'','',$tempClaim->{insured}->[$payerLoop]->getSsn(),$tempClaim,'DA0:Insured ID',('1','2','3','4','5','6','7','8','9','0'));
 		#invalid values
-		$self->checkValidValues(NOT_CONTAINS,CHECK_EXACT_VALUES, '','',$tempClaim->{insured}->[$payerLoop]->getId(),$tempClaim,'DA0:Insured ID May not Contain 1234567890,NONE,UNKNOWN,INDIVIDUAL,SELF,123456789',('1234567890','NONE','UNKNOWN','INDIVIDUAL','SELF','123456789'));
+		$self->checkValidValues(NOT_CONTAINS,CHECK_EXACT_VALUES, '','',$tempClaim->{insured}->[$payerLoop]->getSsn(),$tempClaim,'DA0:Insured ID May not Contain 1234567890,NONE,UNKNOWN,INDIVIDUAL,SELF,123456789',('1234567890','NONE','UNKNOWN','INDIVIDUAL','SELF','123456789'));
 	
 		#Insured Last ,First and Middle Initial
 		$self->checkValidNames(INDIVIDUAL_NAME,$tempClaim->{insured}->[$payerLoop]->getLastName(),$tempClaim->{insured}->[$payerLoop]->getFirstName(),$tempClaim->{insured}->[$payerLoop]->getMiddleInitial(),$tempClaim,'DA0:');
@@ -592,7 +630,7 @@ sub validateD
 	
 	# checks for Champus Sponsor Branch, Status, Grade,
 	# 	Insurance Card Effective and Termination Date
-		if(($tempClaim->{policy}->[$payerLoop]->getSourceOfPayment() eq 'H') && ($tempClaim->{policy}->[$payerLoop]->getClaimFilingIndicator() eq 'P'))
+		if(($tempClaim->{policy}->[$payerLoop]->getSourceOfPayment() eq 'H') && ($tempClaim->getFilingIndicator() eq 'P'))
 		{
 			$self->isRequired($tempClaim->{policy}->[$payerLoop]->getChampusSponsorBranch(),$tempClaim,'DA1:Champus Sponsor Branch');
 			$self->isRequired($tempClaim->{policy}->[$payerLoop]->getChampusSponsorGrade(),$tempClaim,'DA1:Champus Sponsor Grade');
@@ -642,11 +680,16 @@ sub validateE
 {
 	my ($self,$valMgr,$callSeq,$vFlags,$tempClaim) = @_;
 	my $i;
-	my @validTimeCodes = ('00','01','02','03','04','05','06','07','08','09',
-						  '10','11','12','13','14','15','16','17','18','19',
-						  '20','21','22','23','99');
-	my @validSpecialProgramCodes = ('02','03','05','06','07','08','09','10', 
-									'A', 'B', 'D', 'W', 'CA', 'CZ', 'C0', 'C9');						  
+	my @validTimeCodes = @{$VALIDCODES{'time'}};
+	
+	#my @validTimeCodes = ('00','01','02','03','04','05','06','07','08','09',
+	#					  '10','11','12','13','14','15','16','17','18','19',
+	#					  '20','21','22','23','99');
+	
+	my @validSpecialProgramCodes = @{$VALIDCODES{'specialProgram'}};
+	
+	#my @validSpecialProgramCodes = ('02','03','05','06','07','08','09','10', 
+	#								'A', 'B', 'D', 'W', 'CA', 'CZ', 'C0', 'C9');						  
 	my $tempProcedures; 					
 	
 	
@@ -823,7 +866,7 @@ sub validateE
 		
 	if ($#$diagnosis > 3)
 	{
-		$valMgr->addWarning($self->getId() . "  " .$tempClaim->getPayerId()."  ". $tempClaim->getId(),' 1006 ', ' EA0:Diagnosis Codes ' . ' Diagnosis codes above 4 will not be reported in Claim output' ,$self->{claim})
+		$valMgr->addError($self->getId() . "  " .$tempClaim->getPayerId()."  ". $tempClaim->getId(),' 1006 ', ' EA0:Diagnosis Codes ' . ' Diagnosis codes cannot be more than 4 in Invoice.Claim_Diags' ,$self->{claim})
 	}
 	
 	if ($#$diagnosis > -1)
@@ -1493,7 +1536,15 @@ sub getCallSequences
 	'Checks for Payer and Patient Amount Paid has been added in XA0'],
 	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '03/24/2000', 'AUF',
 	'Billing Interface/Validating NSF Output',
-	'A check of diagnosis code more than 4 is added in EA0 validation it will add warning by using method addWarning method of Driver']
+	'A check of diagnosis code more than 4 is added in EA0 validation it will add warning by using method addWarning method of Driver'],
+	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '04/05/2000', 'AUF',
+	'Billing Interface/Validating NSF Output',
+	'All valid time codes, special program codes and speciality codes into a VALIDCODES hash to stop replication '],
+	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '04/18/2000', 'AUF',
+	'Billing Interface/Validating NSF Output',
+	'Function getId of Insured object has been replaced with getSsn of same object to reflect correct value']
+
+
 	
 );
 

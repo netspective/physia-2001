@@ -295,7 +295,7 @@
                         <td class="cell phone">(</td>
                         <td class="cell"><strong>{$patientAddressTelephone ne "&nbsp" ? substr($patientAddressTelephone,0, 3) : "&nbsp"}<strong></td>
                         <td class="cell phone">)</td>
-                        <td class="cell"><strong>{$patientAddressTelephone ne "&nbsp" ? substr($patientAddressTelephone,4, 12) : "&nbsp"}<strong></td>
+                        <td class="cell"><strong>{$patientAddressTelephone ne "&nbsp" ? substr($patientAddressTelephone,3, 12) : "&nbsp"}<strong></td>
                       </tr>
                     </table>
                   </td>
@@ -432,8 +432,14 @@
                         </td>
                       </tr>
                       <tr class="cell">
+                        <td class="cell"> &nbsp &nbsp</td>
+                        <td class="cell">
+                          <strong> &nbsp &nbsp &nbsp {$signaturePatient} <strong>
+                        </td>
+                      </tr>
+                      <tr class="cell">
                         <td class="cell" colspan="2">
-                          SIGNED_____________________________________________________________
+                          SIGNED _____________________________________________________________
                           &nbsp &nbsp DATE____________________
                         </td>
                       </tr>
@@ -507,7 +513,7 @@
                         <td class="cell phone">(</td>
                         <td class="cell"><strong>{$insuredAddressTelephone ne "&nbsp" ? substr($insuredAddressTelephone,0,3) : "&nbsp"}<strong></td>
                         <td class="cell phone">)</td>
-                        <td class="cell"><strong>{$insuredAddressTelephone ne "&nbsp" ? substr($insuredAddressTelephone,4,10) : "&nbsp"}<strong></td>
+                        <td class="cell"><strong>{$insuredAddressTelephone ne "&nbsp" ? substr($insuredAddressTelephone,3,10) : "&nbsp"}<strong></td>
                       </tr>
                     </table>
                   </td>
@@ -596,8 +602,14 @@
                         </td>
                       </tr>
                       <tr class="cell">
+                        <td class="cell"> &nbsp &nbsp</td>
+                        <td class="cell">
+                          <strong> &nbsp &nbsp &nbsp {$signatureInsured} <strong>
+                        </td>
+                      </tr>
+                      <tr class="cell">
                          <td class="cell" colspan="2">
-                           SIGNED_______________________________________
+                           SIGNED _______________________________________
                          </td>
                       </tr>
                     </table>
@@ -1013,7 +1025,13 @@
                                               INCLUDING DEGREES OR CREDENTIALS<br>
                                               (I certify that the statements on the reverse<br>
                                               apply to this bill and are made a part thereof.)
+                                              
                               </td>
+                            </tr>
+                            <tr class="cell">
+                              <td class="cell">&nbsp</td>
+                              <td class="cell"><strong>{$transProviderName} <strong></td>
+                              <td class="cell">&nbsp</td>
                             </tr>
                             <tr class="cell">
                               <td class="cell">&nbsp</td>

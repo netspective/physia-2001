@@ -158,9 +158,9 @@ sub setRelationshipToInsured
 	my $temp = 
 		{ 
 			'0' => '01',
-			'1' => '02',
-			'3' => '03',
-			'4' => '99',
+			'10' => '02',
+			'12' => '03',
+			'99' => '99',
 			'SELF' => '01',
 			'SPOUSE' => '02',
 			'CHILD' => '03',
@@ -185,6 +185,15 @@ sub convertDateToMMDDYYYYFromCCYYMMDD
 
 }
 
+sub printVal
+{
+	my ($self) = @_;
+	foreach my $key (keys(%$self))
+	{
+		print " patient $key = " . $self->{$key} . " \n";
+	}
+
+}
 
 @CHANGELOG =
 ( 
@@ -194,6 +203,7 @@ sub convertDateToMMDDYYYYFromCCYYMMDD
 	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '12/21/1999', 'SSI', 'Billing Interface/Claim Patient','Patient relationship to insured has domain form 0 => 01,1 => 02,3 => 03,4 => 99,SELF => 01,SPOUSE => 02,CHILD => 03,OTHER => 99'],
 	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '01/11/2000', 'SSI', 'Billing Interface/Claim Patient','convertDateToMMDDYYYYFromCCYYMMDD implemented here. its basic function is to convert the date format from  CCYYMMDD to dd-mmm-yy'],
 	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '01/11/2000', 'SSI', 'Billing Interface/Claim Patient','getLastSeenDate can be provided with argument of DATEFORMAT_USA(constant 1) to get the date in mmddyyyy format'],
+	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '04/20/2000', 'SSI', 'Billing Interface/Claim Patient','Patient Relation ship to insured value updated'],
 
 );
 

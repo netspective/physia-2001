@@ -33,8 +33,21 @@ sub new
 	$self->{hmoId} = undef;
 	$self->{effectiveDate} = undef;
 	$self->{terminationDate} = undef;
+	$self->{billSequence} = undef;
 	
 	return bless $self, $type;
+}
+
+sub getBillSequence
+{
+	my ($self) = @_;
+	return $self->{billSequence};
+}
+
+sub setBillSequence
+{
+	my ($self, $value) = @_;
+	$self->{billSequence} = $value;
 }
 
 sub getDbId
@@ -238,6 +251,7 @@ sub getAcceptAssignment
 
 	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '02/25/2000', 'SSI', 'Billing Interface/Claim Insured','Attribute relationshipToInsured is added to reflect the insured relation to patient.'],
 	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '02/25/2000', 'SSI', 'Billing Interface/Claim Insured','Attribute acceptAssignment is added to reflect the Assignment of Benefit for the insured.'],
+	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '04/18/2000', 'SSI', 'Billing Interface/Claim Insured','Attribute billSequence added to reflect the sequence of insured for the bill.'],
 );
 
 1;

@@ -32,6 +32,7 @@ sub new
 	$self->{champusSponsorBranch} = undef;
 	$self->{champusSponsorGrade} = undef;
 	$self->{champusSponsorStatus} = undef;
+	$self->{billSequence} = undef;
 	
 	
 	return bless $self, $type;
@@ -42,6 +43,18 @@ sub property
 	my ($self, $name, $value) = @_;
 	$self->{$name} = $value if defined $value;
 	return $self->{$name};
+}
+
+sub getBillSequence
+{
+	my ($self) = @_;
+	return $self->{billSequence};
+}
+
+sub setBillSequence
+{
+	my ($self, $value) = @_;
+	$self->{billSequence} = $value;
 }
 
 sub setChampusSponsorBranch
@@ -241,6 +254,8 @@ sub getMiddleInitial
 ( 
     # [FLAGS, DATE, ENGINEER, CATEGORY, NOTE]
 	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '02/24/2000', 'SSI','Billing Interface/Claim Patient','A new attribute amountpaid is added which will reflect the amount paid by the payer in claim.'],
+	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '04/17/2000', 'SSI','Billing Interface/Claim Patient','A new attribute billSequence is added which will reflect the billing Sequence for the payer in claim.'],
+
 );
 
 
