@@ -654,7 +654,9 @@ sub prepare_view_superbills
                         
 							<td valign="top" align="center">
 								<input name="addSelected" type="button" value="+" title="Add Codes" onClick="javascript:_addCPT()">
-								<input name="delSelected" type="button" value="-" title="Delete Codes" onClick="javascript:_delCPT()">
+								<input name="delSelected" type="button" value="-" title="Delete Codes" onClick="javascript:_delCPT()"><br><br>
+								<input name="moveUpSelected" type="button" value="^" title="Add Codes" onClick="javascript:_moveCPTUp()"><br>
+								<input name="moveDownSelected" type="button" value="v" title="Delete Codes" onClick="javascript:_moveCPTDown()">
                                         		</td>
 							
 							<td valign="top" align="right">
@@ -813,7 +815,9 @@ sub prepare_view_superbills
                         
 							<td valign="top" align="center">
 								<input name="addSelected" type="button" value="+" title="Add Codes" onClick="javascript:_addCPT()">
-								<input name="delSelected" type="button" value="-" title="Delete Codes" onClick="javascript:_delCPT()">
+								<input name="delSelected" type="button" value="-" title="Delete Codes" onClick="javascript:_delCPT()"><br><br>
+								<input name="moveUpSelected" type="button" value="^" title="Add Codes" onClick="javascript:_moveCPTUp()"><br>
+								<input name="moveDownSelected" type="button" value="v" title="Delete Codes" onClick="javascript:_moveCPTDown()">
                                         		</td>
 							
 							<td valign="top" align="right">
