@@ -33,7 +33,7 @@ sub initialize
 
 	my $orgId = $self->param('org_id');
 	$STMTMGR_ORG->createPropertiesFromSingleRow($self, STMTMGRFLAG_CACHE, ['selRegistry', 'org_'], $orgId);
-	$self->property('org_type', split(1, /,/, $self->property('org_category')));
+	$self->property('org_type', split(/,/, $self->property('org_category')));
 	#$self->property('org_categories', $STMTMGR_ORG->getSingleValueList($self, STMTMGRFLAG_CACHE, 'selOrgCategory', $orgId));
 
 	#unless($orgId eq $self->session('org_id'))
