@@ -17,11 +17,12 @@ $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
 		service_begin_date,
 		service_end_date,
 		provider as care_provider_id ,
+		client_id as patient_id,
 		code, 
 		caption,
 		rel_diags,
 		units,
-		unit_cost,
+		unit_cost,		
 		sum(total_charges) total_charges, 
 		sum(misc_charges) misc_charges ,
 		sum(person_pay) person_pay,
@@ -48,7 +49,8 @@ $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
 		caption,
 		units,
 		unit_cost,
-		rel_diags
+		rel_diags,
+		client_id
 	},
 	'sel_daily_audit' => qq{
 	SELECT	to_char(invoice_date,'$SQLSTMT_DEFAULTDATEFORMAT') invoice_date ,
