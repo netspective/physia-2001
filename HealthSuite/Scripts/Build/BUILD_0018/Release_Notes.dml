@@ -315,6 +315,10 @@
 			Fixed code to not to show up duplicate entries.
 		</deliverable>
 
+		<deliverable id="1896">
+			Updated the field from 'Person ID' to 'Person Name'.
+		</deliverable>
+		
 		<deliverable id="1897">
 			Fixed application error occuring from add fee schedule item dialog.
 		</deliverable>
