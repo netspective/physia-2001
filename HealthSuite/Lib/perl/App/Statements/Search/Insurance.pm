@@ -20,7 +20,7 @@ $STMTFMT_SEL_INSURANCE = qq{
 			FROM insurance ins, insurance_address addr
 			WHERE
 				ins.ins_internal_id = addr.parent_id and
-				%whereCond%
+				%whereCond% and owner_org_id = ?
 				%catCond%
 			order by 1
 };
