@@ -614,7 +614,7 @@
 				<col name="id">9520</col>
 				<col name="caption">Account Owner</col>
 				<col name="group_name">Account Collection</col>
-				<col name="remarks">Collector for this account</col>											
+				<col name="remarks">Collector for this account</col>
 			</row>
 			<row>
 				<col name="id">10000</col>
@@ -703,6 +703,11 @@
 				<col name="id">230</col>
 				<col name="caption">Misc Procedure Code</col>
 			</row>
+			<row>
+				<col name="id">250</col>
+				<col name="caption">ACS Service Code</col>
+			</row>
+
 
 
 		</data>
@@ -1087,7 +1092,7 @@
 				<col name="id">1</col>
 				<col name="caption">Electronic</col>
 			</row>
-			
+
 			<row>
 				<col name="id">1100</col>
 				<col name="caption">Envoy Commercial - Medical</col>
