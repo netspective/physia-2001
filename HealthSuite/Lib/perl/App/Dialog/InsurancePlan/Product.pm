@@ -126,9 +126,9 @@ sub new
 
 		$self->addFooter(new CGI::Dialog::Buttons(
 				nextActions_add => [
-					['Add Insurance Plan', "/org/%param.org_id%/dlg-add-ins-plan?_f_product_name=%field.product_name%&_f_ins_org_id=%field.ins_org_id%", 1],
-					['Add Another Insurance Product', "/org/%param.org_id%/dlg-add-ins-product?_f_ins_org_id=%field.ins_org_id%"],
-					['Go to Org Profile', "/org/%param.org_id%/profile"],
+					['Add Insurance Plan', "/org/%field.ins_org_id%/dlg-add-ins-plan?_f_product_name=%field.product_name%&_f_ins_org_id=%field.ins_org_id%", 1],
+					['Add Another Insurance Product', "/org/%field.ins_org_id%/dlg-add-ins-product?_f_ins_org_id=%field.ins_org_id%"],
+					['Go to Org Profile', "/org/%field.ins_org_id%/profile"],
 				],
 					cancelUrl => $self->{cancelUrl} || undef
 			)
