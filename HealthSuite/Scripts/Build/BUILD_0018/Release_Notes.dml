@@ -121,6 +121,10 @@
 			Added some validation to check if the primary 'Email' is added before adding a secondary email. An error message will be
 			displayed if we try to add a secondary one without adding a primary one.
 		</deliverable>
+
+		<deliverable id="1626">
+			Added check-boxes and a field to enter the 'Other Ethnicity' and 'Other Language'.
+		</deliverable>
 		
 		<deliverable id="1652">
 			Fixed handling of primary, secondary, tertiary claims (i.e. status changes, functions allowed based on status changes, 
