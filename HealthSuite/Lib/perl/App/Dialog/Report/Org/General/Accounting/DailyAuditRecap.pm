@@ -37,7 +37,7 @@ sub new
 				invisibleWhen => CGI::Dialog::DLGFLAG_ADD
 				),
 			new App::Dialog::Field::Organization::ID(caption =>'Site Organization ID', name => 'org_id'),
-			new App::Dialog::Field::Person::ID(caption =>'Physican ID', name => 'person_id', ),
+			new App::Dialog::Field::Person::ID(incSimpleName=>1,caption =>'Physican ID', name => 'person_id', ),
 			new CGI::Dialog::MultiField(caption => 'Batch ID Range', name => 'batch_fields',
 						fields => [
 			new CGI::Dialog::Field(caption => 'Batch ID From', name => 'batch_id_from', size => 12,options=>FLDFLAG_REQUIRED),
