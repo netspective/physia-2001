@@ -50,10 +50,23 @@ sub prepare
 			$description = $cptData->{name};
 		}
 		my @rowData = (
-			formatDate($procedure->{dateOfServiceFrom}),
+			$self->formatDate($procedure->{dateOfServiceFrom} || $procedure->{paymentDate}),
 			$description,
 			$procedure->{extendedCost} || 0,
 			$procedure->{totalAdjustments},
+		);
+		
+		push(@data, \@rowData);
+	}
+
+	for my $i (0..(@{$claim->{voidItems}} -1))
+	{
+		my $procedure = $claim->{voidItems}->[$i];
+		my @rowData = (
+			$self->formatDate($procedure->{paymentDate}),
+			$procedure->{caption} ? $procedure->{caption} . '(Voided)' : decodeType($procedure->{itemType}),
+			$procedure->{extendedCost},
+			$procedure->{totalAdjustments} || 0,
 		);
 		
 		push(@data, \@rowData);
@@ -63,7 +76,7 @@ sub prepare
 	{
 		my $procedure = $claim->{otherItems}->[$i];
 		my @rowData = (
-			formatDate($procedure->{paymentDate}),
+			$self->formatDate($procedure->{paymentDate}),
 			$procedure->{caption} || decodeType($procedure->{itemType}),
 			$procedure->{extendedCost},
 			$procedure->{totalAdjustments} || 0,
@@ -77,7 +90,7 @@ sub prepare
 	{
 		my $procedure = $claim->{copayItems}->[$i];
 		my @rowData = (
-			formatDate($procedure->{paymentDate}),
+			$self->formatDate($procedure->{paymentDate}),
 			$procedure->{caption} || decodeType($procedure->{itemType}),
 			#$procedure->{extendedCost},
 			undef,
@@ -93,7 +106,7 @@ sub prepare
 	{
 		my $procedure = $claim->{adjItems}->[$i];
 		my @rowData = (
-			formatDate($procedure->{paymentDate}),
+			$self->formatDate($procedure->{paymentDate}),
 			$procedure->{caption} || decodeType($procedure->{itemType}),
 			$procedure->{extendedCost},
 			$procedure->{totalAdjustments} || 0,
@@ -158,7 +171,7 @@ sub prepare
 								</TR>
 								<TR>
 									<TD>Today's Total:</TD>
-									<TD align=right>@{[ FORMATTER->format_price($claim->{totalCharge}, 2) ]}</TD>
+									<TD align=right>@{[ FORMATTER->format_price($claim->{totalInvoiceCharges}, 2) ]}</TD>
 								</TR>
 								<TR>
 									<TD>Total Due:</TD>
@@ -233,12 +246,26 @@ sub decodeType
 			return 'Deductible';
 			last SWITCH;
 		}
+		if ($type == 7) {
+			return 'Void';
+			last SWITCH;
+		}
 	}
 }
 
 sub formatDate
 {
-	my ($date) = @_;
+	my ($self, $date, $itemId) = @_;
+	
+	if ($itemId)
+	{
+		$date = $STMTMGR_INVOICE->getSingleValue($self, STMTMGRFLAG_NONE, 
+			'sel_defaultInvoiceItemDate', $itemId);
+	}
+	else
+	{
+		$date ||= 'today';
+	}
 	return UnixDate(ParseDate($date), '%m/%d/%Y');
 }
 

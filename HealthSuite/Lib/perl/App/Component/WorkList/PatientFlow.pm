@@ -192,7 +192,7 @@ sub getComponentHtml
 		$_->{facility_name} = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selId', 
 			$_->{facility});
 		
-		if ($_->{checkin_time})
+		if ($_->{checkin_time} || $_->{checkout_time})
 		{
 			$checkinMinutes  = stamp2minutes($_->{checkin_time});
 			$waitMinutes = $checkinMinutes - $apptMinutes;
@@ -273,11 +273,11 @@ sub getComponentHtml
 				</nobr>
 			},
 
-			$_->{checkin_time} ? qq{<strong>$_->{checkin_time}</strong><br>
+			($_->{checkin_time} || $_->{checkout_time}) ? qq{<strong>$_->{checkin_time}</strong><br>
 				<strong title="Wait time in minutes" style="color:#999999">($waitMinutes)</strong>}:
 				qq{<a href='/worklist/patientflow/dlg-add-checkin/$_->{event_id}' TITLE='CheckIn $_->{patient_id}' class=today>CheckIn</a>},
 
-			$_->{checkin_time} ?
+			$_->{checkin_time} || $_->{checkout_time} ?
 				($_->{checkout_time} ? qq{<strong>$_->{checkout_time}</strong><br>
 				<strong title="Visit time in minutes" style="color:#999999">($visitMinutes)</strong>} :
 					qq{<a href='/worklist/patientflow/dlg-add-checkout/$_->{event_id}' TITLE='CheckOut $_->{patient_id}' class=today>CheckOut</a>}

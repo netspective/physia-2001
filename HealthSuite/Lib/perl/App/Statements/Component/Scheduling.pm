@@ -74,7 +74,7 @@ my $STMTFMT_SEL_EVENTS_WORKLIST_WHERECLAUSE = qq{
 			and item_name = '$WORKLIST_ITEMNAME'
 		)
 	and e.facility_id in (
-		select value_text from Person_Attribute
+		select value_int from Person_Attribute
 		where parent_id = ?
 			and value_type = $FACILITY_ASSOC_VALUE_TYPE
 			and item_name = '$WORKLIST_ITEMNAME'

@@ -40,6 +40,8 @@ sub prepare_view_date
 {
 	my ($self) = @_;
 	
+	$self->param('person_id', $self->session('user_id'));
+	
 	$self->addContent(qq{
 		<TABLE BORDER=0 CELLSPACING=1 CELLPADDING=0>
 			<TR VALIGN=TOP>
@@ -174,7 +176,6 @@ sub prepare_page_content_header
 			[$dateTitle, "$urlPrefix/date", 'date'],
 			['Recent Activity', "$urlPrefix/recentActivity", 'recentActivity'],
 			['Setup', "$urlPrefix/setup", 'setup', ],
-			#['Setup', "#SETUP", 'setup'],
 			
 		], ' | ');
 
@@ -208,7 +209,9 @@ sub getControlBarHtml
 {
 	my ($self) = @_;
 
-	my $selectedDate = $self->param('_seldate') || 'today';
+	my $selectedDate = $self->param('_seldate') || $self->session('selectedDate') || 'today';
+	$self->param('_seldate', $selectedDate);
+	
 	$selectedDate = 'today' unless ParseDate($selectedDate);
 	my $fmtDate = UnixDate($selectedDate, '%m/%d/%Y');
 
@@ -349,7 +352,7 @@ sub getControlBarHtml
 		<tr>
 			<FORM name='dateForm' method=POST>
 				<td ALIGN=LEFT>
-					<SELECT onChange="document.dateForm.selDate.value = this.options[this.selectedIndex].value;
+					<SELECT onBlur="document.dateForm.selDate.value = this.options[this.selectedIndex].value;
 						updatePage(document.dateForm.selDate.value); return false;">
 						$chooseDateOptsHtml
 					</SELECT>
@@ -444,6 +447,7 @@ sub handleARL
 	
 	$self->param('_dialogreturnurl', $baseArl);
 	$self->printContents();
+	$self->session('selectedDate', $self->param('_seldate')) if $self->param('_seldate');
 	return 0;
 }
 
@@ -451,8 +455,12 @@ sub handleARL_date
 {
 	my ($self, $arl, $params, $rsrc, $pathItems) = @_;
 
-	$pathItems->[2] =~ s/\-/\//g if defined $pathItems->[2];
-	$self->param('_seldate', $pathItems->[2]);
+	if (defined $pathItems->[2])
+	{
+		$pathItems->[2] =~ s/\-/\//g;
+		$self->param('_seldate', $pathItems->[2]);
+	}
+	
 	$self->param('noControlBar', 0);
 }
 

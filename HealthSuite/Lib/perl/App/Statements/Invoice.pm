@@ -425,6 +425,10 @@ $STMTMGR_INVOICE = new App::Statements::Invoice(
 		group by upper(client_id)
 	},
 
+	'sel_defaultInvoiceItemDate' => qq{
+		select to_char(cr_stamp, '$SQLSTMT_DEFAULTDATEFORMAT') from Invoice_Item
+		where item_id = ?
+	},
 			
 );
 

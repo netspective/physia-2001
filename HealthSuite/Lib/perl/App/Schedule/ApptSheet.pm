@@ -381,11 +381,6 @@ sub buildHeader
 							<select onChange='location.href=this.value'>
 								<option value='#'>Choose Action</option>
 								<option value='$arl'>$altView View</option>
-								<option value='/search/appointment/$resource_id/$org_id/0/$dashDate/$dashDate/1'>Block Confirm</option>
-								<option value='/search/appointment/$resource_id/$org_id/0/$dashDate/$dashDate/0'>Block Check In</option>
-								<option value='/search/appointment/$resource_id/$org_id/1/$dashDate/$dashDate/1'>Block Check Out</option>
-								<option value='/search/appointment/$resource_id/$org_id/2/$dashDate/$dashDate'>Block Cancel</option>
-								<option value='/search/appointment/$resource_id/$org_id/3/$dashDate/$dashDate'>Block Reschedule</option>
 								<option value='/schedule/dlg-add-appointment//$resource_id/$facility_id/'>Add Appointment</option>
 								<option value='/search/apptslot/$resource_id,$facility_id,$dashDate/1'>Find Slot</option>
 								<option value='/schedule/dlg-add-template/$resource_id/$facility_id'>Add Template</option>
