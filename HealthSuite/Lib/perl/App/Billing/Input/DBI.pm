@@ -283,10 +283,11 @@ sub assignPatientInfo
 	$patient->setSex($row[5]);
 	$patient->setStatus($row[6]);
 	$patient->setSsn($row[7]);
+
 	$queryStatment = "select value_text,value_type,value_int from person_attribute where parent_id = \'$row[8]\' and value_type between 220 and 225";
 	$sth = $self->{dbiCon}->prepare(qq {$queryStatment});
 	# do the execute statement
-	$sth->execute() or $self->{valMgr}->addError($self->getId(),100,"Unable to execute $queryStatment");
+	#$sth->execute() or $self->{valMgr}->addError($self->getId(),100,"Unable to execute $queryStatment");
 	@row = $sth->fetchrow_array();
 	if($row[2])
 	{
