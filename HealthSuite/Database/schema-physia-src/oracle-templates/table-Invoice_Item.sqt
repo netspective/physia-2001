@@ -245,7 +245,6 @@ WHERE   t.trans_id = i.main_transaction
 	AND i.invoice_id = ia.parent_id(+)     
 	AND ii.parent_id  = i.invoice_id
 	AND ia.item_name(+)  = 'Invoice/Creation/Batch ID'		
-	AND NOT (invoice_status =15 AND parent_invoice_id is not null)
 	AND ii.item_id = v_item_id;
 
      end loop; 
