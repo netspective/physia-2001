@@ -162,16 +162,7 @@ sub execute_update
 	#$page->beginUnitWork("Unable to update claim");
 
 	App::Dialog::Encounter::handlePayers($self, $page, $command, $flags);
-
-	my $todaysDate = $page->getDate();
-	my $invoiceId = $page->param('invoice_id');
-
-	#add history item
-	addHistoryItem($page, $invoiceId,
-		value_text => 'Updated',
-		value_date => $todaysDate,
-	);
-
+	addHistoryItem($page, $page->param('invoice_id'), value_text => 'Updated');
 
 	$self->handlePostExecute($page, $command, $flags);
 	#$page->endUnitWork();
@@ -219,14 +210,7 @@ sub execute_remove
 		_debug => 0
 	);
 
-
-	#ADD HISTORY ITEM
-	my $todaysDate = UnixDate('today', $page->defaultUnixDateFormat());
-	addHistoryItem($page, $invoiceId,
-		value_text => 'Voided claim',
-		value_date => $todaysDate,
-	);
-
+	addHistoryItem($page, $invoiceId, value_text => 'Voided claim');
 
 	#$page->endUnitWork();
 	$page->redirect("/invoice/$invoiceId/summary");
