@@ -393,6 +393,7 @@
 		<deliverable id="1664">
 			Fixed redirect problem when creating hospital claims. Next actions have been removed and redirect is now forced
 			to the patient's account.
+			Additional: Next actions added back in. Removed certain options to avoid getting redirect error.
 		</deliverable>
 
 		<deliverable id="1676">
