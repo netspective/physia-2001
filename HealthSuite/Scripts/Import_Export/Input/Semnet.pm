@@ -8,6 +8,7 @@ use DBI::StatementManager;
 use Driver;
 use Dumpvalue;
 use App::Data::Manipulate;
+use Date::Manip;
 use App::Universal;
 
 use base qw(Driver::Input);
@@ -43,6 +44,15 @@ sub init
 	$self->statements('Physia','semnet_docs',
 	  "select p.person_id pers_id, p.name_last lname from person p, person_org_category pog WHERE p.person_id = pog.person_id AND pog.org_internal_id = ?");
 	  
+}
+
+
+#
+# Date formatting for ODBC
+#
+sub formatDate
+{
+    return UnixDate(ParseDate(shift), '%m/%d/%Y');
 }
 
 
@@ -207,7 +217,7 @@ sub populateHertgPatData
 		my $lastName = defined $rowData->[$count] ?App::Data::Manipulate::trim($rowData->[$count]) : '' ; $count++; 
 		my $firstMIName = defined $rowData->[$count] ?App::Data::Manipulate::trim($rowData->[$count]) : '' ; $count++; 
 		my $memberID = defined $rowData->[$count] ?App::Data::Manipulate::trim($rowData->[$count]) : '' ; $count++; 
-		my $dob=defined $rowData->[$count] ?App::Data::Manipulate::trim($rowData->[$count]) : '' ; $count++;		
+		my $sourceDob = defined $rowData->[$count] ?App::Data::Manipulate::trim($rowData->[$count]) : '' ; $count++;	
 		my $sex = defined $rowData->[$count] ?App::Data::Manipulate::trim($rowData->[$count]) : '' ; $count++;
 		my $hpcode = defined $rowData->[$count] ?App::Data::Manipulate::trim($rowData->[$count]) : '' ; $count++; 
 		my $option = defined $rowData->[$count] ?App::Data::Manipulate::trim($rowData->[$count]) : '' ; $count++; 
@@ -215,7 +225,9 @@ sub populateHertgPatData
 		my $pcplastName = defined $rowData->[$count] ?App::Data::Manipulate::trim($rowData->[$count]) : '' ; $count++; 
 		my $pcpfirstName = defined $rowData->[$count] ?App::Data::Manipulate::trim($rowData->[$count]) : '' ; $count++; 
 		
-		my $ssn = substr($memberID,1,9);  
+		my $ssn = substr($memberID,1,9);
+		
+		my $dob = formatDate($sourceDob); 
 		
 		#Create Patient Data
 		
@@ -299,18 +311,20 @@ sub populateHMOBlueSeSeniorPatData
 		my $MI = defined $rowData->[$count] ?App::Data::Manipulate::trim($rowData->[$count]) : '' ; $count++;	
 		my $groupNumber = defined $rowData->[$count] ?App::Data::Manipulate::trim($rowData->[$count]) : '' ; $count++;
 		my $sex = defined $rowData->[$count] ?App::Data::Manipulate::trim($rowData->[$count]) : '' ; $count++;		
-		my $dob = defined $rowData->[$count] ?App::Data::Manipulate::trim($rowData->[$count]) : '' ; $count++;
+		my $sourceDob = defined $rowData->[$count] ?App::Data::Manipulate::trim($rowData->[$count]) : '' ; $count++;
 		my $age = defined $rowData->[$count] ?App::Data::Manipulate::trim($rowData->[$count]) : '' ; $count++;		
 		my $line1 = defined $rowData->[$count] ?App::Data::Manipulate::trim($rowData->[$count]) : '' ; $count++;
 		my $city = defined $rowData->[$count] ?App::Data::Manipulate::trim($rowData->[$count]) : '' ; $count++;
 		my $state = defined $rowData->[$count] ?App::Data::Manipulate::trim($rowData->[$count]) : '' ; $count++;
-		my $zipCode = defined $rowData->[$count] ?App::Data::Manipulate::trim($rowData->[$count]) : '' ; $count+=14;
+		my $zipCode = defined $rowData->[$count] ?App::Data::Manipulate::trim($rowData->[$count]) : '' ; $count++;
+		$count+=13;
 		my $fromDate = defined $rowData->[$count] ?App::Data::Manipulate::trim($rowData->[$count]) : '' ; $count++;	
 		my $termDate = defined $rowData->[$count] ?App::Data::Manipulate::trim($rowData->[$count]) : '' ; $count++;
 		my $retro = defined $rowData->[$count] ?App::Data::Manipulate::trim($rowData->[$count]) : '' ; $count++;		
 
     #print "count=$count recNum=$recNum\n";
 
+		my $dob = formatDate($sourceDob); 
 
 		my $ssn = substr($memberID,1,9);
 		
@@ -395,11 +409,6 @@ sub populateHMOBlueSeSeniorPatData
 
 
 
-
-
-
-
-
 #
 # This subroutine will pull HMOBLUE Se_Comm patients and create patient records and insurance coverage
 #
@@ -425,7 +434,8 @@ sub populateHMOBlueSeCommPatData
   my $recNum=0;
 	
 	while (my $rowData = $sth->fetch()) 
-	{		
+	{	
+
 		$count=0;
 	  $recNum++;
 	  
@@ -436,19 +446,21 @@ sub populateHMOBlueSeCommPatData
 		my $MI = defined $rowData->[$count] ?App::Data::Manipulate::trim($rowData->[$count]) : '' ; $count++;	
 		my $groupNumber = defined $rowData->[$count] ?App::Data::Manipulate::trim($rowData->[$count]) : '' ; $count++;
 		my $sex = defined $rowData->[$count] ?App::Data::Manipulate::trim($rowData->[$count]) : '' ; $count++;		
-		my $dob = defined $rowData->[$count] ?App::Data::Manipulate::trim($rowData->[$count]) : '' ; $count++;
+		my $sourceDob = defined $rowData->[$count] ?App::Data::Manipulate::trim($rowData->[$count]) : '' ; $count++;
 		my $age = defined $rowData->[$count] ?App::Data::Manipulate::trim($rowData->[$count]) : '' ; $count++;		
 		my $line1 = defined $rowData->[$count] ?App::Data::Manipulate::trim($rowData->[$count]) : '' ; $count++;
 		my $city = defined $rowData->[$count] ?App::Data::Manipulate::trim($rowData->[$count]) : '' ; $count++;
+		my $zipCode = defined $rowData->[$count] ?App::Data::Manipulate::trim($rowData->[$count]) : '' ; $count++;
 		my $state = defined $rowData->[$count] ?App::Data::Manipulate::trim($rowData->[$count]) : '' ; $count++;
-		my $zipCode = defined $rowData->[$count] ?App::Data::Manipulate::trim($rowData->[$count]) : '' ; $count+=14;
+		$count+=13;
 		my $fromDate = defined $rowData->[$count] ?App::Data::Manipulate::trim($rowData->[$count]) : '' ; $count++;	
 		my $termDate = defined $rowData->[$count] ?App::Data::Manipulate::trim($rowData->[$count]) : '' ; $count++;
 		my $retro = defined $rowData->[$count] ?App::Data::Manipulate::trim($rowData->[$count]) : '' ; $count++;		
 
     #print "count=$count recNum=$recNum\n";
 
-
+		my $dob = formatDate($sourceDob); 
+		
 		my $ssn = substr($memberID,1,9);
 		
 		my @pcpNames = split(' ', $pcpFullName);
@@ -549,8 +561,8 @@ sub populateDataModel
 	$self->populateHMOBlueSeCommPatData();
 	print "***EXITING HMOBLUESEComm\n";
 	$self->populateHMOBlueSeSeniorPatData();
-	#my $dumper = new Dumpvalue;
-        #$dumper->dumpValue($dataModel);
+	my $dumper = new Dumpvalue;
+        $dumper->dumpValue($dataModel);
 	exit;
 	
 	#return $self->errors_size == 0 ? 1 : 0;
