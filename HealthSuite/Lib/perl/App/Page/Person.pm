@@ -35,8 +35,8 @@ sub initialize
 	my $self = shift;
 
 	my $personId = $self->param('person_id');
-	my $userId = $self->session('user_id');	
-	
+	my $userId = $self->session('user_id');
+
 	$self->SUPER::initialize(@_);
 
 	$STMTMGR_PERSON->createPropertiesFromSingleRow($self, STMTMGRFLAG_CACHE, ['selRegistry', 'person_'], $personId);
@@ -411,6 +411,7 @@ sub prepare_view_profile
 								<TD>#component.stp-person.certification#</TD>
 							</TR>
 						</TABLE><BR>
+						#component.stp-person.recentlyVisitedPatients#<BR>
 						#component.stp-person.affiliations#<BR>
 					#component.stp-person.associatedResources#</BR>
 					#component.stp-person.benefits#</BR>
