@@ -803,7 +803,7 @@ sub assignPolicy
 	else
 	{
 		$queryStatment = "select invoice_billing.BILL_TO_ID, invoice_billing.bill_sequence, invoice_billing.bill_amount,
-				invoice_billing.bill_party_type, invoice_billing.BILL_INS_ID	
+				invoice_billing.bill_party_type, invoice_billing.BILL_INS_ID, nvl(PRODUCT_NAME, PLAN_NAME)	
 				from insurance, invoice_billing
 				where invoice_billing.invoice_id = $invoiceId
 					and invoice_billing.bill_ins_id = insurance.ins_internal_id
@@ -832,14 +832,15 @@ sub assignPolicy
 				$payer->setBillSequence($row1[1]);
 				if ($row1[3] == BILL_PARTY_TYPE_INSURANCE ) 
 				{
-					$insOrgId = $row1[0];
-					$queryStatment = "select name_primary as payer_name, org_id as payer_id from org where org_id = \'$insOrgId\'";
-					$sth = $self->{dbiCon}->prepare(qq {$queryStatment});
-					# do the execute statement
-					$sth->execute() or $self->{valMgr}->addError($self->getId(),100,"Unable to execute $queryStatment");
-					@row = $sth->fetchrow_array();
-					$payer->setName($row[0]);
-					$payer->setId($row[1]);
+#					$insOrgId = $row1[0];
+#					$queryStatment = "select name_primary as payer_name, org_id as payer_id from org where org_id = \'$insOrgId\'";
+#					$queryStatment = "select nvl(PRODUCT_NAME, PLAN_NAME), org_id as payer_id from org where org_id = \'$insOrgId\'";
+#					$sth = $self->{dbiCon}->prepare(qq {$queryStatment});
+#					# do the execute statement
+#					$sth->execute() or $self->{valMgr}->addError($self->getId(),100,"Unable to execute $queryStatment");
+#					@row = $sth->fetchrow_array();
+					$payer->setName($row1[5]);
+					$payer->setId($row1[0]);
 	
 					my $inputMap =
 					{
@@ -952,18 +953,16 @@ sub assignPolicy
 				}
 				elsif ($row1[3] == BILL_PARTY_TYPE_ORGANIZATION)
 				{
-					my $ins_id = $row1[4];
-					$queryStatment = "select nvl(PRODUCT_NAME, PLAN_NAME) , INS_ORG_ID from insurance where INS_INTERNAL_ID = $ins_id";
+					my $oid = $row1[0];
+					$queryStatment = "select name_primary , org_id  from org where org_id = \'$oid\'";
 					$sth = $self->{dbiCon}->prepare(qq {$queryStatment});
 					# do the execute statement
 					$sth->execute() or $self->{valMgr}->addError($self->getId(),100,"Unable to execute $queryStatment");
 					@row = $sth->fetchrow_array();
+			
 					$payer->setId($row[1]);
 					$payer->setName($row[0]);
-			 		my $oid = $row[0];
-			 		$queryStatment = "select line1, line2, city, state, zip, country
-										from insurance_address
-										where parent_id = \'$oid\'";
+			 		$queryStatment = "select line1, line2, city, state, zip, country from org_address where parent_id = \'$oid\' and address_name = \'Mailing\'";
 					$sth = $self->{dbiCon}->prepare(qq {$queryStatment});
 					# do the execute statement
 					$sth->execute() or $self->{valMgr}->addError($self->getId(),100,"Unable to execute $queryStatment");
@@ -974,12 +973,12 @@ sub assignPolicy
 					$payerAddress->setState($row[3]);
 					$payerAddress->setZipCode($row[4]);
 					$payerAddress->setCountry($row[5]);
-#					$queryStatment = "select value_text from org_attribute where parent_id = \'$oid\' and Item_name = \'Contact Method/Telepone/Primary\'";
-#					$sth = $self->{dbiCon}->prepare(qq {$queryStatment});
+					$queryStatment = "select value_text from org_attribute where parent_id = \'$oid\' and Item_name = \'Contact Method/Telepone/Primary\'";
+					$sth = $self->{dbiCon}->prepare(qq {$queryStatment});
 					# do the execute statement
-#					$sth->execute() or $self->{valMgr}->addError($self->getId(),100,"Unable to execute $queryStatment");
-#					@row = $sth->fetchrow_array();
-#					$payerAddress->setTelephoneNo($row[0]);
+					$sth->execute() or $self->{valMgr}->addError($self->getId(),100,"Unable to execute $queryStatment");
+					@row = $sth->fetchrow_array();
+					$payerAddress->setTelephoneNo($row[0]);
 				}
 			}
 		}
@@ -1904,6 +1903,7 @@ sub getId
 	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '05/23/2000', 'SSI', 'Billing Interface/Input DBI','Pay to org tax id is now pulling form invoice_attribue in both pre and post submit cases. Pay To Org/Tax ID(item path)'],
 	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '05/24/2000', 'SY', 'Billing Interface/Input DBI','Change the query, to fetch the values of invoice_type, invoice_subtype and total_items'],
 	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '05/24/2000', 'SY', 'Billing Interface/Input DBI','New Invoice Status (void) Implmented.'],
+	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '05/24/2000', 'SY', 'Billing Interface/Input DBI','Payer name is being populated nvl(PRODUCT_NAME, PLAN_NAME) when bill_party_type =3 in invoice_billing.'],
 
 );
 
