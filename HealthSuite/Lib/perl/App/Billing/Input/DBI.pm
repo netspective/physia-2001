@@ -1034,7 +1034,7 @@ sub assignPolicy
 					@row = $sth->fetchrow_array();
 
 					$payer->setId($row[1]);
-					$payer->setName($row[1]);
+					$payer->setName($row[0]);
 			 		$queryStatment = "select line1, line2, city, state, zip, country from org_address where parent_id = \'$oid\' and address_name = \'Mailing\'";
 					$sth = $self->{dbiCon}->prepare(qq {$queryStatment});
 					# do the execute statement
