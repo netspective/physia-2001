@@ -15,6 +15,7 @@ use vars qw(@ISA @EXPORT
 	$STMTMGR_HCPCS_CODE_SEARCH
 	$STMTMGR_SERVICETYPE_CODE_SEARCH
 	$STMTMGR_SERVICEPLACE_CODE_SEARCH
+	$STMTMGR_MODIFIER_CODE_SEARCH
 	$STMTMGR_EPSDT_CODE_SEARCH
 	$STMTMGR_MISC_PROCEDURE_CODE_SEARCH);
 @ISA    = qw(Exporter DBI::StatementManager);
@@ -24,6 +25,7 @@ use vars qw(@ISA @EXPORT
 	$STMTMGR_HCPCS_CODE_SEARCH
 	$STMTMGR_SERVICETYPE_CODE_SEARCH
 	$STMTMGR_SERVICEPLACE_CODE_SEARCH
+	$STMTMGR_MODIFIER_CODE_SEARCH
 	$STMTMGR_EPSDT_CODE_SEARCH
 	$STMTMGR_MISC_PROCEDURE_CODE_SEARCH);
 
@@ -33,12 +35,13 @@ use vars qw(
 	$STMTFMT_SEL_HCPCS_CODE
 	$STMTFMT_SEL_SERVICETYPE_CODE
 	$STMTFMT_SEL_SERVICEPLACE_CODE
+	$STMTFMT_SEL_MODIFIER_CODE
 	$STMTFMT_SEL_EPSDT_CODE
 	$STMTFMT_SEL_MISC_PROCEDURE
 	$STMTRPTDEFN_ICD
 	$STMTRPTDEFN_CPT
 	$STMTRPTDEFN_HCPCS
-	$STMTRPTDEFN_SERVCODE
+	$STMTRPTDEFN_SERVCODE_AND_MODIFIER
 	$STMTRPTDEFN_EPSDT
 	$STMTRPTDEFN_MISC_PROCEDURE);
 
@@ -88,6 +91,14 @@ $STMTFMT_SEL_CPT_CODE = qq{
 $STMTFMT_SEL_HCPCS_CODE = qq{
 	SELECT hcpcs, name, description 
 	FROM REF_HCPCS
+	WHERE
+		%whereCond%
+		AND rownum < $LIMIT
+};
+
+$STMTFMT_SEL_MODIFIER_CODE = qq{
+	SELECT abbrev, caption
+	FROM hcfa1500_modifier_code
 	WHERE
 		%whereCond%
 		AND rownum < $LIMIT
@@ -159,7 +170,7 @@ $STMTRPTDEFN_HCPCS =
 	#rowSepStr => '',
 };
 
-$STMTRPTDEFN_SERVCODE =
+$STMTRPTDEFN_SERVCODE_AND_MODIFIER =
 {
 	#style => 'pane',
 	#frame =>
@@ -336,30 +347,57 @@ $STMTMGR_HCPCS_CODE_SEARCH = new App::Statements::Search::Code(
 		},
 );
 
+$STMTMGR_MODIFIER_CODE_SEARCH = new App::Statements::Search::Code(
+	'sel_modifier_code' =>
+		{
+			_stmtFmt => $STMTFMT_SEL_MODIFIER_CODE,
+			whereCond => 'abbrev = ?',
+			publishDefn => $STMTRPTDEFN_SERVCODE_AND_MODIFIER,
+		},
+	'sel_modifier_name' =>
+		{
+			_stmtFmt => $STMTFMT_SEL_MODIFIER_CODE,
+			whereCond => 'caption = ?',
+			publishDefn => $STMTRPTDEFN_SERVCODE_AND_MODIFIER,
+		},
+	'sel_modifier_code_like' =>
+		{
+			_stmtFmt => $STMTFMT_SEL_MODIFIER_CODE,
+			 whereCond => 'abbrev like ?',
+			publishDefn => $STMTRPTDEFN_SERVCODE_AND_MODIFIER,
+		},
+	'sel_modifier_name_like' =>
+		{
+			_stmtFmt => $STMTFMT_SEL_MODIFIER_CODE,
+			whereCond => 'caption like ?',
+			publishDefn => $STMTRPTDEFN_SERVCODE_AND_MODIFIER,
+		},
+);
+
 $STMTMGR_SERVICEPLACE_CODE_SEARCH = new App::Statements::Search::Code(
 	'sel_place_code' =>
 		{
 			_stmtFmt => $STMTFMT_SEL_SERVICEPLACE_CODE,
 			whereCond => 'abbrev = ?',
-			publishDefn => $STMTRPTDEFN_SERVCODE,
+			publishDefn => $STMTRPTDEFN_SERVCODE_AND_MODIFIER,
 		},
 	'sel_place_name' =>
 		{
 			_stmtFmt => $STMTFMT_SEL_SERVICEPLACE_CODE,
 			whereCond => 'caption = ?',
-			publishDefn => $STMTRPTDEFN_SERVCODE,
+			publishDefn => $STMTRPTDEFN_SERVCODE_AND_MODIFIER,
 		},
 	'sel_place_code_like' =>
 		{
 			_stmtFmt => $STMTFMT_SEL_SERVICEPLACE_CODE,
 			 whereCond => 'abbrev like ?',
-			publishDefn => $STMTRPTDEFN_SERVCODE,
+			publishDefn => $STMTRPTDEFN_SERVCODE_AND_MODIFIER,
 		},
 	'sel_place_name_like' =>
 		{
 			_stmtFmt => $STMTFMT_SEL_SERVICEPLACE_CODE,
 			whereCond => 'caption like ?',
-			publishDefn => $STMTRPTDEFN_SERVCODE,
+			publishDefn => $STMTRPTDEFN_SERVCODE_AND_MODIFIER,
 		},
 );
 
@@ -368,25 +406,25 @@ $STMTMGR_SERVICETYPE_CODE_SEARCH = new App::Statements::Search::Code(
 		{
 			_stmtFmt => $STMTFMT_SEL_SERVICETYPE_CODE,
 			whereCond => 'abbrev = ?',
-			publishDefn => $STMTRPTDEFN_SERVCODE,
+			publishDefn => $STMTRPTDEFN_SERVCODE_AND_MODIFIER,
 		},
 	'sel_type_name' =>
 		{
 			_stmtFmt => $STMTFMT_SEL_SERVICETYPE_CODE,
 			whereCond => 'caption = ?',
-			publishDefn => $STMTRPTDEFN_SERVCODE,
+			publishDefn => $STMTRPTDEFN_SERVCODE_AND_MODIFIER,
 		},
 	'sel_type_code_like' =>
 		{
 			_stmtFmt => $STMTFMT_SEL_SERVICETYPE_CODE,
 			 whereCond => 'abbrev like ?',
-			publishDefn => $STMTRPTDEFN_SERVCODE,
+			publishDefn => $STMTRPTDEFN_SERVCODE_AND_MODIFIER,
 		},
 	'sel_type_name_like' =>
 		{
 			_stmtFmt => $STMTFMT_SEL_SERVICETYPE_CODE,
 			whereCond => 'caption like ?',
-			publishDefn => $STMTRPTDEFN_SERVCODE,
+			publishDefn => $STMTRPTDEFN_SERVCODE_AND_MODIFIER,
 		},
 );
 
