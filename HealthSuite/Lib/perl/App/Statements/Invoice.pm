@@ -123,7 +123,7 @@ $STMTMGR_INVOICE = new App::Statements::Invoice(
 	'selInvoiceProcedureItems' => q{
 		select parent_id, item_id, item_type, hcfa_service_place, hcfa_service_type, emergency, comments, caption, code, modifier,
 			unit_cost, quantity, rel_diags, data_num_c,	to_char(service_begin_date, 'MM/DD/YYYY') as service_begin_date,
-			to_char(service_end_date, 'MM/DD/YYYY') as service_end_date
+			to_char(service_end_date, 'MM/DD/YYYY') as service_end_date, data_text_a
 		from invoice_item
 		where parent_id = ?
 			and item_type in (?,?)
