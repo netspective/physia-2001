@@ -129,6 +129,11 @@
 	     category from the 'Person_Org_Category' table.
 		</deliverable>				
 
+		<deliverable id="1357">
+			Added a next action to the Check In dialog.  This action, labelled "Print Encounter Form..."
+			allows you to print a superbill for the current patient.
+		</deliverable>
+
 		<deliverable id="1358">
 			Added statuses to condition that shows resubmit to current payer link.
 		</deliverable>
