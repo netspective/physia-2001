@@ -15,7 +15,7 @@ EXTPROC_CONNECTION_DATA.PHYSIA.COM =
 SDEDBS02.physia.com = 
   (DESCRIPTION =
     (ADDRESS_LIST =
-      (ADDRESS = (PROTOCOL = TCP)(HOST = saigon)(PORT = 1521))
+      (ADDRESS = (PROTOCOL = TCP)(HOST = boron)(PORT = 1521))
     )
     (CONNECT_DATA =
       (SID = SDEDBS02)
@@ -25,7 +25,7 @@ SDEDBS02.physia.com =
 SDEDBS03.physia.com = 
   (DESCRIPTION =
     (ADDRESS_LIST =
-      (ADDRESS = (PROTOCOL = TCP)(HOST = saigon)(PORT = 1521))
+      (ADDRESS = (PROTOCOL = TCP)(HOST = boron)(PORT = 1521))
     )
     (CONNECT_DATA =
       (SID = SDEDBS03)
