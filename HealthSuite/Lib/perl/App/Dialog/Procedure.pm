@@ -223,22 +223,25 @@ sub execAction_submit
 	my $invoiceFlags = $invoice->{flags};
 	unless($invoiceFlags & $attrDataFlag)
 	{
+		$STMTMGR_INVOICE->execute($page, STMTMGRFLAG_NONE, 'delPostSubmitAttributes', $invoiceId);
+		$STMTMGR_INVOICE->execute($page, STMTMGRFLAG_NONE, 'delPostSubmitAddresses', $invoiceId);
+
 		storeFacilityInfo($page, $command, $invoiceId, $invoice, $mainTransData);
 		storeAuthorizations($page, $command, $invoiceId, $invoice, $mainTransData);
 		storePatientInfo($page, $command, $invoiceId, $invoice, $mainTransData);
 		storePatientEmployment($page, $command, $invoiceId, $invoice, $mainTransData);
 		storeProviderInfo($page, $command, $invoiceId, $invoice, $mainTransData);		
-		
+
 		if($invoice->{invoice_subtype} != App::Universal::CLAIMTYPE_SELFPAY)
 		{
 			storeInsuranceInfo($page, $command, $invoiceId, $invoice, $mainTransData);
 		}
-		
+
 		if($invoice->{invoice_subtype} == App::Universal::CLAIMTYPE_HMO)
 		{
 			hmoCapWriteoff($page, $command, $invoiceId, $invoice, $mainTransData);
 		}
-		
+
 		createActiveProbTrans($page, $command, $invoiceId, $invoice, $mainTransData);		
 	}
 
@@ -262,7 +265,7 @@ sub execAction_submit
 			parent_id => $invoiceId,
 			item_name => 'Invoice/History/Item',
 			value_type => App::Universal::ATTRTYPE_HISTORY,
-			value_text => 'Reviewed',
+			value_text => 'Submitted',
 			value_date => $todaysDate || undef,
 			_debug => 0
 	);
@@ -355,6 +358,7 @@ sub storeFacilityInfo
 			value_text => $billingFacilityInfo->{name_primary} || undef,
 			value_textB => $billingFacilityInfo->{org_id} || undef,
 			value_int => $billFacilityId || undef,
+			value_intB => 1,
 			_debug => 0
 		);
 
@@ -383,6 +387,7 @@ sub storeFacilityInfo
 			value_text => $serviceFacilityInfo->{name_primary} || undef,
 			value_textB => $serviceFacilityInfo->{org_id} || undef,
 			value_int => $servFacilityId || undef,
+			value_intB => 1,
 			_debug => 0
 		);
 
@@ -397,6 +402,22 @@ sub storeFacilityInfo
 			zip => $serviceFacilityAddr->{zip} || undef,
 			_debug => 0
 		);
+
+	#store pay to org address
+	my $payToOrg = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoiceAttr', $invoiceId, 'Pay To Org/Name');
+	my $payToFacilityAddr = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selOrgAddressByAddrName', $payToOrg->{value_int}, 'Mailing');
+
+	$page->schemaAction(
+			'Invoice_Address', $command,
+			parent_id => $invoiceId,
+			address_name => 'Pay To Org',
+			line1 => $payToFacilityAddr->{line1},
+			line2 => $payToFacilityAddr->{line2} || undef,
+			city => $payToFacilityAddr->{city},
+			state => $payToFacilityAddr->{state},
+			zip => $payToFacilityAddr->{zip},
+			_debug => 0
+	);
 }
 
 sub storeAuthorizations
@@ -421,6 +442,7 @@ sub storeAuthorizations
 			value_text => $patSignature->{value_text} || undef,
 			value_textB => $patSignature->{value_textb} || undef,
 			value_date => $patSignature->{value_date} || undef,
+			value_intB => 1,
 			_debug => 0
 		);
 
@@ -431,6 +453,7 @@ sub storeAuthorizations
 			value_type => defined $textValueType ? $textValueType : undef,
 			value_text => $provAssign->{value_text} || undef,
 			value_textB => $provAssign->{value_textb} || undef,
+			value_intB => 1,
 			_debug => 0
 		);
 
@@ -442,6 +465,7 @@ sub storeAuthorizations
 			value_type => defined $boolValueType ? $boolValueType : undef,
 			value_int => defined $infoRelIndctr ? $infoRelIndctr : undef,
 			value_date => $infoRelease->{value_date} || undef,
+			value_intB => 1,
 			_debug => 0
 		);
 
@@ -451,6 +475,7 @@ sub storeAuthorizations
 			item_name => 'Provider/Signature/Date',
 			value_type => defined $dateValueType ? $dateValueType : undef,
 			value_date => $todaysDate || undef,
+			value_intB => 1,
 			_debug => 0
 		);
 }
@@ -487,6 +512,7 @@ sub storePatientInfo
 			value_type => defined $textValueType ? $textValueType : undef,
 			value_text => $personData->{complete_name} || undef,
 			value_textB => $clientId || undef,
+			value_intB => 1,
 			_debug => 0
 		);
 
@@ -497,6 +523,7 @@ sub storePatientInfo
 			value_type => defined $textValueType ? $textValueType : undef,
 			value_text => $personData->{name_last} || undef,
 			value_textB => $clientId || undef,
+			value_intB => 1,
 			_debug => 0
 		);
 
@@ -507,6 +534,7 @@ sub storePatientInfo
 			value_type => defined $textValueType ? $textValueType : undef,
 			value_text => $personData->{name_first} || undef,
 			value_textB => $clientId || undef,
+			value_intB => 1,
 			_debug => 0
 		);
 
@@ -517,6 +545,7 @@ sub storePatientInfo
 			value_type => defined $textValueType ? $textValueType : undef,
 			value_text => $personData->{name_middle} || undef,
 			value_textB => $clientId || undef,
+			value_intB => 1,
 			_debug => 0
 		) if $personData->{name_middle} ne '';
 
@@ -526,6 +555,7 @@ sub storePatientInfo
 			item_name => 'Patient/Account Number',
 			value_type => defined $textValueType ? $textValueType : undef,
 			value_text => $personData->{person_ref} || undef,
+			value_intB => 1,
 			_debug => 0
 		);
 
@@ -535,6 +565,7 @@ sub storePatientInfo
 			item_name => 'Patient/Contact/Home Phone',
 			value_type => defined $phoneValueType ? $phoneValueType : undef,
 			value_text => $personPhone || undef,
+			value_intB => 1,
 			_debug => 0
 		);
 
@@ -544,6 +575,7 @@ sub storePatientInfo
 			item_name => 'Patient/Personal/Marital Status',
 			value_type => defined $textValueType ? $textValueType : undef,
 			value_text => $personData->{marstat_caption} || undef,
+			value_intB => 1,
 			_debug => 0
 		);
 
@@ -553,6 +585,7 @@ sub storePatientInfo
 			item_name => 'Patient/Personal/Gender',
 			value_type => defined $textValueType ? $textValueType : undef,
 			value_text => $personData->{gender_caption} || undef,
+			value_intB => 1,
 			_debug => 0
 		);
 
@@ -562,6 +595,7 @@ sub storePatientInfo
 			item_name => 'Patient/Personal/DOB',
 			value_type => defined $dateValueType ? $dateValueType : undef,
 			value_date => $personData->{date_of_birth} || undef,
+			value_intB => 1,
 			_debug => 0
 		);
 }
@@ -599,6 +633,7 @@ sub storePatientEmployment
 					item_name => 'Patient/Employment/Status',
 					value_type => defined $valueType ? $valueType : undef,
 					value_text => $status || undef,
+					value_intB => 1,
 					_debug => 0
 				);
 		}
@@ -610,6 +645,7 @@ sub storePatientEmployment
 					item_name => 'Patient/Student/Status',
 					value_type => defined $valueType ? $valueType : undef,
 					value_text => $status || undef,
+					value_intB => 1,
 					_debug => 0
 				);
 		}
@@ -640,6 +676,7 @@ sub storeProviderInfo
 			value_type => defined $textValueType ? $textValueType : undef,
 			value_text => $providerInfo->{complete_name} || undef,
 			value_textB => $providerId || undef,
+			value_intB => 1,
 			_debug => 0
 		);
 
@@ -650,6 +687,7 @@ sub storeProviderInfo
 			value_type => defined $textValueType ? $textValueType : undef,
 			value_text => $providerInfo->{name_first} || undef,
 			value_textB => $providerId || undef,
+			value_intB => 1,
 			_debug => 0
 		);
 
@@ -660,6 +698,7 @@ sub storeProviderInfo
 			value_type => defined $textValueType ? $textValueType : undef,
 			value_text => $providerInfo->{name_middle} || undef,
 			value_textB => $providerId || undef,
+			value_intB => 1,
 			_debug => 0
 		) if $providerInfo->{name_middle} ne '';
 
@@ -670,6 +709,7 @@ sub storeProviderInfo
 			value_type => defined $textValueType ? $textValueType : undef,
 			value_text => $providerInfo->{name_last} || undef,
 			value_textB => $providerId || undef,
+			value_intB => 1,
 			_debug => 0
 		);
 
@@ -679,6 +719,7 @@ sub storeProviderInfo
 			item_name => 'Provider/UPIN',
 			value_type => defined $licenseValueType ? $licenseValueType : undef,
 			value_text => $providerUpin->{value_text} || undef,
+			value_intB => 1,
 			_debug => 0
 		);
 
@@ -688,6 +729,7 @@ sub storeProviderInfo
 			item_name => 'Provider/BCBS',
 			value_type => defined $licenseValueType ? $licenseValueType : undef,
 			value_text => $providerBcbs->{value_text} || undef,
+			value_intB => 1,
 			_debug => 0
 		);
 
@@ -697,6 +739,7 @@ sub storeProviderInfo
 			item_name => 'Provider/Medicare',
 			value_type => defined $licenseValueType ? $licenseValueType : undef,
 			value_text => $providerMedicare->{value_text} || undef,
+			value_intB => 1,
 			_debug => 0
 		);
 
@@ -706,6 +749,7 @@ sub storeProviderInfo
 			item_name => 'Provider/Medicaid',
 			value_type => defined $licenseValueType ? $licenseValueType : undef,
 			value_text => $providerMedicaid->{value_text} || undef,
+			value_intB => 1,
 			_debug => 0
 		);
 
@@ -715,6 +759,7 @@ sub storeProviderInfo
 			item_name => 'Provider/Champus',
 			value_type => defined $licenseValueType ? $licenseValueType : undef,
 			value_text => $providerChampus->{value_text} || undef,
+			value_intB => 1,
 			_debug => 0
 		);
 
@@ -725,6 +770,7 @@ sub storeProviderInfo
 			value_type => defined $licenseValueType ? $licenseValueType : undef,
 			value_text => $providerTaxId->{value_text} || undef,
 			value_textB => $providerTaxId->{value_textb} || undef,
+			value_intB => 1,
 			_debug => 0
 		);
 
@@ -735,6 +781,7 @@ sub storeProviderInfo
 			value_type => defined $textValueType ? $textValueType : undef,
 			value_text => $providerSpecialty->{value_text} || undef,
 			value_textB => $providerSpecialty->{value_textb} || undef,
+			value_intB => 1,
 			_debug => 0
 		);
 }
@@ -790,6 +837,7 @@ sub storeInsuranceInfo
 					value_text => $thirdPartyInfo->{name_primary} || undef,
 					value_textB => $thirdPartyInfo->{org_id} || undef,
 					value_int => $thirdPartyId || undef,
+					value_intB => 1,
 					_debug => 0
 				);
 		
@@ -799,6 +847,7 @@ sub storeInsuranceInfo
 					item_name => 'Third-Party/Org/Phone',
 					value_type => defined $phoneValueType ? $phoneValueType : undef,
 					value_text => $thirdPartyPhone->{phone} || undef,
+					value_intB => 1,
 					_debug => 0
 				);
 
@@ -831,6 +880,7 @@ sub storeInsuranceInfo
 					value_type => defined $textValueType ? $textValueType : undef,
 					value_text => $thirdPartyName || undef,
 					value_textB => $thirdPartyId || undef,
+					value_intB => 1,
 					_debug => 0
 				);
 		
@@ -840,6 +890,7 @@ sub storeInsuranceInfo
 					item_name => 'Third-Party/Person/Phone',
 					value_type => defined $phoneValueType ? $phoneValueType : undef,
 					value_text => $thirdPartyPhone->{phone} || undef,
+					value_intB => 1,
 					_debug => 0
 				);
 
@@ -873,6 +924,7 @@ sub storeInsuranceInfo
 					value_text => $insOrgInfo->{name_primary} || undef,
 					value_textB => $insOrgInfo->{org_id} || undef,
 					value_int => $insOrgId || undef,
+					value_intB => 1,
 					_debug => 0
 				);
 
@@ -883,6 +935,7 @@ sub storeInsuranceInfo
 					value_type => defined $durationValueType ? $durationValueType : undef,
 					value_date => $personInsur->{coverage_begin_date} || undef,
 					value_dateEnd => $personInsur->{coverage_end_date} || undef,
+					value_intB => 1,
 					_debug => 0
 				);
 
@@ -893,6 +946,7 @@ sub storeInsuranceInfo
 					value_type => defined $textValueType ? $textValueType : undef,
 					value_text => $personInsur->{claim_type} || undef,
 					value_textB => $personInsur->{extra} || undef,
+					value_intB => 1,
 					_debug => 0
 				);
 
@@ -903,6 +957,7 @@ sub storeInsuranceInfo
 					value_type => defined $textValueType ? $textValueType : undef,
 					value_text => $personInsur->{plan_name} || $personInsur->{product_name} || $personInsur->{group_name} || undef,
 					value_textB => $personInsur->{group_number} || $personInsur->{policy_number} || undef,
+					value_intB => 1,
 					_debug => 0
 				);
 
@@ -915,6 +970,7 @@ sub storeInsuranceInfo
 					item_name => "Insurance/$payerBillSeq/HMO-PPO ID",
 					value_type => defined $textValueType ? $textValueType : undef,
 					value_text => $ppoHmo->{value_text} || undef,
+					value_intB => 1,
 					_debug => 0
 				);
 
@@ -924,6 +980,7 @@ sub storeInsuranceInfo
 					item_name => "Insurance/$payerBillSeq/BCBS Plan Code",
 					value_type => defined $textValueType ? $textValueType : undef,
 					value_text => $bcbsCode->{value_text} || undef,
+					value_intB => 1,
 					_debug => 0
 				);
 
@@ -935,6 +992,7 @@ sub storeInsuranceInfo
 					item_name => "Insurance/$payerBillSeq/E-Remitter ID",
 					value_type => defined $textValueType ? $textValueType : undef,
 					value_text => $personInsur->{remit_payer_id} || undef,
+					value_intB => 1,
 					_debug => 0
 				);
 
@@ -967,6 +1025,7 @@ sub storeInsuranceInfo
 					item_name => "Insurance/$payerBillSeq/Payment Source",
 					value_type => defined $textValueType ? $textValueType : undef,
 					value_text => $paySource || undef,
+					value_intB => 1,
 					_debug => 0
 				);
 
@@ -981,6 +1040,7 @@ sub storeInsuranceInfo
 					item_name => "Insurance/$payerBillSeq/Champus Branch",
 					value_type => defined $textValueType ? $textValueType : undef,
 					value_text => $champusBranch->{value_text} || undef,
+					value_intB => 1,
 					_debug => 0
 				);
 
@@ -990,6 +1050,7 @@ sub storeInsuranceInfo
 					item_name => "Insurance/$payerBillSeq/Champus Status",
 					value_type => defined $textValueType ? $textValueType : undef,
 					value_text => $champusStatus->{value_text} || undef,
+					value_intB => 1,
 					_debug => 0
 				);
 
@@ -999,6 +1060,7 @@ sub storeInsuranceInfo
 					item_name => "Insurance/$payerBillSeq/Champus Grade",
 					value_type => defined $textValueType ? $textValueType : undef,
 					value_text => $champusGrade->{value_text} || undef,
+					value_intB => 1,
 					_debug => 0
 				);
 
@@ -1012,6 +1074,7 @@ sub storeInsuranceInfo
 					item_name => "Insurance/$payerBillSeq/Phone",
 					value_type => defined $phoneValueType ? $phoneValueType : undef,
 					value_text => $insOrgPhone->{phone} || undef,
+					value_intB => 1,
 					_debug => 0
 				);
 
@@ -1043,6 +1106,7 @@ sub storeInsuranceInfo
 					value_type => defined $textValueType ? $textValueType : undef,
 					value_text => $relToCaption || undef,
 					value_int => $relToCode || undef,
+					value_intB => 1,
 					_debug => 0
 				);
 
@@ -1056,6 +1120,7 @@ sub storeInsuranceInfo
 					value_type => defined $textValueType ? $textValueType : undef,
 					value_text => $insuredData->{complete_name} || undef,
 					value_textB => $insuredId || undef,
+					value_intB => 1,
 					_debug => 0
 				);
 
@@ -1066,6 +1131,7 @@ sub storeInsuranceInfo
 					value_type => defined $textValueType ? $textValueType : undef,
 					value_text => $insuredData->{name_last} || undef,
 					value_textB => $insuredId || undef,
+					value_intB => 1,
 					_debug => 0
 				);
 
@@ -1076,6 +1142,7 @@ sub storeInsuranceInfo
 					value_type => defined $textValueType ? $textValueType : undef,
 					value_text => $insuredData->{name_first} || undef,
 					value_textB => $insuredId || undef,
+					value_intB => 1,
 					_debug => 0
 				);
 
@@ -1086,6 +1153,7 @@ sub storeInsuranceInfo
 					value_type => defined $textValueType ? $textValueType : undef,
 					value_text => $insuredData->{name_middle} || undef,
 					value_textB => $insuredId || undef,
+					value_intB => 1,
 					_debug => 0
 				) if $insuredData->{name_middle} ne '';
 
@@ -1095,6 +1163,7 @@ sub storeInsuranceInfo
 					item_name => "Insurance/$payerBillSeq/Insured/Personal/Marital Status",
 					value_type => defined $textValueType ? $textValueType : undef,
 					value_text => $insuredData->{marstat_caption} || undef,
+					value_intB => 1,
 					_debug => 0
 				);
 
@@ -1104,6 +1173,7 @@ sub storeInsuranceInfo
 					item_name => "Insurance/$payerBillSeq/Insured/Personal/Gender",
 					value_type => defined $textValueType ? $textValueType : undef,
 					value_text => $insuredData->{gender_caption} || undef,
+					value_intB => 1,
 					_debug => 0
 				);
 
@@ -1113,6 +1183,7 @@ sub storeInsuranceInfo
 					item_name => "Insurance/$payerBillSeq/Insured/Personal/DOB",
 					value_type => defined $dateValueType ? $dateValueType : undef,
 					value_date => $insuredData->{date_of_birth} || undef,
+					value_intB => 1,
 					_debug => 0
 				);
 
@@ -1122,6 +1193,7 @@ sub storeInsuranceInfo
 					item_name => "Insurance/$payerBillSeq/Insured/Personal/SSN",
 					value_type => defined $textValueType ? $textValueType : undef,
 					value_text => $insuredData->{ssn} || undef,
+					value_intB => 1,
 					_debug => 0
 				);
 
@@ -1131,6 +1203,7 @@ sub storeInsuranceInfo
 					item_name => "Insurance/$payerBillSeq/Insured/Member Number",
 					value_type => defined $textValueType ? $textValueType : undef,
 					value_text => $personInsur->{member_number} || undef,
+					value_intB => 1,
 					_debug => 0
 				);
 
@@ -1144,6 +1217,7 @@ sub storeInsuranceInfo
 					item_name => "Insurance/$payerBillSeq/Insured/Contact/Home Phone",
 					value_type => defined $phoneValueType ? $phoneValueType : undef,
 					value_text => $insuredPhone || undef,
+					value_intB => 1,
 					_debug => 0
 				);
 
@@ -1182,6 +1256,7 @@ sub storeInsuranceInfo
 						value_type => defined $valueType ? $valueType : undef,
 						value_text => $employerName || undef,
 						value_textB => $empStatus || undef,
+						value_intB => 1,
 						_debug => 0
 					);
 			}
@@ -1197,6 +1272,7 @@ sub storeInsuranceInfo
 			#			value_type => defined $textValueType ? $textValueType : undef,
 			#			value_text => (code)
 			#			value_textB => (reference)
+			#			value_intB => 1,
 			#			_debug => 0
 			#		);
 			#}
