@@ -1,8 +1,8 @@
 /* This script creates web database user. it should be called as
-   sqlplus /NOLOG @create_prod_owner user_name password
+   sqlplus /NOLOG @create_prod_owner user_name password alias
 */
 
-connect system/phtem@sdedbs02
+connect system/phtem@&&3
 
 drop user &&1 cascade;
 
