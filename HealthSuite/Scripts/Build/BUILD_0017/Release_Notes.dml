@@ -69,7 +69,8 @@
 		</deliverable>
 
 		<deliverable id="1544">
-			Allow lookup of physicians/provider and referring physicians/providers.
+			Allow lookup of physicians/provider and referring physicians/providers on the Insurance
+			Verification Dialog.
 		</deliverable>
 
 		<deliverable id="1548">
