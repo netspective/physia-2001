@@ -101,6 +101,13 @@ $STMTMGR_INSURANCE = new App::Statements::Insurance(
 		where owner_person_id = ?
 		order by coverage_end_date desc, bill_sequence
 		},
+	'selInsuranceByPlanNameAndPersonAndInsType' => qq{
+		select *
+		from insurance
+		where plan_name = ?
+			and owner_person_id = ?
+			and ins_type = ?
+		},
 	'selInsuranceByInsType' => qq{
 		select *
 		from insurance
