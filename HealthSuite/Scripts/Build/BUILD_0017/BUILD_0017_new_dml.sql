@@ -67,8 +67,7 @@ insert into person_medication
 	QUANTITY,
 	NUM_REFILLS,
 	ALLOW_GENERIC,
-	NOTES,
-
+	NOTES
 )
 select cr_session_id,
        cr_stamp,
