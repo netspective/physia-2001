@@ -260,6 +260,7 @@
 	<table name="Payment_Method" abbrev="PayMeth" type="Enumeration">
 		<enum>Cash</enum>
 		<enum>Check</enum>
+		<enum>Money Order</enum>
 		<enum>Debit Card</enum>
 		<enum>Refund</enum>
 		<enum>Discount</enum>
