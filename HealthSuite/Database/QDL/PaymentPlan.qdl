@@ -1,0 +1,58 @@
+<?xml version="1.0"?>
+
+<!-- QDL Query Definition Language -->
+
+<component>
+	<query-defn id="payment_plan" caption="Payment Plan" db="Oracle">
+
+		<!-- Fields -->
+		<field id="plan_id" join="payment_plan" column="plan_id"/>
+		<field id="owner_org_id" join="payment_plan" column="owner_org_id"/>
+
+		<field id="patient_name" caption="Patient Name" join="person" column="simple_name"/>
+		<field id="patient_lastname" caption="Patient Last Name" join="person" column="name_last"/>
+		<field id="patient_firstname" caption="Patient First Name" join="person" column="name_first"/>
+		
+		<field id="org_id" caption="Billing Org" join="org" column="org_id"/>
+		
+		<field id="payment_min" caption="Min Payment" join="payment_plan" column="payment_min" ui-datatype="currency"/>
+		<field id="payment_cycle" caption="Payment Cycle" join="payment_plan" column="payment_cycle"/>
+
+		<field id="first_due" caption="First Due Date" join="payment_plan" column="first_due" columndefn="TO_CHAR(payment_plan.first_due,'IYYYMMDD')" ui-datatype="date"/>
+		<field id="next_due" caption="Next Due Date" join="payment_plan" column="next_due" columndefn="TO_CHAR(payment_plan.next_due,'IYYYMMDD')" ui-datatype="date"/>
+		
+		<field id="lastpay_date" caption="Last Pay Date" join="payment_plan" column="lastpay_date" columndefn="TO_CHAR(payment_plan.lastpay_date,'IYYYMMDD')" ui-datatype="date"/>
+		<field id="lastpay_amount" caption="Last Pay Amount" join="payment_plan" column="lastpay_amount" ui-datatype="currency"/>
+		<field id="laststmt_date" caption="Last Statement Date" join="payment_plan" column="lastpay_date" columndefn="TO_CHAR(payment_plan.laststmt_date,'IYYYMMDD')" ui-datatype="date"/>
+		<field id="balance" caption="Balance" join="payment_plan" column="balance" ui-datatype="currency"/>
+		<field id="inv_ids" caption="Claim IDs" join="payment_plan" column="inv_ids"/>
+		
+		
+		<!-- Joins -->
+		<join id="payment_plan" table="payment_plan" autoinclude="1"/>
+		<join id="person" table="person" condition="person.person_id = payment_plan.person_id"/>
+		<join id="org" table="org" condition="org.org_internal_id = payment_plan.billing_org_id"/>
+		
+		<!-- Views -->
+		<view id="all" distinct="yes">
+			<column id="plan_id"/>
+			<column id="patient_name"/>
+			<column id="payment_min"/>
+			<column id="payment_cycle"/>
+			<column id="first_due"/>
+			<column id="next_due"/>
+			
+			<column id="lastpay_date"/>
+			<column id="lastpay_amount"/>
+			<column id="laststmt_date"/>
+			<column id="balance"/>
+			<column id="inv_ids"/>
+			
+			<condition field="owner_org_id" comparison="is" criteria="#session.org_internal_id#"/>
+		</view>
+
+
+	</query-defn>
+</component>
+
+
