@@ -16,6 +16,7 @@ use App::Statements::Org;
 use App::Statements::Person;
 use App::Universal;
 use Date::Manip;
+use constant MAXID => 25;
 use vars qw(@ISA %RESOURCE_MAP);
 
 @ISA = qw(App::Dialog::Person);
@@ -43,52 +44,49 @@ sub initialize
 	$self->addContent(
 		new CGI::Dialog::Field(type => 'hidden', name => 'phy_type_item_id'),
 
-		new CGI::Dialog::Subhead(heading => 'ID Numbers', name => 'id_numbers', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE),
-			new CGI::Dialog::MultiField(caption =>'Memorial Sisters Of Charity/Exp Date', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
-				fields => [
-					new CGI::Dialog::Field(caption => 'Memorial Sisters Of Charity', name => 'charity_id'),
-					new CGI::Dialog::Field(type=> 'date', caption => 'Date of Expiration', name => 'mem_exp_date', defaultValue => '')
-					]),
-			new CGI::Dialog::MultiField(caption =>'EPSDT #/Exp Date', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
-				fields => [
-					new CGI::Dialog::Field(caption => 'EPSDT Number', name => 'provider_num'),
-					new CGI::Dialog::Field(type=> 'date', caption => 'Date of Expiration', name => 'esptd_exp_date', defaultValue => '')
-					]),
-			new CGI::Dialog::MultiField(caption =>'UPIN/Exp Date', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
-				fields => [
-					new CGI::Dialog::Field(  caption => 'UPIN', name => 'upin'),
-					new CGI::Dialog::Field(type=> 'date', caption => 'Date of Expiration', name => 'upin_exp_date', defaultValue => ''),
-					]),
-			new CGI::Dialog::MultiField(caption =>'Medicare/Exp Date', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
-				fields => [
-					new CGI::Dialog::Field( caption => 'Medicare', name => 'medicare'),
-					new CGI::Dialog::Field(type=> 'date', caption => 'Date of Expiration', name => 'medicare_exp_date', futureOnly => 1, defaultValue => ''),
-					]),
-			new CGI::Dialog::MultiField(caption =>'Medicaid/Exp Date', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
-				fields => [
-					new CGI::Dialog::Field( caption => 'Medicaid', name => 'medicaid'),
-					new CGI::Dialog::Field(type=> 'date', caption => 'Date of Expiration', name => 'medicaid_exp_date', futureOnly => 1, defaultValue => ''),
-					]),
-			new CGI::Dialog::MultiField(caption =>'BCBS #/Exp Date', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
-				fields => [
-					new CGI::Dialog::Field(caption => 'bcbs#', name => 'bcbs_num'),
-					new CGI::Dialog::Field(type=> 'date', caption => 'Date of Expiration', name => 'bcbs_exp_date', futureOnly => 1, defaultValue => ''),
-					]),
-			new CGI::Dialog::MultiField(caption =>'Railroad Medicare/Exp Date', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
-				fields => [
-					new CGI::Dialog::Field(caption => 'railroad_medic', name => 'rail_medic'),
-					new CGI::Dialog::Field(type=> 'date', caption => 'Date of Expiration', name => 'rail_exp_date', futureOnly => 1, defaultValue => ''),
-					]),
-			new CGI::Dialog::MultiField(caption =>'Champus/Exp Date', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
-				fields => [
-					new CGI::Dialog::Field(caption => 'champus', name => 'champus'),
-					new CGI::Dialog::Field(type=> 'date', caption => 'Date of Expiration', name => 'champus_exp_date', futureOnly => 1, defaultValue => ''),
-					]),
-			new CGI::Dialog::MultiField(caption =>'WC #/Exp Date', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
-				fields => [
-					new CGI::Dialog::Field(caption => 'wc#', name => 'wc_num'),
-					new CGI::Dialog::Field(type=> 'date', caption => 'Date of Expiration', name => 'wc_exp_date', futureOnly => 1, defaultValue => ''),
-				]),
+		new CGI::Dialog::Subhead(heading => 'ID Numbers', name => 'id_numbers_section', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE),
+		new CGI::Dialog::DataGrid(
+			caption =>'',
+			name => 'id_numbers',
+			invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
+			rows => MAXID,
+			rowFields => [
+				{
+					_class => 'CGI::Dialog::Field',
+					type => 'select',
+					selOptions => 'DEA;DPS;Medicaid;Medicare;UPIN;Tax ID;IRS;Board Certification;BCBS;Railroad Medicare;Champus;WC#;National Provider Identification;Nursing/License;Memorial Sisters Charity;EPSDT',
+					caption => 'License',
+					name => 'id_name',
+					options => FLDFLAG_PREPENDBLANK,
+					readOnlyWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
+					onChangeJS => qq{showHideRows('id_numbers', 'id_name', @{[ MAXID ]});},
+				},
+				{
+					_class => 'CGI::Dialog::Field',
+					caption => 'Number',
+					name => 'id_num',
+				},
+				{
+					_class => 'CGI::Dialog::Field',
+					type=> 'date',
+					caption => 'Exp Date',
+					name => 'id_exp_date',
+					defaultValue => '',
+				},
+				{
+					_class => 'CGI::Dialog::Field',
+					caption => 'Facility ID',
+					name => 'id_facility',
+					fKeyStmtMgr => $STMTMGR_ORG,
+					fKeyStmt => 'selChildFacilityOrgs',
+					fKeyDisplayCol => 0,
+					fKeyValueCol => 0,
+					type => 'select',
+					fKeyStmtBindSession => ['org_internal_id'],
+					options => FLDFLAG_PREPENDBLANK,
+					invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
+				},
+			]),
 
  		new CGI::Dialog::Subhead(heading => 'Certification/Accreditations', name => 'cert_for_physician', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE),
 
@@ -104,7 +102,6 @@ sub initialize
 						options => FLDFLAG_PREPENDBLANK,
 						invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE),
 					new CGI::Dialog::Field(caption => 'Specialty Sequence', name => 'value_int1', type => 'select', selOptions => 'Unknown:5;Primary:1;Secondary:2;Tertiary:3;Quaternary:4', value => '5', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE)
-
 				]),
 
 		new CGI::Dialog::MultiField(caption => '2. Specialty/Sequence', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE, name => 'specialty2',
@@ -137,14 +134,6 @@ sub initialize
 
 		new CGI::Dialog::MultiField(caption => 'Affiliation/Exp Date', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
 			fields => [
-				#new CGI::Dialog::Field(
-				#	type => 'select',
-				#	selOptions => 'Fellow of the Royal College of Physicians;Member of the American Heart Association;
-				#	Member of the Canadian Medical Association;Member of American Society for Bone and Mineral Research;
-				#	Member of Quebec Society of Endocrinologists',
-				#	caption => 'Affiliation',
-				#	name => 'affiliation',
-				#	onValidateData => $self),
 				new CGI::Dialog::Field(caption => 'Affiliation', name => 'affiliation'),
 				new CGI::Dialog::Field(type => 'date', caption => 'Date', name => 'value_dateend', futureOnly => 0, defaultValue => ''),
 			]),
@@ -212,6 +201,16 @@ sub initialize
 						readOnlyWhen => CGI::Dialog::DLGFLAG_REMOVE),
 	);
 
+	$self->addPostHtml(qq{
+		<script language="JavaScript1.2">
+		<!--
+
+		showHideRows('id_numbers', 'id_name', @{[ MAXID ]});
+
+		// -->
+		</script>
+	});
+
 	$self->addFooter(new CGI::Dialog::Buttons(
 						nextActions_add => [
 							['View Physician Summary', "/person/%field.person_id%/profile", 1],
@@ -237,6 +236,8 @@ sub makeStateChanges
 	$self->updateFieldFlags('party_name', FLDFLAG_INVISIBLE, 1);
 	$self->updateFieldFlags('relation', FLDFLAG_INVISIBLE, 1);
 	$self->updateFieldFlags('license_num_state', FLDFLAG_INVISIBLE, 1);
+	$self->updateFieldFlags('license_num_state', FLDFLAG_INVISIBLE, 1);
+
 	#if ($command eq 'update' || $command eq 'remove')
 	#$self->updateFieldFlags('physician_type', FLDFLAG_INVISIBLE, 1) if $command eq 'update' || $command eq 'remove'  ;
 	my $personId = $page->param('person_id');
@@ -365,106 +366,36 @@ sub execute_add
 			_debug => 0
 	) if $accreditation ne '';
 
-	$page->schemaAction(
-			'Person_Attribute', $command,
-			parent_id => $personId || undef,
-			item_name => 'UPIN',
-			value_type => App::Universal::ATTRTYPE_LICENSE,
-			value_text => $page->field('upin') || undef,
-			value_textB => 'UPIN' || undef,
-			value_dateEnd => $page->field('upin_exp_date') || undef,
-			_debug => 0
-	) if $page->field('upin') ne '';
+	my $y = '';
 
-	$page->schemaAction(
-			'Person_Attribute', $command,
-			parent_id => $personId || undef,
-			item_name => 'Medicaid',
-			value_type => App::Universal::ATTRTYPE_LICENSE,
-			value_text => $page->field('medicaid') || undef,
-			value_textB => 'Medicaid' || undef,
-			value_dateEnd => $page->field('medicaid_exp_date') || undef,
-			_debug => 0
-	) if $page->field('medicaid') ne '';
+	for (my $x = 1; $y !=1; $x++)
 
-	$page->schemaAction(
-			'Person_Attribute', $command,
-			parent_id => $personId || undef,
-			item_name => 'Medicare',
-			value_type => App::Universal::ATTRTYPE_LICENSE,
-			value_text => $page->field('medicare') || undef,
-			value_textB => 'Medicare' || undef,
-			value_dateEnd => $page->field('medicare_exp_date') || undef,
-			_debug => 0
-	) if $page->field('medicare') ne '';
+	{
+		my $idName = "id_name_$x";
+		my $idNum = "id_num_$x";
+		my $idDate = "id_exp_date_$x";
+		my $idFacility = "id_facility_$x";
+		my $facility = $page->field("$idFacility") ne '' ? $page->field("$idFacility") : $page->session('org_id');
 
+		if ($idName ne '')
+		{
 
-	$page->schemaAction(
-			'Person_Attribute', $command,
-			parent_id => $personId || undef,
-			item_name => 'Tax ID',
-			value_type => App::Universal::ATTRTYPE_LICENSE,
-			value_text => $page->field('tax_id') || undef,
-			value_textB => 'Tax ID' || undef,
-			value_dateEnd => $page->field('taxid_exp_date') || undef,
-			_debug => 0
-	) if $page->field('tax_id') ne '';
+			$page->schemaAction(
+					'Person_Attribute', $command,
+					parent_id => $personId || undef,
+					item_name => $page->field("$idName") || undef,
+					value_type => App::Universal::ATTRTYPE_LICENSE,
+					value_text => $page->field("$idNum") || undef,
+					value_textB => $page->field("$idName") || undef,
+					name_sort  => $facility,
+					value_dateEnd => $page->field("$idDate") || undef,
+					_debug => 0
+			)if $page->field("$idName") ne '';
 
-	$page->schemaAction(
-			'Person_Attribute', $command,
-			parent_id => $personId || undef,
-			item_name => 'IRS',
-			value_type => App::Universal::ATTRTYPE_LICENSE,
-			value_text => $page->field('irs') || undef,
-			value_textB => 'IRS' || undef,
-			value_dateEnd => $page->field('irs_exp_date') || undef,
-			_debug => 0
-	) if $page->field('irs') ne '';
+		}
 
-	$page->schemaAction(
-			'Person_Attribute', $command,
-			parent_id => $personId || undef,
-			item_name => 'DEA',
-			value_type => App::Universal::ATTRTYPE_LICENSE,
-			value_text => $page->field('dea') || undef,
-			value_textB => 'DEA' || undef,
-			value_dateEnd => $page->field('dea_exp_date') || undef,
-			_debug => 0
-	) if $page->field('dea') ne '';
-
-	$page->schemaAction(
-			'Person_Attribute', $command,
-			parent_id => $personId || undef,
-			item_name => 'DPS',
-			value_type => App::Universal::ATTRTYPE_LICENSE,
-			value_text => $page->field('dps') || undef,
-			value_textB => 'DPS' || undef,
-			value_dateEnd => $page->field('dps_exp_date') || undef,
-			_debug => 0
-	) if $page->field('dps') ne '';
-
-	$page->schemaAction(
-			'Person_Attribute', $command,
-			parent_id => $personId || undef,
-			item_name => 'Memorial Sisters Charity',
-			value_type => App::Universal::ATTRTYPE_LICENSE,
-			value_text => $page->field('charity_id') || undef,
-			value_textB => 'Memorial Sisters Charity' || undef,
-			value_dateEnd => $page->field('mem_exp_date') || undef,
-			_debug => 0
-		) if $page->field('charity_id');
-
-	$page->schemaAction(
-			'Person_Attribute', $command,
-			parent_id => $personId || undef,
-			item_name => 'EPSDT',
-			value_type => App::Universal::ATTRTYPE_LICENSE,
-			value_text => $page->field('provider_num') || undef,
-			value_textB => 'EPSDT' || undef,
-			value_dateEnd => $page->field('esptd_exp_date') || undef,
-			_debug => 0
-		) if $page->field('provider_num');
-
+		$y = $page->field("$idName") ne '' ? '' : 1;
+	};
 
 
 	#State Licenses
@@ -563,6 +494,7 @@ sub execute_add
 
 	$self->handleContactInfo($page, $command, $flags, 'Physician');
 	$page->endUnitWork();
+
 }
 
 sub execute_update
