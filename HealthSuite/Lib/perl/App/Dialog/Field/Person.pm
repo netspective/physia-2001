@@ -168,7 +168,7 @@ use Schema::Utilities;
 use vars qw(@ISA @PERSON_TYPES);
 @ISA = qw(CGI::Dialog::Field);
 
-@PERSON_TYPES = ('Superuser', 'Administrator', 'Physician', 'Referring-Doctor', 'Nurse', 'Staff', 'Guarantor', 'Patient');
+@PERSON_TYPES = ('Superuser', 'Administrator', 'Physician', 'Referring-Doctor', 'Nurse', 'Staff', 'Guarantor', 'Patient', 'Insured-Person');
 
 use enum qw(:IDENTRYSTYLE_ TEXT SELECT);
 
@@ -294,7 +294,9 @@ sub isValid
 				foreach $types (@$types)
 				{
 					my $createPersonHref;
-					$createPersonHref = "javascript:doActionPopup('/org-p/#session.org_id#/dlg-add-" . lc($types) . "/$id');";
+
+					$createPersonHref = $types eq 'Insured-Person' ? "javascript:doActionPopup('/org-p/#session.org_id#/dlg-add-" . 'insured-Person' . "/$id');"
+															:"javascript:doActionPopup('/org-p/#session.org_id#/dlg-add-" . lc($types) . "/$id');" ;
 					$doesntExistMsg .= qq{<a href="$createPersonHref">$types</a>, };
 				}
 				$doesntExistMsg =~ s/, $//;
@@ -348,7 +350,7 @@ use Schema::Utilities;
 use vars qw(@ISA @PERSON_TYPES);
 @ISA = qw(CGI::Dialog::Field);
 
-@PERSON_TYPES = ('Physician', 'Nurse', 'Staff', 'Guarantor', 'Patient');
+@PERSON_TYPES = ('Physician', 'Nurse', 'Staff', 'Guarantor', 'Patient', 'Insured-Person');
 
 use enum qw(:IDENTRYSTYLE_ TEXT SELECT);
 
