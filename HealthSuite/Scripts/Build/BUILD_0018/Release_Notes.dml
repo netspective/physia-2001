@@ -268,6 +268,7 @@
 
 		<deliverable id="1842">
 			Print pt bill from pt flow worklist now showing correct info for Next Appt.
+			Reopened: No longer showing discarded appts that were rescheduled or cancelled as Next Appts in Patient Bill.
 		</deliverable>
 
 		<deliverable id="1844">
@@ -309,8 +310,14 @@
 		<deliverable id="1873">
 			Perl error from link after updating a plan has been fixed.
 		</deliverable>
+
 		<deliverable id="1886">
 			Fixed code to not to show up duplicate entries.
 		</deliverable>
+
+		<deliverable id="1897">
+			Fixed application error occuring from add fee schedule item dialog.
+		</deliverable>
+
 	</deliverables>
 </release-notes>
