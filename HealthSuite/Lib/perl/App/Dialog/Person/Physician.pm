@@ -281,7 +281,7 @@ sub makeStateChanges
 	$self->updateFieldFlags('party_name', FLDFLAG_INVISIBLE, 1);
 	$self->updateFieldFlags('relation', FLDFLAG_INVISIBLE, 1);
 	$self->updateFieldFlags('license_num_state', FLDFLAG_INVISIBLE, 1);
-	$self->updateFieldFlags('license_num_state', FLDFLAG_INVISIBLE, 1);
+	$self->updateFieldFlags('create_unknown_phone', FLDFLAG_INVISIBLE, 1);
 
 	#if ($command eq 'update' || $command eq 'remove')
 	#$self->updateFieldFlags('physician_type', FLDFLAG_INVISIBLE, 1) if $command eq 'update' || $command eq 'remove'  ;
