@@ -147,6 +147,7 @@ sub prepare_page_content_header
 						<OPTION value="/person/$personId/dlg-add-medication-prescribe">Prescribe Medication</OPTION>
 						<!-- <OPTION value="/person/$personId/dlg-add-">Create Note</OPTION> -->
 						<OPTION value="/person/$personId/dialog/postpayment/personal">Apply Payment</OPTION>
+						<!-- <OPTION value="/person/$personId/dialog/postrefund/refund">Post Refund</OPTION> -->
 						<OPTION value="/person/$personId/dlg-remove-$category">Delete Record</OPTION>
 					</SELECT>
 					</FONT>
