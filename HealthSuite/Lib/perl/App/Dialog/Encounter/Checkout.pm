@@ -43,10 +43,11 @@ sub initialize
 	$self->{activityLog} =
 			{
 				scope =>'person',
+				action => $App::Universal::DIALOG_COMMAND_ACTIVITY_MAP{'add'},
 				key => "#field.person_id#",
 				data => qq{Check-out <a href='/person/#field.attendee_id#/profile'>#field.attendee_id#</a>
 					<br>(Appt Time: #field.start_time#)
-				}
+			}
 	};
 
 	$self->addFooter(new CGI::Dialog::Buttons(
