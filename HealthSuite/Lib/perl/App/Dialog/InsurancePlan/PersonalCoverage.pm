@@ -32,6 +32,7 @@ sub new
 				new CGI::Dialog::Field(type => 'hidden', name => 'phone_item_id'),
 				new CGI::Dialog::Field(type => 'hidden', name => 'fax_item_id'),
 				new CGI::Dialog::Field(type => 'hidden', name => 'item_id'),
+				new CGI::Dialog::Field(type => 'bool', name => 'create_record', caption => 'Inactivate Coverage?',	style => 'check'),
 				new App::Dialog::Field::Person::ID(caption => 'Person/Patient ID',types => ['Patient'],	name => 'person_id'),
 				new App::Dialog::Field::Organization::ID(caption => 'Insurance Company ID', name => 'ins_org_id', options => FLDFLAG_REQUIRED),
 				new CGI::Dialog::Field(caption => 'Product Name', name => 'product_name', options => FLDFLAG_REQUIRED, findPopup => '/lookup/insurance/product_name'),
@@ -206,6 +207,34 @@ sub makeStateChanges
 		my $insuredId = $patientAge < 21 ? '' : $personId;
 		$page->field('insured_id', $insuredId);
 	}
+
+	$self->updateFieldFlags('create_record', FLDFLAG_INVISIBLE, 1);
+
+	my $sequence = $page->field('bill_sequence');
+	#if ($sequence eq 99)
+	#{
+	#	my $checkSeq = 1;
+	#	for($checkSeq = 1; $checkSeq <=3; $checkSeq ++)
+	#	{
+
+	#		my $doesBillSeqExists = $STMTMGR_INSURANCE->recordExists($page,STMTMGRFLAG_NONE, 'selDoesInsSequenceExists', $personId, $checkSeq);
+
+
+	#		if($doesBillSeqExists eq '')
+	#		{
+	#			$self->updateFieldFlags('create_record', FLDFLAG_INVISIBLE, 1);
+	#			my $createInsCoverageHref = "javascript:doActionPopup('/org-p/#session.org_id#/dlg-add-ins-coverage/_f_bill_sequence=$previousBillSequence');";
+	#			$self->invalidate($page, Do u want to Inactivate the other low level Insurance Coverages? If so check the box <br><a href="$createInsCoverageHref">Or Click Here to add another Insurance Coverage of the same bill sequence</a>);
+
+	#			if($page->field(create_record, 1))
+	#			{
+	#				$STMTMGR_INSURANCE->getRowsAsHashList($page,STMTMGRFLAG_NONE, 'selUpdateInsSequence', $personId, $checkSeq);
+	#			}
+#
+	#		}
+	#	}
+	#}
+
 }
 
 sub customValidate
@@ -244,6 +273,7 @@ sub customValidate
 	{
 		$insOrg->invalidate($page, " 'Ins Org ID', 'ProductName' and 'PlanName' cannot be blank if the Insurance Coverage is checked.");
 	}
+
 }
 
 sub populateData_add
