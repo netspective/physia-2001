@@ -1342,7 +1342,7 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 					#{ colIdx => 2, head => 'Name', dataFmt => '#2#' },
 					#{ colIdx => 3, head => 'Phone', dataFmt => '#3#', options => PUBLCOLFLAG_DONTWRAP },
 		],
-		bullets => 'stpe-#my.stmtId#/dlg-update-attr-#0#/#1#?home=#homeArl#',
+		bullets => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-update-attr-#0#/#1#?home=#homeArl#',
 		frame => {
 					addUrl => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-add-assoc-provider?home=#homeArl#',
 					editUrl => '/person/#param.person_id#/stpe-#my.stmtId#?home=#homeArl#',
@@ -2606,6 +2606,7 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 		],
 		bullets => '/person/#13#/stpe-#my.stmtId#/dlg-update-trans-#12#/#11#?home=#homeArl#',
 		frame => {
+			addUrl => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-add-hospitalization?home=#homeArl#',
 			editUrl => '/person/#param.person_id#/stpe-#my.stmtId#?home=#homeArl#',
 		},
 	},
@@ -2629,11 +2630,11 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 		banner => {
 			actionRows =>
 			[
-				{ caption => qq{ Add <A HREF= '/schedule/dlg-add-appointment?_dialogreturnurl=/person/#param.person_id#/home'>My Associated Resources Appointments</A> } },
+				{ caption => qq{ Add <A HREF= '/person/#param.person_id#/stpe-#my.stmtId#/dlg-add-hospitalization?home=#homeArl#'>Add Hospitalization</A> } },
 			],
 		},
 		stdIcons =>	{
-			updUrlFmt => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-update-attr-#0#/#1#?home=#param.home#', delUrlFmt => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-remove-attr-#0#/#1#?home=#param.home#',
+			updUrlFmt => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-update-trans-#12#/#11#?home=#param.home#', delUrlFmt => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-remove-trans-#12#/#11#?home=#param.home#',
 		},
 	},
 	publishComp_st =>
@@ -2793,7 +2794,7 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 				},
 		],
 
-		bullets => '/invoice/#0#?home=#homeArl#',
+		bullets => '/invoice/#0#/summary?home=#homeArl#',
 	},
 	publishDefn_panel =>
 	{
