@@ -127,6 +127,7 @@ sub execute
 	{
 		#reportTitle => $self->heading(),
 		reportTitle => "Deposit Summary",
+		groupBySepStr=>qq{<TR VALIGN=TOP ><TD><BR></TD></TR>},
 		columnDefn =>
 			[
 			{groupBy=>'#0#', colIdx => 0, head => 'Batch Date', hAlign=>'left', tAlign=>'left',dAlign => 'left'},
