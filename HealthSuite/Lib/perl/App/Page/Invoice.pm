@@ -262,7 +262,7 @@ sub getProcedureHtml
 							<TD>&nbsp;</TD>
 							<TD ALIGN="Center"><FONT FACE="Arial,Helvetica" SIZE=2 COLOR=777777><B>EMG</B></TD>
 							<TD>&nbsp;</TD>
-							<TD ALIGN="Center"><FONT FACE="Arial,Helvetica" SIZE=2 COLOR=777777><B>Reference</B></TD>
+							<TD ALIGN="Center"><FONT FACE="Arial,Helvetica" SIZE=2 COLOR=777777><B>Expl Code</B></TD>
 						</TR>
 						@rows
 					</TABLE>
@@ -305,8 +305,8 @@ sub getProceduresHtml
 		my $voidProcImg = '';
 		if($invStatus < $submitted && $itemStatus ne 'void')
 		{
-			$editProcImg = "<a href='$editProcHref'><img src='/resources/icons/edit_update.gif' border=0 title='Edit Item'></a>";
-			$voidProcImg = "<a href='$voidProcHref'><img src='/resources/icons/edit_remove.gif' border=0 title='Void Item'></a>";
+			$editProcImg = $procedure->{explosion} ne 'explosion' ? "<a href='$editProcHref'><img src='/resources/icons/edit_update.gif' border=0 title='Edit Item'></a>" : '';
+			$voidProcImg = $procedure->{explosion} ne 'explosion' ? "<a href='$voidProcHref'><img src='/resources/icons/edit_remove.gif' border=0 title='Void Item'></a>" : '';
 		}
 
 		my $itemAdjustmentTotal = $procedure->{totalAdjustments};
@@ -392,8 +392,8 @@ sub getProceduresHtml
 		my $voidProcImg = '';
 		if($invStatus < $submitted && $itemStatus ne 'void')
 		{
-			$editProcImg = "<a href='$editProcHref'><img src='/resources/icons/edit_update.gif' border=0 title='Edit Item'></a>";
-			$voidProcImg = "<a href='$voidProcHref'><img src='/resources/icons/edit_remove.gif' border=0 title='Void Item'></a>";
+			$editProcImg = $suppressedItem->{explosion} ne 'explosion' ? "<a href='$editProcHref'><img src='/resources/icons/edit_update.gif' border=0 title='Edit Item'></a>" : '';
+			$voidProcImg = $suppressedItem->{explosion} ne 'explosion' ? "<a href='$voidProcHref'><img src='/resources/icons/edit_remove.gif' border=0 title='Void Item'></a>" : '';
 		}
 
 		my $itemAdjustmentTotal = $suppressedItem->{totalAdjustments};
@@ -740,7 +740,7 @@ sub getProceduresHtml
 							<TD>&nbsp;</TD>
 							<TD ALIGN="Center"><FONT FACE="Arial,Helvetica" SIZE=2 COLOR=777777><B>EMG</B></TD>
 							<TD>&nbsp;</TD>
-							<TD ALIGN="Center"><FONT FACE="Arial,Helvetica" SIZE=2 COLOR=777777><B>Reference</B></TD>
+							<TD ALIGN="Center"><FONT FACE="Arial,Helvetica" SIZE=2 COLOR=777777><B>Expl Code</B></TD>
 						</TR>
 						@rows
 						<TR BGCOLOR=DDEEEE>
