@@ -593,6 +593,7 @@ sub select_as_html
 		}
 		elsif($self->{style} eq 'multidual')
 		{
+			my $width = $self->{width} || '175 pt';
 			my ($selectOptions, $selectOptionsSelected) = ('', '');
 			foreach (@{$choices})
 			{
@@ -608,7 +609,7 @@ sub select_as_html
 					</TR>
 					<TR>
 					<TD ALIGN=left VALIGN=top>
-						<SELECT ondblclick="MoveSelectItems('Dialog', '$self->{name}_From', '_f_$self->{name}', $sorted)" NAME=$self->{name}_From SIZE=$self->{size} MULTIPLE STYLE="width: $self->{width}pt">
+						<SELECT ondblclick="MoveSelectItems('Dialog', '$self->{name}_From', '_f_$self->{name}', $sorted)" NAME=$self->{name}_From SIZE=$self->{size} MULTIPLE STYLE="width: $width">
 						$selectOptions
 						</SELECT>
 					</TD>
@@ -617,7 +618,7 @@ sub select_as_html
 						&nbsp;<INPUT TYPE=button NAME="$self->{name}_removeBtn" onClick="MoveSelectItems('Dialog', '_f_$self->{name}', '$self->{name}_From', $sorted)" VALUE=" < ">&nbsp;
 					</TD>
 					<TD ALIGN=left VALIGN=top>
-						<SELECT ondblclick="MoveSelectItems('Dialog', '_f_$self->{name}', '$self->{name}_From', $sorted)" NAME=_f_$self->{name} SIZE=$self->{size} MULTIPLE STYLE="width: $self->{width}pt">
+						<SELECT ondblclick="MoveSelectItems('Dialog', '_f_$self->{name}', '$self->{name}_From', $sorted)" NAME=_f_$self->{name} SIZE=$self->{size} MULTIPLE STYLE="width: $width">
 						$selectOptionsSelected
 						</SELECT>
 					</TD>
