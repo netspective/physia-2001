@@ -416,6 +416,10 @@ $STMTMGR_PERSON = new App::Statements::Person(
 			  	from Attribute_Value_Type
 				where id between 220 and 226
 		},
+	'selReferralReason' => q{
+			select id, caption
+			  	from Referral_Reason
+		},
 
 	#
 	# Registration and profile statements/definitions
