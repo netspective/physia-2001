@@ -133,13 +133,6 @@ sub initialize
 				},
 			]),
 
-		new CGI::Dialog::Subhead(heading => 'Billing Information', name => 'billing_id_section', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE),
-		new CGI::Dialog::Field(caption => 'ID Type', name => 'billing_id_type', type => 'select', selOptions => 'Per Se:0;THINnet:2;Other:3', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE),
-		new CGI::Dialog::Field(caption => 'Billing ID',
-			name => 'billing_id',
-			size => 16,
-			invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE),
-
 		new App::Dialog::Field::Scheduling::Date(caption => 'Effective Date',
 			name => 'billing_effective_date',
 			type => 'date',
@@ -395,17 +388,6 @@ sub execute_add
 	my $medSpecCaption = $STMTMGR_PERSON->getSingleValue($page, STMTMGRFLAG_CACHE, 'selMedicalSpecialtyCaption', $medSpecCode);
 	my $medSpecCaption2 = $STMTMGR_PERSON->getSingleValue($page, STMTMGRFLAG_CACHE, 'selMedicalSpecialtyCaption', $medSpecCode2);
 	my $medSpecCaption3 = $STMTMGR_PERSON->getSingleValue($page, STMTMGRFLAG_CACHE, 'selMedicalSpecialtyCaption', $medSpecCode3);
-
-	$page->schemaAction(
-			'Person_Attribute', $command,
-			parent_id => $personId,
-			item_name => $member,
-			value_type => App::Universal::ATTRTYPE_BILLING_INFO,
-			value_text => $page->field('billing_id') || undef,
-			value_int => $page->field('billing_id_type') || undef,
-			value_date => $page->field('billing_effective_date') || undef,
-			_debug => 0,
-		);
 
 	$page->schemaAction(
 			'Person_Attribute', $command,
