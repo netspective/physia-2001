@@ -3,7 +3,7 @@ package CGI::Dialog::DataNavigator;
 ##############################################################################
 
 use strict;
-use SDE::CVS ('$Id: DataNavigator.pm,v 1.4 2000-11-27 03:08:41 robert_jenks Exp $', '$Name:  $');
+use SDE::CVS ('$Id: DataNavigator.pm,v 1.5 2000-12-20 00:23:32 robert_jenks Exp $', '$Name:  $');
 use CGI::Dialog;
 use base qw(CGI::Dialog);
 
@@ -30,7 +30,6 @@ sub new
 	$self->addContent(
 		new CGI::Dialog::Field(type => 'hidden', name => 'drill_depth', defaultValue => 0,),
 		new CGI::Dialog::Field(type => 'hidden', name => 'start_row', defaultValue => 0,),
-		new CGI::Dialog::Field(type => 'hidden', name => 'out_rows', defaultValue => 10,),
 		new CGI::Dialog::Field(type => 'hidden', name => 'sort_column',),
 		new CGI::Dialog::Field(type => 'hidden', name => 'sort_order', defaultValue => 'A',),
 		new CGI::Dialog::DataNavigator::Ancestors(publDefn => $self->{publDefn},),
@@ -38,6 +37,15 @@ sub new
 		new CGI::Dialog::DataNavigator::MultiActions(publDefn => $publDefn,),
 		new CGI::Dialog::DataNavigator::StatusBar(publDefn => $publDefn,),
 		new CGI::Dialog::DataNavigator::JavaScript(publDefn => $publDefn),
+		new CGI::Dialog::Field(#type => 'hidden', name => 'out_rows', defaultValue => $outRows,),
+			type => 'select',
+			caption => 'Output Rows',
+			name => 'out_rows',
+			selOptions => '10;20;30;40;50',
+			onChangeJS => 'document.forms.dialog.submit()',
+			defaultValue => $outRows,
+			postHtml => '<img src="" width="400" height="1">',
+		),
 	);
 
 	return $self;
@@ -80,7 +88,7 @@ package CGI::Dialog::DataNavigator::Results;
 ##############################################################################
 
 use strict;
-use SDE::CVS ('$Id: DataNavigator.pm,v 1.4 2000-11-27 03:08:41 robert_jenks Exp $', '$Name:  $');
+use SDE::CVS ('$Id: DataNavigator.pm,v 1.5 2000-12-20 00:23:32 robert_jenks Exp $', '$Name:  $');
 use Data::Publish;
 use CGI::Dialog;
 use CGI::ImageManager;
@@ -142,7 +150,7 @@ sub getHtml
 	}
 
 	return qq{
-		<tr><td colspan="2">$html</td></tr>
+		<tr><td colspan="4">$html</td></tr>
 	};
 }
 
@@ -296,7 +304,7 @@ sub getQueryHtml
 
 	# Wrap the results in a <tr> to put in the dialog's <table>
 	my $id = "_id_" . $self->{name};
-	$html = qq{<tr valign="top" id="$id"><td width=$self->{_spacerWidth} colspan="2">$html</td></tr>};
+	$html = qq{<tr valign="top" id="$id"><td width=$self->{_spacerWidth} colspan="4">$html</td></tr>};
 
 
 	return $html;
@@ -309,7 +317,7 @@ package CGI::Dialog::DataNavigator::Ancestors;
 ##############################################################################
 
 use strict;
-use SDE::CVS ('$Id: DataNavigator.pm,v 1.4 2000-11-27 03:08:41 robert_jenks Exp $', '$Name:  $');
+use SDE::CVS ('$Id: DataNavigator.pm,v 1.5 2000-12-20 00:23:32 robert_jenks Exp $', '$Name:  $');
 use CGI::Dialog;
 use CGI::ImageManager;
 use base qw(CGI::Dialog::ContentItem);
@@ -356,7 +364,7 @@ sub getHtml
 		}
 	}
 
-	return qq{<tr><td colspan="2">$html</td></tr>};
+	return qq{<tr><td colspan="4">$html</td></tr>};
 }
 
 
@@ -365,7 +373,7 @@ package CGI::Dialog::DataNavigator::MultiActions;
 ##############################################################################
 
 use strict;
-use SDE::CVS ('$Id: DataNavigator.pm,v 1.4 2000-11-27 03:08:41 robert_jenks Exp $', '$Name:  $');
+use SDE::CVS ('$Id: DataNavigator.pm,v 1.5 2000-12-20 00:23:32 robert_jenks Exp $', '$Name:  $');
 use CGI::Dialog;
 use CGI::ImageManager;
 use base qw(CGI::Dialog::ContentItem);
@@ -399,7 +407,9 @@ sub getHtml
 			</td>
 		};
 	}
-
+	
+	#$html .= getImageTag('');
+	
 	# Add a spacer column
 	$html .= qq{<td width="100%"><img src="" width="8" height="1"></td>};
 
@@ -439,7 +449,7 @@ sub getHtml
 
 	$html .= qq{</tr><tr><td><img src="" width="10" height="5"></td></tr></table>};
 
-	return qq{<tr><td colspan="2">$html</td></tr>};
+	return qq{<tr><td colspan="4">$html</td></tr>};
 }
 
 
@@ -496,7 +506,7 @@ package CGI::Dialog::DataNavigator::StatusBar;
 ##############################################################################
 
 use strict;
-use SDE::CVS ('$Id: DataNavigator.pm,v 1.4 2000-11-27 03:08:41 robert_jenks Exp $', '$Name:  $');
+use SDE::CVS ('$Id: DataNavigator.pm,v 1.5 2000-12-20 00:23:32 robert_jenks Exp $', '$Name:  $');
 use CGI::Dialog;
 use CGI::ImageManager;
 use base qw(CGI::Dialog::ContentItem);
@@ -519,7 +529,7 @@ package CGI::Dialog::DataNavigator::JavaScript;
 ##############################################################################
 
 use strict;
-use SDE::CVS ('$Id: DataNavigator.pm,v 1.4 2000-11-27 03:08:41 robert_jenks Exp $', '$Name:  $');
+use SDE::CVS ('$Id: DataNavigator.pm,v 1.5 2000-12-20 00:23:32 robert_jenks Exp $', '$Name:  $');
 use CGI::Dialog;
 use CGI::ImageManager;
 use base qw(CGI::Dialog::ContentItem);
