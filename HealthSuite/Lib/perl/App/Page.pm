@@ -779,6 +779,7 @@ sub component
 	my ($self, $id) = @_;
 	if(my $component = $App::ResourceDirectory::COMPONENT_CATALOG{$id})
 	{
+		push(@{$self->{components}}, $App::ResourceDirectory::COMPONENT_CATALOG_SOURCE{$id});
 		return ref $component eq 'CODE' ? &$component($self, 0) : $component->getHtml($self, 0);
 	}
 	return "Component '$id' not found";
@@ -978,12 +979,20 @@ sub printContents
 	$self->establishSession();
 	$self->initialize();
 	$self->prepare_page_body();
+
+	unshift(@{$self->{page_content_header}}, "#component.sde-page-fields#") if $self->param('_debug_fields');
+	unshift(@{$self->{page_content_header}}, "#component.sde-page-env#") if $self->param('_debug_env');
+	unshift(@{$self->{page_content_header}}, "#component.sde-page-components#") if $self->param('_debug_comp');
+	unshift(@{$self->{page_content_header}}, "#component.sde-page-cookies#") if $self->param('_debug_cookies');
+	unshift(@{$self->{page_content_header}}, "#component.sde-page-session#") if $self->param('_debug_session');
+	unshift(@{$self->{page_content_header}}, "#component.sde-page-params-and-fields#") if $self->param('_debug_params');
+
 	return unless $self->send_http_header();
 	return unless $self->send_page_header();
 
-	$self->dumpParams() if $self->param('_debug_params');
-	$self->dumpSession() if $self->param('_debug_session');
-	$self->dumpCookies() if $self->param('_debug_cookies');
+	#$self->dumpParams() if $self->param('_debug_params');
+	#$self->dumpSession() if $self->param('_debug_session');
+	#$self->dumpCookies() if $self->param('_debug_cookies');
 
 	$self->send_page_body();
 }
