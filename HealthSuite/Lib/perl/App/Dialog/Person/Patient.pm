@@ -198,6 +198,22 @@ sub makeStateChanges
 		$deleteRecord->invalidate($page, "Are you sure you want to delete Patient '$personId'?");
 	}
 
+	my $createRecPhoneField = $self->getField('create_unknown_phone');
+	if ($command eq 'add' && $page->field('create_unknown_phone') eq '')
+	{
+			$self->updateFieldFlags('create_unknown_phone', FLDFLAG_INVISIBLE, 0);
+			unless ($page->field('create_unknown_phone'))
+			{
+				$createRecPhoneField->invalidate($page, "Enter the check-box below the 'Home Phone/Work Phone' field if you want to add the record with unknown phone  ");
+			}
+	}
+
+	else
+	{
+		$self->updateFieldFlags('create_record', FLDFLAG_INVISIBLE, 1);
+	}
+
+
 	$self->SUPER::makeStateChanges($page, $command, $dlgFlags);
 }
 
@@ -244,6 +260,8 @@ sub customValidate
 		my $invMsg = qq{<a href="$createPersonHref">Create Responsible Party</a> };
 		$relationship->invalidate($page, $invMsg);
 	}
+
+
 }
 
 sub handlePostExecute
@@ -341,6 +359,22 @@ sub execute_add
 		value_date => $page->getDate() || undef,
 		_debug => 0
 		);
+
+	my $todaysStamp = $page->getTimeStamp();
+	$page->schemaAction(
+		'Transaction', $command,
+		trans_owner_type => 0,
+		trans_owner_id => $page->field('person_id'),
+		trans_type => App::Universal::TRANSTYPE_ALERTPATIENT || undef,
+		trans_subtype => 'Medium',
+		caption => 'Unknown home phone number',
+		detail => 'Home phone unknown when patient record created' || undef,
+		trans_status => App::Universal::TRANSSTATUS_ACTIVE,
+		initiator_id => $page->session('user_id'),
+		initiator_type => 0,
+		trans_begin_stamp => $todaysStamp || undef,
+		_debug => 0
+	);
 
 	$self->handleContactInfo($page, $command, $flags, 'Patient');
 	$page->endUnitWork();
