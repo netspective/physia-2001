@@ -154,7 +154,7 @@ $STMTMGR_CLAIM_SEARCH = new App::Statements::Search::Claim(
 	'sel_date_like' =>
 		{
 			_stmtFmt => $STMTFMT_SEL_CLAIM,
-			whereCond => "invoice_date like to_date(?, '$SQLSTMT_DEFAULTDATEFORMAT')",
+			whereCond => "'%' = ?",
 			publishDefn => $STMTRPTDEFN_DEFAULT,
 		},
 	'sel_servicedate' =>
@@ -166,7 +166,7 @@ $STMTMGR_CLAIM_SEARCH = new App::Statements::Search::Claim(
 	'sel_servicedate_like' =>
 		{
 			_stmtFmt => $STMTFMT_SEL_CLAIM,
-			whereCond => "service_begin_date like to_date(?, '$SQLSTMT_DEFAULTDATEFORMAT')",
+			whereCond => "'%' = ?",
 			publishDefn => $STMTRPTDEFN_DEFAULT,
 		},
 	'sel_upin' =>
@@ -186,29 +186,29 @@ $STMTMGR_CLAIM_SEARCH = new App::Statements::Search::Claim(
 	'sel_insurance' =>
 		{
 			_stmtFmt => $STMTFMT_SEL_CLAIM,
-			whereCond => 'ib.bill_party_type in (2,3) and ib.bill_to_id = org_internal_id and upper(name_primary) = ?',
+			whereCond => 'ib.bill_party_type in (2,3) and ib.bill_to_id = o.org_internal_id and upper(o.name_primary) = ?',
 			tables => ', org',
 			publishDefn => $STMTRPTDEFN_DEFAULT,
 		},
 	'sel_insurance_like' =>
 		{
 			_stmtFmt => $STMTFMT_SEL_CLAIM,
-			whereCond => 'ib.bill_party_type in (2,3) and ib.bill_to_id = org_internal_id and upper(name_primary) like ?',
+			whereCond => 'ib.bill_party_type in (2,3) and ib.bill_to_id = o.org_internal_id and upper(o.name_primary) like ?',
 			tables => ', org',
 			publishDefn => $STMTRPTDEFN_DEFAULT,
 		},
 	'sel_employer' =>
 		{
 			_stmtFmt => $STMTFMT_SEL_CLAIM,
-			whereCond => 'i.client_id = attr.parent_id and attr.value_type between 220 and 226 and attr.value_int = o.org_internal_id and upper(o.name_primary) = ?',
-			tables => ', org o, person_attribute attr',
+			whereCond => 'i.client_id = attr.parent_id and attr.value_type between 220 and 226 and attr.value_int = o2.org_internal_id and upper(o2.name_primary) = ?',
+			tables => ', org o2, person_attribute attr',
 			publishDefn => $STMTRPTDEFN_DEFAULT,
 		},
 	'sel_employer_like' =>
 		{
 			_stmtFmt => $STMTFMT_SEL_CLAIM,
-			whereCond => 'i.client_id = attr.parent_id and attr.value_type between 220 and 226 and attr.value_int = o.org_internal_id and upper(o.name_primary) like ?',
-			tables => ', org o, person_attribute attr',
+			whereCond => 'i.client_id = attr.parent_id and attr.value_type between 220 and 226 and attr.value_int = o2.org_internal_id and upper(o2.name_primary) like ?',
+			tables => ', org o2, person_attribute attr',
 			publishDefn => $STMTRPTDEFN_DEFAULT,
 		},
 
