@@ -292,6 +292,9 @@
 			UI : Added ethnicity field to 'Add Physician', 'Add Nurse' and 'Add Staff' dialogs.
 		</deliverable>	
 		
+		<deliverable id="1605">
+			Report : Changed daily monthly audit report to filter by service provider and bring back service provider instead of billing provider
+		</deliverable>			
 		<deliverable id="1620">
 			 Fixed prepare method not overridden error found on choose action schedule appointment from patient profile.
 		</deliverable>			
@@ -339,6 +342,10 @@
 		<deliverable id="1645">
 			[UI] Corrected look of Add Account notes and reck date dialog from the collection worklist.  Also corrected query so collection items with a reck date do no appear until request reck date arrives
 		</deliverable>
+		<deliverable id="1657">
+			Report : Changed sort order in query modified query to filter out cap payments that do not belong to the main org
+		</deliverable>
+	</deliverables>
 	</deliverables>
 </release-notes>
 
