@@ -32,6 +32,7 @@ sub new
 	$self->addContent(
 		#new CGI::Dialog::Subhead(heading => 'Attach to Existing Record', name => 'exists_heading'),
 		new App::Dialog::Field::Person::ID(caption =>'Physician/Provider ID', name => 'value_text', hints => 'Please provide an existing Person ID.', options => FLDFLAG_REQUIRED),
+		new CGI::Dialog::Field(caption => 'Is Primary Physician?', type => 'bool', name => 'primary_physician', style => 'check', hints => 'Please check the check-box if the Physician is Primary Physician '),
 		#new CGI::Dialog::Subhead(heading => 'Define New Record', name => 'notexists_heading'),
 		#new CGI::Dialog::Field(caption =>'Full Name', name => 'rel_name', hints => 'Please provide the full name of the contact if a record does not exist for him/her. A link will not be created between the patient and contact.'),
 		#new CGI::Dialog::Subhead(heading => 'Contact Information', name => 'contact_heading'),
@@ -42,6 +43,7 @@ sub new
 								fKeyStmt => 'selMedicalSpeciality',
 								fKeyDisplayCol => 0,
 								fKeyValueCol => 1),
+
 
 		#new CGI::Dialog::Field(type => 'phone', caption => 'Phone Number', name => 'phone_number', options => FLDFLAG_REQUIRED),
 		#new CGI::Dialog::Field(type => 'date', caption => 'Begin Date', name => 'begin_date', defaultValue => ''),
@@ -64,8 +66,18 @@ sub customValidate
 	my ($self, $page) = @_;
 
 	my $pId = $self->getField('value_text');
-	#my $pName = $self->getField('rel_name');
+	my $sName = $self->getField('value_textb');
 	my $itemId = $page->param('item_id');
+	my $sequence = $page->field('speciality_seq');
+	my $physicianId = $page->field('value_text');
+	my $personId = $page->param('person_id');
+	my $specialty = $page->field('value_textb');
+	my $sequenceExists = $STMTMGR_PERSON->getRowAsHash($page,STMTMGRFLAG_NONE, 'selPhysicainSpecialty', $personId, $physicianId, $specialty);
+	if (($sequenceExists->{'value_textb'} eq $specialty) && ($itemId ne $sequenceExists->{'item_id'}))
+	{
+		$sName->invalidate($page, "This $sName->{caption} already exists for the Physician '$physicianId'");
+	}
+
 }
 
 sub populateData
@@ -85,15 +97,32 @@ sub execute
 
 	my $relId = $page->field('value_text');
 	my $medSpecCode = $page->field('value_textb');
+	my $parentId = $page->param('person_id');
+	my $valueType = App::Universal::ATTRTYPE_PROVIDER;
 	my $medSpecCaption = $STMTMGR_PERSON->getSingleValue($page, STMTMGRFLAG_CACHE, 'selMedicalSpecialtyCaption', $medSpecCode);
+	my $primaryPhy = $page->field('primary_physician');
+	if ($primaryPhy ne '')
+	{
+		my $checkPrimary = $STMTMGR_PERSON->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'selAttributeByPersonAndValueType', $parentId, $valueType);
+		foreach my $primaryPhysician(@{$checkPrimary})
+		{
+			if ($primaryPhysician->{'value_int'} ne '')
+			{
+				my $itemId = $primaryPhysician->{'item_id'};
+				$STMTMGR_PERSON->createFieldsFromSingleRow($page, STMTMGRFLAG_NONE, 'updClearPrimaryPhysician', $itemId);
+			}
+		}
+
+	}
 	$page->schemaAction(
 		'Person_Attribute',	$command,
-		parent_id => $page->param('person_id') || undef,
+		parent_id => $parentId || undef,
 		item_id => $page->param('item_id') || undef,
 		item_name => $medSpecCaption || undef,
 		value_type => App::Universal::ATTRTYPE_PROVIDER || undef,
 		value_text => $relId || undef,
 		value_textB => $page->field('value_textb') || undef,
+		value_int => $primaryPhy || undef,
 		_debug => 0
 	);
 	$self->handlePostExecute($page, $command, $flags | CGI::Dialog::DLGFLAG_IGNOREREDIRECT);
