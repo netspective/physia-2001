@@ -604,7 +604,7 @@ sub detailLink
 	my ($type, $code) = @_;
 
 	return qq{
-		<a HREF="javascript:chooseItem2('/lookup/$type/detail/$code', $code, true)"
+		<a HREF="javascript:chooseItem2('/lookup/$type/detail/$code', '$code', true)"
 			STYLE="text-decoration:none"> $code </a>
 	};
 }
