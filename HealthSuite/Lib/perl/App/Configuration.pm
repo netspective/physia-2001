@@ -158,7 +158,7 @@ sub getDefaultConfig
 	$config->path_PerSeEDIErrors(File::Spec->catfile($config->path_PerSeEDIDataIncoming(), 'errors'));
 	$config->path_PerSeEDIErrorsDelim(File::Spec->catfile($config->path_PerSeEDIDataIncoming(), 'errors-delim'));
 	$config->path_PerSeEDIReports(File::Spec->catfile($config->path_PerSeEDIDataIncoming(), 'reports'));
-	$config->path_PerSeEDIReportsDelim(File::Spec->catfile($config->path_PerSeEDIDataIncoming(), 'reports-delim'));	
+	$config->path_PerSeEDIReportsDelim(File::Spec->catfile($config->path_PerSeEDIDataIncoming(), 'reports-delim'));
 	$config->path_OrgLib(PATH_ORGLIB);
 	$config->path_PersonLib(PATH_PERSONLIB);
 
@@ -202,14 +202,14 @@ sub getDefaultConfig
 	'group-swdev' => getDefaultConfig('SWDev Group Configuration', CONFIGGROUP_SWDEV, 'sde01/sde@dbi:Oracle:SDEDBS04'),
 	'group-virtuser' => getDefaultConfig('Virtual User Configuration', CONFIGGROUP_SWDEV, 'sde01/sde@dbi:Oracle:SDEDBS04'),
 	'account-vusr_demo01' => getDefaultConfig('Demo01 Configuration', CONFIGGROUP_DEMO, 'demo01/demo@dbi:Oracle:SDEDBS02'),
-	'account-vusr_test01' => getDefaultConfig('Testing Configuration', CONFIGGROUP_TEST, 'demo01/demo@dbi:Oracle:SDEDBS02'),
+	'account-vusr_test01' => getDefaultConfig('Testing Configuration', CONFIGGROUP_TEST, 'pro_test/pro@dbi:Oracle:SDEDBS04'),
 	'account-alex_hillman' => getDefaultConfig('Alex Hillman Configuration', CONFIGGROUP_SWDEV, 'sde01/sde@dbi:Oracle:SDEDBS04'),
 
 	# configs specifically for use with $ENV{HS_CONFIG}
 	'db-demo01' => getDefaultConfig('Demo01 Configuration', CONFIGGROUP_DEMO, 'demo01/demo@dbi:Oracle:SDEDBS02'),
 	'db-demo02' => getDefaultConfig('Demo02 Configuration', CONFIGGROUP_DEMO, 'demo02/demo@dbi:Oracle:SDEDBS02'),
 	'db-pro01' => getDefaultConfig('Production Configuration', CONFIGGROUP_PRO, 'prod_01/prod01@dbi:Oracle:SDEDBS02'),
-	'db-pro_test' => getDefaultConfig('Production Test Configuration', CONFIGGROUP_TEST, 'pro_test/pro@dbi:Oracle:SDEDBS03'),
+	'db-pro_test' => getDefaultConfig('Production Test Configuration', CONFIGGROUP_TEST, 'pro_test/pro@dbi:Oracle:SDEDBS04'),
 	'db-pro_new' => getDefaultConfig('New Production Configuration', CONFIGGROUP_PRO, 'pro_new/pro@dbi:Oracle:SDEDBS03'),
 	'db-sde01' => getDefaultConfig('New SWDev Configuration', CONFIGGROUP_SWDEV, 'sde01/sde@dbi:Oracle:SDEDBS04'),
 	'db-pro_thai' => getDefaultConfig('Production Test Configuration', CONFIGGROUP_TEST, 'sde04/sde@dbi:Oracle:SDEDBS05'),
