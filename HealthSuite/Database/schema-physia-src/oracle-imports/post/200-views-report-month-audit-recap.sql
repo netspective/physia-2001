@@ -9,10 +9,13 @@ SELECT	invoice_id,
 	(decode(invoice_type,1,nvl(charges, 0),0)) as misc_charges ,
 	decode (adjustment_type,0,nvl(adjustment_amount,0),0) as person_pay ,
 	nvl(plan_paid,0) as insurance_pay,	
-	( nvl(writeoff_amount,0) ) * -1 as charge_adjust ,	
+	--( nvl(writeoff_amount,0) ) * -1 as charge_adjust ,	
+	--should match ins w/o + person w/o
+	(decode(nvl(payer_type,1),1,nvl(decode(nvl(writeoff_code,0),11,8,0,9,0,writeoff_amount),0),0) +	
+	decode(payer_type,0,nvl(decode(nvl(writeoff_code,0),11,0,8,0,9,0,writeoff_amount),0),0)) * -1 as charge_adjust,
 	decode(adjustment_type,2,nvl(net_adjust,0),0) as balance_transfer,
-	decode(nvl(payer_type,1),1,nvl(decode(nvl(writeoff_code,0),8,0,9,0,writeoff_amount),0),0)	 as insurance_write_off ,
-	decode(payer_type,0,nvl(decode(nvl(writeoff_code,0),8,0,9,0,writeoff_amount),0),0) as person_write_off ,
+	decode(nvl(payer_type,1),1,nvl(decode(nvl(writeoff_code,0),11,8,0,9,0,writeoff_amount),0),0)	 as insurance_write_off ,
+	decode(payer_type,0,nvl(decode(nvl(writeoff_code,0),11,0,8,0,9,0,writeoff_amount),0),0) as person_write_off ,
 	0 as a_r,
 	nvl(decode(item_type,7,-units ,units),0) as units ,
 	nvl(decode(item_type,7,-unit_cost,unit_cost),0) as unit_cost,
@@ -33,7 +36,7 @@ SELECT	invoice_id,
 	invoice_subtype,
 	ffs_flag as ffs_cap,
 	decode(adjustment_type,1,nvl(adjustment_amount,0),0) +
- 	decode(writeoff_code,9,writeoff_amount,8,writeoff_amount,0)		 refund,
+ 	decode(writeoff_code,9,writeoff_amount,8,writeoff_amount,11,writeoff_amount,0)		 refund,
 	pay_method as pay_type,
 	trans_id,
 	trans_type,
@@ -44,7 +47,8 @@ SELECT	invoice_id,
 	invoice_status,
 	invoice_date as real_invoice_date
 FROM	AUTO_INVOICE_CHRG
-WHERE 	NOT (invoice_status =15 AND parent_invoice_id is not null);
+WHERE 	NOT (invoice_status =15 AND parent_invoice_id is not null)
+	AND (invoice_status <>16 OR adjustment_type <> 7);
 
 --create or replace view invoice_charges as
 --SELECT	i.invoice_id,
