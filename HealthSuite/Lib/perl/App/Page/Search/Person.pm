@@ -82,10 +82,9 @@ sub getForm
 sub execute
 {
 	my ($self, $type, $expression) = @_;
-
 	# oracle likes '%' instead of wildcard '*'
 	my $appendStmtName = $expression =~ s/\*/%/g ? '_like' : '';
-	my $bindParams = $type eq 'anyname' ? [uc($expression) , uc($expression)] : [uc($expression)];
+	my $bindParams = $type eq 'anyname' ? [$self->session('org_id'), uc($expression) , uc($expression)] : [$self->session('org_id'), uc($expression)];
 	my $category = "";
 	for ($self->param('_pm_view'))
 	{
