@@ -53,7 +53,7 @@ sub prepare_view
 				<TD>
 					#component.stp-person.miscNotes#<BR>
 					#component.stp-person.alerts#<BR>
-					#component.stp-person.refillRequest#<BR>
+					<!-- #component.stp-person.refillRequest#<BR> -->
 					#component.stp-person.phoneMessage#<BR>
 					#component.stp-person.patientAppointments#</BR>
 					$authorization

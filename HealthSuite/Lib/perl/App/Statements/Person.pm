@@ -924,6 +924,14 @@ $STMTMGR_PERSON = new App::Statements::Person(
 		},
 		sqlStmtBindParamDescr => ['Person ID'],
 	},
+	
+	'selPerMedById' => {
+		sqlStmt => qq{
+			SELECT *
+			FROM Person_Medication
+			WHERE permed_id = ?
+		},
+	},
 
 );
 

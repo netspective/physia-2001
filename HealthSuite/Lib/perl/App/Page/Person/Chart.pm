@@ -25,13 +25,8 @@ sub prepare_view
 			<TR VALIGN=TOP>
 				<TD>
 					<font size=1 face=arial>
-					<TABLE CELLSPACING=0 BORDER=0 CELLPADDING=0 WIDTH=100%>
-						<TR VALIGN=TOP>
-							<TD>#component.stp-person.alerts#</TD>
-							<TD WIDTH=10><FONT SIZE=1>&nbsp;</FONT></TD>
-							<TD>#component.stp-person.activeMedications#</TD>
-						</TR>
-					</TABLE><BR>
+					#component.stp-person.alerts#<br>
+					#component.stp-person.activeMedications#<br>
 					#component.stp-person.patientAppointments#</BR>
 					#component.stp-person.appointmentCount#</BR>
 					#component.stp-person.hospitalizationSurgeriesTherapies#<BR>

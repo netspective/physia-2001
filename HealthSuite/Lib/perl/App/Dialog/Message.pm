@@ -3,7 +3,7 @@ package App::Dialog::Message;
 ##############################################################################
 
 use strict;
-use SDE::CVS ('$Id: Message.pm,v 1.2 2000-11-27 18:15:09 robert_jenks Exp $', '$Name:  $');
+use SDE::CVS ('$Id: Message.pm,v 1.3 2000-12-05 15:43:51 robert_jenks Exp $', '$Name:  $');
 use CGI::Validator::Field;
 use CGI::Dialog;
 use base qw(CGI::Dialog);
@@ -243,7 +243,8 @@ sub quoteMsg
 
 sub execute
 {
-	my ($self, $page, $command, $flags) = @_;
+	my ($self, $page, $command, $flags, $messageData) = @_;
+	$messageData = {} unless defined $messageData;
 	
 	unless ($command eq 'send')
 	{
@@ -252,56 +253,19 @@ sub execute
 	
 	unless ($command eq 'trash' || $command eq 'read')
 	{
-		my $messageId = $self->saveMessage($page,
-			doc_mime_type => 'text/plain',
-			doc_orig_stamp => $page->getTimeStamp(),
-			doc_spec_type => App::Universal::DOCSPEC_INTERNAL,
-			doc_spec_subtype => App::Universal::MSGSUBTYPE_MESSAGE,
-			doc_source_id => $page->session('person_id'),
-			doc_source_type => App::Universal::DOCSRCTYPE_PERSON,
-			doc_name => $page->field('subject'),
-			doc_content_small => $page->field('message'),
-		);
-		
-		# Add the To recipients
-		my @toRecipients = split /\,\s*/, $page->field('to');
-		foreach my $toRecipient (@toRecipients)
-		{
-			$self->saveToRecipients($page,
-				parent_id => $messageId,
-				item_name => 'To',
-				value_type => App::Universal::ATTRTYPE_PERSON_ID,
-				value_int => 0,
-				value_text => $toRecipient,
-			);
-		}
-
-		# Add the CC recipients
-		my @ccRecipients = split /\,\s*/, $page->field('cc');
-		foreach my $ccRecipient (@ccRecipients)
-		{
-			$self->saveCCRecipients($page,
-			parent_id => $messageId,
-			item_name => 'CC',
-			value_type => App::Universal::ATTRTYPE_PERSON_ID,
-			value_int => 0,
-			value_text => $ccRecipient,
-			);
-		}
-		
-		$self->saveRegardingPatient($page,
-			parent_id => $messageId,
-			item_name => 'Regarding Patient',
-			value_type => App::Universal::ATTRTYPE_PATIENT_ID,
-			value_text => $page->field('patient_id'),
-			value_int => $page->field('deliver_records') ? 1 : 0,
-		);	
+		$messageData->{'subject'} = $page->field('subject') unless defined $messageData->{'subject'};
+		$messageData->{'message'} = $page->field('message') unless defined $messageData->{'message'};
+		$messageData->{'to'} = $page->field('to') unless defined $messageData->{'to'};
+		$messageData->{'cc'} = $page->field('cc') unless defined $messageData->{'cc'};
+		$messageData->{'rePatient'} = $page->field('patient_id') unless defined $messageData->{'rePatient'};
+		$messageData->{'deliverRecords'} = $page->field('deliver_records') ? 1 : 0 unless defined $messageData->{'deliverRecords'};
+		$self->sendMessage($page, %$messageData);
 	}
 	else
 	{
 		if (my $notes = $page->field('notes'))
 		{
-			$self->saveNotes($page,
+			$self->saveNotes($page, $messageData,
 				parent_id => $page->param('message_id'),
 				value_type => App::Universal::ATTRTYPE_TEXT,
 				item_name => 'Notes',
@@ -318,6 +282,59 @@ sub execute
 }
 
 
+sub sendMessage
+{
+	my $self = shift;
+	my $page = shift;
+	my %messageData = @_;
+	
+	my $messageId = $self->saveMessage($page, \%messageData,
+		doc_mime_type => 'text/plain',
+		doc_orig_stamp => $page->getTimeStamp(),
+		doc_spec_type => App::Universal::DOCSPEC_INTERNAL,
+		doc_spec_subtype => $messageData{'type'} || App::Universal::MSGSUBTYPE_MESSAGE,
+		doc_source_id => $page->session('person_id'),
+		doc_source_type => App::Universal::DOCSRCTYPE_PERSON,
+		doc_name => $messageData{'subject'},
+		doc_content_small => $messageData{'message'},
+	);
+
+	# Add the To recipients
+	my @toRecipients = split /\,\s*/, $messageData{'to'};
+	foreach my $toRecipient (@toRecipients)
+	{
+		$self->saveToRecipients($page, \%messageData,
+			parent_id => $messageId,
+			item_name => 'To',
+			value_type => App::Universal::ATTRTYPE_PERSON_ID,
+			value_int => 0,
+			value_text => $toRecipient,
+		);
+	}
+
+	# Add the CC recipients
+	my @ccRecipients = split /\,\s*/, $messageData{'cc'};
+	foreach my $ccRecipient (@ccRecipients)
+	{
+		$self->saveCCRecipients($page,\%messageData,
+		parent_id => $messageId,
+		item_name => 'CC',
+		value_type => App::Universal::ATTRTYPE_PERSON_ID,
+		value_int => 0,
+		value_text => $ccRecipient,
+		);
+	}
+
+	$self->saveRegardingPatient($page, \%messageData,
+		parent_id => $messageId,
+		item_name => 'Regarding Patient',
+		value_type => App::Universal::ATTRTYPE_PATIENT_ID,
+		value_text => $messageData{'rePatient'},
+		value_int => $messageData{'deliverRecords'} ? 1 : 0,
+	);
+}
+
+
 sub updateRecipientFlags
 {
 	my $self = shift;
@@ -326,10 +343,14 @@ sub updateRecipientFlags
 	my $messageId = $page->param('message_id');
 	my $personId = $page->session('person_id');
 	my $item_id = $STMTMGR_DOCUMENT->getSingleValue($page, STMTMGRFLAG_NONE, 'selMessageRecipientAttrId', $messageId, $personId);
-	$page->schemaAction('Document_Attribute', 'update',
-		item_id => $item_id,
-		value_int => 1,
-	);
+	if ($item_id) #otherwise we're reading someone else's mail
+	{
+		$page->schemaAction('Document_Attribute', 'update',
+			item_id => $item_id,
+			value_int => 1,
+			_debug => 0,
+		);
+	}
 }
 
 
@@ -337,8 +358,9 @@ sub saveMessage
 {
 	my $self = shift;
 	my $page = shift;
+	my $messageData = shift;
 	
-	return $page->schemaAction('Document', 'add', @_);
+	return $page->schemaAction('Document', 'add', @_, _debug => 0);
 }
 
 
@@ -346,8 +368,9 @@ sub saveToRecipients
 {
 	my $self = shift;
 	my $page = shift;
+	my $messageData = shift;
 
-	return $page->schemaAction('Document_Attribute', 'add', @_);
+	return $page->schemaAction('Document_Attribute', 'add', @_, _debug => 0);
 }
 
 
@@ -355,8 +378,9 @@ sub saveCCRecipients
 {
 	my $self = shift;
 	my $page = shift;
+	my $messageData = shift;
 
-	return $page->schemaAction('Document_Attribute', 'add', @_);
+	return $page->schemaAction('Document_Attribute', 'add', @_, _debug => 0);
 }
 
 
@@ -364,12 +388,13 @@ sub saveRegardingPatient
 {
 	my $self = shift;
 	my $page = shift;
-	my %data = @_;
-
+	my $messageData = shift;
+	my %schemaActionData = @_;
+	
 	# Add the regarding patent
-	if (defined $data{value_text})
+	if (defined $schemaActionData{value_text})
 	{
-		return $page->schemaAction('Document_Attribute', 'add', %data);
+		return $page->schemaAction('Document_Attribute', 'add', %schemaActionData, _debug => 0);
 	}
 }
 
@@ -378,8 +403,9 @@ sub saveNotes
 {
 	my $self = shift;
 	my $page = shift;
+	my $messageData = shift;
 	
-	return $page->schemaAction('Document_Attribute', 'add', @_);
+	return $page->schemaAction('Document_Attribute', 'add', @_, _debug => 0);
 }
 
 
@@ -388,7 +414,7 @@ package App::Dialog::Message::Notes;
 ##############################################################################
 
 use strict;
-use SDE::CVS ('$Id: Message.pm,v 1.2 2000-11-27 18:15:09 robert_jenks Exp $', '$Name:  $');
+use SDE::CVS ('$Id: Message.pm,v 1.3 2000-12-05 15:43:51 robert_jenks Exp $', '$Name:  $');
 use CGI::Dialog;
 use base qw(CGI::Dialog::ContentItem);
 

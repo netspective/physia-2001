@@ -82,28 +82,42 @@ sub populateData
 }
 
 
+sub execute
+{
+	my $self = shift;
+	my ($page, $command, $flags, $messageData) = @_;
+	$messageData = {} unless defined $messageData;
+	
+	$messageData->{'returnPhone'} = $page->field('return_phone');
+	return $self->SUPER::execute($page, $command, $flags, $messageData);
+}
+
+
 sub saveMessage
 {
 	my $self = shift;
 	my $page = shift;
-	my %data = @_;
+	my $messageData = shift;
+	my %schemaActionData = @_;
 	
-	$data{doc_spec_subtype} = App::Universal::MSGSUBTYPE_PHONE_MESSAGE;
-	return $self->SUPER::saveMessage($page, %data);
+	$schemaActionData{doc_spec_subtype} = App::Universal::MSGSUBTYPE_PHONE_MESSAGE;
+	return $self->SUPER::saveMessage($page, $messageData, %schemaActionData);
 }
+
 
 sub saveRegardingPatient
 {
 	my $self = shift;
 	my $page = shift;
-	my %data = @_;
+	my $messageData = shift;
+	my %schemaActionData = @_;
 
-	if (my $phone = $page->field('return_phone'))
+	if (my $phone = $messageData->{'returnPhone'})
 	{
-		$data{'value_textB'} = $phone;
+		$schemaActionData{'value_textB'} = $phone;
 	}
 	
-	return $self->SUPER::saveRegardingPatient($page, %data);
+	return $self->SUPER::saveRegardingPatient($page, $messageData, %schemaActionData);
 }
 
 

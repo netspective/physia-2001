@@ -50,7 +50,7 @@ $QDL = File::Spec->catfile($CONFDATA_SERVER->path_Database(), 'QDL', 'Message.qd
 		},
 	],
 	dnQuery => \&sentItemsQuery,
-	dnSelectRowAction => '/person/#session.person_id#/dlg-read-message/#{message_id}#?home=#homeArl#',
+	dnSelectRowAction => '/person/#session.person_id#/dlg-read-message_#{doc_spec_subtype}#/#{message_id}#?home=#homeArl#',
 #	dnAncestorFmt => 'All Lab Results',
 );
 
@@ -66,7 +66,7 @@ sub iconCallback
 	{
 		return $IMAGETAGS{'widgets/mail/phone'}
 	}
-	elsif ($value eq App::Universal::MSGSUBTYPE_REFILL_REQUEST)
+	elsif ($value eq App::Universal::MSGSUBTYPE_PRESCRIPTION)
 	{
 		return $IMAGETAGS{'widgets/mail/prescription'}
 	}
@@ -82,8 +82,10 @@ sub sentItemsQuery
 	my $self = shift;
 	my $sqlGen = new SQL::GenerateQuery(file => $QDL);
 
-	my $cond1 = $sqlGen->WHERE('from_id', 'is', $self->session('person_id'));
-	$cond1->outColumns(
+	my $cond1 = $sqlGen->WHERE('doc_spec_type', 'is', App::Universal::DOCSPEC_INTERNAL);
+	my $cond2 = $sqlGen->WHERE('from_id', 'is', $self->session('person_id'));
+	my $cond3 = $sqlGen->AND($cond1, $cond2);
+	$cond3->outColumns(
 		'message_id',
 		'doc_spec_subtype',
 		'from_id',
@@ -93,9 +95,9 @@ sub sentItemsQuery
 		'deliver_record',
 		"TO_CHAR({date_sent},'IYYYMMDDHH24MISS')",
 	);
-	$cond1->orderBy({id => 'date_sent', order => 'Descending'});
-	$cond1->distinct(1);
-	return $cond1;
+	$cond3->orderBy({id => 'date_sent', order => 'Descending'});
+	$cond3->distinct(1);
+	return $cond3;
 }
 	
 

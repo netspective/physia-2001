@@ -73,7 +73,7 @@ sub iconCallback
 	{
 		return $IMAGETAGS{'widgets/mail/phone'}
 	}
-	elsif ($value eq App::Universal::MSGSUBTYPE_REFILL_REQUEST)
+	elsif ($value eq App::Universal::MSGSUBTYPE_PRESCRIPTION)
 	{
 		return $IMAGETAGS{'widgets/mail/prescription'}
 	}

@@ -1513,6 +1513,84 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 #----------------------------------------------------------------------------------------------------------------------
 
 'person.activeMedications' => {
+	sqlStmt => qq{
+		SELECT
+			permed_id,
+			med_name,
+			dose,
+			dose_units,
+			TO_CHAR(start_date, 'IYYYMMDD') as start_date,
+			frequency,
+			num_refills,
+			approved_by
+		FROM
+			Person_Medication
+		WHERE
+			parent_id = ? AND
+			(end_date IS NULL OR end_date > TRUNC(sysdate))
+		ORDER BY
+			med_name,
+			start_date DESC
+	},
+	publishDefn => {
+		columnDefn => [
+			{ head => 'Medication', colIdx => 1, },
+			{ head => 'Date', colIdx => 4, dformat => 'date', },
+			{ head => 'Dosage', dataFmt => '#2##3#',},
+			{ head => 'Freq', colIdx => 5,},
+			{ head => 'Refills', dataFmt => '#6# Refills', },
+			{ head => 'Approved By', colIdx => 7,},
+		],
+		bullets => [
+			'/person/#param.person_id#/stpe-#my.stmtId#/dlg-update-medication/#0#?home=#homeArl#',
+			{
+				imgSrc => '/resources/widgets/mail/prescription.gif',
+				title => 'Refill Request',
+				urlFmt => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-refill-medication/#0#?home=#homeArl#',
+			}
+		],
+	},
+	publishDefn_panel =>
+	{
+		# automatically inherites columnDefn and other items from publishDefn
+		style => 'panel',
+		frame => {
+			heading => 'Active Medications',
+			editUrl => '/person/#param.person_id#/stpe-#my.stmtId#?home=#homeArl#',
+		},
+	},
+	publishDefn_panelTransp =>
+	{
+		# automatically inherites columnDefn and other items from publishDefn
+		style => 'panel.transparent',
+		inherit => 'panel',
+	},
+	publishDefn_panelEdit =>
+	{
+		# automatically inherites columnDefn and other items from publishDefn
+		style => 'panel.edit',
+		frame => { heading => 'Edit Active Medications' },
+		banner => {
+			actionRows =>
+			[
+				{ caption => qq{ Add <A HREF= '/person/#param.person_id#/stpe-#my.stmtId#/dlg-add-medication/#param.person_id#?home=#param.home#'>Medication</A> } },
+				{ caption => qq{ Prescribe <A HREF= '/person/#param.person_id#/stpe-#my.stmtId#/dlg-prescribe-medication/#param.person_id#?home=#param.home#'>Medication</A> } },
+			],
+		},
+		stdIcons =>	{
+			updUrlFmt => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-update-medication/#0#?home=#param.home#',
+		},
+	},
+	publishComp_st => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.activeMedications', [$personId]); },
+	publishComp_stp => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.activeMedications', [$personId], 'panel'); },
+	publishComp_stpe => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.activeMedications', [$personId], 'panelEdit'); },
+	publishComp_stpt => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.activeMedications', [$personId], 'panelTransp'); },
+},
+
+
+#----------------------------------------------------------------------------------------------------------------------
+
+'person.activeMedicationsOld' => {
 	#App::Universal::TRANSSTATUS_ACTIVE is 2 which is tr.trans_status here
 	#App::Universal::TRANSSTATUS_INACTIVE is 3
 	sqlStmt => qq{
