@@ -799,7 +799,7 @@ sub importRegistry
 						value_type => App::Universal::ATTRTYPE_EMERGENCY || undef,
 						value_text => $registry->{'responsible-person'} || undef,
 						value_int => 1
-					);
+					) if $registry->{'responsible-person'} ne '';
 
 			$self->schemaAction(
 						'Person_Attribute', 'add',
