@@ -94,9 +94,16 @@
 	</table>
 	
 	<table name="REF_EPSDT">
-			<column name="epsdt" type="text" size="5" primarykey="yes" descr="Actual EPSDT Code"/>
-			<column name="name" type="text" size="64" descr="Short Description of the EPSDT code"/>
-			<column name="description" type="text" size="1024" descr="Long description of the EPSDT code"/>
+		<column name="epsdt" type="text" size="5" primarykey="yes" descr="Actual EPSDT Code"/>
+		<column name="name" type="text" size="64" descr="Short Description of the EPSDT code"/>
+		<column name="description" type="text" size="1024" descr="Long description of the EPSDT code"/>
 	</table>
 
+	<table name="REF_Code_Service_Type" abbrev="CodeServType">
+		<column name="id" type="autoinc" primarykey="yes" descr="Unique identification for the code service type mapping"/>
+		<column name="code_min" type="text" size="10" descr="Minimum code in range"/>
+		<column name="code_max" type="text" size="10" descr="Maximum code in range"/>
+		<column name="entry_type" lookupref="Catalog_Entry_Type.id"  descr="Code Type (EPSDT,CPT,etc)"/>
+		<column name="service_type" type="text" size="10" descr="Service Type (Medical Care,Surgery,Diagnostic X-Ray,etc)"/>			
+	</table>
 </schema>
