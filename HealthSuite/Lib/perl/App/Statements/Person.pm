@@ -89,6 +89,18 @@ $STMTMGR_PERSON = new App::Statements::Person(
 		from person p,person_org_category pcat where p.person_id = pcat.person_id and pcat.org_internal_id = ?
 		},
 
+	'selValidOrgs' => q{
+		SELECT DISTINCT
+			org.org_id,
+			poc.org_internal_id
+		FROM
+			person_org_category poc,
+			org
+		WHERE
+			poc.org_internal_id = org.org_internal_id AND
+			poc.person_id = ?
+		},
+
 	'selCategory' => qq{
 		select category
 		from person_org_category
@@ -403,6 +415,11 @@ $STMTMGR_PERSON = new App::Statements::Person(
 		select person_id, org_internal_id, password, quantity
 		from person_login
 		where person_id = ? and org_internal_id = ?
+		},
+	'selLoginAnyOrg' => qq{
+		select person_id, org_internal_id, password, quantity
+		from person_login
+		where person_id = ?
 		},
 	'updPersonLogin' => qq{
 		update Person_Login
