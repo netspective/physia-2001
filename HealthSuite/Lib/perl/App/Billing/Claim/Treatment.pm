@@ -717,6 +717,12 @@ sub setImpairmentRatingAgreement
 	$self->{ImpairmentRatingAgreement} = $value;
 }
 
+sub setReasonForReport
+{
+	my ($self,$value) = @_;
+	$self->{reasonForReport} = $value;
+}
+
 @CHANGELOG =
 ( 
     # [FLAGS, DATE, ENGINEER, CATEGORY, NOTE]
