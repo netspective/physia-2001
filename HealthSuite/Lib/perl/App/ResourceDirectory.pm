@@ -9,6 +9,7 @@ use App::Page;
 use App::Page::Error;
 use XML::Generator;
 use File::Spec;
+use CGI::ImageManager;
 
 use constant RESOURCE_NAME_SEPERATOR => '-';
 use constant PAGE_RESOURCE_PREFIX => 'page' . RESOURCE_NAME_SEPERATOR;
@@ -58,6 +59,17 @@ use App::Statements::Transaction;
 );
 
 
+# Build IMAGETAGS hash at startup
+my %IMAGE_TYPES = (
+	'resources' => {
+		baseDir => File::Spec->catfile($App::Configuration::CONFDATA_SERVER->path_WebSite, 'resources'),
+		baseUrl => '/resources',
+		excludeDirs => [],
+	},
+);
+CGI::ImageManager::buildImageTags(\%IMAGE_TYPES);
+
+
 # st-* are the default statement components
 # stp-* are the statement panel components
 # stpe-* are the statement panelEdit components
@@ -73,6 +85,7 @@ buildResources(\%RESOURCES, \%RESOURCE_TYPES, \@COMPONENT_CATALOG);
 
 $ACCESS_CONTROL = buildAccessControl();
 
+
 ##############################################################################
 # Utility functions
 ##############################################################################
@@ -86,6 +99,7 @@ sub handlePage
 		if (defined $pathItems->[0] && defined $resource->{$pathItems->[0]})
 		{
 			$resource = $resource->{$pathItems->[0]};
+			$resourceId = $resource->{_id};
 		}
 		elsif (defined $resource->{_default})
 		{
@@ -96,18 +110,30 @@ sub handlePage
 	return 'ARL-000200' unless defined $resource->{_class};
 	my $pageClass = $resource->{_class};
 	my $page = $pageClass->new();
+	
+	
+	$page->property('resourceMap', $resource);
+	foreach (keys %{$resource})
+	{
+		$page->property($_, $resource->{$_});
+	}
 
 	#
 	# some pages will need their own ARLs for calling themselves as popups, so set it up now
 	#
 	my $arlAsPopup = $arl;
-	$arlAsPopup =~ s/^$resourceId/$resourceId\-\p/;
+	$arlAsPopup =~ s|^([^/]+)|$1\-p|;
+
+	# Remove the resource prefix from the ID
+	my $prefix = PAGE_RESOURCE_PREFIX;
+	$resourceId =~ s|^$prefix||;
 
 	$page->param('arl', $arl);
 	$page->param('arl_asPopup', $arlAsPopup);
 	$page->param('arl_resource', $resourceId);
 	$page->param('arl_pathItems', @$pathItems) if $pathItems;
 	$page->param('_isPopup', 1) if $flags & PAGEFLAG_ISPOPUP;
+	
 	$page->setFlag($flags);
 	
 	# CGI.pm doesn't auto parse the URL Query String if we're in POST mode
@@ -152,7 +178,8 @@ sub handleARL
 		# translate the ARL so that the resource doesn't have -p or -a or -xxx
 		$arl =~ s/^$resourceId\-$1/$resourceId/;
 	}
-	if(my $resource = $RESOURCES{PAGE_RESOURCE_PREFIX . $resourceId})
+	$resourceId = PAGE_RESOURCE_PREFIX . $resourceId;
+	if(my $resource = $RESOURCES{$resourceId})
 	{
 		my @pathItems = split(/\//, $path);
 		$errorCode = handlePage($resource, $flags, $arl, $params, $resourceId, \@pathItems);
