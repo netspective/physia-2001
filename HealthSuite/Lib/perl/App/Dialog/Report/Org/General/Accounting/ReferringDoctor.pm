@@ -28,6 +28,12 @@ sub new
 			begin_caption => 'Report Begin Date',
 			end_caption => 'Report End Date',
 		),
+		new CGI::Dialog::Field::Duration(
+			name => 'service',
+			caption => 'Start/End Service Date',
+			begin_caption => 'Service Begin Date',
+			end_caption => 'Service End Date',
+		),
 		new CGI::Dialog::Field(
 			name => 'insurance_select',
 			caption => 'Insurance Org',
@@ -120,23 +126,23 @@ sub execute
 	};
 
 
-	my $totalPatients = $STMTMGR_REPORT_REFERRING_DOCTOR->getSingleValue($page, STMTMGRFLAG_NONE, 'totalPatientCount', $page->field('report_begin_date'), $page->field('report_end_date'));
+	my $totalPatients = $STMTMGR_REPORT_REFERRING_DOCTOR->getSingleValue($page, STMTMGRFLAG_NONE, 'totalPatientCount', $page->field('report_begin_date'), $page->field('report_end_date'), $page->field('service_begin_date'), $page->field('service_end_date'));
 	my @data = undef;
 
 	if($page->field('insurance_select') ne '')
 	{
-		my $referringPhysician = $STMTMGR_REPORT_REFERRING_DOCTOR->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'patientOrgCount', $page->field('report_begin_date'), $page->field('report_end_date'));
+		my $referringPhysician = $STMTMGR_REPORT_REFERRING_DOCTOR->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'patientOrgCount', $page->field('report_begin_date'), $page->field('report_end_date'), $page->field('service_begin_date'), $page->field('service_end_date'));
 		my ($prvDoctor, $patients, $percent);
-			
+
 		foreach(@$referringPhysician)
 		{
 			if ($prvDoctor eq $_->{person_id})
 			{
 				my @rowData = (
-					undef, 
-					undef, 
-					($_->{name_primary} eq '') ? 'Other' : $_->{name_primary}, 
-					$_->{patientcount}, 
+					undef,
+					undef,
+					($_->{name_primary} eq '') ? 'Other' : $_->{name_primary},
+					$_->{patientcount},
 					sprintf  "%3.2f%", ($_->{patientcount} / $totalPatients) * 100
 				);
 				push(@data, \@rowData);
@@ -179,7 +185,7 @@ sub execute
 	}
 	else
 	{
-		my $referringPhysician = $STMTMGR_REPORT_REFERRING_DOCTOR->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'patientCount', $page->field('report_begin_date'), $page->field('report_end_date'));
+		my $referringPhysician = $STMTMGR_REPORT_REFERRING_DOCTOR->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'patientCount', $page->field('report_begin_date'), $page->field('report_end_date'), $page->field('service_begin_date'), $page->field('service_end_date'));
 		foreach(@$referringPhysician)
 		{
 			my $patientCountPercent = sprintf  "%3.2f%", ($_->{patientcount} / $totalPatients) * 100;
@@ -196,7 +202,7 @@ sub execute
 
 	my $patientTotalPercent = '100.00%' if ($totalPatients !=0);
 	my $html;
-	
+
 	if($page->field('insurance_select') ne '')
 	{
 		my @rowData = (	"<B>Grand Total</B>", undef, undef, "<B>$totalPatients</B>", "<B>$patientTotalPercent</B>");

@@ -23,6 +23,11 @@ $STMTMGR_REPORT_REFERRING_DOCTOR = new App::Statements::Report::ReferringDoctor
 			where i.invoice_date between to_date(:1, '$SQLSTMT_DEFAULTDATEFORMAT') and to_date(:2, '$SQLSTMT_DEFAULTDATEFORMAT')
 			and t.trans_id = i.main_transaction
 			and p.person_id = t.data_text_a
+			and i.invoice_id in 
+				(select parent_id from invoice_item ii
+				where (ii.service_begin_date >= to_date(:3, 'MM/DD/YYYY') OR :3 is NULL)
+				and (ii.service_end_date <= to_date(:4, 'MM/DD/YYYY') OR :4 is NULL)
+				)			
 		}
 	},
 
@@ -35,6 +40,11 @@ $STMTMGR_REPORT_REFERRING_DOCTOR = new App::Statements::Report::ReferringDoctor
 			where i.invoice_date between to_date(:1, '$SQLSTMT_DEFAULTDATEFORMAT') and to_date(:2, '$SQLSTMT_DEFAULTDATEFORMAT')
 			and t.trans_id = i.main_transaction
 			and p.person_id = t.data_text_a
+			and i.invoice_id in 
+				(select parent_id from invoice_item ii
+				where (ii.service_begin_date >= to_date(:3, 'MM/DD/YYYY') OR :3 is NULL)
+				and (ii.service_end_date <= to_date(:4, 'MM/DD/YYYY') OR :4 is NULL)
+				)			
 			group by p.simple_name, p.person_id
 		},
 
@@ -46,13 +56,20 @@ $STMTMGR_REPORT_REFERRING_DOCTOR = new App::Statements::Report::ReferringDoctor
 			[
 				{
 					colIdx => 0,
+					head => 'Speciality',
+					hAlign => 'center',
+					dAlign => 'left',
+					dataFmt => '#3#',
+				},
+				{
+					colIdx => 1,
 					head => 'Doctor',
 					hAlign => 'center',
 					dAlign => 'left',
 					dataFmt => '#0#',
 				},
 				{
-					colIdx => 1,
+					colIdx => 2,
 					head => '# of Patients',
 					hAlign => 'center',
 					dAlign => 'right',
@@ -75,6 +92,11 @@ $STMTMGR_REPORT_REFERRING_DOCTOR = new App::Statements::Report::ReferringDoctor
 			and ib.bill_ins_id = ins.ins_internal_id
 			and ins.ins_org_id = o.org_internal_id
 			and ib.bill_party_type = 3
+			and i.invoice_id in 
+				(select parent_id from invoice_item ii
+				where (ii.service_begin_date >= to_date(:3, 'MM/DD/YYYY') OR :3 is NULL)
+				and (ii.service_end_date <= to_date(:4, 'MM/DD/YYYY') OR :4 is NULL)
+				)			
 			group by p.simple_name, p.person_id, o.name_primary
 
 			union
@@ -86,6 +108,11 @@ $STMTMGR_REPORT_REFERRING_DOCTOR = new App::Statements::Report::ReferringDoctor
 			and p.person_id = t.data_text_a
 			and i.billing_id = ib.bill_id
 			and ib.bill_party_type <> 3
+			and i.invoice_id in 
+				(select parent_id from invoice_item ii
+				where (ii.service_begin_date >= to_date(:3, 'MM/DD/YYYY') OR :3 is NULL)
+				and (ii.service_end_date <= to_date(:4, 'MM/DD/YYYY') OR :4 is NULL)
+				)			
 			group by p.simple_name, p.person_id
 		},
 
