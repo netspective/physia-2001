@@ -46,16 +46,17 @@ sub new
 			fKeyStmtMgr => $STMTMGR_RPT_CLAIM_STATUS,
 			fKeyStmt => 'sel_payer_type',
 			fKeyDisplayCol => 0,
-			fKeyValueCol => 1,
+			fKeyValueCol => 1,			
 		),
 
 		new CGI::Dialog::Field(caption => 'Insurance Company ID', 
 			name => 'ins_org_id',
 			type => 'select',
 			fKeyStmtMgr => $STMTMGR_RPT_CLAIM_STATUS,
-			fKeyStmt => 'sel_distinct_ins_org_id',
+			fKeyStmt => 'sel_distinct_ins_org_id_by_id',
 			fKeyDisplayCol => 0,
 			fKeyValueCol => 0,
+			fKeyStmtBindSession=>['org_internal_id']
 		),
 
 		new App::Dialog::Field::Insurance::Product(caption => 'Insurance Product',
