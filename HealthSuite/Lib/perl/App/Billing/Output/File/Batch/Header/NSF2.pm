@@ -52,9 +52,11 @@ sub formatData
 	my $claimPayToOrganizationAddress = $claimPayToOrganization->{address};
 	my $claimPayToProviderAddress = $claimPayToProvider->{address};
 	my $claimRenderingProvierAddress = $claimRenderingProvier->{address};
-	
 	my $emcId;
+	my $taxId;
+	my $taxTypeId;
 	
+
 	for my $eachClaim (0..$#$inpClaim)
 	{
 		$emcId = $inpClaim->[$eachClaim]->getEMCId();

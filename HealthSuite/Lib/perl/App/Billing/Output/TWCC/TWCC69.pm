@@ -1435,7 +1435,7 @@ sub box19Data
 {	
 	my($self, $p, $claim, $x, $y, $report) = @_;
 	my $arr1 = [23,102,162];
-	my $arr2 = [294,380];
+	my $arr2 = [295,380];
 	
 	my $t1 = $claim->{treatment}->getDoctorType;
 	my $textX = "x" if $t1 ne "";
@@ -1483,7 +1483,7 @@ sub box22Data
 {	
 	my($self, $p, $claim, $x, $y, $report) = @_;
 	
-	my $arrtmp = [279,11];
+	my $arrtmp = [280,15];
 	my $t1 = $claim->{treatment}->getMaximumImprovementAgreement;
 	my $textX = "x" if $t1 ne "";
 	
@@ -1493,7 +1493,7 @@ sub box22Data
 		'fontWidth' => DATA_FONT_SIZE,
 		'color' => DATA_FONT_COLOR,
 		'x' => $x + $arrtmp->[$t1],
-		'y' => $y - 67
+		'y' => $y - 68
 	};
 	$report->drawText($p, $properties);
 

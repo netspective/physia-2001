@@ -972,10 +972,14 @@ sub drawForm
 			checkBoxes =>
 				[
 					{
+						'height' => 7,
+						'width' => 7, 
 						'x' => $box17X + BOX17_LINE_PADDING,
 						'y' => $box17Y - BOX17_PADDING - 10 * BOX17_SPACING - 7
 					},
 					{
+						'height' => 7,
+						'width' => 7, 
 						'x' => $box17X + BOX17_LINE_PADDING + 45,
 						'y' => $box17Y - BOX17_PADDING - 10 * BOX17_SPACING - 7
 					}
@@ -1429,7 +1433,7 @@ sub box16Data
 				'text' => $claim->{treatment}->getReturnToLimitedWorkAnticipatedDate,
 				'fontWidth' => DATA_FONT_SIZE,
 				'color' => DATA_FONT_COLOR,
-				'x' => $x + 108,
+				'x' => $x + 99,
 				'y' => $y - DATA_TOP_PADDING
 			};
 	$report->drawText($p, $properties);
@@ -1439,7 +1443,7 @@ sub box16Data
 				'text' => $claim->{treatment}->getMaximumImprovementAnticipatedDate,
 				'fontWidth' => DATA_FONT_SIZE,
 				'color' => DATA_FONT_COLOR,
-				'x' => $x + 282,
+				'x' => $x + 266,
 				'y' => $y - DATA_TOP_PADDING
 			};
 	$report->drawText($p, $properties);
@@ -1449,7 +1453,7 @@ sub box16Data
 				'text' => $claim->{treatment}->getReturnToFullTimeWorkAnticipatedDate,
 				'fontWidth' => DATA_FONT_SIZE,
 				'color' => DATA_FONT_COLOR,
-				'x' => $x + 410,
+				'x' => $x + 408,
 				'y' => $y - DATA_TOP_PADDING
 			};
 	$report->drawText($p, $properties);
@@ -1507,6 +1511,19 @@ sub box17Data
 				'x' => $x + 60,
 				'y' => $y - 8 * BOX17_SPACING - 4 
 			};
+	$report->drawText($p, $properties);
+
+	my $arr = [13,58];
+	my $t = $claim->{treatment}->getReferralSelection;
+	my $textX = "x" if $t ne "";
+	$properties =
+	{
+		'text' => $textX,
+		'fontWidth' => DATA_FONT_SIZE,
+		'color' => DATA_FONT_COLOR,
+		'x' => $x + $arr->[$t - 1],
+		'y' => $y - 140
+	};
 	$report->drawText($p, $properties);
 
 	$properties =

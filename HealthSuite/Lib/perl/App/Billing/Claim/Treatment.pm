@@ -46,6 +46,7 @@ sub new
 	$params{laboratoryTests} = undef;
 	$params{treatmentPlan} = undef;
 	$params{referralInfo} = undef;
+	$params{referralSelection} = undef;
 	$params{medications} = undef;
 	$params{prognosis} = undef;
 	$params{dateMailedToEmployee} = undef;
@@ -476,6 +477,12 @@ sub getReferralInfo
 	return $self->{referralInfo};
 }
 
+sub getReferralSelection
+{
+	my $self = shift;
+	return $self->{referralSelection};
+}
+
 sub getMedications
 {
 	my $self = shift;
@@ -627,6 +634,12 @@ sub setReferralInfo
 	$self->{referralInfo} = $value;
 }
 
+sub setReferralSelection
+{
+	my ($self,$value) = @_;
+	$self->{referralSelection} = $value;
+}
+
 sub setMedications
 {
 	my ($self,$value) = @_;
@@ -662,6 +675,13 @@ sub setActivityDate
 	my ($self,$value) = @_;
 	$self->{activityDate} = $value;
 }
+
+sub setReasonForReport
+{
+	my ($self,$value) = @_;
+	$self->{reasonForReport} = $value;
+}
+
 
 sub setChangeInCondition
 {
@@ -715,12 +735,6 @@ sub setImpairmentRatingAgreement
 {
 	my ($self,$value) = @_;
 	$self->{ImpairmentRatingAgreement} = $value;
-}
-
-sub setReasonForReport
-{
-	my ($self,$value) = @_;
-	$self->{reasonForReport} = $value;
 }
 
 @CHANGELOG =

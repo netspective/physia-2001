@@ -52,8 +52,27 @@ sub formatData
 	my $claimPayToProvider = $firstClaim->{payToOrganization};
 	my $claimRenderingProvider = $firstClaim->{renderingProvider};
 	my $emcId;
+	my $taxId;
+	my $taxIdType;
 	
-	
+	if ($claimPayToProvider->getTaxId() ne '')
+	{
+		$taxId = $claimPayToProvider->getTaxId();
+		$taxId =~ s/-//g;
+		$taxIdType = 'E';
+	}
+	elsif($claimPayToProvider->getFederalTaxId() ne '')
+	{
+		$taxId = $claimPayToProvider->getFederalTaxId();
+		$taxId =~ s/-//g;
+		$taxIdType = 'E';
+	}
+	else
+	{
+		$taxIdType = '';
+	}
+		
+
 	for my $eachClaim (0..$#$inpClaim)
 	{
 		$emcId = $inpClaim->[$eachClaim]->getEMCId();
@@ -71,9 +90,9 @@ my %nsfType = ( NSF_HALLEY . "" =>
 	  $self->batchType(),
 	  $self->numToStr(4,0,$container->getSequenceNo()),
 	  $spaces, # batch id
-  	  $self->numToStr(9,0,$claimPayToProvider->getTaxId()),  # ne '') ? $claimCareProvider->getFederalTaxId() : $spaces,
+  	  $self->numToStr(9,0,$taxId),  # ne '') ? $claimCareProvider->getFederalTaxId() : $spaces,
 	  $spaces, #substr($claimPayToProvider->getSiteId(),0,6), # site id
-	  substr($claimPayToProvider->getTaxTypeId(),0,1), # taxId Type
+	  substr($taxIdType,0,1), # taxId Type
 	  $spaces, # reserved filler 
 	  $spaces, # reserved filler
 	  $spaces, # reserved filler

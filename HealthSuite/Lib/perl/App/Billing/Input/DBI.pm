@@ -752,11 +752,15 @@ sub assignPaytoAndRendProviderInfo
 	foreach $provider(@providers)
 	{
 		$id = $renderingProvider->getId();
+		my $providerAddress=$provider->getAddress();
+
 		my $inputMap =
 			{
 				CERTIFICATION_LICENSE . 'Tax ID' => [ [$provider, $provider], [\&App::Billing::Claim::Physician::setFederalTaxId, \&App::Billing::Claim::Physician::setTaxTypeId], [$colValText, $colValTextB]],
 				PHYSICIAN_SPECIALTY . 'Primary' => [ $provider,  \&App::Billing::Claim::Physician::setSpecialityId, $colValTextB],
 				CERTIFICATION_LICENSE . 'UPIN' => [ $provider, \&App::Billing::Claim::Physician::setPIN, $colValText],
+				CONTACT_METHOD_TELEPHONE . 'Work' => [ $providerAddress, \&App::Billing::Claim::Address::setTelephoneNo, $colValText],
+
 			};
 		# do the execute statement
 		$queryStatment = "select value_text , value_textB, value_type || item_name  from person_attribute where parent_id = \'$id\' ";
@@ -919,12 +923,13 @@ sub assignServiceBilling
 	if($orgInternalId ne "")
 	{
 
-		$queryStatment = "select value_text from org_attribute where parent_id = $row[2] and value_type = " . FACILITY_GROUP_NUMBER;
+		$queryStatment = "select value_text from org_attribute where parent_id = $orgInternalId and value_type = " . FACILITY_GROUP_NUMBER;
 		$sth = $self->{dbiCon}->prepare(qq {$queryStatment});
 		$sth->execute() or $self->{valMgr}->addError($self->getId(),100,"Unable to execute $queryStatment");
 		@row = $sth->fetchrow_array();
-	#	$payToOrganization->setGRP($row[0]);
-		my $payToOrganizationAddress = new App::Billing::Claim::Address;
+#		$payToOrganization->setGRP($row[0]);
+#		my $payToOrganizationAddress = new App::Billing::Claim::Address;
+		my $payToOrganizationAddress = $payToOrganization->getAddress;
 		$queryStatment = "select line1, line2, city, state, zip, country from org_address where parent_id = $orgInternalId and address_name = \'Mailing\'";
 		$sth = $self->{dbiCon}->prepare(qq {$queryStatment});
 		# do the execute statement
@@ -936,6 +941,12 @@ sub assignServiceBilling
 		$payToOrganizationAddress->setState($row[3]);
 		$payToOrganizationAddress->setZipCode($row[4]);
 		$payToOrganizationAddress->setCountry($row[5]);
+
+		$queryStatment = "select value_text from org_attribute where parent_id = $orgInternalId and value_type = " . CONTACT_METHOD_TELEPHONE . " and item_name = \'Primary\'";
+		$sth = $self->{dbiCon}->prepare(qq {$queryStatment});
+		$sth->execute() or $self->{valMgr}->addError($self->getId(),100,"Unable to execute $queryStatment");
+		@row = $sth->fetchrow_array();
+		$payToOrganizationAddress->setTelephoneNo($row[0]);
 		$payToOrganization->setAddress($payToOrganizationAddress);
 	}
 
@@ -1267,7 +1278,7 @@ sub assignInvoiceProperties
 		'Laboratory/Charges' => [$treatment, \&App::Billing::Claim::Treatment::setOutsideLabCharges, COLUMNINDEX_VALUE_TEXT],
 		'Medicaid/Resubmission' => [$treatment, [ \&App::Billing::Claim::Treatment::setMedicaidResubmission, \&App::Billing::Claim::Treatment::setResubmissionReference], [COLUMNINDEX_VALUE_TEXT, COLUMNINDEX_VALUE_TEXTB]],
 		'Prior Authorization Number' => [$treatment, \&App::Billing::Claim::Treatment::setPriorAuthorizationNo, COLUMNINDEX_VALUE_TEXT],
-		'Provider/Tax ID' => [[$payToProvider, $renderingProvider, $payToOrganization, $payToProvider, $renderingProvider, $payToOrganization ], [\&App::Billing::Claim::Physician::setFederalTaxId ,\&App::Billing::Claim::Physician::setFederalTaxId, \&App::Billing::Claim::Organization::setTaxId,\&App::Billing::Claim::Physician::setTaxTypeId, \&App::Billing::Claim::Physician::setTaxTypeId, \&App::Billing::Claim::Organization::setTaxTypeId], [COLUMNINDEX_VALUE_TEXT, COLUMNINDEX_VALUE_TEXT, COLUMNINDEX_VALUE_TEXTB, COLUMNINDEX_VALUE_TEXTB, COLUMNINDEX_VALUE_TEXTB]],
+		'Provider/Tax ID' => [[$payToProvider, $renderingProvider, $payToOrganization, $payToProvider, $renderingProvider, $payToOrganization ], [\&App::Billing::Claim::Physician::setFederalTaxId ,\&App::Billing::Claim::Physician::setFederalTaxId, \&App::Billing::Claim::Organization::setTaxId,\&App::Billing::Claim::Physician::setTaxTypeId, \&App::Billing::Claim::Physician::setTaxTypeId, \&App::Billing::Claim::Organization::setTaxTypeId], [COLUMNINDEX_VALUE_TEXT, COLUMNINDEX_VALUE_TEXT, COLUMNINDEX_VALUE_TEXT, COLUMNINDEX_VALUE_TEXTB, COLUMNINDEX_VALUE_TEXTB, COLUMNINDEX_VALUE_TEXTB]],
 		'Patient/Control Number' => [$patient, \&App::Billing::Claim::Patient::setAccountNo, COLUMNINDEX_VALUE_TEXT],
 		'Service Facility/Name' => [[$renderingOrganization, $renderingOrganization], [\&App::Billing::Claim::Organization::setName,\&App::Billing::Claim::Organization::setId], [COLUMNINDEX_VALUE_TEXT,COLUMNINDEX_VALUE_TEXTB]],
 		'Billing Facility/Name' =>[$payToOrganization, [\&App::Billing::Claim::Organization::setName,\&App::Billing::Claim::Organization::setId], [COLUMNINDEX_VALUE_TEXT, COLUMNINDEX_VALUE_TEXTB]],
@@ -1438,13 +1449,13 @@ sub assignInvoiceProperties
 		'Insurance/' . BILLSEQ_QUATERNARY_CAPTION . '/BCBS/Plan Code' => [$insured4, \&App::Billing::Claim::Insured::setBCBSPlanCode, COLUMNINDEX_VALUE_TEXT],
 		'Insurance/' . BILLSEQ_QUATERNARY_CAPTION . '/E-Remitter ID' => [$payer4, \&App::Billing::Claim::Payer::setPayerId, COLUMNINDEX_VALUE_TEXT],
 
-		'Invoice/TWCC61/16' => [$treatment, [\&App::Billing::Claim::Treatment::setReturnToFullTimeWorkAnticipatedDate, \&App::Billing::Claim::Treatment::setReturnToFullTimeWorkAnticipatedDate, \&App::Billing::Claim::Treatment::setReturnToFullTimeWorkAnticipatedDate], [COLUMNINDEX_VALUE_DATE, COLUMNINDEX_VALUE_DATEEND, COLUMNINDEX_VALUE_DATEA]],
+		'Invoice/TWCC61/16' => [$treatment, [\&App::Billing::Claim::Treatment::setReturnToLimitedWorkAnticipatedDate, \&App::Billing::Claim::Treatment::setMaximumImprovementAnticipatedDate, \&App::Billing::Claim::Treatment::setReturnToFullTimeWorkAnticipatedDate], [COLUMNINDEX_VALUE_DATE, COLUMNINDEX_VALUE_DATEA, COLUMNINDEX_VALUE_DATEB]],
 		'Invoice/TWCC61/17' => [$treatment, \&App::Billing::Claim::Treatment::setInjuryHistory, COLUMNINDEX_VALUE_TEXT],
 		'Invoice/TWCC61/18' => [$treatment, \&App::Billing::Claim::Treatment::setPastMedicalHistory, COLUMNINDEX_VALUE_TEXT],
 		'Invoice/TWCC61/19' => [$treatment, \&App::Billing::Claim::Treatment::setClinicalFindings, COLUMNINDEX_VALUE_TEXT],
 		'Invoice/TWCC61/20' => [$treatment, \&App::Billing::Claim::Treatment::setLaboratoryTests, COLUMNINDEX_VALUE_TEXT],
 		'Invoice/TWCC61/21' => [$treatment, \&App::Billing::Claim::Treatment::setTreatmentPlan, COLUMNINDEX_VALUE_TEXT],
-		'Invoice/TWCC61/22' => [$treatment, \&App::Billing::Claim::Treatment::setReferralInfo, COLUMNINDEX_VALUE_TEXT],
+		'Invoice/TWCC61/22' => [$treatment, [\&App::Billing::Claim::Treatment::setReferralInfo, \&App::Billing::Claim::Treatment::setReferralSelection], [COLUMNINDEX_VALUE_TEXT, COLUMNINDEX_VALUE_INT]],
 		'Invoice/TWCC61/23' => [$treatment, \&App::Billing::Claim::Treatment::setMedications, COLUMNINDEX_VALUE_TEXT],
 		'Invoice/TWCC61/24' => [$treatment, \&App::Billing::Claim::Treatment::setPrognosis, COLUMNINDEX_VALUE_TEXT],
 		'Invoice/TWCC61/26' => [$treatment, \&App::Billing::Claim::Treatment::setDateMailedToEmployee, COLUMNINDEX_VALUE_DATE],

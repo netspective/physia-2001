@@ -1334,7 +1334,7 @@ sub box16Data
 				'text' => $claim->{treatment}->getReturnToLimitedWorkAnticipatedDate,
 				'fontWidth' => DATA_FONT_SIZE,
 				'color' => DATA_FONT_COLOR,
-				'x' => $x + 125,
+				'x' => $x + 120,
 				'y' => $y - DATA_TOP_PADDING
 			};
 	$report->drawText($p, $properties);
@@ -1344,7 +1344,7 @@ sub box16Data
 				'text' => $claim->{treatment}->getMaximumImprovementAnticipatedDate,
 				'fontWidth' => DATA_FONT_SIZE,
 				'color' => DATA_FONT_COLOR,
-				'x' => $x + 318,
+				'x' => $x + 313,
 				'y' => $y - DATA_TOP_PADDING
 			};
 	$report->drawText($p, $properties);
@@ -1354,7 +1354,7 @@ sub box16Data
 				'text' => $claim->{treatment}->getReturnToFullTimeWorkAnticipatedDate,
 				'fontWidth' => DATA_FONT_SIZE,
 				'color' => DATA_FONT_COLOR,
-				'x' => $x + 465,
+				'x' => $x + 460,
 				'y' => $y - DATA_TOP_PADDING
 			};
 	$report->drawText($p, $properties);
@@ -1364,7 +1364,7 @@ sub box17Data
 {
 	my($self, $p, $claim, $x, $y, $report) = @_;
 
-	my $arr1 = [12,26,39,92]; 		# reason for report check boxes
+	my $arr1 = [12,25,38,92]; 		# reason for report check boxes
 	my $arr2 = [142,244];			# activity type check boxes
 	
 	my $reason = $claim->{treatment}->getReasonForReport;
@@ -1374,7 +1374,7 @@ sub box17Data
 				'text' => $textX,
 				'fontWidth' => DATA_FONT_SIZE,
 				'color' => DATA_FONT_COLOR,
-				'x' => $x + 12,
+				'x' => $x + 13,
 				'y' => $y - $arr1->[$reason - 1]
 			};
 	$report->drawText($p, $properties);
@@ -1387,7 +1387,7 @@ sub box17Data
 				'fontWidth' => DATA_FONT_SIZE,
 				'color' => DATA_FONT_COLOR,
 				'x' => $x + $arr2->[$claim->{treatment}->getActivityType - 1],
-				'y' => $y - 26
+				'y' => $y - 25
 			};
 		$report->drawText($p, $properties);
 
@@ -1397,7 +1397,7 @@ sub box17Data
 				'fontWidth' => DATA_FONT_SIZE,
 				'color' => DATA_FONT_COLOR,
 				'x' => $x + 329,
-				'y' => $y - 26
+				'y' => $y - 25
 			};
 		$report->drawText($p, $properties);
 	}
