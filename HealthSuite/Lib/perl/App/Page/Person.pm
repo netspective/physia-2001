@@ -19,7 +19,6 @@ use App::Dialog::Person;
 use App::Dialog::Person::Patient;
 use App::Dialog::Person::Physician;
 use App::Dialog::Person::Nurse;
-use App::Dialog::Adjustment;
 use App::Dialog::PostGeneralPayment;
 use App::Dialog::PostRefund;
 use App::Dialog::PostTransfer;
