@@ -3,7 +3,7 @@ package SQL::GenerateQuery;
 ##############################################################################
 
 use strict;
-use SDE::CVS ('$Id: GenerateQuery.pm,v 1.6 2000-10-08 21:43:33 robert_jenks Exp $', '$Name:  $');
+use SDE::CVS ('$Id: GenerateQuery.pm,v 1.7 2000-10-10 21:21:09 robert_jenks Exp $', '$Name:  $');
 use XML::Parser;
 use fields qw(qdlFile id fields joins views params);
 use vars qw(%CACHE $COMPARISONS);
@@ -525,7 +525,6 @@ sub genSQL
 		if (exists $compare->{fieldDefn})
 		{
 			my $fieldDefn = $compare->{fieldDefn};
-			print "handling special fieldDefn '$fieldDefn' for columnDefn '$columnDefn'\n";
 			$fieldDefn =~ s/\{\w+\}/$columnDefn/;
 			$columnDefn = $fieldDefn;
 		}
