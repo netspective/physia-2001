@@ -792,8 +792,9 @@ sub importRegistry
 						value_int => 1
 					);
 
-			$self->schemaAction(
-						'Person_Attribute', 'add',
+			my $dv = new Dumpvalue;
+			$dv->dumpValue($registry->{'responsible-person'});
+			$self->schemaAction($flags, 'Person_Attribute', 'add',
 						parent_id => $personId || undef,
 						item_name => 'Guarantor' || undef,
 						value_type => App::Universal::ATTRTYPE_EMERGENCY || undef,
@@ -801,15 +802,12 @@ sub importRegistry
 						value_int => 1
 					) if $registry->{'responsible-person'} ne '';
 
-			$self->schemaAction(
-						'Person_Attribute', 'add',
+			$self->schemaAction($flags, 'Person_Attribute', 'add',
 						parent_id => $personId || undef,
 						item_name => 'BloodType' || undef,
 						value_type => 0,
 						value_text => 0
 					);
-
-
 	}
 
 }
