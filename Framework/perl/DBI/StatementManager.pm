@@ -106,7 +106,10 @@ sub fixupStatements
 					}
 					elsif (defined $1 and $1 eq 'simpleStamp:')
 					{
-						"decode(to_char($2, 'YYYYMMDD'), to_char(sysdate, 'YYYYMMDD'), to_char($2, 'hh:miam'), to_char($2, 'MM/DD/YYYY hh:miam'))"
+						my $element = $2;
+						my $offset = $2;
+						$offset =~ /.*?([+-].*)/;
+						"decode(to_char($element, 'YYYYMMDD'), to_char(sysdate $1, 'YYYYMMDD'), to_char($element, 'hh:miam'), to_char($element, 'MM/DD/YYYY hh:miam'))"
 					}
 					else { $value->{$2} || "" }
 					!ge;
