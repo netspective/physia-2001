@@ -250,6 +250,10 @@
 			    as an 'Insured-Person' in the Person_Org_Category table and it will show up in the InsuredPerson's lookup.			
 		</deliverable>
 
+		<deliverable id="1578">
+			Populating default fee schedule field in Add Claim with fee schedules associated with payer.
+		</deliverable>
+
 		<deliverable id="1583">
 			Migrated all invoice history attributes to new invoice_history table.
 		</deliverable>
