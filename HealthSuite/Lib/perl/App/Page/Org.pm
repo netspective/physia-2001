@@ -133,6 +133,7 @@ sub prepare_page_content_header
 		/insurance/ and do {$category = 'insurance'; last};
 		/ipa/ and do {$category = 'ipa'; last};
 		/department/ and do {$category = 'dept'; last};
+		/lab/ and do {$category = 'lab'; last};		
 		/location_dir_entry/ and do {$category = 'provider'; last};
 		/main_dir_entry/ and do {$category = 'provider'; last};
 		$category = defined $self->property('org_parent_org_id') ? 'provider' : 'main';
@@ -335,6 +336,13 @@ sub prepare_view_catalog
 	{
 		/insurance/ and do {$category = 'insurance'; last};
 	}
+	
+	my $showLabTest=0;
+	my $labTestList = 'LAB';	
+	
+	
+	#Probably show do this for all sub tabs on page		
+	$showLabTest=1 if uc($category)=~m/$labTestList/; 
 
 	my @pathItems = split('/', $self->param('arl'));
 	my $html;
@@ -342,6 +350,7 @@ sub prepare_view_catalog
 			[ "Fee Schedule Catalog","./catalog?catalog=fee_schedule" ],
 			[ "Contract Catalog","./catalog?catalog=contract" ],
 			[ "Superbill Catalog","./catalog?catalog=superbill" ],
+			$showLabTest ? [ "Lab Tests","./catalog?catalog=labtest"] : undef,
 		];
 	my $viewMenuHtml = $self->getMenu_Tabs(App::Page::MENUFLAGS_DEFAULT, '_query_view', $viewMenu, {
 				selColor => '#CCCCCC', selTextColor => 'black', unselColor => '#EEEEEE', unselTextColor => '#555555', highColor => 'navy',
@@ -377,6 +386,10 @@ sub prepare_view_catalog
 	elsif($self->param('catalog') eq "fee_schedule_detail")
 	{
 		$html .=qq{<CENTER> #component.stp-org.FSCatalogDetail# </CENTER>};
+	}
+	elsif($self->param('catalog') eq "labtest")
+	{
+		$html .=qq{<CENTER> #component.stp-org.LabTestSummary# </CENTER>};
 	}
 	#TBD - Maybe a default catalog ????
 	$self->addContent($html);

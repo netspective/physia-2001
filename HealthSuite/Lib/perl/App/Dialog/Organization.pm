@@ -63,6 +63,12 @@ use vars qw(@ISA %RESOURCE_MAP);
 		_arl => ['org_id'],
 		_idSynonym => 'Ipa'
 	},
+	'org-lab' => {
+		heading => '$Command Lab Organization',
+		orgtype => 'lab',
+		_arl => ['org_id'],
+		_idSynonym => 'Lab'
+	},	
 );
 
 
@@ -434,7 +440,7 @@ sub addContentOrgType
 {
 	my ($self, $type) = @_;
 	my $excludeGroups = "''";
-	if ($type eq 'dept' || $type eq 'employer' || $type eq 'insurance' || $type eq 'ipa')
+	if ($type eq 'dept' || $type eq 'employer' || $type eq 'insurance' || $type eq 'ipa'|| $type eq 'lab')
 	{
 		$self->addContent(new CGI::Dialog::Field(type => 'hidden', name => 'member_name',));
 		return 1;
@@ -519,6 +525,7 @@ sub populateData
 				/insurance/	and do { $page->field('member_name','Insurance'); last };
 				/employer/	and do { $page->field('member_name','Employer'); last };
 				/ipa/		and do { $page->field('member_name','IPA'); last };
+				/lab/		and do { $page->field('member_name','Lab');last };
 			}
 		$page->field('parent_org_id', $page->param('org_id'));
 	}
@@ -931,6 +938,9 @@ sub execute_add
 		value_text => $page->field('area_served') || undef,
 		_debug => 0
 	) if $page->field('area_served') ne '';
+	
+	#If Org is a Lab create a Lab,Radiology,Other Catalogs
+	$self->addLabCatalogs($page,$orgIntId) if $page->field('member_name') eq 'Lab';
 
 	$page->param('_dialogreturnurl', "/org/$orgId/profile");
 
@@ -938,6 +948,23 @@ sub execute_add
 
 	$self->handlePostExecute($page, $command, $flags);
 	return '';
+}
+
+sub addLabCatalogs
+{
+	my $self=shift;
+	my $page=shift;	
+	my $orgIntId=shift;
+	$page->schemaAction(
+		'Offering_Catalog', 'add',
+		org_internal_id => $orgIntId,
+		catalog_id =>"Lab_Test",
+		caption =>'Lab Test',
+		catalog_type=>5,
+		description=>'List of Lab tests',
+		_debug => 0,
+	)	
+	
 }
 
 
