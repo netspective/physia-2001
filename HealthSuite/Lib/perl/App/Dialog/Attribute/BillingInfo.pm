@@ -10,11 +10,6 @@ use CGI::Validator::Field;
 use App::Universal;
 use Date::Manip;
 use App::Statements::Person;
-use constant SEQUENCE_SPECIALTY_PRIMARY => 1;
-use constant SEQUENCE_SPECIALTY_SECONDARY => 2;
-use constant SEQUENCE_SPECIALTY_TERTIARY => 3;
-use constant SEQUENCE_SPECIALTY_QUATERNARY => 4;
-use constant SEQUENCE_SPECIALTY_UNKNOWN => 5;
 use vars qw(@ISA %RESOURCE_MAP);
 
 @ISA = qw(CGI::Dialog);
@@ -36,6 +31,10 @@ sub initialize
 	$self->heading('$Command Billing Information');
 
 	$self->addContent(
+		new CGI::Dialog::Field(caption => 'Person ID',
+			name => 'parent_id',
+		),
+
 		new CGI::Dialog::Field(caption => 'ID Type',
 			name => 'billing_id_type',
 			type => 'select',
@@ -67,24 +66,35 @@ sub initialize
 	$self->addFooter(new CGI::Dialog::Buttons(cancelUrl => $self->{cancelUrl} || undef));
 }
 
+sub makeStateChanges
+{
+	my ($self, $page, $command, $dlgFlags) = @_;
+	
+	$self->SUPER::makeStateChanges($page, $command, $dlgFlags);
+	$self->updateFieldFlags('parent_id', FLDFLAG_READONLY, 1) if (($command eq 'update') or ($command eq 'remove'));
+}
+
 sub populateData
 {
 	my ($self, $page, $command, $activeExecMode, $flags) = @_;
 
-	return unless $flags & CGI::Dialog::DLGFLAG_UPDORREMOVE_DATAENTRY_INITIAL;
+#	return unless $flags & CGI::Dialog::DLGFLAG_UPDORREMOVE_DATAENTRY_INITIAL;
 
 	my $itemId = $page->param('item_id');
 	my $billingInfo;
-	my $billingExists = $STMTMGR_PERSON->recordExists($page, STMTMGRFLAG_NONE, 'selAttributeById', $itemId);
+	my $billingExists = 0;
+	$billingExists = $STMTMGR_PERSON->recordExists($page, STMTMGRFLAG_NONE, 'selAttributeById', $itemId) if ($itemId);
 
 	if ($billingExists) {
 		$billingInfo = $STMTMGR_PERSON->getRowAsArray($page, STMTMGRFLAG_NONE, 'selAttributeById', $itemId);
 
+		$page->field ('parent_id', $billingInfo->[2]);
 		$page->field ('billing_id_type', $billingInfo->[9]);
 		$page->field ('billing_id', $billingInfo->[6]);
 		$page->field ('billing_effective_date', $billingInfo->[13]);
 		$page->field ('billing_active', $billingInfo->[7]);
 	} else {
+		$page->field ('parent_id', $page->param('person_id'));
 		$page->field ('billing_id_type', 5);
 		$page->field ('billing_effective_date', $page->getDate());
 	}
@@ -98,14 +108,8 @@ sub execute
 	my $billingActive = $page->field ('billing_active') ? 1 : 0;
 	
 	$page->schemaAction(
-			value_int => $page->field('billing_id_type') || undef,
-			value_date => $page->field('billing_effective_date') || undef,
-			_debug => 0,
-		);
-
-	$page->schemaAction(
 		'Person_Attribute',	$command,
-		parent_id => $page->param('person_id'),
+		parent_id => $page->field('parent_id'),
 		item_name => 'Physician',
 		item_id => $page->param('item_id') || undef,
 		value_type => $valueType || undef,
