@@ -49,9 +49,9 @@
 			
 			<task>
 				<name>Dialogs</name>
-				<task><name>Identify all dialog types (simple, editors, etc) in ASPire.</name></task>
+				<task><name>Identify all dialog types (simple, editors, etc) in ASPire.</name><completed>100</completed></task>
 				<task><name>Split files so that each package is in a separate xml file.</name><completed>100</completed></task>
-				<task><name>Create a <i>metrics</i> summary for Perl/iHOS dialogs that is similar to XAF metrics to ensure that translation is complete (nothing is missing).</name><completed>85</completed></task>
+				<task><name>Create a <i>metrics</i> summary for Perl/iHOS dialogs that is similar to XAF metrics to ensure that translation is complete (nothing is missing).</name><completed>100</completed></task>
 				<task><name>Open each dialog and compare between iHOS/Perl version and Java/XAF version to ensure that translation is accurate.</name></task>
 				<task>
 					<name>Configure package names correctly</name>
@@ -71,22 +71,26 @@
 						create a feature in the generator script that creates a separate log file
 						with specific reports/logs.
 					</comments>
-					<task><name>Some field.select statements' choices attribute have entire select statements embedded inside the XML.  Remove these and put them in a separate sql-statements package named "dialogs" and refer to them when writing out the XML for the field.select.</name></task>
-					<task><name>Assure that all targets of query: value sources are valid statements</name></task>
+					<task><name>Some field.select statements' choices attribute have entire select statements embedded inside the XML.  Remove these and put them in a separate sql-statements package named "dialogs" and refer to them when writing out the XML for the field.select.</name><completed>100</completed></task>
+					<task><name>Assure that all targets of query: value sources are valid statements</name><completed>100</completed></task>
 					<task><name>Make trim="yes" a default attribute</name><completed>100</completed></task>
-					<task><name>Convert all field.select's with a choices of "Yes;No" to a field.boolean of the "yesno" variety</name></task>
+					<task><name>Convert all field.select's with a choices of "Yes;No" to a field.boolean of the "yesno" variety</name><completed>100</completed></task>
 					<task><name>Remove style="combo" and size="1" attributes as defaults from field.select statements</name><completed>100</completed></task>
 					<task><name>Remove all <i>perl-ref</i> attributes.</name><completed>100</completed></task>
 					<task><name>Assure that caption names don't have colon [:] in the caption names. Anything with a colon in considered a value source.</name><completed>100</completed></task>
 					<task><name>Remove all <i>default</i> attributes (like size=24 and max-length=1024).</name><completed>100</completed></task>
-					<task><name>Identify all field types used in ASPire (list of ref of all $field objects with dupes removed).</name><completed>80</completed></task>
-					<task><name>Identify common field types that don't exist in XAF that ASPire needs (float, integer, etc).</name></task>
+					<task><name>Identify all field types used in ASPire (list of ref of all $field objects with dupes removed).</name><completed>100</completed></task>
+					<task><name>Identify common field types that don't exist in XAF that ASPire needs (float, integer, etc).</name><completed>100</completed></task>
 					<task><name>Identify all iHOS/ASPire attributes that are not being generated in XAF (preHtml, postHtml, etc).</name></task>
 					<task><name>Translate all <i>special</i> field types that exist in ASPire to XAF field types (IDs, Insurance, Procedures, etc)</name></task>
 					<task><name>Identify all field attributes that have anything with a dollar ($) sign -- these will need to be replaced with XAF equivalents after further analysis (like $Command and $command).</name><completed>100</completed></task>
-					<task><name>Try and figure out the difference between <i>hint</i> and <i>hints</i> attributes in iHOS and create equivalents in XAF.</name></task>
+					<task><name>Try and figure out the difference between <i>hint</i> and <i>hints</i> attributes in iHOS and create equivalents in XAF.</name><completed>100</completed></task>
 					<task><name>Add all popup/lookup buttons and URLs.</name></task>
-					<task><name>Connect all field.select query choices to statement manager queries.</name></task>
+					<task><name>Connect all field.select query choices to statement manager queries.</name><completed>100</completed></task>
+					<task><name>Translate readonly-when and invisible-when flags from iHOS to XAF conditionals</name></task>
+					<task><name>Convert bind parameters obtained from fKeyStmtBind* to Build 39 style query: attributes</name></task>
+					<task><name>Convert publish definitions of SQL statements to report tags under XAF</name></task>
+					<task><name>Identify all fields that have the same captions to possibly convert them to specialized fields</name></task>
 				</task>
 			</task>
 			
