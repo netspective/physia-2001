@@ -587,8 +587,10 @@ sub populateFinalCharges
 	my $data = $self->{data};
 
 	$data->{claimTotalCharge} = $self->trailingZeros($claim->getTotalCharge);
-	$data->{claimAmountPaid} = $self->trailingZeros(abs($claim->getTotalChargePaid));
-	$data->{claimBalance} = $self->trailingZeros(abs(abs($claim->getTotalCharge) - abs($claim->getTotalChargePaid)));
+#	$data->{claimAmountPaid} = $self->trailingZeros(abs($claim->getTotalChargePaid));
+#	$data->{claimBalance} = $self->trailingZeros(abs(abs($claim->getTotalCharge) - abs($claim->getTotalChargePaid)));
+	$data->{claimAmountPaid} = $self->trailingZeros(abs($claim->getAmountPaid));
+	$data->{claimBalance} = $self->trailingZeros(abs(abs($claim->getTotalCharge) - abs($claim->getAmountPaid)));
 
 }
 
