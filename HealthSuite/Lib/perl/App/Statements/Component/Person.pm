@@ -2312,7 +2312,7 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 	{
 		# automatically inherites columnDefn and other items from publishDefn
 		style => 'panel.transparent',
-		inherit => 'panel',
+		# inherit => 'panel',
 		frame =>
 		{
 				-editUrl => '', 
