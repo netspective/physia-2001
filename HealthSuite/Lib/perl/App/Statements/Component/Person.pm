@@ -2274,8 +2274,58 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 	publishComp_stpt => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->session('user_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.recentlyVisitedPatients', [$personId], 'panelTransp'); },
 },
 
-#----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+#----------------------------------------------------------------------------------------------------------------------
 
+'person.diagnosisSummary' => {
+	sqlStmt => qq{
+			select member_name as code, name as description, to_char(min(trans_begin_stamp), 'mm/dd/yy') as earliest_date, 
+			       to_char(min(trans_begin_stamp), 'mm/dd/yy') as latest_date, count(member_name) as num_times
+			from   ref_icd, invoice_claim_diags,transaction, invoice
+			where  client_id = ?
+			and    trans_id = main_transaction
+			and    invoice_claim_diags.parent_id = invoice.invoice_id
+			and    ref_icd.icd (+) = member_name
+			group  by member_name, name
+	},
+	sqlStmtBindParamDescr => ['Person ID for Diagnosis Summary'],
+	publishDefn => 
+	{
+		columnDefn => 
+		[
+			{ colIdx =>0, head => 'Code', dataFmt => '#0#'},
+			{ colIdx =>0, head => 'Diagnosis', dataFmt => '#1#'},
+			{ colIdx =>1, head => 'Earliest Date', dataFmt => '#2#'},
+			{ colIdx =>2, head => 'Latest Date', dataFmt => '#3#'},
+			{ colIdx =>3, head => 'Diagnosed Times', dataFmt => '#4#'},								
+		],
+		frame => 
+		{ 
+				heading => 'Diagnosis Summary'
+		},		 	
+	},
+	publishDefn_panel => 
+	{
+		# automatically inherites columnDefn and other items from publishDefn
+		style => 'panel.static',
+		inherit => 'panel',
+		frame => 
+		{ 
+				heading => ''
+		},
+	},
+	publishDefn_panelTransp =>
+	{
+		# automatically inherites columnDefn and other items from publishDefn
+		style => 'panel.transparent',
+		inherit => 'panel',
+	},
+	publishComp_st => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.diagnosisSummary', [$personId]); },
+	publishComp_stp => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.diagnosisSummary', [$personId], 'panel'); },
+	publishComp_stpe => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.diagnosisSummary', [$personId], 'panelEdit'); },
+	publishComp_stpt => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.diagnosisSummary', [$personId], 'panelTransp'); },
+},
+	
+#----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 );
 
