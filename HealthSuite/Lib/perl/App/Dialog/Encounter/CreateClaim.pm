@@ -152,6 +152,7 @@ sub execute_remove
 	$page->schemaAction(
 		'Transaction', 'add',
 		parent_trans_id => $parentTransId || undef,
+		parent_event_id => $page->field('event_id') || undef,
 		trans_type => defined $transType ? $transType : undef,
 		trans_status => defined $transStatus ? $transStatus : undef,	
 		trans_status_reason => "Claim $invoiceId has been voided by $sessUser",
