@@ -16,7 +16,7 @@ sub getForm
 sub createRedirect_person
 {
 	my ($self, $prefix, $expression) = @_;
-	
+
 	return "$prefix/id/$expression" if $expression =~ m/^[A-Z0-9_\*]+$/;
 	return "$prefix/dob/$expression" if $expression =~ m/^\d\d\-\d\d\-\d\d\d\d$/;
 	return "$prefix/ssn/$expression" if $expression =~ m/^\d\d\d\-\d\d\-\d\d\d\d$/;
@@ -27,7 +27,7 @@ sub createRedirect_person
 sub createRedirect_org
 {
 	my ($self, $prefix, $expression) = @_;
-	
+
 	return "$prefix/id/$expression" if $expression =~ m/^[A-Z0-9_\*]+$/;
 	return "$prefix/primname/$expression";
 }
@@ -35,8 +35,8 @@ sub createRedirect_org
 sub prepare
 {
 	my $self = shift;
-	my ($scope, $expression) = ($self->param('search_scope'), $self->param('search_expression'));	
-	
+	my ($scope, $expression) = ($self->param('search_scope'), $self->param('search_expression'));
+
 	my $prefix = "/search/$scope";
 	$self->redirect($prefix) unless $expression;
 
@@ -44,14 +44,14 @@ sub prepare
 	$scope =~ s/\//_/;
 	if(my $method = $self->can("createRedirect_$scope"))
 	{
-		$self->redirect(&{$method}($self, $prefix, $expression));
+		$self->redirect(&{$method}($self, $prefix, $expression),1);
 	}
 	else
 	{
 		$self->redirect($prefix);
 		#$self->addContent("Unknown scope '$scope' ($expression).");
 	}
-	
+
 	return 1;
 }
 
