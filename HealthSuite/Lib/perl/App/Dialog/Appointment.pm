@@ -719,7 +719,7 @@ sub handle_page
 		}) if $apptAlertExist;
 	}
 
-	my $returnUrl = $self->getReferer($page);
+	my $returnUrl = $page->param('home') ? $page->param('home') : 'javascript:history.back()';
 
 	my ($status, $person, $stamp) = checkEventStatus($page, $eventId);
 	

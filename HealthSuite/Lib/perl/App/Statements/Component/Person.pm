@@ -1347,32 +1347,40 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 'person.careProviders' => {
 
 	sqlStmt => qq{
-			select	value_type, item_id, item_name, value_text, value_textb, parent_id, decode(value_int,1,'Primary Physician',''), pc.category
-			from 	person_attribute p, person_org_category pc
-			where 	parent_id = ?
-			and 	value_type = @{[ App::Universal::ATTRTYPE_PROVIDER ]}
-			and   pc.person_id = p.value_text
-			and   pc.org_internal_id = ?
+			select	
+				p.value_type,
+				p.item_id, 
+				p.item_name,
+				p.value_text, 
+				p.value_textb, 
+				p.parent_id, 
+				decode(p.value_int,1,', Primary Physician', ''),
+				pc.category
+			from 	person_org_category pc, person_attribute p
+			where p.parent_id = upper(:1)
+			and p.value_type = @{[ App::Universal::ATTRTYPE_PROVIDER ]}
+			and pc.person_id = p.value_text
+			and pc.org_internal_id = :2
+			and pc.category in ('Physician', 'Referring-Doctor')
 		},
 	sqlStmtBindParamDescr => ['Person ID for Attribute Table'],
 	publishDefn => {
 		columnDefn => [
-					{ head => 'CareProvider',
-						colIdx => 7,
-						dataFmt => {
-								'Physician' => "<A HREF = '/person/#3#/profile'>#3#</A> (#2#, #6#)<A HREF ='/person/#5#/dlg-add-appointment/#5#/#3#?_dialogreturnurl=#homeArl#'> Sched Appointment</A>",
-								'Referring-Doctor'  => "<A HREF = '/person/#3#/profile'>#3#</A> (#2#, #6#)",
-						},
+			{ head => 'CareProvider',
+				colIdx => 7,
+				dataFmt => {
+					'Physician' => qq{<A HREF = '/person/#3#/profile' title='View #3# Profile'>#3#</A> (#2##6#)
+						<A HREF ='/person/#5#/dlg-add-appointment/#5#/#3#?_dialogreturnurl=#homeArl#' title='Schedule Appointment with #3#'>Sched Appointment</A>
 					},
-					#{ colIdx => 1, head => 'Provider', dataFmt => '&{fmt_stripLeadingPath:1}:' },
-					#{ colIdx => 2, head => 'Name', dataFmt => '#2#' },
-					#{ colIdx => 3, head => 'Phone', dataFmt => '#3#', options => PUBLCOLFLAG_DONTWRAP },
+					'Referring-Doctor'  => "<A HREF = '/person/#3#/profile'>#3#</A> (#2#, #6#)",
+				},
+			},
 		],
 		bullets => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-update-attr-#0#/#1#?home=#homeArl#',
 		frame => {
-					addUrl => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-add-assoc-provider?home=#homeArl#',
-					editUrl => '/person/#param.person_id#/stpe-#my.stmtId#?home=#homeArl#',
-				},
+			addUrl => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-add-assoc-provider?home=#homeArl#',
+			editUrl => '/person/#param.person_id#/stpe-#my.stmtId#?home=#homeArl#',
+		},
 	},
 	publishDefn_panel =>
 	{
