@@ -84,8 +84,8 @@ sub processClaims
     	$self->{nsfTHINFileObj} = new App::Billing::Output::File::THIN();
 
 		# To get new serial number from serial.txt file
-		my $serialNumber = $self->getFileSerialNumber();	
-		
+		my $serialNumber = $self->getFileSerialNumber();
+
 		# creates logical files for multiple payers
 		foreach my $key(keys %$claimsCollection)
 		{
@@ -115,18 +115,18 @@ sub processClaims
 				{
 						$payerType = App::Billing::Universal::THIN_COMMERCIAL;
 				}
-				
+
 				$self->{nsfTHINFileObj}->processFile(claimList => $tempCollection, outArray => $params{outArray}, nsfType => $params{nsfType}, payerType => $payerType, serialNumber => $serialNumber);
-				
+
 				# increamenting serial number for next File header
-				$serialNumber++; 
+				$serialNumber++;
     		}
 	    } # end of for loop
-	    
+
 	    $self->setFileSerialNumber($serialNumber);
 
 	    # To add new line character in the last line inserted in array
-	    #$params{outArray}->[$#{$params{outArray}}] = $params{outArray}->[$#{$params{outArray}}] . "\n";
+	    $params{outArray}->[$#{$params{outArray}}] = $params{outArray}->[$#{$params{outArray}}] . "\n";
     }
     else
     {
@@ -206,9 +206,9 @@ sub getClaimsCollectionForTHIN
 
 sub getFileSerialNumber
 {
-	my $self = shift;	
+	my $self = shift;
 	my $retVal;
-	
+
 	open(SERIAL,"serial.txt") or die "File does not exist";
 	while (<SERIAL>)
 	{
@@ -223,11 +223,11 @@ sub getFileSerialNumber
 sub setFileSerialNumber
 {
 	my ($self, $newSerial) = @_;
-	
+
 	open (SERIAL,">serial.txt");
 	print SERIAL "$newSerial\n";
 	close(SERIAL);
-}	
+}
 
 sub createOutputFile
 {
