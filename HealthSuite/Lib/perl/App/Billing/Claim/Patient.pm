@@ -30,32 +30,9 @@ sub new
 	$self->{multipleIndicator} = undef;
 	$self->{legalRepData} = undef;
 	$self->{lastSeenDate} = undef;
-	$self->{employerOrSchoolName} = undef;
+	$self->{signatureDate} = undef;
+
 	return bless $self, $type;
-}
-
-sub getEmployerAddress
-{
-	my ($self) = @_;
-	return $self->{employerAddress};
-}
-
-sub setEmployerAddress
-{
-	my ($self, $value) = @_;
-	$self->{employerAddress} = $value;
-}
-
-sub setEmployerOrSchoolName
-{
-	my ($self, $value) = @_;
-	$self->{employerOrSchoolName} = $value;
-}
-
-sub getEmployerOrSchoolName
-{
-	my $self = shift;
-	return $self->{employerOrSchoolName};
 }
 
 sub getPoNumber
@@ -84,7 +61,7 @@ sub getLastSeenDate
 
 sub setLastSeenDate
 {
-	my ($self,$value) = @_;
+	my ($self, $value) = @_;
 	$value =~ s/ 00:00:00//;
 	$value = $self->convertDateToCCYYMMDD($value);
 	$self->{lastSeenDate} = $value;
@@ -101,7 +78,7 @@ sub getTPO
 
 sub setTPO
 {
-	my ($self,$value) = @_;
+	my ($self, $value) = @_;
 
 	$self->{tpo} = $value;
 }
@@ -116,7 +93,7 @@ sub getlegalIndicator
 
 sub setlegalIndicator
 {
-	my ($self,$value) = @_;
+	my ($self, $value) = @_;
 
 	$self->{legalIndicator} = $value;
 }
@@ -132,7 +109,7 @@ sub getMultipleIndicator
 
 sub setMultipleIndicator
 {
-	my ($self,$value) = @_;
+	my ($self, $value) = @_;
 
 	$self->{multipleIndicator} = $value;
 }
@@ -147,8 +124,20 @@ sub getSignature
 
 sub setSignature
 {
-	my ($self,$value) = @_;
+	my ($self, $value) = @_;
 	$self->{signature} = $value;
+}
+
+sub getSignatureDate
+{
+	my $self = shift;
+	return $self->{signatureDate};
+}
+
+sub setSignatureDate
+{
+	my ($self, $value) = @_;
+	$self->{signatureDate} = $value;
 }
 
 sub getAccountNo
@@ -161,7 +150,7 @@ sub getAccountNo
 
 sub setAccountNo
 {
-	my ($self,$value) = @_;
+	my ($self, $value) = @_;
 
 	$self->{accountNo} = $value;
 }
@@ -175,7 +164,7 @@ sub getRelationshipToInsured
 
 sub setRelationshipToInsured
 {
-	my ($self,$value) = @_;
+	my ($self, $value) = @_;
 	my $temp = 
 		{ 
 			'0' => '01',

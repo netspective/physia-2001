@@ -5,6 +5,7 @@ use strict;
 use App::Billing::Output::Driver;
 use App::Billing::Claims;
 use App::Billing::Output::Html::Template;
+use App::Billing::Output::Html::Worker;
 use Text::Template;
 use vars qw(@ISA);
 use constant EDIT => 1;
@@ -51,7 +52,7 @@ sub createHTML
 sub generateHTML
 {
 	my ($self, $claim, $tempPath) = @_;
-	my $htmlTemplate = new App::Billing::Output::Html::Template();
+	my $htmlTemplate = ($claim->getInvoiceSubtype() eq 6) ? new App::Billing::Output::Html::Worker() : new App::Billing::Output::Html::Template();
 	my @html;
 	my $procesedProc = [];
 	$tempPath = $tempPath eq "" ? 'C:\\hsc-live\\View1500.dat' : $tempPath;
@@ -74,10 +75,10 @@ sub allProcTraverse
 	my ($self, $procesedProc, $claim) = @_;
 	my $procs = $claim->{procedures};
 	my $sum = 0;
-	
+
 	for my $i (0..$#$procs)
 	{
-		$sum = ($procesedProc->[$i] eq "1") ? ++$sum : $sum; 
+		$sum = ($procesedProc->[$i] eq "1") ? ++$sum : $sum;
 	}
 	return $sum >= $#$procs ? 1 : 0;
 }
@@ -96,7 +97,7 @@ sub setPrimaryProcedure
 		if ($procedure ne "")
 		{
 			 $primaryProcedure = $procedure->getDiagnosis() =~ /$dg/ ? $i : -1;
-			
+
 		}
 	}
 	if ($primaryProcedure != -1)

@@ -35,7 +35,10 @@ sub new
 	$self->{status} = undef;
 	$self->{ssn} = undef;
 	$self->{type} = undef;
-
+	$self->{employerOrSchoolName} = undef;
+	$self->{employerAddress} = undef;
+	$self->{employerOrSchoolId} = undef;
+	
 	return bless $self, $type;
 }
 
@@ -52,6 +55,43 @@ sub getType
 	
 	return $self->{type};
 }
+
+sub getEmployerAddress
+{
+	my ($self) = @_;
+	return $self->{employerAddress};
+}
+
+sub setEmployerAddress
+{
+	my ($self, $value) = @_;
+	$self->{employerAddress} = $value;
+}
+
+sub setEmployerOrSchoolName
+{
+	my ($self, $value) = @_;
+	$self->{employerOrSchoolName} = $value;
+}
+
+sub getEmployerOrSchoolName
+{
+	my $self = shift;
+	return $self->{employerOrSchoolName};
+}
+
+sub setEmployerOrSchoolId
+{
+	my ($self, $value) = @_;
+	$self->{employerOrSchoolId} = $value;
+}
+
+sub getEmployerOrSchoolId
+{
+	my $self = shift;
+	return $self->{employerOrSchoolId};
+}
+
 
 sub setType
 {
@@ -312,6 +352,15 @@ sub convertDateToMMDDYYYYFromCCYYMMDD
 	{
 		return "";
 	}
+}
+sub printVal
+{
+	my ($self) = @_;
+	foreach my $key (keys(%$self))
+	{
+		print " payer $key = " . $self->{$key} . " \n";
+	}
+
 }
 
 @CHANGELOG =

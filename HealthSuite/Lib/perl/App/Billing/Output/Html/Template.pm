@@ -6,8 +6,11 @@ use vars qw(@ISA);
 
 # this object is inherited from App::Billing::Output::Driver
 use Devel::ChangeLog;
+use App::Billing::Output::Html::Worker;
+
 use vars qw(@CHANGELOG);
 use constant DATEFORMAT_USA => 1;
+
 sub new
 {
 	my ($type, %params) = @_;
@@ -157,6 +160,7 @@ sub new
 		transProviderName => undef,
 		signatureInsured => undef,
 		signaturePatient => undef,
+		signaturePatientDate => undef,
 	};
 
 	return bless \%params, $type;
@@ -165,6 +169,7 @@ sub new
 sub populateTemplate
 {
 	my ($self, $claim, $procesedProc) = @_;
+	
 	$self->populatePatient($claim);
 	$self->populateInsured($claim);
 	$self->populateOtherInsured($claim);
@@ -228,6 +233,7 @@ sub populatePatient
 	$data->{patientStatusStudentFullTime} = uc($patient->getStudentStatus)  =~ /STUDENT \(FULL-TIME\)|F|0/ ? "checked" : "";
 	$data->{patientStatusStudentPartTime} = uc($patient->getStudentStatus)  =~ /STUDENT \(PART-TIME\)|P|1/ ? "checked" : "";
 	$data->{signaturePatient} = uc($patient->getSignature()) =~ /C|S|B|P/ ? 'Signature on File' : "";
+	$data->{signaturePatientDate} = uc($patient->getSignatureDate())
 };
 
 sub populateInsured
@@ -238,16 +244,17 @@ sub populateInsured
 	my $insuredAddress = $insured->getAddress();
 	my $data = $self->{data};
 
-	$data->{insuredName} = $insured->getLastName() . " " . $insured->getFirstName() . " " . $insured->getMiddleInitial();
+	$data->{insuredName} = $claim->{insured}->[$claimType]->getLastName() . " " . $claim->{insured}->[$claimType]->getFirstName() . " " . $claim->{insured}->[$claimType]->getMiddleInitial();
 	$data->{insuredDateOfBirth} = $insured->getDateOfBirth(DATEFORMAT_USA);
 	$data->{insuredSexM} = $insured->getSex() eq 'M' ? "Checked" : "";
 	$data->{insuredSexF} = $insured->getSex() eq 'F' ? "Checked" : "";
-	$data->{insuredAddressCity} = $insuredAddress->getCity;	
-	$data->{insuredAddressState} = $insuredAddress->getState;
-	$data->{insuredAddressTelephone} = $insuredAddress->getTelephoneNo;
-	$data->{insuredAddressZipCode} = $insuredAddress->getZipCode;
-	$data->{insuredAddress} = $insuredAddress->getAddress1 . " " . $insuredAddress->getAddress2;
-	$data->{insuredId} = $insured->getSsn;
+	my $dataA = $claim->{insured}->[$claimType]->getAddress();
+	$data->{insuredAddressCity} = $dataA->getCity;	
+	$data->{insuredAddressState} = $dataA->getState;
+	$data->{insuredAddressTelephone} = $dataA->getTelephoneNo;
+	$data->{insuredAddressZipCode} = $dataA->getZipCode;
+	$data->{insuredAddress} = $dataA->getAddress1 . " " . $dataA->getAddress2;
+	$data->{insuredId} = $claim->{insured}->[$claimType]->getSsn();
 	$insured = $claim->{insured}->[0];
 	$data->{insuredEmployerOrSchoolName} = $insured->getEmployerOrSchoolName;
 	$data->{insuredInsurancePlanOrProgramName} = $insured->getInsurancePlanOrProgramName;	
@@ -455,9 +462,11 @@ sub populateProcedure
 	my @diagCodes = split(/,/, $cod);
 	for (my $diagnosisCount = 0; $diagnosisCount <= $#diagCodes; $diagnosisCount++)
 	{
-	$ptr = $ptr . $tb->[0]->{$diagCodes[$diagnosisCount]} . " "  ;
+	$ptr = $ptr . $tb->[0]->{$diagCodes[$diagnosisCount]} . ","  ;
 	}
 #	my $ptr = $procedure->getDiagnosisCodePointer;
+#	$ptr =~ s/ /,/g;
+	$ptr = substr($ptr, 0,length($ptr)-1);
 	$data->{'procedure' . $i . 'DiagnosisCodePointer'} = $ptr; # join (' ', @$ptr);
 	$data->{'procedure' . $i . 'Charges'} = $procedure->getCharges;
 	$data->{'procedure' . $i . 'DaysOrUnits'} = substr ('000' . $procedure->getDaysOrUnits(), length('000' . $procedure->getDaysOrUnits()) - 3);

@@ -434,7 +434,7 @@
                       <tr class="cell">
                         <td class="cell"> &nbsp &nbsp</td>
                         <td class="cell">
-                          <strong> &nbsp &nbsp &nbsp {$signaturePatient} <strong>
+                          <strong> &nbsp &nbsp &nbsp {$signaturePatient} &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp {$signaturePatientDate}<strong>
                         </td>
                       </tr>
                       <tr class="cell">

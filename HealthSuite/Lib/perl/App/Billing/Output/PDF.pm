@@ -8,8 +8,11 @@ use pdflib 2.01;
 
 use vars qw(@ISA);
 use Devel::ChangeLog;
-
+use App::Billing::Output::PDF::Worker;
 use vars qw(@CHANGELOG);
+
+use constant CLAIM_TYPE_WORKCOMP => 6;
+
 
 use constant FORM_RED => 0.7;
 use constant FORM_GREEN => 0.0;
@@ -1593,7 +1596,13 @@ sub populatePDF
 	my ($self, $p, $Claim, $cordinates, $procesedProc)  = @_;
 	
 	pdflib::PDF_setrgbcolor($p, DATA_RED, DATA_GREEN, DATA_BLUE);
-	
+	if ($Claim->getInvoiceSubtype() == CLAIM_TYPE_WORKCOMP)
+	{
+		my $pdfWorker = new App::Billing::Output::PDF::Worker();
+		$pdfWorker->populate($p, $Claim, $cordinates, $procesedProc);
+	}
+	else
+	{
 	$self->box1ClaimData($p, $Claim, $cordinates);
 	$self->box1aClaimData($p, $Claim, $cordinates);
 	$self->box2ClaimData($p, $Claim, $cordinates);
@@ -1606,9 +1615,9 @@ sub populatePDF
 	$self->box7ClaimData($p, $Claim, $cordinates);
 	$self->box7aClaimData($p, $Claim, $cordinates);
 	$self->box7bClaimData($p, $Claim, $cordinates);
+	$self->box11ClaimData($p, $Claim, $cordinates);
 	$self->box8ClaimData($p, $Claim, $cordinates);
 	$self->box10ClaimData($p, $Claim, $cordinates);
-	$self->box11ClaimData($p, $Claim, $cordinates);
 	$self->box11aClaimData($p, $Claim, $cordinates);
 	$self->box11bClaimData($p, $Claim, $cordinates);
 	$self->box11cClaimData($p, $Claim, $cordinates);
@@ -1640,8 +1649,9 @@ sub populatePDF
 	$self->box31ClaimData($p, $Claim, $cordinates);
 	$self->box32ClaimData($p, $Claim, $cordinates);
 	$self->box33ClaimData($p, $Claim, $cordinates);
-	
+	}
 	pdflib::PDF_setrgbcolor($p, FORM_RED, FORM_GREEN, FORM_BLUE);
+		
 	
 }
 
@@ -1682,7 +1692,8 @@ sub box1aClaimData
 	die "Couldn't set font"  if ($font == -1);
 	pdflib::PDF_setfont($p, $font, DATA_FONT_SIZE);
 	my $claimType = $claim->getClaimType();
-	pdflib::PDF_show_xy($p ,$claim->{insured}->[$claimType]->getSsn() , $box1aX + CELL_PADDING_X + DATA_PADDING_X, $box1Y - 3 * FORM_FONT_SIZE);
+	my $data = $claim->{insured}->[$claimType]->getSsn();
+	pdflib::PDF_show_xy($p , $data , $box1aX + CELL_PADDING_X + DATA_PADDING_X, $box1Y - 3 * FORM_FONT_SIZE);
 	pdflib::PDF_stroke($p);
 }
 
@@ -1696,7 +1707,6 @@ sub box2ClaimData
 	my $font = pdflib::PDF_findfont($p, DATA_FONT_NAME, "default", 0);
 	die "Couldn't set font"  if ($font == -1);
 	pdflib::PDF_setfont($p, $font, DATA_FONT_SIZE);
-	
 	pdflib::PDF_show_xy($p , $claim->{careReceiver}->getLastName() .", " . $claim->{careReceiver}->getFirstName() . " " . $claim->{careReceiver}->getMiddleInitial() , $box2X + CELL_PADDING_X + DATA_PADDING_X, $box2Y - 3 * FORM_FONT_SIZE);
 	pdflib::PDF_stroke($p);
 
@@ -1743,7 +1753,8 @@ sub box4ClaimData
 	die "Couldn't set font"  if ($font == -1);
 	pdflib::PDF_setfont($p, $font, DATA_FONT_SIZE);
 	my $claimType = $claim->getClaimType();
-	pdflib::PDF_show_xy($p, $claim->{insured}->[$claimType]->getLastName() . " " . $claim->{insured}->[$claimType]->getFirstName() . " " . $claim->{insured}->[$claimType]->getMiddleInitial() , $box4X + CELL_PADDING_X + DATA_PADDING_X, $box4Y - 3 * FORM_FONT_SIZE);
+	my $data = $claim->{insured}->[$claimType]->getLastName() . " " . $claim->{insured}->[$claimType]->getFirstName() . " " . $claim->{insured}->[$claimType]->getMiddleInitial();
+	pdflib::PDF_show_xy($p, $data , $box4X + CELL_PADDING_X + DATA_PADDING_X, $box4Y - 3 * FORM_FONT_SIZE);
 	pdflib::PDF_stroke($p);
 }
 
@@ -1856,8 +1867,9 @@ sub box7ClaimData
 	die "Couldn't set font"  if ($font == -1);
 	pdflib::PDF_setfont($p, $font, DATA_FONT_SIZE);
 	my $claimType = $claim->getClaimType();
-	pdflib::PDF_show_xy($p , $claim->{insured}->[$claimType]->{address}->getAddress1(), $box7X + CELL_PADDING_X + DATA_PADDING_X, $box7Y  - 2.5 * FORM_FONT_SIZE);
-	pdflib::PDF_show_xy($p , $claim->{insured}->[$claimType]->{address}->getAddress2(), $box7X + CELL_PADDING_X + DATA_PADDING_X, $box7Y  - 3.5 * FORM_FONT_SIZE);
+	my $data = $claim->{insured}->[$claimType]->getAddress();
+	pdflib::PDF_show_xy($p , $data->getAddress1(), $box7X + CELL_PADDING_X + DATA_PADDING_X, $box7Y  - 2.5 * FORM_FONT_SIZE);
+	pdflib::PDF_show_xy($p , $data->getAddress2(), $box7X + CELL_PADDING_X + DATA_PADDING_X, $box7Y  - 3.5 * FORM_FONT_SIZE);
 
 	pdflib::PDF_stroke($p);
 }
@@ -1874,8 +1886,10 @@ sub box7aClaimData
 	die "Couldn't set font"  if ($font == -1);
 	pdflib::PDF_setfont($p, $font, DATA_FONT_SIZE);
 	my $claimType = $claim->getClaimType();
-	pdflib::PDF_show_xy($p , $claim->{insured}->[$claimType]->{address}->getCity(),$box7aX + CELL_PADDING_X + DATA_PADDING_X, $box7aY - 3 * FORM_FONT_SIZE);
-	pdflib::PDF_show_xy($p , substr($claim->{insured}->[$claimType]->{address}->getState(),0,7), $box7aX + CELL_PADDING_X + $stateSpace + 3, $box7aY - 3 * FORM_FONT_SIZE);
+	my $data = $claim->{insured}->[$claimType]->getAddress();
+
+	pdflib::PDF_show_xy($p , $data->getCity(),$box7aX + CELL_PADDING_X + DATA_PADDING_X, $box7aY - 3 * FORM_FONT_SIZE);
+	pdflib::PDF_show_xy($p , substr($data->getState(),0,7), $box7aX + CELL_PADDING_X + $stateSpace + 3, $box7aY - 3 * FORM_FONT_SIZE);
 	pdflib::PDF_stroke($p);
 }
 
@@ -1892,9 +1906,11 @@ sub box7bClaimData
 	die "Couldn't set font"  if ($font == -1);
 	pdflib::PDF_setfont($p, $font, DATA_FONT_SIZE);
 	my $claimType = $claim->getClaimType();
-	pdflib::PDF_show_xy($p , $claim->{insured}->[$claimType]->{address}->getZipCode, $box7bX + CELL_PADDING_X  + DATA_PADDING_X, $box7bY - 3.5 * FORM_FONT_SIZE);
-	pdflib::PDF_show_xy($p , substr($claim->{insured}->[$claimType]->{address}->getTelephoneNo, 0, 3), $box7bX + $stateSpace + CELL_PADDING_X + 20, $box7bY - 3.5 * FORM_FONT_SIZE);
-	pdflib::PDF_show_xy($p , substr($claim->{insured}->[$claimType]->{address}->getTelephoneNo, 3, 25), $box7bX + $stateSpace + CELL_PADDING_X + 50, $box7bY - 3.5 * FORM_FONT_SIZE) if (length($claim->{insured}->[$claimType]->{address}->getTelephoneNo) > 3);
+	my $data = $claim->{insured}->[$claimType]->getAddress();
+
+	pdflib::PDF_show_xy($p , $data->getZipCode, $box7bX + CELL_PADDING_X  + DATA_PADDING_X, $box7bY - 3.5 * FORM_FONT_SIZE);
+	pdflib::PDF_show_xy($p , substr($data->getTelephoneNo, 0, 3), $box7bX + $stateSpace + CELL_PADDING_X + 20, $box7bY - 3.5 * FORM_FONT_SIZE);
+	pdflib::PDF_show_xy($p , substr($data->getTelephoneNo, 3, 25), $box7bX + $stateSpace + CELL_PADDING_X + 50, $box7bY - 3.5 * FORM_FONT_SIZE) if (length($data->getTelephoneNo) > 3);
 	pdflib::PDF_stroke($p);
 }
 
@@ -2557,8 +2573,10 @@ sub box24ClaimData
 				my @diagCodes = split(/,/, $cod);
 				for	(my $diagnosisCount = 0; $diagnosisCount <= $#diagCodes; $diagnosisCount++)
 				{
-					$ptr = $ptr . $tb->[0]->{$diagCodes[$diagnosisCount]} . " "  ;
+					$ptr = $ptr . $tb->[0]->{$diagCodes[$diagnosisCount]} . ","  ;
 				}
+				$ptr = substr($ptr, 0, length($ptr)-1);
+#				$ptr =~ s/$,//g;
 				pdflib::PDF_show_xy($p , $ptr , $box24X + STARTX_BOX24E_SPACE + CELL_PADDING_X + 14, $y + 6);
 				$ptr = "";
 				my @amount  = split (/\./ , $procedure->getCharges());

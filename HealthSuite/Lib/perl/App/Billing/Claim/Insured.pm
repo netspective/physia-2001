@@ -24,7 +24,6 @@ sub new
 	$self->{policyGroupName} = undef;
 	$self->{policyGroupOrFECANo} = undef;
 	$self->{otherInsuranceIndicator} = undef;
-	$self->{employerOrSchoolName} = undef;
 	$self->{insurancePlanOrProgramName} = undef;
 	$self->{anotherHealthBenefitPlan} = undef;
 	$self->{typeCode} = undef;
@@ -34,21 +33,9 @@ sub new
 	$self->{terminationDate} = undef;
 	$self->{billSequence} = undef;
 	$self->{bcbsPlanCode} = undef;
-	$self->{employerAddress} = undef;
 	return bless $self, $type;
 }
 
-sub getEmployerAddress
-{
-	my ($self) = @_;
-	return $self->{employerAddress};
-}
-
-sub setEmployerAddress
-{
-	my ($self, $value) = @_;
-	$self->{employerAddress} = $value;
-}
 
 sub getBillSequence
 {
@@ -219,11 +206,6 @@ sub getPolicyGroupOrFECANo
 	return $self->{policyGroupOrFECANo};
 }
 
-sub getEmployerOrSchoolName
-{
-	my $self = shift;
-	return $self->{employerOrSchoolName};
-}
 
 sub getInsurancePlanOrProgramName
 {
@@ -249,11 +231,6 @@ sub setPolicyGroupOrFECANo
 	$self->{policyGroupOrFECANo} = $value;
 }
 
-sub setEmployerOrSchoolName
-{
-	my ($self, $value) = @_;
-	$self->{employerOrSchoolName} = $value;
-}
 
 sub setInsurancePlanOrProgramName
 {

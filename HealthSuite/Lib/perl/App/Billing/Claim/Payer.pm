@@ -35,7 +35,8 @@ sub new
 	$self->{billSequence} = undef;
 	$self->{payerId} = undef; # envoy id for payer
 	$self->{type} = undef;
-	
+	$self->{insurancePlanOrProgramName}	= undef;
+
 	return bless $self, $type;
 }
 
@@ -45,6 +46,19 @@ sub property
 	$self->{$name} = $value if defined $value;
 	return $self->{$name};
 }
+
+sub getInsurancePlanOrProgramName
+{
+	my $self = shift;
+	return $self->{insurancePlanOrProgramName};
+}
+
+sub setInsurancePlanOrProgramName
+{
+	my ($self, $value) = @_;
+	$self->{insurancePlanOrProgramName} = $value;
+}
+
 
 sub getType
 {
