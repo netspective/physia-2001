@@ -73,6 +73,9 @@
 			tabs is clicked.
 		</deliverable>
 
+		<deliverable id="1452">
+			Script to Parse Statement Status Reports From Per-Se and update database.  Scripts assumes the file provider from PerSe is fixed formatted.  Meaning the start column position for data fields is the same.
+			Database : requires new Statement tables
 		<deliverable id="1511">
 			UI: Looking up a nurse's session set of physicians reveals his/her session set of physicians
 			not those of the current user of the app.
