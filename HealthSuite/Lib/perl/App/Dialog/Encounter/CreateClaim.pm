@@ -34,7 +34,6 @@ use Devel::ChangeLog;
 @ISA = qw(App::Dialog::Encounter);
 
 use constant NEXTACTION_ADDPROC => "/invoice/%param.invoice_id%/dialog/procedure/add";
-#use constant NEXTACTION_ONHOLD => "/invoice/%param.invoice_id%/dialog/hold";
 use constant NEXTACTION_CLAIMSUMM => "/invoice/%param.invoice_id%/summary";
 use constant NEXTACTION_PATIENTACCT => "/person/%field.attendee_id%/account";
 use constant NEXTACTION_POSTPAYMENT => "/invoice/%param.invoice_id%/dialog/postinvoicepayment?paidBy=personal";
@@ -75,20 +74,6 @@ sub initialize
 		data => "claim '#param.invoice_id#' to <a href='/person/#field.attendee_id#/account'>#field.attendee_id#</a>"
 	};
 
-	$self->addFooter(new CGI::Dialog::Buttons(
-						nextActions_add => [
-							['Add a Procedure', NEXTACTION_ADDPROC],
-							#['Place this claim on hold', NEXTACTION_ONHOLD],
-							['Go to Claim Summary', NEXTACTION_CLAIMSUMM, 1],
-							['Go to Patient Account', NEXTACTION_PATIENTACCT],
-							['Post Personal Payment to this Claim', NEXTACTION_POSTPAYMENT],
-							['Post Transfer for this Patient', NEXTACTION_POSTTRANSFER],
-							['Add Claim', NEXTACTION_CREATECLAIM],
-							['Add Hospital Claim', NEXTACTION_CREATEHOSPCLAIM],
-							['Return to Work List', NEXTACTION_WORKLIST],
-							],
-						cancelUrl => $self->{cancelUrl} || undef));
-
 	return $self;
 }
 
@@ -110,11 +95,26 @@ sub makeStateChanges
 	{
 		$self->heading('$Command Hospital Claim');
 		$self->updateFieldFlags('org_fields', FLDFLAG_INVISIBLE, 1);
+
+		$self->addFooter(new CGI::Dialog::Buttons(cancelUrl => $self->{cancelUrl} || undef));
 	}
 	else
 	{
 		$self->heading('$Command Claim');
 		$self->updateFieldFlags('hosp_org_fields', FLDFLAG_INVISIBLE, 1);
+
+		$self->addFooter(new CGI::Dialog::Buttons(
+				nextActions_add => [
+					['Add a Procedure', NEXTACTION_ADDPROC],
+					['Go to Claim Summary', NEXTACTION_CLAIMSUMM, 1],
+					['Go to Patient Account', NEXTACTION_PATIENTACCT],
+					['Post Personal Payment to this Claim', NEXTACTION_POSTPAYMENT],
+					['Post Transfer for this Patient', NEXTACTION_POSTTRANSFER],
+					['Add Claim', NEXTACTION_CREATECLAIM],
+					['Add Hospital Claim', NEXTACTION_CREATEHOSPCLAIM],
+					['Return to Work List', NEXTACTION_WORKLIST],
+					],
+				cancelUrl => $self->{cancelUrl} || undef));
 	}
 
 	#turn these fields off if there is no person id
@@ -185,47 +185,11 @@ sub execute_remove
 	foreach my $item (@{$lineItems})
 	{
 		my $itemType = $item->{item_type};
-		my $itemId = $item->{item_id};
-		my $voidItemType = App::Universal::INVOICEITEMTYPE_VOID;
-
 		next if $itemType == App::Universal::INVOICEITEMTYPE_ADJUST;
-		next if $itemType == $voidItemType;
+		next if $itemType == App::Universal::INVOICEITEMTYPE_VOID;
 		next if $item->{data_text_b} eq 'void';
 
-		my $extCost = 0 - $item->{extended_cost};
-		my $itemBalance = $extCost;
-		my $emg = $item->{emergency};
-		$page->schemaAction(
-			'Invoice_Item', 'add',
-			parent_item_id => $itemId || undef,
-			parent_id => $invoiceId || undef,
-			item_type => defined $voidItemType ? $voidItemType : undef,
-			service_begin_date => $item->{service_begin_date} || undef,
-			service_end_date => $item->{service_end_date} || undef,
-			hcfa_service_place => $item->{hcfa_service_place} || undef,
-			hcfa_service_type => $item->{hcfa_service_type} || undef,
-			modifier => $item->{modifier} || undef,
-			quantity => $item->{quantity} || undef,
-			emergency => defined $emg ? $emg : undef,
-			code => $item->{code} || undef,
-			caption => $item->{caption} || undef,
-			#comments =>  $item->{} || undef,
-			unit_cost => $item->{unit_cost} || undef,
-			rel_diags => $item->{rel_diags} || undef,
-			data_text_a => $item->{data_text_a} || undef,
-			extended_cost => defined $extCost ? $extCost : undef,
-			_debug => 0
-		);
-
-		$page->schemaAction(
-			'Invoice_Item', 'update',
-			item_id => $itemId || undef,
-			data_text_b => 'void',
-			_debug => 0
-		);
-
-		$self->handlePostExecute($page, $command, $flags);
-
+		voidInvoiceItem($page, $invoiceId, $item->{item_id});
 	}
 
 
