@@ -24,6 +24,12 @@ sub initialize
 	$self->heading('Check-In');
 
 	$self->SUPER::initialize();
+	$self->{activityLog} =
+			{
+				scope =>'person',
+				key => "#field.person_id#",
+				data => "Checkin <a href='/person/#field.attendee_id#/profile'>#field.attendee_id#</a> (Appt Time: #field.start_time#)"
+	};
 
 	$self->addFooter(new CGI::Dialog::Buttons);
 	return $self;
