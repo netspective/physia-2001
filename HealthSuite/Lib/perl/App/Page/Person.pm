@@ -68,8 +68,10 @@ sub initialize
 
 	my $guarantor = 'Guarantor';
 	my $guarantorName =  $STMTMGR_PERSON->getRowAsHash($self, STMTMGRFLAG_NONE, 'selAttribute', $personId, $guarantor);
-	my $respPerson = $guarantorName->{'value_text'} eq $personId ? 'Self' :  $guarantorName->{'value_text'};
+	my $respPersonSimpleName = $STMTMGR_PERSON->getSingleValue($self, STMTMGRFLAG_NONE, 'selPersonSimpleNameById', $guarantorName->{'value_text'});
+	my $respPerson = $guarantorName->{'value_text'} eq $personId ? 'Self' : $guarantorName->{'value_text'};
 	$self->property('person_responsible', $respPerson);
+	$self->property('person_responsible_simple_name', $respPersonSimpleName);
 
 	unless($self->property('person_categories'))
 	{
@@ -208,7 +210,7 @@ sub prepare_page_content_header
 	$profileLine .= '&nbsp;#property.person_marstat_caption# ' if $self->property('person_marstat_caption');
 	if ($self->property('person_responsible'))
 	{
-		$profileLine .=  $self->property('person_responsible') eq 'Self' ? '&nbsp;Responsible Person: #property.person_responsible# ' : '&nbsp;Responsible Person: <A HREF="/person/#property.person_responsible#/profile">#property.person_responsible#</A> ';
+		$profileLine .=  $self->property('person_responsible') eq 'Self' ? '&nbsp;Responsible Person: #property.person_responsible# ' : '&nbsp;Responsible Person: #property.person_responsible_simple_name# (<A HREF="/person/#property.person_responsible#/profile">#property.person_responsible#</A>) ';
 	}
 
 	my $homeArl = '/' . $self->param('arl');
