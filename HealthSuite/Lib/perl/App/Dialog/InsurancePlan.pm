@@ -228,8 +228,22 @@ sub validateExistingInsSeq
 	my $billSeqExists = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInsuranceByBillSequence', $value, $personId);
 	my $billSeqCap = $STMTMGR_INSURANCE->getSingleValue($page, STMTMGRFLAG_NONE, 'selInsuranceBillCaption', $value);
 
-	return $billSeqExists->{ins_internal_id} ne '' ?
-			("\u$billSeqCap insurance for '$personId' already exists.") : ();
+	
+	return ("\u$billSeqCap insurance for '$personId' already exists.") if $billSeqExists->{ins_internal_id} ne '';
+
+	# If it's Secondary - Quatinary
+	if ($value > App::Universal::INSURANCE_PRIMARY && $value <= App::Universal::INSURANCE_QUATERNARY)
+	{
+		foreach my $seq (App::Universal::INSURANCE_PRIMARY .. ($value-1))
+		{
+			unless($STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInsuranceByBillSequence', $seq, $personId))
+			{
+				my $seqCap = $STMTMGR_INSURANCE->getSingleValue($page, STMTMGRFLAG_NONE, 'selInsuranceBillCaption', $seq);
+				return ("\u$seqCap insurance for '$personId' must exist before adding \u$billSeqCap coverage.");
+			}
+		}
+	}
+	return ();
 }
 
 sub populateData
