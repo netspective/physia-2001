@@ -47,11 +47,6 @@ sub prepare_view_date
 			</TR>
 			<TR VALIGN=TOP>
 				<TD>
-					#component.stp-person.phoneMessage#<BR>
-					#component.stp-person.refillRequest#<BR>
-				</TD>
-				<TD>&nbsp;</TD>
-				<TD>
 					#component.lookup-records#<BR>
 				</TD>
 				<TD>&nbsp;</TD>
@@ -59,7 +54,11 @@ sub prepare_view_date
 					#component.create-records# <BR>
 					#component.navigate-reports-root#
 				</TD>
-
+				<TD>&nbsp;</TD>
+				<TD>
+					#component.stp-person.phoneMessage#<BR>
+					#component.stp-person.refillRequest#<BR>
+				</TD>
 			</TR>
 		</TABLE>
 	});
