@@ -9,6 +9,9 @@
 	</release-info>
 	
 	<deliverables>
+		<deliverable id="978">
+			UI:  Added a new field called 'Gender' in the 'Responsible party' dialog.
+		</deliverable>
 
 	</deliverables>
 </release-notes>
