@@ -11,8 +11,10 @@ use CGI::Validator::Field;
 use CGI::Dialog;
 use Date::Manip;
 use App::Statements::Invoice;
-#use Schema::Utilities;
+use App::Universal;
 
+#use Schema::Utilities;
+my $CLOSE_ATTRR_TYPE = App::Universal::ATTRTYPE_DATE;
 use vars qw(@ISA);
 @ISA = qw(CGI::Dialog::MultiField);
 
@@ -61,7 +63,7 @@ sub isValid
 		foreach my $invoiceId (@list)
 		{
 			$orgInternalId = $STMTMGR_INVOICE->getSingleValue($page,STMTMGRFLAG_NONE,'selServiceOrgByInvoiceId',$invoiceId);
-			my $item = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_NONE, 'selValueDateByItemNameAndValueTypeAndParent', $orgInternalId,'Retire Batch Date',0);
+			my $item = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_NONE, 'selValueDateByItemNameAndValueTypeAndParent', $orgInternalId,'Retire Batch Date',$CLOSE_ATTRR_TYPE);
 			next unless $item->{value_date};
 			my $closeDate = Date_SetTime ($item->{value_date});
 			$self->invalidate($page, "Close Date is <b>$item->{value_date}</b> for Invoice $invoiceId. Batch Date must be greater than Close Date ") if ($closeDate >=$checkDate);
@@ -69,7 +71,7 @@ sub isValid
 		return;
 	}
 	
-	my $item = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_NONE, 'selValueDateByItemNameAndValueTypeAndParent', $orgInternalId,'Retire Batch Date',0);
+	my $item = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_NONE, 'selValueDateByItemNameAndValueTypeAndParent', $orgInternalId,'Retire Batch Date',$CLOSE_ATTRR_TYPE);
 	return unless $item->{value_date};
 	my $checkDate = Date_SetTime ($page->field('batch_date'));
 	my $closeDate = Date_SetTime ($item->{value_date});
