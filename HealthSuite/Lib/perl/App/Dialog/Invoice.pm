@@ -37,6 +37,15 @@ sub new
 		new CGI::Dialog::Field(type => 'hidden', name => 'trans_id'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'claim_type'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'current_status'),
+		new CGI::Dialog::Field(type => 'hidden', name => 'batch_item_id'),
+
+		new CGI::Dialog::MultiField(caption => 'Batch ID/Date', name => 'batch_fields', readOnlyWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
+			fields => [
+				new CGI::Dialog::Field(caption => 'Batch ID', name => 'batch_id', options => FLDFLAG_REQUIRED,
+						readOnlyWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE, size => 12),
+				new CGI::Dialog::Field(type => 'date', caption => 'Batch Date', name => 'batch_date', options => FLDFLAG_REQUIRED, 
+						readOnlyWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE),
+			]),
 
 		new App::Dialog::Field::Person::ID(caption => 'Patient ID', name => 'client_id', options => FLDFLAG_REQUIRED, types => ['Patient']),
 		new CGI::Dialog::MultiField(caption => 'Payer ID/Type', name => 'other_payer_fields', hints => "If left blank, invoice will be billed to the 'Patient ID'",
@@ -100,6 +109,10 @@ sub populateData
 	my $billToType = $invoiceBilling->{bill_party_type} == App::Universal::INVOICEBILLTYPE_THIRDPARTYORG || $invoiceBilling->{bill_party_type} == App::Universal::INVOICEBILLTYPE_THIRDPARTYINS ? 'org' : 'person';
 	$page->field('bill_to_type', $billToType);
 
+	my $batchInfo = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoiceAttr', $invoiceId, 'Invoice/Creation/Batch ID');
+	$page->field('batch_item_id', $batchInfo->{item_id});
+	$page->field('batch_id', $batchInfo->{value_text});
+	$page->field('batch_date', $batchInfo->{value_date});
 
 	my $items = $STMTMGR_INVOICE->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'selInvoiceItems', $invoiceId);
 	my $totalItems = scalar(@{$items});
@@ -112,6 +125,65 @@ sub populateData
 		$page->param("_f_item_$line\_description", $items->[$idx]->{caption});
 		$page->param("_f_item_$line\_comments", $items->[$idx]->{comments});
 	}
+}
+
+sub execute_add
+{
+	my ($self, $page, $command, $flags) = @_;
+	addTransactionAndInvoice($self, $page, $command, $flags);
+}
+
+sub execute_update
+{
+	my ($self, $page, $command, $flags) = @_;
+	addTransactionAndInvoice($self, $page, $command, $flags);
+}
+
+sub execute_remove
+{
+	my ($self, $page, $command, $flags) = @_;
+
+	my $sessUser = $page->session('user_id');
+	my $invoiceId = $page->param('invoice_id');
+
+	#VOID INVOICE
+	my $invoiceStatus = App::Universal::INVOICESTATUS_VOID;
+	$page->schemaAction(
+		'Invoice', 'update',
+		invoice_id => $invoiceId || undef,
+		invoice_status => defined $invoiceStatus ? $invoiceStatus : undef,
+		_debug => 0
+	);
+
+
+	#CREATE NEW VOID TRANSACTION FOR VOIDED INVOICE
+	my $parentTransId = $page->field('trans_id');
+	my $transType = App::Universal::TRANSTYPEACTION_VOID;
+	my $transStatus = App::Universal::TRANSSTATUS_ACTIVE;
+	$page->schemaAction(
+		'Transaction', 'add',
+		parent_trans_id => $parentTransId || undef,
+		trans_type => defined $transType ? $transType : undef,
+		trans_status => defined $transStatus ? $transStatus : undef,
+		trans_status_reason => "Invoice $invoiceId has been voided by $sessUser",
+		_debug => 0
+	);
+
+
+	#ADD HISTORY ATTRIBUTE
+	my $historyValueType = App::Universal::ATTRTYPE_HISTORY;
+	my $todaysDate = UnixDate('today', $page->defaultUnixDateFormat());
+	$page->schemaAction(
+		'Invoice_Attribute', 'add',
+		parent_id => $invoiceId,
+		item_name => 'Invoice/History/Item',
+		value_type => defined $historyValueType ? $historyValueType : undef,
+		value_text => "Voided by $sessUser",
+		value_date => $todaysDate,
+		_debug => 0
+	);
+
+	$page->redirect('/search/claim');
 }
 
 sub handlePayer
@@ -199,65 +271,6 @@ sub handlePayer
 	}
 }
 
-sub execute_add
-{
-	my ($self, $page, $command, $flags) = @_;
-	addTransactionAndInvoice($self, $page, $command, $flags);
-}
-
-sub execute_update
-{
-	my ($self, $page, $command, $flags) = @_;
-	addTransactionAndInvoice($self, $page, $command, $flags);
-}
-
-sub execute_remove
-{
-	my ($self, $page, $command, $flags) = @_;
-
-	my $sessUser = $page->session('user_id');
-	my $invoiceId = $page->param('invoice_id');
-
-	#VOID INVOICE
-	my $invoiceStatus = App::Universal::INVOICESTATUS_VOID;
-	$page->schemaAction(
-		'Invoice', 'update',
-		invoice_id => $invoiceId || undef,
-		invoice_status => defined $invoiceStatus ? $invoiceStatus : undef,
-		_debug => 0
-	);
-
-
-	#CREATE NEW VOID TRANSACTION FOR VOIDED INVOICE
-	my $parentTransId = $page->field('trans_id');
-	my $transType = App::Universal::TRANSTYPEACTION_VOID;
-	my $transStatus = App::Universal::TRANSSTATUS_ACTIVE;
-	$page->schemaAction(
-		'Transaction', 'add',
-		parent_trans_id => $parentTransId || undef,
-		trans_type => defined $transType ? $transType : undef,
-		trans_status => defined $transStatus ? $transStatus : undef,
-		trans_status_reason => "Invoice $invoiceId has been voided by $sessUser",
-		_debug => 0
-	);
-
-
-	#ADD HISTORY ATTRIBUTE
-	my $historyValueType = App::Universal::ATTRTYPE_HISTORY;
-	my $todaysDate = UnixDate('today', $page->defaultUnixDateFormat());
-	$page->schemaAction(
-		'Invoice_Attribute', 'add',
-		parent_id => $invoiceId,
-		item_name => 'Invoice/History/Item',
-		value_type => defined $historyValueType ? $historyValueType : undef,
-		value_text => "Voided by $sessUser",
-		value_date => $todaysDate,
-		_debug => 0
-	);
-
-	$page->redirect('/search/claim');
-}
-
 sub addTransactionAndInvoice
 {
 	my ($self, $page, $command, $flags) = @_;
@@ -279,6 +292,7 @@ sub addTransactionAndInvoice
 	my $orgType = App::Universal::ENTITYTYPE_ORG;
 	my $transStatus = App::Universal::TRANSSTATUS_ACTIVE;
 	my $transType = App::Universal::TRANSTYPEVISIT_FACILITY;
+	my $textValueType = App::Universal::ATTRTYPE_TEXT;
 
 	# ------------------------------------------------------------------------------
 
@@ -390,6 +404,17 @@ sub addTransactionAndInvoice
 		value_type => defined $historyValueType ? $historyValueType : undef,
 		value_text => $description,
 		value_date => $todaysDate,
+		_debug => 0
+	);
+
+	$page->schemaAction(
+		'Invoice_Attribute', $command,
+		item_id => $page->field('batch_item_id') || undef,
+		parent_id => $invoiceId || undef,
+		item_name => 'Invoice/Creation/Batch ID',
+		value_type => defined $textValueType ? $textValueType : undef,
+		value_text => $page->field('batch_id') || undef,
+		value_date => $page->field('batch_date') || undef,
 		_debug => 0
 	);
 

@@ -35,6 +35,14 @@ sub new
 
 	$self->addContent(
 		new CGI::Dialog::Field(type => 'hidden', name => 'orgpayer_internal_id'),
+		new CGI::Dialog::Field(caption => 'Invoice ID', name => 'sel_invoice_id', options => FLDFLAG_REQUIRED),
+
+		new CGI::Dialog::MultiField(caption =>'Batch ID/Date', name => 'batch_fields',
+			fields => [
+				new CGI::Dialog::Field(caption => 'Batch ID', name => 'batch_id', size => 12),
+				new CGI::Dialog::Field(type => 'date', caption => 'Batch Date', name => 'batch_date'),
+			]),
+
 
 		#fields for insurance payment
 
@@ -47,7 +55,7 @@ sub new
 
 		new CGI::Dialog::MultiField(caption => 'Check Amount/Number', name => 'check_fields',
 			fields => [
-					new CGI::Dialog::Field(caption => 'Check Amount', name => 'check_amount', readOnlyWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE, options => FLDFLAG_REQUIRED),
+					new CGI::Dialog::Field(caption => 'Check Amount', name => 'check_amount', options => FLDFLAG_REQUIRED),
 					new CGI::Dialog::Field::TableColumn(
 						caption => 'Check Number/Pay Reference',
 						schema => $schema,
@@ -59,29 +67,22 @@ sub new
 		
 		#fields for personal payment
 
-		new CGI::Dialog::Field(caption => 'Total Amount', name => 'total_amount', readOnlyWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE, options => FLDFLAG_REQUIRED),
-				
+		new CGI::Dialog::Field(type => 'currency', caption => 'Total Amount', name => 'total_amount', options => FLDFLAG_REQUIRED),
+
 		new CGI::Dialog::Field(
 				name => 'pay_type',
 				caption => 'Payment Type', 
-				lookup => 'Payment_Type'),
-
-		#new CGI::Dialog::Field::TableColumn(
-		#		caption => 'Payment Type', 
-		#		schema => $schema, 
-		#		column => 'Invoice_Item_Adjust.pay_type'),
+				enum => 'Payment_Type'),
 
 		new CGI::Dialog::MultiField(caption =>'Pay Method/Check No. or Auth. Code', name => 'pay_method_fields',
 			fields => [
 				new CGI::Dialog::Field::TableColumn(
 							schema => $schema,
-							column => 'Invoice_Item_Adjust.pay_method',
-							readOnlyWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE),
+							column => 'Invoice_Item_Adjust.pay_method'),
 				new CGI::Dialog::Field::TableColumn(
 							schema => $schema,
 							column => 'Invoice_Item_Adjust.pay_ref',
-							type => 'text',
-							readOnlyWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE)
+							type => 'text')
 						]),
 
 
@@ -106,54 +107,117 @@ sub makeStateChanges
 	my ($self, $page, $command, $dlgFlags) = @_;
 	$self->SUPER::makeStateChanges($page, $command, $dlgFlags);
 
-	my $isPayer = $page->param('isPayer');
-	
-	my $isPersonal = $isPayer eq 'personal';
-	my $isInsurance = $isPayer eq 'insurance';
+	my $invoiceId = $page->param('invoice_id') || $page->field('sel_invoice_id');
+	my $invoiceInfo = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoice', $invoiceId);
 
-	$page->param('batch_id') ? $self->heading('Add Batch Insurance Payments') : $self->heading("Add \u$isPayer Payment");
+	my $paidBy = $page->param('paidBy');
+	my $isPersonal = $paidBy eq 'personal';
+	my $isInsurance = $paidBy eq 'insurance';
 
-	$self->updateFieldFlags('total_amount', FLDFLAG_INVISIBLE, $isInsurance);
-	#$self->updateFieldFlags('pay_type', FLDFLAG_INVISIBLE, $isInsurance);
-	$self->updateFieldFlags('pay_method_fields', FLDFLAG_INVISIBLE, $isInsurance);
-	$self->updateFieldFlags('check_fields', FLDFLAG_INVISIBLE, $isPersonal);
+	$page->param('_p_batch_id') ? $self->heading('Add Batch Insurance Payments') : $self->heading("Add \u$paidBy Payment");
 
-	#my $payTypeField = $self->getField('pay_type');
-	$self->getField('pay_type')->{fKeyWhere} = "group_name is NULL or group_name = '$isPayer'";
+	if(! $invoiceId || $isInsurance && $invoiceInfo->{invoice_subtype} == App::Universal::CLAIMTYPE_SELFPAY)
+	{
+		if($invoiceId)
+		{
+			$self->getField('sel_invoice_id')->invalidate($page, "Claim $invoiceId is 'Self-Pay'. Cannot apply insurance payment to this claim.");
+		}
+
+		$self->updateFieldFlags('payer_id', FLDFLAG_INVISIBLE, 1);
+		$self->updateFieldFlags('total_amount', FLDFLAG_INVISIBLE, 1);
+		$self->updateFieldFlags('pay_type', FLDFLAG_INVISIBLE, 1);
+		$self->updateFieldFlags('pay_method_fields', FLDFLAG_INVISIBLE, 1);
+		$self->updateFieldFlags('check_fields', FLDFLAG_INVISIBLE, 1);
+		$self->updateFieldFlags('outstanding_heading', FLDFLAG_INVISIBLE, 1);
+		$self->updateFieldFlags('outstanding_items_list', FLDFLAG_INVISIBLE, 1);
+	}
+	elsif($invoiceId)
+	{
+		$self->updateFieldFlags('sel_invoice_id', FLDFLAG_READONLY, 1);
+		$self->updateFieldFlags('total_amount', FLDFLAG_INVISIBLE, $isInsurance);
+		$self->updateFieldFlags('pay_type', FLDFLAG_INVISIBLE, $isInsurance);
+		$self->updateFieldFlags('pay_method_fields', FLDFLAG_INVISIBLE, $isInsurance);
+		$self->updateFieldFlags('check_fields', FLDFLAG_INVISIBLE, $isPersonal);
+	}
+
+	my $batchId = $page->param('_p_batch_id') || $page->field('batch_id');
+	my $batchDate = $page->param('_p_batch_date') || $page->field('batch_date');
+	if( $batchId && $batchDate )
+	{
+		$self->setFieldFlags('batch_fields', FLDFLAG_READONLY, 1);
+	}
+
+	$self->getField('pay_type')->{fKeyWhere} = "group_name is NULL or group_name = '$paidBy'";
 }
 
 sub populateData
 {
 	my ($self, $page, $command, $activeExecMode, $flags) = @_;
 
-	my $invoiceId = $page->param('invoice_id');
+	my $invoiceId = $page->param('invoice_id') || $page->field('sel_invoice_id');
+	$page->field('sel_invoice_id', $invoiceId);
 	my $invoiceInfo = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoice', $invoiceId);
-	my $isPayer = $page->param('isPayer');
-	if($isPayer eq 'insurance')
+	my $paidBy = $page->param('paidBy');
+	if($paidBy eq 'insurance')
 	{
 		my $primaryPayer = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoiceBillingPrimary', $invoiceId);
-		my $orgId = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_NONE, 'selRegistry', $primaryPayer->{bill_to_id});
-		$page->field('payer_id', $orgId->{org_id});
-		$page->field('orgpayer_internal_id', $primaryPayer->{bill_to_id});
+		my $billToId = $primaryPayer->{bill_to_id};
+		if($primaryPayer->{bill_party_type} == App::Universal::INVOICEBILLTYPE_THIRDPARTYINS || $primaryPayer->{bill_party_type} == App::Universal::INVOICEBILLTYPE_THIRDPARTYORG)
+		{
+			my $orgId = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_NONE, 'selRegistry', $billToId);
+			$page->field('payer_id', $orgId->{org_id});
+			$page->field('orgpayer_internal_id', $billToId);
+		}
 	}
-	elsif($isPayer eq 'personal')
+	elsif($paidBy eq 'personal')
 	{	
 		$page->field('payer_id', $invoiceInfo->{client_id});
 	}
+
+	if(my $batchId = $page->param('_p_batch_id'))
+	{
+		my $batchDate = $page->param('_p_batch_date');
+		$page->field('batch_id', $batchId);
+		$page->field('batch_date', $batchDate);
+	}
+}
+
+sub customValidate
+{
+	my ($self, $page) = @_;
+
+	my $batchIdField = $self->getField('batch_fields')->{fields}->[0];
+	my $batchDateField = $self->getField('batch_fields')->{fields}->[1];
+	unless($page->param('_p_batch_id') || $page->field('batch_id'))
+	{
+		$batchIdField->invalidate($page, "Please provide a '$batchIdField->{caption}'");
+	}
+	unless($page->param('_p_batch_date') || $page->field('batch_date'))
+	{
+		$batchDateField->invalidate($page, "Please provide a '$batchDateField->{caption}'");
+	}
+
+	my $invoiceId = $page->param('invoice_id') || $page->field('sel_invoice_id');
+	my $invoiceInfo = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoice', $invoiceId);
+	#if($page->param('paidBy') eq 'insurance' && $invoiceInfo->{invoice_subtype} == App::Universal::CLAIMTYPE_SELFPAY)
+	#{
+	
+	#}
 }
 
 sub execute
 {
 	my ($self, $page, $command, $flags) = @_;
+	my $textValueType = App::Universal::ATTRTYPE_TEXT;
 
-	my $isPayer = $page->param('isPayer');
-	my $invoiceId = $page->param('invoice_id');
+	my $paidBy = $page->param('paidBy');
+	my $invoiceId = $page->param('invoice_id') || $page->field('sel_invoice_id');
 
 	my $todaysDate = $page->getDate();
-	my $payerType = $isPayer eq 'insurance' ? App::Universal::ENTITYTYPE_ORG : App::Universal::ENTITYTYPE_PERSON;
+	my $payerType = $paidBy eq 'insurance' ? App::Universal::ENTITYTYPE_ORG : App::Universal::ENTITYTYPE_PERSON;
 	my $adjType = App::Universal::ADJUSTMENTTYPE_PAYMENT;
-	my $payMethod = $isPayer eq 'insurance' ? App::Universal::ADJUSTMENTPAYMETHOD_CHECK : $page->field('pay_method');
-	my $payerId = $isPayer eq 'insurance' ? $page->field('orgpayer_internal_id') : $page->field('payer_id');
+	my $payMethod = $paidBy eq 'insurance' ? App::Universal::ADJUSTMENTPAYMETHOD_CHECK : $page->field('pay_method');
+	my $payerId = $paidBy eq 'insurance' ? $page->field('orgpayer_internal_id') : $page->field('payer_id');
 	my $payRef = $page->field('pay_ref');
 	my $payType = $page->field('pay_type');
 
@@ -189,7 +253,7 @@ sub execute
 
 		my $netAdjust = 0 - $totalAdjsMade;
 		my $comments = $page->param("_f_item_$line\_comments");
-		$page->schemaAction(
+		my $adjItemId = $page->schemaAction(
 			'Invoice_Item_Adjust', 'add',
 			adjustment_type => defined $adjType ? $adjType : undef,
 			adjustment_amount => defined $amtApplied ? $amtApplied : undef,
@@ -214,7 +278,7 @@ sub execute
 		my $historyValueType = App::Universal::ATTRTYPE_HISTORY;
 		my $itemCPT = $page->param("_f_item_$line\_item_adjustments");
 		my $payerIdDisplay = $page->field('payer_id');
-		my $description = "\u$isPayer payment made by '$payerIdDisplay'";
+		my $description = "\u$paidBy payment made by '$payerIdDisplay'";
 		$page->schemaAction(
 			'Invoice_Attribute', 'add',
 			parent_id => $invoiceId || undef,
@@ -223,6 +287,18 @@ sub execute
 			value_text => $description,
 			value_textB => $comments || undef,
 			value_date => $todaysDate,
+			_debug => 0
+		);
+
+		#Create attribute for batchId
+		$page->schemaAction(
+			'Invoice_Attribute', 'add',
+			parent_id => $invoiceId || undef,
+			item_name => 'Invoice/Payment/Batch ID',
+			value_type => defined $textValueType ? $textValueType : undef,
+			value_text => $page->field('batch_id') || undef,
+			value_date => $page->field('batch_date') || undef,
+			value_int => $adjItemId || undef,
 			_debug => 0
 		);
 	}
@@ -249,7 +325,6 @@ sub execute
 
 
 	$page->redirect("/invoice/$invoiceId/summary");
-
 }
 
 1;
