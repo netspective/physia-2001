@@ -931,7 +931,7 @@ sub execAction_submit
 					service_facility_id => $mainTransData->{service_facility_id},
 					code => $icdCode || undef,
 					provider_id => $mainTransData->{provider_id},
-					trans_begin_stamp => $todaysStamp,
+					trans_begin_stamp => $todaysStamp || undef,
 					_debug => 0
 				);
 		}
@@ -960,7 +960,7 @@ sub execAction_submit
 			value_type => App::Universal::ATTRTYPE_HISTORY,
 			value_text => 'Reviewed',
 			value_textB => $page->field('comments') || undef,
-			value_date => $todaysDate,
+			value_date => $todaysDate || undef,
 			_debug => 0
 	);
 }
@@ -989,7 +989,7 @@ sub execute
 
 	my @relDiags = $page->field('procdiags');
 	my @hcpcsCode = split(/,/, $page->field('hcpcs'));
-	my $cptCode = $page->field('procedure');
+	my @cptCode = $page->field('procedure');
 
 	my $comments = $page->field('comments');
 	my $emg = $page->field('emg') == 1 ? 1 : 0;
@@ -1000,11 +1000,11 @@ sub execute
 	## RUN INTELLICODE
 	if($command ne 'remove')
 	{
-		App::IntelliCode::incrementUsage($page, 'Cpt', $cptCode, $sessUser, $sessOrg);
+		App::IntelliCode::incrementUsage($page, 'Cpt', \@cptCode, $sessUser, $sessOrg);
 		#App::IntelliCode::incrementUsage($page, 'Hcpcs', \@hcpcsCode, $sessUser, $sessOrg);
 
 
-		my @itemCosts = App::IntelliCode::getItemCost($page, $cptCode, \@feeSchedules);
+		#my @itemCosts = App::IntelliCode::getItemCost($page, \@cptCode, \@feeSchedules);
 
 	}
 
@@ -1013,7 +1013,7 @@ sub execute
 			item_id => $itemId || undef,
 			parent_id => $invoiceId,
 			item_type => defined $itemType ? $itemType : undef,
-			code => $cptCode || undef,
+			code => $page->field('procedure') || undef,
 			modifier => $page->field('procmodifier') || undef,
 			rel_diags => join(', ', @relDiags) || undef,
 			unit_cost => $page->field('proccharge') || undef,
@@ -1081,7 +1081,7 @@ sub execute
 			value_type => App::Universal::ATTRTYPE_HISTORY,
 			value_text => "$action line item $itemNum",
 			value_textB => $comments || undef,
-			value_date => $todaysDate,
+			value_date => $todaysDate || undef,
 			_debug => 0
 	);
 
