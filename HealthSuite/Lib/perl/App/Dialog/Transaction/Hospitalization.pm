@@ -43,7 +43,7 @@ sub new
 		new CGI::Dialog::MultiField(caption =>'Admission/Discharge Dates', name => 'hosp_dates',
 			fields => [
 				new CGI::Dialog::Field(caption => 'Admission Date', name => 'trans_begin_stamp', type => 'date', options => FLDFLAG_REQUIRED, defaultValue => '', futureOnly => 0),
-				new CGI::Dialog::Field(caption => 'Discharge Date', name => 'trans_end_stamp', type => 'date', defaultValue => '', futureOnly => 1)
+				new CGI::Dialog::Field(caption => 'Discharge Date', name => 'trans_end_stamp', type => 'date', defaultValue => '', futureOnly => 0)
 			]),
 		new CGI::Dialog::Field(caption => 'Duration of Stay', name => 'data_num_a', size => 4, type => 'integer', maxLength => 4, options => FLDFLAG_REQUIRED, hints => 'Days'),			
 
