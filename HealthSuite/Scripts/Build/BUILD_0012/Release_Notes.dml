@@ -63,5 +63,35 @@
 			insurance coverage records out of sequence.
 		</deliverable>
 		
+
+		<deliverable id="417">
+			UI: In Main Menu, there is a new lookup for Modifiers. This lookup has been implemented into add claim and 
+			add procedure dialogs also.			
+		</deliverable>
+
+		<deliverable id="946">
+			UI: Units in add claim is calculated based on the service date range provided.
+		</deliverable>
+
+		<deliverable id="994">
+			UI: Service date fields were added to the generic invoice dialog. They also now appear in the invoice summary
+			and the account summary.
+		</deliverable>
+
+		<deliverable id="1011">
+			UI: Batch Ids are now a part of the invoice/claim history.
+		</deliverable>
+
+		<deliverable id="1021">
+			UI: Payer name in payment dialog for generic invoices now shows correct payer id.
+		</deliverable>
+
+		<deliverable id="1046">
+			UI: Insurance plans will not show up in the Payer drop down in add claim dialog if the patient's insurance
+			is out of sequence.
+		</deliverable>
+
+
+
 	</deliverables>
 </release-notes>
