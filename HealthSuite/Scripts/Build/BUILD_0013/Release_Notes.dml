@@ -43,6 +43,9 @@
 		<deliverable id="934">
 			UI:  Added few more options in the 'Blood Type' drop-down list field and added a new component called 
 			     'Blood Type' in the 'Chart' page.
-		</deliverable>		
+		</deliverable>	
+		<deliverable id="435">
+			UI: Added a printer drop down box in the Add Phone Message dialog that allows you to print a copy of the phone message to a user specified printer in the Org.
+		</deliverable>	
 	</deliverables>
 </release-notes>
