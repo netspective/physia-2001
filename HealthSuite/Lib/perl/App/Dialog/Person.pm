@@ -127,16 +127,16 @@ sub initialize
 		new CGI::Dialog::Subhead(heading => 'Contact Methods', name => 'contact_methods_heading', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE),
 		new CGI::Dialog::MultiField(name => 'home_work_phone', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
 			fields => [
-				new CGI::Dialog::Field(type => 'phone', caption => 'Home Phone', name => 'home_phone', options => FLDFLAG_REQUIRED, invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE),
+				new CGI::Dialog::Field(type => 'phone', caption => 'Home Phone', name => 'home_phone', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE),
 				new CGI::Dialog::Field(type => 'phone', caption => 'Work Phone', name => 'work_phone', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE),
 			]),
+		new CGI::Dialog::Field(type => 'bool', name => 'create_unknown_phone', caption => 'Create record with unknown home phone', style => 'check'),
 
 		new CGI::Dialog::MultiField(caption =>'Cell Phone/Pager', name => 'home_pager_phone', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
 			fields => [
 				new CGI::Dialog::Field(type => 'phone', caption => 'Cell Phone', name => 'cell_phone', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE),
 				new CGI::Dialog::Field(type => 'phone', caption => 'Primary Pager', name => 'primary_pager', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE),
 			]),
-
 		new CGI::Dialog::Field(type => 'phone', caption => 'Alternate', name => 'alternate_phone', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE),
 
 		new App::Dialog::Field::Address(caption=>'Home Address', options => FLDFLAG_REQUIRED, invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE, name => 'address'),
