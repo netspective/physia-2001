@@ -374,6 +374,7 @@ sub storePatientInfo
 			item_name => 'Patient/Name',
 			value_type => defined $textValueType ? $textValueType : undef,
 			value_text => $personData->{complete_name},
+			value_textB => $clientId,
 			_debug => 0
 		);
 
@@ -383,6 +384,7 @@ sub storePatientInfo
 			item_name => 'Patient/Name/Last',
 			value_type => defined $textValueType ? $textValueType : undef,
 			value_text => $personData->{name_last},
+			value_textB => $clientId,
 			_debug => 0
 		);
 
@@ -392,6 +394,7 @@ sub storePatientInfo
 			item_name => 'Patient/Name/First',
 			value_type => defined $textValueType ? $textValueType : undef,
 			value_text => $personData->{name_first},
+			value_textB => $clientId,
 			_debug => 0
 		);
 
@@ -401,6 +404,7 @@ sub storePatientInfo
 			item_name => 'Patient/Name/Middle',
 			value_type => defined $textValueType ? $textValueType : undef,
 			value_text => $personData->{name_middle},
+			value_textB => $clientId,
 			_debug => 0
 		) if $personData->{name_middle} ne '';
 
@@ -527,6 +531,7 @@ sub storeProviderInfo
 			item_name => 'Provider/Name/First',
 			value_type => defined $textValueType ? $textValueType : undef,
 			value_text => $providerInfo->{name_first},
+			value_textB => $providerId,
 			_debug => 0
 		);
 
@@ -536,6 +541,7 @@ sub storeProviderInfo
 			item_name => 'Provider/Name/Middle',
 			value_type => defined $textValueType ? $textValueType : undef,
 			value_text => $providerInfo->{name_middle},
+			value_textB => $providerId,
 			_debug => 0
 		) if $providerInfo->{name_middle} ne '';
 
@@ -545,6 +551,7 @@ sub storeProviderInfo
 			item_name => 'Provider/Name/Last',
 			value_type => defined $textValueType ? $textValueType : undef,
 			value_text => $providerInfo->{name_last},
+			value_textB => $providerId,
 			_debug => 0
 		);
 
