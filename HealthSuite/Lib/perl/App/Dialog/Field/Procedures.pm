@@ -546,8 +546,6 @@ sub getHtml
 	}
 
 	my $readOnly = '';
-	my $invoiceFlags = '';
-	my $attrDataFlag = '';
 	if(my $invoiceId = $page->param('invoice_id'))
 	{
 		my $submitOrder = $page->field('submission_order');
@@ -560,7 +558,7 @@ sub getHtml
 	$lineCount = $isHospClaim ? 10 : $lineCount;
 	for(my $line = 1; $line <= $lineCount; $line++)
 	{
-		$removeChkbox = $allowRemove && ! ($invoiceFlags & $attrDataFlag) ? qq{<TD ALIGN=CENTER $numCellRowSpan><INPUT TYPE="CHECKBOX" NAME='_f_proc_$line\_remove'></TD>} : '';
+		$removeChkbox = $allowRemove ? qq{<TD ALIGN=CENTER $numCellRowSpan><INPUT TYPE="CHECKBOX" NAME='_f_proc_$line\_remove'></TD>} : '';
 
 		#create html for error messages, if any
 		if(ref $lineMsgs[$line] eq 'ARRAY' && @{$lineMsgs[$line]})
@@ -599,17 +597,8 @@ sub getHtml
 
 		#create html for emg field
 		my $emg = $page->param("_f_proc_$line\_emg");
-		my $emgHtml;
-		if($invoiceFlags & $attrDataFlag)
-		{
-			$emgHtml = $emg eq 'on' ? 
-					   "<INPUT $readOnly CLASS='procinput' NAME='_f_proc_$line\_emg' ID='_f_proc_$line\_emg' VALUE='on' TYPE='CHECKBOX' CHECKED><FONT $textFontAttrs/><LABEL FOR='_f_proc_$line\_emg'>Emergency</LABEL></FONT>" : '';		
-		}
-		else
-		{
-			my $checked = $emg eq 'on' ? 'CHECKED' : '';
-			$emgHtml = "<INPUT $readOnly CLASS='procinput' NAME='_f_proc_$line\_emg' ID='_f_proc_$line\_emg' VALUE='on' TYPE='CHECKBOX' $checked><FONT $textFontAttrs/><LABEL FOR='_f_proc_$line\_emg'>Emergency</LABEL></FONT>";
-		}
+		my $checked = $emg eq 'on' ? 'CHECKED' : '';
+		my $emgHtml = "<INPUT $readOnly CLASS='procinput' NAME='_f_proc_$line\_emg' ID='_f_proc_$line\_emg' VALUE='on' TYPE='CHECKBOX' $checked><FONT $textFontAttrs/><LABEL FOR='_f_proc_$line\_emg'>Emergency</LABEL></FONT>";
 
 		$linesHtml .= qq{
 			<INPUT TYPE="HIDDEN" NAME="_f_proc_$line\_fs_used" VALUE='@{[ $page->param("_f_proc_$line\_fs_used")]}'/>
@@ -790,7 +779,7 @@ sub getHtml
 			</TD>
 	} if $allowQuickRef;
 
-	my $removeHd = $allowRemove && ! ($invoiceFlags & $attrDataFlag) ? qq{<TD ALIGN=CENTER><FONT $textFontAttrs><IMG SRC="/resources/icons/action-edit-remove-x.gif"></FONT></TD>} : '';
+	my $removeHd = $allowRemove ? qq{<TD ALIGN=CENTER><FONT $textFontAttrs><IMG SRC="/resources/icons/action-edit-remove-x.gif"></FONT></TD>} : '';
 	my $providerHd = $isHospClaim ? qq{<TD><FONT SIZE=1>&nbsp;</FONT></TD><TD ALIGN=CENTER  COLSPAN=2><FONT $textFontAttrs>Providers<BR>Service/Billing</FONT></TD>} : '';
 	return qq{
 		<TR valign=top $bgColorAttr>
