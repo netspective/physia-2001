@@ -85,6 +85,14 @@ sub populateData
 
 	my $sessUser = $page->session('user_id');
 	$page->field('user_id', $sessUser);
+
+	return unless $flags & CGI::Dialog::DLGFLAG_ADD_DATAENTRY_INITIAL;
+
+	my $batchType = $page->param('_p_batch_type');
+	$page->field('batch_type', $batchType);
+
+	my $batchId = $page->param('_p_batch_id');
+	$page->field('batch_id', $batchId);
 }
 
 sub customValidate
