@@ -166,10 +166,8 @@ sub importInvoice
 
 		if(my $item = $invoice->{comments})
 		{
-			$self->schemaAction($flags, 'Invoice_Attribute', 'add',
+			$self->schemaAction($flags, 'Invoice_History', 'add',
 				parent_id => $invoice->{__invoice_id},
-				item_name => 'Invoice/History/Item',
-				value_type => App::Universal::ATTRTYPE_HISTORY,
 				value_text => 'Created claim',
 				value_textB => $item->{_text},
 				value_date => $item->{date});
