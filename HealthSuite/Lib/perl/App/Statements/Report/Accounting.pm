@@ -210,31 +210,44 @@ $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
 				],
 			},
 	},
-
-
+	
+	'selGetVisit' =>qq
+	{
+		SELECT 	count (decode(t.trans_type ,2000,1,2010,1,2040,1,2050,1,2060,1,2070,1,2080,1,2090,1,2100,1,2120,1,2130,1,2160,1,2170,1,2180,1,0)) 
+			as office_visit,                               
+			count (decode(t.trans_type,2020,1,0)) as hospital_visit
+		FROM	transaction t, invoice i, invoice_attribute ia,org o
+		WHERE	i.main_transaction = t.trans_id
+		AND	ia.parent_id = i.invoice_id
+		AND	ia.item_name = 'Invoice/Creation/Batch ID'
+		AND	(invoice_status !=15 or parent_invoice_id is null)
+		AND 	o.org_internal_id = t.service_facility_id		
+		AND	ia.value_date between to_date(:1,'$SQLSTMT_DEFAULTDATEFORMAT')
+                AND 	to_date(:2,'$SQLSTMT_DEFAULTDATEFORMAT')
+                AND 	(:3 is NULL OR t.service_facility_id = :3 )
+		AND	t.care_provider_id = :4
+                AND 	(ia.value_text >= :5 OR :5 is NULL)
+                AND 	(ia.value_text <= :6 OR :6 is NULL)		
+		AND 	o.owner_org_id = :7
+	},
 	'sel_revenue_collection' => qq{
         SELECT  provider,
-                sum(nvl(ffs_prof,0)) as ffs_prof,
+                sum(nvl(ffs_prof,0)+nvl(misc_charges,0)) as ffs_prof,
                 sum(nvl(x_ray,0)) as x_ray,
                 sum(nvl(lab,0)) as lab,
                 sum(nvl(cap_ffs_prof,0)) as cap_ffs_prof,
                 sum(nvl(cap_x_ray,0)) as cap_x_ray,
                 sum(nvl(cap_lab,0)) as cap_lab,
-                sum(nvl(ffs_pmt,0)) as ffs_pmt,
-                sum(nvl(cap_pmt,0)) as cap_pmt,
-                sum(nvl(ancill_pmt,0)) as ancill_pmt,
-                count((select 1 FROM dual
-                      WHERE rc.trans_type in (2000,2010,2040,2050,2060,2070,2080,2090,2100,2120,2130,2160,2170,2180)
-                     )) as office_visit,                   
-                count((select 1 FROM dual
-                      WHERE rc.trans_type in (2020)
-                     )) as hospital_visit
-                    
+                sum(nvl(ffs_pmt,0)+nvl(ancill_pmt,0)) as ffs_pmt,
+                sum(nvl(cap_pmt,0)++ nvl(cap_month,0)) as cap_pmt,
+                sum(nvl(ancill_pmt,0) + nvl(lab_pmt,0) + nvl(x_ray_pmt,0) ) as ancill_pmt,
+                sum(nvl(refund,0)) as refund,
+                sum(nvl(prof_pmt,0)+ nvl(cap_month,0)) as prof_pmt                
         FROM 	revenue_collection rc,org o
         WHERE   invoice_date between to_date(:1,'$SQLSTMT_DEFAULTDATEFORMAT')
                 AND to_date(:2,'$SQLSTMT_DEFAULTDATEFORMAT')
                 AND (facility = :3 OR :3 is NULL)
-                AND (provider =:4 OR :4 is NULL)
+                AND ( (provider =:4 AND provider is not null )OR :4 is NULL)
                 AND (batch_id >= :5 OR :5 is NULL)
                 AND (batch_id <= :6 OR :6 is NULL)
 		AND o.org_internal_id = rc.facility
