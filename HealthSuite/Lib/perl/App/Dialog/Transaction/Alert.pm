@@ -16,10 +16,10 @@ use vars qw(@ISA %RESOURCE_MAP);
 
 @ISA = qw(CGI::Dialog);
 
-%RESOURCE_MAP = ( 
-	'alert-person' => { 
+%RESOURCE_MAP = (
+	'alert-person' => {
 		transType => App::Universal::TRANSTYPE_ALERTORG, heading => '$Command Alert',
-		_arl => ['person_id'], 
+		_arl => ['person_id'],
 		_arl_modify => ['trans_id'],
 		_idSynonym => [
 			'trans-' .App::Universal::TRANSTYPE_ALERTORG(),
@@ -55,13 +55,13 @@ sub new
 	$self->addContent(
 		new CGI::Dialog::MultiField(
 			fields => [
-				new App::Dialog::Field::Scheduling::Date(caption => 'Begin Alert', 
-					name => 'trans_begin_stamp', 
-					options => FLDFLAG_REQUIRED, 
+				new App::Dialog::Field::Scheduling::Date(caption => 'Begin Alert',
+					name => 'trans_begin_stamp',
+					options => FLDFLAG_REQUIRED,
 					futureOnly => 0
 				),
 				new App::Dialog::Field::Scheduling::Date(caption => 'End Alert',
-					name => 'trans_end_stamp', 
+					name => 'trans_end_stamp',
 					defaultValue => '',
 				),
 			],
@@ -69,7 +69,7 @@ sub new
 		new CGI::Dialog::Field::TableColumn(
 			caption => 'Type',
 			schema => $schema,
-			column => 'Transaction.trans_type', 
+			column => 'Transaction.trans_type',
 			typeRange => '8000..8999',
 			onChangeJS => qq{showFieldsOnValues(event, [@{[ALERT_ACCOUNTING]}], ['data_text_a']);},
 		),
@@ -86,20 +86,20 @@ sub new
 				Payment Plan:'Payment Plan',},
 			type => 'select',
 		),
-		new CGI::Dialog::Field(lookup => 'Alert_Priority', caption => 'Priority', 
-			name => 'trans_subtype', 
+		new CGI::Dialog::Field(lookup => 'Alert_Priority', caption => 'Priority',
+			name => 'trans_subtype',
 			options => FLDFLAG_REQUIRED
 		),
-		new CGI::Dialog::Field(caption => 'Caption', 
-			name => 'caption', 
+		new CGI::Dialog::Field(caption => 'Caption',
+			name => 'caption',
 			options => FLDFLAG_REQUIRED,
 		),
-		new CGI::Dialog::Field(type => 'memo', caption => 'Details', 
-			name => 'detail', 
+		new CGI::Dialog::Field(type => 'memo', caption => 'Details',
+			name => 'detail',
 			options => FLDFLAG_REQUIRED,
 		),
-		new App::Dialog::Field::Person::ID(caption => 'Staff Member', 
-			name => 'initiator_id', 
+		new App::Dialog::Field::Person::ID(caption => 'Staff Member',
+			name => 'initiator_id',
 			types => ['Physician', 'Staff', 'Nurse'],
 			options => FLDFLAG_REQUIRED,
 		),
@@ -112,17 +112,17 @@ sub new
 			options => FLDFLAG_REQUIRED,
 		),
 	);
-	
+
 	$self->{activityLog} =
 	{
 		level => 2,
 		scope =>'transaction',
-		key => "#param.person_id#",
-		data => "Alert '#field.caption#' for <a href='/person/#param.person_id#/profile'>#param.person_id#</a>"
+		key => "#param.person_id##param.org_id#",
+		data => "Alert '#field.caption#' for <a href='/org/#param.org_id#/profile'>#param.org_id#</a><a href='/person/#param.person_id#/profile'>#param.person_id#</a>"
 	};
-	
+
 	$self->addFooter(new CGI::Dialog::Buttons);
-	
+
 	$self->addPostHtml(qq{
 		<script language="JavaScript1.2">
 		<!--
@@ -162,24 +162,24 @@ sub populateData
 sub execute
 {
 	my ($self, $page, $command, $flags) = @_;
-	
+
 	my $transId = $page->param('trans_id');
-	my $transStatus = $command eq 'remove' ? 
+	my $transStatus = $command eq 'remove' ?
 		App::Universal::TRANSSTATUS_INACTIVE : $page->field('trans_status');
-	
+
 	my $actualCommand = $command eq 'remove' ? 'update' : $command;
-	
+
 	my $entityId = $page->param('person_id') ? $page->param('person_id') : $page->param('org_id');
 	my $entityType = $page->param('person_id') ? '0' : '1';
-	
+
 	if($entityType eq '1')
 	{
 		my $orgId = $page->param('org_id') ? $page->param('org_id') : $page->session('org_id');
 		my $orgIntId = $page->session('org_internal_id');
-		$entityId = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgId', $orgIntId, $orgId) 
+		$entityId = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgId', $orgIntId, $orgId)
 			if $page->param('org_id');
 	}
-	
+
 	$page->schemaAction(
 		'Transaction', $actualCommand,
 		trans_id => $transId || undef,
