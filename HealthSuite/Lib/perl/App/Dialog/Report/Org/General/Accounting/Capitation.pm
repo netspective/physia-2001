@@ -26,16 +26,28 @@ sub new
 	my $self = App::Dialog::Report::new(@_, id => 'rpt-capitation', heading => 'Capitation/Utilization Report');
 
 	$self->addContent(
-		new CGI::Dialog::Field(
+		new CGI::Dialog::Field::Duration(
+			name => 'batch',
 			caption => 'Batch Date',
-			name => 'batch_date',
-			type => 'date'
-			),
-		new CGI::Dialog::Field(
-			caption => 'Batch ID',
-			name => 'batch_id',
-			size => 5
-			),
+			begin_caption => 'Batch Begin Date',
+			end_caption => 'Batch End Date',
+		),
+		new CGI::Dialog::MultiField(
+			caption => 'Batch ID Range',
+			name => 'batch_fields',
+			fields => [
+				new CGI::Dialog::Field(
+				caption => 'Batch ID From',
+				name => 'batch_id_from',
+				size => 12
+				),
+				new CGI::Dialog::Field(
+				caption => 'Batch ID To',
+				name => 'batch_id_to',
+				size => 12
+				),
+			]
+		),
 		new App::Dialog::Field::OrgType(
 			caption => 'Org ID',
 			name => 'org_id',
@@ -88,7 +100,7 @@ sub execute
 			{ colIdx => 1, head => 'Org ID',dAlign => 'left', dataFmt => '#1#' },
 			{ colIdx => 2, head => 'Product ID', dAlign => 'left',dataFmt => '#2#' },
 			{ colIdx => 3, head => 'Plan ID', dAlign => 'left',dataFmt => '#3#' },
-			{ colIdx => 4, head => 'Month', dAlign => 'right',dataFmt => '#4#' },
+			{ colIdx => 4, head => 'Month', dAlign => 'left',dataFmt => '#4#' },
 			{ colIdx => 5, head => 'Monthly Ck Amt',summarize => 'sum',dformat => 'currency', dAlign => 'center',dataFmt => '#5#' },
 			{ colIdx => 6, head => 'Copay Exp',summarize => 'sum',dformat => 'currency', dAlign => 'center' ,dataFmt => '#6#' },
 			{ colIdx => 7, head => 'Copay Rcvd',summarize => 'sum',dformat => 'currency', dAlign => 'right' ,dataFmt => '#7#' },
@@ -96,31 +108,43 @@ sub execute
 		],
 	};
 
-	my $batchDate = $page->field('batch_date');
-	my $batchID = $page->field('batch_id');
+	my $batchBeginDate = $page->field('batch_begin_date');
+	my $batchEndDate = $page->field('batch_end_date');
+	my $batchIDFrom = $page->field('batch_id_from');
+	my $batchIDTo = $page->field('batch_id_to');
 	my $planID = $page->field('plan_id');
 	my $productID = $page->field('product_id');
 	my $physicianID = $page->field('provider_id');
 	my $orgID = $page->field('org_id');
 
-	my $batchIDClause1 =qq { and  ta.value_text = \'$batchID\'} if($batchID ne '');
-	my $batchDateClause1 =qq { and ta.value_date = to_date('$batchDate', 'mm/dd/yyyy')} if($batchDate ne '');
-	my $planClause1 =qq { and t.data_text_b = \'$planID\'} if($planID ne '');
-	my $productClause1 =qq { and t.data_text_a = \'$productID\'} if($productID ne '');
-	my $physicianClause1 =qq { and t.provider_id = \'$physicianID\'} if($physicianID ne '');
+	my $batchIDClause1 =qq { and ta.value_text between '$batchIDFrom' and '$batchIDTo'} if($batchIDFrom ne '' && $batchIDTo ne '');
+	$batchIDClause1 =qq { and ta.value_text <= '$batchIDTo' } if($batchIDFrom eq '' && $batchIDTo ne '');
+	$batchIDClause1 =qq { and ta.value_text >= '$batchIDFrom' } if($batchIDFrom ne '' && $batchIDTo eq '');
+
+	my $batchDateClause1 =qq { and ta.value_date between to_date('$batchBeginDate', 'mm/dd/yyyy') and to_date('$batchEndDate', 'mm/dd/yyyy') } if($batchBeginDate ne '' && $batchEndDate ne '');
+	$batchDateClause1 =qq { and ta.value_date <= to_date('$batchEndDate', 'mm/dd/yyyy')	} if($batchBeginDate eq '' && $batchEndDate ne '');
+	$batchDateClause1 =qq { and ta.value_date >= to_date('$batchBeginDate', 'mm/dd/yyyy') } if($batchBeginDate ne '' && $batchEndDate eq '');
+
+	my $planClause1 =qq { and t.data_text_b = '$planID'} if($planID ne '');
+	my $productClause1 =qq { and t.data_text_a = '$productID'} if($productID ne '');
+	my $physicianClause1 =qq { and t.provider_id = '$physicianID'} if($physicianID ne '');
 	my $orgClause1 =qq { and t.receiver_id = $orgID} if($orgID ne '');
 
-	my $batchIDClause2 =qq { and  ia.value_text = \'$batchID\'} if($batchID ne '');
-	my $batchDateClause2 =qq { and ia.value_date = to_date('$batchDate', 'mm/dd/yyyy')} if($batchDate ne '');
-	my $planClause2 =qq { and ins.plan_name = \'$planID\'} if($planID ne '');
-	my $productClause2 =qq { and ins.product_name = \'$productID\'} if($productID ne '');
-	my $physicianClause2 =qq { and t.care_provider_id = \'$physicianID\'} if($physicianID ne '');
+	my $batchIDClause2 =qq { and ia.value_text between '$batchIDFrom' and '$batchIDTo'} if($batchIDFrom ne '' && $batchIDTo ne '');
+	$batchIDClause2 =qq { and ia.value_text <= '$batchIDTo' } if($batchIDFrom eq '' && $batchIDTo ne '');
+	$batchIDClause2 =qq { and ia.value_text >= '$batchIDFrom' } if($batchIDFrom ne '' && $batchIDTo eq '');
+
+	my $batchDateClause2 =qq { and ia.value_date between to_date('$batchBeginDate', 'mm/dd/yyyy') and to_date('$batchEndDate', 'mm/dd/yyyy') } if($batchBeginDate ne '' && $batchEndDate ne '');
+	$batchDateClause2 =qq { and ia.value_date <= to_date('$batchEndDate', 'mm/dd/yyyy')	} if($batchBeginDate eq '' && $batchEndDate ne '');
+	$batchDateClause2 =qq { and ia.value_date >= to_date('$batchBeginDate', 'mm/dd/yyyy') } if($batchBeginDate ne '' && $batchEndDate eq '');
+
+	my $planClause2 =qq { and ins.plan_name = '$planID'} if($planID ne '');
+	my $productClause2 =qq { and ins.product_name = '$productID'} if($productID ne '');
+	my $physicianClause2 =qq { and t.care_provider_id = '$physicianID'} if($physicianID ne '');
 	my $orgClause2 =qq { and t.service_facility_id = $orgID} if($orgID ne '');
 
 	my $sqlStmt = qq {
-		select
-			ta.value_text batchid,
-			to_char(ta.value_date, 'DD-MON-YYYY') batchdate,
+		select distinct
 			t.data_text_b plan,
 			t.data_text_a product,
 			t.provider_id provider,
@@ -143,8 +167,6 @@ sub execute
 			$orgClause1
 		union
 		select
-			ia.value_text batchid,
-			to_char(ia.value_date, 'DD-MON-YYYY') batchdate,
 			ins.plan_name plan,
 			ins.product_name product,
 			t.care_provider_id provider,
@@ -180,18 +202,18 @@ sub execute
 
 	foreach my $row (@$rows)
 	{
-		my $batchIDClauseA =qq { and  ta.value_text = \'$row->{batchid}\'} if($row->{batchid} ne '');
-		my $batchDateClauseA =qq { and ta.value_date = \'$row->{batchdate}\'} if($row->{batchdate} ne '');
-		my $planClauseA =qq { and t.data_text_b = \'$row->{plan}\'} if($row->{plan} ne '');
-		my $productClauseA =qq { and t.data_text_a = \'$row->{product}\'} if($row->{product} ne '');
-		my $physicianClauseA =qq { and t.provider_id = \'$row->{provider}\'} if($row->{provider} ne '');
+#		my $batchIDClauseA = qq { and  ta.value_text = '$row->{batchid}'} if($row->{batchid} ne '');
+#		my $batchDateClauseA = qq { and ta.value_date = to_date('$row->{batchdate}', 'mm/dd/yyyy')} if($row->{batchdate} ne '');
+		my $planClauseA =qq { and t.data_text_b = '$row->{plan}'} if($row->{plan} ne '');
+		my $productClauseA =qq { and t.data_text_a = '$row->{product}'} if($row->{product} ne '');
+		my $physicianClauseA =qq { and t.provider_id = '$row->{provider}'} if($row->{provider} ne '');
 		my $orgClauseA =qq { and t.receiver_id = $row->{org_id}} if($row->{org_id} ne '');
 
-		my $batchIDClauseB =qq { and  ia.value_text = \'$row->{batchid}\'} if($row->{batchid} ne '');
-		my $batchDateClauseB =qq { and ia.value_date =  \'$row->{batchdate}\'} if($row->{batchdate} ne '');
-		my $planClauseB =qq { and ins.plan_name = \'$row->{plan}\'} if($row->{plan} ne '');
-		my $productClauseB =qq { and ins.product_name = \'$row->{product}\'} if($row->{product} ne '');
-		my $physicianClauseB =qq { and t.care_provider_id = \'$row->{provider}\'} if($row->{provider} ne '');
+#		my $batchIDClauseB = qq { and  ia.value_text = '$row->{batchid}'} if($row->{batchid} ne '');
+#		my $batchDateClauseB = qq { and ia.value_date =  to_date('$row->{batchdate}', 'mm/dd/yyyy')} if($row->{batchdate} ne '');
+		my $planClauseB =qq { and ins.plan_name = '$row->{plan}'} if($row->{plan} ne '');
+		my $productClauseB =qq { and ins.product_name = '$row->{product}'} if($row->{product} ne '');
+		my $physicianClauseB =qq { and t.care_provider_id = '$row->{provider}'} if($row->{provider} ne '');
 		my $orgClauseB =qq { and t.service_facility_id = $row->{org_id}} if($row->{org_id} ne '');
 
 		$query0 = qq{
@@ -208,36 +230,34 @@ sub execute
 
 		$query1 = qq{
 						select
-							ta.value_text batchid,
-							ta.value_date batchdate,
 							t.data_text_b plan,
 							t.data_text_a product,
 							t.provider_id provider,
 							t.receiver_id org,
-							t.data_num_a month,
+							m.caption month,
 							sum(t.unit_cost) cap_amount
 						from
 							transaction t,
-							trans_attribute ta
+							trans_attribute ta,
+							month m
 						where
 							t.trans_type = 9030
 							and t.trans_status = 7
 							and t.trans_id = ta.parent_id
 							and ta.item_name = 'Monthly Cap/Payment/Batch ID'
-							$batchIDClauseA
-							$batchDateClauseA
+							and m.id = t.data_num_a
+							$batchIDClause1
+							$batchDateClause1
 							$planClauseA
 							$productClauseA
 							$physicianClauseA
 							$orgClauseA
 						group by
-							ta.value_text,
-							ta.value_date,
 							t.data_text_b,
 							t.data_text_a,
 							t.provider_id,
 							t.receiver_id,
-							t.data_num_a
+							m.caption
 					};
 
 		$row1 = $STMTMGR_RPT_CLAIM_STATUS->getRowAsHash($page,STMTMGRFLAG_DYNAMICSQL,$query1);
@@ -246,11 +266,14 @@ sub execute
 			$amount = $row1->{cap_amount};
 			$month = $row1->{month};
 		}
+		else
+		{
+			$amount = undef;
+			$month = undef;
+		}
 
 		$query2 = qq{
 					select
-						ia.value_text,
-						ia.value_date,
 						t.care_provider_id provider_id,
 						t.service_facility_id org_id,
 						ins.product_name product_id,
@@ -274,15 +297,13 @@ sub execute
 						ib.bill_id = i.billing_id and
 						ib.bill_ins_id = ins.ins_internal_id and
 						t.trans_id = i.main_transaction
-						$batchIDClauseB
-						$batchDateClauseB
+						$batchIDClause2
+						$batchDateClause2
 						$planClauseB
 						$productClauseB
 						$physicianClauseB
 						$orgClauseB
 					group by
-						ia.value_text,
-						ia.value_date,
 						ins.plan_name,
 						ins.product_name,
 						t.care_provider_id,
@@ -295,6 +316,12 @@ sub execute
 			$copay_expected = $row2->{copay_expected};
 			$copay_received = $row2->{copay_received};
 			$patients_seen = $row2->{patients_seen};
+		}
+		else
+		{
+			$copay_expected = undef;
+			$copay_received = undef;
+			$patients_seen = undef;
 		}
 
 		my @rowData = (
