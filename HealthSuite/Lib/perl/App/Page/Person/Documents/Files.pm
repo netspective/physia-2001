@@ -44,7 +44,7 @@ $QDL = File::Spec->catfile($CONFDATA_SERVER->path_Database(), 'QDL', 'Document.q
 	name => 'imagefiles',
 	banner => {
 		actionRows => [
-			{caption => 'Add Document', url => '/person/#session.person_id#/dlg-add-document/#param._specSubType#',},
+			{caption => 'Add Document', url => '/person/#param.person_id#/dlg-add-document/#param._specSubType#?home=#homeArl#',},
 		],
 	},
 	columnDefn => [
@@ -63,13 +63,13 @@ $QDL = File::Spec->catfile($CONFDATA_SERVER->path_Database(), 'QDL', 'Document.q
 sub iconCallback
 {
 	my $value = $_[0]->[$_[1]];
-	if (exists $IMAGETAGS{"images/icons/mime/$value"})
+	if (exists $IMAGETAGS{"icons/mime/$value"})
 	{
-		return $IMAGETAGS{"images/icons/mime/$value"};
+		return $IMAGETAGS{"icons/mime/$value"};
 	}
 	else
 	{
-		return $IMAGETAGS{"images/icons/default"};
+		return $IMAGETAGS{"icons/default"};
 	}
 }
 
