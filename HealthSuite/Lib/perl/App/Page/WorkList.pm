@@ -27,6 +27,7 @@ sub prepare_view_default
 		<P><FONT SIZE=+1>
 		<A HREF='/worklist/patientflow'>Patient Flow Worksheet</A><BR>
 		<A HREF='/worklist/collection'>Collection Worksheet</A><BR>
+		<A HREF='/worklist/referral'>Referral Authorization Worksheet</A><BR>
 		</FONT></P>
 	});
 
