@@ -75,8 +75,7 @@ sub execute_detail
 			#$STMTMGR_CATALOG_SEARCH->createHierHtml($self, STMTMGRFLAG_NONE,
 			#	['sel_catalog_detail', 0, 8],	[uc($expression)],
 			$STMTMGR_CATALOG_SEARCH->createHtml($self, STMTMGRFLAG_NONE,
-				'sel_catalog_detail',	[uc($expression), $self->param('org_id')
-				|| $self->session('org_id')],
+				'sel_catalog_detail',	[uc($expression)],
 		),
 		'</CENTER>'
 	);
