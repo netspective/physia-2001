@@ -496,13 +496,14 @@ sub prepare_page_content_header
 	my $today = UnixDate('today', '%m-%d-%Y');
 	my $nextweek = UnixDate('nextweek', '%m-%d-%Y');
 
-	my $heading = ($self->param('_pm_view') =~ /template/) ? 'Schedule' : 'Appointments';
+	#my $heading = ($self->param('_pm_view') =~ /template/) ? 'Schedule' : 'Appointments';
+	my $heading = 'Scheduling';
 
 	my $urlPrefix = "/schedule";
 	my $functions = $self->getMenu_Simple(App::Page::MENUFLAG_SELECTEDISLARGER,
 		'_pm_view',
 		[
-			['Schedule', "$urlPrefix/apptsheet", 'apptsheet'],
+			['Appointments', "$urlPrefix/apptsheet", 'apptsheet'],
 			['Assign', "$urlPrefix/assign/$today/$today", 'assign'],
 		], ' | ');
 
