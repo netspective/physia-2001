@@ -68,6 +68,28 @@ sub new
 	my $icdType = App::Universal::TRANSTYPEDIAG_ICD;
 	my $notesType = App::Universal::TRANSTYPEDIAG_NOTES;
 	my $surgicalType = App::Universal::TRANSTYPEDIAG_SURGICAL;
+	my $problemType = '';
+
+	if ($transType == $notesType)
+	{
+		$problemType = 'Notes';
+	}
+	elsif ($transType == $transientType)
+	{
+			$problemType = 'Transient diagnosis';
+	}
+	elsif ($transType == $permanentType)
+	{
+			$problemType = 'Permanent diagnosis';
+	}
+	elsif ($transType == $icdType)
+	{
+			$problemType = 'ICD code';
+	}
+	elsif ($transType == $surgicalType)
+	{
+			$problemType = 'Surgical procedure';
+	}
 
 	if($transType == $notesType)
 	{
@@ -106,6 +128,14 @@ sub new
 			new CGI::Dialog::Field(caption => 'Surgery Date', name => 'curr_onset_date', type => 'date'),
 		);
 	}
+
+	$self->{activityLog} =
+		{
+			level => 2,
+			scope =>'Transaction',
+			key => "#param.person_id#",
+			data => "$problemType to <a href='/person/#param.person_id#/profile'>#param.person_id#</a>"
+	};
 
 	$self->addFooter(new CGI::Dialog::Buttons);
 	return $self;
