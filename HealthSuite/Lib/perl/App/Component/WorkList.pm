@@ -231,7 +231,8 @@ sub getComponentHtml
 			$copay->{item_id},
 			
 			$_->{invoice_id} ? qq{
-				<a href='javascript:doActionPopup("/patientbill/$_->{invoice_id}")' class=today>Print</a>
+				<a href='javascript:doActionPopup("/patientbill/$_->{invoice_id}")' class=today title="Print Patient Bill $_->{invoice_id}">
+					Print</a>
 			}
 				: undef,
 

@@ -183,9 +183,9 @@ sub execute
 	my ($self, $dbpage, $flags, $name) = (shift, shift, shift, shift);
 
 	my $execRV = undef;
-	if(($flags & STMTMGRFLAG_DEBUG) || $dbpage->param('_debug_stmt') eq $name)
+	if(($flags & STMTMGRFLAG_DEBUG) || $dbpage->param('_debug_stmt') eq $name || $dbpage->param('_debug_stmt_all'))
 	{
-		$dbpage->addDebugStmt("Query: <b>$name</b>");
+		$dbpage->addDebugStmt("<u>Query</u>: <b>$name</b>");
 		unless($flags & STMTMGRFLAG_DYNAMICSQL)
 		{
 			$dbpage->addDebugStmt('<pre>', $self->{$name}, '</pre');

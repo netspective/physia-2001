@@ -369,7 +369,7 @@ sub prepare_view_personnel
 			<TR VALIGN=TOP>
 				<TD WIDTH=30%>
 					<font size=1 face=arial>
-						#component.stpe-org.associatedResources#<BR>
+						#component.stpe-org.personnel#<BR>
 					</font>
 				</TD>
 			</TR>

@@ -375,25 +375,29 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 
 #----------------------------------------------------------------------------------------------------------------------
 
-'org.associatedResources' => {
+'org.personnel' => {
 	sqlStmt => qq{
 			select 	p.complete_name, pa.category, pa.person_id
 			from 	person_org_category pa, person p
 			where	pa.org_id = ?
-			and	p.person_id = pa.person_id
+				and pa.category <> 'Patient'
+				and pa.category <> 'Guarantor'
+				and	p.person_id = pa.person_id
 			order by pa.category, p.complete_name, pa.person_id
 		},
 	sqlStmtBindParamDescr => ['Org ID for org_id in Person_Org_Category Table'],
 	publishDefn => {
 		columnDefn => [
-			{ head => 'Category', dataFmt => '#1#: <A HREF = "/person/#2#/profile">#0# (#2#)</A>'},
+			#{ head => 'Category', dataFmt => '#1#: <A HREF = "/person/#2#/profile">#0# (#2#)</A>'},
+			{head => 'Name', colIdx => 0, dataFmt => '<A HREF = "/person/#2#/profile">#2# #0#</A>'},
+			{head => 'Type', colIdx => 1, dataFmt => '#1#'},
 		],
-		#bullets => 'stpe-#my.stmtId#/dlg-update-attr-#1#/#0#?home=/#param.arl#',
+		bullets => 'stpe-#my.stmtId#/dlg-update-password/#2#/#param.org_id#?home=#param.home#',
 	},
 	publishDefn_panel =>
 	{
 		# automatically inherits columnDefn and other items from publishDefn
-		style => 'panel',
+		style => 'panel.static',
 		frame => { heading => 'Personnel', editUrl => 'personnel' },
 	},
 	publishDefn_panelTransp =>
@@ -420,10 +424,10 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 			updUrlFmt => '#param.home#/../stpe-#my.stmtId#/dlg-update-#1#/#2#?home=#param.home#', delUrlFmt => '#param.home#/../stpe-#my.stmtId#/dlg-remove-#1#/#2#?home=#param.home#',
 		},
 	},
-	publishComp_st => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.associatedResources', [$orgId] ); },
-	publishComp_stp => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.associatedResources', [$orgId], 'panel'); },
-	publishComp_stpt => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.associatedResources', [$orgId], 'panelTransp'); },
-	publishComp_stpe => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.associatedResources', [$orgId], 'panelEdit'); },
+	publishComp_st => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.personnel', [$orgId] ); },
+	publishComp_stp => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.personnel', [$orgId], 'panel'); },
+	publishComp_stpt => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.personnel', [$orgId], 'panelTransp'); },
+	publishComp_stpe => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.personnel', [$orgId], 'panelEdit'); },
 },
 
 

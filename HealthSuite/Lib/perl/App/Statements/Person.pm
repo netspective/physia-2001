@@ -301,6 +301,13 @@ $STMTMGR_PERSON = new App::Statements::Person(
 		select person_id,org_id,password,quantity from person_login
 		where person_id = ? and org_id = ?
 		},
+	'updPersonLogin' => qq{
+		update Person_Login
+		set password = ?,
+			quantity = ?
+		where person_id = ?
+			and org_id = ?
+	},
 	'updSessionsTimeout' => qq{
 		update person_session set status = 2
 		where status = 0 and person_id = ?
