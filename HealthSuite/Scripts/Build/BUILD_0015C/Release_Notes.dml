@@ -85,7 +85,9 @@ pt/2000 then the year to data date from Oct-1999 to Sept-2000.
 		<deliverable id="219">
 			Added a whole group of additional fields.  Only missing a couple columns, but the query should be done enough to start serious testing.  The main issue isn't if it works or not, but is it usable for it's intended purpose.
 		</deliverable>
-
+		<deliverable id="1283">
+			Report : Created reporting table to improve performance of financial reports.   This change will impact report under the Reports - Accounting.   Should see improvement in performance but the reports will need to be tested to make sure the calulation are still correct.
+		</deliverable>
 	</deliverables>
 </release-notes>
 
