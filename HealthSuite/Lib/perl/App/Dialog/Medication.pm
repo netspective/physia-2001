@@ -3,7 +3,7 @@ package App::Dialog::Medication;
 ##############################################################################
 
 use strict;
-use SDE::CVS ('$Id: Medication.pm,v 1.3 2000-12-07 18:23:34 robert_jenks Exp $', '$Name:  $');
+use SDE::CVS ('$Id: Medication.pm,v 1.4 2000-12-18 14:36:07 radha_kotagiri Exp $', '$Name:  $');
 use CGI::Validator::Field;
 use CGI::Dialog;
 use base qw(CGI::Dialog);
@@ -28,7 +28,7 @@ use vars qw(%RESOURCE_MAP);
 sub new
 {
 	my $self = CGI::Dialog::new(@_, id => 'message', heading => '$Command Medication');
-	
+	my $mode = $self->{command};
 	$self->addContent(
 		new App::Dialog::Field::Person::ID(
 			name => 'parent_id',
@@ -196,13 +196,21 @@ sub new
 			caption => 'Printer',
 		),
 	);
-	
+
+	$self->{activityLog} =
+	{
+		level => 2,
+		scope =>'Person_Medication',
+		key => "#param.person_id#",
+		data => "medication to <a href='/person/#param.person_id#/profile'>#param.person_id#</a>"
+	};
+
 	$self->{_buttons_field} = new CGI::Dialog::Buttons();
 	$self->addFooter($self->{_buttons_field});
-	
+
 	$self->addPostHtml(q{
 		<script language="JavaScript1.2">
-		
+
 		function onChangeDestination()
 		{
 			if (destObj = eval('document.all._f_destination'))
@@ -228,10 +236,10 @@ sub new
 
 		// Call it at startup to initially hide fields
 		onChangeDestination();
-		
+
 		</script>
 	});
-	
+
 	return $self;
 }
 
@@ -240,12 +248,12 @@ sub makeStateChanges
 {
 	my ($self, $page, $command, $activeExecMode, $dlgFlags) = @_;
 	$self->SUPER::makeStateChanges($page, $command, $activeExecMode, $dlgFlags);
-	
+
 	#my $buttonsField = $self->{_buttons_field};
-	
+
 	my $isNurse = grep {$_ eq 'Nurse'} @{$page->session('categories')};
 	my $isPhysician = grep {$_ eq 'Physician'} @{$page->session('categories')};
-	
+
 	if ($command eq 'add')
 	{
 		$self->setFieldFlags('approved_by', FLDFLAG_INVISIBLE);
@@ -262,7 +270,7 @@ sub makeStateChanges
 			$self->setFieldFlags('pharmacy_id', FLDFLAG_INVISIBLE);
 			$self->setFieldFlags('printer', FLDFLAG_INVISIBLE);
 		}
-		
+
 		if ($isPhysician)
 		{
 			$self->setFieldFlags('get_approval_from', FLDFLAG_INVISIBLE);
@@ -301,7 +309,7 @@ sub makeStateChanges
 			#$buttonsField->addActionButtons({caption => 'Close'});
 			#$buttonsField->{noCancelButton} = 1;
 		}
-		
+
 	}
 	elsif ($command eq 'view')
 	{
@@ -322,18 +330,18 @@ sub populateData
 {
 	my ($self, $page, $command, $activeExecMode, $flags) = @_;
 	return unless $flags & CGI::Dialog::DLGFLAG_DATAENTRY_INITIAL;
-	
+
 	if (my $permedId = $page->param('permed_id'))
 	{
 		$STMTMGR_PERSON->createFieldsFromSingleRow($page, STMTMGRFLAG_NONE, 'selPerMedById', $permedId);
 	}
-	
+
 	if ($command eq 'refill' || $command eq 'prescribe')
 	{
 		$page->field('start_date'. UnixDate('today', '%m/%d/%Y'));
 		$page->field('end_date', '');
 	}
-	
+
 	if ($command eq 'add' || $command eq 'prescribe')
 	{
 		if ($page->param('person_id'))
@@ -342,7 +350,7 @@ sub populateData
 			$self->setFieldFlags('parent_id', FLDFLAG_READONLY);
 		}
 	}
-	
+
 	if ($command eq 'update' && $page->field('approved_by'))
 	{
 		foreach my $field (@{$self->{content}})
@@ -385,7 +393,7 @@ sub execute_add
 		_debug => 0,
 	);
 	$page->param('permed_id', $permedId);
-	
+
 	unless ($page->field('approved_by'))
 	{
 		$self->sendApprovalRequest($page, $command, $flags);
@@ -447,9 +455,9 @@ sub execute_approve
 {
 	my $self = shift;
 	my ($page, $command, $flags) = @_;
-	
+
 	my $results = $self->execute_update(@_);
-	
+
 	my $relatedMessages = $STMTMGR_DOCUMENT->getSingleValueList($page, STMTMGRFLAG_NONE, 'selMessagesByPerMedId', $page->param('permed_id'));
 	foreach my $doc_id (@$relatedMessages)
 	{
@@ -463,7 +471,7 @@ sub execute_approve
 			value_text => 'I have approved this medication/prescription.',
 		);
 	}
-	
+
 	return $results;
 }
 
@@ -472,13 +480,13 @@ sub sendApprovalRequest
 {
 	my $self = shift;
 	my ($page, $command, $flags) = @_;
-	
+
 	my $med_name = $page->field('med_name');
 	my $patient = $page->field('parent_id');
 	my $dosage = $page->field('dose') . $page->field('dose_units');
-	
+
 	my $msgDlg = new App::Dialog::Message::Prescription();
-	$msgDlg->sendMessage($page, 
+	$msgDlg->sendMessage($page,
 		subject => 'Prescription Approval Request',
 		message => $page->session('person_id') . " is seeking approval for a prescription:\n\nPatient: $patient\nMedication: $med_name $dosage\n",
 		to => $page->field('get_approval_from'),
