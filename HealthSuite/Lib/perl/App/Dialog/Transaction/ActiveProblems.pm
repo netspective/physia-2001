@@ -100,6 +100,7 @@ sub execute_add
 	my $personType = App::Universal::ENTITYTYPE_PERSON;
 	my $transStatusActive = App::Universal::TRANSSTATUS_ACTIVE;
 	#my @icdDiags = split(/\s*,\s*/, $page->field('code'));
+	my $todaysDate = UnixDate('today', $page->defaultUnixStampFormat());
 
 	$page->schemaAction(
 		'Transaction', 'add',
@@ -108,6 +109,7 @@ sub execute_add
 		trans_owner_type => $personType || undef,
 		trans_owner_id => $page->param('person_id') || undef,
 		curr_onset_date => $page->field('curr_onset_date') || undef,
+		trans_begin_stamp => $todaysDate || undef,
 		provider_id => $page->field('provider_id') || undef,
 		data_text_a => $page->field('data_text_a') || undef,
 		code => $page->field('code') || undef,
