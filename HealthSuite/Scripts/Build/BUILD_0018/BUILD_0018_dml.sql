@@ -76,4 +76,9 @@ update invoice_item_adjust set adjustment_type = 7 where data_num_a = 1;
 insert into Org_Type (id, caption, group_name) values (13, 'Pharmacy', 'provider');
 
 
+--bug 1363 Shahbaz Javeed
+
+update OFFERING_CATALOG set flags=1 where catalog_type=4         
+
+
 commit;
