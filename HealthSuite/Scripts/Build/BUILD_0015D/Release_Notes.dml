@@ -36,7 +36,9 @@
 		<deliverable id="1110">
 			TWCC 73
 		</deliverable>
-			
+		<deliverable id="758">
+			Faster text report printing.
+		</deliverable>
 	</deliverables>
 </release-notes>
 
