@@ -1016,7 +1016,7 @@ sub prepare_view_superbills
 		);
 		
 		my $sampleLink = File::Spec->catfile($CONFDATA_SERVER->path_PDFSuperBillOutputHREF, $theFilename);
-		$self->addContent (qq {<b>PDF Generated: </b><i><a href="$sampleLink">Sample Report</a></i>});
+		$self->addContent (qq {<b>SuperBill Generated: </b><a href="$sampleLink">Click here to view</a>});
 	} elsif ($self->param ('action') eq 'delete') {
 		my $internalCatalogID = $self->param('superbillid');
 
