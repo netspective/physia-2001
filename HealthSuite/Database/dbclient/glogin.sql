@@ -1,5 +1,5 @@
 --
---  $Header: /home/engineer/cvs2git/physia/HealthSuite/Database/dbclient/glogin.sql,v 1.4 2000-06-02 23:41:24 alex_hillman Exp $
+--  $Header: /home/engineer/cvs2git/physia/HealthSuite/Database/dbclient/glogin.sql,v 1.5 2000-06-03 20:11:25 alex_hillman Exp $
 --  Copyright (c) Oracle Corporation 1988, 1994, 1995.  All Rights Reserved.
 --
 --  SQL*Plus Global Login startup file.
@@ -38,13 +38,20 @@ define user_prompt=''
 variable sql_prompt varchar2(50)
 
 declare
- v_count number;
+
+ v_count_source number;
+ v_count_object number;
  v_sql_prompt varchar2(50);
+ 
 begin
- select count(*) into v_count from all_synonyms where synonym_name = 'GET_SQLPROMPT_FS';
+
+ select count(*) into v_count_source from all_source where name = 'GET_SQLPROMPT_F' and owner='SYS';
+ Select count(*) into v_count_object from all_objects where owner='SYS' and object_name='GET_SQLPROMPT_F'
+ and status='VALID' and object_type='FUNCTION';
+ 
  :sql_prompt := 'SQL->';
- if v_count > 0 then
-  execute immediate 'select rtrim(get_sqlprompt_fs) from dual' into v_sql_prompt;
+ if v_count_source > 0 and v_count_object > 0 then
+  execute immediate 'select rtrim(sys.get_sqlprompt_f) from dual' into v_sql_prompt;
   :sql_prompt := v_sql_prompt;
  end if;
 end;
