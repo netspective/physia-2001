@@ -858,7 +858,6 @@ sub isValid
 	my $totalPatientBalance = $STMTMGR_INVOICE->getSingleValue($page, STMTMGRFLAG_CACHE, 'selTotalPatientBalance', $clientId, $sessOrgIntId);
 	my $creditWarned = $page->field('credit_warning_flag');
 
-
 	#validation for each item listed
 	my $lineCount = $page->param('_f_line_count');
 	for(my $line = 1; $line <= $lineCount; $line++)
@@ -869,7 +868,6 @@ sub isValid
 		$totalInvoiceBalance += $itemBalance;
 		next if $itemPayment eq '';
 
-		#no validation needed for overpayments - overpayments are allowed
 		if($itemPayment > $itemCharge && $totalPayRcvd >= 0)
 		{
 			my $difference = $itemPayment - $itemCharge;
