@@ -158,7 +158,8 @@ $STMTMGR_WORKLIST_COLLECTION = new App::Statements::Worklist::WorklistCollection
 			  (SELECT MIN(item_id) FROM invoice_item ii WHERE ii.parent_id = i.invoice_id AND
 			   ii.item_type in (0,1,2) )
 			) as description ,
-			to_number(NULL) as trans_id
+			to_number(NULL) as trans_id ,
+			pb.value_float as min_amount
 		FROM 	person p, person_attribute pf,person_attribute pp,person_attribute pd ,
 			person_attribute pl,person_attribute pa, person_attribute pb,
 			transaction t, invoice i, invoice_billing ib, person_org_category pog
@@ -221,7 +222,9 @@ $STMTMGR_WORKLIST_COLLECTION = new App::Statements::Worklist::WorklistCollection
 			  (SELECT MIN(item_id) FROM invoice_item ii WHERE ii.parent_id = i.invoice_id AND
 			   ii.item_type in (0,1,2) )
 			) as description,
-			t.trans_id as trans_id
+			t.trans_id as trans_id,
+			(SELECT value_float FROM person_attribute WHERE parent_id = :1 AND
+				item_name = 'WorkList-Collection-Setup-BalanceAmount-Range') as min_amount 
 		FROM 	transaction t ,invoice i
 		WHERE 	t.trans_type = $ACCOUNT_OWNER
 		AND 	t.trans_status = $ACTIVE
