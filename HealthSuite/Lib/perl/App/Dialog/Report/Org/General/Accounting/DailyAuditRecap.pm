@@ -32,7 +32,7 @@ sub new
 				readOnlyWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
 				invisibleWhen => CGI::Dialog::DLGFLAG_ADD
 				),
-			new App::Dialog::Field::Organization::ID(caption =>'Site Organization ID', name => 'org_id'),
+			new App::Dialog::Field::Organization::ID(caption =>'Site Organization ID', name => 'org_id',options=>FLDFLAG_REQUIRED),
 			new App::Dialog::Field::Person::ID(caption =>'Physican ID', name => 'person_id', ),
 			new CGI::Dialog::MultiField(caption => 'Batch ID Range', name => 'batch_fields', 
 						fields => [
@@ -62,7 +62,7 @@ sub populateData
 	my $startDate = $page->getDate();
 	$page->field('batch_begin_date', $page->param('_f_batch_begin_date')|| $startDate);
 	$page->field('batch_end_date', $page->param('_f_batch_begin_end')||$startDate);
-	$page->field('org_id', $page->param('_f_org_id') || $page->session('org_id') );
+	#$page->field('org_id', $page->param('_f_org_id') || $page->session('org_id') );
 }
 
 sub prepare_detail_payment
@@ -207,6 +207,7 @@ sub execute
 			push(@data, \@rowData);
 		}
 	}
+
 	$html .= createHtmlFromData($page, 0, \@data,$pub);
 	return $html
 }
