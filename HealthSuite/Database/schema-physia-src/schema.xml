@@ -138,31 +138,6 @@
 		<column name="extra" type="text" size="512" descr="Any extra information needed for insurance record"/>
 	</table>
 
-	<table name="Event" abbrev="Event" type="Audit,Secure,Restrict_Rows">
-		<description>A scheduled meeting with one or more attendees, which may be linked to another event</description>
-		<column name="event_id" type="autoinc" primarykey="yes" descr="Unique ID for a specific event"/>
-		<column name="parent_id" indexed="yes" selfref="Event.event_id" descr="The original event ID for which this event is waiting (Waiting List)."/>
-		<column name="owner_id" parentref="Org.org_internal_id" required="yes" descr="The owning organization with which event was made"/>
-		<column name="event_type" required="yes" lookupref="Event_Type" descr="The type of event"/>
-		<column name="event_status" required="yes" lookupref="Appt_Status" descr="The status of the event"/>
-		<column name="subject" type="text" size="128" required="yes" descr="The reason for the event"/>
-		<column name="facility_id" lookupref="Org.org_internal_id" descr="The location where the event will take place"/>
-		<column name="start_time" type="stamp" required="yes" descr="The starting time of the event"/>
-		<column name="duration" type="integer" required="yes" descr="The expected duration of the event in minutes"/>
-		<column name="end_time" type="stamp" descr="Based on the start and duration, trigger fills in the end time (if left NULL)"/>
-		<column name="remarks" type="text" size="2048" descr="Any other data needed for the event"/>
-		<column name="scheduled_by_id" lookupref="Person.person_id" descr="The person who checked the patient in"/>
-		<column name="scheduled_stamp" type="stamp" descr="The date/time when the event was taken (if differnt from system time)"/>
-		<column name="checkin_by_id" lookupref="Person.person_id" descr="The person who checked the patient in"/>
-		<column name="checkin_stamp" type="stamp" descr="The date/time when the patient was checked in"/>
-		<column name="checkout_by_id" lookupref="Person.person_id" descr="The person who checked the patient out"/>
-		<column name="checkout_stamp" type="stamp" descr="The date/time when the patient was checked out"/>
-		<column name="discard_type" lookupref="Appt_Discard_Type" descr="The type of discard (cancel, no-show, etc)"/>
-		<column name="discard_by_id" lookupref="Person.person_id" descr="The person (employee) who cancelled, no-showed, or rescheduled"/>
-		<column name="discard_stamp" type="stamp" descr="The date/time when the event was cancelled, no-showed, or rescheduled"/>
-		<column name="discard_remarks" type="text" size="512" descr="Any remarks for cancellation/noshow, etc"/>
-	</table>
-
 	<table name="Resource_Item" abbrev="Res" type="Audit,Secure,Restrict_Rows">
 		<description>A specific physical resource such as the blue room or the new EKG, which may be linked to another resource item</description>
 		<column name="resource_id" type="autoinc" primarykey="yes" descr="Unique ID for a specific resource"/>
@@ -215,6 +190,32 @@
 		<column name="pm_limit" type="integer" descr="Limit the number of appointments of this type in PM hours"/>
 		<column name="r_ids" type="text" size="128" descr="Additional Resource(s) required for this appointment type"/>
 		<column name="owner_org_id" parentref="Org.org_internal_id" required="yes" indexed="yes" descr="The organization which owns the appt type"/>
+	</table>
+
+	<table name="Event" abbrev="Event" type="Audit,Secure,Restrict_Rows">
+		<description>A scheduled meeting with one or more attendees, which may be linked to another event</description>
+		<column name="event_id" type="autoinc" primarykey="yes" descr="Unique ID for a specific event"/>
+		<column name="parent_id" indexed="yes" selfref="Event.event_id" descr="The original event ID for which this event is waiting (Waiting List)."/>
+		<column name="owner_id" parentref="Org.org_internal_id" required="yes" descr="The owning organization with which event was made"/>
+		<column name="event_type" required="yes" lookupref="Event_Type" descr="The type of event"/>
+		<column name="event_status" required="yes" lookupref="Appt_Status" descr="The status of the event"/>
+		<column name="subject" type="text" size="128" required="yes" descr="The reason for the event"/>
+		<column name="facility_id" lookupref="Org.org_internal_id" descr="The location where the event will take place"/>
+		<column name="start_time" type="stamp" required="yes" descr="The starting time of the event"/>
+		<column name="duration" type="integer" required="yes" descr="The expected duration of the event in minutes"/>
+		<column name="end_time" type="stamp" descr="Based on the start and duration, trigger fills in the end time (if left NULL)"/>
+		<column name="remarks" type="text" size="2048" descr="Any other data needed for the event"/>
+		<column name="scheduled_by_id" lookupref="Person.person_id" descr="The person who checked the patient in"/>
+		<column name="scheduled_stamp" type="stamp" descr="The date/time when the event was taken (if differnt from system time)"/>
+		<column name="checkin_by_id" lookupref="Person.person_id" descr="The person who checked the patient in"/>
+		<column name="checkin_stamp" type="stamp" descr="The date/time when the patient was checked in"/>
+		<column name="checkout_by_id" lookupref="Person.person_id" descr="The person who checked the patient out"/>
+		<column name="checkout_stamp" type="stamp" descr="The date/time when the patient was checked out"/>
+		<column name="discard_type" lookupref="Appt_Discard_Type" descr="The type of discard (cancel, no-show, etc)"/>
+		<column name="discard_by_id" lookupref="Person.person_id" descr="The person (employee) who cancelled, no-showed, or rescheduled"/>
+		<column name="discard_stamp" type="stamp" descr="The date/time when the event was cancelled, no-showed, or rescheduled"/>
+		<column name="discard_remarks" type="text" size="512" descr="Any remarks for cancellation/noshow, etc"/>
+		<column name="appt_type" parentref="Appt_Type.appt_type_id" descr="The Appointment Type"/>
 	</table>
 
 	<table name="Transaction" abbrev="Trans" type="Audit,Secure,Restrict_Rows">

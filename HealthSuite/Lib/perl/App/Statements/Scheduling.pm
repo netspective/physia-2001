@@ -18,6 +18,8 @@ use vars qw(@ISA @EXPORT $STMTMGR_SCHEDULING $STMTRPTDEFN_TEMPLATEINFO $STMTFMT_
 @ISA    = qw(Exporter DBI::StatementManager);
 @EXPORT = qw($STMTMGR_SCHEDULING);
 
+my $timeFormat = 'HH:MI am';
+
 $STMTFMT_SEL_TEMPLATEINFO = qq{
 	select template_id, r_ids as resources, caption, org_id,
 		to_char(start_time, 'hh:miam') as start_time,
@@ -219,8 +221,8 @@ $STMTMGR_SCHEDULING = new App::Statements::Scheduling(
 			preferences, days_of_month, months, days_of_week, patient_types, visit_types,
 			to_char(effective_begin_date,'$SQLSTMT_DEFAULTDATEFORMAT') as effective_begin_date,
 			to_char(effective_end_date,'$SQLSTMT_DEFAULTDATEFORMAT') as effective_end_date,
-			to_char(start_time, 'HH:MI am') as duration_begin_time,
-			to_char(end_time,'HH:MI am') as duration_end_time
+			to_char(start_time, '$timeFormat') as duration_begin_time,
+			to_char(end_time,'$timeFormat') as duration_end_time
 		from Template_R_Ids, Template
 		where template_id = ?
 			and parent_id = template_id
@@ -236,17 +238,21 @@ $STMTMGR_SCHEDULING = new App::Statements::Scheduling(
 
 	'selPopulateAppointmentDialog' => qq{
 		select e.event_id, e.facility_id, e.event_status, e.event_type, e.subject,
-			to_char(e.start_time, '$SQLSTMT_DEFAULTSTAMPFORMAT') as start_stamp,
+			to_char(e.start_time, '$SQLSTMT_DEFAULTDATEFORMAT') as appt_date,
+			to_char(e.start_time, '$timeFormat') as appt_time,
 			e.duration, e.remarks, e.owner_id,
 			e.scheduled_by_id, e.scheduled_stamp, e.checkin_by_id,
 			ep1.value_text as attendee_id, ep1.value_int as attendee_type,
-			ep2.value_text as resource_id
-		from event_attribute ep2, event_attribute ep1, event e
+			ep2.value_text as resource_id,
+			e.appt_type as appt_type_id,
+			at.caption as appt_type_caption
+		from appt_type at, event_attribute ep2, event_attribute ep1, event e
 		where event_id = ?
 			and ep1.parent_id = e.event_id
 			and ep1.value_type = $EVENTATTRTYPE_PATIENT
 			and ep2.parent_id = ep1.parent_id
 			and ep2.value_type = $EVENTATTRTYPE_PHYSICIAN
+			and at.appt_type_id (+) = e.appt_type
 	},
 
 	'selSchedulePreferences' => qq{
@@ -296,12 +302,14 @@ $STMTMGR_SCHEDULING = new App::Statements::Scheduling(
 			columnDefn =>
 			[
 				{ head => 'ID', 
-					url => q{javascript:location.href='/org/#session.org_id#/dlg-update-appttype/#&{?}#'}, hint => 'Edit Appointment Type #&{?}#'
+					#url => q{javascript:chooseItem('/org/#session.org_id#/dlg-update-appttype/#&{?}#', '#2# (ApptType ID #0#)', false)},
 				},
 				{ head => 'Resource',
 					url => q{javascript:location.href='/search/appttype/1/#&{?}#'}, hint => 'View #&{?}# Appointment Types',
 				},
-				{ head => 'Caption'},
+				{ head => 'Caption',
+					url => q{javascript:chooseItem('/org/#session.org_id#/dlg-update-appttype/#&{?}#', '#2#', false, '#0#')},
+				},
 				{ head => 'Duration', dAlign => 'center'},
 				{ head => 'Lead', dAlign => 'center'},
 				{ head => 'Lag', dAlign => 'center'},

@@ -22,7 +22,6 @@ use App::Dialog::Field::Organization;
 use App::Dialog::Field::Scheduling;
 
 use App::Schedule::Utilities;
-
 use vars qw(@ISA %RESOURCE_MAP);
 
 @ISA = qw(CGI::Dialog);
@@ -38,6 +37,8 @@ use vars qw(@ISA %RESOURCE_MAP);
 		_modes => ['add', 'update', 'remove', 'noshow', 'cancel', 'reschedule'],
 	},
 );
+
+use constant DUMMY_EVENT_TYPE => 100;
 
 sub new
 {
@@ -97,10 +98,12 @@ sub new
 		new CGI::Dialog::Field(caption => 'Symptoms',
 			type => 'memo', name => 'remarks'
 		),
-		new CGI::Dialog::Field::TableColumn(caption => 'Appointment Type',
-			name => 'event_type',
-			schema => $schema,
-			column => 'Event.event_type', typeRange => '100..199'
+
+		new CGI::Dialog::Field(type => 'hidden', name => 'appt_type_id'),
+		new App::Dialog::Field::Scheduling::ApptType(caption => 'Appointment Type',
+			name => 'appt_type_caption',
+			findPopup => '/lookup/appttype',
+			secondaryFindField => '_f_appt_type_id',
 		),
 		
 		new CGI::Dialog::MultiField (caption => 'Appointment Date / Time',
@@ -115,14 +118,19 @@ sub new
 				),
 			],
 		),
-		
-		new CGI::Dialog::Field(name => 'appt_minute',
-			caption => '(Minute)',
-			choiceDelim =>',',
-			selOptions => "10,20,30,40,50",
-			type => 'select',
-			style => 'radio',
-			onclickJS => q{setField(this.form._f_start_stamp, this.value)},
+		new CGI::Dialog::MultiField (
+			fields => [
+				new App::Dialog::Field::Scheduling::Minutes(
+					caption => 'Appt Time Minutes',
+					name => 'appt_minute',
+					timeField => '_f_appt_time'
+				),
+				new App::Dialog::Field::Scheduling::AMPM(
+					caption => 'AM PM',
+					name => 'appt_am',
+					timeField => '_f_appt_time'
+				),
+			],
 		),
 		new CGI::Dialog::Field(caption => 'Check for Conflicts',
 			name => 'conflict_check',
@@ -220,7 +228,7 @@ sub makeStateChanges_cancel
 	my ($self, $page, $command, $activeExecMode, $dlgFlags) = @_;
 	$self->updateFieldFlags('attendee_id', FLDFLAG_READONLY, 1);
 	$self->updateFieldFlags('attendee_type', FLDFLAG_READONLY, 1);
-	$self->updateFieldFlags('event_type', FLDFLAG_READONLY, 1);
+	
 	$self->updateFieldFlags('subject', FLDFLAG_READONLY, 1);
 	$self->updateFieldFlags('remarks', FLDFLAG_READONLY, 1);
 	$self->updateFieldFlags('start_stamp', FLDFLAG_READONLY, 1);
@@ -244,7 +252,6 @@ sub populateData_add
 
 	return unless $flags & CGI::Dialog::DLGFLAG_DATAENTRY_INITIAL;
 
-	my $personId = $page->param('person_id');
 	my $startStamp;
 	if ($startStamp = $page->param('start_stamp'))
 	{
@@ -256,8 +263,13 @@ sub populateData_add
 		$startStamp = $page->getTimeStamp();
 	}
 	
-	$page->field('attendee_id', $personId);
-	$page->field('start_stamp', $startStamp);
+	$startStamp =~ /(.*?) (.*)/;
+	my ($appt_date, $appt_time) = ($1, $2);
+	
+	$page->field('appt_date', $appt_date);
+	$page->field('appt_time', $appt_time);
+	
+	$page->field('attendee_id', $page->param('person_id'));
 	$page->field('resource_id', $page->param('resource_id'));
 	$page->field('facility_id', $page->param('facility_id'));
 	
@@ -350,8 +362,9 @@ sub customValidate
 sub findConflictEvent
 {
 	my ($self, $page) = @_;
-
-	my ($startDate, $startTime, $am) = split(/ /, $page->field('start_stamp'));
+	
+	my $start_time = $page->field('appt_date') . ' '  . $page->field('appt_time');
+	my ($startDate, $startTime, $am) = split(/ /, $start_time);
 	my $endDate   = UnixDate(DateCalc($startDate, "+1 day"), "%Y,%m,%d");
 	$startDate = UnixDate($startDate, "%Y,%m,%d");
 
@@ -423,6 +436,8 @@ sub execute
 
 	my $eventId = $page->field('event_id');
 	my $timeStamp = $page->getTimeStamp();
+	
+	my $start_time = $page->field('appt_date') . ' '  . $page->field('appt_time');
 
 	my $parentId = $page->field('parent_id');
 	undef $parentId if $page->field('whatToDo') eq 'db';
@@ -434,16 +449,17 @@ sub execute
 			my $apptID = $page->schemaAction(
 				'Event', 'add',
 				owner_id => $page->session('org_internal_id') || undef,
-				event_type => $page->field('event_type') || undef,
+				event_type => DUMMY_EVENT_TYPE,
 				event_status => 0,
 				subject => $page->field('subject'),
-				start_time => $page->field('start_stamp') || undef,
+				start_time => $start_time,
 				duration => $page->field('duration') || undef,
 				facility_id => $page->field('facility_id') || undef,
 				remarks => $page->field('remarks') || undef,
 				scheduled_stamp => $timeStamp,
 				scheduled_by_id => $page->session('user_id') || undef,
 				parent_id => $parentId || undef,
+				appt_type => $page->field('appt_type_id') || undef,
 				_debug => 0
 			);
 			if ($apptID gt 0)
@@ -472,14 +488,15 @@ sub execute
 			$page->schemaAction(
 				'Event', 'update',
 				event_id => $eventId,
-				event_type => $page->field('event_type') || undef,
+				event_type => DUMMY_EVENT_TYPE,
 				event_status => 0,
 				subject => $page->field('subject'),
-				start_time => $page->field('start_stamp') || undef,
+				start_time => $start_time,
 				duration => $page->field('duration') || undef,
 				facility_id => $page->field('facility_id') || undef,
 				remarks => $page->field('remarks') || undef,
 				parent_id => $parentId || undef,
+				appt_type => $page->field('appt_type_id') || undef,
 				_debug => 0
 			);
 
@@ -519,16 +536,17 @@ sub execute
 			my $apptID = $page->schemaAction(
 				'Event', 'add',
 				owner_id => $page->session('org_internal_id') || undef,
-				event_type => $page->field('event_type') || undef,
+				event_type => DUMMY_EVENT_TYPE,
 				event_status => 0,
 				subject => $page->field('subject'),
-				start_time => $page->field('start_stamp') || undef,
+				start_time => $start_time,
 				duration => $page->field('duration') || undef,
 				facility_id => $page->field('facility_id') || undef,
 				remarks => $page->field('remarks') || undef,
 				scheduled_stamp => $timeStamp,
 				scheduled_by_id => $page->session('user_id') || undef,
 				parent_id => $parentId || undef,
+				appt_type => $page->field('appt_type_id') || undef,
 				_debug => 0
 			);
 			if ($apptID gt 0)

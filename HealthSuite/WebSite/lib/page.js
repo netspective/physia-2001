@@ -856,8 +856,10 @@ var activeFindForm = null;
 var activeFindWinControl = null;
 var activeFindARL = null;
 var activeFindAppendValue = '';
+var secondaryFindWinControl = null;
 
-function doFindLookup(formInstance, populateControl, arl, appendValue, prefill, features, controlField)
+function doFindLookup(formInstance, populateControl, arl, appendValue, prefill, features, 
+	controlField, hiddenPopulateField)
 {
 	if(prefill == null)
 		prefill = true;
@@ -868,6 +870,7 @@ function doFindLookup(formInstance, populateControl, arl, appendValue, prefill, 
 	activeFindForm = formInstance;
 	activeFindWinControl = populateControl;
 	activeFindARL = arl;
+	secondaryFindWinControl = hiddenPopulateField;
 
 	if(appendValue == null) appendValue = '';
 	activeFindAppendValue = appendValue;
@@ -900,7 +903,7 @@ function isLookupWindow()
 	return flag;
 }
 
-function populateControl(what, closeWindow)
+function populateControl(what, closeWindow, secondItem)
 {
 	if(closeWindow == null)
 		closeWindow = true;
@@ -917,6 +920,11 @@ function populateControl(what, closeWindow)
 		else
 			parent.opener.activeFindWinControl.value = what;
 
+		if (secondItem != null)
+		{
+			parent.opener.secondaryFindWinControl.value = secondItem;
+		}
+		
 		parent.opener.activeFindWinControl.title = 'lookup result: ' + what;
 		populated = true;
 	}
@@ -977,11 +985,11 @@ function chooseEntry(itemValue,  actionObj, destObj, itemCategory)
 	}
 }
 
-function chooseItem(arlFmt, itemValue, inNewWin)
+function chooseItem(arlFmt, itemValue, inNewWin, secondValue)
 {
 	if(isLookupWindow())
 	{
-		populateControl(itemValue, true);
+		populateControl(itemValue, true, secondValue);
 		return;
 	}
 
@@ -1232,9 +1240,24 @@ function validateHours(Form)
 	}
 }
 
-function setField(Field, Value)
+function setField(_field, _value, _re, _default)
 {
-	Field.value = Value;
+	if (_re == null && _default == null)
+	{
+		_field.value = _value;	
+	}
+	else
+	{
+		var curVal = _field.value;
+		if (curVal == '') 
+		{
+			curVal = _default;
+		}
+		
+		regExpr = new RegExp(_re);
+		var newValue = curVal.replace(regExpr, _value);
+		_field.value = newValue;
+	}
 }
 
 //
