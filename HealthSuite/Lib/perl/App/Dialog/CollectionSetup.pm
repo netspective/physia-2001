@@ -142,7 +142,13 @@ sub new
 		$facilitiesField,
 
 		new CGI::Dialog::Subhead(heading => 'Insurance Providers'),
-		new CGI::Dialog::Field(
+			new CGI::Dialog::Field(type => 'select',
+							defaultValue=>'0', 
+							selOptions=>"Selected:0;All:1", 
+							name => 'product_select', 
+							caption => 'Products',
+							onChangeJS => qq{showFieldsOnValues(event, [0], ['products']);}),					
+			new CGI::Dialog::Field(
 				name => 'products',
 				style => 'multidual',
 				type => 'select',
@@ -155,7 +161,7 @@ sub new
 				fKeyStmt => 'sel_worklist_available_products',
 				fKeyStmtBindSession => ['org_internal_id'],
 				hints => ''
-			),
+			),							
 
 		new CGI::Dialog::Subhead(heading => 'Patients Last Name'),
 		new CGI::Dialog::MultiField(caption =>'Enter range:',
@@ -240,6 +246,22 @@ sub makeStateChanges
 	my ($self, $page, $command, $activeExecMode, $dlgFlags) = @_;
 
 	$self->SUPER::makeStateChanges($page, $command, $activeExecMode, $dlgFlags);
+	my $userId =  $page->session('user_id');
+	my $sessOrgId = $page->session('org_internal_id');
+	
+	#Check if the all products option was selected if so get all products move to list
+	#if so hide the product list box
+	my $productsAll = $STMTMGR_WORKLIST_COLLECTION->getRowAsHash($page,
+		STMTMGRFLAG_NONE, 'sel_worklist_all_products', $userId, $sessOrgId);
+	if($productsAll->{value_int} == -1)
+	{
+		$self->addPostHtml(
+	       	qq{
+			<script language="JavaScript1.2">	
+			setIdDisplay("products",'none');
+			</script>
+		});
+	}
 }
 
 ###############################
@@ -263,15 +285,34 @@ sub populateData
 	}
 	$page->field('physician_list', @physicians);
 
-	my $productsList = $STMTMGR_WORKLIST_COLLECTION->getRowsAsHashList($page,
-		STMTMGRFLAG_NONE, 'sel_worklist_associated_products', $userId, $sessOrgId);
-	my @products = ();
-	for (@$productsList)
+	#Get products
+	
+	#Check if the all products option was selected if so get all products move to list
+	my $productsAll = $STMTMGR_WORKLIST_COLLECTION->getRowAsHash($page,
+		STMTMGRFLAG_NONE, 'sel_worklist_all_products', $userId, $sessOrgId);
+	if($productsAll->{value_int} == -1)
 	{
-		push(@products, $_->{product_id});
+		$page->field('product_select',1);
+		my $productsList = $STMTMGR_WORKLIST_COLLECTION->getRowsAsHashList($page,
+			STMTMGRFLAG_NONE, 'sel_worklist_available_products',  $sessOrgId);
+		my @products = ();
+		for (@$productsList)
+		{
+			push(@products, $_->{product_id});
+		}
+		$page->field('products', @products);		
 	}
-	$page->field('products', @products);
-
+	else
+	{
+		my $productsList = $STMTMGR_WORKLIST_COLLECTION->getRowsAsHashList($page,
+			STMTMGRFLAG_NONE, 'sel_worklist_associated_products', $userId, $sessOrgId);
+		my @products = ();
+		for (@$productsList)
+		{
+			push(@products, $_->{product_id});
+		}
+		$page->field('products', @products);
+	}
 	# Populate the selected facilities
 	my $facilityList = $STMTMGR_WORKLIST_COLLECTION->getRowsAsHashList($page,
 		STMTMGRFLAG_NONE, 'sel_worklist_facilities', $userId, $sessOrgId);
@@ -377,8 +418,7 @@ sub execute
 
 	$STMTMGR_WORKLIST_COLLECTION->execute($page, STMTMGRFLAG_NONE,
 		'del_worklist_associated_products', $userId, $orgIntId);
-	my @products = $page->field('products');
-	for (@products)
+	if($page->field('product_select'))
 	{
 		$page->schemaAction(
 			'Person_Attribute',	'add',
@@ -387,9 +427,26 @@ sub execute
 			parent_org_id => $orgIntId,
 			value_type => App::Universal::ATTRTYPE_INTEGER || undef,
 			item_name => 'WorkList-Collection-Setup-Product',
-			value_int => $_,
+			value_int => -1,
 			_debug => 0
 		);
+	}
+	else
+	{
+		my @products = $page->field('products');
+		for (@products)
+		{
+			$page->schemaAction(
+				'Person_Attribute',	'add',
+				item_id => undef,
+				parent_id => $userId,
+				parent_org_id => $orgIntId,
+				value_type => App::Universal::ATTRTYPE_INTEGER || undef,
+				item_name => 'WorkList-Collection-Setup-Product',
+				value_int => $_,
+				_debug => 0
+			);
+		}
 	}
 
 
