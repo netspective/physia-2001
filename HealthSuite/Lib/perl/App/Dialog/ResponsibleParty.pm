@@ -11,7 +11,7 @@ use App::Dialog::Person;
 use App::Dialog::Field::Person;
 use App::Dialog::Field::Address;
 use App::Dialog::Field::Organization;
-
+use App::Dialog::Field::Association;
 use DBI::StatementManager;
 use App::Statements::Insurance;
 use App::Statements::Org;
@@ -34,6 +34,7 @@ sub new
 
 
 	$self->addContent(
+		new CGI::Dialog::Field(type => 'hidden', name => 'resp_item_id'),
 		new App::Dialog::Field::Person::ID::New(caption => 'Person/Patient ID', name => 'resp_party_id', readOnlyWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE, types => ['Guarantor'], options => FLDFLAG_REQUIRED),
 		new App::Dialog::Field::Association(caption => 'Relationship', options => FLDFLAG_REQUIRED),
 		new App::Dialog::Field::Person::Name(),
@@ -74,8 +75,24 @@ sub populateData
 	my $personInfo = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_NONE, 'selPersonData', $personId);
 	my $partyId = $personInfo->{'person_id'};
 	$page->field('resp_party_id', $partyId);
+	my $parentId = $page->param('person_id');
+	my $relationName = 'Responsible Party';
+	my $respData = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_NONE, 'selAttribute', $parentId, $relationName);
+	my $relation = $respData->{'value_text'};
+	my @itemNamefragments = split('/', $relation);
 
+	if($itemNamefragments[0] eq 'Other')
+	{
+		$page->field('rel_type', $itemNamefragments[0]);
+		$page->field('other_rel_type', $itemNamefragments[1]);
+	}
 
+	else
+	{
+		$page->field('rel_type', $itemNamefragments[0]);
+	}
+
+	$page->field('resp_item_id', $respData->{'item_id'});
 
 	if($command eq 'remove')
 	{
@@ -143,17 +160,28 @@ sub execute
 	$otherRelType = "\u$otherRelType";
 
 	my $relationship = $relType eq 'Other' ? "Other/$otherRelType" : $relType;
-
+	my $commandResponsible = $command eq 'update' &&  $page->field('resp_item_id') eq '' ? 'add' : $command;
 	$page->schemaAction(
-			'Person_Attribute',	$command,
-			parent_id => $page->param('person_id') || undef,
-			item_id => $page->param('item_id') || undef,
-			item_name => $page->field('phone_number') || undef,
-			value_type => App::Universal::ATTRTYPE_EMERGENCY || undef,
-			value_text => $page->field('misc_notes') || undef,
-			value_int => 1,
-			_debug => 0
+		'Person_Attribute', $commandResponsible,
+		parent_id => $personId || undef,
+		item_id => $page->field('resp_item_id') || undef,
+		item_name => 'Responsible Party' || undef,
+		value_type => App::Universal::ATTRTYPE_EMERGENCY || undef,
+		value_text => $relationship || undef,
+		value_textB => $page->field('home_phone') || undef,
+		_debug => 0
 	);
+
+	#$page->schemaAction(
+	#		'Person_Attribute',	$command,
+	#		parent_id => $page->param('person_id') || undef,
+	#		item_id => $page->param('item_id') || undef,
+	#		item_name => $page->field('phone_number') || undef,
+	#		value_type => App::Universal::ATTRTYPE_EMERGENCY || undef,
+	#		value_text => $page->field('misc_notes') || undef,
+	#		value_int => 1,
+	#		_debug => 0
+	#);
 
 	$self->handlePostExecute($page, $command, $flags);
 }
