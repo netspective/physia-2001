@@ -72,12 +72,12 @@
 		<enum id="99">Other</enum>
 	</table>
 
-
 	<table name="Ethnicity" type="Lookup">
 		<enum>Native-American</enum>
 		<enum>Caucasian</enum>
 		<enum>African-American</enum>
 		<enum>Asian-American</enum>
+		<enum>Hispanic</enum>
 	</table>
 
 	<table name="Family_Relationship" abbrev="FMRel" type="Lookup">
