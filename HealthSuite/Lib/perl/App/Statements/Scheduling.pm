@@ -18,15 +18,15 @@ use vars qw(@ISA @EXPORT $STMTMGR_SCHEDULING $STMTRPTDEFN_TEMPLATEINFO $STMTFMT_
 @ISA    = qw(Exporter DBI::StatementManager);
 @EXPORT = qw($STMTMGR_SCHEDULING);
 
-my $timeFormat = 'HH:MI am';
+my $timeFormat = 'HH:MI AM';
 
 $STMTFMT_SEL_TEMPLATEINFO = qq{
 	select template_id,
 		r_ids as resources,
 		caption,
 		org_id,
-		to_char(start_time, 'hh:miam') as start_time,
-		to_char(end_time, 'hh:miam') as end_time,
+		to_char(start_time, '$timeFormat') as start_time,
+		to_char(end_time, '$timeFormat') as end_time,
 		to_char(effective_begin_date, '$SQLSTMT_DEFAULTDATEFORMAT') as begin_date,
 		to_char(effective_end_date, '$SQLSTMT_DEFAULTDATEFORMAT') as end_date,
 		decode(available,0,'NO',1,'YES') as available,
@@ -41,9 +41,8 @@ $STMTFMT_SEL_TEMPLATEINFO = qq{
 		and r_ids like ?
 		and org_id like ?
 		and (available = ? or available = ?)
-		and status = ?
-		and nvl(effective_end_date, sysdate+1) > sysdate
-	order by r_ids, template_id
+		%effectiveWhereClause%
+	order by available, r_ids, template_id
 };
 
 $STMTFMT_SEL_EVENTS = qq{
@@ -312,11 +311,28 @@ $STMTMGR_SCHEDULING = new App::Statements::Scheduling(
 		and Event_Attribute.value_type = $EVENTATTRTYPE_PATIENT
 	},
 
-	'selTemplateInfo' =>
+	'selEffectiveTemplate' =>
 	{
 		sqlStmt => $STMTFMT_SEL_TEMPLATEINFO,
-		simpleReport => $STMTRPTDEFN_TEMPLATEINFO,
+		#simpleReport => $STMTRPTDEFN_TEMPLATEINFO,
 		publishDefn => $STMTRPTDEFN_TEMPLATEINFO,
+		effectiveWhereClause => qq{
+			and status = ?
+			and nvl(effective_end_date, sysdate+1) > sysdate},
+	},
+
+	'selInEffectiveTemplate' =>
+	{
+		sqlStmt => $STMTFMT_SEL_TEMPLATEINFO,
+		#simpleReport => $STMTRPTDEFN_TEMPLATEINFO,
+		publishDefn => $STMTRPTDEFN_TEMPLATEINFO,
+		effectiveWhereClause => qq{
+			and (status = ? or
+				(	effective_end_date is NOT NULL 
+					and trunc(effective_end_date) < trunc(sysdate)
+				)
+			)
+		},
 	},
 
 	'selApptTypeInfo' =>
