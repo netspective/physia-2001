@@ -286,8 +286,8 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 			{ colIdx => 1, head => 'Primary Name', dataFmt => '#1#:' },
 			{ colIdx => 2, head => 'Org ID', dataFmt => '#3#' },
 		],
-		bullets => 'stpe-#my.stmtId#/dlg-update-dept/#3#?home=/#param.arl#',
-		frame => { addUrl => 'stpe-#my.stmtId#/dlg-add-dept?home=/#param.arl#' },
+		bullets => 'stpe-#my.stmtId#/dlg-update-org-dept/#3#?home=/#param.arl#',
+		frame => { addUrl => 'stpe-#my.stmtId#/dlg-add-org-dept?home=/#param.arl#' },
 	},
 	publishDefn_panel =>
 	{
@@ -309,11 +309,11 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 		banner => {
 			actionRows =>
 			[
-				{ caption => qq{ Add <A HREF='#param.home#/../stpe-#my.stmtId#/dlg-add-dept?home=#param.home#'>Department</A> }	},
+				{ caption => qq{ Add <A HREF='#param.home#/../stpe-#my.stmtId#/dlg-add-org-dept?home=#param.home#'>Department</A> }	},
 			],
 		},
 		stdIcons =>	{
-			updUrlFmt => '#param.home#/../stpe-#my.stmtId#/dlg-update-dept/#3#?home=#param.home#', delUrlFmt => '#param.home#/../stpe-#my.stmtId#/dlg-remove-dept/#3#?home=#param.home#',
+			updUrlFmt => '#param.home#/../stpe-#my.stmtId#/dlg-update-org-dept/#3#?home=#param.home#', delUrlFmt => '#param.home#/../stpe-#my.stmtId#/dlg-remove-org-dept/#3#?home=#param.home#',
 		},
 	},
 	publishComp_st => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.departments', [$orgId]); },
