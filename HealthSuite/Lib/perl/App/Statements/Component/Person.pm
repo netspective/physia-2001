@@ -1292,23 +1292,25 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 'person.careProviders' => {
 
 	sqlStmt => qq{
-			select	value_type, item_id, item_name, value_text, value_textb, parent_id, decode(value_int,1,'Primary Physician','')
-			from 	person_attribute
+			select	value_type, item_id, item_name, value_text, value_textb, parent_id, decode(value_int,1,'Primary Physician',''), pc.category
+			from 	person_attribute p, person_org_category pc
 			where 	parent_id = ?
 			and 	value_type = @{[ App::Universal::ATTRTYPE_PROVIDER ]}
+			and   pc.person_id = p.value_text
 		},
 	sqlStmtBindParamDescr => ['Person ID for Attribute Table'],
 	publishDefn => {
 		columnDefn => [
-			{ head => 'CareProvider',
-				dataFmt => q{
-					<A HREF = "/person/#3#/profile">#3#</A> (#2#, #6#)
-					<A HREF ="/person/#5#/dlg-add-appointment/#5#/#3#?_dialogreturnurl=#homeArl#"> Sched Appointment</A>
-				},
-			},
-			#{ colIdx => 1, head => 'Provider', dataFmt => '&{fmt_stripLeadingPath:1}:' },
-			#{ colIdx => 2, head => 'Name', dataFmt => '#2#' },
-			#{ colIdx => 3, head => 'Phone', dataFmt => '#3#', options => PUBLCOLFLAG_DONTWRAP },
+					{ head => 'CareProvider',
+						colIdx => 7,
+						dataFmt => {
+								'Physician' => "<A HREF = '/person/#3#/profile'>#3#</A> (#2#, #6#)<A HREF ='/person/#5#/dlg-add-appointment/#5#/#3#?_dialogreturnurl=#homeArl#'> Sched Appointment</A>",
+								'Referring-Doctor'  => "<A HREF = '/person/#3#/profile'>#3#</A> (#2#, #6#)",
+						},
+					},
+					#{ colIdx => 1, head => 'Provider', dataFmt => '&{fmt_stripLeadingPath:1}:' },
+					#{ colIdx => 2, head => 'Name', dataFmt => '#2#' },
+					#{ colIdx => 3, head => 'Phone', dataFmt => '#3#', options => PUBLCOLFLAG_DONTWRAP },
 		],
 		bullets => 'stpe-#my.stmtId#/dlg-update-attr-#0#/#1#?home=#homeArl#',
 		frame => {
@@ -2168,8 +2170,8 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 							"@{[ App::Universal::ATTRTYPE_LICENSE ]}" => '#2# (#4# #5#): #3#, #6#',
 							"@{[ App::Universal::ATTRTYPE_PROVIDER_NUMBER ]}" => '#2# (#4# #5#): #3#, #6#',
 							"@{[ App::Universal::ATTRTYPE_STATE ]}"  => '#2# (#4# #5#): #3#',
-							"@{[ App::Universal::ATTRTYPE_ACCREDITATION ]}"  => '#2# (#4# #5#): #3#',
-							"@{[ App::Universal::ATTRTYPE_SPECIALTY ]}" => '#2# (#4# #5#): #3#'
+							"@{[ App::Universal::ATTRTYPE_ACCREDITATION ]}"  => '#2# (#4# #5#)',
+							"@{[ App::Universal::ATTRTYPE_SPECIALTY ]}" => '#2# (#4# #5#)'
 						},
 					},
 		],
@@ -2338,7 +2340,7 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 	sqlStmt => qq{
 		select to_char(e.start_time - :1, 'hh:miam') as start_time,
 			ea.value_textB as resource_id,
-			patient.complete_name as patient_complete_name,
+			patient.simple_name as patient_complete_name,
 			e.subject,
 			at.caption as appt_type,
 			aat.caption as patient_type,
@@ -2458,7 +2460,7 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 	sqlStmt => qq{
 		SELECT
 			%simpleDate:trans_begin_stamp - :1%,
-			complete_name,
+			simple_name,
 			related_data,
 			trans_status_reason,
 			provider_id, caption,
