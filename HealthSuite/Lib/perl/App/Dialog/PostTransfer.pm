@@ -36,14 +36,16 @@ sub new
 				new CGI::Dialog::Field(caption => 'Invoice ID', name => 'trans_from_invoice_id', options => FLDFLAG_REQUIRED),
 				new CGI::Dialog::Field(type => 'currency', caption => 'Transfer Amount', name => 'trans_from_amt', options => FLDFLAG_REQUIRED),
 			]),
+		new CGI::Dialog::Field(type => 'memo', caption => 'Comments',	name => 'from_comments'),
+			
 
 		new CGI::Dialog::Subhead(heading => 'Transfer To', name => 'transfer_to_heading'),
 		new CGI::Dialog::Field(caption => 'Invoice ID', name => 'trans_to_invoice_id', options => FLDFLAG_REQUIRED),
+		new CGI::Dialog::Field(type => 'memo', caption => 'Comments',	name => 'to_comments'),
 	
 		
 		new CGI::Dialog::Subhead(heading => 'Invoices', name => 'transfer_invoices_heading'),
 		new App::Dialog::Field::AllInvoices(name =>'transfer_invoices_list'),
-
 	);
 	$self->{activityLog} =
 	{
@@ -157,6 +159,7 @@ sub handleTransferFromInvoice
 	# Create adjustment for the item
 
 	my $adjType = App::Universal::ADJUSTMENTTYPE_TRANSFER;
+	my $comments = $page->field('from_comments');
 	$page->schemaAction(
 			'Invoice_Item_Adjust', 'add',
 			adjustment_type => defined $adjType ? $adjType : undef,
@@ -164,8 +167,7 @@ sub handleTransferFromInvoice
 			parent_id => $itemId || undef,
 			pay_date => $todaysDate || undef,
 			net_adjust => defined $transferAmt ? $transferAmt : undef,
-			#writeoff_code => undef,
-			#comments => undef,
+			comments => $comments || undef,
 			_debug => 0
 	);
 
@@ -198,7 +200,7 @@ sub handleTransferFromInvoice
 			item_name => 'Invoice/History/Item',
 			value_type => defined $historyValueType ? $historyValueType : undef,
 			value_text => $description,
-			value_textB => $page->field('comments') || undef,
+			value_textB => $comments || undef,
 			value_date => $todaysDate,
 			_debug => 0
 	);
@@ -233,6 +235,7 @@ sub handleTransferToInvoice
 	# Create adjustment for the item
 
 	my $adjType = App::Universal::ADJUSTMENTTYPE_TRANSFER;
+	my $comments = $page->field('to_comments');
 	$page->schemaAction(
 			'Invoice_Item_Adjust', 'add',
 			adjustment_type => defined $adjType ? $adjType : undef,
@@ -240,8 +243,7 @@ sub handleTransferToInvoice
 			parent_id => $itemId || undef,
 			pay_date => $todaysDate || undef,
 			net_adjust => defined $totalAdjust ? $totalAdjust : undef,
-			#writeoff_code => undef,
-			#comments => undef,
+			comments => $comments || undef,
 			_debug => 0
 	);
 
@@ -274,7 +276,7 @@ sub handleTransferToInvoice
 			item_name => 'Invoice/History/Item',
 			value_type => defined $historyValueType ? $historyValueType : undef,
 			value_text => $description,
-			value_textB => $page->field('comments') || undef,
+			value_textB => $comments || undef,
 			value_date => $todaysDate,
 			_debug => 0
 	);

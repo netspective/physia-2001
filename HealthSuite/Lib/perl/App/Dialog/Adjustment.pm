@@ -33,7 +33,7 @@ sub new
 
 	$self->addContent(
 		new CGI::Dialog::Field::TableColumn(
-							caption => 'Adjustment Amount', 
+							caption => 'Amount Paid', 
 							schema => $schema, column => 'Invoice_Item_Adjust.adjustment_amount', 
 							readOnlyWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
 							options => FLDFLAG_REQUIRED),
@@ -235,7 +235,7 @@ sub execute_add
 		$payerType = App::Universal::ENTITYTYPE_ORG if $payerIs eq 'insurance';
 
 		my $writeoffAmt = $page->field('writeoff_amount');
-		my $writeoffCode = $page->field('writeoff_code');
+		my $writeoffCode = $writeoffAmt > 0 ? $page->field('writeoff_code') : undef;
 		if($payerIs eq 'insurance' && $writeoffAmt > 0)
 		{
 			$writeoffCode = App::Universal::ADJUSTWRITEOFF_CONTRACTAGREEMENT; 
@@ -260,7 +260,7 @@ sub execute_add
 				payer_type => defined $payerType ? $payerType : undef,
 				payer_id => $payerId || undef,
 				writeoff_code => defined $writeoffCode ? $writeoffCode : undef,
-				writeoff_amount => defined $writeoffAmt ? $writeoffAmt : undef,
+				writeoff_amount => $writeoffAmt || undef,
 				net_adjust => defined $netAdjust ? $netAdjust : undef,
 				adjust_codes => $page->field('adjust_codes') || undef,
 				comments => $page->field('comments') || undef,

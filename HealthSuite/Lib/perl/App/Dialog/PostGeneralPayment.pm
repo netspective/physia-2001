@@ -267,7 +267,7 @@ sub execute
 			my $payMethod = $page->field('pay_method');
 			my $payerId = $page->field('payer_id');			#this is a hidden field for now, it is populated with invoice.client_id
 			my $payType = $page->field('pay_type');
-
+			my $comments = $page->param("_f_invoice_$line\_comments");
 			$page->schemaAction(
 					'Invoice_Item_Adjust', 'add',
 					adjustment_type => defined $adjType ? $adjType : undef,
@@ -281,12 +281,7 @@ sub execute
 					net_adjust => defined $totalAdjustForItemAndItemAdjust ? $totalAdjustForItemAndItemAdjust : undef,
 					data_text_a => $page->field('auth_ref') || undef,
 					pay_type => defined $payType ? $payType : undef,
-					#plan_allow => undef,
-					#plan_paid => undef,
-					#writeoff_code => undef,
-					#writeoff_amount => undef,
-					#adjust_codes => undef,
-					#comments => undef,
+					comments => $comments || undef,
 					_debug => 0
 				);
 
@@ -322,7 +317,7 @@ sub execute
 					item_name => 'Invoice/History/Item',
 					value_type => defined $historyValueType ? $historyValueType : undef,
 					value_text => $description,
-					value_textB => $page->field('comments') || undef,
+					value_textB => $comments || undef,
 					value_date => $todaysDate,
 					_debug => 0
 				);

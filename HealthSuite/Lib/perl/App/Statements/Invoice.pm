@@ -211,16 +211,17 @@ $STMTMGR_INVOICE = new App::Statements::Invoice(
 		where item_id = ?
 		},
 	'selItemAdjustments' => q{
-		select 	iia.adjustment_id, adm.caption as adjustment_type, iia.adjustment_amount,
-			iia.payer_id, iia.plan_allow, iia.plan_paid, iia.deductible, iia.copay,
-			iia.submit_date, iia.pay_date, pat.caption as pay_type, comments,
-			pam.caption as pay_method, pay_ref, pay_method as pay_method_id,
-			writeoff_code, writeoff_amount, adjust_codes, net_adjust, data_text_a
-		from invoice_item_adjust iia, adjust_method adm, payment_type pat, payment_method pam
+		select 	iia.adjustment_id, iia.adjustment_amount,	iia.payer_id, iia.plan_allow, iia.plan_paid, iia.deductible, iia.copay,
+			iia.submit_date, iia.pay_date, comments, pay_ref, pay_method as pay_method_id, writeoff_amount, 
+			adjust_codes, net_adjust, data_text_a,
+			pat.caption as pay_type, adm.caption as adjustment_type, 
+			pam.caption as pay_method, wt.caption as writeoff_code
+		from invoice_item_adjust iia, adjust_method adm, payment_type pat, payment_method pam, writeoff_type wt
 		where iia.parent_id = ?
-		and iia.adjustment_type = adm.id
+		and iia.writeoff_code = wt.id (+)
+		and iia.pay_method = pam.id (+)
+		and iia.adjustment_type = adm.id (+)
 		and iia.pay_type = pat.id (+)
-		and iia.pay_method = pam.id
 		},
 	'selInvoiceTypeForClient' =>
 		{

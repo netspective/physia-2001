@@ -389,7 +389,9 @@ sub getProceduresHtml
 		my $adjItem = $claim->{adjItems}->[$itemIdx];
 		my $itemNum = $itemIdx + 1;
 
-		my $adjType = $adjItem->{adjustments}->[0]->{adjustType};
+		my $adjustment = $adjItem->{adjustments}->[0];
+		my $adjComments = $adjustment->{comments};
+		my $adjType = $adjustment->{adjustType};
 		my $adjTypeCaption = $STMTMGR_INVOICE->getSingleValue($self, STMTMGRFLAG_NONE, 'selAdjTypeCaption', $adjType);
 
 		my $itemAdjustmentTotal = $adjItem->{totalAdjustments};
@@ -399,7 +401,7 @@ sub getProceduresHtml
 
 		push(@rows, qq{
 			<TR>
-				<TD COLSPAN=11><FONT FACE="Arial,Helvetica" SIZE=2 COLOR="Darkred">$adjTypeCaption</TD>
+				<TD COLSPAN=11><FONT FACE="Arial,Helvetica" SIZE=2 COLOR="Darkred">$adjTypeCaption - $adjComments</TD>
 				<TD><FONT FACE="Arial,Helvetica" SIZE=2 COLOR="Green">&nbsp;</FONT></TD>
 				<TD ALIGN="Right"><FONT FACE="Arial,Helvetica" SIZE=2 COLOR="Darkred">$viewPaymentHtml</TD>
 			</TR>
@@ -694,18 +696,23 @@ sub prepare_dialog_adjustment
 
 			<CENTER>
 			<TABLE>
-					<TR VALIGN=TOP>
-						<TD BGCOLOR=EEEEEE><FONT FACE="Arial,Helvetica" SIZE=2 COLOR=333333>Date</TD>
-						<TD BGCOLOR=EEEEEE><FONT FACE="Arial,Helvetica" SIZE=2 COLOR=333333>Payer</TD>
-						<TD BGCOLOR=EEEEEE><FONT FACE="Arial,Helvetica" SIZE=2 COLOR=333333>Adj Type</TD>
-						<TD BGCOLOR=EEEEEE><FONT FACE="Arial,Helvetica" SIZE=2 COLOR=333333>Pay Type</TD>
-						<TD BGCOLOR=EEEEEE><FONT FACE="Arial,Helvetica" SIZE=2 COLOR=333333>Pay Method</TD>
-						<TD BGCOLOR=EEEEEE><FONT FACE="Arial,Helvetica" SIZE=2 COLOR=333333>Pay Ref</TD>
-						<TD BGCOLOR=EEEEEE><FONT FACE="Arial,Helvetica" SIZE=2 COLOR=333333>Auth Ref</TD>
-						<TD BGCOLOR=EEEEEE><FONT FACE="Arial,Helvetica" SIZE=2 COLOR=333333>Payment</TD>
-						<TD BGCOLOR=EEEEEE><FONT FACE="Arial,Helvetica" SIZE=2 COLOR=333333>Writeoff</TD>
-						<TD BGCOLOR=EEEEEE><FONT FACE="Arial,Helvetica" SIZE=2 COLOR=333333>Net Adjust</TD>
-					</TR>
+		});
+
+		push(@{$self->{page_content}}, qq{
+				<TR VALIGN=TOP>
+					<TD BGCOLOR=EEEEEE><FONT FACE="Arial,Helvetica" SIZE=2 COLOR=333333>Date</TD>
+					<TD BGCOLOR=EEEEEE><FONT FACE="Arial,Helvetica" SIZE=2 COLOR=333333>Payer</TD>
+					<TD BGCOLOR=EEEEEE><FONT FACE="Arial,Helvetica" SIZE=2 COLOR=333333>Adj Type</TD>
+					<TD BGCOLOR=EEEEEE><FONT FACE="Arial,Helvetica" SIZE=2 COLOR=333333>Pay Type</TD>
+					<TD BGCOLOR=EEEEEE><FONT FACE="Arial,Helvetica" SIZE=2 COLOR=333333>Pay Method</TD>
+					<TD BGCOLOR=EEEEEE><FONT FACE="Arial,Helvetica" SIZE=2 COLOR=333333>Pay Ref</TD>
+					<TD BGCOLOR=EEEEEE><FONT FACE="Arial,Helvetica" SIZE=2 COLOR=333333>Auth Ref</TD>
+					<TD BGCOLOR=EEEEEE><FONT FACE="Arial,Helvetica" SIZE=2 COLOR=333333>Payment</TD>
+					<TD BGCOLOR=EEEEEE><FONT FACE="Arial,Helvetica" SIZE=2 COLOR=333333>Writeoff Amt</TD>
+					<TD BGCOLOR=EEEEEE><FONT FACE="Arial,Helvetica" SIZE=2 COLOR=333333>Writeoff Code</TD>
+					<TD BGCOLOR=EEEEEE><FONT FACE="Arial,Helvetica" SIZE=2 COLOR=333333>Net Adjust</TD>
+					<TD BGCOLOR=EEEEEE><FONT FACE="Arial,Helvetica" SIZE=2 COLOR=333333>Comments</TD>
+				</TR>
 		});
 
 		foreach my $adj (@{$itemAdjs})
@@ -722,7 +729,9 @@ sub prepare_dialog_adjustment
 						<TD><FONT FACE="Arial,Helvetica" SIZE=2>$adj->{data_text_a}</TD>
 						<TD><FONT FACE="Arial,Helvetica" SIZE=2>$totalAdj</TD>
 						<TD><FONT FACE="Arial,Helvetica" SIZE=2>$adj->{writeoff_amount}</TD>
+						<TD><FONT FACE="Arial,Helvetica" SIZE=2>$adj->{writeoff_code}</TD>
 						<TD><FONT FACE="Arial,Helvetica" SIZE=2>$adj->{net_adjust}</TD>
+						<TD><FONT FACE="Arial,Helvetica" SIZE=2>$adj->{comments}</TD>
 					</TR>
 			});
 		}
@@ -1396,6 +1405,7 @@ sub handleARL
 	unless($self->arlHasStdAction($rsrc, $pathItems, 1))
 	{
 		$self->param('_pm_view', $pathItems->[1] || 'summary') if $pathItems->[1];
+		$self->param('_pm_item', $pathItems->[2]) if defined $pathItems->[2] && $self->param('_pm_view') eq 'adjustment';
 		$self->param('_pm_dialog', $pathItems->[2]) if defined $pathItems->[2] && $self->param('_pm_view') eq 'dialog';
 		$self->param('_pm_dialog_cmd', $pathItems->[3]) if defined $pathItems->[3] && $self->param('_pm_view') eq 'dialog';
 	}

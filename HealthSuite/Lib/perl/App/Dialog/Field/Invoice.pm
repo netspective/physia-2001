@@ -297,6 +297,8 @@ sub getHtml
 				<TD ALIGN=RIGHT><FONT $textFontAttrs>\$$invoiceBalance</TD>
 				<TD><FONT SIZE=1>&nbsp;</FONT></TD>
 				<TD><INPUT NAME='_f_invoice_$line\_payment' TYPE='text' size=10 VALUE='@{[ $page->param("_f_invoice_$line\_payment") ]}'></TD>
+				<TD><FONT SIZE=1>&nbsp;</FONT></TD>
+				<TD><INPUT NAME='_f_invoice_$line\_comments' TYPE='text' size=30 VALUE='@{[ $page->param("_f_invoice_$line\_comments") ]}'></TD>
 			</TR>
 		};
 	}
@@ -304,7 +306,7 @@ sub getHtml
 	return qq{
 		<TR valign=top $bgColorAttr>
 			<TD width=$self->{_spacerWidth}>$spacerHtml</TD>
-			<TD>
+			<TD colspan=2>
 				<TABLE CELLSPACING=0 CELLPADDING=2>
 					<INPUT TYPE="HIDDEN" NAME="_f_line_count" VALUE="$totalInvoices"/>
 					<INPUT TYPE="HIDDEN" NAME="_f_total_patient_balance" VALUE="$totalPatientBalance"/>
@@ -317,6 +319,8 @@ sub getHtml
 						<TD ALIGN=CENTER><FONT $textFontAttrs>Balance</FONT></TD>
 						<TD><FONT SIZE=1>&nbsp;</FONT></TD>
 						<TD ALIGN=CENTER><FONT $textFontAttrs>Payment</FONT></TD>
+						<TD><FONT SIZE=1>&nbsp;</FONT></TD>
+						<TD ALIGN=CENTER><FONT $textFontAttrs>Comments</FONT></TD>
 					</TR>
 					$linesHtml
 					<TR VALIGN=TOP BGCOLOR=#DDDDDD>
@@ -449,6 +453,8 @@ sub getHtml
 				<TD ALIGN=RIGHT><FONT $textFontAttrs>\$$invoiceBalance</TD>
 				<TD><FONT SIZE=1>&nbsp;</FONT></TD>
 				<TD><INPUT NAME='_f_invoice_$line\_refund' TYPE='text' size=10 VALUE='@{[ $page->param("_f_invoice_$line\_refund") ]}'></TD>
+				<TD><FONT SIZE=1>&nbsp;</FONT></TD>
+				<TD><INPUT NAME='_f_invoice_$line\_comments' TYPE='text' size=30 VALUE='@{[ $page->param("_f_invoice_$line\_comments") ]}'></TD>
 			</TR>
 		};
 	}
@@ -469,6 +475,8 @@ sub getHtml
 						<TD ALIGN=CENTER><FONT $textFontAttrs>Balance</FONT></TD>
 						<TD><FONT SIZE=1>&nbsp;</FONT></TD>
 						<TD ALIGN=CENTER><FONT $textFontAttrs>Refund</FONT></TD>
+						<TD><FONT SIZE=1>&nbsp;</FONT></TD>
+						<TD ALIGN=CENTER><FONT $textFontAttrs>Comments</FONT></TD>
 					</TR>
 					$linesHtml
 					<TR VALIGN=TOP BGCOLOR=#DDDDDD>
@@ -590,8 +598,6 @@ sub getHtml
 				<TD><FONT $textFontAttrs>$dateDisplay</TD>
 				<TD><FONT SIZE=1>&nbsp;</FONT></TD>
 				<TD ALIGN=RIGHT><FONT $textFontAttrs>\$$invoiceBalance</TD>
-				<!-- <TD><FONT SIZE=1>&nbsp;</FONT></TD>
-				<TD><INPUT NAME='_f_invoice_$line\_refund' TYPE='text' size=10 VALUE='@{[ $page->param("_f_invoice_$line\_refund") ]}'></TD> -->
 			</TR>
 		};
 	}
@@ -599,7 +605,7 @@ sub getHtml
 	return qq{
 		<TR valign=top $bgColorAttr>
 			<TD width=$self->{_spacerWidth}>$spacerHtml</TD>
-			<TD>
+			<TD colspan=2>
 				<TABLE CELLSPACING=0 CELLPADDING=2>
 					<INPUT TYPE="HIDDEN" NAME="_f_line_count" VALUE="$totalInvoices"/>
 					<INPUT TYPE="HIDDEN" NAME="_f_total_patient_balance" VALUE="$totalPatientBalance"/>
@@ -610,8 +616,6 @@ sub getHtml
 						<TD ALIGN=CENTER><FONT $textFontAttrs>Svc Date(s)</FONT></TD>
 						<TD><FONT SIZE=1>&nbsp;</FONT></TD>
 						<TD ALIGN=CENTER><FONT $textFontAttrs>Balance</FONT></TD>
-						<!-- <TD><FONT SIZE=1>&nbsp;</FONT></TD>
-						<TD ALIGN=CENTER><FONT $textFontAttrs>Refund</FONT></TD> -->
 					</TR>
 					$linesHtml
 					<TR VALIGN=TOP BGCOLOR=#DDDDDD>

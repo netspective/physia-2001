@@ -32,7 +32,6 @@ sub new
 	$self->addContent(
 		new CGI::Dialog::Subhead(heading => 'Overpaid Invoices', name => 'credit_heading'),
 		new App::Dialog::Field::CreditInvoices(name =>'credit_invoices_list'),
-
 	);
 	$self->{activityLog} =
 	{
@@ -95,17 +94,16 @@ sub execute
 
 		# Create adjustment for the item
 
-		my $adjType = App::Universal::ADJUSTMENTTYPE_PAYMENT;
-
+		my $adjType = App::Universal::ADJUSTMENTTYPE_REFUND;
+		my $comments = $page->param("_f_invoice_$line\_comments");
 		$page->schemaAction(
 				'Invoice_Item_Adjust', 'add',
-				#adjustment_type => defined $adjType ? $adjType : undef,
+				adjustment_type => defined $adjType ? $adjType : undef,
 				adjustment_amount => defined $refundAmt ? $refundAmt : undef,
 				parent_id => $itemId || undef,
 				pay_date => $todaysDate || undef,
 				net_adjust => defined $totalAdjustForItemAndItemAdjust ? $totalAdjustForItemAndItemAdjust : undef,
-				#writeoff_code => undef,
-				#comments => undef,
+				comments => $comments || undef,
 				_debug => 0
 			);
 
@@ -140,7 +138,7 @@ sub execute
 				item_name => 'Invoice/History/Item',
 				value_type => defined $historyValueType ? $historyValueType : undef,
 				value_text => $description,
-				value_textB => $page->field('comments') || undef,
+				value_textB => $comments || undef,
 				value_date => $todaysDate,
 				_debug => 0
 			);
