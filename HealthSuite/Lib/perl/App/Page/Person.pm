@@ -389,7 +389,6 @@ sub prepare_view_profile
 					</TABLE><BR>
 					#component.stp-person.hospitalizationSurgeriesTherapies#<BR>
 					#component.stp-person.activeProblems#<BR>
-					#component.stp-person.surgeryProcedures#<BR>
 					#component.stp-person.authorization#<BR>
 						<TABLE CELLSPACING=0 BORDER=0 CELLPADDING=0 WIDTH=100%>
 							<TR VALIGN=TOP>
@@ -400,7 +399,6 @@ sub prepare_view_profile
 						</TABLE><BR>
 						#component.stp-person.affiliations#<BR>
 					#component.stp-person.associatedResources#</BR>
-					#component.stp-person.patientAppointments#</BR>
 					#component.stp-person.benefits#</BR>
 					#component.stp-person.miscNotes#</BR>
 					</font>
@@ -437,6 +435,7 @@ sub prepare_view_chart
 							<TD>#component.stp-person.activeMedications#</TD>
 						</TR>
 					</TABLE><BR>
+					#component.stp-person.patientAppointments#</BR>
 					#component.stp-person.hospitalizationSurgeriesTherapies#<BR>
 					#component.stp-person.activeProblems#<BR>
 					#component.stp-person.surgeryProcedures#<BR>
