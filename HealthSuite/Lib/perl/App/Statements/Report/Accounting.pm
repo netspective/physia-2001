@@ -6,9 +6,9 @@ use strict;
 use Exporter;
 use DBI::StatementManager;
 use App::Universal;
-use vars qw(@ISA @EXPORT $STMTMGR_REPORT_ACCOUNTING $STMTFMT_SEL_RECEIPT_ANALYSIS $STMTRPTDEFN_DEFAULT $STMTMGR_AGED_PATIENT_ORG_PROV);
+use vars qw(@ISA @EXPORT $STMTMGR_REPORT_ACCOUNTING $STMTFMT_SEL_RECEIPT_ANALYSIS $STMTRPTDEFN_DEFAULT $STMTMGR_AGED_PATIENT_ORG_PROV $STMTMGR_AGED_INSURANCE_ORG_PROV);
 @ISA    = qw(Exporter DBI::StatementManager);
-@EXPORT = qw($STMTMGR_REPORT_ACCOUNTING $STMTMGR_AGED_PATIENT_ORG_PROV);
+@EXPORT = qw($STMTMGR_REPORT_ACCOUNTING $STMTMGR_AGED_PATIENT_ORG_PROV $STMTMGR_AGED_INSURANCE_ORG_PROV);
 
 my $FILLED =App::Universal::TRANSSTATUS_FILLED;
 my $PAYMENT	=App::Universal::TRANSTYPEACTION_PAYMENT;
@@ -43,6 +43,27 @@ $STMTMGR_AGED_PATIENT_ORG_PROV = qq
 	%whereClause%
 	GROUP BY a.person_id, p.complete_name
 	having sum(total_pending)> 0
+};
+
+$STMTMGR_AGED_INSURANCE_ORG_PROV = qq
+{
+	SELECT 	a.bill_to_id as insurance_ID , count (distinct(a.invoice_id)),
+		sum(balance_0),
+		sum(balance_31),
+		sum(balance_61),
+		sum(balance_91),
+		sum(balance_121),
+		sum(balance_151),
+		sum(total_pending)
+	FROM	agedpayments a,org, transaction t, invoice i
+	WHERE	(a.bill_plain = :1 or :1 is NULL)
+	AND	a.bill_party_type  in (2,3)
+	AND	a.bill_plain = org.org_internal_id
+	AND	org.owner_org_id = :2
+	and i.invoice_id = a.invoice_id
+	and t.trans_id = i.main_transaction
+	%whereClause%
+	GROUP BY bill_to_id
 };
 
 $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
@@ -100,8 +121,8 @@ $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
 					   to_date(:3,'$SQLSTMT_DEFAULTDATEFORMAT')
 				     		,i.units,
 				     	 0)
-				     ) as batch_units				     
-			FROM 	invoice_charges i, person p, transaction_type tt, ref_cpt r							
+				     ) as batch_units
+			FROM 	invoice_charges i, person p, transaction_type tt, ref_cpt r
 			WHERE (:1 IS NULL OR provider= :1 )
 			AND (i.invoice_date) BETWEEN to_date(:2,'MM/DD/YYYY')
 			AND to_date(:3,'MM/DD/YYYY')
@@ -110,7 +131,7 @@ $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
 			AND (:6 is NULL OR :6 >=i.code)
 			AND owner_org_id = :7
 			AND tt.id (+)= i.trans_type
-			AND r.cpt(+)=i.code 
+			AND r.cpt(+)=i.code
 			AND p.person_id = i.provider
 			group by p.simple_name,
 				tt.caption,
@@ -140,16 +161,16 @@ $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
 							(nvl(insurance_pay,0)+nvl(person_pay,0)),
 					 0)
 				     ) as batch_rcpt
-			FROM 	invoice_charges ic, person p				
+			FROM 	invoice_charges ic, person p
 			WHERE 	(:1 IS NULL OR provider = :1)
 			AND	(:2 IS NULL OR upper(pay_type) = upper(:2))
 			AND	(:3 IS NULL OR batch_id = :3)
 			AND	invoice_date between to_date(:4,'$SQLSTMT_DEFAULTDATEFORMAT')
 			AND 	to_date(:5,'$SQLSTMT_DEFAULTDATEFORMAT')
 			AND	payer_type is not null
-			AND	owner_org_id = :6	
+			AND	owner_org_id = :6
 			AND	p.person_id (+)= ic.provider
-			GROUP BY p.simple_name,	
+			GROUP BY p.simple_name,
 				payer_type,	payer_id,
 				pay_type
 			UNION
@@ -169,7 +190,7 @@ $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
 					    to_date(:5,'MM/DD/YYYY'),
 				     		(nvl(unit_cost,0)),
 				     	 0)
-				     ) as batch_rcpt				     
+				     ) as batch_rcpt
 			FROM 	transaction t,trans_attribute  ta,person p
 			WHERE	t.trans_id = ta.parent_id
 			AND	ta.item_name = 'Monthly Cap/Payment/Batch ID'
@@ -180,16 +201,16 @@ $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
 			AND	(:3 IS NULL OR	ta.value_text = :3)
 			AND	ta.value_date between to_date(:4,'MM/DD/YYYY')
 			AND 	to_date(:5,'MM/DD/YYYY')
-			AND	provider_id is not null	
+			AND	provider_id is not null
 			AND	p.person_id (+)= t.provider_id
-			GROUP BY p.simple_name,	
-				nvl(data_text_b,data_text_a) 				
+			GROUP BY p.simple_name,
+				nvl(data_text_b,data_text_a)
 			ORDER BY 1,3,4,5
 
 		},
 	},
-			
-	
+
+
 	'sel_providerreceipt2' =>
 	{
 		sqlStmt=>
@@ -333,6 +354,76 @@ $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
 			},
 
 	},
+
+	'sel_aged_insurance_prov' =>
+	{
+		sqlStmt => $STMTMGR_AGED_INSURANCE_ORG_PROV,
+
+		whereClause => 'and t.care_provider_id = :3',
+
+		publishDefn =>
+			{
+			columnDefn =>
+				[
+				{ colIdx => 0, head => 'Insurance', dataFmt => '<A HREF = "/org/#0#/account">#0#</A>' },
+				{ colIdx => 1, head => 'Total Invoices', tAlign=>'center', summarize=>'sum',,dataFmt => '#1#',dAlign =>'center' },
+				{ colIdx => 2, head => '0 - 30', summarize=>'sum',dataFmt => '#2#', dformat => 'currency' },
+				{ colIdx => 3, head => '31 - 60',summarize=>'sum', dataFmt => '#3#', dformat => 'currency' },
+				{ colIdx => 4, head => '61 - 90',summarize=>'sum', dataFmt => '#4#', dformat => 'currency' },
+				{ colIdx => 5, head => '91 - 120',summarize=>'sum', dataFmt => '#5#', dformat => 'currency' },
+				{ colIdx => 6, head => '121 - 150',summarize=>'sum', dataFmt => '#6#', dformat => 'currency' },
+				{ colIdx => 7, head => '151+',summarize=>'sum', dataFmt => '#7#', dformat => 'currency' },
+				{ colIdx => 8, head => 'Total Pending',summarize=>'sum', dataFmt => '#8#', dAlign => 'center', dformat => 'currency' },
+				],
+			},
+	},
+
+	'sel_aged_insurance_org' =>
+	{
+		sqlStmt => $STMTMGR_AGED_INSURANCE_ORG_PROV,
+
+		whereClause => 'and t.service_facility_id = :3',
+
+		publishDefn =>
+			{
+			columnDefn =>
+				[
+				{ colIdx => 0, head => 'Insurance', dataFmt => '<A HREF = "/org/#0#/account">#0#</A>' },
+				{ colIdx => 1, head => 'Total Invoices', tAlign=>'center', summarize=>'sum',,dataFmt => '#1#',dAlign =>'center' },
+				{ colIdx => 2, head => '0 - 30', summarize=>'sum',dataFmt => '#2#', dformat => 'currency' },
+				{ colIdx => 3, head => '31 - 60',summarize=>'sum', dataFmt => '#3#', dformat => 'currency' },
+				{ colIdx => 4, head => '61 - 90',summarize=>'sum', dataFmt => '#4#', dformat => 'currency' },
+				{ colIdx => 5, head => '91 - 120',summarize=>'sum', dataFmt => '#5#', dformat => 'currency' },
+				{ colIdx => 6, head => '121 - 150',summarize=>'sum', dataFmt => '#6#', dformat => 'currency' },
+				{ colIdx => 7, head => '151+',summarize=>'sum', dataFmt => '#7#', dformat => 'currency' },
+				{ colIdx => 8, head => 'Total Pending',summarize=>'sum', dataFmt => '#8#', dAlign => 'center', dformat => 'currency' },
+				],
+			},
+	},
+
+	'sel_aged_insurance_prov_org' =>
+	{
+		sqlStmt => $STMTMGR_AGED_INSURANCE_ORG_PROV,
+
+		whereClause => 'and t.care_provider_id = :3 and t.service_facility_id = :4',
+
+		publishDefn =>
+			{
+			columnDefn =>
+				[
+				{ colIdx => 0, head => 'Insurance', dataFmt => '<A HREF = "/org/#0#/account">#0#</A>' },
+				{ colIdx => 1, head => 'Total Invoices', tAlign=>'center', summarize=>'sum',,dataFmt => '#1#',dAlign =>'center' },
+				{ colIdx => 2, head => '0 - 30', summarize=>'sum',dataFmt => '#2#', dformat => 'currency' },
+				{ colIdx => 3, head => '31 - 60',summarize=>'sum', dataFmt => '#3#', dformat => 'currency' },
+				{ colIdx => 4, head => '61 - 90',summarize=>'sum', dataFmt => '#4#', dformat => 'currency' },
+				{ colIdx => 5, head => '91 - 120',summarize=>'sum', dataFmt => '#5#', dformat => 'currency' },
+				{ colIdx => 6, head => '121 - 150',summarize=>'sum', dataFmt => '#6#', dformat => 'currency' },
+				{ colIdx => 7, head => '151+',summarize=>'sum', dataFmt => '#7#', dformat => 'currency' },
+				{ colIdx => 8, head => 'Total Pending',summarize=>'sum', dataFmt => '#8#', dAlign => 'center', dformat => 'currency' },
+				],
+			},
+	},
+
 
 	'sel_aged_patient' =>
 	{
@@ -609,7 +700,7 @@ $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
 		(person_write_off) as person_write_off,
 		(refund) as refund,
 		pay_type,
-		p.complete_name 
+		p.complete_name
 	FROM 	invoice_charges, org o, person p
 	WHERE 	to_char(invoice_date,'MM/YYYY') = :1
 	AND	invoice_date between to_date(:7,'$SQLSTMT_DEFAULTDATEFORMAT')
