@@ -277,6 +277,8 @@ sub execute
 			}
 			close ASCIIREPORT;
 
+			print $printHandle "\f";
+
 			my $reportOpened = 1;
 			open (ASCIIREPORT, $tempDir.$prodFilename) or $reportOpened = 0;
 			if ($reportOpened) {
