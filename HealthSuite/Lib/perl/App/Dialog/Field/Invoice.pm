@@ -1176,4 +1176,142 @@ sub getHtml
 	};
 }
 
+##############################################################################
+package App::Dialog::Field::TWCC60;
+##############################################################################
+
+use strict;
+use Carp;
+use CGI::Validator;
+use CGI::Validator::Field;
+use CGI::Dialog;
+
+use DBI::StatementManager;
+use App::Statements::Person;
+use App::Statements::Invoice;
+use App::Statements::Catalog;
+use App::Universal;
+
+use Number::Format;
+use Date::Manip;
+use Date::Calc qw(:all);
+
+use vars qw(@ISA);
+
+@ISA = qw(CGI::Dialog::Field);
+
+sub new
+{
+	my ($type, %params) = @_;
+
+	$params{name} = 'disputed_services' unless exists $params{name};
+	#$params{type} = 'invoices';
+	#$params{lineCount} = 4 unless exists $params{count};
+	#$params{allowComments} = 1 unless exists $params{allowComments};
+
+	return CGI::Dialog::Field::new($type, %params);
+}
+
+sub needsValidation
+{
+	return 0;
+}
+
+sub isValid
+{
+	my ($self, $page, $validator, $valFlags) = @_;
+
+	#return $page->haveValidationErrors() ? 0 : 1;
+}
+
+sub getHtml
+{
+	my ($self, $page, $dialog, $command, $dlgFlags) = @_;
+
+	my $errorMsgsHtml = '';
+	my $bgColorAttr = '';
+	my $spacerHtml = '&nbsp;';
+	my $textFontAttrs = 'SIZE=1 FACE="Tahoma,Arial,Helvetica" STYLE="font-family:tahoma; font-size:8pt"';
+	my $textFontAttrsForTotalBalRow = 'SIZE=2 FACE="Tahoma,Arial,Helvetica" STYLE="font-family:tahoma; font-size:10pt"';
+
+	if(my @messages = $page->validationMessages($self->{name}))
+	{
+		$spacerHtml = '<img src="/resources/icons/arrow_right_red.gif" border=0>';
+		$bgColorAttr = "bgcolor='$dialog->{errorBgColor}'";
+		$errorMsgsHtml = "<br><font $dialog->{bodyFontErrorAttrs}>" . join("<br>", @messages) . "</font>";
+	}
+
+	#get invoice items which can have payments applied to them
+	my $linesHtml;
+	my $invoiceId = $page->param('invoice_id');
+	my $lineCount = $self->{lineCount};
+	for(my $line = 1; $line <= $lineCount; $line++)
+	{
+		$linesHtml .= qq{
+			<INPUT TYPE="HIDDEN" NAME="_f_item_$line\_item_id" VALUE='@{[ $page->param("_f_item_$line\_item_id") ]}'/>
+			<TR VALIGN=TOP>
+				<TD ALIGN=RIGHT><FONT $textFontAttrs COLOR="#333333"/><B>$line</B></FONT></TD>
+				<TD><INPUT NAME='_f_item_$line\_disputed_dos' SIZE=10 VALUE='@{[ $page->param("_f_item_$line\_disputed_dos") ]}'></TD>
+				<TD><FONT SIZE=1>&nbsp;</FONT></TD>
+				<TD><INPUT NAME='_f_item_$line\_cpts' SIZE=10 VALUE='@{[ $page->param("_f_item_$line\_cpts") ]}'></TD>
+				<TD><FONT SIZE=1>&nbsp;</FONT></TD>
+				<TD><INPUT NAME='_f_item_$line\_amt_billed' SIZE=10 VALUE='@{[ $page->param("_f_item_$line\_amt_billed") ]}'></TD>
+				<TD><FONT SIZE=1>&nbsp;</FONT></TD>
+				<TD><INPUT NAME='_f_item_$line\_med_fee' SIZE=10 VALUE='@{[ $page->param("_f_item_$line\_med_fee") ]}'></TD>
+				<TD><FONT SIZE=1>&nbsp;</FONT></TD>
+				<TD><INPUT NAME='_f_item_$line\_amt_paid' SIZE=10 VALUE='@{[ $page->param("_f_item_$line\_amt_paid") ]}'></TD>
+				<TD><FONT SIZE=1>&nbsp;</FONT></TD>
+				<TD><INPUT NAME='_f_item_$line\_amt_disputed' SIZE=10 VALUE='@{[ $page->param("_f_item_$line\_amt_disputed") ]}'></TD>
+				<TD><FONT SIZE=1>&nbsp;</FONT></TD>
+				<TD><INPUT NAME='_f_item_$line\_refund_rationale' TYPE='text' size=25 VALUE='@{[ $page->param("_f_item_$line\_refund_rationale") ]}'></TD>
+				<TD><INPUT NAME='_f_item_$line\_denial_rationale' TYPE='text' size=25 VALUE='@{[ $page->param("_f_item_$line\_denial_rationale") ]}'></TD>
+			</TR>
+		};
+	}
+
+	return qq{
+		<TR valign=top $bgColorAttr>
+			<TD width=$self->{_spacerWidth}>$spacerHtml</TD>
+			<TD colspan=2>
+				<TABLE CELLSPACING=0 CELLPADDING=2>
+					<INPUT TYPE="HIDDEN" NAME="_f_line_count" VALUE="$lineCount"/>
+					<TR VALIGN=TOP BGCOLOR=#DDDDDD>
+						<TD ALIGN=CENTER><FONT $textFontAttrs>&nbsp;</FONT></TD>
+						<TD ALIGN=CENTER><FONT $textFontAttrs>Disputed<BR>DOS</FONT></TD>
+						<TD><FONT SIZE=1>&nbsp;</FONT></TD>
+						<TD ALIGN=CENTER><FONT $textFontAttrs>CPT Code(s)</FONT></TD>
+						<TD><FONT SIZE=1>&nbsp;</FONT></TD>
+						<TD ALIGN=CENTER><FONT $textFontAttrs>Amount<BR>Billed</FONT></TD>
+						<TD><FONT SIZE=1>&nbsp;</FONT></TD>
+						<TD ALIGN=CENTER><FONT $textFontAttrs>Medical Fee<BR>Guideline<BR>MAR</FONT></TD>
+						<TD><FONT SIZE=1>&nbsp;</FONT></TD>
+						<TD ALIGN=CENTER><FONT $textFontAttrs>Total<BR>Amount<BR>Paid</FONT></TD>
+						<TD><FONT SIZE=1>&nbsp;</FONT></TD>
+						<TD ALIGN=CENTER><FONT $textFontAttrs>Amount in<BR>Dispute</FONT></TD>
+						<TD><FONT SIZE=1>&nbsp;</FONT></TD>
+						<TD ALIGN=LEFT><FONT $textFontAttrs>Requestor's Rationale for<BR>Incr Reimbursement or Refund</FONT></TD>
+						<TD ALIGN=LEFT><FONT $textFontAttrs>Requestor's Rationale for<BR>Maintaining the Reduction or Denial</FONT></TD>
+					</TR>
+					$linesHtml
+					<!-- <TR VALIGN=TOP BGCOLOR=#DDDDDD>
+						<TD><FONT SIZE=1>&nbsp;</FONT></TD>
+						<TD><FONT $textFontAttrsForTotalBalRow><b>Totals:</b></FONT></TD>
+						<TD><FONT SIZE=1>&nbsp;</FONT></TD>
+						<TD><INPUT NAME='_f_item_total_cpts' SIZE=10 VALUE='@{[ $page->param("_f_item_total_cpts") ]}'></TD>
+						<TD><FONT SIZE=1>&nbsp;</FONT></TD>
+						<TD><INPUT NAME='_f_item_total_amt_billed' SIZE=10 VALUE='@{[ $page->param("_f_item_total_amt_billed") ]}'></TD>
+						<TD><FONT SIZE=1>&nbsp;</FONT></TD>
+						<TD><INPUT NAME='_f_item_total_med_fee' SIZE=10 VALUE='@{[ $page->param("_f_item_total_med_fee") ]}'></TD>
+						<TD><FONT SIZE=1>&nbsp;</FONT></TD>
+						<TD><INPUT NAME='_f_item_total_amt_paid' SIZE=10 VALUE='@{[ $page->param("_f_item_total_amt_paid") ]}'></TD>
+						<TD><FONT SIZE=1>&nbsp;</FONT></TD>
+						<TD COLSPAN=4><INPUT NAME='_f_item_total_amt_disputed' SIZE=10 VALUE='@{[ $page->param("_f_item_total_amt_disputed") ]}'></TD>
+					</TR> -->
+				</TABLE>
+			</TD>
+			<TD width=$self->{_spacerWidth}>$spacerHtml</TD>
+		</TR>
+	};
+}
+
 1;
