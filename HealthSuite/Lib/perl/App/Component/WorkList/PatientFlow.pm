@@ -12,6 +12,7 @@ use DBI::StatementManager;
 use App::Statements::Component::Scheduling;
 use App::Statements::Person;
 use App::Statements::Scheduling;
+use App::Statements::Org;
 use App::Schedule::Utilities;
 use Data::Publish;
 use Exporter;
@@ -188,6 +189,9 @@ sub getComponentHtml
 		my ($apptMinutes, $checkinMinutes, $checkoutMinutes, $waitMinutes, $visitMinutes);
 		$apptMinutes = stamp2minutes($_->{appointment_time});
 
+		$_->{facility_name} = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selId', 
+			$_->{facility});
+		
 		if ($_->{checkin_time})
 		{
 			$checkinMinutes  = stamp2minutes($_->{checkin_time});
@@ -214,7 +218,7 @@ sub getComponentHtml
 		my $physicianHref = $PHYSICIAN_URLS{$page->session('physicianOnSelect')}->{arl};
 		$physicianHref =~ s/itemValue/$_->{physician}/;
 		my $orgHref = $ORG_URLS{$page->session('orgOnSelect')}->{arl};
-		$orgHref =~ s/itemValue/$_->{facility}/;
+		$orgHref =~ s/itemValue/$_->{facility_name}/;
 		my $apptHref = $APPT_URLS{$page->session('apptOnSelect')}->{arl};
 		$apptHref =~ s/itemValue/$_->{event_id}/;
 
@@ -241,7 +245,7 @@ sub getComponentHtml
 
 				<A HREF='$physicianHref' TITLE='$physicianTitle' class=today>
 				$_->{physician}</A>
-				(<A HREF='$orgHref' TITLE='$orgTitle' class=today>$_->{facility}</A>)
+				(<A HREF='$orgHref' TITLE='$orgTitle' class=today>$_->{facility_name}</A>)
 			},
 
 			qq{
