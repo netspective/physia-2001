@@ -56,3 +56,12 @@ SDEDBS04.physia.com =
     )
   )
 
+SDEDBS05.physia.com = 
+  (DESCRIPTION =
+    (ADDRESS_LIST =
+      (ADDRESS = (PROTOCOL = TCP)(HOST = lima.physia.com)(PORT = 1521))
+    )
+    (CONNECT_DATA =
+      (SID = SDEDBS05)
+    )
+  )
