@@ -400,12 +400,22 @@ sub populateHMOBlueSeSeniorPatData
     # add person object to all semnet main orgs
     
     my $mainOrg = $dataModel->getFirstOrgOfType('MainOrg');	
+
+    my $first=1;
     while ($mainOrg)
     {
+       		if($first)
+    		{    		
 	  		$dataModel->people->add_personnel($person,$mainOrg);		
+	  		$first=0;
+	  	}
+	  	else
+	  	{
+	  		$dataModel->people->add_category($person,$mainOrg);
+	  	}
 				#process code here
 		    $mainOrg = $dataModel->getNextOrgOfType('MainOrg');
-    }
+    };
     
     #print "end of record\n";
 
@@ -544,12 +554,23 @@ sub populateHMOBlueSeCommPatData
     # add person object to all semnet main orgs
     
     my $mainOrg = $dataModel->getFirstOrgOfType('MainOrg');	
+
+    my $first=1;
     while ($mainOrg)
     {
+       		if($first)
+    		{    		
 	  		$dataModel->people->add_personnel($person,$mainOrg);		
+	  		$first=0;
+	  	}
+	  	else
+	  	{
+	  		$dataModel->people->add_category($person,$mainOrg);
+	  	}
 				#process code here
 		    $mainOrg = $dataModel->getNextOrgOfType('MainOrg');
-    }
+    };
+
     
     #print "end of record\n";
 
@@ -564,7 +585,7 @@ sub populateHMOBlueSeCommPatData
 	#
 	# STAGE 1: identify duplicates in source
 	#
-	my %index = ();
+#	my %index = ();
 #	foreach my $person (@{$dataModel->people()->all()})
 #	{
 			#
