@@ -94,7 +94,8 @@ sub makeStateChanges
 	#turn these fields off if there is no person id
 	if($command eq 'add')
 	{
-		unless(my $personId = $page->param('person_id') || $page->param('attendee_id') || $page->field('attendee_id'))
+		my $personId = $page->param('person_id') || $page->field('attendee_id');
+		unless($STMTMGR_PERSON->recordExists($page, STMTMGRFLAG_NONE, 'selPersonData', $personId))
 		{
 			$self->updateFieldFlags('payer', FLDFLAG_INVISIBLE, 1);
 			#$self->updateFieldFlags('deduct_fields', FLDFLAG_INVISIBLE, 1);

@@ -214,7 +214,7 @@ sub makeStateChanges
 
 
 	#Set attendee_id field and make it read only if person_id exists
-	if(my $personId = $page->param('person_id') || $page->param('attendee_id') || $page->field('attendee_id'))
+	if(my $personId = $page->param('person_id'))
 	{
 		$page->field('attendee_id', $personId);
 		$self->setFieldFlags('attendee_id', FLDFLAG_READONLY);
@@ -371,9 +371,12 @@ sub populateData
 		$page->field('invoiceFieldsAreSet', 1);
 	}
 
-	if( my $personId = $page->field('attendee_id') || $page->param('person_id') || $page->param('attendee_id') )
+	if( my $personId = $page->field('attendee_id') || $page->param('person_id') )
 	{
-		setInsuranceFields($self, $page, $command, $activeExecMode, $flags, $invoiceId, $personId);
+		if($STMTMGR_PERSON->recordExists($page, STMTMGRFLAG_NONE, 'selPersonData', $personId))
+		{
+			setInsuranceFields($self, $page, $command, $activeExecMode, $flags, $invoiceId, $personId);
+		}
 	}
 
 	return unless $flags & CGI::Dialog::DLGFLAG_ADD_DATAENTRY_INITIAL;
