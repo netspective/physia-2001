@@ -243,6 +243,12 @@ $STMTMGR_INSURANCE = new App::Statements::Insurance(
 			where owner_person_id = ?
 				and ins_org_id = ?
 		},
+	'selInsuranceByInsOrgAndMemberNumber' => qq{
+		select *
+			from insurance
+			where ins_org_id = ?
+				and member_number = ?
+		},
 	'selInsuranceByBillSequence' => qq{
 		select *
 			from insurance
