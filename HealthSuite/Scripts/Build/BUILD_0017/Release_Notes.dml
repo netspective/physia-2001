@@ -23,6 +23,10 @@
 			UI: Added the 'Fee Schedule Items' choice in the lookup drop-down list in the main menu page.
 		</deliverable>
 		
+		<deliverable id="517">
+			UI: For dialogs indicated, a static html confirmation page is shown after execution with a link to continue.
+		</deliverable>
+
 		<deliverable id="613">
 			Implement Claims Work List.  *** Big-Time DB Change Required ***
 		</deliverable>
@@ -77,6 +81,10 @@
 			UI: Under 'Care Provider' component, the 'Schedule Appointment' link shows up only for Ohysicians but not for 'Referring Doctors'.
 		</deliverable>		
 		
+		<deliverable id="1250">
+			UI: New QDL and patient view for patient statements.
+		</deliverable>		
+
 		<deliverable id="1262">
 			UI: The Electronic Billing Information component has now been moved form the Insurance tab
 			of an organization to the Clearing House tab.
