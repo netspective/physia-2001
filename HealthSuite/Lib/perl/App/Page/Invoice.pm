@@ -1102,6 +1102,7 @@ sub prepare_view_summary
 	my $submitted = App::Universal::INVOICESTATUS_SUBMITTED;
 	my $transferred = App::Universal::INVOICESTATUS_TRANSFERRED;
 	my $void = App::Universal::INVOICESTATUS_VOID;
+	my $closed = App::Universal::INVOICESTATUS_CLOSED;
 	my $hcfaInvoiceType = App::Universal::INVOICETYPE_HCFACLAIM;
 	my $genericInvoiceType = App::Universal::INVOICETYPE_SERVICE;
 
@@ -1150,7 +1151,7 @@ sub prepare_view_summary
 							</FONT>
 						</TD>" : '' ]}
 
-						@{[ $invStatus != $void ?
+						@{[ $invStatus != $void && $invStatus != $closed ?
 						"<TD>
 							<FONT FACE='Arial,Helvetica' SIZE=2>
 							<a href='/invoice/$invoiceId/dialog/postinvoicepayment?paidBy=personal'>Apply Personal Payment</a>
@@ -1353,7 +1354,7 @@ sub prepare_view_submit
 		my $handler = \&{'App::Dialog::Procedure::execAction_submit'};
 		eval
 		{
-			&{$handler}($self, 'add');
+			&{$handler}($self, 'add', $invoiceId);
 		};
 		$self->addError($@) if $@;
 
@@ -1632,6 +1633,7 @@ sub prepare_page_content_header
 	my $submitted = App::Universal::INVOICESTATUS_SUBMITTED;
 	my $transferred = App::Universal::INVOICESTATUS_TRANSFERRED;
 	my $void = App::Universal::INVOICESTATUS_VOID;
+	my $closed = App::Universal::INVOICESTATUS_CLOSED;
 	my $selfPay = App::Universal::CLAIMTYPE_SELFPAY;
 	my $hcfaInvoiceType = App::Universal::INVOICETYPE_HCFACLAIM;
 	my $genericInvoiceType = App::Universal::INVOICETYPE_SERVICE;
@@ -1699,8 +1701,8 @@ sub prepare_page_content_header
 						<option value="/person/$clientId/dlg-add-posttransfer">Post Transfer</option>
 						<option value="/person/$clientId/account">View All Claims for the Patient</option>
 						
-						@{[ $invType == $hcfaInvoiceType && $invStatus != $void ? "<option value='/invoice/$invoiceId/dialog/claim/update'>Edit Claim</option>" : '' ]}
-						@{[ $invType == $genericInvoiceType && $invStatus != $void ? "<option value='/invoice/$invoiceId/dlg-update-invoice'>Edit Invoice</option>" : '' ]}
+						@{[ $invType == $hcfaInvoiceType && $invStatus != $void && $invStatus != $closed ? "<option value='/invoice/$invoiceId/dialog/claim/update'>Edit Claim</option>" : '' ]}
+						@{[ $invType == $genericInvoiceType && $invStatus != $void && $invStatus != $closed ? "<option value='/invoice/$invoiceId/dlg-update-invoice'>Edit Invoice</option>" : '' ]}
 
 						@{[ $invStatus < $submitted && $invStatus != $void && $claimType != $selfPay && $totalItems > 0 && $invType == $hcfaInvoiceType ? "<option value='/invoice/$invoiceId/submit'>Submit Claim for Transfer</option>" : '' ]}
 						<!-- @{[ $invStatus != $pending && $invStatus < $submitted && $invStatus != $void && $totalItems > 0 && $invType == $hcfaInvoiceType ? "<option value='/invoice/$invoiceId/review'>Submit Claim for Review</option>" : '' ]} -->
@@ -1709,7 +1711,7 @@ sub prepare_page_content_header
 						@{[ $invStatus < $submitted && $invStatus != $void && $invType == $hcfaInvoiceType ? "<option value='/invoice/$invoiceId/dialog/claim/remove'>Void Claim</option>" : '' ]}
 						@{[ $invStatus < $submitted && $invStatus != $void && $invType == $genericInvoiceType ? "<option value='/invoice/$invoiceId/dlg-remove-invoice'>Void Invoice</option>" : '' ]}
 
-						@{[ $invStatus >= $submitted && $invStatus != $void && $invType == $hcfaInvoiceType ? "<option value='/invoice/$invoiceId/dialog/problem'>Report Problems with this Claim</option>" : '' ]}
+						@{[ $invStatus >= $submitted && $invStatus != $void && $invStatus != $closed && $invType == $hcfaInvoiceType ? "<option value='/invoice/$invoiceId/dialog/problem'>Report Problems with this Claim</option>" : '' ]}
 						@{[ $claimType == $selfPay || $invStatus >= $submitted ? qq{<option value='javascript:doActionPopup("/patientbill/$invoiceId")'>Print Patient Bill</option>} : '' ]}
 						<option value="/invoice/$invoiceId/summary">View Claim</option>
 					</SELECT>
