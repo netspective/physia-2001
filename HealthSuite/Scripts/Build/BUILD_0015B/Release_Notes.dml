@@ -16,6 +16,17 @@
 				 refund instead of write offs.  This change will impact financial Analysis report , 
  				 Daily Audit Recap report, Monthly Audit Recap and Revenue Collection report.
 		</deliverable>	
+
+		<deliverable id="1110">
+			Dialog for TWCC 73 form created and fully implemented into TWCC 73 pdf view.
+		</deliverable>
+		<deliverable id="1079">
+			For EPSDT claims, only epsdt id for provider is showing and GRP is being left blank as requested.
+		</deliverable>
+		<deliverable id="1300">
+			Proper payer name showing now when updating payer.
+		</deliverable>
+
 	</deliverables>
 </release-notes>
 
