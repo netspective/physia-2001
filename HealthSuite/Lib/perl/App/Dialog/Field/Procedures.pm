@@ -498,6 +498,27 @@ sub getHtml
 						document.$dialogName._f_proc_$line\_charges.value = '';
 						document.$dialogName._f_proc_$line\_service_type.value = '';						
 					}
+					function getFFS(event)
+					{			
+						if (eval("document.$dialogName._f_payer") && document.$dialogName._f_payer.options[document.$dialogName._f_payer.selectedIndex].value.search(/Primary/)==0)
+						{						
+							document.$dialogName._f_proc_all_catalogs.value = 
+							document.$dialogName._f_ins_ffs.value + "," +
+							document.$dialogName._f_proc_default_catalog.value ;
+						}
+						else if (eval("document.$dialogName._f_payer") && document.$dialogName._f_payer.options[document.$dialogName._f_payer.selectedIndex].value.search(/Work Comp/)==0)
+						{							
+							document.$dialogName._f_proc_all_catalogs.value = 
+							document.$dialogName._f_work_ffs.value + "," +
+							document.$dialogName._f_proc_default_catalog.value ;
+						}
+						else
+						{
+							document.$dialogName._f_proc_all_catalogs.value = 						
+							document.$dialogName._f_proc_default_catalog.value ;
+						}
+																	
+					}
 				</SCRIPT>
 				<TD ALIGN=RIGHT $numCellRowSpan><FONT $textFontAttrs COLOR="#333333"/><B>$line</B></FONT></TD>
 				$removeChkbox
@@ -505,7 +526,7 @@ sub getHtml
 					<INPUT CLASS='procinput' NAME='_f_proc_$line\_dos_end' TYPE='text' size=10 VALUE='@{[ $page->param("_f_proc_$line\_dos_end") || 'To' ]}' ONBLUR="validateChange_Date(event)"></TD>
 				<TD><FONT SIZE=1>&nbsp;</FONT></TD>
 				<TD><NOBR><INPUT $readOnly CLASS='procinput' NAME='_f_proc_$line\_procedure' TYPE='text' size=8 VALUE='@{[ $page->param("_f_proc_$line\_procedure") || ($line == 1 ? 'Procedure' : '') ]}' ONBLUR="onChange_procedure_$line(event)">
-					<A HREF="javascript:doFindLookup(document.$dialogName, document.$dialogName._f_proc_$line\_procedure, '/lookup/cpt', '', false);"><IMG SRC="/resources/icons/magnifying-glass-sm.gif" BORDER=0></A></NOBR><BR>
+										<A HREF="javascript:getFFS();doFindLookup(document.$dialogName, document.$dialogName._f_proc_$line\_procedure, '/lookup/feeprocedure/itemValue',null,false,null,document.$dialogName._f_proc_all_catalogs);"><IMG SRC="/resources/icons/magnifying-glass-sm.gif" BORDER=0></A></NOBR><BR>
 					<INPUT $readOnly CLASS='procinput' NAME='_f_proc_$line\_modifier' TYPE='text' size=4 VALUE='@{[ $page->param("_f_proc_$line\_modifier") || ($line == 1 && $command eq 'add' ? '' : '') ]}'></TD>
 				<TD><FONT SIZE=1>&nbsp;</FONT></TD>
 				<TD><INPUT CLASS='procinput' NAME='_f_proc_$line\_diags' TYPE='text' size=10 VALUE='@{[ $page->param("_f_proc_$line\_diags") ]}'></TD>
@@ -579,6 +600,7 @@ sub getHtml
 			<TD COLSPAN=2>
 				<TABLE CELLSPACING=0 CELLPADDING=2>
 					<INPUT TYPE="HIDDEN" NAME="_f_proc_active_catalogs" VALUE='@{[ $page->param("_f_proc_active_catalogs") ]}'/>
+					<INPUT TYPE="HIDDEN" NAME="_f_proc_all_catalogs" VALUE='@{[ $page->param("_f_proc_all_catalogs") ]}'/>
 					<TR VALIGN=TOP BGCOLOR=#DDDDDD>
 						<TD><FONT $textFontAttrs>Diagnoses (ICD-9s)</FONT></TD>
 						<TD><FONT SIZE=1>&nbsp;</FONT></TD>
