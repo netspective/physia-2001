@@ -143,7 +143,7 @@ sub isValid
 
 			if($self->{name} eq "party_name")
 			{
-				my $createPersonHref = "javascript:doActionPopup('/org-p/#session.org_id#/dlg-add-responsibleparty/$value');";
+				my $createPersonHref = "javascript:doActionPopup('/org-p/#session.org_id#/dlg-add-guarantor/$value');";
 				$self->invalidate($page, qq{
 					$self->{caption} '$value' does not exist.<br>
 					<img src="/images/icons/arrow_right_red.gif">
