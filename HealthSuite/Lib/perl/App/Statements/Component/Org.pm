@@ -1073,6 +1073,70 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 	publishComp_stpe => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_internal_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.listAssociatedOrgs',  [$page->param('org_id'),$page->session('org_internal_id')], 'panelEdit'); },
 	publishComp_stpt => sub { my ($page, $flags, $orgId) = @_; $orgId ||= $page->param('org_id'); $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.listAssociatedOrgs',  [$page->param('org_id'),$page->session('org_internal_id')], 'panelTransp'); },
 },
+#----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+'org.closingDateInfo' => {
+	sqlStmt => qq{
+			SELECT
+				o.org_id,
+				a.value_date,
+				DECODE (o.org_id, :1, 'Parent Org', 'Child Org') as parent_child
+			FROM  	org o, org_attribute a, org p
+			WHERE  	a.parent_id = o.org_internal_id
+			AND	p.org_internal_id (+) = o.parent_org_id
+			AND     a.item_name = 'Retire Batch Date'
+			AND 	( o.org_id = :1 OR p.org_id = :1)
+			ORDER BY parent_child DESC
+		},
+		sqlStmtBindParamDescr => ['Org ID for Attribute Table'],
+
+	publishDefn =>
+	{
+		columnDefn => [
+				{
+					colIdx => 2,
+					dataFmt => {
+						'Parent Org' => "<A HREF = '/org/#0#/profile'>#0#</A> (Parent Org): #1#)",
+						'Child Org' => "<A HREF = '/org/#0#/profile'>#0#</A> (Child Org): #1#)",
+					},
+				},
+
+		],
+
+		frame => {
+			addUrl => '/org/#param.org_id#/stpe-#my.stmtId#/dlg-add-close-date?home=#homeArl#',
+			editUrl => '/org/#param.org_id#/stpe-#my.stmtId#?home=#homeArl#',
+		},
+	},
+
+	publishDefn_panel =>
+	{
+		# automatically inherits columnDefn and other items from publishDefn
+		style => 'panel',
+		frame => { heading => 'Closing Date Information' },
+	},
+	publishDefn_panelTransp =>
+	{
+		# automatically inherits columnDefn and other items from publishDefn
+		style => 'panel.transparent',
+		inherit => 'panel',
+	},
+	publishDefn_panelEdit =>
+	{
+		# automatically inherits columnDefn and other items from publishDefn
+		style => 'panel.edit',
+		frame => { heading => 'Closing Date Information' },
+		banner => {
+			actionRows =>
+			[
+				{ caption => qq{ Add <A HREF= '/org/#param.org_id#/stpe-#my.stmtId#/dlg-add-close-date?home=#param.home#'>Closing Date Information</A> } },
+			],
+		},
+	},
+	publishComp_st => sub { my ($page, $flags, $orgId) = @_; $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.closingDateInfo',  [$page->param('org_id')]); },
+	publishComp_stp => sub { my ($page, $flags, $orgId) = @_; $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.closingDateInfo',  [$page->param('org_id')], 'panel'); },
+	publishComp_stpe => sub { my ($page, $flags, $orgId) = @_; $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.closingDateInfo',  [$page->param('org_id')], 'panelEdit'); },
+	publishComp_stpt => sub { my ($page, $flags, $orgId) = @_; $STMTMGR_COMPONENT_ORG->createHtml($page, $flags, 'org.closingDateInfo',  [$page->param('org_id')], 'panelTransp'); },
+},
 
 ),
 
