@@ -10,36 +10,11 @@
 
 	<deliverables>
 
-		<deliverable id="1263">
-			UI:  Added Patient Lookup tab to Schedule Desk.
-		</deliverable>
-
-		<deliverable id="1288">
-			UI:  Appointment Type Lookup.
-		</deliverable>
-
-		<deliverable id="1246">
-			Changed the activity logs in some of the dialogs to showup the correct message
-		</deliverable>
-
-		<deliverable id="767">
-			UI: Changed the field 'Cancel Remarks' to 'Cancel Reason' which is now a drop-downlist consisting 
-			    of the list of reasons for cancelling the appointment
-		</deliverable>		
-		
-		<deliverable id="1139">
-			Report : Added report that determines Appts that were entered on a particular date.
-		</deliverable>		
-		
-		<deliverable id="1143">
-			Report : Added  Facility/Site Constraint for Claim Status Report and 5 lastest EDI notes to Claim Status report
-		</deliverable>		
-
 		<deliverable id="219">
 			UI: Added early version of Financial Transaction query.  Only about half of the required fields have been 
 			entered so far.  Also fixed a bug in query that didn't allow you to go past the second page of results.
 		</deliverable>
-		
+
 		<deliverable id="758">
 			Reports: Daily Audit Recap, Revenue/Collection, Appointment Charges
 			Added: (UI) A pull-down combo box labelled "Printer" that lists all the printers that an
@@ -49,7 +24,43 @@
 			Added: (UI) A link at the top of each report's output that points to an ASCII version of the
 			       same report executed with the same parameters.
 		</deliverable>
+
+		<deliverable id="767">
+			UI: Changed the field 'Cancel Remarks' to 'Cancel Reason' which is now a drop-downlist consisting 
+			    of the list of reasons for cancelling the appointment
+		</deliverable>		
+
+		<deliverable id="1079">
+			HCFA 1500 box 33.
+		</deliverable>		
+
+		<deliverable id="1139">
+			Report: Added report that determines Appts that were entered on a particular date.
+		</deliverable>		
 		
+		<deliverable id="1143">
+			Report: Added  Facility/Site Constraint for Claim Status Report and 5 lastest EDI notes to Claim Status report
+		</deliverable>		
+
+		<deliverable id="1204">
+			UI:  Printing multi-page HCFA with 'CONTINUED'.
+		</deliverable>
+
+		<deliverable id="1246">
+			Changed the activity logs in some of the dialogs to showup the correct message
+		</deliverable>
+
+		<deliverable id="1263">
+			UI:  Added Patient Lookup tab to Schedule Desk.
+		</deliverable>
+
+		<deliverable id="1288">
+			UI:  Appointment Type Lookup.
+		</deliverable>
+
+		<deliverable id="1328">
+			Populate NSF file with Rendering and Referring Provider IDs.
+		</deliverable>
+
 	</deliverables>
 </release-notes>
-
