@@ -1,5 +1,17 @@
 #!/usr/bin/perl -I.
 
+##############################################################################
+package InvoiceObject;
+##############################################################################
+
+sub new
+{
+	my ($type, %params) = @_;
+	return bless \%params, $type;
+}
+
+1;
+
 use strict;
 
 use Schema::API;
@@ -10,13 +22,13 @@ use App::Configuration;
 use vars qw($page $sqlPlusKey);
 
 use DBI::StatementManager;
-use App::Statements::Scheduling;
+use App::Statements::BillingStatement;
 
-use App::Billing::Claims;
-use App::Billing::Input::DBI;
 use Date::Manip;
+use IO::File;
 
-my $DATEFORMAT = 'mm/dd/yyyy';
+my $TODAY = UnixDate('today', '%m/%d/%Y');
+my $currencyFormat = "\$%.2f";
 
 #########
 # main
@@ -32,26 +44,11 @@ connectDB();
 my $connectKey = $CONFDATA_SERVER->db_ConnectKey() =~ /(.*?)\/(.*?)\@(.*)/;
 my ($userName, $password, $connectString) = ($1, $2, $3);
 
-my $outstandingClaims = findOutStandingClaims();
-
-unless (defined $outstandingClaims)
-{
-	print "\nNo claim found to meet search criteria.  Exit with nothing to do.\n";
-	exit;
-}
-
-my $claimList = new App::Billing::Claims;
-my $input = new App::Billing::Input::DBI;
-
-$input->populateClaims($claimList,
-	UID => $userName,
-	PWD => $password,
-	connectStr => $connectString,
-	invoiceIds => $outstandingClaims,
-) || die "Unable to call populateClaims routine: $!\n";
-
-my $records = processClaimList($claimList);
-writeFile($records);
+my $outstandingClaims = $STMTMGR_STATEMENTS->getRowsAsHashList($page, STMTMGRFLAG_CACHE, 
+	'sel_outstandingClaims', $daysBack);
+		
+my $statements = populateStatementsHash($outstandingClaims);
+writeStatementsFile($statements);
 
 exit;
 
@@ -59,237 +56,184 @@ exit;
 # end main
 ############
 
-sub writeFile
+sub writeStatementsFile
 {
-	my ($records) = @_;
+	my ($statements) = @_;
 	
 	my $now = UnixDate('today', '%m%d%Y_%H%M');
 	my $fileName = 'phy169_' . $now . '.s01';
 	
-	open(OUTPUT, ">$fileName") || die "Unable to open output file '$fileName': $! \n";
+	my $fileHandle = new IO::File;
+	open($fileHandle, ">$fileName") || die "Unable to open output file '$fileName': $! \n";
 	
-	for my $record (@{$records})
+	my $i = 1;
+	for my $key (sort keys %{$statements})
 	{
-		my $numFields = @{$record} -1;
-		for my $i (0..$numFields)
+		my $statement = $statements->{$key};
+		
+		$statement->{statementId} = $i++;
+	
+		writeRecord($fileHandle, getHeaderRecord($statement));
+		
+		for my $invoice (@{$statement->{invoices}})
 		{
-			print OUTPUT '"' . $record->[$i] . '"';
-			print OUTPUT ',' if $i < $numFields;
+			writeRecord($fileHandle, getDetailRecord($statement, $invoice));
 		}
-		print OUTPUT "\n";
+		
+		writeRecord($fileHandle, getFooterRecord($statement));
 	}
 }
 
-sub processClaimList
+sub writeRecord
 {
-	my ($claimList) = @_;
-
-	my $invoiceInfoStmt = qq{
-		select client_id, total_cost, to_char(invoice_date, '$DATEFORMAT') as invoice_date,
-			nvl(total_adjust, 0) as total_adjust, balance, bill_party_type, bill_to_id, 
-			provider_id, care_provider_id
-		from Transaction, Invoice_Billing, Invoice
-		where Invoice.invoice_id = ?
-			and Invoice_Billing.bill_id = Invoice.billing_id
-			and Transaction.trans_id = Invoice.main_transaction
-	};
+	my ($fileHandle, @record) = @_;
 	
-	my $insReceiptStmt = qq{
-		select nvl(sum(adjustment_amount), 0) from Invoice_Item_Adjust
-		where parent_id in (select item_id from Invoice_Item where parent_id = ?)
-			and adjustment_type = 0
-			and payer_type <> 0
-	};
-	
-	my $patReceiptStmt = qq{
-		select nvl(sum(adjustment_amount), 0) from Invoice_Item_Adjust
-		where parent_id in (select item_id from Invoice_Item where parent_id = ?)
-			and adjustment_type = 0
-			and payer_type = 0
-	};
-	
-	my $agingStmt = qq{
-		select nvl(sum(balance), 0) 
-		from Invoice_Billing, Invoice
-		where client_id = ?
-			and invoice_date >= trunc(sysdate) - ?
-			and invoice_date <= trunc(sysdate) - ?
-			and invoice_status > 3
-			and invoice_status < 15
-			and bill_id = billing_id
-			and bill_party_type != 3
-	};
-
-	my $today = UnixDate('today', '%m/%d/%Y');
-	my @records = ();
-
-	for my $claim (@{$claimList->getClaim()} )
+	my $numFields = @record -1;
+	for my $i (0..$numFields)
 	{
-		my $invoiceId = $claim->{id};
-
-		my $invoice = $STMTMGR_SCHEDULING->getRowAsHash($page, STMTMGRFLAG_DYNAMICSQL,
-			$invoiceInfoStmt, $invoiceId);
-
-		my ($sendToName, $sendToAddr1, $sendToAddr2, $sendToAddrCity, $sendToAddrState, $sendToAddrZip)
-			= getSendToAddress($invoice);
-
-		my $renderingProvider = $claim->{renderingProvider};
-		my $renderingProviderAddress = $renderingProvider->{address};
-
-		my $payToOrg = $claim->{payToOrganization};
-		my $payToOrgAddress = $payToOrg->{address};
-
-		my $patient = $claim->{careReceiver};
-		my $patientAddress = $patient->{address};
-		
-		my $insuranceReceipts = $STMTMGR_SCHEDULING->getSingleValue($page, STMTMGRFLAG_DYNAMICSQL,
-			$insReceiptStmt, $invoiceId);
-		my $patientReceipts = $STMTMGR_SCHEDULING->getSingleValue($page, STMTMGRFLAG_DYNAMICSQL,
-			$patReceiptStmt, $invoiceId);
-		
-		my $agingCurrent = $STMTMGR_SCHEDULING->getSingleValue($page, STMTMGRFLAG_DYNAMICSQL,
-			$agingStmt, $invoice->{client_id}, 30, 0);
-		
-		my $aging30 = $STMTMGR_SCHEDULING->getSingleValue($page, STMTMGRFLAG_DYNAMICSQL,
-			$agingStmt, $invoice->{client_id}, 60, 30);
-		
-		my $aging60 = $STMTMGR_SCHEDULING->getSingleValue($page, STMTMGRFLAG_DYNAMICSQL,
-			$agingStmt, $invoice->{client_id}, 90, 60);
-		
-		my $aging90 = $STMTMGR_SCHEDULING->getSingleValue($page, STMTMGRFLAG_DYNAMICSQL,
-			$agingStmt, $invoice->{client_id}, 120, 90);
-		
-		my $aging120 = $STMTMGR_SCHEDULING->getSingleValue($page, STMTMGRFLAG_DYNAMICSQL,
-			$agingStmt, $invoice->{client_id}, 10950, 120);
-
-		my @record = (
-			$invoiceId,
-			getName($renderingProvider), $renderingProvider->{name},
-			$renderingProviderAddress->getAddress1(),
-			$renderingProviderAddress->getAddress2(),
-			$renderingProviderAddress->getCity(),
-			$renderingProviderAddress->getState(),
-			$renderingProviderAddress->getZipCode(),
-
-			$sendToName,
-			$sendToAddr1,
-			$sendToAddr2,
-			$sendToAddrCity,
-			$sendToAddrState,
-			$sendToAddrZip,
-
-			$payToOrg->{name},
-			$payToOrgAddress->getAddress1(),
-			$payToOrgAddress->getAddress2(),
-			$payToOrgAddress->getCity(),
-			$payToOrgAddress->getState(),
-			$payToOrgAddress->getZipCode(),
-
-			'Y',
-			$invoice->{client_id},
-			getName($patient),
-			$today,
-
-			'RETURN SERVICE REQUESTED',
-			
-			$invoice->{invoice_date},
-			$invoice->{care_provider_id} || $invoice->{provider_id},
-			$invoice->{total_cost},
-			$insuranceReceipts,
-			$invoice->{total_adjust},
-			$patientReceipts,
-			$invoice->{balance},
-			
-			undef,
-			'PAYMENT DUE UPON RECEIPT',
-
-			getName($renderingProvider),
-			$renderingProviderAddress->getAddress1(),
-			$renderingProviderAddress->getAddress2(),
-			$renderingProviderAddress->getCity(),
-			$renderingProviderAddress->getState(),
-			$renderingProviderAddress->getZipCode(),
-			undef,
-			
-			$agingCurrent,
-			$aging30,
-			$aging60,
-			$aging90,
-			$aging120,
-			'PLEASE RETAIN THIS STATEMENT FOR YOUR RECORDS'
-		);
-		
-		push(@records, \@record);
+		print $fileHandle '"' . $record[$i] . '"';
+		print $fileHandle ',' if $i < $numFields;
 	}
+	print $fileHandle "\n";
+}
+
+sub getHeaderRecord
+{
+	my ($statement) = @_;
+
+	my @payToAddress = getOrgAddress($statement->{payToId});
 	
-	return \@records;
+	return (
+		'H',
+		$statement->{statementId},
+		@payToAddress,
+		getSendToAddress($statement->{billToId}, $statement->{billPartyType}),
+		@payToAddress,
+		$statement->{clientId},
+		$statement->{patientName},
+		$TODAY,
+		sprintf($currencyFormat, $statement->{amountDue}),
+	);
+}
+
+sub getDetailRecord
+{
+	my ($statement, $invoice) = @_;
+	
+	return (
+		'D',
+		$statement->{statementId},
+		$invoice->{invoiceId},
+		$invoice->{invoiceDate},
+		$invoice->{careProviderId},
+		sprintf($currencyFormat, $invoice->{totalCost}),
+		sprintf($currencyFormat, $invoice->{insuranceReceipts}),
+		sprintf($currencyFormat, $invoice->{totalAdjust}),
+		sprintf($currencyFormat, $invoice->{patientReceipts}),
+		sprintf($currencyFormat, $invoice->{balance}),
+	);
+}
+
+sub getFooterRecord
+{
+	my ($statement) = @_;
+	
+	return (
+		'F',
+		$statement->{statementId},
+		getPersonAddress($statement->{careProviderId}) 
+			|| getPersonAddress($statement->{billingProviderId}),
+		'PAYMENT DUE UPON RECEIPT',
+		'PLEASE RETAIN THIS STATEMENT FOR YOUR RECORDS',
+		sprintf($currencyFormat, $statement->{agingCurrent}),
+		sprintf($currencyFormat, $statement->{aging30}),
+		sprintf($currencyFormat, $statement->{aging60}),
+		sprintf($currencyFormat, $statement->{aging90}),
+		sprintf($currencyFormat, $statement->{aging120}),
+	);
+}
+
+sub getOrgAddress
+{
+	my ($orgInternalId) = @_;
+	
+	my $org = $STMTMGR_STATEMENTS->getRowAsHash($page, STMTMGRFLAG_CACHE, 'sel_orgAddress', $orgInternalId);
+	return ($org->{name_primary}, $org->{line1}, $org->{line2}, $org->{city}, $org->{state}, $org->{zip});
+}
+
+sub getPersonAddress
+{
+	my ($personId) = @_;
+	
+	my $person = $STMTMGR_STATEMENTS->getRowAsHash($page, STMTMGRFLAG_CACHE, 'sel_personAddress', $personId);
+	return ($person->{complete_name}, $person->{line1}, $person->{line2}, $person->{city}, $person->{state}, $person->{zip});
 }
 
 sub getSendToAddress
 {
-	my ($invoice) = @_;
+	my ($billToId, $billPartyType) = @_;
 
-	if ($invoice->{bill_party_type} < 2)
-	{
-		my $person = $STMTMGR_SCHEDULING->getRowAsHash($page, STMTMGRFLAG_DYNAMICSQL,
-			q{select complete_name, line1, line2, city, State, zip
-				from Person_Address, Person
-				where person_id = ?
-					and Person_Address.parent_id = Person.person_id
-			},
-			$invoice->{bill_to_id}
-		);
-
-		return ($person->{complete_name}, $person->{line1}, $person->{line2}, $person->{city},
-			$person->{state}, $person->{zip});
-	}
-	else
-	{
-		my $org = $STMTMGR_SCHEDULING->getRowAsHash($page, STMTMGRFLAG_DYNAMICSQL,
-			q{select name_primary, line1, line2, city, state, zip
-				from Org_Address, Org
-				where org_internal_id = ?
-					and Org_Address.parent_id = Org.org_internal_id
-			}, $invoice->{bill_to_id}
-		);
-
-		return ($org->{name_primary}, $org->{line1}, $org->{line2}, $org->{city}, $org->{state},
-			$org->{zip});
-	}
+	return $billPartyType < 2 ? getPersonAddress($billToId) : getOrgAddress($billToId);
 }
 
-sub getName
+sub populateStatementsHash
 {
-	my ($entity) = @_;
+	my ($claims) = @_;
+	my %statements = ();
+	
+	for (@{$claims})
+	{
+		my $key = $_->{billing_facility_id} . '_' . $_->{bill_to_id} . '_' . $_->{client_id};
+		
+		$statements{$key}->{billToId} = $_->{bill_to_id};
+		$statements{$key}->{payToId} = $_->{billing_facility_id};
+		$statements{$key}->{clientId} = $_->{client_id};
+		
+		$statements{$key}->{billingProviderId} = $_->{provider_id};
+		$statements{$key}->{careProviderId} = $_->{care_provider_id};
+		
+		$statements{$key}->{billPartyType} = $_->{bill_party_type};
+		$statements{$key}->{patientName} = $_->{patient_name};
+		
+		my $invObject = new InvoiceObject(
+			invoiceId => $_->{invoice_id},
+			invoiceDate => $_->{invoice_date},
+			careProviderId => $_->{care_provider_id},
+			totalCost => $_->{total_cost},
+			totalAdjust => $_->{total_adjust} < 0 ? $_->{total_adjust} * (-1) : $_->{total_adjust},
+			insuranceReceipts => $_->{insurance_receipts} < 0 ? $_->{insurance_receipts} * (-1) : $_->{insurance_receipts},
+			patientReceipts => $_->{patient_receipts} < 0 ? $_->{patient_receipts} * (-1) : $_->{patient_receipts},
+			balance => $_->{balance},
+		);
+		
+		push(@{$statements{$key}->{invoices}}, $invObject);
+	}
+	
+	for my $key (sort keys %statements)
+	{
+		my $clientId = $statements{$key}->{clientId};
+		my $billToId = $statements{$key}->{billToId};
+		
+		$statements{$key}->{agingCurrent} = $STMTMGR_STATEMENTS->getSingleValue($page, STMTMGRFLAG_CACHE, 
+			'sel_aging', $clientId, 30, 0, $billToId);
+		
+		$statements{$key}->{aging30} = $STMTMGR_STATEMENTS->getSingleValue($page, STMTMGRFLAG_CACHE, 
+			'sel_aging', $clientId, 60, 30, $billToId);
 
-	my $firstName = $entity->getFirstName();
-	my $middleName = $entity->getMiddleInitial() ? "@{[$entity->getMiddleInitial()]}." : undef;
-	my $lastName = $entity->getLastName();
+		$statements{$key}->{aging60} = $STMTMGR_STATEMENTS->getSingleValue($page, STMTMGRFLAG_CACHE,
+			'sel_aging', $clientId, 90, 60, $billToId);
 
-	return $middleName ? "$firstName $middleName $lastName" : "$firstName $lastName";
-}
+		$statements{$key}->{aging90} = $STMTMGR_STATEMENTS->getSingleValue($page, STMTMGRFLAG_CACHE,
+			'sel_aging', $clientId, 120, 90, $billToId);
 
-sub findOutStandingClaims
-{
-	return $STMTMGR_SCHEDULING->getSingleValueList($page, STMTMGRFLAG_DYNAMICSQL,
-		qq{
-			SELECT
-			 invoice.invoice_id
-			FROM
-			 Invoice_Billing,
-			 Invoice
-			WHERE
-			 invoice.invoice_status > 3
-			 AND invoice.invoice_status < 15
-			 AND invoice.balance > 0
-			 AND invoice_billing.bill_id = invoice.billing_id
-			 AND invoice_billing.bill_party_type != 3
-			 AND invoice_billing.bill_to_id IS NOT NULL
-			 AND invoice.invoice_date <= trunc(sysdate) - ?
-			ORDER BY
-			invoice.invoice_id
-		}, $daysBack
-	);
+		$statements{$key}->{aging120} = $STMTMGR_STATEMENTS->getSingleValue($page, STMTMGRFLAG_CACHE,
+			'sel_aging', $clientId, 10950, 120, $billToId);
+			
+		$statements{$key}->{amountDue} = $statements{$key}->{agingCurrent} + $statements{$key}->{aging30} +
+			$statements{$key}->{aging60} + $statements{$key}->{aging90} + $statements{$key}->{aging120};
+	}
+	
+	return \%statements;
 }
 
 sub connectDB
