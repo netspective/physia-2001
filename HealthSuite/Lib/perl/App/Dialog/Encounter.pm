@@ -91,9 +91,11 @@ sub initialize
 		new CGI::Dialog::Field(type => 'memo', caption => 'Symptoms', name => 'remarks'),
 
 		new CGI::Dialog::Field(name => 'accident',
-				enum => 'trans_related_to',
-				style => 'multicheck',
-				caption => 'Accident?'),
+				caption => 'Accident?',
+				fKeyStmtMgr => $STMTMGR_INVOICE,
+				fKeyStmt => 'selAccidentDropDown',
+				fKeyDisplayCol => 0,
+				fKeyValueCol => 1),
 
 		new CGI::Dialog::Field(caption => 'Place of Auto Accident (State)', name => 'accident_state', size => 2, maxLength => 2),
 
@@ -307,7 +309,7 @@ sub populateData
 		$STMTMGR_INVOICE->createFieldsFromSingleRow($page, STMTMGRFLAG_NONE, 'selInvoiceAttrIllness',$invoiceId);
 		$STMTMGR_INVOICE->createFieldsFromSingleRow($page, STMTMGRFLAG_NONE, 'selInvoiceAttrDisability',$invoiceId);
 		$STMTMGR_INVOICE->createFieldsFromSingleRow($page, STMTMGRFLAG_NONE, 'selInvoiceAttrHospitalization',$invoiceId);
-		$STMTMGR_INVOICE->createFieldsFromSingleRow($page, STMTMGRFLAG_NONE, 'selInvoiceAttrPatientSign',$invoiceId);
+		#$STMTMGR_INVOICE->createFieldsFromSingleRow($page, STMTMGRFLAG_NONE, 'selInvoiceAttrPatientSign',$invoiceId);
 		$STMTMGR_INVOICE->createFieldsFromSingleRow($page, STMTMGRFLAG_NONE, 'selInvoiceAttrAssignment',$invoiceId);
 		$STMTMGR_INVOICE->createFieldsFromSingleRow($page, STMTMGRFLAG_NONE, 'selInvoiceAuthNumber',$invoiceId);
 		$STMTMGR_INVOICE->createFieldsFromSingleRow($page, STMTMGRFLAG_NONE, 'selInvoiceDeductible',$invoiceId);
@@ -503,19 +505,19 @@ sub handlePayers
 				elsif($singlePayer[0] eq 'Secondary')
 				{
 					my $secIns = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInsuranceByBillSequence', $secondary, $personId);
-					$claimType = $secIns->{ins_type};
+					#$claimType = $secIns->{ins_type};
 					$page->field('secondary_payer', $secIns->{product_name});
 				}
 				elsif($singlePayer[0] eq 'Tertiary')
 				{
 					my $tertIns = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInsuranceByBillSequence', $tertiary, $personId);
-					$claimType = $tertIns->{ins_type};
+					#$claimType = $tertIns->{ins_type};
 					$page->field('tertiary_payer', $tertIns->{product_name});
 				}
 				elsif($singlePayer[0] eq 'Quaternary')
 				{
 					my $quatIns = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInsuranceByBillSequence', $quaternary, $personId);
-					$claimType = $quatIns->{ins_type};
+					#$claimType = $quatIns->{ins_type};
 					$page->field('quaternary_payer', $quatIns->{product_name});
 				}
 			}
@@ -632,12 +634,6 @@ sub addTransactionAndInvoice
 
 	$page->param('invoice_id', $invoiceId);
 
-#$page->addDebugStmt("Command: $command");
-#$page->addDebugStmt("Trans ID: $transId");
-#$page->addDebugStmt("Invoice ID: $invoiceId");
-#$page->addError("error");
-
-
 
 	handleInvoiceAttrs($self, $page, $command, $flags, $invoiceId);
 }
@@ -690,12 +686,15 @@ sub handleInvoiceAttrs
 	#	 Illness/Disability/Hospitalization Dates
 
 	my $condRelToAuto = App::Universal::CONDRELTO_AUTO;
+	my $condRelToFakeNone = App::Universal::CONDRELTO_FAKE_NONE;
 	my @condRelToIds = $page->field('accident');
 	my @condRelToCaptions = ();
 	my $state = '';
 
 	foreach my $relToId (@condRelToIds)
 	{
+		next if $relToId == $condRelToFakeNone;
+
 		my $condition = $STMTMGR_TRANSACTION->getSingleValue($page, STMTMGRFLAG_NONE, 'selCondition', $relToId);
 
 		push(@condRelToCaptions, $condition);
@@ -1300,6 +1299,7 @@ sub __payCopay
 sub addProcedureItems
 {
 	my ($self, $page, $command, $flags, $invoiceId) = @_;
+
 	my $servItemType = App::Universal::INVOICEITEMTYPE_SERVICE;
 	my $labItemType = App::Universal::INVOICEITEMTYPE_LAB;
 
@@ -1312,9 +1312,17 @@ sub addProcedureItems
 		next if $page->param("_f_proc_$line\_dos_begin") eq 'From' || $page->param("_f_proc_$line\_dos_end") eq 'To';
 		next unless $page->param("_f_proc_$line\_dos_begin") && $page->param("_f_proc_$line\_dos_end");
 
+		my $procCommand = $command;
+		my $itemId = $page->param("_f_proc_$line\_item_id");
+		if(! $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selInvoiceItem', $itemId))
+		{
+			$procCommand = 'add';
+		}
+
+
 		my $emg = $page->param("_f_proc_$line\_emg") eq 'on' ? 1 : 0;
 		my %record = (
-			item_id => $page->param("_f_proc_$line\_item_id") || undef,
+			item_id => $itemId || undef,
 			service_begin_date => $page->param("_f_proc_$line\_dos_begin") || undef,			#default for service start date is today
 			service_end_date => $page->param("_f_proc_$line\_dos_end") || undef,			#default for service end date is today
 			hcfa_service_place => $page->param('_f_proc_service_place') || undef,		#default for place is 11
@@ -1334,7 +1342,7 @@ sub addProcedureItems
 			$record{extended_cost} = $record{unit_cost} * $record{quantity};
 			$record{balance} = $record{extended_cost};
 
-			my $totalInvItems = $STMTMGR_INVOICE->getRowCount($page, STMTMGRFLAG_CACHE, 'selInvoiceProcedureItemCount', $invoiceId, $servItemType, $labItemType);
+			my $totalInvItems = $STMTMGR_INVOICE->getSingleValue($page, STMTMGRFLAG_CACHE, 'selInvoiceProcedureItemCount', $invoiceId, $servItemType, $labItemType);
 			my $itemSeq = 0;
 			$itemSeq = $totalInvItems + 1;
 
@@ -1342,7 +1350,7 @@ sub addProcedureItems
 
 
 			# IMPORTANT: ADD VALIDATION FOR FIELD ABOVE (TALK TO RADHA/MUNIR/SHAHID)
-			$page->schemaAction('Invoice_Item',	$command,
+			$page->schemaAction('Invoice_Item',	$procCommand,
 					%record,
 					parent_id => $invoiceId,
 					_debug => 0,
@@ -1356,11 +1364,11 @@ sub addProcedureItems
 			my $invoice = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoice', $invoiceId);
 
 			my $totalItems = $invoice->{total_items};
-			if($command eq 'add')
+			if($procCommand eq 'add')
 			{
 				$totalItems = $invoice->{total_items} + 1;
 			}
-			elsif($command eq 'remove')
+			elsif($procCommand eq 'remove')
 			{
 				$totalItems = $invoice->{total_items} - 1;
 			}
