@@ -3,7 +3,7 @@ package SQL::GenerateQuery;
 ##############################################################################
 
 use strict;
-use SDE::CVS ('$Id: GenerateQuery.pm,v 1.1 2000-09-12 15:12:16 robert_jenks Exp $', '$Name:  $');
+use SDE::CVS ('$Id: GenerateQuery.pm,v 1.2 2000-09-12 15:34:37 robert_jenks Exp $', '$Name:  $');
 use XML::Parser;
 use fields qw(qdlFile id fields views styles);
 use vars qw(%CACHE $COMPARISONS);
@@ -561,7 +561,10 @@ sub genSQL
 		my $fieldDefn;
 		unless ($sqlGen->field($field))
 		{
-			die "Field '$field' is invalid";
+			my @fields = $field =~ /\{(\w+)\}/g;
+			die "Only one field may be specified" if $#fields;
+			die "Field '$_' is invalid" unless $sqlGen->field($fields[0]);
+			$field = $fields[0];
 		}
 		
 		push @ORDER_BY, $field;
