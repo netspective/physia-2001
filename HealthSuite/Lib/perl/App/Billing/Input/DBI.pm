@@ -666,14 +666,25 @@ sub assignPaytoAndRendProviderInfo
 	my @providers = ($renderingProvider, $payToProvider);
 
 	my @row;
-	my $queryStatment;
-	my $sth;
+
+	my $queryStatment = qq
+	{
+		select org_address.state
+		from invoice, transaction, org_address
+		where invoice.invoice_id = $invoiceId
+		and invoice.main_transaction = transaction.trans_id
+		and org_address.parent_id = transaction.service_facility_id
+		and org_address.address_name = 'Mailing'
+	};
+	my $sth = $self->{dbiCon}->prepare("$queryStatment");
+	$sth->execute() or $self->{valMgr}->addError($self->getId(), 100, "Unable to execute $queryStatment");
+	my $state = uc($sth->fetchrow_array());
+
 
 	foreach my $provider (@providers)
 	{
 		my $id = $provider->getId();
-		my $providerAddress = $provider->getAddress();
-		my $state = uc($providerAddress->getState());
+		my $r2;
 
 		my $inputMap =
 		{
@@ -695,7 +706,7 @@ sub assignPaytoAndRendProviderInfo
 		{
 			select value_text, value_textB, value_type || item_name
 			from person_attribute
-			where parent_id = \'$id\'
+			where parent_id = '$id'
 		};
 		$sth = $self->{dbiCon}->prepare("$queryStatment");
 		$sth->execute() or $self->{valMgr}->addError($self->getId(), 100, "Unable to execute $queryStatment");
@@ -2102,8 +2113,8 @@ sub populateItems
 		}
 	}
 
-	$currentClaim->{treatment}->setOutsideLab(($outsideLabCharges eq "") ? 'N' : 'Y');
-	$currentClaim->{treatment}->setOutsideLabCharges($outsideLabCharges);
+	$currentClaim->{treatment}->setOutsideLab(($outsideLabCharges == 0) ? 'N' : 'Y');
+	$currentClaim->{treatment}->setOutsideLabCharges(($outsideLabCharges == 0) ? undef : $outsideLabCharges);
 	$currentClaim->setTotalCharge($claimCharge[INVOICE_ITEM_LAB] + $claimCharge[INVOICE_ITEM_SERVICE]);
 	$currentClaim->setTotalChargePaid($claimChargePaid);
 }

@@ -88,6 +88,7 @@ sub populatePhysician
 {
 	my ($self, $claim) = @_;
 	my $physician = $claim->getPayToProvider();
+	my $servicePhysician = $claim->getRenderingProvider();
 	my $billingFacility = $claim->getPayToOrganization();
 	my $billingFacilityAddress = $billingFacility->getAddress();
 	my $data = $self->{data};
@@ -101,7 +102,7 @@ sub populatePhysician
 	$data->{physicianTelephone} = $billingFacilityAddress->getTelephoneNo(1);
 	$data->{physicianPin} = $physician->getPIN;
 	$data->{physicianGrp} = $billingFacility->getGRP;
-	$data->{providerLicense} = $physician->getProfessionalLicenseNo;
+	$data->{providerLicense} = $servicePhysician->getProfessionalLicenseNo;
 }
 
 sub populateTreatment
