@@ -33,6 +33,7 @@ use vars qw(@ISA %RESOURCE_MAP);
 		_arl_cancel => ['event_id'],
 		_arl_noshow => ['event_id'],
 		_arl_reschedule => ['event_id'],
+		_modes => ['add', 'update', 'remove', 'noshow', 'cancel', 'reschedule'],
 	},
 );
 
