@@ -99,7 +99,7 @@ sub createBatchPaperClaims
 	for (@{$claims})
 	{
 		push(@claimsHtml, qq{
-			<a href="/invoice/$_/summary" >$_</a>
+			<a href="/invoice/$_/summary" title="View Invoice $_ Summary">$_</a>
 		});
 	}
 	open (LISTFILE, ">$listFile") || die "Unable to open list file $listFile: $!\n";
@@ -107,7 +107,7 @@ sub createBatchPaperClaims
 		<font face=Verdana size=3>
 		<b>Paper Claims Included in this batch:</b><br>
 		@{[ join(', ', @claimsHtml) ]}
-		<br><br>Click here to <a href="/paperclaims/pdf/$pdfName" ><b>Print</b></a>
+		<br><br>Click here to <a href="/paperclaims/pdf/$pdfName" title="Print Batch Paper Claims"><b>Print</b></a>
 		</font>
 	};
 
