@@ -368,7 +368,7 @@ sub populateData_add
 		}
 		my $productName = $page->field('product_name');
 		my $planName = $page->field('plan_name');
-		my $insOrgId = $page->field('ins_org_id'');
+		my $insOrgId = $page->field('ins_org_id');
 		my $planType = App::Universal::RECORDTYPE_INSURANCEPLAN;
 		my $planData = $STMTMGR_INSURANCE->createFieldsFromSingleRow($page, STMTMGRFLAG_NONE, 'selInsPlan', $productName, $planName, $insOrgId);
 }
@@ -400,7 +400,7 @@ sub execute
 
 	my $productName = $page->field('product_name');
 	my $planName = $page->field('plan_name');
-	my $insOrgId = $page->field('ins_org_id'');
+	my $insOrgId = $page->field('ins_org_id');
 	my $recordType = App::Universal::RECORDTYPE_INSURANCEPLAN;
 	my $recordTypeProduct = App::Universal::RECORDTYPE_INSURANCEPRODUCT;
 	my $planData = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInsPlan', $productName, $planName, $insOrgId);
