@@ -34,8 +34,8 @@ sub getForm
 			<FONT size=5 face='arial'>&nbsp;</FONT>
 			On Select:
 			<SELECT name="item_action_arl_select">
-				<option value="/person/%itemValue%/chart">View Chart</option>
 				<option value="/person/%itemValue%/profile">View Summary</option>
+				<option value="/person/%itemValue%/chart">View Chart</option>
 				<option value="/person/%itemValue%/dlg-add-appointment">Schedule Appointment</option>
 				<option value="/person/%itemValue%/dlg-add-claim">Add Claim</option>
 				<option value="/person/%itemValue%/dlg-update-%itemCategory%">Edit Profile</option>
