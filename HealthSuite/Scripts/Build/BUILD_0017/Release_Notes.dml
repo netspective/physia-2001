@@ -170,6 +170,7 @@
 		<deliverable id="1501">
 			Modified all invoice actions and invoice status changes based on Karen's word document.
 			Additional: Fixed invoice actions based on invoice status changes based on Karen's second word document.
+			Additional: Allowing submission/resubmission for all claim types regardless of balance.
 		</deliverable>
 
 		<deliverable id="1511">
