@@ -130,7 +130,6 @@ sub initialize
 				new CGI::Dialog::Field(type => 'phone', caption => 'Home Phone', name => 'home_phone', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE),
 				new CGI::Dialog::Field(type => 'phone', caption => 'Work Phone', name => 'work_phone', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE),
 			]),
-		new CGI::Dialog::Field(type => 'bool', name => 'create_unknown_phone', caption => 'Create record with unknown home phone', style => 'check'),
 
 		new CGI::Dialog::MultiField(caption =>'Cell Phone/Pager', name => 'home_pager_phone', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
 			fields => [
