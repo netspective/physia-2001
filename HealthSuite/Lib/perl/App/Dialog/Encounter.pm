@@ -59,6 +59,7 @@ sub initialize
 		new CGI::Dialog::Field(type => 'hidden', name => 'invoiceFieldsAreSet'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'invoice_flags'),	#to check if this claim has been submitted already
 		new CGI::Dialog::Field(type => 'hidden', name => 'old_invoice_id'),	#the invoice id of the claim that is being modified after submission
+		new CGI::Dialog::Field(type => 'hidden', name => 'current_status'),
 
 		new CGI::Dialog::Field(type => 'hidden', name => 'payer_chosen'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'primary_payer'),
@@ -339,6 +340,7 @@ sub populateData
 		my $invoiceInfo = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoice', $invoiceId);
 		$page->field('attendee_id', $invoiceInfo->{client_id});
 		#$page->field('reference', $invoiceInfo->{reference});
+		$page->field('current_status', $invoiceInfo->{invoice_status});
 		$page->field('proc_diags', $invoiceInfo->{claim_diags});
 		$page->field('invoice_flags', $invoiceInfo->{flags});
 		$page->field('old_invoice_id', $invoiceId);	#this is needed if the current claim is being edited but has already been submitted. if this is the case, a new claim is being
@@ -699,7 +701,7 @@ sub addTransactionAndInvoice
 
 	#invoice constants
 	my $invoiceType = App::Universal::INVOICETYPE_HCFACLAIM;
-	my $invoiceStatus = App::Universal::INVOICESTATUS_CREATED;
+	my $invoiceStatusCreate = App::Universal::INVOICESTATUS_CREATED;
 
 	#entity types
 	my $entityTypePerson = App::Universal::ENTITYTYPE_PERSON;
@@ -750,6 +752,7 @@ sub addTransactionAndInvoice
 	my @claimDiags = split(/\s*,\s*/, $page->param('_f_proc_diags'));
 	App::IntelliCode::incrementUsage($page, 'Icd', \@claimDiags, $sessUser, $sessOrg);
 
+	my $invoiceStatus = $command eq 'add' ? $invoiceStatusCreate : $page->field('current_status');
 	my $invoiceId = $page->schemaAction(
 		'Invoice', $command,
 		invoice_id => $editInvoiceId || undef,

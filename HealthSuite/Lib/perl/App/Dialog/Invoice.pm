@@ -32,6 +32,7 @@ sub new
 	$self->addContent(
 		new CGI::Dialog::Field(type => 'hidden', name => 'trans_id'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'claim_type'),
+		new CGI::Dialog::Field(type => 'hidden', name => 'current_status'),
 
 		new App::Dialog::Field::Person::ID(caption => 'Patient ID', name => 'client_id', options => FLDFLAG_REQUIRED, types => ['Patient']),
 		new CGI::Dialog::MultiField(caption => 'Payer ID/Type', name => 'other_payer_fields', hints => "If left blank, invoice will be billed to the 'Patient ID'",
@@ -85,6 +86,7 @@ sub populateData
 	my $invoiceId = $page->param('invoice_id');
 	my $invoiceInfo = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoice', $invoiceId);
 	$page->field('client_id', $invoiceInfo->{client_id});
+	$page->field('current_status', $invoiceInfo->{invoice_status});
 	$page->field('claim_type', $invoiceInfo->{invoice_subtype});
 	$page->field('owner_id', $invoiceInfo->{owner_id});
 	$STMTMGR_TRANSACTION->createFieldsFromSingleRow($page, STMTMGRFLAG_NONE, 'selTransCreateClaim', $invoiceInfo->{main_transaction});
@@ -265,7 +267,7 @@ sub addTransactionAndInvoice
 
 	# Constants -----------------------------------------------------------------
 
-	my $invoiceStatus = App::Universal::INVOICESTATUS_CREATED;
+	my $invoiceStatusCreate = App::Universal::INVOICESTATUS_CREATED;
 	my $invoiceType = App::Universal::INVOICETYPE_SERVICE;
 	my $itemType = App::Universal::INVOICEITEMTYPE_INVOICE;
 	my $historyValueType = App::Universal::ATTRTYPE_HISTORY;
@@ -298,7 +300,7 @@ sub addTransactionAndInvoice
 	);
 
 	$transId = $command eq 'add' ? $transId : $editTransId;
-
+	my $invoiceStatus = $command eq 'add' ? $invoiceStatusCreate : $page->field('current_status');
 	my $editInvoiceId = $page->param('invoice_id');
 	my $invoiceId = $page->schemaAction(
 		'Invoice', $command,
