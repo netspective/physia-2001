@@ -78,7 +78,7 @@ sub populateData_add
 	my $personId = $page->param('person_id');
 
 	my $physicianData = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_NONE, 'selPrimaryPhysicianOrProvider', $personId);
-	$page->field('provider_id', $physicianData->{'value_text'});
+	$page->field('provider_id', $page->session('person_id'));
 
 
 }
