@@ -3802,6 +3802,48 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 	publishComp_stpt => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.bloodGroup', [$personId], 'panelTransp'); },
 },
 
+#----------------------------------------------------------------------------------------------------------------------------------------------------------
+
+'person.appointmentCount' => {
+	sqlStmt => qq{
+			SELECT
+				count(e.discard_type),
+				DECODE(d.caption, 'Patient Reschedule','Reschedule', d.caption)
+			FROM event e, event_attribute ea, Appt_Discard_Type d, person p
+			WHERE Ea.value_text = p.person_id
+			AND p.person_id = ?
+			AND ea.parent_id = e.event_id
+			AND d.id = e.discard_type
+			GROUP BY d.caption
+
+
+		},
+		sqlStmtBindParamDescr => ['Person ID for Attribute Table'],
+
+	publishDefn =>
+	{
+		columnDefn => [
+			{ dataFmt => '#1#s : #0#' },
+		],
+	},
+	publishDefn_panel =>
+	{
+		# automatically inherits columnDefn and other items from publishDefn
+		style => 'panel',
+		frame => { heading => 'Appointment Discard Type Count' },
+	},
+	publishDefn_panelTransp =>
+	{
+		# automatically inherits columnDefn and other items from publishDefn
+		style => 'panel.transparent',
+		inherit => 'panel',
+	},
+
+	publishComp_st => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.appointmentCount', [$personId]); },
+	publishComp_stp => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.appointmentCount', [$personId], 'panel'); },
+	publishComp_stpe => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.appointmentCount', [$personId], 'panelEdit'); },
+	publishComp_stpt => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.appointmentCount', [$personId], 'panelTransp'); },
+},
 
 #----------------------------------------------------Doc Short Term Stuff
 #----------------------------------------------------------------------------------------------------------------------

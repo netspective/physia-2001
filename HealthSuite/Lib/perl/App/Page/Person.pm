@@ -231,6 +231,7 @@ sub prepare_page_content_header
 			<OPTION value="/person/$personId/dlg-add-postpersonalpayment?home=$homeArl">Apply Personal Payment</OPTION>
 			<OPTION value="/person/$personId/dlg-add-postrefund?home=$homeArl">Post Refund</OPTION>
 			<OPTION value="/person/$personId/dlg-add-posttransfer?home=$homeArl">Post Transfer</OPTION>
+			<OPTION value="/person/$personId/dlg-remove-category?home=$homeArl">Remove Login</OPTION>
 			<!-- <OPTION value="/person/$personId/dlg-add-billingcycle">Billing Cycle</OPTION> -->
 		</SELECT>} if $self->param('_pm_view');
 
@@ -702,6 +703,7 @@ sub prepare_view_chart
 						</TR>
 					</TABLE><BR>
 					#component.stp-person.patientAppointments#</BR>
+					#component.stp-person.appointmentCount#</BR>
 					#component.stp-person.hospitalizationSurgeriesTherapies#<BR>
 					#component.stp-person.activeProblems#<BR>
 					#component.stp-person.surgicalProcedures#<BR>
