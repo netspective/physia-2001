@@ -1,5 +1,5 @@
 # 
-# $Header: /home/engineer/cvs2git/physia/HealthSuite/Database/dbserver/initSDEDBS04.ora,v 1.1 2000-09-07 20:34:19 alex_hillman Exp $ 
+# $Header: /home/engineer/cvs2git/physia/HealthSuite/Database/dbserver/initSDEDBS04.ora,v 1.2 2000-09-07 20:47:29 alex_hillman Exp $ 
 # 
 # Copyright (c) 1991, 1997, 1998 by Oracle Corporation
 # NAME
@@ -172,4 +172,4 @@ utl_file_dir = *
 job_queue_processes = 2
 
 query_rewrite_integrity = trusted
-query_rewrite_enable = true
+query_rewrite_enabled = true
