@@ -5,27 +5,36 @@ package App::Statements::Search::Org;
 use strict;
 use Exporter;
 use DBI::StatementManager;
-use Devel::ChangeLog;
-use vars qw(@ISA @CHANGELOG);
+use vars qw(@ISA);
 
 use vars qw(@ISA @EXPORT $STMTMGR_ORG_SEARCH $STMTRPTDEFN_DEFAULT);
 @ISA    = qw(Exporter DBI::StatementManager);
 @EXPORT = qw($STMTMGR_ORG_SEARCH);
-use vars qw($STMTFMT_SEL_ORG);
+use vars qw($STMTFMT_SEL_ORG $STMTFMT_SEL_ORG_CAT);
 
 $STMTFMT_SEL_ORG = qq{
-			select distinct o.org_id, o.name_primary, o.category
-			from org o, org_category cat
+			select distinct o.org_id, o.name_primary, o.category, decode(t.group_name, 'other', 'main', t.group_name)
+			from org o, org_category cat, org_type t
 			where
 				cat.parent_id = o.org_id and
+				cat.member_name = t.caption and
+				cat.member_name = (
+					select caption from org_type
+					where id = (
+						select min(id)
+						from org_type, org_category
+						where parent_id = o.org_id and caption = member_name
+					)
+				) and
 				%whereCond%
 };
+
 
 $STMTRPTDEFN_DEFAULT =
 {
 	columnDefn =>
 			[
-				{ head => 'ID', url => 'javascript:chooseEntry("#&{?}#")'},
+				{ head => 'ID', url => 'javascript:chooseEntry("#&{?}#", null, null, "#3#")'},
 				{ head => 'Primary Name' },
 				{ head => 'Category'},
 			],
@@ -70,16 +79,4 @@ $STMTMGR_ORG_SEARCH = new App::Statements::Search::Org(
 		},
 );
 
-@CHANGELOG =
-(
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_ADD, '01/06/2000', 'RK',
-		'Search/Org',
-		'Updated the Org select statements by replacing them with _stmtFmt.'],
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_ADD, '01/19/2000', 'RK',
-		'Search/Org',
-		'Created simple reports instead of using createOutput function.'],
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_UPDATE, '03/07/2000', 'RK',
-		'Search/Org',
-		'Updated the Sql statement to show the org only once even when it has multiple categories.'],
-);
 1;

@@ -31,7 +31,7 @@ sub initialize
 	$self->SUPER::initialize(@_);
 
 	my $orgId = $self->param('org_id');
-	$STMTMGR_ORG->createPropertiesFromSingleRow($self, STMTMGRFLAG_CACHE, ['selRegistry', 'org_'], $orgId);
+	$STMTMGR_ORG->createPropertiesFromSingleRow($self, STMTMGRFLAG_CACHE, ['selOrgCategoryRegistry', 'org_'], $orgId);
 	$self->property('org_type', split(/,/, $self->property('org_category')));
 	#$self->property('org_categories', $STMTMGR_ORG->getSingleValueList($self, STMTMGRFLAG_CACHE, 'selOrgCategory', $orgId));
 
@@ -42,6 +42,7 @@ sub initialize
 				[$orgId, 'profile', undef, App::Page::MENUITEMFLAG_FORCESELECTED],
 			);
 	#}
+	#$self->addDebugStmt(@{[$self->property('org_group_name')]});
 }
 
 sub getContentHandlers
@@ -56,16 +57,17 @@ sub prepare_page_content_header
 	return if $self->flagIsSet(App::Page::PAGEFLAG_ISPOPUP);
 
 	$self->SUPER::prepare_page_content_header(@_);
-	my $category = defined $self->property('org_type') ? lc($self->property('org_type')) : undef;
-	for ($category)
-	{
-		/employer/ and do {$category = 'employer'; last};
-		/insurance/ and do {$category = 'insurance'; last};
-		/ipa/ and do {$category = 'ipa'; last};
-		/department/ and do {$category = 'dept'; last};
-		$category = defined $self->property('org_parent_org_id') ? 'provider' : 'main';
-
-	}
+	my $category = $self->property('org_group_name');
+#	my $category = defined $self->property('org_type') ? lc($self->property('org_type')) : undef;
+#	for ($category)
+#	{
+#		/employer/ and do {$category = 'employer'; last};
+#		/insurance/ and do {$category = 'insurance'; last};
+#		/ipa/ and do {$category = 'ipa'; last};
+#		/department/ and do {$category = 'dept'; last};
+#		$category = defined $self->property('org_parent_org_id') ? 'provider' : 'main';
+#
+#	}
 	#Retired Pane/Org/Heading.pm
 	#push(@{$self->{page_content_header}}, new App::Pane::Org::Heading()->as_html($self), '<P>');
 

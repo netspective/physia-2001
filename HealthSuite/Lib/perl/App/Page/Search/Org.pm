@@ -14,6 +14,7 @@ use vars qw(@ISA @CHANGELOG);
 sub getForm
 {
 	my ($self, $flags) = @_;
+	
 
 	my ($createFns, $itemFns) = ('', '');
 	if($self->param('execute') && ! ($flags & (SEARCHFLAG_LOOKUPWINDOW | SEARCHFLAG_SEARCHBAR)))
@@ -24,9 +25,9 @@ sub getForm
 			On Select:
 			<SELECT name="item_action_arl_select">
 				<option value="/org/%itemValue%/profile">View Summary</option>
-				<option value="/org/%itemValue%/update">Edit Registry</option>
-				<option value="/org/#session.org_id#/dlg-add-ins-newplan">Create Insurance Plan</option>
-				<option value="/org/#session.org_id#/dlg-add-ins-workerscomp">Create Workers Compensation Plan</option>
+				<option value="/org/%itemValue%/dlg-update-org-%itemCategory%">Edit Profile</option>
+				<option value="/org/%itemValue%/dlg-add-ins-newplan">Create Insurance Plan</option>
+				<option value="/org/%itemValue%/dlg-add-ins-workerscomp">Create Workers Compensation Plan</option>
 				<option value="/org/%itemValue%/remove">Delete Record</option>
 			</SELECT>
 			<SELECT name="item_action_arl_dest_select">
@@ -83,14 +84,10 @@ sub execute
 		'<CENTER>',
 		$STMTMGR_ORG_SEARCH->createHtml($self, STMTMGRFLAG_NONE, "sel_$type$appendStmtName",
 			[uc($expression)]
-			#[
-				#['ID', '<A HREF=\'javascript:chooseEntry("%0")\' STYLE="text-decoration:none">%0</A>'],
-				#['Primary Name'],
-				#['Category'],
-			#]
 			),
 		'</CENTER>'
 		);
+
 
 	return 1;
 }

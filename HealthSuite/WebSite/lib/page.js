@@ -794,7 +794,7 @@ function replaceString(lookInStr, lookForStr, replaceWithStr)
 	return lookInStr;
 }
 
-function chooseEntry(itemValue, actionObj, destObj)
+function chooseEntry(itemValue,  actionObj, destObj, itemCategory)
 {
 	if(isLookupWindow())
 	{
@@ -811,6 +811,11 @@ function chooseEntry(itemValue, actionObj, destObj)
 	if(actionObj != null) {
 		var arlFmt = actionObj.options[actionObj.selectedIndex].value;
 		var newArl = replaceString(arlFmt, '%itemValue%', itemValue);
+
+		if(itemCategory != null) {
+			itemCategory = itemCategory.toLowerCase()
+			newArl = replaceString(newArl, '%itemCategory%', itemCategory);
+		}
 		if(destObj == null)
 		{
 			window.location.href = newArl;

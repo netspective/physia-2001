@@ -114,6 +114,22 @@ $STMTMGR_ORG = new App::Statements::Org(
 			from Org_Category
 			where parent_id = ?
 		},
+	'selOrgCategoryRegistry' => qq{
+			select distinct o.*, decode(t.group_name, 'other', 'main', t.group_name) as group_name
+			from org o, org_category cat, org_type t
+			where
+				cat.parent_id = o.org_id and
+				cat.member_name = t.caption and
+				cat.member_name = (
+					select caption from org_type
+					where id = (
+						select min(id)
+						from org_type, org_category
+						where parent_id = o.org_id and caption = member_name
+					)
+				) and
+			org_id = ?
+		},
 );
 
 1;
