@@ -96,34 +96,22 @@ sub populateSuperBillComponent
 	my $sth;
 	my @row;
 
-	$queryStatement = qq
-	{
-		select caption, internal_catalog_id
-		from offering_catalog
-		where catalog_id = '$superBillID'
-	};
-
-	$sth = $self->{dbiCon}->prepare("$queryStatement");
-	$sth->execute;
-
-	@row = $sth->fetchrow_array();
-
-	my $catalogCaption = $row[0];
-	my $internalCatalogID = $row[1];
+	my $internalCatalogID = $superBillID;
 
 	$queryStatement = qq
 	{
 		select entry_id, name
 		from offering_catalog_entry
-		where catalog_id = $internalCatalogID
+		where catalog_id = ?
 		and parent_entry_id is null
 		and entry_type = 0
 		and status = 1
+		and not name = 'main'
 		order by entry_id
 	};
 
-	$sth = $self->{dbiCon}->prepare("$queryStatement");
-	$sth->execute;
+	$sth = $self->{dbiCon}->prepare($queryStatement);
+	$sth->execute($superBillID);
 
 	while(@row = $sth->fetchrow_array())
 	{
@@ -145,7 +133,7 @@ sub populateSuperBillComponent
 			and status = 1
 		};
 
-		$sthComp = $self->{dbiCon}->prepare("$queryStatement");
+		$sthComp = $self->{dbiCon}->prepare($queryStatement);
 		$sthComp->execute;
 		@rowComp = $sthComp->fetchrow_array();
 		$superBillComponent->setCount($rowComp[0]);
@@ -161,7 +149,7 @@ sub populateSuperBillComponent
 			order by entry_id
 		};
 
-		$sthComp = $self->{dbiCon}->prepare("$queryStatement");
+		$sthComp = $self->{dbiCon}->prepare($queryStatement);
 		$sthComp->execute;
 
 		while(@rowComp = $sthComp->fetchrow_array())
