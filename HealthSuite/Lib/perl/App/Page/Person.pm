@@ -154,7 +154,7 @@ sub prepare_page_content_header
 	my $activityList = '';
 
 	my $showAssociate=0;
-	my $assoicateList = 'STAFF|NURSE|PHYSICIAN|ADMINISTRATOR';
+	my $assoicateList = 'STAFF|NURSE|PHYSICIAN|ADMINISTRATOR|REFERRING-DOCTOR';
 
 	my $showHome=0;
 
