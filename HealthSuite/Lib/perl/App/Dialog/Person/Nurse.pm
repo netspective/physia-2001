@@ -41,6 +41,7 @@ sub initialize
 	$self->addContent(
 		new CGI::Dialog::Field(type => 'hidden', name => 'nurse_title_item_id'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'nurse_license_item_id'),
+		new CGI::Dialog::Field(type => 'hidden', name => 'nurse_title_item_id'),
 
 		new CGI::Dialog::Subhead(heading => 'Certification', name => 'cert_for_nurse', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,),
 
@@ -116,7 +117,7 @@ sub makeStateChanges
 	$self->updateFieldFlags('acct_chart_num', FLDFLAG_INVISIBLE, 1);
 	$self->updateFieldFlags('physician_type', FLDFLAG_INVISIBLE, 1);
 	$self->updateFieldFlags('misc_notes', FLDFLAG_INVISIBLE, 1);
-	$self->updateFieldFlags('nurse_title', FLDFLAG_INVISIBLE, 1) if $command eq 'update' || $command eq 'remove';
+	#$self->updateFieldFlags('nurse_title', FLDFLAG_INVISIBLE, 1) if $command eq 'update' || $command eq 'remove';
 
 	my $personId = $page->param('person_id');
 
@@ -179,7 +180,7 @@ sub execute_add
 			'Person_Attribute',	$command,
 			parent_id => $page->field('person_id'),
 			item_name => 'Physician',
-			value_type => 250,
+			value_type => App::Universal::ATTRTYPE_RESOURCEPERSON,
 			value_text => $page->field('value_text') || undef,
 			#parent_org_id => $page->session('org_id') || undef,
 			_debug => 0
@@ -189,7 +190,7 @@ sub execute_add
 			'Person_Attribute', $command,
 			parent_id => $page->field('person_id'),
 			item_name => 'Specialty',
-			value_type => 500,
+			value_type => App::Universal::ATTRTYPE_LICENSE,
 			value_text => $page->field('specialty1')  || undef,
 			value_dateA => $page->field('specialty1_exp_date') || undef,
 			_debug => 0
@@ -199,7 +200,7 @@ sub execute_add
 			'Person_Attribute', $command,
 			parent_id => $page->field('person_id'),
 			item_name => 'Specialty',
-			value_type => 500,
+			value_type => App::Universal::ATTRTYPE_LICENSE,
 			value_text => $page->field('specialty2')  || undef,
 			value_dateA => $page->field('specialty2_exp_date') || undef,
 			_debug => 0
@@ -209,7 +210,7 @@ sub execute_add
 			'Person_Attribute', $command,
 			parent_id => $page->field('person_id'),
 			item_name => 'Specialty',
-			value_type => 500,
+			value_type => App::Universal::ATTRTYPE_LICENSE,
 			value_text => $page->field('specialty3')  || undef,
 			value_dateA => $page->field('specialty3_exp_date') || undef,
 			_debug => 0
@@ -220,7 +221,7 @@ sub execute_add
 			'Person_Attribute', $command,
 			parent_id => $page->field('person_id')  || undef,
 			item_name => 'Employee',
-			value_type => 500,
+			value_type => App::Universal::ATTRTYPE_LICENSE,
 			value_text => $page->field('emp_id')  || undef,
 			value_dateA=> $page->field('emp_exp_date') || undef,
 			_debug => 0
@@ -236,17 +237,6 @@ sub execute_add
 		_debug => 0
 	);
 
-	$page->schemaAction(
-		'Person_Attribute', $command,
-		parent_id => $personId || undef,
-		item_id => $page->field('nurse_title_item_id') || undef,
-		parent_org_id => $page->session('org_id') ||undef,
-		item_name => 'Nurse/Title',
-		value_type => 0,
-		value_text => $page->field('nurse_title') || undef,
-		_debug => 0
-	) if $page->field('nurse_title') ne '';
-
 	$self->handleContactInfo($page, $command, $flags, 'nurse');
 
 }
@@ -255,7 +245,7 @@ sub execute_update
 {
 	my ($self, $page, $command, $flags) = @_;
 
-	my $member = 'nurse';
+	my $member = 'Nurse';
 
 	$self->SUPER::handleRegistry($page, $command, $flags, $member);
 
