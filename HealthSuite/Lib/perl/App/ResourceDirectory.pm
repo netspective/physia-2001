@@ -47,7 +47,7 @@ use App::Page::PatientBill;
 use App::Page::WorkList;
 use App::Page::Worklist::Collection;
 use App::Page::Worklist::PatientFlow;
-
+use App::Page::Worklist::Referral;
 
 ##############################################################################
 # Directory of all available Search Page Objects
