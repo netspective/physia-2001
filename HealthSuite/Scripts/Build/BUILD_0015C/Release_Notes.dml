@@ -50,6 +50,9 @@
 		</deliverable>
 		<deliverable id="1244">
 			Updated the code to add the the same 'Ins Product' and 'Ins Plan' under a different main org
+		</deliverable>
+		<deliverable id="1396">
+			Fixed the code to show up the correct dialogs in the 'Extended Health Coverage' component
 		</deliverable>		
 	</deliverables>
 </release-notes>
