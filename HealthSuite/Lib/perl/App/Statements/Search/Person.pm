@@ -82,98 +82,98 @@ my %personTemplates = (
 		{
 			_stmtFmt => $STMTFMT_SEL_PERSON,
 			 whereCond => 'upper(per.name_last) = ?',
-			 orderBy => 'ORDER BY per.name_last, per.name_last',
+			 orderBy => 'ORDER BY per.name_last, per.name_first',
 			 publishDefn => $STMTRPTDEFN_DEFAULT,
 		},
 	'sel_lastname_like' =>
 		{
 			_stmtFmt => $STMTFMT_SEL_PERSON,
 			 whereCond => 'upper(per.name_last) like ? ',
-			 orderBy => 'ORDER BY per.name_last, per.name_last',
+			 orderBy => 'ORDER BY per.name_last, per.name_first',
 			 publishDefn => $STMTRPTDEFN_DEFAULT,
 		},
 	'sel_anyname' =>
 		{
 			_stmtFmt => $STMTFMT_SEL_PERSON,
 			 whereCond => '(upper(per.name_last) = ? or upper(per.name_first) = ?)',
-			 orderBy => 'ORDER BY per.name_last, per.name_last',
+			 orderBy => 'ORDER BY per.name_last, per.name_first',
 			 publishDefn => $STMTRPTDEFN_DEFAULT,
 		},
 	'sel_anyname_like' =>
 		{
 			_stmtFmt => $STMTFMT_SEL_PERSON,
 			 whereCond => '(upper(per.name_last) like ? or upper(per.name_first) like ? )',
-			 orderBy => 'ORDER BY per.name_last, per.name_last',
+			 orderBy => 'ORDER BY per.name_last, per.name_first',
 			 publishDefn => $STMTRPTDEFN_DEFAULT,
 		},
 	'sel_ssn' =>
 		{
 			_stmtFmt => $STMTFMT_SEL_PERSON,
 			 whereCond => 'per.ssn = ?',
-			 orderBy => 'ORDER BY per.name_last, per.name_last',
+			 orderBy => 'ORDER BY per.name_last, per.name_first',
 			 publishDefn => $STMTRPTDEFN_DEFAULT,
 		},
 	'sel_ssn_like' =>
 		{
 			_stmtFmt => $STMTFMT_SEL_PERSON,
 			 whereCond => 'per.ssn like ?',
-			 orderBy => 'ORDER BY per.name_last, per.name_last',
+			 orderBy => 'ORDER BY per.name_last, per.name_first',
 			 publishDefn => $STMTRPTDEFN_DEFAULT,
 		},
 	'sel_dob' =>
 		{
 			_stmtFmt => $STMTFMT_SEL_PERSON,
 			 whereCond => "per.date_of_birth = to_date(?, '$SQLSTMT_DEFAULTDATEFORMAT')",
-			 orderBy => 'ORDER BY per.name_last, per.name_last',
+			 orderBy => 'ORDER BY per.name_last, per.name_first',
 			 publishDefn => $STMTRPTDEFN_DEFAULT,
 		},
 	'sel_dob_like' =>
 		{
 			_stmtFmt => $STMTFMT_SEL_PERSON,
 			 whereCond => "to_char(per.date_of_birth, '$SQLSTMT_DEFAULTDATEFORMAT') like ?",
-			 orderBy => 'ORDER BY per.name_last, per.name_last',
+			 orderBy => 'ORDER BY per.name_last, per.name_first',
 			 publishDefn => $STMTRPTDEFN_DEFAULT,
 		},
 	'sel_phone' =>
 		{
 			_stmtFmt => $STMTFMT_SEL_PERSON,
 			 whereCond => 'hphone.value_text = ?',
-			 orderBy => 'ORDER BY per.name_last, per.name_last',
+			 orderBy => 'ORDER BY per.name_last, per.name_first',
 			 publishDefn => $STMTRPTDEFN_DEFAULT,
 		},
 	'sel_phone_like' =>
 		{
 			_stmtFmt => $STMTFMT_SEL_PERSON,
 			 whereCond => 'hphone.value_text like ?',
-			 orderBy => 'ORDER BY per.name_last, per.name_last',
+			 orderBy => 'ORDER BY per.name_last, per.name_first',
 			 publishDefn => $STMTRPTDEFN_DEFAULT,
 		},
 	'sel_account' =>
 		{
 			_stmtFmt => $STMTFMT_SEL_PERSON,
 			 whereCond => 'upper(account.value_text) = ?',
-			 orderBy => 'ORDER BY per.name_last, per.name_last',
+			 orderBy => 'ORDER BY per.name_last, per.name_first',
 			 publishDefn => $STMTRPTDEFN_DEFAULT,
 		},
 	'sel_account_like' =>
 		{
 			_stmtFmt => $STMTFMT_SEL_PERSON,
 			 whereCond => 'upper(account.value_text) like ?',
-			 orderBy => 'ORDER BY per.name_last, per.name_last',
+			 orderBy => 'ORDER BY per.name_last, per.name_first',
 			 publishDefn => $STMTRPTDEFN_DEFAULT,
 		},
 	'sel_chart' =>
 		{
 			_stmtFmt => $STMTFMT_SEL_PERSON,
 			 whereCond => 'upper(chart.value_text) = ?',
-			 orderBy => 'ORDER BY per.name_last, per.name_last',
+			 orderBy => 'ORDER BY per.name_last, per.name_first',
 			 publishDefn => $STMTRPTDEFN_DEFAULT,
 		},
 	'sel_chart_like' =>
 		{
 			_stmtFmt => $STMTFMT_SEL_PERSON,
 			 whereCond => 'upper(chart.value_text) like ?',
-			 orderBy => 'ORDER BY per.name_last, per.name_last',
+			 orderBy => 'ORDER BY per.name_last, per.name_first',
 			 publishDefn => $STMTRPTDEFN_DEFAULT,
 		},
 	);
