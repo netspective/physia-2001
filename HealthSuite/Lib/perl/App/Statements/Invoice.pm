@@ -394,13 +394,14 @@ $STMTMGR_INVOICE = new App::Statements::Invoice(
 		where invoice_id = ?
 		order by bill_sequence
 		},
-	'selAllAttributesExclHistory' => qq{
+	'selAllAttributesExclHistoryAndTransferred' => qq{
 		select item_id, parent_id, item_type, item_name, value_type, value_text, value_textB, value_int, value_intB, value_float, value_floatB, value_block,
 			to_char(value_date, '$SQLSTMT_DEFAULTDATEFORMAT') as value_date, to_char(value_dateEnd, '$SQLSTMT_DEFAULTDATEFORMAT') as value_dateEnd,
 			to_char(value_dateA, '$SQLSTMT_DEFAULTDATEFORMAT') as value_dateA, to_char(value_dateB, '$SQLSTMT_DEFAULTDATEFORMAT') as value_dateB
 		from invoice_attribute
 		where parent_id = ?
 			and NOT item_name = 'Invoice/History/Item'
+			and NOT item_name = 'Invoice/Transferred'
 		},
 	'selInvoiceAttributeById' => qq{
 		select item_id, permissions, parent_id, item_type, item_name, value_type, value_text, value_textb, name_sort, value_int, value_intb, value_float, value_floatb,
