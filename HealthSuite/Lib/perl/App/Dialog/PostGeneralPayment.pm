@@ -167,10 +167,7 @@ sub execute
 			# Create adjustment for the item
 
 			my $payerIs = $page->param('payment');
-			my $payerType = '';
-			   $payerType = App::Universal::ENTITYTYPE_PERSON if $payerIs eq 'personal';
-			   $payerType = App::Universal::ENTITYTYPE_ORG if $payerIs eq 'insurance';
-
+			my $payerType = App::Universal::ENTITYTYPE_PERSON;
 			my $adjType = App::Universal::ADJUSTMENTTYPE_PAYMENT;
 			my $payMethod = $page->field('pay_method');
 			my $payerId = $page->field('payer_id');			#this is a hidden field for now, it is populated with invoice.client_id
@@ -184,7 +181,7 @@ sub execute
 					pay_date => $todaysDate || undef,
 					pay_method => defined $payMethod ? $payMethod : undef,
 					pay_ref => $page->field('pay_ref') || undef,
-					payer_type => defined $payerType ? $payerType : undef,
+					payer_type => $payerType || 0,
 					payer_id => $payerId || undef,
 					net_adjust => defined $totalAdjustForItemAndItemAdjust ? $totalAdjustForItemAndItemAdjust : undef,
 					data_text_a => $page->field('auth_ref') || undef,
@@ -265,10 +262,7 @@ sub execute
 			# Create adjustment for the item
 
 			my $payerIs = $page->param('payment');
-			my $payerType = '';
-			   $payerType = App::Universal::ENTITYTYPE_PERSON if $payerIs eq 'personal';
-			   $payerType = App::Universal::ENTITYTYPE_ORG if $payerIs eq 'insurance';
-
+			my $payerType = App::Universal::ENTITYTYPE_PERSON;
 			my $adjType = App::Universal::ADJUSTMENTTYPE_PAYMENT;
 			my $payMethod = $page->field('pay_method');
 			my $payerId = $page->field('payer_id');			#this is a hidden field for now, it is populated with invoice.client_id
@@ -282,7 +276,7 @@ sub execute
 					pay_date => $todaysDate || undef,
 					pay_method => defined $payMethod ? $payMethod : undef,
 					pay_ref => $page->field('pay_ref') || undef,
-					payer_type => defined $payerType ? $payerType : undef,
+					payer_type => $payerType || 0,
 					payer_id => $payerId || undef,
 					net_adjust => defined $totalAdjustForItemAndItemAdjust ? $totalAdjustForItemAndItemAdjust : undef,
 					data_text_a => $page->field('auth_ref') || undef,
