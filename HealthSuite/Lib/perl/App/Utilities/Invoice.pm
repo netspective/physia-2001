@@ -721,7 +721,7 @@ sub hmoCapWriteoff
 			_debug => 0
 		);
 
-		addBatchPaymentAttr($page, $invoiceId, value_text => $batchInfo->{value_text} || undef, value_int => $adjItemId, value_date => $todaysDate);
+		addBatchPaymentAttr($page, $invoiceId, value_text => $page->session('batch_id') || $batchInfo->{value_text} || undef, value_int => $adjItemId, value_date => $todaysDate);
 	}
 
 
