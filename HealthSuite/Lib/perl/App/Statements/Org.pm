@@ -46,7 +46,7 @@ $STMTMGR_ORG = new App::Statements::Org(
 			org_id
 		FROM 	org
 		WHERE 	owner_org_id = ?
-		AND     category IN ('Practice', 'Clinic', 'Facility/Site')
+		AND     category IN ('Practice','Clinic','Facility/Site','Diagnostic Service','Department','Hospital','Therapeutical Services')
 		},
 	'selOwnerOrgId' => qq{
 		select org_internal_id
