@@ -9,11 +9,13 @@ use CGI::Validator::Field;
 use CGI::ImageManager;
 use App::Universal;
 use Date::Manip;
+use SDE::CVS ('$Id: Login.pm,v 1.18 2000-11-01 19:32:50 robert_jenks Exp $', '$Name:  $');
+use App::Configuration;
 
 use DBI::StatementManager;
 use App::Statements::Person;
 use App::Statements::Org;
-use vars qw(%RESOURCE_MAP);
+use vars qw(%RESOURCE_MAP $CVS);
 %RESOURCE_MAP = (
 	'login' => {},
 );
@@ -210,6 +212,8 @@ sub handle_page
 	# first "run" the dialog and get the flags to see what happened
 	my $dlgHtml = $self->getHtml($page, $command);
 	my $dlgFlags = $page->property(&CGI::Dialog::PAGEPROPNAME_FLAGS . '_' . $self->id());
+	my $configGroup = $CONFDATA_SERVER->name_Group();
+	my $tagName = ($CVS->Name() || 'Development') . ' Code';
 
 	# if we executed the dialog (performed some action), then we
 	# want to leave because execute should have setup the redirect already
@@ -270,6 +274,8 @@ sub handle_page
 						<br>
 						Copyright \&copy; 2000 <a href="http://www.physia.com/">Physia Corp</a> - All Rights Reserved.<br>
 						Various Trademarks Held By Their Respective Owners.<br>
+						<br>
+						[ \u$configGroup Database / $tagName ]
 						</p>
 					</font>
 				</td></tr></table>
