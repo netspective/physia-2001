@@ -129,7 +129,15 @@ sub referralExpQuery
 	push(@setupConditions, $sqlGen->WHERE('name_last', 'leall', $lnTo . 'ZZZZ')) if $lnTo;
 
 	my $expiryDays = $self->getExpiryDays;
-	push(@setupConditions, $sqlGen->WHERE('expiryDays', 'leall', $expiryDays)) if $expiryDays;
+	if($expiryDays ne '')
+	{
+		push(@setupConditions, $sqlGen->WHERE('expiryDays', 'between', 0, $expiryDays));
+	}
+	else
+	{
+		push(@setupConditions, $sqlGen->WHERE('referral_end_date', 'isnotdefined'));
+		push(@setupConditions, $sqlGen->WHERE('referral_end_date', 'isdefined'));
+	}
 
 	my $query = $sqlGen->AND($cond1, @setupConditions);
 	$query->outColumns(
@@ -157,6 +165,7 @@ sub referralExpQuery
 	}
 
 	return $query;
+
 }
 
 sub getSelectedPhysicians
