@@ -79,6 +79,9 @@ alter table person_medication_aud modify (dose number(20,6), quantity number(20,
 alter table person_medication drop (label_in_spanish);
 alter table person_medication drop (label);
 alter table person_medication add (label varchar2(32));
+alter table person_medication_aud drop (label_in_spanish);
+alter table person_medication_aud drop (label);
+alter table person_medication_aud add (label varchar2(32));
 
 start tables-code/Person_Medication
 
