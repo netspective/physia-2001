@@ -31,7 +31,7 @@ sub initialize
 	$self->SUPER::initialize();
 	$self->addContent(
 		new CGI::Dialog::Field(type => 'hidden', name => 'phy_type_item_id'),
-		
+
 		new CGI::Dialog::Subhead(heading => 'Certification/Accreditations', name => 'cert_for_physician', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE),
 
 		new CGI::Dialog::Field(caption => '1. Specialty',
@@ -134,6 +134,31 @@ sub initialize
 				new CGI::Dialog::Field(caption => 'License', name => 'license3'),
 				new CGI::Dialog::Field(type=> 'date', caption => 'Date of Expiration', name => 'state3_exp_date', futureOnly => 1, defaultValue => ''),
 				]),
+		new CGI::Dialog::MultiField(caption =>'BCBS #/Exp Date', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
+			fields => [
+				new CGI::Dialog::Field(caption => 'bcbs#', name => 'bcbs_num'),
+				new CGI::Dialog::Field(type=> 'date', caption => 'Date of Expiration', name => 'bcbs_exp_date', futureOnly => 1, defaultValue => ''),
+				]),
+		new CGI::Dialog::MultiField(caption =>'Railroad Medicare/Exp Date', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
+			fields => [
+				new CGI::Dialog::Field(caption => 'railroad_medic', name => 'rail_medic'),
+				new CGI::Dialog::Field(type=> 'date', caption => 'Date of Expiration', name => 'rail_exp_date', futureOnly => 1, defaultValue => ''),
+				]),
+		new CGI::Dialog::MultiField(caption =>'Champus/Exp Date', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
+			fields => [
+				new CGI::Dialog::Field(caption => 'champus', name => 'champus'),
+				new CGI::Dialog::Field(type=> 'date', caption => 'Date of Expiration', name => 'champus_exp_date', futureOnly => 1, defaultValue => ''),
+				]),
+		new CGI::Dialog::MultiField(caption =>'WC #/Exp Date', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
+			fields => [
+				new CGI::Dialog::Field(caption => 'wc#', name => 'wc_num'),
+				new CGI::Dialog::Field(type=> 'date', caption => 'Date of Expiration', name => 'wc_exp_date', futureOnly => 1, defaultValue => ''),
+				]),
+		new CGI::Dialog::MultiField(caption =>'National Provider Indentification/Exp Date', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
+			fields => [
+				new CGI::Dialog::Field(caption => 'provider identification', name => 'provider_identif_num'),
+				new CGI::Dialog::Field(type=> 'date', caption => 'Date of Expiration', name => 'identif_exp_date', futureOnly => 1, defaultValue => ''),
+				]),
 
 		new CGI::Dialog::Field(
 						type => 'bool',
@@ -160,14 +185,14 @@ sub initialize
 
 sub makeStateChanges
 {
-	my ($self, $page, $command, $dlgFlags) = @_;	
-	
-	$self->updateFieldFlags('acct_chart_num', FLDFLAG_INVISIBLE, 1);	
-	$self->updateFieldFlags('nurse_title', FLDFLAG_INVISIBLE, 1);	
-	$self->updateFieldFlags('misc_notes', FLDFLAG_INVISIBLE, 1);	
+	my ($self, $page, $command, $dlgFlags) = @_;
+
+	$self->updateFieldFlags('acct_chart_num', FLDFLAG_INVISIBLE, 1);
+	$self->updateFieldFlags('nurse_title', FLDFLAG_INVISIBLE, 1);
+	$self->updateFieldFlags('misc_notes', FLDFLAG_INVISIBLE, 1);
 	#if ($command eq 'update' || $command eq 'remove')
-	$self->updateFieldFlags('physician_type', FLDFLAG_INVISIBLE, 1) if $command eq 'update' || $command eq 'remove'  ;	
-	my $personId = $page->param('person_id');	
+	$self->updateFieldFlags('physician_type', FLDFLAG_INVISIBLE, 1) if $command eq 'update' || $command eq 'remove'  ;
+	my $personId = $page->param('person_id');
 
 	if($command eq 'remove')
 	{
@@ -359,6 +384,56 @@ sub execute_add
 			value_int => 3,
 			_debug => 0
 	) if $state3 ne '' && $page->field('license3') ne '';
+
+	$page->schemaAction(
+			'Person_Attribute', $command,
+			parent_id => $personId || undef,
+			item_name => 'BCBS',
+			value_type => 520,
+			value_text => $page->field('bcbs_num') || undef,
+			value_dateEnd => $page->field('bcbs_exp_date') || undef,
+			_debug => 0
+	) if $page->field('bcbs_num') ne '';
+
+	$page->schemaAction(
+			'Person_Attribute', $command,
+			parent_id => $personId || undef,
+			item_name => 'Railroad Medicare',
+			value_type => 520,
+			value_text => $page->field('rail_medic') || undef,
+			value_dateEnd => $page->field('rail_exp_date') || undef,
+			_debug => 0
+	) if $page->field('rail_medic') ne '';
+
+	$page->schemaAction(
+			'Person_Attribute', $command,
+			parent_id => $personId || undef,
+			item_name => 'Champus',
+			value_type => 520,
+			value_text => $page->field('champus') || undef,
+			value_dateEnd => $page->field('champus_exp_date') || undef,
+			_debug => 0
+	) if $page->field('champus') ne '';
+
+	$page->schemaAction(
+			'Person_Attribute', $command,
+			parent_id => $personId || undef,
+			item_name => 'WC#',
+			value_type => 520,
+			value_text => $page->field('wc_num') || undef,
+			value_dateEnd => $page->field('wc_exp_date') || undef,
+			_debug => 0
+	) if $page->field('wc_num') ne '';
+
+	$page->schemaAction(
+			'Person_Attribute', $command,
+			parent_id => $personId || undef,
+			item_name => 'National Provider Identification',
+			value_type => 520,
+			value_text => $page->field('provider_identif_num') || undef,
+			value_dateEnd => $page->field('identif_exp_date') || undef,
+			_debug => 0
+	) if $page->field('provider_identif_num') ne '';
 
 	$self->handleContactInfo($page, $command, $flags, 'physician');
 }
