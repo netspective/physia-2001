@@ -9,17 +9,30 @@
 	</release-info>
 
 	<deliverables>
+
+		<deliverable id="1023">
+			UI: Fixed the data formatt to not to display the 'Accreditation' information twice in the same record
+		</deliverable>
+
 		<deliverable id="1025">
 			Added a validation in the specialty dialog of 'Certification' component to check if the previous specialty 
 			sequence has been added to the physician or not
 		</deliverable>
-		<deliverable id="1023">
-			Fixed the data formatt to not to display the 'Accreditation' information twice in the same record
+
+		<deliverable id="1286">
+			UI: Show how an appointment was or was not verified.
 		</deliverable>
+
 		<deliverable id="1415">
-			Fixed the code to not to show up the Mr and Mrs in the 'My Associated Resources Appointments' component of the
+			UI: Fixed the code to not to show up the Mr and Mrs in the 'My Associated Resources Appointments' component of the
 			User's home page
 		</deliverable>
+
+		<deliverable id="1424">
+			Added safeguards before adding invoice attributes and updating invoice status while parsing
+			claims status report files from Perse.  Deleted extraneous invoice attributes.
+		</deliverable>
+
 	</deliverables>
 </release-notes>
 
