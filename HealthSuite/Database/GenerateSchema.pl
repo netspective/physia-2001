@@ -7,6 +7,7 @@ use Schema;
 use Schema::Generator::Oracle;
 use Benchmark;
 use File::Spec;
+use App::Configuration;
 
 sub Main
 {
@@ -14,7 +15,9 @@ sub Main
 	#my $connectStr     = 'hs/hs@HealthSuiteCairo';
 	#my $connectStr     = 'physia/physia@Physia';
 	#my $connectStr     = 'physia/physia@SDEdbs01';
-	my $connectStr     = 'sde01/sde@SDEdbs01';
+	#my $connectStr     = 'sde01/sde@SDEdbs01';
+	my $connectStr     = $CONFDATA_SERVER->db_ConnectKey();
+	$connectStr        =~ s/dbi:Oracle://;
 	my $scriptPath     = "$Bin";
 	my $srcPath        = File::Spec->catfile($scriptPath, 'schema-physia-src');
 	my $srcFile        = File::Spec->catfile($srcPath, 'schema.xml');
