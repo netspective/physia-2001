@@ -224,23 +224,21 @@ sub addInvoiceHistory
 	return 0 unless $invoice;
 	
 	$date = UnixDate($date, '%m/%d/%Y');
-	my $invAttribute = $STMTMGR_EXTERNAL->getRowsAsHashList($page, STMTMGRFLAG_CACHE,
-		'sel_InvoiceAttribute', $invoice, 'Invoice/History/Item', $message, $date);
+	my $invHistory = $STMTMGR_EXTERNAL->getRowsAsHashList($page, STMTMGRFLAG_CACHE,
+		'sel_InvoiceHistory', $invoice, $message, $date);
 		
-	if (@{$invAttribute})
+	if (@{$invHistory})
 	{
-		for (@{$invAttribute})
+		for (@{$invHistory})
 		{
 			print "EXISTING: $_->{item_id} - $_->{cr_stamp}: $_->{value_text} - $_->{value_date} \n";
 		}
 		return 0;
 	}
 
-	return $page->schemaAction(0, 'Invoice_Attribute', 'add',
+	return $page->schemaAction(0, 'Invoice_History', 'add',
 		parent_id => $invoice,
 		cr_user_id => 'EDI_PERSE',
-		item_name => 'Invoice/History/Item',
-		value_type => App::Universal::ATTRTYPE_HISTORY,
 		value_text => $message,
 		value_date => $date,
 		value_float => $amtPaid || undef,
