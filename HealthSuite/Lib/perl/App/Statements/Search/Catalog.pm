@@ -66,7 +66,7 @@ $STMTRPTDEFN_DEFAULT =
 		},
 	columnDefn =>
 			[
-				{ head => 'ID', url => '/search/catalog/detail/#&{?}#', dataFmt => '&{level_indent:0}#0#', tDataFmt => '&{count:0} Schedules', options => PUBLCOLFLAG_DONTWRAP },
+				{ head => 'ID', url => 'javascript:chooseItem("/search/catalog/detail/#&{?}#", "#&{?}#", true)', dataFmt => '&{level_indent:0}#0#', tDataFmt => '&{count:0} Schedules', options => PUBLCOLFLAG_DONTWRAP },
 				{ head => 'Name', dataFmt => '<B>#2#</B><BR><I>#3#</I>'},
 				{ head => 'Entries', colIdx => 1, dAlign => 'CENTER', tAlign=>'CENTER', summarize => 'sum'},
 			],
@@ -82,7 +82,7 @@ my $STMTRPTDEFN_ORG =
                                 caption => qq{
                                         <a href='/org/#session.org_id#/dlg-add-catalog'>Add Fee Schedule</a> |
                                         <a href='/org/#session.org_id#/dlg-add-feescheduledataentry'>Add Fee Schedule Entries</a
-> 
+>
                                 },
 
 				#caption => "<a href='/org/#session.org_id#/dlg-add-catalog'>Add Fee Schedule</a>",
@@ -142,7 +142,7 @@ my $STMTRPTDEFN_DEFAULT_ITEM_ORG =
 			{
 				caption => qq{<b style="font-size:10pt">#param.catalog_id#</b> <br>
 					<a href='/org/#session.org_id#/dlg-add-catalog/#param.catalog_id#'>Add Fee Schedule</a> |
-					<a href='/org/#session.org_id#/dlg-add-catalog-copy/#param.catalog_id#'>Copy Fee Schedule</a> |										
+					<a href='/org/#session.org_id#/dlg-add-catalog-copy/#param.catalog_id#'>Copy Fee Schedule</a> |
 					<a href='/org/#session.org_id#/dlg-add-catalog-item/#param.catalog_id#'>Add Item</a>
 				},
 				#url => '/org/#session.org_id#/dlg-add-catalog-item'
