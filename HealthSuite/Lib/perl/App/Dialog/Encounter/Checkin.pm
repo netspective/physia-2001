@@ -10,6 +10,7 @@ use App::Dialog::Encounter;
 use App::Dialog::Field::Person;
 use App::Universal;
 use App::Schedule::Utilities;
+use App::Utilities::Invoice;
 
 use vars qw(%RESOURCE_MAP);
 %RESOURCE_MAP = (
@@ -101,7 +102,7 @@ sub handle_page
 	
 	my $eventId = $page->field('parent_event_id') || $page->param('event_id');
 	my $returnUrl = $self->getReferer($page);
-	my ($status, $person, $stamp) = $self->checkEventStatus($page, $eventId);
+	my ($status, $person, $stamp) = checkEventStatus($page, $eventId);
 	
 	if ($status =~ /in|out/i) 
 	{

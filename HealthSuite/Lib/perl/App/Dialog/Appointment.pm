@@ -24,6 +24,7 @@ use App::Dialog::Field::Scheduling;
 use App::Component::WorkList::PatientFlow;
 
 use App::Schedule::Utilities;
+use App::Utilities::Invoice;
 use vars qw(%RESOURCE_MAP);
 
 use base qw(CGI::Dialog);
@@ -698,7 +699,7 @@ sub handle_page
 	my $eventId = $page->field('parent_event_id') || $page->param('event_id');
 
 	my $returnUrl = $self->getReferer($page);
-	my ($status, $person, $stamp) = App::Dialog::Encounter::checkEventStatus($self, $page, $eventId);
+	my ($status, $person, $stamp) = checkEventStatus($page, $eventId);
 
 	if ($status =~ /in|out/ && $command =~ /cancel|noshow|reschedule|update/)
 	{
