@@ -74,6 +74,7 @@ sub new
 
 		new App::Dialog::Field::Person::ID(caption => 'Patient ID',
 			name => 'attendee_id',
+			addType => 'patient',
 			size => 25,
 			useShortForm => 1,
 			hints => 'Leave blank to use ID autosuggestion feature for new patients',
