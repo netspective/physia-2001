@@ -10,6 +10,14 @@ use vars qw(@ISA @EXPORT $STMTMGR_CATALOG);
 @ISA    = qw(Exporter DBI::StatementManager);
 @EXPORT = qw($STMTMGR_CATALOG);
 
+my $SEL_CATALOG_ENTRY = qq{
+	select * from Offering_Catalog_Entry
+	where code = ?
+		%modifierWhereClause%
+		and entry_type = ?
+		and catalog_id = ?
+};
+
 $STMTMGR_CATALOG = new App::Statements::Catalog(
 	'selCatalogById' => q{
 		select *
@@ -179,7 +187,7 @@ $STMTMGR_CATALOG = new App::Statements::Catalog(
 		and parent_id is not null
 		and rownum < 16
 		order by read_count desc
-		},
+	},
 	'selTop15ICDsByORG' => q{
 		select distinct(parent_id), read_count
 		from REF_ICD_Usage
@@ -187,7 +195,7 @@ $STMTMGR_CATALOG = new App::Statements::Catalog(
 		and parent_id is not null
 		and rownum < 16
 		order by read_count desc
-		},
+	},
 	'selTop15CPTsByPerson' => q{
 		select distinct(parent_id), read_count
 		from REF_CPT_Usage
@@ -195,7 +203,7 @@ $STMTMGR_CATALOG = new App::Statements::Catalog(
 		and parent_id is not null
 		and rownum < 16
 		order by read_count desc
-		},
+	},
 	'selTop15ICDsByPerson' => q{
 		select distinct(parent_id), read_count
 		from REF_ICD_Usage
@@ -203,17 +211,25 @@ $STMTMGR_CATALOG = new App::Statements::Catalog(
 		and parent_id is not null
 		and rownum < 16
 		order by read_count desc
-		},
+	},
 	'selAllServicePlaceId' => q{
 		select id
 		from HCFA1500_Service_Place_Code
-		},
+	},
 	'selAllServiceTypeId' => q{
 		select id
 		from HCFA1500_Service_Type_Code
-		},
-
-
+	},
+	
+	'sel_catalogEntry_by_catalogTypeCodeModifier' => {
+		sqlStmt => $SEL_CATALOG_ENTRY,
+		modifierWhereClause => 'and modifier = ?',
+	},
+	
+	'sel_catalogEntry_by_catalogTypeCode' => {
+		sqlStmt => $SEL_CATALOG_ENTRY,
+		modifierWhereClause => 'and modifier is null',
+	},
 );
 
 1;

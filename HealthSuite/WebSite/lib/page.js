@@ -711,7 +711,7 @@ var activeFindWinControl = null;
 var activeFindARL = null;
 var activeFindAppendValue = '';
 
-function doFindLookup(formInstance, populateControl, arl, appendValue, prefill, features, controlField, controlComboBox)
+function doFindLookup(formInstance, populateControl, arl, appendValue, prefill, features, controlField)
 {
 	if(prefill == null)
 		prefill = true;
@@ -727,15 +727,10 @@ function doFindLookup(formInstance, populateControl, arl, appendValue, prefill, 
 	activeFindAppendValue = appendValue;
 
 	var newArl = arl;
-
-	if(controlField != '')
+	
+	if(controlField)
 	{
-		newArl = replaceString(arl, 'itemValue', eval(controlField));
-	}
-
-	if (controlComboBox != '')
-	{
-		newArl = replaceString(arl, 'itemValue', eval(controlComboBox));
+		newArl = replaceString(arl, 'itemValue', controlField.value);
 	}
 
 	//

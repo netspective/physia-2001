@@ -112,7 +112,7 @@ $STMTRPTDEFN_DEFAULT_ITEM =
 	stdIcons =>
 	{
 		#location => 'trail',
-		addUrlFmt => '/org/#session.org_id#/dlg-add-catalog-item',
+		addUrlFmt => '/org/#session.org_id#/dlg-add-catalog-item/#param.search_expression#',
 		updUrlFmt => '/org/#session.org_id#/dlg-update-catalog-item/#0#',
 		delUrlFmt => '/org/#session.org_id#/dlg-remove-catalog-item/#0#',
 	},

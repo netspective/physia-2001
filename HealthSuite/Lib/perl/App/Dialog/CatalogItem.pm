@@ -6,14 +6,14 @@ use strict;
 use DBI::StatementManager;
 use App::Statements::Catalog;
 use App::Statements::Person;
+use App::Statements::Search::Code;
 
 use Carp;
 use CGI::Dialog;
 use CGI::Validator::Field;
 use App::Dialog::Field::Catalog;
 
-use Devel::ChangeLog;
-use vars qw(@ISA @CHANGELOG);
+use vars qw(@ISA);
 use Date::Manip;
 
 @ISA = qw(CGI::Dialog);
@@ -33,35 +33,58 @@ sub new
 			options => FLDFLAG_REQUIRED,
 			findPopup => '/lookup/catalog',
 		),
-
-		#new CGI::Dialog::Field::TableColumn(caption => 'Fee Schedule Item ID', name => 'catalog_id',
-		#		schema => $schema, column => 'Offering_Catalog_Entry.catalog_id',
-		#		findPopup => '/lookup/catalog/id', options => FLDFLAG_REQUIRED),
-
-		new CGI::Dialog::Field::TableColumn(caption => 'Item Name',
-			name => 'name',
-			schema => $schema,
-			column => 'Offering_Catalog_Entry.name',
-			options => FLDFLAG_REQUIRED,
-			findPopup => '/lookup/catalog/detail/itemValue',
-			findPopupControlField => '_f_catalog_id',
-		),
 		new CGI::Dialog::Field(type => 'enum',
 			enum => 'Catalog_Entry_Type',
 			caption => 'Fee Schedule Entry Type',
 			name => 'entry_type',
 			options => FLDFLAG_REQUIRED
 		),
-		new CGI::Dialog::Field(type => 'enum',
-			enum => 'Catalog_Entry_Status',
-			caption => 'Status',
-			name => 'status',
-			options => FLDFLAG_REQUIRED
+		new CGI::Dialog::MultiField(caption =>'Code/Modifier',
+			fields => [
+				new CGI::Dialog::Field::TableColumn(caption => 'Code',
+					name => 'code',
+					schema => $schema,
+					column => 'Offering_Catalog_Entry.code',
+					options => FLDFLAG_REQUIRED,
+					size => 10,
+					findPopup => '/lookup/itemValue',
+					findPopupControlField => '_f_entry_type',
+				),
+				new CGI::Dialog::Field::TableColumn(caption => 'Modifier',
+					name => 'modifier',
+					size => 10,
+					schema => $schema,
+					column => 'Offering_Catalog_Entry.modifier'
+				),
+			]
+		),
+		new CGI::Dialog::Field::TableColumn(caption => 'Item Name',
+			name => 'name',
+			schema => $schema,
+			column => 'Offering_Catalog_Entry.name',
+			#options => FLDFLAG_REQUIRED,
+			size => 40,
+			hints => 'autofill for CPT, ICD and HCPCS codes',
+			#findPopup => '/lookup/catalog/detail/itemValue',
+			#findPopupControlField => '_f_catalog_id',
+		),
+		new CGI::Dialog::Field::TableColumn(caption => 'Description',
+			name => 'description',
+			schema => $schema,
+			column => 'Offering_Catalog_Entry.description',
+			size => '50'
 		),
 		new CGI::Dialog::Field(type => 'enum',
+			name => 'status',
+			enum => 'Catalog_Entry_Status',
+			caption => 'Status',
+			options => FLDFLAG_REQUIRED
+		),
+		new CGI::Dialog::Field(caption => 'Cost Type',
+			name => 'cost_type',
+			type => 'enum',
 			enum => 'Catalog_Entry_Cost_Type',
-			caption => 'Cost Type',
-			name => 'cost_type', options => FLDFLAG_REQUIRED
+			options => FLDFLAG_REQUIRED
 		),
 		new CGI::Dialog::Field( caption => 'Unit Cost',
 			name => 'unit_cost',
@@ -74,29 +97,6 @@ sub new
 			size => 5,
 			maxLength => 8
 		),
-		new CGI::Dialog::MultiField(caption =>'Code/Modifier',
-			fields => [
-				new CGI::Dialog::Field::TableColumn(caption => 'Code',
-					name => 'code',
-					schema => $schema,
-					column => 'Offering_Catalog_Entry.code',
-					options => FLDFLAG_REQUIRED,
-					findPopup => '/lookup/itemValue',
-					findPopupComboBox => '_f_entry_type',
-				),
-				new CGI::Dialog::Field::TableColumn(caption => 'Modifier',
-					name => 'modifier',
-					schema => $schema,
-					column => 'Offering_Catalog_Entry.modifier'
-				),
-			]
-		),
-		new CGI::Dialog::Field::TableColumn(caption => 'Description',
-			name => 'description',
-			schema => $schema,
-			column => 'Offering_Catalog_Entry.description',
-			size => '50'
-		),
 		new CGI::Dialog::Field::TableColumn(caption => 'Parent Entry ID',
 			name => 'parent_entry_id',
 			schema => $schema,
@@ -104,6 +104,7 @@ sub new
 			findPopup => '/lookup/catalog/detail/itemValue',
 			findPopupControlField => '_f_catalog_id',
 		),
+		new CGI::Dialog::Field(type => 'hidden', name => 'add_mode'),
 	);
 
 	$self->{activityLog} =
@@ -122,7 +123,7 @@ sub new
 
 	$self->addFooter(new CGI::Dialog::Buttons(
 					nextActions_add => [
-						['Add Another Fee Schedule Item', "/org/#session.org_id#/dlg-add-catalog-item", 1],
+						['Add Another Fee Schedule Item', "/org/#session.org_id#/dlg-add-catalog-item/%field.catalog_id%", 1],
 						['Show Current Fee Schedule Item', '/search/catalog/detail/%field.catalog_id%'],
 						],
 					cancelUrl => $self->{cancelUrl} || undef));
@@ -138,6 +139,7 @@ sub populateData_add
 	$page->field('entry_type', 100);
 	$page->field('status', 1);
 	$page->field('cost_type', 1);
+	$page->field('add_mode', 1);
 }
 
 sub populateData_update
@@ -158,6 +160,85 @@ sub populateData_remove
 	populateData_update(@_);
 }
 
+sub checkDupEntry
+{
+	my ($self, $page, $fs, $entryType, $code, $modifier) = @_;
+
+	if ($page->field('add_mode'))
+	{
+		my $entryExists;
+		
+		if ($modifier)
+		{
+			$entryExists = $STMTMGR_CATALOG->recordExists($page, STMTMGRFLAG_NONE,
+				'sel_catalogEntry_by_catalogTypeCodeModifier', $code, $modifier, $entryType, $fs);
+		}
+		else
+		{
+			$entryExists = $STMTMGR_CATALOG->recordExists($page, STMTMGRFLAG_NONE,
+				'sel_catalogEntry_by_catalogTypeCode', $code, $entryType, $fs);
+		}
+		
+		my $field = $self->getField('catalog_id');
+		$field->invalidate($page, qq{Entry already exists in the system.}) if $entryExists;
+	}
+}
+
+sub customValidate
+{
+	my ($self, $page) = @_;
+	
+	my $fs = $page->param('_f_catalog_id');
+	my $entryType = $page->param('_f_entry_type');
+	my $code = $page->param('_f_code');
+	my $modifier = $page->param('_f_modifier');
+	
+	$self->checkDupEntry($page, $fs, $entryType, $code, $modifier);
+	
+	if (
+		(! $page->param('_f_name') || ! $page->param('_f_description')) &&
+		(grep(/$entryType/, (App::Universal::CATALOGENTRYTYPE_ICD, App::Universal::CATALOGENTRYTYPE_CPT, App::Universal::CATALOGENTRYTYPE_HCPCS)) )
+	)
+	{
+		my $codeInfo;
+
+		CASE: {
+			if ($entryType == App::Universal::CATALOGENTRYTYPE_ICD) {
+				$codeInfo = $STMTMGR_CATALOG_CODE_SEARCH->getRowAsHash($page, STMTMGRFLAG_NONE,
+					'sel_icd_code', $code);
+				last CASE;			
+			}
+			if ($entryType == App::Universal::CATALOGENTRYTYPE_CPT) {
+				$codeInfo = $STMTMGR_CPT_CODE_SEARCH->getRowAsHash($page, STMTMGRFLAG_NONE,
+					'sel_cpt_code', $code);
+				last CASE;			
+			}
+			if ($entryType == App::Universal::CATALOGENTRYTYPE_HCPCS) {
+				$codeInfo = $STMTMGR_HCPCS_CODE_SEARCH->getRowAsHash($page, STMTMGRFLAG_NONE,
+					'sel_hcpcs_code', $code);
+				last CASE;			
+			}
+		}
+		
+		unless ($page->param('_f_name'))
+		{
+			my $itemNameField = $self->getField('name');
+			$page->field('name', $codeInfo->{name});
+			$itemNameField->invalidate($page, qq{
+				@{[ $codeInfo->{name} ? "Autofilled Item Name" : "Unable to find a name for code '$code'" ]}
+			});
+		}
+		unless ($page->param('_f_description'))
+		{
+			my $descrField = $self->getField('description');
+			$page->field('description', $codeInfo->{description} || $codeInfo->{descr});
+			$descrField->invalidate($page, qq{
+				@{[ $codeInfo->{description} || $codeInfo->{descr} ? "Autofilled Description" :
+				"Unable to find a description for code '$code'" ]}
+			});
+		}
+	}
+}
 
 sub execute
 {
@@ -190,35 +271,8 @@ sub execute
 		_debug => 0
 		);
 
+	$page->param('_dialogreturnurl', '/search/catalog/detail/%field.catalog_id%') if $command ne 'add';
 	$self->handlePostExecute($page, $command, $flags);
 }
 
-
-use constant CATALOGITEM_DIALOG => 'Dialog/FeeScheduleItem';
-
-@CHANGELOG =
-(
-	[	CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '01/04/2000', 'RK',
-		CATALOGITEM_DIALOG,
-		'Added a dialog called fee schedule item. '],
-	[	CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '01/04/2000', 'MAF',
-		CATALOGITEM_DIALOG,
-		'Added few more fields to the dialog feescheduleitem '],
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_UPDATE, '01/05/2000', 'RK',
-		CATALOGITEM_DIALOG,
-		'Updated the dialog and schema-action for Fee Schedule Item dialog'],
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_UPDATE, '01/10/2000', 'RK',
-		CATALOGITEM_DIALOG,
-		'Added Session Activity to  Fee Schedule Item. '],
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_UPDATE, '01/25/2000', 'RK',
-		CATALOGITEM_DIALOG,
-		'Added Next Action Button to the FeeScheduleItem dialog. '],
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_UPDATE, '01/28/2000', 'RK',
-		CATALOGITEM_DIALOG,
-		'Added id for catalogitem dialog (as catalogitem) in sub new subroutine.'],
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_UPDATE, '02/20/2000', 'MAF',
-		CATALOGITEM_DIALOG,
-		'Implemented new field type for catalog ids.'],
-
-);
 1;
