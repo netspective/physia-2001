@@ -16,7 +16,7 @@ use vars qw(@ISA %RESOURCE_MAP);
 
 @ISA = qw(CGI::Dialog);
 
-my $FS_ATTRR_TYPE = App::Universal::ATTRTYPE_TEXT;#App::Universal::ATTRTYPE_FEE_SCHEDULE;
+my $FS_ATTRR_TYPE = App::Universal::ATTRTYPE_INTEGER;
 
 
 %RESOURCE_MAP = (
@@ -40,7 +40,7 @@ my $FS_ATTRR_TYPE = App::Universal::ATTRTYPE_TEXT;#App::Universal::ATTRTYPE_FEE_
 
 sub new
 {
-	my ($self, $command) = CGI::Dialog::new(@_, id => 'associate-fs-person', heading => '$Command Associated Fee Schedule');
+	my ($self, $command) = CGI::Dialog::new(@_, id => 'associate-fs-person', heading => 'Associate Fee Schedule');
 
 	my $schema = $self->{schema};
 	my $pane = $self->{pane};
@@ -82,16 +82,7 @@ sub new
 						name => 'value_int',
 						type => 'integer',
 						options => FLDFLAG_REQUIRED,
-						hints => 'Numeric Fee Schedule ID'),
-			new CGI::Dialog::Field(type => 'select',
-							style => 'radio',
-							selOptions => 'Yes:0;No:1',
-							caption => "Override Insurance Fee Schedule(s): ",
-							preHtml => "<B><FONT COLOR=DARKRED>",
-							postHtml => "</FONT></B>",
-							name => 'value_intb', defaultValue => '0',
-							hints =>'Indicates Fee Schedule Precedence'),
-														
+						hints => 'Numeric Fee Schedule ID'),										
 			
 		);
 
@@ -132,12 +123,12 @@ sub customValidate
 	{	
 		my $parent_id = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgId', $page->session('org_internal_id'), $page->param('org_id'));		
 		$field->invalidate($page,$msg) if $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selAttributeByIdValueIntParent',
-						$parent_id,$page->field('value_int'),'Fee Schedules');
+						$parent_id,$page->field('value_int'),'Fee Schedule');
 	}
 	else
 	{
 		$field->invalidate($page,$msg) if $STMTMGR_PERSON->getSingleValue($page, STMTMGRFLAG_NONE, 'selAttributeByIdValueIntParent',
-						$page->field('parent_id'),$page->field('value_int'),'Fee Schedules');
+						$page->field('parent_id'),$page->field('value_int'),'Fee Schedule');
 	}
 }
 
@@ -154,15 +145,15 @@ sub execute
 		$parent_id = $page->field('parent_id');
 	}
 	my $table = $self->{table};
+	$page->addError($FS_ATTRR_TYPE);
 	$page->schemaAction(
 			$table, $command,
 			item_id => $page->param('item_id') || undef,
 			parent_id => $parent_id,
-			item_name => 'Fee Schedules',
+			item_name => 'Fee Schedule',
 			item_type => 0,
 			value_type => $FS_ATTRR_TYPE,
-			value_int => $page->field('value_int'),
-			value_intB => $page->field('value_intb'),			
+			value_int => $page->field('value_int'),			
 	);
 
 	$self->handlePostExecute($page, $command, $flags | CGI::Dialog::DLGFLAG_IGNOREREDIRECT);
