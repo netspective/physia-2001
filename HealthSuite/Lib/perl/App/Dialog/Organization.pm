@@ -807,7 +807,7 @@ sub execute_add
 			state => $page->field('bill_state') || undef,
 			zip => $page->field('bill_zip') || undef,
 			_debug => 0
-		) if $page->field('addr_line1') ne '';
+		) if $page->field('bill_line1') ne '';
 
 	my $orgInternalId = $page->session('org_internal_id');
 	my $catalogId = $page->field('org_id').'_FEE_SCHEDULE';
