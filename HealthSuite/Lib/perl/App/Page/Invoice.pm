@@ -55,7 +55,7 @@ use vars qw(@ISA %RESOURCE_MAP);
 					{caption => 'Errors', name => 'errors',},
 					{caption => 'History', name => 'history',},
 					{caption => 'Notes', name => 'notes',},
-					{caption => 'Envoy NSF', name => 'envoy_nsf',},
+					{caption => 'THIN NSF', name => 'thin_nsf',},
 					{caption => 'Halley NSF', name => 'halley_nsf',},
 					{caption => 'Dialog', name => 'dialog',},
 					{caption => 'Submit', name => 'submit',},
@@ -1679,7 +1679,7 @@ sub prepare_view_notes
 	return $self->prepare_view_summary();
 }
 
-sub prepare_view_envoy_nsf
+sub prepare_view_thin_nsf
 {
 	my $self = shift;
 
@@ -1694,7 +1694,7 @@ sub prepare_view_envoy_nsf
 		$valMgr->validateClaim('Output', DEFAULT_VFLAGS, $claimList);
 
 		my @outArray = ();
-		$output->processClaims(destination => NSFDEST_ARRAY, outArray => \@outArray, claimList => $claimList, validationMgr => $valMgr, nsfType => App::Billing::Universal::NSF_ENVOY);
+		$output->processClaims(destination => NSFDEST_ARRAY, outArray => \@outArray, claimList => $claimList, validationMgr => $valMgr, nsfType => App::Billing::Universal::NSF_THIN);
 
 		push(@{$self->{page_content}}, '<pre>', join("\n", @outArray), '</pre>');
 
@@ -1704,7 +1704,7 @@ sub prepare_view_envoy_nsf
 			push(@{$self->{page_content}}, '<li>', join(', ', @$error), '</li>');
 		}
 	};
-	$self->addError('Problem in sub prepare_view_envoy_nsf', $@) if $@;
+	$self->addError('Problem in sub prepare_view_thin_nsf', $@) if $@;
 
 	return 1;
 }
@@ -2172,14 +2172,14 @@ sub prepare_page_content_header
 			['Errors', "$urlPrefix/errors", 'errors'],
 			['History', "$urlPrefix/history", 'history'],
 			['Notes', "$urlPrefix/notes", 'notes'],
-			['Envoy NSF', "$urlPrefix/envoy_nsf", 'envoy_nsf'],
+			['THIN NSF', "$urlPrefix/thin_nsf", 'thin_nsf'],
 			['Halley NSF', "$urlPrefix/halley_nsf", 'halley_nsf'],
 		];
 	$self->{page_menu_siblingSelectorParam} = '_pm_view';
 
 	my $view = $self->param('_pm_view');
 	my $chooseActionMenu = '';
-	if($view eq 'envoy_nsf' || $view eq 'halley_nsf' || $view eq 'history')
+	if($view eq 'thin_nsf' || $view eq 'halley_nsf' || $view eq 'history')
 	{
 		$chooseActionMenu = qq{ <TD COLSPAN=2><FONT FACE="Arial,Helvetica" SIZE=4 STYLE="font-family: tahoma; font-size: 14pt">&nbsp;</TD> };
 	}
