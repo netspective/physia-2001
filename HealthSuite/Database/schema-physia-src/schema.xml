@@ -461,7 +461,7 @@
 		<param name="parentref">insurance.ins_internal_id</param>
 	</table>
 	<table name="Trans_Address" abbrev="TransAddr" type="Address">
-		<param name="parentref">trans.trans_id</param>
+		<param name="parentref">transaction.trans_id</param>
 	</table>
 
 	<table name="Person_Attribute" abbrev="PerAttr" type="Attribute">
