@@ -50,13 +50,13 @@ sub execute
 	my $appendStmtName = $expression =~ s/\*/%/g ? '_like' : '';
 	my $bindParams = [uc($expression)];
 	push(@$bindParams, uc($expression)) if $type eq 'nameordescr';
-	
+
 	$self->addContent(
 		'<CENTER>',
-			#$STMTMGR_CATALOG_SEARCH->createHierHtml($self, STMTMGRFLAG_NONE, 
+			#$STMTMGR_CATALOG_SEARCH->createHierHtml($self, STMTMGRFLAG_NONE,
 			#	["sel_catalog_$type$appendStmtName", 5, 4], $bindParams,),
-			$STMTMGR_CATALOG_SEARCH->createHtml($self, STMTMGRFLAG_NONE, 
-				"sel_catalog_$type$appendStmtName", $bindParams,),
+			$STMTMGR_CATALOG_SEARCH->createHtml($self, STMTMGRFLAG_NONE,
+				"sel_catalog_$type$appendStmtName", $bindParams),
 		'</CENTER>'
 	);
 
@@ -66,18 +66,18 @@ sub execute
 sub execute_detail
 {
 	my ($self, $expression) = @_;
-	
+
 	$self->addContent(
 		'<CENTER>',
-			#$STMTMGR_CATALOG_SEARCH->createHierHtml($self, STMTMGRFLAG_NONE, 
+			#$STMTMGR_CATALOG_SEARCH->createHierHtml($self, STMTMGRFLAG_NONE,
 			#	['sel_catalog_detail', 0, 8],	[uc($expression)],
-			$STMTMGR_CATALOG_SEARCH->createHtml($self, STMTMGRFLAG_NONE, 
+			$STMTMGR_CATALOG_SEARCH->createHtml($self, STMTMGRFLAG_NONE,
 				'sel_catalog_detail',	[uc($expression)],
 		),
 		'</CENTER>'
 	);
-	
-	return 1;	
+
+	return 1;
 }
 
 1;

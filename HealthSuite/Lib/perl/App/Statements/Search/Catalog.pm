@@ -70,9 +70,19 @@ $STMTRPTDEFN_DEFAULT =
 	},
 	columnDefn =>
 	[
-		{ head => 'ID', hint => 'Fee Schedule ID #5#', url => 'javascript:chooseItem("/search/catalog/detail/#5#", "#5#", false)', dataFmt => '&{level_indent:0}#0#', tDataFmt => '&{count:0} Schedules', options => PUBLCOLFLAG_DONTWRAP },
+		{ head => 'ID', hint => 'Fee Schedule ID #5#', 
+			url => 'javascript:chooseItem("/search/catalog/detail/#5#", "#5#", false)', 
+			#dataFmt => '&{level_indent:0}#0#', 
+			tDataFmt => '&{count:0} Schedules', 
+			options => PUBLCOLFLAG_DONTWRAP,
+		},
 		{ head => 'Name', dataFmt => '<B>#2#</B><BR><I>#3#</I>'},
-		{ head => 'Entries', colIdx => 1, dAlign => 'CENTER', tAlign=>'CENTER', summarize => 'sum'},
+		{ head => 'Entries', 
+			colIdx => 1, 
+			dAlign => 'CENTER', 
+			tAlign=>'CENTER',
+			summarize => 'sum'
+		},
 	],
 	bullets => '/org/#session.org_id#/dlg-update-catalog/#5#',
 };
@@ -102,10 +112,19 @@ my $STMTRPTDEFN_ORG =
 	},
 	columnDefn =>
 	[
-		{ head => 'ID', hint => 'Fee Schedule ID #5#', url => '/org/#session.org_id#/catalog/#5#/#0#', dataFmt => '&{level_indent:0}#0#', tDataFmt => '&{count:0} Schedules', options => PUBLCOLFLAG_DONTWRAP },
+		{ head => 'ID', hint => 'Fee Schedule ID #5#', 
+			url => '/org/#session.org_id#/catalog/#5#/#0#', 
+			dataFmt => '&{level_indent:0}#0#', 
+			tDataFmt => '&{count:0} Schedules', 
+			options => PUBLCOLFLAG_DONTWRAP
+		},
 		{ head => 'Name', dataFmt => '<B>#2#</B><BR><I>#3#</I>'},
-		{ head => 'Entries', colIdx => 1, dAlign => 'CENTER', tAlign=>'CENTER', summarize => 'sum'},
-		{ head => '', colIdx => 6, hint => 'Add Child Schedule', url => '/org/#session.org_id#/dlg-add-catalog/#5#' }
+		{ head => 'Entries', colIdx => 1, dAlign => 'CENTER', tAlign=>'CENTER', 
+			summarize => 'sum',
+		},
+		{ head => '', colIdx => 6, hint => 'Add Child Schedule', 
+			url => '/org/#session.org_id#/dlg-add-catalog/#5#' 
+		},
 	],
 	bullets => '/org/#session.org_id#/dlg-update-catalog/#5#',
 };
@@ -120,22 +139,24 @@ $STMTRPTDEFN_DEFAULT_ITEM =
 		delUrlFmt => '/org/#session.org_id#/dlg-remove-catalog-item/#0#',
 	},
 	columnDefn =>
-			[
-				{ head => 'ID',
-					#url => '/search/catalog/detail/#0#',
-					url => 'javascript:chooseItem("/org/#session.org_id#/dlg-update-catalog-item/#0#", "#0#", false)',
-					dataFmt => '&{level_indent:0}#0#',
-					tDataFmt => '&{count:0} Entries',
-					options => PUBLCOLFLAG_DONTWRAP
-				},
-				{ head => 'Type' },
-				{ head => 'Code' },
-				{ head => 'Modifier' },
-				{ head => 'Description' },
-				{ head => 'Price', dformat => 'currency', tAlign => 'RIGHT', tDataFmt => '&{avg_currency:&{?}}<BR>&{sum_currency:&{?}}' },
-				{ head => 'UOH', hint => 'Units', dAlign => 'CENTER' },
-				{ head => 'Name', colIdx => 9},
-			],
+	[
+		{ head => 'ID',
+			#url => '/search/catalog/detail/#0#',
+			url => 'javascript:chooseItem("/org/#session.org_id#/dlg-update-catalog-item/#0#", "#0#", false)',
+			dataFmt => '&{level_indent:0}#0#',
+			tDataFmt => '&{count:0} Entries',
+			options => PUBLCOLFLAG_DONTWRAP
+		},
+		{ head => 'Type' },
+		{ head => 'Code' },
+		{ head => 'Modifier' },
+		{ head => 'Description' },
+		{ head => 'Price', dformat => 'currency', tAlign => 'RIGHT', 
+			tDataFmt => '&{avg_currency:&{?}}<BR>&{sum_currency:&{?}}' 
+		},
+		{ head => 'UOH', hint => 'Units', dAlign => 'CENTER' },
+		{ head => 'Name', colIdx => 9},
+	],
 };
 
 #<a href='/org/#session.org_id#/dlg-add-catalog-copy/#param.catalog_id#'>Copy Fee Schedule</a> |
@@ -161,21 +182,26 @@ my $STMTRPTDEFN_DEFAULT_ITEM_ORG =
 		updUrlFmt => '/org/#session.org_id#/dlg-update-catalog-item/#0#',
 		delUrlFmt => '/org/#session.org_id#/dlg-remove-catalog-item/#0#',
 	},
+
 	columnDefn =>
-			[
-				{ head => 'ID', url => '/org/#session.org_id#/dlg-update-catalog-item/#0#',
-					dataFmt => '&{level_indent:0}#0#',
-					tDataFmt => '&{count:0} Entries',
-					options => PUBLCOLFLAG_DONTWRAP
-				},
-				{ head => 'Type' },
-				{ head => 'Code' },
-				{ head => 'Modifier' },
-				{ head => 'Description' },
-				{ head => 'Price', dformat => 'currency', tAlign => 'RIGHT', tDataFmt => '&{avg_currency:&{?}}<BR>&{sum_currency:&{?}}' },
-				{ head => 'UOH', hint => 'Units', dAlign => 'CENTER' },
-				{ head => '', hint => 'Add Child Entry', url => '/org/#session.org_id#/dlg-add-catalog-item/#param.internal_catalog_id#/#0#' }
-			],
+	[
+		{ head => 'ID', url => '/org/#session.org_id#/dlg-update-catalog-item/#0#',
+			dataFmt => '&{level_indent:0}#0#',
+			tDataFmt => '&{count:0} Entries',
+			options => PUBLCOLFLAG_DONTWRAP
+		},
+		{ head => 'Type' },
+		{ head => 'Code' },
+		{ head => 'Modifier' },
+		{ head => 'Description' },
+		{ head => 'Price', dformat => 'currency', tAlign => 'RIGHT', 
+			tDataFmt => '&{avg_currency:&{?}}<BR>&{sum_currency:&{?}}' 
+		},
+		{ head => 'UOH', hint => 'Units', dAlign => 'CENTER' },
+		{ head => '', hint => 'Add Child Entry', 
+			url => '/org/#session.org_id#/dlg-add-catalog-item/#param.internal_catalog_id#/#0#' 
+		},
+	],
 };
 
 $STMTMGR_CATALOG_SEARCH = new App::Statements::Search::Catalog(
