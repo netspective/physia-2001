@@ -452,15 +452,32 @@ sub prepare_view_superbills
 	#$self->addLocatorLinks(['Profile', 'profile']);
 
 	if ($self->param ('action') eq 'add') {
-		my $catalogIDExists = $STMTMGR_ORG->recordExists($self, STMTMGRFLAG_NONE, 'selSuperbillsByCatalogId', $self->param('catalog_id'));
+		my $catalogIDExists = $STMTMGR_ORG->recordExists($self, STMTMGRFLAG_NONE, 'selSuperbillsByCatalogId', $self->param('catalog_id'), $self->session ('org_internal_id'));
+		my $internalCatalogID = $self->param('int_cat_id');
+		my $superbillCaption = $self->param ('caption');
 		
-		if ($catalogIDExists) {
+		my $validationError = 0;
+		
+		$validationError = 1 unless ($superbillCaption);
+		$validationError = 1 if ($catalogIDExists or $self->param('catalog_id') eq '');
+
+		if ($validationError and not $internalCatalogID) {
 			my $superbillID = $self->param ('int_cat_id');
 			my $superbillCatalogID = $self->param ('catalog_id');
-			my $superbillCaption = $self->param ('caption');
 			my $superbillDescription = $self->param ('description');
 			my $groupsField = $self->param ('groups');
 			my $cptField = $self->param ('cpts');
+			
+			my $superbillIDWarning = qq{<br><font color="red">Another superbill already exists with this ID.  Please change this and re-submit.  Thank you.</font>};
+			my $superbillCaptionWarning = qq{<br><font color="red">Please enter a name for this superbill.</font>};
+			
+			if ($self->param('catalog_id')) {
+				$superbillIDWarning = $catalogIDExists ? $superbillIDWarning : '';
+			} else {
+				$superbillIDWarning = qq{<br><font color="red">Please enter a superbill ID</font>};
+			}
+
+			$superbillCaptionWarning = $superbillCaption eq '' ? $superbillCaptionWarning : '';
 
 			$self->addContent(qq{
 				<script src="/lib/superbill.js" language="JavaScript1.2">
@@ -470,13 +487,13 @@ sub prepare_view_superbills
 				<table>
 					<tr>
 						<td align="right" valign="top">Superbill ID:</td>
-						<td align="left" valign="top"><input name="superbillID" type="text" size="15"><br>
-						<font color="red">Another superbill already exists by this name.  Please change this and re-submit.  Thank you.</font>
+						<td align="left" valign="top"><input name="superbillID" type="text" size="15">$superbillIDWarning
 						</td>
 					</tr>
 					<tr>
 						<td align="right" valign="top">Name:</td>
-						<td align="left" valign="top"><input name="superbillName" type="text" size="40"></td>
+						<td align="left" valign="top"><input name="superbillName" type="text" size="40">$superbillCaptionWarning
+						</td>
 					</tr>
 					<tr>
 						<td align="right" valign="top">Description:</td>
@@ -600,8 +617,7 @@ sub prepare_view_superbills
 				$i ++;
 			}
 
-			my $orgRecord = $STMTMGR_ORG->getRowAsArray($self, STMTMGRFLAG_NONE, 'selOwnerOrgId', $self->param ('org_id'));
-			my $orgIntId = $orgRecord->[0];
+			my $orgIntId = $self->session ('org_internal_id');
 			my $internalCatalogID = $self->param('int_cat_id');
 
 			if ($internalCatalogID) {
@@ -809,8 +825,8 @@ sub prepare_view_superbills
 			<script language="JavaScript1.2">_refreshGroupList ();</script>
 		});
 	} elsif ($self->param ('action') eq 'edit') {
-		my $superbillInfo = $STMTMGR_ORG->getRowAsArray($self, STMTMGRFLAG_NONE, 'selComponentSuperbillsByCatalogId', $self->param ('superbillid'));
-		my $superbillList = $STMTMGR_ORG->getRowsAsHashList($self, STMTMGRFLAG_NONE, 'selSuperbillInfoByCatalogID', $self->param ('superbillid'));
+		my $superbillInfo = $STMTMGR_ORG->getRowAsArray($self, STMTMGRFLAG_NONE, 'selComponentSuperbillsByCatalogId', $self->param ('superbillid'), $self->session ('org_internal_id'));
+		my $superbillList = $STMTMGR_ORG->getRowsAsHashList($self, STMTMGRFLAG_NONE, 'selSuperbillInfoByCatalogID', $self->param ('superbillid')) if $STMTMGR_ORG->recordExists($self, STMTMGRFLAG_NONE, 'selComponentSuperbillsByCatalogId', $self->param ('superbillid'), $self->session ('org_internal_id'));
 		
 		my $superbillID = $self->param ('superbillid');
 		my $superbillCatalogID = $superbillInfo->[1];
