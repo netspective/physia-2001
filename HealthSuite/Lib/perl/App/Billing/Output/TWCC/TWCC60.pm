@@ -1,6 +1,7 @@
 package App::Billing::Output::TWCC::TWCC60;
 
 use App::Billing::Output::PDF::Report;
+use strict;
 
 use constant LEFT_MARGIN => 36;
 use constant TOP_MARGIN => 756; # 792 - 36
@@ -28,7 +29,7 @@ use constant NO_RIGHT_LINE => 0;
 use constant NO_TOP_LINE => 0;
 use constant NO_BOTTOM_LINE => 0;
 use constant SPC => " ";
-use constant DATA_LEFT_PADDING => 6;
+use constant DATA_LEFT_PADDING => 3;
 use constant DATA_TOP_PADDING => 10;
 use constant DATA_FONT_SIZE => 8;
 use constant DATA_FONT_COLOR => '0,0,0';
@@ -62,7 +63,7 @@ sub printReport
 	my $report = new App::Billing::Output::PDF::Report();
 	$report->newPage($p);
 	$self->drawForm($p, $claim, $report);
-#	$self->fillData($p, $claim, $report);
+	$self->fillData($p, $claim, $report);
 	$report->endPage($p);
 	
 	my $properties = {'pageWidth' => PAGE2_WIDTH, 'pageHeight' => PAGE2_HEIGHT};
@@ -102,10 +103,6 @@ sub drawForm
 
 	my $box12Y = $boxPart2Y - PART_HEIGHT;
 	$self->box12($p, $claim, $mainBoxX, $box12Y, $report);
-#	$self->box15($p, $claim, $mainBoxX, $box12Y - BOX_HEIGHT, $report);
-#	$self->box18($p, $claim, $mainBoxX, $box12Y - 2 * BOX_HEIGHT, $report);
-#	$self->box21($p, $claim, $mainBoxX, $box12Y - 3 * BOX_HEIGHT, $report);
-#	$self->box24($p, $claim, $mainBoxX, $box12Y - 4 * BOX_HEIGHT, $report);
 	$self->box27($p, $claim, $mainBoxX, $box12Y - 5 * BOX_HEIGHT, $report);
 
 	my $boxPart3Y = $box12Y - 5 * BOX_HEIGHT - DOUBLE_BOX_HEIGHT - 14;
@@ -153,6 +150,62 @@ sub fillData
 	my $mainBoxY = TOP_MARGIN - MAIN_BOX_Y;
 
 	$self->box1Data($p, $claim, $mainBoxX, $mainBoxY - PART_HEIGHT, $report);
+	$self->box2Data($p, $claim, $mainBoxX + HALF_MAIN_BOX_WIDTH, $mainBoxY - PART_HEIGHT, $report);
+	
+	my $box3Y = $mainBoxY - PART_HEIGHT - BOX1_HEIGHT;
+	
+	$self->box3Data($p, $claim, $mainBoxX, $box3Y, $report);
+	$self->box4Data($p, $claim, $mainBoxX + HALF_MAIN_BOX_WIDTH, $box3Y, $report);
+	$self->box5Data($p, $claim, $mainBoxX, $box3Y - BOX_HEIGHT, $report);
+	$self->box6Data($p, $claim, $mainBoxX + QUARTER_MAIN_BOX_WIDTH, $box3Y - BOX_HEIGHT, $report);
+	$self->box7Data($p, $claim, $mainBoxX + HALF_MAIN_BOX_WIDTH, $box3Y - BOX_HEIGHT, $report);
+	$self->box8Data($p, $claim, $mainBoxX, $box3Y - 2 * BOX_HEIGHT, $report);
+	$self->box9Data($p, $claim, $mainBoxX + QUARTER_MAIN_BOX_WIDTH, $box3Y - 2 * BOX_HEIGHT, $report);
+	$self->box10Data($p, $claim, $mainBoxX + HALF_MAIN_BOX_WIDTH, $box3Y - 2 * BOX_HEIGHT, $report);
+	$self->box11Data($p, $claim, $mainBoxX + HALF_MAIN_BOX_WIDTH + QUARTER_MAIN_BOX_WIDTH, $box3Y - 2 * BOX_HEIGHT, $report);
+	
+	my $boxPart2Y = $box3Y - 3 * BOX_HEIGHT - PART_SPACING;
+	$self->boxPart2($p, $claim, $mainBoxX, $boxPart2Y, $report);
+
+	my $box12Y = $boxPart2Y - PART_HEIGHT;
+	$self->box12Data($p, $claim, $mainBoxX, $box12Y, $report);
+	$self->box13Data($p, $claim, $mainBoxX + ONE_THIRD_MAIN_BOX_WIDTH, $box12Y, $report);
+	$self->box14Data($p, $claim, $mainBoxX + 2 * ONE_THIRD_MAIN_BOX_WIDTH, $box12Y, $report);
+	
+	$self->box15Data($p, $claim, $mainBoxX, $box12Y - BOX_HEIGHT, $report);
+	$self->box16Data($p, $claim, $mainBoxX + ONE_THIRD_MAIN_BOX_WIDTH, $box12Y - BOX_HEIGHT, $report);
+	$self->box17Data($p, $claim, $mainBoxX + 2 * ONE_THIRD_MAIN_BOX_WIDTH, $box12Y - BOX_HEIGHT, $report);
+	
+	$self->box18Data($p, $claim, $mainBoxX, $box12Y - 2 * BOX_HEIGHT, $report);
+	$self->box19Data($p, $claim, $mainBoxX + ONE_THIRD_MAIN_BOX_WIDTH, $box12Y - 2 * BOX_HEIGHT, $report);
+	$self->box20Data($p, $claim, $mainBoxX + 2 * ONE_THIRD_MAIN_BOX_WIDTH, $box12Y - 2 * BOX_HEIGHT, $report);
+	
+	$self->box21Data($p, $claim, $mainBoxX, $box12Y - 3 * BOX_HEIGHT, $report);
+	$self->box22Data($p, $claim, $mainBoxX + ONE_THIRD_MAIN_BOX_WIDTH, $box12Y - 3 * BOX_HEIGHT, $report);
+	$self->box23Data($p, $claim, $mainBoxX + 2 * ONE_THIRD_MAIN_BOX_WIDTH, $box12Y - 3 * BOX_HEIGHT, $report);
+	
+	$self->box24Data($p, $claim, $mainBoxX, $box12Y - 4 * BOX_HEIGHT, $report);
+	$self->box25Data($p, $claim, $mainBoxX + ONE_THIRD_MAIN_BOX_WIDTH, $box12Y - 4 * BOX_HEIGHT, $report);
+	$self->box26Data($p, $claim, $mainBoxX + 2 * ONE_THIRD_MAIN_BOX_WIDTH, $box12Y - 4 * BOX_HEIGHT, $report);
+
+	$self->box27Data($p, $claim, $mainBoxX, $box12Y - 5 * BOX_HEIGHT, $report);
+
+	my $boxPart3Y = $box12Y - 5 * BOX_HEIGHT - DOUBLE_BOX_HEIGHT - 14;
+	$self->boxPart3($p, $claim, $mainBoxX, $boxPart3Y, $report);
+	$self->box28Data($p, $claim, $mainBoxX, $boxPart3Y - PART_HEIGHT, $report);
+
+	my $box29Y = $boxPart3Y - PART_HEIGHT - BOX28_HEIGHT;
+	$self->box29Data($p, $claim, $mainBoxX, $box29Y, $report);
+	$self->box30Data($p, $claim, $mainBoxX + HALF_MAIN_BOX_WIDTH, $box29Y, $report);
+	$self->box31Data($p, $claim, $mainBoxX, $box29Y - BOX_HEIGHT, $report);
+	$self->box32Data($p, $claim, $mainBoxX + QUARTER_MAIN_BOX_WIDTH, $box29Y - BOX_HEIGHT, $report);
+	$self->box33Data($p, $claim, $mainBoxX + HALF_MAIN_BOX_WIDTH, $box29Y - BOX_HEIGHT, $report);
+	$self->box34Data($p, $claim, $mainBoxX, $box29Y - 2 * BOX_HEIGHT, $report);
+	$self->box35Data($p, $claim, $mainBoxX + QUARTER_MAIN_BOX_WIDTH, $box29Y - 2 * BOX_HEIGHT, $report);
+	$self->box36Data($p, $claim, $mainBoxX + HALF_MAIN_BOX_WIDTH, $box29Y - 2 * BOX_HEIGHT, $report);
+	$self->box37Data($p, $claim, $mainBoxX + HALF_MAIN_BOX_WIDTH + QUARTER_MAIN_BOX_WIDTH, $box29Y - 2 * BOX_HEIGHT, $report);
+	$self->box38Data($p, $claim, $mainBoxX, $box29Y - 3 * BOX_HEIGHT, $report);
+	
 }
 
 sub fillData_2
@@ -208,7 +261,7 @@ sub header
 
 	for $i(0..4)
 	{
-		$properties =
+		my $properties =
 		{
 			'text' => $arrCenter->[$i],
 			'x' => LEFT_MARGIN + 202,
@@ -221,7 +274,7 @@ sub header
 
 	for $i(0..3)
 	{
-		$properties =
+		my $properties =
 		{
 			'text' => $arrRight->[$i],
 			'x' => LEFT_MARGIN + 446,
@@ -232,7 +285,7 @@ sub header
 		$report->drawText($p,$properties);
 	}
 
-	$properties =
+	my $properties =
 	{
 		'text' => "MEDICAL DISPUTE RESOLUTION REQUEST / RESPONSE",
 		'fontName' => BOLD_FONT_NAME,
@@ -1000,17 +1053,346 @@ sub footer
 sub box1Data
 {
 	my($self, $p, $claim, $x, $y, $report) = @_;
-
+	my $arrX = [83,125,160];
+	
 	my $properties =
 	{
-		'text' => "",
+		'text' => "X",
 		'fontWidth' => DATA_FONT_SIZE,
 		'color' => DATA_FONT_COLOR,
-		'x' => $x + DATA_LEFT_PADDING,
-		'y' => $y - DATA_TOP_PADDING
+		'x' => $x + $arrX->[$claim->{twcc60}->getRequestorType - 1],
+		'y' => $y - 5
 	};
 	$report->drawText($p, $properties);
 }
+
+sub box2Data
+{
+	my($self, $p, $claim, $x, $y, $report) = @_;
+	my $arrX = [65,180,1,108,191];
+	my $arrY = [6,6,16,16,16];
+	
+	my $properties =
+	{
+		'text' => "X",
+		'fontWidth' => DATA_FONT_SIZE,
+		'color' => DATA_FONT_COLOR,
+		'x' => $x  + $arrX->[$claim->{twcc60}->getDisputeType - 1],
+		'y' => $y  - $arrY->[$claim->{twcc60}->getDisputeType - 1]
+	};
+	$report->drawText($p, $properties);
+}
+
+sub box3Data
+{
+	my($self, $p, $claim, $x, $y, $report) = @_;
+	$self->boxData($p, $claim, $x, $y, $report, $claim->{twcc60}->getRequestorName, 
+				DATA_LEFT_PADDING, DATA_TOP_PADDING);
+}
+
+sub box4Data
+{
+	my($self, $p, $claim, $x, $y, $report) = @_;
+	$self->boxData($p, $claim, $x, $y, $report, $claim->{twcc60}->{requestorAddress}->getAddress1,
+				DATA_LEFT_PADDING, DATA_TOP_PADDING);
+}
+
+sub box5Data
+{
+	my($self, $p, $claim, $x, $y, $report) = @_;
+	$self->boxData($p, $claim, $x, $y, $report, $claim->{twcc60}->getRequestorContactName,
+				DATA_LEFT_PADDING, DATA_TOP_PADDING);
+}
+
+sub box6Data
+{
+	my($self, $p, $claim, $x, $y, $report) = @_;
+	$self->boxData($p, $claim, $x, $y, $report, 
+				substr($claim->{twcc60}->{requestorAddress}->getTelephoneNo, 0, 3) . "   " . substr($claim->{twcc60}->{requestorAddress}->getTelephoneNo, 3, 7),
+				DATA_LEFT_PADDING, DATA_TOP_PADDING);
+}
+
+sub box7Data
+{
+	my($self, $p, $claim, $x, $y, $report) = @_;
+	$self->boxData($p, $claim, $x, $y, $report, 
+				$claim->{twcc60}->{requestorAddress}->getCity,
+				DATA_LEFT_PADDING, DATA_TOP_PADDING);
+}
+
+sub box8Data
+{
+	my($self, $p, $claim, $x, $y, $report) = @_;
+	$self->boxData($p, $claim, $x, $y, $report, 
+				substr($claim->{twcc60}->{requestorAddress}->getFaxNo, 0, 3) . "   " . substr($claim->{twcc60}->{requestorAddress}->getFaxNo, 3, 7),
+				DATA_LEFT_PADDING, DATA_TOP_PADDING);
+}
+
+sub box9Data
+{
+	my($self, $p, $claim, $x, $y, $report) = @_;
+	$self->boxData($p, $claim, $x, $y, $report, $claim->{twcc60}->{requestorAddress}->getEmailAddress,
+				DATA_LEFT_PADDING, DATA_TOP_PADDING);
+}
+
+sub box10Data
+{
+	my($self, $p, $claim, $x, $y, $report) = @_;
+	$self->boxData($p, $claim, $x, $y, $report, $claim->{twcc60}->getRequestorFEIN,
+				DATA_LEFT_PADDING, DATA_TOP_PADDING);
+}
+
+sub box11Data
+{
+	my($self, $p, $claim, $x, $y, $report) = @_;
+	$self->boxData($p, $claim, $x, $y, $report, $claim->{twcc60}->getRequestorLicenseNo,
+				DATA_LEFT_PADDING, DATA_TOP_PADDING);
+}
+
+sub box12Data
+{
+	my($self, $p, $claim, $x, $y, $report) = @_;
+	$self->boxData($p, $claim, $x, $y, $report, $claim->{careReceiver}->getName, 45, 6);
+}
+
+sub box13Data
+{
+	my($self, $p, $claim, $x, $y, $report) = @_;
+	$self->boxData($p, $claim, $x, $y, $report, $claim->{renderingProvider}->getName, 45, 6);
+}
+
+sub box14Data
+{
+	my($self, $p, $claim, $x, $y, $report) = @_;
+	$self->boxData($p, $claim, $x, $y, $report, $claim->{payer}->getName, 45, 6);
+}
+
+sub box15Data
+{
+	my($self, $p, $claim, $x, $y, $report) = @_;
+	$self->boxData($p, $claim, $x, $y, $report, 
+					$claim->{treatment}->getDateOfIllnessInjuryPregnancy(DATEFORMAT_USA), 
+					55, 6);
+}
+
+sub box16Data
+{
+	my($self, $p, $claim, $x, $y, $report) = @_;
+	$self->boxData($p, $claim, $x, $y, $report, 
+					substr($claim->{renderingProvider}->{address}->getTelephoneNo, 0, 3) . "   " . substr($claim->{renderingProvider}->{address}->getTelephoneNo, 3, 7),
+					75, 6);
+}
+
+sub box17Data
+{
+	my($self, $p, $claim, $x, $y, $report) = @_;
+	$self->boxData($p, $claim, $x, $y, $report, 
+					substr($claim->{payer}->{address}->getTelephoneNo, 0, 3) . "   " . substr($claim->{payer}->{address}->getTelephoneNo, 3, 7),
+					73, 6);
+}
+
+sub box18Data
+{
+	my($self, $p, $claim, $x, $y, $report) = @_;
+	$self->boxData($p, $claim, $x, $y, $report, 
+					substr($claim->{careReceiver}->{address}->getTelephoneNo, 0, 3) . "   " . substr($claim->{careReceiver}->{address}->getTelephoneNo, 3, 7),
+					73, 6);
+}
+
+sub box19Data
+{
+	my($self, $p, $claim, $x, $y, $report) = @_;
+	$self->boxData($p, $claim, $x, $y, $report, 
+					substr($claim->{renderingProvider}->{address}->getFaxNo, 0, 3) . "   " . substr($claim->{renderingProvider}->{address}->getFaxNo, 3, 7),
+					73, 6);
+}
+
+sub box20Data
+{
+	my($self, $p, $claim, $x, $y, $report) = @_;
+	$self->boxData($p, $claim, $x, $y, $report, 
+					substr($claim->{payer}->{address}->getFaxNo, 0, 3) . "   " . substr($claim->{payer}->{address}->getFaxNo, 3, 7),
+					73, 6);
+}
+
+sub box21Data
+{
+	my($self, $p, $claim, $x, $y, $report) = @_;
+	$self->boxData($p, $claim, $x, $y, $report, $claim->{careReceiver}->getSsn,	85, 6);
+}
+
+sub box22Data
+{
+	my($self, $p, $claim, $x, $y, $report) = @_;
+	$self->boxData($p, $claim, $x, $y, $report, 
+				$claim->{renderingProvider}->{address}->getEmailAddress,
+				75, 6);
+}
+
+sub box23Data
+{
+	my($self, $p, $claim, $x, $y, $report) = @_;
+	$self->boxData($p, $claim, $x, $y, $report, $claim->{payer}->{address}->getEmailAddress, 75, 6);
+}
+
+sub box24Data
+{
+	my($self, $p, $claim, $x, $y, $report) = @_;
+	$self->boxData($p, $claim, $x, $y, $report, 
+				$claim->{insured}->[$claim->getClaimType]->getPolicyGroupOrFECANo,
+				75, 6);
+}
+
+sub box25Data
+{
+	my($self, $p, $claim, $x, $y, $report) = @_;
+	$self->boxData($p, $claim, $x, $y, $report, 
+				$claim->{insured}->[$claim->getClaimType]->getEmployerOrSchoolName,
+				85, 6);
+}
+
+sub box26Data
+{
+	my($self, $p, $claim, $x, $y, $report) = @_;
+	$self->boxData($p, $claim, $x, $y, $report,  $claim->getId, 80, 6);
+}
+
+sub box27Data
+{
+	my($self, $p, $claim, $x, $y, $report) = @_;
+	my $arrX1 = [429,404];
+	
+	my $properties =
+	{
+		'text' => "X",
+		'fontWidth' => DATA_FONT_SIZE,
+		'color' => DATA_FONT_COLOR,
+		'x' => $x + $arrX1->[$claim->{twcc60}->getNoticeOfDenial - 1],
+		'y' => $y - 6
+	};
+	$report->drawText($p, $properties);
+
+	my $arrX2 = [450,425];
+	
+	$properties =
+	{
+		'text' => "X",
+		'fontWidth' => DATA_FONT_SIZE,
+		'color' => DATA_FONT_COLOR,
+		'x' => $x + $arrX2->[$claim->{twcc60}->getNoticeOfDispute - 1],
+		'y' => $y - 28
+	};
+	$report->drawText($p, $properties);
+}
+
+sub box28Data
+{
+	my($self, $p, $claim, $x, $y, $report) = @_;
+	my $arrX = [86,128,161];
+	
+	my $properties =
+	{
+		'text' => "X",
+		'fontWidth' => DATA_FONT_SIZE,
+		'color' => DATA_FONT_COLOR,
+		'x' => $x + $arrX->[$claim->{twcc60}->getRespondentType - 1],
+		'y' => $y - 6
+	};
+	$report->drawText($p, $properties);
+}
+
+sub box29Data
+{
+	my($self, $p, $claim, $x, $y, $report) = @_;
+	$self->boxData($p, $claim, $x, $y, $report, $claim->{twcc60}->getRespondentName,
+				DATA_LEFT_PADDING, DATA_TOP_PADDING);
+}
+
+sub box30Data
+{
+	my($self, $p, $claim, $x, $y, $report) = @_;
+	$self->boxData($p, $claim, $x, $y, $report, $claim->{twcc60}->{respondentAddress}->getAddress1,
+				DATA_LEFT_PADDING, DATA_TOP_PADDING);
+}
+
+sub box31Data
+{
+	my($self, $p, $claim, $x, $y, $report) = @_;
+	$self->boxData($p, $claim, $x, $y, $report, $claim->{twcc60}->getRespondentContactName,
+				DATA_LEFT_PADDING, DATA_TOP_PADDING);
+}
+
+sub box32Data
+{
+	my($self, $p, $claim, $x, $y, $report) = @_;
+	$self->boxData($p, $claim, $x, $y, $report, 
+				substr($claim->{twcc60}->{respondentAddress}->getTelephoneNo, 0, 3) . "   " . substr($claim->{twcc60}->{respondentAddress}->getTelephoneNo, 3, 7),
+				DATA_LEFT_PADDING, DATA_TOP_PADDING);
+}
+
+sub box33Data
+{
+	my($self, $p, $claim, $x, $y, $report) = @_;
+	$self->boxData($p, $claim, $x, $y, $report, 
+				$claim->{twcc60}->{respondentAddress}->getCity,
+				DATA_LEFT_PADDING, DATA_TOP_PADDING);
+}
+
+sub box34Data
+{
+	my($self, $p, $claim, $x, $y, $report) = @_;
+	$self->boxData($p, $claim, $x, $y, $report, 
+				substr($claim->{twcc60}->{respondentAddress}->getFaxNo, 0, 3) . "   " . substr($claim->{twcc60}->{respondentAddress}->getFaxNo, 3, 7),
+				DATA_LEFT_PADDING, DATA_TOP_PADDING);
+}
+
+sub box35Data
+{
+	my($self, $p, $claim, $x, $y, $report) = @_;
+	$self->boxData($p, $claim, $x, $y, $report, $claim->{twcc60}->{respondentAddress}->getEmailAddress,
+				DATA_LEFT_PADDING, DATA_TOP_PADDING);
+}
+
+sub box36Data
+{
+	my($self, $p, $claim, $x, $y, $report) = @_;
+	$self->boxData($p, $claim, $x, $y, $report, $claim->{twcc60}->getRespondentFEIN,
+				DATA_LEFT_PADDING, DATA_TOP_PADDING);
+}
+
+sub box37Data
+{
+	my($self, $p, $claim, $x, $y, $report) = @_;
+	$self->boxData($p, $claim, $x, $y, $report, $claim->{twcc60}->getRespondentLicenseNo, 
+				DATA_LEFT_PADDING, DATA_TOP_PADDING);
+}
+
+sub box38Data
+{
+	my($self, $p, $claim, $x, $y, $report) = @_;
+	my $arrX = [139,105];
+	
+	my $properties =
+	{
+		'text' => "X",
+		'fontWidth' => DATA_FONT_SIZE,
+		'color' => DATA_FONT_COLOR,
+		'x' => $x + $arrX->[$claim->{twcc60}->getIssueResolved - 1],
+		'y' => $y - 6
+	};
+	$report->drawText($p, $properties);
+	
+	$properties =
+		{
+			'text' => $claim->{twcc60}->getIssueResolvedDesc,
+			'fontWidth' => DATA_FONT_SIZE,
+			'color' => DATA_FONT_COLOR,
+			'x' => $x + 3,
+			'y' => $y - 18
+		};
+	$report->drawText($p, $properties);
+}
+
 
 sub header_2
 {
@@ -1029,10 +1411,10 @@ sub header_2
 	$properties = {};
 	for my $i(0..5)
 	{
-		$report->drawBox($p,  $x + $i * BOX_WIDTH_2,  $y, BOX_WIDTH_2, BOX_HEAD_HEIGHT_2, LEFT_LINE, RIGHT_LINE, TOP_LINE, BOTTOM_LINE, $properties);
+		$report->drawBox($p,  $x + $i * BOX_WIDTH_2,  $y, BOX_WIDTH_2, BOX_HEAD_HEIGHT_2, LEFT_LINE, RIGHT_LINE, TOP_LINE, BOTTOM_LINE);
 	}
 	
-	for $i(0..1)
+	for my $i(0..1)
 	{
 		$report->drawBox($p,  $x + 6 * BOX_WIDTH_2 + $i * WIDE_BOX_WIDTH_2,  $y, WIDE_BOX_WIDTH_2, BOX_HEAD_HEIGHT_2, LEFT_LINE, RIGHT_LINE, TOP_LINE, BOTTOM_LINE, $properties);
 	}
@@ -1120,7 +1502,7 @@ sub footer_2
 		$report->drawText($p, $properties);
 	}	
 	
-	$properties = 
+	my $properties = 
 	{
 		'text' => "PLEASE TYPE OR PRINT - ALL INFORMATION MUST BE LEGIBLE",
 		'fontName' => 'Helvetica-Bold',
@@ -1145,5 +1527,19 @@ sub footer_2
 	}	
 }
 
+sub boxData
+{
+	my($self, $p, $claim, $x, $y, $report, $data, $xPadding, $yPadding) = @_;
+	
+	my $properties =
+	{
+		'text' => $data,
+		'fontWidth' => DATA_FONT_SIZE,
+		'color' => DATA_FONT_COLOR,
+		'x' => $x + $xPadding,
+		'y' => $y - $yPadding
+	};
+	$report->drawText($p, $properties);
+}
 
 1;

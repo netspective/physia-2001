@@ -21,6 +21,7 @@ use App::Billing::Claim::Address;
 use App::Billing::Claim::Payer;
 use App::Billing::Claim::Adjustment;
 use App::Billing::Claim::TWCC73;
+use App::Billing::Claim::TWCC60;
 use App::Billing::Validator;
 use App::Billing::Input::Validate::DBI;
 
@@ -1299,6 +1300,13 @@ sub assignInvoiceProperties
 	my $twcc73 = new App::Billing::Claim::TWCC73;
 	$claim->setTWCC73($twcc73);
 
+	my $twcc60 = new App::Billing::Claim::TWCC60;
+	my $requestorAddress = new App::Billing::Claim::Address;
+	$twcc60->setRequestorAddress($requestorAddress);
+	my $respondentAddress = new App::Billing::Claim::Address;
+	$twcc60->setRespondentAddress($respondentAddress);
+	$claim->setTWCC60($twcc60);
+	
 	$payToProvider->setType("pay to");
 	$renderingProvider->setType("rendering");
 	$payToOrganization->setType("pay to");
@@ -1624,6 +1632,20 @@ sub assignInvoiceProperties
 		'Invoice/TWCC73/23'  => [$twcc73,  \&App::Billing::Claim::TWCC73::setVisitType, COLUMNINDEX_VALUE_INT],
 		'Invoice/TWCC73/24'  => [$twcc73,  \&App::Billing::Claim::TWCC73::setDoctorRole, COLUMNINDEX_VALUE_INT],
 
+		'Invoice/TWCC60/1' => [$twcc60, [\&App::Billing::Claim::TWCC60::setRequestorType, \&App::Billing::Claim::TWCC60::setDisputeType], [COLUMNINDEX_VALUE_INT, COLUMNINDEX_VALUE_INTB]],
+		'Invoice/TWCC60/2' => [$twcc60, \&App::Billing::Claim::TWCC60::setRequestorName, COLUMNINDEX_VALUE_TEXT],
+		'Invoice/TWCC60/3' => [$requestorAddress, [\&App::Billing::Claim::Address::setAddress1, \&App::Billing::Claim::Address::setCity], [COLUMNINDEX_VALUE_TEXT, COLUMNINDEX_VALUE_TEXTB]],
+		'Invoice/TWCC60/4' => [[$twcc60, $requestorAddress], [\&App::Billing::Claim::TWCC60::setRequestorContactName, \&App::Billing::Claim::Address::setTelephoneNo], [COLUMNINDEX_VALUE_TEXT, COLUMNINDEX_VALUE_TEXTB]],
+		'Invoice/TWCC60/5' => [$requestorAddress, [\&App::Billing::Claim::Address::setFaxNo, \&App::Billing::Claim::Address::setEmailAddress], [COLUMNINDEX_VALUE_TEXT, COLUMNINDEX_VALUE_TEXTB]],
+		'Invoice/TWCC60/6' => [$twcc60, [\&App::Billing::Claim::TWCC60::setRequestorFEIN, \&App::Billing::Claim::TWCC60::setRequestorLicenseNo], [COLUMNINDEX_VALUE_TEXT, COLUMNINDEX_VALUE_TEXTB]],
+		'Invoice/TWCC60/22' => [$twcc60, [\&App::Billing::Claim::TWCC60::setNoticeOfDenial, \&App::Billing::Claim::TWCC60::setNoticeOfDispute], [COLUMNINDEX_VALUE_INT, COLUMNINDEX_VALUE_INTB]],
+		'Invoice/TWCC60/23' => [$twcc60, \&App::Billing::Claim::TWCC60::setRespondentType, COLUMNINDEX_VALUE_INT],
+		'Invoice/TWCC60/24' => [$twcc60, \&App::Billing::Claim::TWCC60::setRespondentName, COLUMNINDEX_VALUE_TEXT],
+		'Invoice/TWCC60/25' => [$respondentAddress, [\&App::Billing::Claim::Address::setAddress1, \&App::Billing::Claim::Address::setCity], [COLUMNINDEX_VALUE_TEXT, COLUMNINDEX_VALUE_TEXTB]],
+		'Invoice/TWCC60/26' => [[$twcc60, $respondentAddress], [\&App::Billing::Claim::TWCC60::setRespondentContactName, \&App::Billing::Claim::Address::setTelephoneNo], [COLUMNINDEX_VALUE_TEXT, COLUMNINDEX_VALUE_TEXTB]],
+		'Invoice/TWCC60/27' => [$respondentAddress, [\&App::Billing::Claim::Address::setFaxNo, \&App::Billing::Claim::Address::setEmailAddress], [COLUMNINDEX_VALUE_TEXT, COLUMNINDEX_VALUE_TEXTB]],
+		'Invoice/TWCC60/28' => [$twcc60, [\&App::Billing::Claim::TWCC60::setRespondentFEIN, \&App::Billing::Claim::TWCC60::setRespondentLicenseNo], [COLUMNINDEX_VALUE_TEXT, COLUMNINDEX_VALUE_TEXTB]],
+		'Invoice/TWCC60/29' => [$twcc60, [\&App::Billing::Claim::TWCC60::setIssueResolved, \&App::Billing::Claim::TWCC60::setIssueResolvedDesc], [COLUMNINDEX_VALUE_INT, COLUMNINDEX_VALUE_TEXT]],
 	};
 
 	my $queryStatment = qq
