@@ -72,3 +72,8 @@ alter table person_medication modify (dose number(20,6), quantity number(20,6));
 alter table person_medication_aud modify (dose number(20,6), quantity number(20,6));
 
 start tables-code/Person_Medication
+
+
+-- Semnet loading
+
+start pre/create_unique_person_id
