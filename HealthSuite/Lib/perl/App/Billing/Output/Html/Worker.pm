@@ -5,8 +5,6 @@ use strict;
 use vars qw(@ISA);
 @ISA = qw(App::Billing::Output::Html::Template);
 # this object is inherited from App::Billing::Output::Driver
-use Devel::ChangeLog;
-use vars qw(@CHANGELOG);
 use constant DATEFORMAT_USA => 1;
 use constant CLAIM_TYPE_WORKCOMP => 6;
 sub new
@@ -24,6 +22,7 @@ sub populateTemplate
 	$self->populatePhysician($claim);
 	$self->populateTreatment($claim);
 	$self->populateClaim($claim);
+	$self->populateOrganization($claim);
 	my $tb = $self->populateProcedures($claim, $procesedProc);
 	$self->populateDiagnosis($claim, $tb);
 	$self->concatSpace();
@@ -36,6 +35,7 @@ sub populatePatient
 	my $patientAddress = $patient->getAddress();
 	my $data = $self->{data};
 
+	$data->{patientAccountNo} = $patient->getAccountNo();
 	$data->{patientName} = $patient->getLastName() . " " . $patient->getFirstName() . " " . $patient->getMiddleInitial();
 	$data->{patientDateOfBirth} = $patient->getDateOfBirth(DATEFORMAT_USA);
 	$data->{patientSexM} = $patient->getSex() eq 'M' ? "Checked" : "";
@@ -136,16 +136,23 @@ sub populateClaim
 	$data->{claimProgramNameOther} = uc($claim->getProgramName) eq 'OTHER' ? "Checked" : "";
 	$data->{claimProgramNameFECA} = uc($claim->getProgramName) eq 'FECA' ? "Checked" : "";
 	$data->{claimTotalCharge} = $claim->getTotalCharge;
+	$data->{claimBalance} = $claim->getTotalCharge;
 	$data->{transProviderName} = $claim->getTransProviderName();
 	$data->{providerSignatureDate} = uc($claim->getInvoiceDate);
 
 }
 
-@CHANGELOG =
-(
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '02/16/2000', 'SSI', 'Billing Interface/PDF Claim','Procedure are displayed on descending order of charges. '],
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '04/19/2000', 'SSI', 'Billing Interface/PDF Claim','transFacilityId is added to reflect the box31 of HCFA. '],
+sub populateOrganization
+{
+	my ($self, $claim) = @_;
+	my $organization = $claim->getRenderingOrganization();
+	my $organizationAddress = $organization->getAddress();
+	my $data = $self->{data};
 
-);
+	$data->{organizationAddress} = $organizationAddress->getAddress1 . " " . $organizationAddress->getAddress2;
+	$data->{organizationCityStateZipCode} = $organizationAddress->getCity . " " . $organizationAddress->getState . " " . $organizationAddress->getZipCode;
+	$data->{organizationName} = $organization->getName;
+}
+
 
 1;

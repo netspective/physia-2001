@@ -5,10 +5,8 @@ use strict;
 use vars qw(@ISA);
 
 # this object is inherited from App::Billing::Output::Driver
-use Devel::ChangeLog;
 use App::Billing::Output::Html::Worker;
 
-use vars qw(@CHANGELOG);
 use constant DATEFORMAT_USA => 1;
 
 sub new
@@ -214,6 +212,8 @@ sub populatePatient
 	my ($self, $claim) = @_;
 	my $patient = $claim->getCareReceiver();
 	my $patientAddress = $patient->getAddress();
+	my $claimType = $claim->getClaimType();
+	my $insured = $claim->{insured}->[$claimType];
 	my $data = $self->{data};
 
 	$data->{patientName} = $patient->getLastName() . " " . $patient->getFirstName() . " " . $patient->getMiddleInitial();
@@ -227,10 +227,14 @@ sub populatePatient
 	$data->{patientAddressTelephone} = $patientAddress->getTelephoneNo();
 	$data->{patientAddressZipCode} = $patientAddress->getZipCode();
 	$data->{patientStatusEmployment} = $patient->getEmploymentStatus() ne "" ? "checked" : "";
-	$data->{patientInsuredRelationSelf} = (uc($patient->getRelationshipToInsured) =~ /01|1|SELF/) ? "checked" : "";
-	$data->{patientInsuredRelationSpouse} = (uc($patient->getRelationshipToInsured) =~ /02|2|SPOUSE/) ? "checked" : "";
-	$data->{patientInsuredRelationChild} = (uc($patient->getRelationshipToInsured) =~ /03|3|05|06|CHILD/) ? "checked" : "";
-	$data->{patientInsuredRelationOther} = (uc($patient->getRelationshipToInsured) =~ /04|4|07|08|09|10|11|12|13|14|15|16|17|18|19|50|99|OTHER/) ? "checked" : "";
+#	$data->{patientInsuredRelationSelf} = (uc($patient->getRelationshipToInsured) =~ /1|SELF/) ? "checked" : "";
+#	$data->{patientInsuredRelationSpouse} = (uc($patient->getRelationshipToInsured) =~ /2|SPOUSE/) ? "checked" : "";
+#	$data->{patientInsuredRelationChild} = (uc($patient->getRelationshipToInsured) =~ /3|5|6|CHILD/) ? "checked" : "";
+#	$data->{patientInsuredRelationOther} = (uc($patient->getRelationshipToInsured) =~ /4|7|8|9|10|11|12|13|14|15|16|17|18|19|50|99|OTHER/) ? "checked" : "";
+	$data->{patientInsuredRelationSelf} = (uc($insured->getRelationshipToPatient) =~ /1|SELF/) ? "checked" : "";
+	$data->{patientInsuredRelationSpouse} = (uc($insured->getRelationshipToPatient) =~ /2|SPOUSE/) ? "checked" : "";
+	$data->{patientInsuredRelationChild} = (uc($insured->getRelationshipToPatient) =~ /3|5|6|CHILD/) ? "checked" : "";
+	$data->{patientInsuredRelationOther} = (uc($insured->getRelationshipToPatient) =~ /4|7|8|9|10|11|12|13|14|15|16|17|18|19|50|99|OTHER/) ? "checked" : "";
 	$data->{patientStatusSingle} = uc(($patient->getStatus) =~ /S/) ? "checked" : "";
 	$data->{patientStatusMarried} = uc($patient->getStatus) =~ /M/ ? "checked" : "";
 	$data->{patientStatusOther} = uc($patient->getStatus) =~ /U|D|W|X|P/ ? "checked" : "";
@@ -541,12 +545,5 @@ sub diagnosisTable
 	return 	[\%diagTable, \@targetproc];
 }
 
-
-@CHANGELOG =
-(
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '02/16/2000', 'SSI', 'Billing Interface/PDF Claim','Procedure are displayed on descending order of charges. '],
-	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '04/19/2000', 'SSI', 'Billing Interface/PDF Claim','transFacilityId is added to reflect the box31 of HCFA. '],
-
-);
 
 1;

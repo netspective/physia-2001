@@ -9,8 +9,6 @@ use pdflib 2.01;
 
 use vars qw(@ISA);
 @ISA = qw(App::Billing::Output::PDF);
-use Devel::ChangeLog;
-use vars qw(@CHANGELOG);
 
 use constant CLAIM_TYPE_WORKCOMP => 6;
 
@@ -96,6 +94,7 @@ sub populate
 	$self->box7ClaimData($p, $Claim, $cordinates);
 	$self->box7aClaimData($p, $Claim, $cordinates);
 	$self->box7bClaimData($p, $Claim, $cordinates);
+	$self->box10ClaimData($p, $Claim, $cordinates);
 	$self->box11ClaimData($p, $Claim, $cordinates);
 	$self->box11dClaimData($p, $Claim, $cordinates);
 
@@ -107,9 +106,12 @@ sub populate
 	my $dg = $self->box24ClaimData($p, $Claim, $cordinates, $procesedProc);
 	$self->box21ClaimData($p, $Claim, $cordinates, $dg);
 	$self->box25ClaimData($p, $Claim, $cordinates);
+	$self->box26ClaimData($p, $Claim, $cordinates);
+	$self->box27ClaimData($p, $Claim, $cordinates);
 	$self->box28ClaimData($p, $Claim, $cordinates);
-#	$self->box29ClaimData($p, $Claim, $cordinates);
+	$self->box30ClaimData($p, $Claim, $cordinates);
 	$self->box31ClaimData($p, $Claim, $cordinates);
+	$self->box32ClaimData($p, $Claim, $cordinates);
 	$self->box33ClaimData($p, $Claim, $cordinates);
 	pdflib::PDF_setrgbcolor($p, FORM_RED, FORM_GREEN, FORM_BLUE);
 }
@@ -305,12 +307,6 @@ sub carrierData
 	}
 }
 
-@CHANGELOG =
-(
-    # [FLAGS, DATE, ENGINEER, CATEGORY, NOTE]
-
-#	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '12/16/1999', 'SSI', 'Billing Interface/PDF Claim', 'Name of PDF object fixed. Now it is PDF rather than pdflib.'],
-);
 
 1;
 
