@@ -333,7 +333,7 @@ sub redirect
 
 	if(my $curRedirect = $self->{page_redirect})
 	{
-		unless(defined $acceptDup && $acceptDup == 1)
+		unless(($curRedirect eq $redirect) || (defined $acceptDup && ($acceptDup == 1)))
 		{
 			my ($package, $filename, $line, $subroutine) = caller();
 		    $self->addError(qq{
