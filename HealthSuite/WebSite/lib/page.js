@@ -158,7 +158,11 @@ function getDialogData(fieldName, dataName)
 
 function processOnInit()
 {
-	setDialogHome()
+	// Comment this out because it needs work.  Need to handle hidden fields in the dialog.
+	// Cannot simply set focus to the "first" field because it may be hidden or of the type
+	// that does not accept focus.  TVN 1/22/2001.
+	// setDialogHome();
+	
 	return true;
 }
 
