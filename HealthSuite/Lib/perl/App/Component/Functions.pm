@@ -191,12 +191,6 @@ use constant CONTENT_HTML => qq{
 		<input type="radio" name="search_scope" value="drug/name" ondblclick="location.href='/search/'+this.value">Drug Name
 		<input type="radio" name="search_scope" value="drug/keyword" ondblclick="location.href='/search/'+this.value">Drug Keywords
 	</nobr><br>
-	<nobr>
-		<input type="radio" name="search_scope" value="research" ondblclick="location.href='/search/'+this.value">Research
-		<input type="radio" name="search_scope" value="web" ondblclick="location.href='/search/'+this.value">Web
-	</nobr>
-	<nobr><input type="radio" name="search_scope" value="supplies" ondblclick="location.href='/search/'+this.value">Medical Supplies</nobr>
-	<br>
 	<input name="search_expression"><input type="submit" value="Search">
 };
 
