@@ -1317,7 +1317,7 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 'org.billinginfo' => {
 	sqlStmt => qq{
 			select	pa.value_type, pa.item_id, pa.value_text, pa.value_textb, pa.value_int, %simpleDate:pa.value_date%,
-				decode(pa.value_int,0,'Unknown',1,'Per Se',2,'ThinNET','Other'),
+				decode(pa.value_int,0,'Unknown',1,'Per Se',2,'THINet','Other'),
 				decode(pa.value_textb,'1','Active','Inactive'),
 				pa.parent_id
 			from	Person_Attribute pa, Org o, Person_Org_Category poc
@@ -1327,7 +1327,7 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 			and	pa.value_type = @{[ App::Universal::ATTRTYPE_BILLING_INFO ]}
 			order by pa.value_int
 		},
-	sqlStmtBindParamDescr => ['Org ID for Billing Information'],
+	sqlStmtBindParamDescr => ['Org ID for Electronic Billing Information'],
 	publishDefn => {
 		columnDefn => [
 					{
@@ -1346,7 +1346,7 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 	{
 		# automatically inherites columnDefn and other items from publishDefn
 		style => 'panel',
-		frame => { heading => 'Billing Information' },
+		frame => { heading => 'Electronic Billing Information' },
 	},
 	publishDefn_panelTransp =>
 	{
@@ -1358,7 +1358,7 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 	{
 		# automatically inherites columnDefn and other items from publishDefn
 		style => 'panel.edit',
-		frame => { heading => 'Edit Billing Information' },
+		frame => { heading => 'Edit Electronic Billing Information' },
 		banner => {
 			actionRows =>
 			[

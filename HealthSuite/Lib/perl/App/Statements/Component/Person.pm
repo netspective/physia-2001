@@ -2241,14 +2241,14 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 'person.billinginfo' => {
 	sqlStmt => qq{
 			select	value_type, item_id, value_text, value_textb, value_int, %simpleDate:value_date%,
-				decode(value_int,0,'Unknown',1,'Per Se',2,'ThinNET','Other'),
+				decode(value_int,0,'Unknown',1,'Per Se',2,'THINet','Other'),
 				decode(value_textb,'1','Active','Inactive')
 			from	person_attribute
 			where	parent_id = ?
 			and	value_type = @{[ App::Universal::ATTRTYPE_BILLING_INFO ]}
 			order by value_int
 		},
-	sqlStmtBindParamDescr => ['Person ID for Billing Information'],
+	sqlStmtBindParamDescr => ['Person ID for Electronic Billing Information'],
 	publishDefn => {
 		columnDefn => [
 					{
@@ -2267,7 +2267,7 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 	{
 		# automatically inherites columnDefn and other items from publishDefn
 		style => 'panel',
-		frame => { heading => 'Billing Information' },
+		frame => { heading => 'Electronic Billing Information' },
 	},
 	publishDefn_panelTransp =>
 	{
@@ -2279,7 +2279,7 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 	{
 		# automatically inherites columnDefn and other items from publishDefn
 		style => 'panel.edit',
-		frame => { heading => 'Edit Billing Information' },
+		frame => { heading => 'Edit Electronic Billing Information' },
 		banner => {
 			actionRows =>
 			[
