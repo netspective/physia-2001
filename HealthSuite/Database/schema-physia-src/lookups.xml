@@ -39,8 +39,9 @@
 		<enum id="0">Primary</enum>
 		<enum id="1">Secondary</enum>
 		<enum id="2">Alternate</enum>
+		<enum id="4">Billing</enum>
 	</table>
-
+	
 	<table name="Person_Type" type="Lookup">
 		<enum id="0">Patient</enum>
 		<enum id="1" group_name="staff">Physician</enum>
