@@ -593,6 +593,12 @@ $STMTMGR_INVOICE = new App::Statements::Invoice(
 			where parent_id = ?
 			and item_name = 'Prior Authorization Number'
 		},
+	'selInvoiceMedicaidResubNumber' => q{
+		select item_id as resub_number_item_id, value_text as resub_number
+			from invoice_attribute
+			where parent_id = ?
+			and item_name = 'Medicaid/Resubmission'
+		},
 	'selInvoiceDeductible' => q{
 		select item_id as deduct_item_id, value_text as deduct_balance
 			from invoice_attribute
