@@ -172,6 +172,20 @@ $STMTMGR_APPOINTMENT_SEARCH = new App::Statements::Search::Appointment(
 		orderBy => 'ORDER BY upper(patient.name_last), upper(patient.name_first), upper(patient.name_middle)',
 	},
 
+	'sel_appointment_orderbyAccount' =>
+		{
+			sqlStmt => $STMTFMT_SEL_APPOINTMENT,
+			publishDefn => $STMTRPTDEFN_DEFAULT,
+			orderBy => 'ORDER BY upper(account_number)',
+	},
+
+	'sel_appointment_orderbyChart' =>
+		{
+			sqlStmt => $STMTFMT_SEL_APPOINTMENT,
+			publishDefn => $STMTRPTDEFN_DEFAULT,
+			orderBy => 'ORDER BY upper(chart_number) ',
+	},
+
 );
 
 1;
