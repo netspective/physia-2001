@@ -1,5 +1,5 @@
 # 
-# $Header: /home/engineer/cvs2git/physia/HealthSuite/Database/dbserver/initSDEDBS03.ora,v 1.1 2000-05-01 21:00:18 alex_hillman Exp $ 
+# $Header: /home/engineer/cvs2git/physia/HealthSuite/Database/dbserver/initSDEDBS03.ora,v 1.2 2000-09-01 17:01:53 alex_hillman Exp $ 
 # 
 # Copyright (c) 1991, 1997, 1998 by Oracle Corporation
 # NAME
@@ -81,19 +81,21 @@ db_files = 80                                                         # SMALL
 # db_files = 400                                                      # MEDIUM 
 # db_files = 1500 
 
-db_block_size = 16384
+db_block_size = 8192
 
-db_file_multiblock_read_count = 8                                     # SMALL  
+db_file_multiblock_read_count = 16                                     # SMALL  
 # db_file_multiblock_read_count = 16                                  # MEDIUM 
 # db_file_multiblock_read_count = 32                                  # LARGE  
 
 # db_block_buffers = 100                                              # SMALL  
 # db_block_buffers = 550                                              # MEDIUM 
- db_block_buffers = 5000                                             # LARGE  
+ db_block_buffers = 10000                                             # LARGE  
 
 #shared_pool_size = 3500000                                            # SMALL
 # shared_pool_size = 5000000                                          # MEDIUM
- shared_pool_size = 100000000                                          # LARGE
+ shared_pool_size = 80000000                                          # LARGE
+ 
+ java_pool_size = 1048576
 
 log_checkpoint_interval = 10000
 
@@ -109,19 +111,18 @@ log_checkpoint_interval = 10000
 # log_buffer = 32768                                                  # MEDIUM
  log_buffer = 163840                                                 # LARGE
 
-# audit_trail = true            # if you want auditing
+audit_trail = DB            # if you want auditing
 # timed_statistics = true       # if you want timed statistics
 max_dump_file_size = 10240      # limit trace file size to 5 Meg each
 
 # Uncommenting the line below will cause automatic archiving if archiving has
 # been enabled using ALTER DATABASE ARCHIVELOG.
 log_archive_start = true      
-log_archive_dest = /home/u01/app/oracle/admin/SDEDBS03/arch/
- log_archive_format = "T%TS%S.ARC"
+log_archive_dest = /share/app/oracle/admin/SDEDBS03/arch/
+log_archive_format = "SDEDBS03_%T%S.ARC"
 
-background_dump_dest = /home/u01/app/oracle/admin/SDEDBS03/bdump/
-user_dump_dest = /home/u01/app/oracle/admin/SDEDBS03/udump
-core_dump_dest = /home/u01/app/oracle/admin/SDEDBS03/bdump
+background_dump_dest = /share/app/oracle/admin/SDEDBS03/bdump/
+user_dump_dest = /share/app/oracle/admin/SDEDBS03/udump
 
 # If using private rollback segments, place lines of the following
 # form in each of your instance-specific init.ora files:
@@ -135,7 +136,7 @@ core_dump_dest = /home/u01/app/oracle/admin/SDEDBS03/bdump
 # transactions_per_rollback_segment = 5 
 
 # Global Naming -- enforce that a dblink has same name as the db it connects to
-# global_names = TRUE
+global_names = FALSE
 
 # Edit and uncomment the following line to provide the suffix that will be
 # appended to the db_name parameter (separated with a dot) and stored as the
@@ -145,16 +146,9 @@ core_dump_dest = /home/u01/app/oracle/admin/SDEDBS03/bdump
 
  db_domain = physia.com 	# global database name is db_name.db_domain
 
-# FOR DEVELOPMENT ONLY, ALWAYS TRY TO USE SYSTEM BACKING STORE
-# vms_sga_use_gblpagfil = TRUE
-
-# FOR BETA RELEASE ONLY.  Enable debugging modes.  Note that these can 
-# adversely affect performance.  On some non-VMS ports the db_block_cache_* 
-# debugging modes have a severe effect on performance. 
-
 # define two control files by default
-control_files = (/home/u01/app/oradata/SDEDBS03/control_01.dbf,
-                 /u02/oradata/SDEDBS03/control_02.dbf)
+control_files = (/u03/oradata/SDEDBS03/control_01.ctl,
+                 /u02/oradata/SDEDBS03/control_02.ctl)
 
 # Uncomment the following line if you wish to enable the Oracle Trace product
 # to trace server activity.  This enables scheduling of server collections
@@ -169,8 +163,12 @@ control_files = (/home/u01/app/oradata/SDEDBS03/control_01.dbf,
 # features. Please remember that using them may require some downgrade
 # actions if you later decide to move back to 8.0.
 
-compatible = 8.1.5
+compatible = 8.1.6
 
 open_cursors = 500
 
 utl_file_dir = *
+
+job_queue_processes = 2
+
+
