@@ -106,6 +106,7 @@ sub initialize
 						nextActions_add => [
 							['Add Insurance Coverage', "/person/%field.person_id%/dlg-add-ins-coverage?_f_product_name=%field.product_name%&_f_ins_org_id=%field.ins_org_id%&_f_plan_name=%field.plan_name%", 1],
 							['View Patient Summary', "/person/%field.person_id%/profile"],
+							['Add Referral', '/person/%field.person_id%/dlg-add-referral'],
 							['Add Another Patient', '/org/#session.org_id#/dlg-add-patient'],
 							['Go to Search', "/search/person/id/%field.person_id%"],
 							['Return to Home', "/person/#session.user_id#/home"],

@@ -507,7 +507,7 @@ sub execute_add
 			_debug => 0
 	) if $page->field('provider_identif_num') ne '';
 
-	#$self->handleContactInfo($page, $command, $flags, 'physician');
+	$self->handleContactInfo($page, $command, $flags, 'Physician');
 }
 
 sub execute_update
