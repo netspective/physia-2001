@@ -343,6 +343,7 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 			from 	person_attribute
 			where	parent_id = ?
 			and 	value_type = @{[ App::Universal::ATTRTYPE_EMERGENCY ]}
+			and 	item_name != 'Guarantor'
 		},
 				#UNION ALL
 			#					select 0 as value_type, 1 as item_id, 'a' as item_name, value_text as value_text, 'b' as value_textb, person_id
@@ -646,6 +647,7 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 			from insurance
 			where record_type = 3
 			and owner_person_id = ?
+			order by bill_sequence
 
 			},
 			#select 	decode(bill_sequence,0,'Inactive',1,'Primary',2,'Secondary',3,'Tertiary','','W. Comp'),
