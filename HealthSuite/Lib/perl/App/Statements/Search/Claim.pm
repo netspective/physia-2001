@@ -42,10 +42,8 @@ $STMTFMT_SEL_CLAIM = qq{
 			%tables%
 		WHERE
 			%whereCond%
-			AND iit.parent_id (+) = i.invoice_id			
-			AND ib.invoice_id = i.invoice_id
-			AND ib.invoice_item_id IS NULL
-			AND ib.bill_sequence = 1
+			AND iit.parent_id (+) = i.invoice_id
+			AND ib.bill_id = i.billing_id
 			AND (owner_type = 1 AND owner_id = ?)
 			AND iis.id = i.invoice_status
 			AND to_char(o.org_internal_id (+)) = ib.bill_to_id
