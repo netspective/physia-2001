@@ -67,7 +67,7 @@ my %insTemplates = (
 	'sel_product' =>
 		{
 			_stmtFmt => $STMTFMT_SEL_INSURANCE,
-			whereCond => 'upper(ins.product_name) = ?',
+			whereCond => qq{upper(ins.product_name) = replace(?, '%20', ' ')},
 			publishDefn => $STMTRPTDEFN_DEFAULT,
 		},
 	'sel_product_like' =>
