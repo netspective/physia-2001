@@ -886,7 +886,7 @@ sub isValid
 	my ($self, $page, $validator, $valFlags) = @_;
 
 	my $payType = $page->field('pay_type');
-	my $paidBy = $page->param('paidBy');
+	my $paidBy = $page->param('paidBy') || 'personal';
 	return if $payType == App::Universal::ADJUSTMENTPAYTYPE_PREPAY && $paidBy eq 'personal';
 
 	my $formatter = new Number::Format('INT_CURR_SYMBOL' => '$');
@@ -997,9 +997,9 @@ sub getHtml
 	}
 
 	#get invoice items which can have payments applied to them
-	my $linesHtml = '';
+	my $linesHtml;
 	my $invoiceId = $page->param('invoice_id') || $page->field('sel_invoice_id');
-	my $paidBy = $page->param('paidBy');
+	my $paidBy = $page->param('paidBy') || 'personal';
 	my $outstandItems = $paidBy eq 'insurance' ?
 		$STMTMGR_INVOICE->getRowsAsHashList($page, STMTMGRFLAG_CACHE, 'selInvoiceProcedureItems', $invoiceId, App::Universal::INVOICEITEMTYPE_SERVICE, App::Universal::INVOICEITEMTYPE_LAB)
 		: $STMTMGR_INVOICE->getRowsAsHashList($page, STMTMGRFLAG_CACHE, 'selInvoiceItems', $invoiceId);

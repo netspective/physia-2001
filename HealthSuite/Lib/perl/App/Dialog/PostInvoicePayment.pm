@@ -140,7 +140,7 @@ sub makeStateChanges
 	my $invoiceId = $page->param('invoice_id') || $page->param('_sel_invoice_id') || $page->field('sel_invoice_id');
 	my $invoiceInfo = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoice', $invoiceId);
 
-	my $paidBy = $page->param('paidBy');
+	my $paidBy = $page->param('paidBy') || 'personal';
 	my $isPersonal = $paidBy eq 'personal';
 	my $isInsurance = $paidBy eq 'insurance';
 
