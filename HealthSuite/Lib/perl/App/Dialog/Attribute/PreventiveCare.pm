@@ -6,6 +6,7 @@ use DBI::StatementManager;
 use App::Statements::Invoice;
 use App::Statements::Person;
 use App::Statements::Catalog;
+use App::Statements::Transaction;
 use strict;
 use Carp;
 use CGI::Dialog;
@@ -13,6 +14,7 @@ use App::Dialog::Field::Attribute;
 use CGI::Validator::Field;
 use App::Universal;
 use Date::Manip;
+use Date::Calc qw(:all);
 use vars qw(@ISA %RESOURCE_MAP);
 
 @ISA = qw(CGI::Dialog);
@@ -105,20 +107,54 @@ sub execute
 	$page->field('cpt_name',$cptCodeName);
 	#my $cptCodeName = $page->field('cpt_name');
 
+	my $itemId = $page->schemaAction(
+						'Person_Attribute', $command,
+						parent_id => $page->param('person_id'),
+						item_id => $page->param('item_id') || undef,
+						item_name => $page->field('attr_name') || undef,
+						value_type => $self->{valueType} || undef,
+						value_date => $page->field('value_date') || undef,
+						value_text => $page->field('value_text') || undef,
+						value_textB => $page->field('cpt_name') || undef,
+						value_dateEnd => $page->field('value_dateend') || undef,
+						value_int => $page->field('frequency') || undef,
+						value_intB => $page->field('measure') || undef,
+						_debug => 0
+					);
+
+	my $dataTextB = $command eq 'add' ? $itemId : $page->param('item_id');
+
+	my $todayDate = Date_to_Days(Decode_Date_US2($page->getDate()));
+
+	my $dueDate = Date_to_Days(Decode_Date_US2($page->field('value_dateend')));
+
+
+	my $test = $dueDate - $todayDate;
+	my $transStatus = $dueDate >= $todayDate ?
+							App::Universal::TRANSSTATUS_ACTIVE : App::Universal::TRANSSTATUS_INACTIVE;
+
+	my $transData = $STMTMGR_TRANSACTION->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selByDataTextB', $dataTextB, $page->param('person_id'));
+
+	my $transId = $command ne 'add' ? $transData->{trans_id} : undef;
 	$page->schemaAction(
-		'Person_Attribute', $command,
-		parent_id => $page->param('person_id'),
-		item_id => $page->param('item_id') || undef,
-		item_name => $page->field('attr_name') || undef,
-		value_type => $self->{valueType} || undef,
-		value_date => $page->field('value_date') || undef,
-		value_text => $page->field('value_text') || undef,
-		value_textB => $page->field('cpt_name') || undef,
-		value_dateEnd => $page->field('value_dateend') || undef,
-		value_int => $page->field('frequency') || undef,
-		value_intB => $page->field('measure') || undef,
-		_debug => 0
-	);
+			'Transaction', $command,
+			trans_id => $transId || undef,
+			trans_owner_type => 0,
+			trans_owner_id => $page->param('person_id') || undef,
+			trans_type => App::Universal::TRANSTYPE_ALERTMEDICATION,
+			trans_subtype => 'Medium' || undef,
+			caption => 'Preventive Care' || undef,
+			detail => $page->field('attr_name') || undef,
+			trans_status => $transStatus || undef,
+			initiator_id => $page->session('user_id') || undef,
+			initiator_type => 0,
+			trans_status => $transStatus,
+			trans_begin_stamp => $page->field('value_date') || undef,
+			trans_end_stamp => $page->field('value_dateend') || undef,
+			data_text_b => $dataTextB || undef,
+			_debug => 0
+	) if $command eq 'add' || $transData->{trans_id} ne '';
+
 	$self->handlePostExecute($page, $command, $flags | CGI::Dialog::DLGFLAG_IGNOREREDIRECT);
 	return "\u$command completed.";
 }
