@@ -88,11 +88,14 @@ sub inboxQuery
 	my $self = shift;
 	my $sqlGen = new SQL::GenerateQuery(file => $QDL);
 
-	my $cond1 = $sqlGen->WHERE('doc_spec_type', 'is', App::Universal::DOCSPEC_INTERNAL);
-	my $cond2 = $sqlGen->WHERE('recipient_id', 'is', $self->session('person_id'));
-	my $cond3 = $sqlGen->WHERE('recipient_status', 'isnot', 2);
+	my @conditions = ();
+	
+	push(@conditions, $sqlGen->WHERE('doc_spec_type', 'is', App::Universal::DOCSPEC_INTERNAL));
+	push(@conditions, $sqlGen->WHERE('recipient_id', 'is', $self->session('person_id')));
+	push(@conditions, $sqlGen->WHERE('recipient_status', 'isnot', 2));
+	push(@conditions, $sqlGen->WHERE('owner_org_id', 'is', $self->session('org_internal_id')));
 
-	my $finalCond = $sqlGen->AND($cond1, $cond2, $cond3);
+	my $finalCond = $sqlGen->AND(@conditions);
 	$finalCond->outColumns(
 		'message_id',
 		'doc_spec_subtype',

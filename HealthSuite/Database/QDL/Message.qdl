@@ -27,6 +27,7 @@
 		<field id="permed_id" caption="Person Medication ID" join="message_doc" column="doc_data_a"/>
 		<field id="priority" caption="Priority" join="message_doc" column="doc_data_b"/>
 		<field id="to_ids" caption="To" join="message_doc" column="doc_dest_ids"/>
+		<field id="owner_org_id" join="message_doc" column="cr_org_internal_id"/>
 		
 		<!-- Joins -->
 		<join id="message_doc" table="document"/>

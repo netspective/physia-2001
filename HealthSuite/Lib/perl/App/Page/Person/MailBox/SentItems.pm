@@ -89,10 +89,15 @@ sub sentItemsQuery
 	my $self = shift;
 	my $sqlGen = new SQL::GenerateQuery(file => $QDL);
 
-	my $cond1 = $sqlGen->WHERE('doc_spec_type', 'is', App::Universal::DOCSPEC_INTERNAL);
-	my $cond2 = $sqlGen->WHERE('from_id', 'is', $self->session('person_id'));
-	my $cond3 = $sqlGen->AND($cond1, $cond2);
-	$cond3->outColumns(
+	my @conditions = ();
+	
+	push(@conditions, $sqlGen->WHERE('doc_spec_type', 'is', App::Universal::DOCSPEC_INTERNAL));
+	push(@conditions, $sqlGen->WHERE('from_id', 'is', $self->session('person_id')));
+	push(@conditions, $sqlGen->WHERE('owner_org_id', 'is', $self->session('org_internal_id')));
+		
+	my $finalCond = $sqlGen->AND(@conditions);
+	
+	$finalCond->outColumns(
 		'priority',
 		'message_id',
 		'doc_spec_subtype',
@@ -104,9 +109,9 @@ sub sentItemsQuery
 		"TO_CHAR({date_sent},'IYYYMMDDHH24MISS')",
 		'to_ids',
 	);
-	$cond3->orderBy({id => 'date_sent', order => 'Descending'});
-	$cond3->distinct(1);
-	return $cond3;
+	$finalCond->orderBy({id => 'date_sent', order => 'Descending'});
+	$finalCond->distinct(1);
+	return $finalCond;
 }
 	
 
