@@ -6,12 +6,44 @@ use strict;
 use Exporter;
 use DBI::StatementManager;
 use App::Universal;
-use vars qw(@ISA @EXPORT $STMTMGR_REPORT_ACCOUNTING $STMTFMT_SEL_RECEIPT_ANALYSIS $STMTRPTDEFN_DEFAULT);
+use vars qw(@ISA @EXPORT $STMTMGR_REPORT_ACCOUNTING $STMTFMT_SEL_RECEIPT_ANALYSIS $STMTRPTDEFN_DEFAULT $STMTMGR_AGED_PATIENT_ORG_PROV);
 @ISA    = qw(Exporter DBI::StatementManager);
-@EXPORT = qw($STMTMGR_REPORT_ACCOUNTING );
+@EXPORT = qw($STMTMGR_REPORT_ACCOUNTING $STMTMGR_AGED_PATIENT_ORG_PROV);
 
-my $FILLED =App::Universal::TRANSSTATUS_FILLED;        
-my $PAYMENT	=App::Universal::TRANSTYPEACTION_PAYMENT; 
+my $FILLED =App::Universal::TRANSSTATUS_FILLED;
+my $PAYMENT	=App::Universal::TRANSTYPEACTION_PAYMENT;
+
+$STMTMGR_AGED_PATIENT_ORG_PROV = qq
+{
+	SELECT 	a.person_id person_ID ,
+		count(distinct a.invoice_id),
+		sum(balance_0),
+		sum(balance_31),
+		sum(balance_61),
+		sum(balance_91),
+		sum(balance_121),
+		sum(balance_151),
+		sum(decode(item_type,3,total_pending,0)),
+		sum(total_pending),
+		p.complete_name person_name
+	FROM	agedpayments a, person p, transaction t, invoice i
+	WHERE	(a.person_id = :1 or :1 is NULL)
+	AND 	(a.invoice_item_id is NULL  or a.item_type in (3) )
+	AND	a.bill_party_type in (0,1)
+	AND a.balance > 0
+	AND p.person_id = a.person_id
+	AND	a.person_id IN
+	(
+	 SELECT poc.person_id
+	 FROM 	person_org_category poc
+	 WHERE  org_internal_id = :2
+	)
+	and i.invoice_id = a.invoice_id
+	and t.trans_id = i.main_transaction
+	%whereClause%
+	GROUP BY a.person_id, p.complete_name
+	having sum(total_pending)> 0
+};
 
 $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
 'procAnalysis' => {
@@ -24,15 +56,15 @@ $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
 			sum(i.units) units,
 			i.invoice_date,
 			trunc(invoice_date,'MM') as month_date,
-			trunc(invoice_date,'YYYY') as year_date					
+			trunc(invoice_date,'YYYY') as year_date
 			from invoice_charges i
 			where (:1 IS NULL OR provider= :1 )
 			AND (i.invoice_date) BETWEEN to_date(:2,'MM/DD/YYYY')
 			AND to_date(:3,'MM/DD/YYYY')
 			AND (:4 IS NULL OR :4 = i.facility)
 			AND (:5 IS NULL OR :5 <=i.code)
-			AND (:6 is NULL OR :6 >=i.code)			
-			AND owner_org_id = :7			
+			AND (:6 is NULL OR :6 >=i.code)
+			AND owner_org_id = :7
 			group by nvl(i.code,'UNK'),trunc(invoice_date,'MM') ,trunc(invoice_date,'YYYY') ,i.invoice_date,
 			provider,trans_type
 			order by 1,2,7 asc
@@ -54,8 +86,8 @@ $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
 				invoice_date ,
 				(nvl(insurance_pay,0)+nvl(person_pay,0)) as rcpt,
 				trunc(invoice_date,'MM') as month_date,
-				trunc(invoice_date,'YYYY') as year_date				
-			FROM 	invoice_charges ic		
+				trunc(invoice_date,'YYYY') as year_date
+			FROM 	invoice_charges ic
 			WHERE 	(:1 IS NULL OR provider = :1)
 			AND	(:2 IS NULL OR upper(pay_type) = upper(:2))
 			AND	(:3 IS NULL OR batch_id = :3)
@@ -67,7 +99,7 @@ $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
 			SELECT (SELECT simple_name FROM person WHERE person_id = t.provider_id) as provider,
 				to_number(NULL) as invoice_id,
 				'Cap Insurance Receipts' as category,
-				nvl(nvl(data_text_b,data_text_a),'UNK') as payer_name,				
+				nvl(nvl(data_text_b,data_text_a),'UNK') as payer_name,
 				'Check' as pay_type,
 				value_date,
 				unit_cost as rcpt,
@@ -77,19 +109,19 @@ $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
 			WHERE 	t.trans_id = ta.parent_id
 			AND	ta.item_name = 'Monthly Cap/Payment/Batch ID'
 			AND	trans_type = $PAYMENT
-			AND	trans_status =$FILLED 
+			AND	trans_status =$FILLED
 			AND	(:1 IS NULL OR  provider_id = :1)
 			AND	(:2 IS NULL OR 'CHECK' = upper(:2))
 			AND	(:3 IS NULL OR	ta.value_text = :3)
 			AND	ta.value_date between to_date(:4,'$SQLSTMT_DEFAULTDATEFORMAT')
 			AND 	to_date(:5,'$SQLSTMT_DEFAULTDATEFORMAT')
 			AND	EXISTS
-				(SELECT 1 FROM org where org_internal_id = t.receiver_id AND owner_org_id = :6) 
+				(SELECT 1 FROM org where org_internal_id = t.receiver_id AND owner_org_id = :6)
 			AND	provider_id is not null
 			ORDER BY 1,3,5,6
 		}
 	},
-	
+
 	'sel_financial_monthly' =>
 	{
 		sqlStmt =>
@@ -188,7 +220,7 @@ $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
 		sqlStmt =>
 		qq
 		{
-			SELECT 	person_id person_ID ,
+			SELECT 	a.person_id person_ID ,
 			count(distinct invoice_id),
 				sum(balance_0),
 				sum(balance_31),
@@ -197,19 +229,21 @@ $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
 				sum(balance_121),
 				sum(balance_151),
 				sum(decode(item_type,3,total_pending,0)),
-				sum(total_pending)
-			FROM	agedpayments a
+				sum(total_pending),
+				p.complete_name person_name
+			FROM	agedpayments a, person p
 			WHERE	(a.person_id = :1 or :1 is NULL)
 			AND 	(invoice_item_id is NULL  or item_type in (3) )
 			AND	bill_party_type in (0,1)
 			AND 	a.balance > 0
-			AND	person_id IN
+			AND p.person_id = a.person_id
+			AND	a.person_id IN
 			(
-			 SELECT person_id
-			 FROM 	person_org_category
+			 SELECT poc.person_id
+			 FROM 	person_org_category poc
 			 WHERE  org_internal_id = :2
-			 ) 
-			GROUP BY person_id
+			)
+			GROUP BY a.person_id, p.complete_name
 			having sum(total_pending)> 0
 		},
 		sqlStmtBindParamDescr => ['Org Insurance ID'],
@@ -218,7 +252,7 @@ $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
 			reportTitle => 'Aged Patient Receivables',
 			columnDefn =>
 				[
-				{ colIdx => 0, head => 'Patient ID', dataFmt => '<A HREF = "/person/#0#/account">#0#</A>' },
+				{ colIdx => 0, head => 'Patient', dataFmt => '#10# <A HREF = "/person/#0#/account">#0#</A>' },
 				{ colIdx => 1, head => 'Total Invoices',tAlign=>'center', summarize=>'sum',dataFmt => '#1#',dAlign =>'center' },
 				{ colIdx => 2, head => '0 - 30',summarize=>'sum', dataFmt => '#2#', dformat => 'currency' },
 				{ colIdx => 3, head => '31 - 60', summarize=>'sum',dataFmt => '#3#', dformat => 'currency' },
@@ -231,24 +265,96 @@ $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
 				],
 			},
 	},
-	
+
+	'sel_aged_patient_prov' =>
+	{
+		sqlStmt => $STMTMGR_AGED_PATIENT_ORG_PROV,
+
+		whereClause => 'and t.care_provider_id = :3',
+
+		publishDefn =>
+			{
+			columnDefn =>
+				[
+				{ colIdx => 0, head => 'Patient', dataFmt => '#10# <A HREF = "/person/#0#/account">#0#</A>' },
+				{ colIdx => 1, head => 'Total Invoices',tAlign=>'center', summarize=>'sum',dataFmt => '#1#',dAlign =>'center' },
+				{ colIdx => 2, head => '0 - 30',summarize=>'sum', dataFmt => '#2#', dformat => 'currency' },
+				{ colIdx => 3, head => '31 - 60', summarize=>'sum',dataFmt => '#3#', dformat => 'currency' },
+				{ colIdx => 4, head => '61 - 90', summarize=>'sum',dataFmt => '#4#', dformat => 'currency' },
+				{ colIdx => 5, head => '91 - 120',summarize=>'sum', dataFmt => '#5#', dformat => 'currency' },
+				{ colIdx => 6, head => '121 - 150',summarize=>'sum', dataFmt => '#6#', dformat => 'currency' },
+				{ colIdx => 7, head => '151+', summarize=>'sum',dataFmt => '#7#', dformat => 'currency' },
+				{ colIdx => 8, head => 'Co-Pay Owed', summarize=>'sum',dataFmt => '#7#', dformat => 'currency' },
+				{ colIdx => 9, head => 'Total Pending', summarize=>'sum',dataFmt => '#8#', dAlign => 'center', dformat => 'currency' },
+				],
+			},
+	},
+
+	'sel_aged_patient_org' =>
+	{
+		sqlStmt => $STMTMGR_AGED_PATIENT_ORG_PROV,
+
+		whereClause => 'and t.service_facility_id = :3',
+
+		publishDefn =>
+			{
+			columnDefn =>
+				[
+				{ colIdx => 0, head => 'Patient', dataFmt => '#10# <A HREF = "/person/#0#/account">#0#</A>' },
+				{ colIdx => 1, head => 'Total Invoices',tAlign=>'center', summarize=>'sum',dataFmt => '#1#',dAlign =>'center' },
+				{ colIdx => 2, head => '0 - 30',summarize=>'sum', dataFmt => '#2#', dformat => 'currency' },
+				{ colIdx => 3, head => '31 - 60', summarize=>'sum',dataFmt => '#3#', dformat => 'currency' },
+				{ colIdx => 4, head => '61 - 90', summarize=>'sum',dataFmt => '#4#', dformat => 'currency' },
+				{ colIdx => 5, head => '91 - 120',summarize=>'sum', dataFmt => '#5#', dformat => 'currency' },
+				{ colIdx => 6, head => '121 - 150',summarize=>'sum', dataFmt => '#6#', dformat => 'currency' },
+				{ colIdx => 7, head => '151+', summarize=>'sum',dataFmt => '#7#', dformat => 'currency' },
+				{ colIdx => 8, head => 'Co-Pay Owed', summarize=>'sum',dataFmt => '#7#', dformat => 'currency' },
+				{ colIdx => 9, head => 'Total Pending', summarize=>'sum',dataFmt => '#8#', dAlign => 'center', dformat => 'currency' },
+				],
+			},
+	},
+
+	'sel_aged_patient_prov_org' =>
+	{
+		sqlStmt => $STMTMGR_AGED_PATIENT_ORG_PROV,
+
+		whereClause => 'and t.care_provider_id = :3 and t.service_facility_id = :4',
+
+		publishDefn =>
+			{
+			columnDefn =>
+				[
+				{ colIdx => 0, head => 'Patient', dataFmt => '#10# <A HREF = "/person/#0#/account">#0#</A>' },
+				{ colIdx => 1, head => 'Total Invoices',tAlign=>'center', summarize=>'sum',dataFmt => '#1#',dAlign =>'center' },
+				{ colIdx => 2, head => '0 - 30',summarize=>'sum', dataFmt => '#2#', dformat => 'currency' },
+				{ colIdx => 3, head => '31 - 60', summarize=>'sum',dataFmt => '#3#', dformat => 'currency' },
+				{ colIdx => 4, head => '61 - 90', summarize=>'sum',dataFmt => '#4#', dformat => 'currency' },
+				{ colIdx => 5, head => '91 - 120',summarize=>'sum', dataFmt => '#5#', dformat => 'currency' },
+				{ colIdx => 6, head => '121 - 150',summarize=>'sum', dataFmt => '#6#', dformat => 'currency' },
+				{ colIdx => 7, head => '151+', summarize=>'sum',dataFmt => '#7#', dformat => 'currency' },
+				{ colIdx => 8, head => 'Co-Pay Owed', summarize=>'sum',dataFmt => '#7#', dformat => 'currency' },
+				{ colIdx => 9, head => 'Total Pending', summarize=>'sum',dataFmt => '#8#', dAlign => 'center', dformat => 'currency' },
+				],
+			},
+	},
+
 	'selGetVisit' =>qq
 	{
-		SELECT 	sum (decode(t.trans_type ,2000,1,2010,1,2040,1,2050,1,2060,1,2070,1,2080,1,2090,1,2100,1,2120,1,2130,1,2160,1,2170,1,2180,1,0)) 
-			as office_visit,                               
+		SELECT 	sum (decode(t.trans_type ,2000,1,2010,1,2040,1,2050,1,2060,1,2070,1,2080,1,2090,1,2100,1,2120,1,2130,1,2160,1,2170,1,2180,1,0))
+			as office_visit,
 			sum (decode(t.trans_type,2020,1,0)) as hospital_visit
 		FROM	transaction t, invoice i, invoice_attribute ia,org o
 		WHERE	i.main_transaction = t.trans_id
 		AND	ia.parent_id = i.invoice_id
 		AND	ia.item_name = 'Invoice/Creation/Batch ID'
 		AND	(invoice_status !=15 or parent_invoice_id is null)
-		AND 	o.org_internal_id = t.service_facility_id		
+		AND 	o.org_internal_id = t.service_facility_id
 		AND	ia.value_date between to_date(:1,'$SQLSTMT_DEFAULTDATEFORMAT')
                 AND 	to_date(:2,'$SQLSTMT_DEFAULTDATEFORMAT')
                 AND 	(:3 is NULL OR t.service_facility_id = :3 )
 		AND	t.provider_id = :4
                 AND 	(ia.value_text >= :5 OR :5 is NULL)
-                AND 	(ia.value_text <= :6 OR :6 is NULL)		
+                AND 	(ia.value_text <= :6 OR :6 is NULL)
 		AND 	o.owner_org_id = :7
 	},
 	'sel_revenue_collection' => qq{
@@ -263,7 +369,7 @@ $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
                 sum(nvl(cap_pmt,0)++ nvl(cap_month,0)) as cap_pmt,
                 sum(nvl(ancill_pmt,0) + nvl(lab_pmt,0) + nvl(x_ray_pmt,0) ) as ancill_pmt,
                 sum(nvl(refund,0)) as refund,
-                sum(nvl(prof_pmt,0)+ nvl(cap_month,0)) as prof_pmt                
+                sum(nvl(prof_pmt,0)+ nvl(cap_month,0)) as prof_pmt
         FROM 	revenue_collection rc,org o
         WHERE   invoice_date between to_date(:1,'$SQLSTMT_DEFAULTDATEFORMAT')
                 AND to_date(:2,'$SQLSTMT_DEFAULTDATEFORMAT')
@@ -296,7 +402,7 @@ $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
 		(balance_transfer) balance_transfer,
 		(charge_adjust) as  charge_adjust,
 		(person_write_off) as person_write_off,
-		(refund) as refund,		
+		(refund) as refund,
 		pay_type
 	FROM	invoice_charges,org o
 	WHERE 	invoice_date = to_date(:1,'$SQLSTMT_DEFAULTDATEFORMAT')
@@ -322,7 +428,7 @@ $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
 		sum(person_pay) person_pay,
 		sum(insurance_pay) insurance_pay ,
 		sum(person_write_off) person_write_off,
-		sum(refund) as refund	
+		sum(refund) as refund
 	FROM 	invoice_charges,org o
 	WHERE   invoice_date between to_date(:1,'$SQLSTMT_DEFAULTDATEFORMAT')
 		AND to_date(:2,'$SQLSTMT_DEFAULTDATEFORMAT')
@@ -380,12 +486,12 @@ $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
 		(balance_transfer) balance_transfer,
 		(charge_adjust) as  charge_adjust,
 		(person_write_off) as person_write_off,
-		(refund) as refund,		
+		(refund) as refund,
 		pay_type
 	FROM 	invoice_charges, org o
 	WHERE 	to_char(invoice_date,'MM/YYYY') = :1
 	AND	invoice_date between to_date(:7,'$SQLSTMT_DEFAULTDATEFORMAT')
-	AND 	to_date(:8,'$SQLSTMT_DEFAULTDATEFORMAT')	
+	AND 	to_date(:8,'$SQLSTMT_DEFAULTDATEFORMAT')
 	AND 	(facility = :2 or :2 IS NULL )
 	AND 	(provider = :3 or :3 IS NULL)
 	AND
@@ -403,13 +509,13 @@ $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
 	'selChildernOrgs' =>qq{
 		SELECT	org_internal_id,org_id
 		FROM	org
-		WHERE	owner_org_id = :1 
+		WHERE	owner_org_id = :1
 		AND	( (parent_org_id = :2 AND :3 = 1) OR org_internal_id = :2 OR :2 IS NULL)
 		AND	upper(category) IN ('PRACTICE', 'CLINIC','FACILITY/SITE','DIAGNOSTIC SERVICES', 'DEPARTMENT', 'HOSPITAL', 'THERAPEUTIC SERVICES')
 		ORDER BY org_id
 	},
 
-	'sel_patient_superbill_info' => 
+	'sel_patient_superbill_info' =>
 	{
 		sqlStmt => qq
 		{
@@ -447,11 +553,11 @@ $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
 				AND thePatient.person_id = thePatientAddr.parent_id
 				AND theDoctor.person_id = theDoctorAddr.parent_id
 		},
-		
+
 		sqlStmtBindParamDescr => ['Date'],
-		publishDefn => 
+		publishDefn =>
 			{
-			columnDefn => 
+			columnDefn =>
 				[
 				{ colIdx =>  0, head => 'Start Time', dataFmt => '#0# #1#' },
 				{ colIdx =>  1, head => 'Patient', dataFmt => '#2#'},
@@ -478,7 +584,7 @@ $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
 			maxCols => '80',
 			maxRows => '63',
 #			mtbDebug => 'none',
-			fieldDefn => 
+			fieldDefn =>
 				[
 				# Date
 				{ colIdx =>  0, col =>  1, row => 48, width => 10, align => 'LEFT' },
@@ -508,7 +614,7 @@ $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
 				# Sex
 				{ colIdx => 10, col =>  3, row => 55, width =>  3, align => 'LEFT',
 				  type => 'conditional',
-				  data => { 
+				  data => {
 				  	'1' => 'X  ',
 				  	'2' => '  X',
 				  	'3' => ' * ',
@@ -564,9 +670,9 @@ $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
 				],
 			},
 	},
-		
-	
-	'sel_patient_superbill_ins_info' => 
+
+
+	'sel_patient_superbill_ins_info' =>
 	{
 		sqlStmt => qq
 		{
@@ -583,9 +689,9 @@ $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
 			AND	thePatient.person_id = :1
 		},
 		sqlStmtBindParamDescr => ['Date'],
-		publishDefn => 
+		publishDefn =>
 			{
-			columnDefn => 
+			columnDefn =>
 				[
 				{ colIdx => 0, head => 'Patient', dataFmt => '#0#'},
 				{ colIdx => 1, head => 'Insurance Company', dataFmt => '#1#' },
