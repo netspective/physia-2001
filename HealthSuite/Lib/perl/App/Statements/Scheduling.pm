@@ -178,11 +178,33 @@ $STMTMGR_SCHEDULING = new App::Statements::Scheduling(
 
 	'selColumnPreference' => qq{
 		select item_id, value_text as resource_id, value_textb as facility_id,
-			value_intb as date_offset
+			nvl(value_intb, 0) as date_offset
 		from Person_Attribute
 		where parent_id = ?
 			and item_name = 'Preference/Schedule/DayView/Column'
 			and value_int = ?
+	},
+	
+	'selApptSheetTimes' => qq{
+		select value_int as start_time, value_intB as end_time
+		from Person_Attribute
+		where parent_id = ?
+			and item_name = 'ApptSheet Times'
+	},
+	
+	'insApptSheetTimesPref' => qq{
+		insert into Person_Attribute
+		(parent_id, item_name        , value_int, value_intB)
+		values
+		(?        , 'ApptSheet Times', ?        , ?         )
+	},
+	
+	'updApptSheetTimesPref' => qq{
+		update Person_Attribute set
+			value_int  = ?,
+			value_intB = ?
+		where parent_id = ?
+			and item_name = 'ApptSheet Times'
 	},
 
 	'selNumPreferences' => qq{

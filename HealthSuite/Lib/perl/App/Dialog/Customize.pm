@@ -80,6 +80,38 @@ sub new
 			invisibleWhen => CGI::Dialog::DLGFLAG_ADD
 		),
 
+		new CGI::Dialog::Subhead(heading => ''),
+		
+		new CGI::Dialog::MultiField (caption => 'Appt Sheet Start/End Hours',
+			fields => [		
+				new CGI::Dialog::Field(caption => 'Start Hour',
+					type => 'integer',
+					size => 2,
+					options => FLDFLAG_REQUIRED,
+					hints => 'The starting Appointment Sheet time',
+					name => 'start_hour',
+					defaultValue => 6,
+					minValue => 0,
+					maxValue => 23,
+					onBlurJS => qq{validateHours(this.form)},
+				),
+
+				new CGI::Dialog::Field(caption => 'End Hour',
+					type => 'integer',
+					size => 2,
+					options => FLDFLAG_REQUIRED,
+					hints => 'The starting Appointment Sheet time',
+					name => 'end_hour',
+					defaultValue => 21,
+					minValue => 0,
+					maxValue => 23,
+					onBlurJS => qq{validateHours(this.form)},
+				),
+			],
+		),
+		
+		new CGI::Dialog::Field(type => 'hidden', name => 'have_pref', defaultValue => 0,),	
+
 	);
 	$self->addFooter(new CGI::Dialog::Buttons);
 
@@ -94,14 +126,28 @@ sub getSupplementaryHtml
 {
 	my ($self, $page, $command) = @_;
 
-	#$page->dumpParams();
+	my $apptsheetTimes = $STMTMGR_SCHEDULING->getRowAsHash($page, STMTMGRFLAG_NONE,
+		'selApptSheetTimes', $page->session('user_id'));
+
+	my ($apptSheetStartTime, $apptSheetEndTime);
+
+	if(defined $apptsheetTimes->{start_time})
+	{
+		$apptSheetStartTime = $apptsheetTimes->{start_time};
+		$apptSheetEndTime   = $apptsheetTimes->{end_time};
+	}
+	else
+	{
+		$apptSheetStartTime = 6;
+		$apptSheetEndTime   = 21;
+	}	
 
 	if ($command eq 'update') {
 		my @column = ($page->param('selDate'), $page->param('resource_id'), $page->param('facility_id'));
 		my @inputSpec = (\@column);
 
 		my $apptSheet = new App::Schedule::ApptSheet (inputSpec => \@inputSpec);
-		my $apptSheetHtml = $apptSheet->getHtml($page, APPTSHEET_STARTTIME, APPTSHEET_ENDTIME,
+		my $apptSheetHtml = $apptSheet->getHtml($page, $apptSheetStartTime, $apptSheetEndTime,
 			APPTSHEET_HEADER|APPTSHEET_BODY|APPTSHEET_BOOKCOUNT);
 
 		return (CGI::Dialog::PAGE_SUPPLEMENTARYHTML_RIGHT, $apptSheetHtml);
@@ -129,6 +175,7 @@ sub populateData_add
 	my ($self, $page, $command, $activeExecMode, $flags) = @_;
 
 	$page->field('date_offset', 0);
+	$self->populateHourFields($page);
 }
 
 sub populateData_update
@@ -141,6 +188,19 @@ sub populateData_update
 	$STMTMGR_SCHEDULING->createFieldsFromSingleRow($page, STMTMGRFLAG_NONE, 'selColumnPreference', $userID, $column);
 
 	$page->field('column', $column+1);
+	$self->populateHourFields($page);
+}
+
+sub populateHourFields
+{
+	my ($self, $page) = @_;
+	
+	my $pref = $STMTMGR_SCHEDULING->getRowAsHash($page, STMTMGRFLAG_NONE, 'selApptSheetTimes', 
+		$page->session('user_id'));
+		
+	$page->field('start_hour', $pref->{start_time} || 6);
+	$page->field('end_hour', $pref->{end_time} || 21);
+	$page->field('have_pref', 1) if defined $pref->{start_time};
 }
 
 ###############################
@@ -185,8 +245,18 @@ sub execute
 			_debug => 0
 		);
 	}
-
-	#$page->redirect("/schedule");
+	
+	if ($page->field('have_pref'))
+	{
+		$STMTMGR_SCHEDULING->execute($page, STMTMGRFLAG_DEBUG, 'updApptSheetTimesPref', 
+			$page->field('start_hour'), $page->field('end_hour'), $userID );
+	}
+	else
+	{
+		$STMTMGR_SCHEDULING->execute($page, STMTMGRFLAG_DEBUG, 'insApptSheetTimesPref', 
+			$userID, $page->field('start_hour'), $page->field('end_hour') );
+	}
+	
 	$self->handlePostExecute($page, $command, $flags);
 
 }

@@ -228,13 +228,15 @@ sub prepare_view_apptcol
 		inputSpec => \@inputSpec
 	);
 
+	my ($apptSheetStartTime, $apptSheetEndTime) = $self->getApptSheetTimes();
+
 	my $content = qq{
 		<TABLE cellpadding=5>
 			<TR valign=top>
 				<TD>
 					<TABLE BGCOLOR='#DDDDDD' BORDER=0 CELLSPACING=1 CELLPADDING=0>
 						<TR>
-							<TD>@{[$apptSheet->getHtml($self, APPTSHEET_STARTTIME, APPTSHEET_ENDTIME, APPTSHEET_HEADER|APPTSHEET_BODY|APPTSHEET_BOOKCOUNT)]}</TD>
+							<TD>@{[$apptSheet->getHtml($self, $apptSheetStartTime, $apptSheetEndTime, APPTSHEET_HEADER|APPTSHEET_BODY|APPTSHEET_BOOKCOUNT)]}</TD>
 						</TR>
 					</TABLE>
 				</TD>
@@ -245,6 +247,29 @@ sub prepare_view_apptcol
 	$self->addContent($content);
 
 	return 1;
+}
+
+sub getApptSheetTimes
+{
+	my ($self) = @_;
+	
+	my $apptsheetTimes = $STMTMGR_SCHEDULING->getRowAsHash($self, STMTMGRFLAG_NONE,
+		'selApptSheetTimes', $self->session('user_id'));
+	
+	my ($apptSheetStartTime, $apptSheetEndTime);
+
+	if(defined $apptsheetTimes->{start_time})
+	{
+		$apptSheetStartTime = $apptsheetTimes->{start_time};
+		$apptSheetEndTime   = $apptsheetTimes->{end_time};
+	}
+	else
+	{
+		$apptSheetStartTime = 6;
+		$apptSheetEndTime   = 21;
+	}	
+	
+	return ($apptSheetStartTime, $apptSheetEndTime);
 }
 
 sub prepare_view_apptsheet
@@ -308,14 +333,16 @@ sub prepare_view_apptsheet
 	my $apptSheet = new App::Schedule::ApptSheet(
 		inputSpec => \@inputSpec
 	);
-
+	
+	my ($apptSheetStartTime, $apptSheetEndTime) = $self->getApptSheetTimes();
+	
 	my $content = qq{
 		<TABLE cellpadding=5>
 			<TR valign=top>
 				<TD>
 					<TABLE BGCOLOR='#DDDDDD' BORDER=0 CELLSPACING=1 CELLPADDING=0>
 						<TR>
-							<TD>@{[$apptSheet->getHtml($self, APPTSHEET_STARTTIME, APPTSHEET_ENDTIME, APPTSHEET_ALL)]}</TD>
+							<TD>@{[$apptSheet->getHtml($self, $apptSheetStartTime, $apptSheetEndTime, APPTSHEET_ALL)]}</TD>
 						</TR>
 					</TABLE>
 				</TD>

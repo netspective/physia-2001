@@ -915,6 +915,18 @@ function confirmPassword(Form)
 	}
 }
 
+function validateHours(Form)
+{
+	startHour = new Number(Form._f_start_hour.value);
+	endHour   = new Number(Form._f_end_hour.value);
+	
+	if (endHour < startHour && startHour != '' && endHour != '')
+	{
+		alert("End Hour must be greater than or equal to Start Hour");
+		Form._f_end_hour.focus();
+	}
+}
+
 //
 // The following variable is set so that pages that call this library can check
 // to see if the library was successfully loaded. The code to verify the package

@@ -16,15 +16,10 @@ use App::Statements::Scheduling;
 use enum qw(BITMASK:APPTSHEET_ HEADER BODY CUSTOMIZE BOOKCOUNT TEMPLATE);
 use constant APPTSHEET_ALL => APPTSHEET_HEADER|APPTSHEET_BODY|APPTSHEET_CUSTOMIZE|APPTSHEET_BOOKCOUNT|APPTSHEET_TEMPLATE;
 
-use constant APPTSHEET_STARTTIME => 6;
-use constant APPTSHEET_ENDTIME   => 21;
-
 use Exporter;
 use vars qw(@EXPORT @ISA);
 
 @ISA = qw(Exporter);
-@EXPORT = qw(APPTSHEET_HEADER APPTSHEET_BODY APPTSHEET_CUSTOMIZE APPTSHEET_BOOKCOUNT
-	APPTSHEET_TEMPLATE APPTSHEET_ALL APPTSHEET_STARTTIME APPTSHEET_ENDTIME);
 
 my $negTemplateColor = 'firebrick';
 my $posTemplateColor = 'lightgreen';
@@ -38,6 +33,9 @@ use vars qw(@PATIENT_TYPES @VISIT_TYPES @DAYS_OF_WEEK @MONTHS);
 @VISIT_TYPES   = ();
 @DAYS_OF_WEEK  = ();
 @MONTHS        = ();
+
+@EXPORT = qw(APPTSHEET_HEADER APPTSHEET_BODY APPTSHEET_CUSTOMIZE APPTSHEET_BOOKCOUNT
+	APPTSHEET_TEMPLATE APPTSHEET_ALL);
 
 sub new
 {
@@ -82,7 +80,7 @@ sub getHtml
 	my ($self, $page, $startHour, $endHour, $flags) = @_;
 
 	$self->init($page) unless @PATIENT_TYPES;
-
+	
 	my @apptSheet = ();
 	my $html = $self->addStyle($page);
 
