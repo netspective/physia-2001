@@ -265,11 +265,12 @@ sub makeStateChanges
 	$self->getField('provider_fields')->{fields}->[0]->{fKeyStmtBindPageParams} = [$sessOrg, 'Physician'];
 	$self->getField('provider_fields')->{fields}->[1]->{fKeyStmtBindPageParams} = [$sessOrg, 'Physician'];
 
-	#Don't want to show opt proc entry when updating or deleting
-	#if($command ne 'add')
-	#{
-	#	$self->updateFieldFlags('procedures_list', FLDFLAG_INVISIBLE, 1);
-	#}
+	#Don't want to show opt proc entry when deleting
+	if($command eq 'remove')
+	{
+		$self->updateFieldFlags('procedures_heading', FLDFLAG_INVISIBLE, 1);
+		$self->updateFieldFlags('procedures_list', FLDFLAG_INVISIBLE, 1);
+	}
 
 	#Billing Org Contact Information
 	my $billingOrg = $page->field('billing_facility_id');
@@ -331,6 +332,8 @@ sub populateData
 		my $totalProcs = scalar(@{$procedures});
 		foreach my $idx (0..$totalProcs)
 		{
+			#NOTE: data_text_a stores the indexes of the rel_diags (which are actual codes, not pointers)
+
 			my $line = $idx + 1;
 			$page->param("_f_proc_$line\_item_id", $procedures->[$idx]->{item_id});
 			$page->param("_f_proc_$line\_dos_begin", $procedures->[$idx]->{service_begin_date});
@@ -338,11 +341,12 @@ sub populateData
 			$page->param("_f_proc_$line\_service_type", $procedures->[$idx]->{hcfa_service_type});
 			$page->param("_f_proc_$line\_procedure", $procedures->[$idx]->{code});
 			$page->param("_f_proc_$line\_modifier", $procedures->[$idx]->{modifier});
-			$page->param("_f_proc_$line\_diags", $procedures->[$idx]->{rel_diags});
 			$page->param("_f_proc_$line\_units", $procedures->[$idx]->{quantity});
 			$page->param("_f_proc_$line\_charges", $procedures->[$idx]->{unit_cost});
-			$page->param("_f_proc_$line\_emg", $procedures->[$idx]->{emergency});
+			$page->param("_f_proc_$line\_emg", @{[ ($procedures->[$idx]->{emergency} == 1 ? 'on' : '' ) ]});
 			$page->param("_f_proc_$line\_comments", $procedures->[$idx]->{comments});
+			$page->param("_f_proc_$line\_diags", $procedures->[$idx]->{data_text_a});
+			$page->param("_f_proc_$line\_actual_diags", $procedures->[$idx]->{rel_diags});
 		}
 
 
@@ -1410,9 +1414,10 @@ sub addProcedureItems
 
 	for(my $line = 1; $line <= $lineCount; $line++)
 	{
-
+		next if $page->param("_f_proc_$line\_dos_begin") eq 'From' || $page->param("_f_proc_$line\_dos_end") eq 'To';
 		next unless $page->param("_f_proc_$line\_dos_begin") && $page->param("_f_proc_$line\_dos_end");
 
+		my $emg = $page->param("_f_proc_$line\_emg") eq 'on' ? 1 : 0;
 		my %record = (
 			item_id => $page->param("_f_proc_$line\_item_id") || undef,
 			service_begin_date => $page->param("_f_proc_$line\_dos_begin") || undef,			#default for service start date is today
@@ -1421,12 +1426,13 @@ sub addProcedureItems
 			hcfa_service_type => $page->param("_f_proc_$line\_service_type") || undef,		#default for service type is 2 for consultation
 			modifier => $page->param("_f_proc_$line\_modifier") || undef,				#default for modifier is "mandated services"
 			quantity => $page->param("_f_proc_$line\_units") || undef,				#default for units is 1
-			emergency => @{[ ($page->param("_f_proc_$line\_emg") ? '1' : '0' ) ]} || undef,	#default for emergency is 0 or 1
+			emergency => defined $emg ? $emg : undef,								#default for emergency is 0 or 1
 			item_type => App::Universal::INVOICEITEMTYPE_SERVICE || undef,				#default for item type is service
 			code => $page->param("_f_proc_$line\_procedure") || undef,
 			comments =>  $page->param("_f_proc_$line\_comments") || undef,
-			rel_diags => $page->param("_f_proc_$line\_diags") || undef,
 			unit_cost => $page->param("_f_proc_$line\_charges") || undef,
+			rel_diags => $page->param("_f_proc_$line\_actual_diags") || undef,		#the actual icd (diag) codes
+			data_text_a => $page->param("_f_proc_$line\_diags") || undef,			#the diag code pointers
 			);
 
 
