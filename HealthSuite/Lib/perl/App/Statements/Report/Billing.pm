@@ -41,7 +41,7 @@ $STMTMGR_REPORT_BILLING = new App::Statements::Report::Billing(
 	'sel_detail_payers' => {
 		_stmtFmt => qq{
 			select Claim_Type.caption as payer, invoice_id, invoice_date, client_id,
-				provider_id, Transaction_Status.caption as status, total_cost, total_adjust, complete_name
+				provider_id, Transaction_Status.caption as status, total_cost, total_adjust, simple_name
 			from Claim_Type, Transaction_Status, Transaction, Invoice, Person
 			where Invoice.owner_id = ?
 				and Invoice.owner_type = $typeOrg
@@ -92,7 +92,7 @@ $STMTMGR_REPORT_BILLING = new App::Statements::Report::Billing(
 	'sel_detail_insurance' => {
 		_stmtFmt => qq{
 			select Insurance.ins_org_id as payer, invoice.invoice_id, invoice_date, client_id, bill_to_id,
-				provider_id, Transaction_Status.caption as status, total_cost, total_adjust, complete_name
+				provider_id, Transaction_Status.caption as status, total_cost, total_adjust, simple_name
 			from Insurance, Transaction_Status, Transaction, Invoice, Person, invoice_billing ib
 			where Invoice.owner_id = ?
 				and Invoice.owner_type = $typeOrg
@@ -182,7 +182,7 @@ $STMTMGR_REPORT_BILLING = new App::Statements::Report::Billing(
 	'sel_detailProcedures' => {
 		_stmtFmt => qq{
 			select Invoice_Item.code as procedure, Invoice_Item.modifier, invoice_id, invoice_date,
-				client_id, provider_id, complete_name
+				client_id, provider_id, simple_name
 			from Transaction, Invoice_Item, Invoice, Person
 			where Invoice_Item.code is NOT NULL
 				and Invoice.owner_id = ?

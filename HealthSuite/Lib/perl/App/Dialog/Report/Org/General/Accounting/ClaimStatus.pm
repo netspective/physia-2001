@@ -128,7 +128,7 @@ sub buildSqlStmt
 			i.reference,
 			ct.caption,
 			bs.caption as cap,
-			p.complete_name};
+			p.simple_name};
 
 	my $fromTable= qq{invoice i,
 		   	invoice_status i_s,
@@ -239,7 +239,7 @@ sub execute
 		$_->{caption},
 		$_->{cap},
 		$notes,
-		$_->{complete_name});
+		$_->{simple_name});
 		push(@data, \@rowData);
 	};
 

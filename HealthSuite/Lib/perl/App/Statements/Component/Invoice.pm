@@ -584,7 +584,7 @@ $STMTMGR_COMPONENT_INVOICE = new App::Statements::Component::Invoice(
 				p2.complete_name,
 				nvl(i.total_cost, 0),
 				i.client_id,
-				p3.complete_name
+				p3.simple_name
 			from 	event e, transaction t, org o, transaction_type tt,
 				person p, person p1, person p2, invoice i, invoice_billing ib, person p3
 			where	e.start_time >= to_date(:1, '$SQLSTMT_DEFAULTDATEFORMAT') + :4
@@ -611,7 +611,7 @@ $STMTMGR_COMPONENT_INVOICE = new App::Statements::Component::Invoice(
 				o1.name_primary,
 				nvl(i.total_cost, 0),
 				i.client_id,
-				p3.complete_name
+				p3.simple_name
 			from 	event e, transaction t, org o, org o1, transaction_type tt,
 				person p, person p1, invoice i, invoice_billing ib, person p3
 			where	e.start_time >= to_date(:1, '$SQLSTMT_DEFAULTDATEFORMAT') + :4

@@ -162,7 +162,7 @@ $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
 					 0)
 				     ) as batch_rcpt
 			FROM 	invoice_charges ic, person p, invoice_item_adjust iia, payment_method pm
-			WHERE 	(:1 IS NULL OR provider = :1)			
+			WHERE 	(:1 IS NULL OR provider = :1)
 			AND	(:3 IS NULL OR batch_id = :3)
 			AND	ic.invoice_date between to_date(:4,'$SQLSTMT_DEFAULTDATEFORMAT')
 			AND 	to_date(:5,'$SQLSTMT_DEFAULTDATEFORMAT')
@@ -442,7 +442,7 @@ $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
 				sum(balance_151),
 				sum(decode(item_type,3,total_pending,0)),
 				sum(total_pending),
-				p.complete_name person_name
+				p.simple_name person_name
 			FROM	agedpayments a, person p
 			WHERE	(a.person_id = :1 or :1 is NULL)
 			AND 	(invoice_item_id is NULL  or item_type in (3) )
@@ -455,7 +455,7 @@ $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
 			 FROM 	person_org_category poc
 			 WHERE  org_internal_id = :2
 			)
-			GROUP BY a.person_id, p.complete_name
+			GROUP BY a.person_id, p.simple_name
 			having sum(total_pending)> 0
 		},
 		sqlStmtBindParamDescr => ['Org Insurance ID'],
@@ -616,7 +616,7 @@ $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
 		(person_write_off) as person_write_off,
 		(refund) as refund,
 		pay_type,
-		p.complete_name
+		p.simple_name simple_name
 	FROM	invoice_charges,org o, person p
 	WHERE 	invoice_date = to_date(:1,'$SQLSTMT_DEFAULTDATEFORMAT')
 		AND (facility = :2 or :2 IS NULL )
@@ -702,7 +702,7 @@ $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
 		(person_write_off) as person_write_off,
 		(refund) as refund,
 		pay_type,
-		p.complete_name
+		p.simple_name
 	FROM 	invoice_charges, org o, person p
 	WHERE 	to_char(invoice_date,'MM/YYYY') = :1
 	AND	invoice_date between to_date(:7,'$SQLSTMT_DEFAULTDATEFORMAT')

@@ -135,7 +135,7 @@ sub prepare_detail_payment
 		{
 			$_->{care_provider_id}='';
 			$_->{patient_id}='';
-			$_->{complete_name}='';
+			$_->{simple_name}='';
 		};
 		
 		my @rowData = 
@@ -157,7 +157,7 @@ sub prepare_detail_payment
 			$_->{refund},
 			$_->{pay_type},
 			$_->{invoice_batch_date},
-			$_->{complete_name}
+			$_->{simple_name}
 		);
 		push(@data, \@rowData);
 	}

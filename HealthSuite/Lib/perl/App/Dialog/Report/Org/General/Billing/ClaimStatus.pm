@@ -220,7 +220,7 @@ sub buildSqlStmt
 			 FROM insurance_attribute  ia
 			 WHERE ia.parent_id = Insurance.parent_ins_id
 			 AND ia.item_name = 'Contact Method/Telephone/Primary' ) as phone_number,
-			 Person.complete_name
+			 Person.simple_name
 		};
 
 		$groupBy = qq{order by 3,1};
@@ -381,7 +381,7 @@ sub prepare_detail_status
 		$_->{client_id},
 		$_->{phone_number},
 		$notes,
-		$_->{complete_name});
+		$_->{simple_name});
 		push(@data, \@rowData);
 	};
 
