@@ -34,6 +34,230 @@ $STMTMGR_WORKLIST_COLLECTION = new App::Statements::Worklist::WorklistCollection
 
 ########################
 
+	'selAllCollectors'=>qq
+	{
+		SELECT distinct parent_id,parent_org_id
+		FROM   person_attribute 
+		WHERE  item_name ='WorkList-Collection-Setup-Physician'
+	},
+	'selCollectorRecordCnt' =>qq
+	{
+		SELECT 	count (*)
+		FROM 	Invoice_Worklist
+		WHERE 	owner_id = :1
+		AND   	responsible_id = :1
+		AND	org_internal_id = :2
+		AND	worklist_status = 'Account In Collection'
+		AND	worklist_type = 'Collection'
+	},
+
+	'isOnCollectionWorklist' =>qq
+	{
+		SELECT  owner_id
+		FROM 	Invoice_Worklist
+		WHERE 	invoice_id=:1
+		AND   	owner_id = :2
+		AND  	org_internal_id = :3
+		AND	worklist_type='Collection'
+		AND	worklist_status='Account In Collection'	
+	},
+	
+	'transferCollection'=>qq
+	{
+		UPDATE 	Invoice_Worklist
+		SET responsible_id = :4
+		WHERE 	invoice_id=:1
+		AND   	responsible_id = :2
+		AND  	org_internal_id = :3
+		AND	worklist_type='Collection'
+		AND	worklist_status='Account In Collection'
+	},
+	'selReckDataById' =>qq
+	{	
+		SELECT 	reck_date,invoice_id
+		FROM	Invoice_Worklist
+		WHERE 	invoice_worklist_id = :1
+	},
+	'updCollectorRecords' =>qq
+	{
+		UPDATE Invoice_WorkList
+		set data_date_a = (	select min(e.start_time) as appt
+					from event e, event_attribute ea
+					where ea.value_text = Invoice_Worklist.person_id
+					and ea.item_name = 'Appointment' 
+					and ea.value_type = 333
+					and e.event_id  = ea.parent_id
+					and trunc(e.start_time) >= trunc(sysdate) 
+				),
+		comments = (
+				SELECT MIN(iia.comments) FROM invoice_item_adjust iia WHERE parent_id =
+				(SELECT MIN(item_id) FROM invoice_item ii WHERE ii.parent_id = Invoice_WorkList.invoice_id AND
+				ii.item_type in (0,1,2) )				
+				)		
+		WHERE 	owner_id = :1
+		AND   	responsible_id = :1
+		AND	org_internal_id = :2
+		AND	worklist_status = 'Account In Collection'
+		AND	worklist_type = 'Collection'
+		AND   
+		( 	comments is NULL
+			OR 
+			(data_date_a = (	select min(e.start_time) as appt
+								from event e, event_attribute ea
+								where ea.value_text = Invoice_Worklist.person_id
+								and ea.item_name = 'Appointment' 
+								and ea.value_type = 333
+								and e.event_id  = ea.parent_id
+								and trunc(e.start_time) >= trunc(sysdate) 
+					)
+			)
+		)
+	},
+	'closeInvoiceCollection'=>qq
+	{
+		UPDATE 	Invoice_Worklist
+		SET  	worklist_status = 'Account Closed'
+		WHERE 	invoice_id=:1
+		AND   	responsible_id = :2
+		AND  	org_internal_id = :3
+		AND	worklist_type='Collection'
+		AND	worklist_status='Account In Collection'	
+	},
+	
+	'moveCollectionRecord'=>qq
+	{
+	 	Insert into Invoice_Worklist (
+	 		owner_id,
+	 		responsible_id,
+	 		person_id,
+	 		invoice_id,
+	 		data_date_a,
+	 		comments,
+	 		org_internal_id,
+	 		worklist_status,
+			worklist_type)
+		SELECT :4,
+	 		:4,
+	 		person_id,
+	 		invoice_id,
+	 		data_date_a,
+	 		comments,
+	 		org_internal_id,
+	 		worklist_status,
+			worklist_type		
+		FROM 	Invoice_Worklist
+		WHERE 	invoice_id=:1
+		AND   	owner_id = :2
+		AND	responsible_id  =:2
+		AND  	org_internal_id = :3
+		AND	worklist_type='Collection'
+		AND	worklist_status='Account In Collection'	
+		AND	rownum < 2
+	},
+	#START NEW COLLETION QUERIES
+	'pullCollectorRecords'=>qq
+	{
+		Insert into Invoice_Worklist (
+		owner_id,
+		responsible_id,
+		person_id,
+		invoice_id,
+		data_date_a,
+		comments,
+		org_internal_id,
+		worklist_status,
+		worklist_type)
+		SELECT 	
+		:8,
+		:8, 
+		p.person_id,
+		i.invoice_id,
+		(	select min(e.start_time)
+			from event e, event_attribute ea
+			where ea.value_text = p.person_id
+			and ea.item_name = 'Appointment' 
+			and ea.value_type = 333
+			and e.event_id  = ea.parent_id
+			and e.start_time - to_date(:9,'MM/DD/YYYY') >=0			
+		)as appt,				
+		(SELECT MIN(iia.comments) FROM invoice_item_adjust iia WHERE parent_id =
+		  (SELECT MIN(item_id) FROM invoice_item ii WHERE ii.parent_id = i.invoice_id AND
+		   ii.item_type in (0,1,2) )
+			) as description,:7,'Account In Collection','Collection'
+		FROM 	person p  ,invoice i , transaction t
+		WHERE	upper(substr(p.name_last,1,1)) between upper(:1) 
+		AND	upper(:2)
+		AND	i.client_id = p.person_id
+		AND	i.balance between (:3) 
+		AND	(:4)
+		AND	i.invoice_date between to_date(:5,'MM/DD/YYYY')
+		AND	to_date(:6,'MM/DD/YYYY')		
+		AND	i.invoice_status not in (15,16)			
+		AND 	t.trans_id = i.main_transaction
+		AND EXISTS
+		(
+			SELECT 	1
+			FROM 	person_attribute
+			WHERE	item_name = 'WorkList-Collection-Setup-Org'
+			AND	value_text = t.service_facility_id 
+			AND 	parent_id = :8
+			AND	parent_org_id = :7
+		)
+		AND EXISTS
+		(
+			SELECT 	1 
+			FROM  	person_org_category poc
+			WHERE 	p.person_id = poc.person_id
+			AND	poc.org_internal_id = :7			
+		)
+		AND EXISTS
+		(	
+			SELECT 	1
+			FROM	person_attribute pa,invoice_billing ib
+			WHERE	pa.item_name = 'WorkList-Collection-Setup-Product'
+			AND	i.billing_id = ib.bill_id
+			AND 	parent_id = :8
+			AND	pa.parent_org_id = :7			
+			AND	(
+				ib.bill_party_type IN (0,1)
+				OR
+				EXISTS
+				(
+					SELECT 1 
+				 	FROM 	insurance coverage,insurance prod_plan 
+				 	WHERE	ib.bill_ins_id = coverage.ins_internal_id
+				 	AND	prod_plan.ins_internal_id = coverage.parent_ins_id
+				 	AND	
+				 	(
+				 		(prod_plan.ins_internal_id = pa.value_int AND prod_plan.record_type =1)
+				 		OR prod_plan.parent_ins_id = pa.value_int
+					)					 	
+				 )
+				)
+		)
+		AND EXISTS
+		(
+			SELECT 	1
+			FROM	person_attribute
+			WHERE	item_name = 'WorkList-Collection-Setup-Physician'
+			AND	value_text = t.provider_id 
+			AND 	parent_id = :8
+			AND	parent_org_id = :7						
+		)						
+		AND NOT EXISTS
+		(
+			SELECT 	1
+			FROM 	Invoice_Worklist
+			WHERE 	owner_id = :8			
+			AND	org_internal_id = :7
+			AND	worklist_status = 'Account In Collection'
+			AND	worklist_type = 'Collection'		
+			AND	invoice_id = i.invoice_id
+		)	
+		AND	ROWNUM<=:10			
+	},
+
+	#END NEW COLLETION QUERIES
 	'selCloseInvoiceByID'=>qq
 	{
 		SELECT trans_id,trans_invoice_id
