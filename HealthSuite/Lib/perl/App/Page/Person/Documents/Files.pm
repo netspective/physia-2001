@@ -26,8 +26,8 @@ use vars qw(%RESOURCE_MAP $QDL %PUB_IMGFILES);
 		_tabCaption => 'Referral/Auth',
 		_specSubType => App::Universal::FILESUBTYPE_AUTH,
 		},
-	'person/documents/corespondence' => {
-		_tabCaption => 'Corespondence',
+	'person/documents/correspondence' => {
+		_tabCaption => 'Correspondence',
 		_specSubType => App::Universal::FILESUBTYPE_CORESPONDENCE,
 		},
 	'person/documents/misc' => {
