@@ -7,6 +7,7 @@ use App::Data::MDL::Module;
 use App::Data::MDL::Invoice;
 use App::Universal;
 use DBI::StatementManager;
+use App::Statements::Org;
 use App::Statements::Catalog;
 use App::Statements::Person;
 use Date::Manip;
@@ -372,11 +373,14 @@ sub importCategories
 		$list = [$list] if ref $list eq 'HASH';
 		foreach my $item (@$list)
 		{
-			#my $dv = new Dumpvalue;
-			#$dv->dumpValue($item);
+			my $orgId = $item->{'org-id'};
+			my $ownerOrg = exists $item->{'owner-org'} ? $item->{'owner-org'} : $orgId;
+			my $ownerOrgIdExist = $STMTMGR_ORG->getSingleValue($self, STMTMGRFLAG_NONE, 'selOwnerOrgId', $ownerOrg);
+			my $internalOrgId = exists $item->{'owner-org'} ? $STMTMGR_ORG->getSingleValue($self, STMTMGRFLAG_NONE, 'selOrg', $ownerOrgIdExist, $orgId) : $ownerOrgIdExist;
+
 			$self->schemaAction($flags, "Person_Org_Category", 'add',
 				person_id => $parentId,
-				org_id => $item->{'org-id'},
+				org_internal_id => $internalOrgId,
 				category => $item->{_text});
 
 			$self->schemaAction($flags, "Person_Attribute", 'add',
@@ -384,7 +388,8 @@ sub importCategories
 					item_name => $item->{_text},
 					value_type => App::Universal::ATTRTYPE_RESOURCEORG || undef,
 					value_text => $item->{'org-id'},
-					parent_org_id => $item->{'org-id'}) if $item->{_text} ne 'Patient';
+					value_int  => $internalOrgId,
+					parent_org_id => $internalOrgId) if $item->{_text} ne 'Patient';
 		}
 
 
@@ -566,8 +571,7 @@ sub importAssocSessionPhysicians
 			push(@phys, $physician);
 		}
 
-		#my $dv = new Dumpvalue;
-		#$dv->dumpValue($item);
+
 		$self->schemaAction($flags, "Person_Attribute", 'add',
 			parent_id => $parentId,
 			item_name => 'SessionPhysicians',
@@ -586,8 +590,11 @@ sub importAssociatedNurse
 		$list = [$list] if ref $list eq 'HASH';
 		foreach my $item (@$list)
 		{
-			#my $dv = new Dumpvalue;
-			#$dv->dumpValue($item);
+			my $orgId = $item->{id};
+			my $ownerOrg = $item->{'owner-org'};
+			my $ownerInternalId = $STMTMGR_ORG->getSingleValue($self, STMTMGRFLAG_NONE, 'selOwnerOrgId', $ownerOrg);
+			my $orgInternalId = $STMTMGR_ORG->getSingleValue($self, STMTMGRFLAG_NONE, 'selOrg', $ownerInternalId, $orgId);
+
 			$self->schemaAction($flags, "Person_Attribute", 'add',
 				parent_id => $parentId,
 				item_name => 'Physician',
@@ -746,11 +753,13 @@ sub importLogins
 		$list = [$list] if ref $list eq 'HASH';
 		foreach my $item (@$list)
 		{
+			my $OrgId = $item->{'org-id'};
+			my $internalOrgId = $STMTMGR_ORG->getSingleValue($self, STMTMGRFLAG_NONE, 'selOwnerOrgId', $OrgId);
 			#my $dv = new Dumpvalue;
 			#$dv->dumpValue($item);
 			$self->schemaAction($flags, "Person_Login", 'add',
 				person_id => $parentId,
-				org_id => $item->{'org-id'},
+				org_internal_id => $internalOrgId,
 				password => $item->{password},
 				quantity =>  $item->{limit} ne '' ? $item->{limit} : '1' );
 		}
@@ -782,9 +791,15 @@ sub importRoles
 				$existRoleId = $existRoleData->{'role_name_id'};
 			}
 
+			my $orgId = $item->{'org-id'};
+			my $ownerOrg = $item->{'owner-org'};
+			my $ownerOrgIdExist = $STMTMGR_ORG->getSingleValue($self, STMTMGRFLAG_NONE, 'selOwnerOrgId', $ownerOrg);
+
+			my $internalOrgId = $STMTMGR_ORG->getSingleValue($self, STMTMGRFLAG_NONE, 'selOrg', $ownerOrgIdExist, $orgId);
+
 			my $personRoleId = $roleNameId ne '' ? $roleNameId : $existRoleId;
 			$self->schemaAction($flags, "Person_Org_Role", 'add',
-						org_id    => $item->{'org-id'},
+						org_internal_id    => $internalOrgId,
 						role_name_id => $personRoleId,
 						person_id => $personId,
 						priority  => $item->{priority},
