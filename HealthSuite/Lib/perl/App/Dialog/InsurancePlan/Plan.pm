@@ -72,15 +72,13 @@ sub new
 				hints => 'Numeric Fee Schedule ID',
 			),
 			new App::Dialog::Field::Address(caption=>'Billing Address',
-				name => 'billing_addr',
-				options => FLDFLAG_REQUIRED
+				name => 'billing_addr',  options => FLDFLAG_REQUIRED
 			),
 			new CGI::Dialog::MultiField(caption =>'Phone/Fax', name => 'phone_fax',
 				fields => [
 						new CGI::Dialog::Field(type=>'phone',
 								caption => 'Phone',
 								name => 'phone',
-								options => FLDFLAG_REQUIRED,
 								invisibleWhen => CGI::Dialog::DLGFLAG_UPDATE),
 						new CGI::Dialog::Field(type=>'phone',
 								caption => 'Fax',
@@ -175,8 +173,9 @@ sub makeStateChanges
 	my ($self, $page, $command, $dlgFlags) = @_;
 	my $productName = $page->field('product_name');
 	my $recordType = App::Universal::RECORDTYPE_INSURANCEPRODUCT;
+	my $ownerOrgId = $page->session('org_internal_id');
 
-	my $recordData = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selPlanByInsIdAndRecordType', $productName, $recordType);
+	my $recordData = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selProductRecord', $ownerOrgId, $productName);
 
 	my $insType = $recordData->{'ins_type'};
 	$page->field('ins_type', $insType);
@@ -216,10 +215,10 @@ sub populateData_add
 	return unless ($flags & CGI::Dialog::DLGFLAG_ADD_DATAENTRY_INITIAL);
 	my $productName = $page->field('product_name');
 	my $recordType = App::Universal::RECORDTYPE_INSURANCEPRODUCT;
+	my $ownerOrgId = $page->session('org_internal_id');
 	$page->field('product_name', $productName);
 
-	my $recordData = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE,
-		'selPlanByInsIdAndRecordType', $productName, $recordType);
+	my $recordData = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selProductRecord', $ownerOrgId, $productName);
 	my $insOrgInternalId = $recordData->{'ins_org_id'};
 	my $insOrgId = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInsOrgData', $insOrgInternalId);
 	$page->field('ins_org_id', $insOrgId->{'org_id'});
@@ -319,15 +318,15 @@ sub execute
 
 	my $recordType = App::Universal::RECORDTYPE_INSURANCEPRODUCT;
 	my $productName = $page->field('product_name');
+	my $ownerOrgId = $page->session('org_internal_id');
 
-	my $recordData = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE,
-		'selPlanByInsIdAndRecordType', $productName, $recordType);
+	my $recordData = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selProductRecord', $ownerOrgId, $productName);
 
 	my $parentInsId = $recordData->{'ins_internal_id'};
 	my $editInsIntId = $page->param('ins_internal_id');
 	my $insType = $recordData->{'ins_type'};
 	my $insOrgId = $page->field('ins_org_id');
-	my $ownerOrgId = $page->session('org_internal_id');
+
 	my $insOrgInternalId = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgId', $ownerOrgId, $insOrgId);
 	my $planName = $page->field('plan_name');
 
