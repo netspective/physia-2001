@@ -400,6 +400,19 @@ sub addTransactionAndInvoice
 
 	$invoiceId = $command eq 'add' ? $invoiceId : $editInvoiceId;
 
+	#Add batch creation attribute
+	my $batchId = $page->field('batch_id');
+	$page->schemaAction(
+		'Invoice_Attribute', $command,
+		item_id => $page->field('batch_item_id') || undef,
+		parent_id => $invoiceId || undef,
+		item_name => 'Invoice/Creation/Batch ID',
+		value_type => defined $textValueType ? $textValueType : undef,
+		value_text => $batchId || undef,
+		value_date => $page->field('batch_date') || undef,
+		_debug => 0
+	);
+
 	my $itemCount = 0;
 	my $invoiceTotal = 0;
 	my $lineCount = $page->param('_f_line_count');
@@ -451,8 +464,7 @@ sub addTransactionAndInvoice
 
 
 
-	## Add history and batch creation attribute and reset session batch id with batch id in field
-	my $batchId = $page->field('batch_id');
+	## Add history and reset session batch id with batch id in field
 	$page->session('batch_id', $batchId);
 	my $description = $command eq 'add' ? "Created" : 'Modified';
 	$page->schemaAction(
@@ -466,17 +478,6 @@ sub addTransactionAndInvoice
 		_debug => 0
 	);
 
-
-	$page->schemaAction(
-		'Invoice_Attribute', $command,
-		item_id => $page->field('batch_item_id') || undef,
-		parent_id => $invoiceId || undef,
-		item_name => 'Invoice/Creation/Batch ID',
-		value_type => defined $textValueType ? $textValueType : undef,
-		value_text => $batchId || undef,
-		value_date => $page->field('batch_date') || undef,
-		_debug => 0
-	);
 
 	handleBillingInfo($self, $page, $command, $flags, $invoiceId);
 }
