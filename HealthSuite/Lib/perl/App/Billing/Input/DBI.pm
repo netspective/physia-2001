@@ -184,13 +184,13 @@ sub preStatusCheck
 {
 	my ($self, $claim, $attrDataFlag, $row) = @_;
 	my $go = 0;
-	
+
 	$go = 1 if (($claim->getStatus() <=  PRE_STATUS) || (($claim->getInvoiceSubtype == CLAIM_TYPE_SELF) && ($claim->getStatus() ==  INVOICESTATUS_CLOSED)) || (($claim->getStatus() == PRE_VOID) && not($attrDataFlag & $row)));
 # 	$go = 1 if (($claim->getStatus() >  INVOICESTATUS_SUBMITTED) && ($claim->getStatus() <  INVOICESTATUS_CLOSED));
 	return $go
 }
-	
-	
+
+
 sub populateClaims
 {
 	my ($self, $claimList, %params) = @_;
@@ -596,7 +596,7 @@ sub assignInsuredInfo
 						@row = $sth->fetchrow_array();
 						$insured->setHMOIndicator($row[0]);
 
-						$queryStatment = "select extra
+						$queryStatment = "select extra, employer_org_id
 							from insurance, invoice_billing
 							where invoice_billing.invoice_id = $invoiceId
 								and invoice_billing.bill_sequence = " . $insured->getBillSequence().
@@ -608,6 +608,9 @@ sub assignInsuredInfo
 						$sth->execute() or $self->{valMgr}->addError($self->getId(),100,"Unable to execute $queryStatment");
 						@row = $sth->fetchrow_array();
 						$insured->setTypeCode($row[0]);
+						my $orgInternalId = $row[1];
+						$insured->setEmployerOrSchoolId($orgInternalId);
+
 					}
 					$queryStatment = "select value_text,value_type,value_int from person_attribute where parent_id = \'$insuredId\' and value_type between 220 and 225";
 					$sth = $self->{dbiCon}->prepare(qq {$queryStatment});
@@ -616,9 +619,10 @@ sub assignInsuredInfo
 					@row = $sth->fetchrow_array();
 					if($row[2])
 					{
-						my $orgInternalId = $row[2];
-						$insured->setEmployerOrSchoolId($orgInternalId);
+#						my $orgInternalId = $row[2];
+#						$insured->setEmployerOrSchoolId($orgInternalId);
 
+#						$queryStatment = "select name_primary , org_id, org_internal_id  from org where org_internal_id = $orgInternalId";
 						$queryStatment = "select name_primary , org_id, org_internal_id  from org where org_internal_id = $orgInternalId";
 						$sth = $self->{dbiCon}->prepare(qq {$queryStatment});
 						# do the execute statement
@@ -807,14 +811,14 @@ sub assignPaytoAndRendProviderInfo
 	@row = $sth->fetchrow_array();
 	$renderingProvider->setAssignIndicator($row[0]);
 	$payToProvider->setAssignIndicator($row[0]);
-	
+
 	$queryStatment = "select value_text from person_attribute where parent_id = \'$id\' and value_type = " . PROFESSIONAL_LICENSE_NO;
 	$sth = $self->{dbiCon}->prepare(qq {$queryStatment});
 	$sth->execute() or $self->{valMgr}->addError($self->getId(),100,"Unable to execute $queryStatment");
 	@row = $sth->fetchrow_array();
 	$renderingProvider->setProfessionalLicenseNo($row[0]);
 	$payToProvider->setProfessionalLicenseNo($row[0]);
-	
+
 	$claim->setRenderingProvider($renderingProvider);
 	$claim->setPayToProvider($payToProvider);
 }
@@ -1865,7 +1869,7 @@ sub populateItems
 	my @itemMap;
 	my @claimCharge;
 	my $claimChargePaid=0;
-	
+
 	$itemMap[INVOICE_ITEM_OTHER] = \&App::Billing::Claim::addOtherItems;
 	$itemMap[INVOICE_ITEM_SERVICE] = \&App::Billing::Claim::addProcedure;
 	$itemMap[INVOICE_ITEM_LAB] = \&App::Billing::Claim::addProcedure;
@@ -1930,7 +1934,7 @@ sub populateItems
 		{
 			$claimCharge[$tempRow[16]] = $claimCharge[$tempRow[16]] + $tempRow[13];
 			$claimChargePaid = $claimChargePaid + $tempRow[15] if (($tempRow[16] == INVOICE_ITEM_SERVICE) ||($tempRow[16] == INVOICE_ITEM_LAB));
-			
+
 		}
 		if ($functionRef ne "")
 		{
@@ -2137,7 +2141,7 @@ sub populateVisitDate
 	$sth->execute or  $self->{valMgr}->addError($self->getId(),100,"Unable to execute $queryStatment");
 	@tempRow = $sth->fetchrow_array();
 	$patient->setVisitDate($tempRow[0]);
-	
+
 }
 
 sub populateChangedTreatingDoctor
@@ -2148,8 +2152,8 @@ sub populateChangedTreatingDoctor
 	$changedTreatingDoctor->setType("changedTreatingDoctor");
 	$changedTreatingDoctor->setAddress($changedTreatingDoctorAddress);
 	$currentClaim->setChangedTreatingDoctor($changedTreatingDoctor);
-	
-	if ($currentClaim->{treatment}->{reasonForReport} == 3) 
+
+	if ($currentClaim->{treatment}->{reasonForReport} == 3)
 	{
 		my $id = $currentClaim->{treatment}->{activityType};
 		my $queryStatment = "select complete_name from person where person_id = \'$id\'";
