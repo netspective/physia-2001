@@ -23,24 +23,19 @@ use vars qw(%RESOURCE_MAP $QDL %PUB_INBOX);
 $QDL = File::Spec->catfile($CONFDATA_SERVER->path_Database(), 'QDL', 'Message.qdl');
 
 
-########################################################
-# Drill Level 0 - Observations
-########################################################
-
-
 %PUB_INBOX = (
 	name => 'inbox',
 	banner => {
 		actionRows => [
 			{caption => 'Send Message', url => '/person/#session.person_id#/dlg-send-message',},
 			{caption => 'Send Phone Message', url => '/person/#session.person_id#/dlg-send-phone_message',},
-			#{caption => 'Send Refill Request', url => '/person/#session.person_id#/dlg-send-refill_request',},
 		],
 	},
 	bodyRowAttr => {
 		class => 'message_status_#{recipient_status}#',
 	},
 	columnDefn => [
+		{head => '', colIdx => '#{priority}#', dataFmt => sub {return $IMAGETAGS{'widgets/mail/pri_' . $_[0]->[$_[1]]}},},
 		{head => '', colIdx => '#{doc_spec_subtype}#', dataFmt => \&iconCallback,},
 		{head => 'From', hAlign=> 'left', dataFmt => '#{from_id}#',},
 		{head => 'Subject', hAlign=> 'left', dataFmt => '#{subject}#',},
@@ -58,7 +53,6 @@ $QDL = File::Spec->catfile($CONFDATA_SERVER->path_Database(), 'QDL', 'Message.qd
 	],
 	dnSelectRowAction => '/person/#session.person_id#/dlg-read-message_#{doc_spec_subtype}#/#{message_id}#?home=#homeArl#',
 	dnQuery => \&inboxQuery,
-#	dnAncestorFmt => 'All Lab Results',
 );
 
 
@@ -102,6 +96,7 @@ sub inboxQuery
 		'repatient_name',
 		'deliver_record',
 		"TO_CHAR({date_sent},'IYYYMMDDHH24MISS')",
+		'priority',
 	);
 	$cond3->orderBy({id => 'date_sent', order => 'Descending'});
 	$cond3->distinct(1);
