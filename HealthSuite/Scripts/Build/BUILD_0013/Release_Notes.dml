@@ -47,5 +47,9 @@
 		<deliverable id="435">
 			UI: Added a printer drop down box in the Add Phone Message dialog that allows you to print a copy of the phone message to a user specified printer in the Org.
 		</deliverable>	
+		<deliverable id="468">
+			UI:  Added a multifield in the update Patient dialog to add 'Patient deceased and date'. 
+			     This added information about deceased patient can be viewed in the 'Alert' component.
+		</deliverable>		
 	</deliverables>
 </release-notes>
