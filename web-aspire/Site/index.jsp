@@ -40,11 +40,11 @@
 				<!-- $IMAGETAGS{'icons/arrow_right_red'} -->
 			</td><td>
 				<font face="arial,helvetica" size=2>
-					<b>Add</b> a new <app:link url="/org/${session:org_id}/dlg-add-patient">Patient</app:link>,
-					<app:link url="/org/${session:org_id}/dlg-add-physician">Physician / Provider</app:link>,
+					<b>Add</b> a new <app:link url="/dialogs/person/patient.jsp?data_cmd=add">Patient</app:link>,
+					<app:link url="/dialogs/person/physician.jsp?data_cmd=add">Physician / Provider</app:link>,
 					<app:link url="/org/${session:org_id}/dlg-add-referring-doctor">Referring Doctor</app:link>,
-					<app:link url="/org/${session:org_id}/dlg-add-nurse">Nurse</app:link>, or
-					<app:link url="/org/${session:org_id}/dlg-add-staff">Staff Member</app:link>
+					<app:link url="/dialogs/person/nurse.jsp?data_cmd=add">Nurse</app:link>, or
+					<app:link url="/dialogs/person/staff.jsp?data_cmd=add">Staff Member</app:link>
 				</font>
 			</td></tr></table>
 			<p>
@@ -75,13 +75,13 @@
 			</td><td>
 				<font face="arial,helvetica" size=2>
 					<b>Add</b> a new
-					<app:link url="/org/${session:org_id}/dlg-add-org-dept">Department</app:link>,
-					<app:link url="/org/${session:org_id}/dlg-add-org-provider">Associated Provider</app:link>,
-					<app:link url="/org/${session:org_id}/dlg-add-org-pharmacy">Pharmacy</app:link>,
-					<app:link url="/org/${session:org_id}/dlg-add-org-employer">Employer</app:link>,
-					<app:link url="/org/${session:org_id}/dlg-add-org-insurance">Insurance</app:link>,
-					<app:link url="/org/${session:org_id}/dlg-add-org-ipa">IPA</app:link>, or
-					<app:link url="/org/${session:org_id}/dlg-add-org-ancillary">Ancillary Service</app:link>
+					<app:link url="/dialogs/org/department.jsp?data_cmd=add">Department</app:link>,
+					<app:link url="/dialogs/org/provider.jsp?data_cmd=add">Associated Provider</app:link>,
+					<app:link url="/dialogs/org/pharmacy.jsp?data_cmd=add">Pharmacy</app:link>,
+					<app:link url="/dialogs/org/employer.jsp?data_cmd=add">Employer</app:link>,
+					<app:link url="/dialogs/org/insurance.jsp?data_cmd=add">Insurance</app:link>,
+					<app:link url="/dialogs/org/ipa.jsp?data_cmd=add">IPA</app:link>, or
+					<app:link url="/dialogs/org/ancillary.jsp?data_cmd=add">Ancillary Service</app:link>
 				</font>
 			</td></tr></table>
 			<p>
@@ -142,13 +142,13 @@
 			</td><td>
 				<font face="arial,helvetica" size=2>
 					<b>Add</b> a new
-					<app:link url="/org/${session:org_id}/dlg-add-claim">Claim</app:link>,
-					<app:link url="/org/${session:org_id}/dlg-add-claim?isHosp=1">Hospital Claim</app:link>,
-					<app:link url="/org/${session:org_id}/dlg-add-batch">Batch Payment</app:link>,
-					<app:link url="/org/${session:org_id}/dlg-add-postcappayment">Monthly Cap Payment</app:link>,
-					<app:link url="/org/${session:org_id}/dlg-add-close-date">Close Date</app:link>,
-					<app:link url="/org/${session:org_id}/dlg-add-catalog">Fee Schedule</app:link>,
-					<app:link url="/org/${session:org_id}/dlg-add-catalog-item">Fee Schedule Item</app:link>,
+					<app:link url="/dialogs/accounting/claim.jsp?data_cmd=add">Claim</app:link>,
+					<app:link url="/dialogs/accounting/claim.jsp?data_cmd=add&isHosp=1">Hospital Claim</app:link>,
+					<app:link url="/dialogs/accounting/batch.jsp?data_cmd=add">Batch Payment</app:link>,
+					<app:link url="/dialogs/accounting/postcappayment.jsp?data_cmd=add">Monthly Cap Payment</app:link>,
+					<app:link url="/dialogs/accounting/closedate.jsp?data_cmd=add">Close Date</app:link>,
+					<app:link url="/dialogs/accounting/catalog.jsp?data_cmd=add">Fee Schedule</app:link>,
+					<app:link url="/dialogs/accounting/catalogitem.jsp?data_cmd=add">Fee Schedule Item</app:link>,
 					<app:link url="/org/${session:org_id}/dlg-add-ins-product">Insurance Product</app:link>,
 					<app:link url="/org/${session:org_id}/dlg-add-ins-plan">Insurance Plan</app:link>, or
 					<app:link url="/org/${session:org_id}/dlg-add-ins-coverage">Personal Insurance Coverage</app:link>
