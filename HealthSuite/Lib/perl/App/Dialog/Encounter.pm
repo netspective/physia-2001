@@ -191,7 +191,15 @@ sub initialize
 		new CGI::Dialog::Field(caption => 'Billing Contact', name => 'billing_contact'),
 		new CGI::Dialog::Field(type=>'phone', caption => 'Billing Phone', name => 'billing_phone'),
 
-		new App::Dialog::Field::Person::ID(caption => 'Referring Physician ID', name => 'ref_id', types => ['Physician']),
+		#new App::Dialog::Field::Person::ID(caption => 'Referring Physician ID', name => 'ref_id', types => ['Referring-Doctor']),
+		new CGI::Dialog::Field(
+				caption => 'Referring Physician ID',
+				name => 'ref_id',
+				fKeyStmtMgr => $STMTMGR_PERSON,
+				fKeyStmt => 'selPersonBySessionOrgAndCategory',
+				fKeyDisplayCol => 0,
+				fKeyValueCol => 0,
+			),
 
 		new CGI::Dialog::MultiField(caption =>'Current/Similar Illness Dates', name => 'illness_dates',
 			fields => [
@@ -254,6 +262,7 @@ sub makeStateChanges
 	my $sessOrgIntId = $page->session('org_internal_id');
 	$self->getField('provider_fields')->{fields}->[0]->{fKeyStmtBindPageParams} = [$sessOrgIntId, 'Physician'];
 	$self->getField('provider_fields')->{fields}->[1]->{fKeyStmtBindPageParams} = [$sessOrgIntId, 'Physician'];
+	$self->getField('ref_id')->{fKeyStmtBindPageParams} = [$sessOrgIntId, 'Referring-Doctor'];
 
 
 
