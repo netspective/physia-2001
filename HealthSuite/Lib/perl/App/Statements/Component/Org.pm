@@ -1073,9 +1073,7 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 							where owner_org_id = :2 AND
 							org_id = :1
 				)
-				and pa.category <> 'Patient'
-				and pa.category <> 'Guarantor'
-				and pa.category <> 'Expatient'
+				and pa.category in ('Physician', 'Referring-Doctor', 'Nurse', 'Staff', 'Administrator', 'Superuser')
 				and	p.person_id = pa.person_id
 			order by pa.person_id, pa.category, p.complete_name
 		},
