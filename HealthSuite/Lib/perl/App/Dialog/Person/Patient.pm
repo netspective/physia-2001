@@ -246,6 +246,21 @@ sub customValidate
 	}
 }
 
+sub handlePostExecute
+{
+	my ($self, $page, $command, $flags, $specificRedirect) = @_;
+
+	if($page->session('org_id') eq 'ACS')
+	{
+			my $personId = $page->field('person_id');
+			$self->SUPER::handlePostExecute($page, $command, $flags,"/person/$personId/dlg-add-referral?_f_person_id=$personId");
+	}
+	else
+	{
+			$self->SUPER::handlePostExecute($page, $command, $flags, $specificRedirect);
+	}
+}
+
 sub execute_add
 {
 	my ($self, $page, $command, $flags) = @_;
