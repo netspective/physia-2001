@@ -313,13 +313,23 @@ $STMTMGR_INVOICE = new App::Statements::Invoice(
 		},
 	'selInvoiceItemsByType' => qq{
 		select parent_id, item_id, item_type, hcfa_service_place, hcfa_service_type, emergency, comments, caption, code, code_type, modifier, flags,
-			unit_cost, quantity, rel_diags, to_char(service_begin_date, '$SQLSTMT_DEFAULTDATEFORMAT') as service_begin_date,parent_code,
+			unit_cost, quantity, rel_diags, to_char(service_begin_date, '$SQLSTMT_DEFAULTDATEFORMAT') as service_begin_date, parent_code,
 			to_char(service_end_date, '$SQLSTMT_DEFAULTDATEFORMAT') as service_end_date, balance, total_adjust, extended_cost,
 			data_text_a, data_text_b, data_text_c, data_num_a, data_num_b, data_num_c
 		from invoice_item
 		where parent_id = ?
 			and item_type = ?
 			and data_text_b is NULL
+		},
+	'selExplCodeInvItems' => qq{
+		select parent_id, item_id, item_type, hcfa_service_place, hcfa_service_type, emergency, comments, caption, code, code_type, modifier, flags,
+			unit_cost, quantity, rel_diags, to_char(service_begin_date, '$SQLSTMT_DEFAULTDATEFORMAT') as service_begin_date, parent_code,
+			to_char(service_end_date, '$SQLSTMT_DEFAULTDATEFORMAT') as service_end_date, balance, total_adjust, extended_cost,
+			data_text_a, data_text_b, data_text_c, data_num_a, data_num_b, data_num_c
+		from invoice_item
+		where parent_id = ?
+			and parent_code = ?
+			and data_text_c = 'explosion'			
 		},
 	'selServiceDateRangeForAllItems' => qq{
 		select  to_char(least(service_begin_date), '$SQLSTMT_DEFAULTDATEFORMAT') as service_begin_date,
