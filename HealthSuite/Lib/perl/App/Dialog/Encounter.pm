@@ -675,32 +675,32 @@ sub addTransactionAndInvoice
 	my $confirmedInfo = $page->field('confirmed_info') eq 'Yes' ? 1 : 0;
 	my $relTo = $page->field('accident') == $condRelToFakeNone ? '' : $page->field('accident');
 	my $transId = $page->schemaAction(
-			'Transaction', $command,
-			trans_id => $editTransId || undef,
-			trans_type => $page->field('trans_type'),
-			trans_status => defined $transStatus ? $transStatus : undef,
-			parent_event_id => $page->field('event_id') || undef,
-			caption => $page->field('subject') || undef,
-			service_facility_id => $page->field('service_facility_id') || undef,
-			billing_facility_id => $billingFacility || undef,
-			provider_id => $page->field('provider_id') || undef,
-			care_provider_id => $page->field('care_provider_id') || undef,
-			trans_owner_type => defined $entityTypePerson ? $entityTypePerson : undef,
-			trans_owner_id => $personId || undef,
-			initiator_type => defined $entityTypePerson ? $entityTypePerson : undef,
-			initiator_id => $personId || undef,
-			receiver_type => defined $entityTypeOrg ? $entityTypeOrg : undef,
-			receiver_id => $page->session('org_id') || undef,
-			init_onset_date => $page->field('illness_begin_date') || undef,
-			curr_onset_date => $page->field('illness_end_date') || undef,
-			bill_type => defined $claimType ? $claimType : undef,
-			related_to => $relTo || undef,
-			data_text_a => $page->field('ref_id') || undef,
-			data_text_b => $page->field('comments') || undef,
-			data_num_a => defined $confirmedInfo ? $confirmedInfo : undef,
-			trans_begin_stamp => $timeStamp || undef,
-			_debug => 0
-		);
+		'Transaction', $command,
+		trans_id => $editTransId || undef,
+		trans_type => $page->field('trans_type'),
+		trans_status => defined $transStatus ? $transStatus : undef,
+		parent_event_id => $page->field('event_id') || undef,
+		caption => $page->field('subject') || undef,
+		service_facility_id => $page->field('service_facility_id') || undef,
+		billing_facility_id => $billingFacility || undef,
+		provider_id => $page->field('provider_id') || undef,
+		care_provider_id => $page->field('care_provider_id') || undef,
+		trans_owner_type => defined $entityTypePerson ? $entityTypePerson : undef,
+		trans_owner_id => $personId || undef,
+		initiator_type => defined $entityTypePerson ? $entityTypePerson : undef,
+		initiator_id => $personId || undef,
+		receiver_type => defined $entityTypeOrg ? $entityTypeOrg : undef,
+		receiver_id => $page->session('org_id') || undef,
+		init_onset_date => $page->field('illness_begin_date') || undef,
+		curr_onset_date => $page->field('illness_end_date') || undef,
+		bill_type => defined $claimType ? $claimType : undef,
+		related_to => $relTo || undef,
+		data_text_a => $page->field('ref_id') || undef,
+		data_text_b => $page->field('comments') || undef,
+		data_num_a => defined $confirmedInfo ? $confirmedInfo : undef,
+		trans_begin_stamp => $timeStamp || undef,
+		_debug => 0
+	);
 
 	$transId = $command eq 'add' ? $transId : $editTransId;
 
@@ -709,26 +709,24 @@ sub addTransactionAndInvoice
 	App::IntelliCode::incrementUsage($page, 'Icd', \@claimDiags, $sessUser, $sessOrg);
 
 	my $invoiceId = $page->schemaAction(
-			'Invoice', $command,
-			invoice_id => $editInvoiceId || undef,
-			invoice_type => defined $invoiceType ? $invoiceType : undef,
-			invoice_subtype => defined $claimType ? $claimType : undef,
-			invoice_status => defined $invoiceStatus ? $invoiceStatus : undef,
-			invoice_date => $page->getDate() || undef,
-			main_transaction => $transId || undef,
-			submitter_id => $page->session('user_id') || undef,
-			claim_diags => join(', ', @claimDiags) || undef,
-			owner_type => App::Universal::ENTITYTYPE_ORG,
-			owner_id => $page->session('org_id') || undef,
-			client_type => App::Universal::ENTITYTYPE_PERSON,
-			client_id => $personId || undef,
-			_debug => 0
-		);
+		'Invoice', $command,
+		invoice_id => $editInvoiceId || undef,
+		invoice_type => defined $invoiceType ? $invoiceType : undef,
+		invoice_subtype => defined $claimType ? $claimType : undef,
+		invoice_status => defined $invoiceStatus ? $invoiceStatus : undef,
+		invoice_date => $page->getDate() || undef,
+		main_transaction => $transId || undef,
+		submitter_id => $page->session('user_id') || undef,
+		claim_diags => join(', ', @claimDiags) || undef,
+		owner_type => App::Universal::ENTITYTYPE_ORG,
+		owner_id => $page->session('org_id') || undef,
+		client_type => App::Universal::ENTITYTYPE_PERSON,
+		client_id => $personId || undef,
+		_debug => 0
+	);
 
 	$invoiceId = $command eq 'add' ? $invoiceId : $editInvoiceId;
-
 	$page->param('invoice_id', $invoiceId);
-
 
 	handleInvoiceAttrs($self, $page, $command, $flags, $invoiceId);
 }
@@ -1410,61 +1408,58 @@ sub addProcedureItems
 			unit_cost => $page->param("_f_proc_$line\_charges") || undef,
 			rel_diags => $page->param("_f_proc_$line\_actual_diags") || undef,		#the actual icd (diag) codes
 			data_text_a => $page->param("_f_proc_$line\_diags") || undef,			#the diag code pointers
-			);
+		);
 
 
-			$record{extended_cost} = $record{unit_cost} * $record{quantity};
-			$record{balance} = $record{extended_cost};
+		$record{extended_cost} = $record{unit_cost} * $record{quantity};
+		$record{balance} = $record{extended_cost};
 
-			my $totalInvItems = $STMTMGR_INVOICE->getSingleValue($page, STMTMGRFLAG_CACHE, 'selInvoiceProcedureItemCount', $invoiceId, $servItemType, $labItemType);
-			my $itemSeq = 0;
-			$itemSeq = $totalInvItems + 1;
+		my $totalInvItems = $STMTMGR_INVOICE->getSingleValue($page, STMTMGRFLAG_CACHE, 'selInvoiceProcedureItemCount', $invoiceId, $servItemType, $labItemType);
+		my $itemSeq = 0;
+		$itemSeq = $totalInvItems + 1;
 
-			$record{data_num_c} = $itemSeq || undef;
-
-
-			# IMPORTANT: ADD VALIDATION FOR FIELD ABOVE (TALK TO RADHA/MUNIR/SHAHID)
-			$page->schemaAction('Invoice_Item',	$procCommand,
-					%record,
-					parent_id => $invoiceId,
-					_debug => 0,
-					);
+		$record{data_num_c} = $itemSeq || undef;
 
 
+		# IMPORTANT: ADD VALIDATION FOR FIELD ABOVE (TALK TO RADHA/MUNIR/SHAHID)
+		$page->schemaAction('Invoice_Item',	$procCommand,
+			%record,
+			parent_id => $invoiceId,
+			_debug => 0,
+		);
 
 
-			#UPDATE INVOICE
 
-			my $invoice = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoice', $invoiceId);
+		#UPDATE INVOICE
 
-			my $totalItems = $invoice->{total_items};
-			if($procCommand eq 'add')
-			{
-				$totalItems = $invoice->{total_items} + 1;
-			}
-			elsif($procCommand eq 'remove')
-			{
-				$totalItems = $invoice->{total_items} - 1;
-			}
+		my $invoice = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoice', $invoiceId);
 
-			my $allInvItems = $STMTMGR_INVOICE->getRowsAsHashList($page, STMTMGRFLAG_CACHE, 'selInvoiceItems', $invoiceId);
-			my $totalCostForInvoice = '';
-			foreach my $item (@{$allInvItems})
-			{
-				$totalCostForInvoice += $item->{extended_cost};
-			}
+		my $totalItems = $invoice->{total_items};
+		if($procCommand eq 'add')
+		{
+			$totalItems = $invoice->{total_items} + 1;
+		}
+		elsif($procCommand eq 'remove')
+		{
+			$totalItems = $invoice->{total_items} - 1;
+		}
 
-			my $invBalance = $totalCostForInvoice + $invoice->{total_adjust};
+		my $allInvItems = $STMTMGR_INVOICE->getRowsAsHashList($page, STMTMGRFLAG_CACHE, 'selInvoiceItems', $invoiceId);
+		my $totalCostForInvoice = '';
+		foreach my $item (@{$allInvItems})
+		{
+			$totalCostForInvoice += $item->{extended_cost};
+		}
 
-			$page->schemaAction('Invoice',
-					'update',
-					invoice_id => $invoiceId,
-					total_cost => defined $totalCostForInvoice ? $totalCostForInvoice : undef,
-					total_items => defined $totalItems ? $totalItems : undef,
-					balance => defined $invBalance ? $invBalance : undef
-				);
+		my $invBalance = $totalCostForInvoice + $invoice->{total_adjust};
 
-
+		$page->schemaAction('Invoice',
+			'update',
+			invoice_id => $invoiceId,
+			total_cost => defined $totalCostForInvoice ? $totalCostForInvoice : undef,
+			total_items => defined $totalItems ? $totalItems : undef,
+			balance => defined $invBalance ? $invBalance : undef
+		);
 	}
 }
 
@@ -1564,77 +1559,5 @@ sub checkEventStatus
 
 	return ($status, $person, $stamp);
 }
-
-use constant CLAIM_DIALOG => 'Dialog/Claim';
-
-@CHANGELOG =
-(
-	[	CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '12/30/1999', 'MAF',
-		CLAIM_DIALOG,
-		'Updated the setInsuranceFields subroutine to populate the Primary Physician in the Create claim, Checkin and Checkout dialogs for a patient. '],
-	[	CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '01/02/2000', 'MAF',
-		CLAIM_DIALOG,
-		'Updated validation to disallow user from entering in the same icd code twice.'],
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_NOTE, '01/03/2000', 'MAF',
-		CLAIM_DIALOG,
-		'Added Pay To Org/Phone and Claim Filing/Indicator invoice attributes. '],
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_ADD, '01/05/2000', 'RK',
-		CLAIM_DIALOG,
-		'Added active-session execute action.'],
-	[	CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '01/06/2000', 'MAF',
-		CLAIM_DIALOG,
-		'Updated validation to disallow user from deleting an icd code that is being used in a procedure.'],
-	[	CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '01/10/2000', 'RK',
-		CLAIM_DIALOG,
-		'Added session-activity to the claim.'],
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_NOTE, '01/12/2000', 'MAF',
-		CLAIM_DIALOG,
-		'Retired old InvoiceButtons and replaced it with CGI::Dialog::Buttons.'],
-	[	CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_REMOVE, '01/13/2000', 'MAF',
-		CLAIM_DIALOG,
-		'Removed Information Release checkbox and date (this is now an Authorization and can be set in the Authorization pane).'],
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_UPDATE, '01/20/2000', 'MAF',
-		CLAIM_DIALOG,
-		'Changed setInsuranceFields to setFields.'],
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_UPDATE, '01/23/2000', 'MM',
-		CLAIM_DIALOG,
-		'Added Optimized Procedure entry textarea box.'],
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_UPDATE, '01/24/2000', 'MAF',
-		CLAIM_DIALOG,
-		'Replaced magic numbers with constants.'],
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_UPDATE, '01/26/2000', 'MM',
-		CLAIM_DIALOG,
-		'Added validateProcEntryTextArea validation routine.'],
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_UPDATE, '01/26/2000', 'MM',
-		CLAIM_DIALOG,
-		'Added validateEachItemInProcEntryTextArea validation routine.'],
-	[	CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '02/19/2000', 'MAF',
-		CLAIM_DIALOG,
-		'Created CPT Explosion Code entry field.'],
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_ADD, '02/19/2000', 'MAF',
-		CLAIM_DIALOG,
-		'Added executeExplosionCode subroutine.'],
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_ADD, '02/25/2000', 'MAF',
-		CLAIM_DIALOG,
-		'Added submission order attribute.'],
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_ADD, '03/27/2000', 'MAF',
-		CLAIM_DIALOG,
-		'Added radio buttons for all insurances belonging to patient. Defaults to primary ins.'],
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_ADD, '03/28/2000', 'MAF',
-		CLAIM_DIALOG,
-		'Removed setFields function. Placed contents in populateData.'],
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_ADD, '03/28/2000', 'MAF',
-		CLAIM_DIALOG,
-		'Created parent sub initialize for checkin, checkout, and createclaim dialogs.'],
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_ADD, '03/28/2000', 'MAF',
-		CLAIM_DIALOG,
-		'Finally got sub copay to work.'],
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_ADD, '04/02/2000', 'MAF',
-		CLAIM_DIALOG,
-		"Deleted validateOrgId. The field 'Payment Type' which was using this is no longer being used in this dialog."],
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_ADD, '04/02/2000', 'MAF',
-		CLAIM_DIALOG,
-		"Deleted sub copay. Now all 'visit' claim information will be stored in one invoice."],
-);
 
 1;

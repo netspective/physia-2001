@@ -167,30 +167,30 @@ sub populateData
 	my $servTypeCaption = $STMTMGR_CATALOG->getSingleValue($page, STMTMGRFLAG_CACHE, 'selGenericServiceType', $indivItem->{data_num_b});
 
 	$self->addPreHtml(qq{
-					<table cellspacing=0 border=0>
-						<tr>
-							<td align=right>$font Service:</td>
-							<td>$font $fromDate $toDate ($servPlaceCaption, Type $indivItem->{data_num_b})</td>
-						</tr>
-						<tr>
-							<td align=right>$font Diagnoses:</td>
-							<td>$font $indivItem->{rel_diags}</td>
-						</tr>
-						<tr>
-							<td align=right valign=top>$font Procedure:</td>
-							<td>$font $indivItem->{code} - $cptCaption->{name} (Modf $modCaption), EMG: $emg</td>
-						</tr>
-						<tr>
-							<td align=right>$font Charge:</td>
-							<td>$font \$$indivItem->{extended_cost} (\$$indivItem->{unit_cost} * $indivItem->{quantity}),
-								Adj: \$$adjustTotal
-							</td>
-						</tr>
-						<tr>
-							<td align=right>&nbsp;</td>
-							<td>$font $indivItem->{data_text_b}</td>
-						</tr>
-					</table>
+		<table cellspacing=0 border=0>
+			<tr>
+				<td align=right>$font Service:</td>
+				<td>$font $fromDate $toDate ($servPlaceCaption, Type $indivItem->{data_num_b})</td>
+			</tr>
+			<tr>
+				<td align=right>$font Diagnoses:</td>
+				<td>$font $indivItem->{rel_diags}</td>
+			</tr>
+			<tr>
+				<td align=right valign=top>$font Procedure:</td>
+				<td>$font $indivItem->{code} - $cptCaption->{name} (Modf $modCaption), EMG: $emg</td>
+			</tr>
+			<tr>
+				<td align=right>$font Charge:</td>
+				<td>$font \$$indivItem->{extended_cost} (\$$indivItem->{unit_cost} * $indivItem->{quantity}),
+					Adj: \$$adjustTotal
+				</td>
+			</tr>
+			<tr>
+				<td align=right>&nbsp;</td>
+				<td>$font $indivItem->{data_text_b}</td>
+			</tr>
+		</table>
 	});
 }
 
@@ -215,14 +215,13 @@ sub execute_add
 			my $itemSeq = $totalDummyItems + 1;
 
 			$itemId = $page->schemaAction(
-					'Invoice_Item', 'add',
-					parent_id => $invoiceId,
-					item_type => $itemType,
-					data_num_c => $itemSeq,
-					_debug => 0
-				);
+				'Invoice_Item', 'add',
+				parent_id => $invoiceId,
+				item_type => $itemType,
+				data_num_c => $itemSeq,
+				_debug => 0
+			);
 		}
-
 
 
 
@@ -247,25 +246,25 @@ sub execute_add
 		my $netAdjust = 0 - $page->field('adjustment_amount') - $page->field('plan_paid') - $page->field('writeoff_amount');
 
 		$page->schemaAction(
-				'Invoice_Item_Adjust', 'add',
-				adjustment_type => defined $adjType ? $adjType : undef,
-				adjustment_amount => $page->field('adjustment_amount') || undef,
-				parent_id => $itemId || undef,
-				plan_allow => $page->field('plan_allow') || undef,
-				plan_paid => $page->field('plan_paid') || undef,
-				pay_date => $todaysDate,
-				pay_type => defined $payType ? $payType : undef,
-				pay_method => defined $payMethod ? $payMethod : undef,
-				pay_ref => $page->field('pay_ref') || undef,
-				payer_type => defined $payerType ? $payerType : undef,
-				payer_id => $payerId || undef,
-				writeoff_code => defined $writeoffCode ? $writeoffCode : undef,
-				writeoff_amount => $writeoffAmt || undef,
-				net_adjust => defined $netAdjust ? $netAdjust : undef,
-				adjust_codes => $page->field('adjust_codes') || undef,
-				comments => $page->field('comments') || undef,
-				_debug => 0
-			);
+			'Invoice_Item_Adjust', 'add',
+			adjustment_type => defined $adjType ? $adjType : undef,
+			adjustment_amount => $page->field('adjustment_amount') || undef,
+			parent_id => $itemId || undef,
+			plan_allow => $page->field('plan_allow') || undef,
+			plan_paid => $page->field('plan_paid') || undef,
+			pay_date => $todaysDate,
+			pay_type => defined $payType ? $payType : undef,
+			pay_method => defined $payMethod ? $payMethod : undef,
+			pay_ref => $page->field('pay_ref') || undef,
+			payer_type => defined $payerType ? $payerType : undef,
+			payer_id => $payerId || undef,
+			writeoff_code => defined $writeoffCode ? $writeoffCode : undef,
+			writeoff_amount => $writeoffAmt || undef,
+			net_adjust => defined $netAdjust ? $netAdjust : undef,
+			adjust_codes => $page->field('adjust_codes') || undef,
+			comments => $page->field('comments') || undef,
+			_debug => 0
+		);
 
 
 
@@ -278,12 +277,12 @@ sub execute_add
 		my $balance = $invItem->{extended_cost} + $totalAdjustForItem;
 
 		$page->schemaAction(
-				'Invoice_Item', 'update',
-				item_id => $itemId || undef,
-				total_adjust => defined $totalAdjustForItem ? $totalAdjustForItem : undef,
-				balance => defined $balance ? $balance : undef,
-				_debug => 0
-			);
+			'Invoice_Item', 'update',
+			item_id => $itemId || undef,
+			total_adjust => defined $totalAdjustForItem ? $totalAdjustForItem : undef,
+			balance => defined $balance ? $balance : undef,
+			_debug => 0
+		);
 
 
 
@@ -296,12 +295,12 @@ sub execute_add
 		$balance = $invoice->{total_cost} + $totalAdjustForInvoice;
 
 		$page->schemaAction(
-				'Invoice', 'update',
-				invoice_id => $invoiceId || undef,
-				total_adjust => defined $totalAdjustForInvoice ? $totalAdjustForInvoice : undef,
-				balance => defined $balance ? $balance : undef,
-				_debug => 0
-			);
+			'Invoice', 'update',
+			invoice_id => $invoiceId || undef,
+			total_adjust => defined $totalAdjustForInvoice ? $totalAdjustForInvoice : undef,
+			balance => defined $balance ? $balance : undef,
+			_debug => 0
+		);
 
 
 
@@ -311,36 +310,19 @@ sub execute_add
 		my $description = "$payerIs payment/adjustment made";
 
 		$page->schemaAction(
-				'Invoice_Attribute', 'add',
-				parent_id => $invoiceId || undef,
-				item_name => 'Invoice/History/Item',
-				value_type => defined $historyValueType ? $historyValueType : undef,
-				value_text => $description,
-				value_textB => $page->field('comments') || undef,
-				value_date => $todaysDate,
-				_debug => 0
-			);
+			'Invoice_Attribute', 'add',
+			parent_id => $invoiceId || undef,
+			item_name => 'Invoice/History/Item',
+			value_type => defined $historyValueType ? $historyValueType : undef,
+			value_text => $description,
+			value_textB => $page->field('comments') || undef,
+			value_date => $todaysDate,
+			_debug => 0
+		);
 	}
 
 	$self->handlePostExecute($page, $command, $flags);
 
 }
-
-#
-# change log is an array whose contents are arrays of
-# 0: one or more CHANGELOGFLAG_* values
-# 1: the date the change/update was made
-# 2: the person making the changes (usually initials)
-# 3: the category in which change should be shown (user-defined) - can have '/' for hierarchies
-# 4: any text notes about the actual change/action
-#
-use constant ADJUST_DIALOG => 'Dialog/Adjustment';
-
-@CHANGELOG =
-(
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_NOTE, '12/15/1999', 'MAF',
-		ADJUST_DIALOG,
-		'Fixed item_type of "dummy" invoice items.'],
-);
 
 1;
