@@ -20,6 +20,8 @@
 	<register-field tag-name="field.multiperson.id" class="dialog.field.multiperson.IDField"/>
 	<register-field tag-name="field.organization.id" class="dialog.field.organization.IDField"/>
 	<register-field tag-name="field.organization.id.new" class="dialog.field.organization.id.NewField"/>
+	<register-field tag-name="field.organization.id.main" class="dialog.field.organization.id.MainField"/>
+	<register-field tag-name="field.organization.id.main.new" class="dialog.field.organization.id.main.NewField"/>
 	<register-field tag-name="field.outstandinginvoices" class="dialog.field.OutstandingInvoicesField"/>
 	<register-field tag-name="field.outstandingitems" class="dialog.field.OutstandingItemsField"/>
 	<register-field tag-name="field.person.id" class="dialog.field.person.IDField"/>
