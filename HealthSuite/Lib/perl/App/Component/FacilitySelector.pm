@@ -4,6 +4,7 @@ package App::Component::FacilitySelector;
 
 use strict;
 use CGI::Layout;
+use CGI::Validator::Field;
 use CGI::Component;
 
 use DBI::StatementManager;
@@ -38,16 +39,24 @@ sub getComponentHtml
 
 	my $dialog = new CGI::Dialog(schema => $page->getSchema());
 
-	my $field = 	new CGI::Dialog::Field(caption => 'Facility',
+	#my $field = 	new CGI::Dialog::Field(caption => 'Facility',
+	#	name => 'facility_list',
+	#	style => 'multicheck',
+	#	hints => 'Choose one or more Facilities to monitor.',
+	#	fKeyStmtMgr => $STMTMGR_SCHEDULING,
+	#	fKeyStmt => 'selFacilityList',
+	#	fKeyDisplayCol => 1,
+	#	fKeyValueCol => 0,
+	#);
+
+	my $field = new App::Dialog::Field::OrgType(
+		caption => 'Facility',
 		name => 'facility_list',
 		style => 'multicheck',
-		hints => 'Choose one or more Facilities to monitor.',
-		fKeyStmtMgr => $STMTMGR_SCHEDULING,
-		fKeyStmt => 'selFacilityList',
-		fKeyDisplayCol => 1,
-		fKeyValueCol => 0,
+		hints => 'Choose one or more Facilities to monitor.'
 	);
-
+	$field->clearFlag(FLDFLAG_REQUIRED);
+			
 	$dialog->addContent($field);
 	
 	# populate	

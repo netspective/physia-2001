@@ -305,7 +305,7 @@ sub getControlBarHtml
 						<img src='/resources/icons/calendar2.gif' title='Show calendar' BORDER=0></A> &nbsp
 
 					<input name=left  type=button value='<' onClick="updatePage('$prevDay')" title="Goto $pDay">
-					<INPUT size=13 name="selDate" type="text" value="$fmtDate" onChange="updatePage(document.dateForm.selDate.value);">
+					<INPUT size=13 name="selDate" type="text" value="$fmtDate" onChange="updatePage(this.value);">
 					<input name=right type=button value='>' onClick="updatePage('$nextDay')" title="Goto $nDay">
 
 					$timeFieldsHtml
