@@ -62,6 +62,7 @@ sub initialize
 		new CGI::Dialog::Field(type => 'hidden', name => 'parent_event_id'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'insuranceIsSet'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'eventFieldsAreSet'),
+		new CGI::Dialog::Field(type => 'hidden', name => 'hospFieldsAreSet'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'invoiceFieldsAreSet'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'invoice_flags'),	#to check if this claim has been submitted already
 		new CGI::Dialog::Field(type => 'hidden', name => 'old_invoice_id'),	#the invoice id of the claim that is being modified after submission
@@ -76,22 +77,21 @@ sub initialize
 		new CGI::Dialog::Field(type => 'hidden', name => 'tertiary_payer'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'quaternary_payer'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'third_party_payer_ins_id'),
+
+		new CGI::Dialog::Field(type => 'hidden', name => 'provider_pair'), # for hosp claims, the service and billing provider ids are concatenated and checked in the handleProcedureItems function
 		new CGI::Dialog::Field(type => 'hidden', name => 'copay_amt'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'dupCheckin_returnUrl'),
+
 		new CGI::Dialog::Field(type => 'hidden', name => 'ins_ffs'), # Contains the insurance FFS
 		new CGI::Dialog::Field(type => 'hidden', name => 'work_ffs'), # Contains the works comp
 		new CGI::Dialog::Field(type => 'hidden', name => 'org_ffs'), # Contains the Org FFS
 		new CGI::Dialog::Field(type => 'hidden', name => 'prov_ffs'), # Contains the Provider FFS
-		new CGI::Dialog::Field(type => 'hidden', name => 'provider_pair'), # for hosp claims, the service and billing provider ids are concatenated and checked in the handleProcedureItems function
+
 
 		#BatchDateId Needs the name of the Org.  So it can check if the org has a close date.
 		#Batch Date must be > then close Date to pass validation
 		new App::Dialog::Field::BatchDateID(caption => 'Batch ID Date', name => 'batch_fields',orgInternalIdFieldName=>'service_facility_id'),
-		new App::Dialog::Field::Person::ID(caption => 'Patient ID', name => 'attendee_id', options => FLDFLAG_REQUIRED,
-			#readOnlyWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
-			types => ['Patient']),
-
-
+		new App::Dialog::Field::Person::ID(caption => 'Patient ID', name => 'attendee_id', options => FLDFLAG_REQUIRED, types => ['Patient']),
 
 		new CGI::Dialog::Field(type => 'stamp', caption => 'Appointment Time',
 			name => 'start_time', options => FLDFLAG_READONLY),
@@ -104,14 +104,12 @@ sub initialize
 			schema => $schema,
 			column => 'Transaction.trans_type',
 			typeRange => '2000..2999'),
-
 		new CGI::Dialog::Field::TableColumn(
 			name => 'appt_type',
 			options => FLDFLAG_READONLY,
 			caption => 'Appointment Type',
 			schema => $schema,
 			column => 'Event.appt_type'),
-
 		new CGI::Dialog::Field(caption => 'Reason for Visit', name => 'subject', options => FLDFLAG_REQUIRED),
 		new CGI::Dialog::Field(type => 'memo', caption => 'Symptoms', name => 'remarks'),
 
@@ -135,14 +133,8 @@ sub initialize
 				new CGI::Dialog::Field(type => 'select', selOptions => 'Person:person;Organization:org', caption => 'Payer for Today Type', name => 'other_payer_type'),
 			]),
 
-		#new CGI::Dialog::MultiField(caption => 'Deductible Balance/Insurance Phone', name => 'deduct_fields',
-		#	fields => [
-				new CGI::Dialog::Field(type => 'currency', caption => 'Deductible Balance', name => 'deduct_balance'),
-		#		new CGI::Dialog::Field(caption => 'Contact Phone for Primary Insurance', name => 'primary_ins_phone', options => FLDFLAG_READONLY),
-		#	]),
+		new CGI::Dialog::Field(type => 'currency', caption => 'Deductible Balance', name => 'deduct_balance'),
 		new CGI::Dialog::Field(caption => 'Contact Phone for Primary Insurance', name => 'primary_ins_phone', options => FLDFLAG_READONLY),
-
-
 
 		new CGI::Dialog::MultiField(caption => 'Provider Service/Billing', name => 'provider_fields',
 			fields => [
@@ -167,11 +159,6 @@ sub initialize
 			]),
 
 
-
-		#new CGI::Dialog::MultiField(caption => 'Org Service/Billing/Pay To', name => 'org_fields',
-		#	hints => 'Service Org is the org in which services were rendered.<br>
-		#				Billing org is the org in which the billing should be tracked.<br>
-		#				Pay To org is the org which should receive payment.',
 		new CGI::Dialog::MultiField(caption => 'Org Service/Billing', name => 'org_fields',
 			hints => 'Service Org is the org in which services were rendered.<br>
 						Billing org is the org in which the billing should be tracked.',
@@ -186,11 +173,6 @@ sub initialize
 							name => 'billing_facility_id',
 							options => FLDFLAG_REQUIRED,
 							types => "'PRACTICE'"),
-				#new App::Dialog::Field::OrgType(
-				#			caption => 'Pay To Org',
-				#			name => 'pay_to_org_id',
-				#			options => FLDFLAG_REQUIRED,
-				#			types => "'PRACTICE'"),
 			]),
 		new CGI::Dialog::MultiField(caption => 'Hospital/Billing Facility', name => 'hosp_org_fields',
 			hints => 'Hospital is the org in which services were rendered.<br>
@@ -261,14 +243,8 @@ sub makeStateChanges
 	$self->SUPER::makeStateChanges($page, $command, $dlgFlags);
 	$command ||= 'add';
 
-	my $isHosp = $page->param('isHosp');
-
 	#keep third party other invisible unless it is chosen (see customValidate)
-	my $payer = $page->field('payer');
-	unless($payer eq 'Third-Party Payer')
-	{
-		$self->setFieldFlags('other_payer_fields', FLDFLAG_INVISIBLE, 1);
-	}
+	$self->setFieldFlags('other_payer_fields', FLDFLAG_INVISIBLE, 1);
 
 	#Set attendee_id field and make it read only if person_id exists
 	if(my $personId = $page->param('person_id'))
@@ -281,7 +257,6 @@ sub makeStateChanges
 	my $sessOrgIntId = $page->session('org_internal_id');
 	$self->getField('provider_fields')->{fields}->[0]->{fKeyStmtBindPageParams} = [$sessOrgIntId, 'Physician'];
 	$self->getField('provider_fields')->{fields}->[1]->{fKeyStmtBindPageParams} = [$sessOrgIntId, 'Physician'];
-	#$self->getField('ref_id')->{fKeyStmtBindPageParams} = [$sessOrgIntId, 'Referring-Doctor'];
 
 
 	#Don't want to show opt proc entry when deleting
@@ -370,6 +345,7 @@ sub populateData
 
 	my $invoiceId = $page->param('invoice_id');
 	my $eventId = $page->param('event_id') || $page->field('parent_event_id');
+	my $hospTransId = $page->param('hospId');
 
 	if(! $page->field('eventFieldsAreSet') && $eventId)
 	{
@@ -388,7 +364,21 @@ sub populateData
 		$page->field('eventFieldsAreSet', 1);
 	}
 
-	if(! $page->field('invoiceFieldsAreSet') && $invoiceId ne '')
+	#if coming from the hospitalization component, prefill fields with ones entered from hosp component dialog
+	if(! $page->field('hospFieldsAreSet') && $hospTransId)
+	{
+		my $hospTransData = $STMTMGR_TRANSACTION->getRowAsHash($page, STMTMGRFLAG_NONE, 'selTransactionById', $hospTransId);
+		$page->field('hospital_id', $hospTransData->{service_facility_id});
+		$page->field('hospitalization_begin_date', $hospTransData->{trans_begin_stamp});
+		$page->field('hospitalization_end_date', $hospTransData->{trans_end_stamp});
+		$page->field('prior_auth', $hospTransData->{auth_ref});
+		$page->field('ref_id', $hospTransData->{data_text_b});
+		$page->param('_f_proc_diags', $hospTransData->{detail});
+
+		$page->field('hospFieldsAreSet', 1);
+	}
+
+	if(! $page->field('invoiceFieldsAreSet') && $invoiceId)
 	{
 		my $invoiceInfo = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoice', $invoiceId);
 		$page->field('attendee_id', $invoiceInfo->{client_id});
@@ -396,80 +386,81 @@ sub populateData
 		$page->field('current_status', $invoiceInfo->{invoice_status});
 		$page->param('_f_proc_diags', $invoiceInfo->{claim_diags});
 		$page->field('invoice_flags', $invoiceInfo->{flags});
-		$page->field('old_invoice_id', $invoiceId);	#this is needed if the current claim is being edited but has already been submitted. if this is the case, a new claim is being
-											#created that is an exact copy of the submitted claim.
 
+		#this is needed if the current claim is being edited but has already been transferred (see Encounter/CreateClaim.pm for conditions).
+		#if this is the case, a new claim is being created that is an exact copy of the submitted claim.
+		$page->field('old_invoice_id', $invoiceId);
+
+		#Get payer
+		#my $invoiceBilling = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoiceBillingCurrent', $invoiceInfo->{billing_id});
+		#my $billToId = $invoiceBilling->{bill_to_id};
+		#my $billPartyType = $invoiceBilling->{bill_party_type};
+		#if($billPartyType == App::Universal::INVOICEBILLTYPE_THIRDPARTYINS || $billPartyType == App::Universal::INVOICEBILLTYPE_THIRDPARTYORG)
+		#{
+		#	my $orgId = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_NONE, 'selRegistry', $billToId);
+		#	$billToId = $orgId->{org_id};
+		#}
+		#$page->field('payer', $billToId);
+
+		#Get copay
 		my $invoiceCopayItem = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoiceItemsByType', $invoiceId, App::Universal::INVOICEITEMTYPE_COPAY);
 		$page->field('copay_amt', $invoiceCopayItem->{extended_cost});
 
+		#Get all procedure and lab items for the claim
 		my $procedures = $STMTMGR_INVOICE->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'selInvoiceProcedureItems', $invoiceId, App::Universal::INVOICEITEMTYPE_SERVICE, App::Universal::INVOICEITEMTYPE_LAB);
 
-		#taken off the UI
-		#my $servPlaceCode = $STMTMGR_CATALOG->getSingleValue($page, STMTMGRFLAG_CACHE, 'selGenericServicePlaceById', $procedures->[0]->{hcfa_service_place});
-		#$page->param('_f_proc_service_place', $servPlaceCode);
-
-		my $servTypeCode;
+		#For regular procedures (not children of explosion codes)
 		my $line;
 		my $totalProcs = scalar(@{$procedures});
-
-		#For regular procedures (not children of explosion codes)
 		foreach my $idx (0..$totalProcs-1)
 		{
-			#NOTE: data_text_a stores the indexes of the rel_diags (which are actual codes, not pointers)
-			#NOTE: data_text_c indicates if the line item is a child of an explosion code
-
-			next if $procedures->[$idx]->{data_text_c} eq 'explosion';
-			$servTypeCode = $STMTMGR_CATALOG->getSingleValue($page, STMTMGRFLAG_CACHE, 'selGenericServiceTypeById', $procedures->[$idx]->{hcfa_service_type});
+			next if $procedures->[$idx]->{data_text_c} eq 'explosion';							#data_text_c indicates if the line item is a child of an explosion code
 
 			$line = $idx + 1;
 			$page->param("_f_proc_$line\_item_id", $procedures->[$idx]->{item_id});
 			$page->param("_f_proc_$line\_dos_begin", $procedures->[$idx]->{service_begin_date});
 			$page->param("_f_proc_$line\_dos_end", $procedures->[$idx]->{service_end_date});
-			#$page->param("_f_proc_$line\_service_type", $servTypeCode);
+			#$page->param("_f_proc_$line\_service_type", );									#this is set in Procedures.pm by fee schedule and intellicode
 			$page->param("_f_proc_$line\_procedure", $procedures->[$idx]->{code});
 			$page->param("_f_proc_$line\_modifier", $procedures->[$idx]->{modifier});
 			$page->param("_f_proc_$line\_units", $procedures->[$idx]->{quantity});
-			#$page->param("_f_proc_$line\_charges", $procedures->[$idx]->{unit_cost});						#don't want to populate this in the event fee schedules should change
+			#$page->param("_f_proc_$line\_charges", $procedures->[$idx]->{unit_cost});			#don't want to populate this in the event fee schedules should change
 			$page->param("_f_proc_$line\_emg", @{[ ($procedures->[$idx]->{emergency} == 1 ? 'on' : '' ) ]});
 			$page->param("_f_proc_$line\_comments", $procedures->[$idx]->{comments});
-			$page->param("_f_proc_$line\_diags", $procedures->[$idx]->{data_text_a});
+			$page->param("_f_proc_$line\_diags", $procedures->[$idx]->{data_text_a});			#data_text_a stores the diag code pointers
 			$page->param("_f_proc_$line\_actual_diags", $procedures->[$idx]->{rel_diags});
 			$page->param("_f_proc_$line\_ffs_flag", $procedures->[$idx]->{data_num_a});
 		}
 
 		#For children of explosion codes
-		my $parentCode;
 		$line = 0;
+		my $parentCode;
 		my $prevCode;
 		foreach my $idx (0..$totalProcs-1)
 		{
-			#NOTE: data_text_a stores the indexes of the rel_diags (which are actual codes, not pointers)
-			#NOTE: data_text_c indicates if the line item is a child of an explosion code
 			$parentCode = $procedures->[$idx]->{parent_code};
 			next if $parentCode eq '';
-			next if $procedures->[$idx]->{data_text_c} ne 'explosion';
+			next if $procedures->[$idx]->{data_text_c} ne 'explosion';							#data_text_c indicates if the line item is a child of an explosion code
 			next if $prevCode eq $parentCode;			
 			$prevCode = $parentCode;
-
-			#next if $parentCode eq $procedures->[$idx-1]->{parent_code};
-			$servTypeCode = $STMTMGR_CATALOG->getSingleValue($page, STMTMGRFLAG_CACHE, 'selGenericServiceTypeById', $procedures->[$idx]->{hcfa_service_type});
 
 			$line = $idx + 1;
 			$page->param("_f_proc_$line\_item_id", $procedures->[$idx]->{item_id});
 			$page->param("_f_proc_$line\_dos_begin", $procedures->[$idx]->{service_begin_date});
 			$page->param("_f_proc_$line\_dos_end", $procedures->[$idx]->{service_end_date});
-			#$page->param("_f_proc_$line\_service_type", $servTypeCode);
+			#$page->param("_f_proc_$line\_service_type", );									#this is set in Procedures.pm by fee schedule and intellicode
 			$page->param("_f_proc_$line\_procedure", $parentCode);
 			$page->param("_f_proc_$line\_prev_code", $parentCode);
 			$page->param("_f_proc_$line\_modifier", $procedures->[$idx]->{modifier});
 			$page->param("_f_proc_$line\_units", $procedures->[$idx]->{quantity});
-			#$page->param("_f_proc_$line\_charges", $procedures->[$idx]->{unit_cost});						#don't want to populate this in the event fee schedules should change
+			#$page->param("_f_proc_$line\_charges", $procedures->[$idx]->{unit_cost});			#don't want to populate this in the event fee schedules should change
 			$page->param("_f_proc_$line\_emg", @{[ ($procedures->[$idx]->{emergency} == 1 ? 'on' : '' ) ]});
 			$page->param("_f_proc_$line\_comments", $procedures->[$idx]->{comments});
-			$page->param("_f_proc_$line\_diags", $procedures->[$idx]->{data_text_a});
+			$page->param("_f_proc_$line\_diags", $procedures->[$idx]->{data_text_a});			#data_text_a stores the diag code pointers
 			$page->param("_f_proc_$line\_actual_diags", $procedures->[$idx]->{rel_diags});
 			$page->param("_f_proc_$line\_ffs_flag", $procedures->[$idx]->{data_num_a});
 		}
+
 
 		$STMTMGR_TRANSACTION->createFieldsFromSingleRow($page, STMTMGRFLAG_NONE, 'selTransCreateClaim', $invoiceInfo->{main_transaction});
 		$STMTMGR_INVOICE->createFieldsFromSingleRow($page, STMTMGRFLAG_NONE, 'selInvoiceAttrIllness',$invoiceId);
@@ -891,14 +882,15 @@ sub addTransactionAndInvoice
 	my ($self, $page, $command, $flags) = @_;
 	$command ||= 'add';
 
+	my $timeStamp = $page->getTimeStamp();
 	my $sessOrgIntId = $page->session('org_internal_id');
 	my $sessUser = $page->session('user_id');
 	my $personId = $page->field('attendee_id');
 	my $claimType = $page->field('claim_type');
 	my $editInvoiceId = $page->param('invoice_id');
 	my $editTransId = $page->field('trans_id');
-	my $timeStamp = $page->getTimeStamp();
 	my $onHold = $page->field('on_hold');
+	my $submissionOrder = $page->field('submission_order');
 
 	#CONSTANTS -------------------------------------------
 		#invoice constants
@@ -992,7 +984,7 @@ sub addTransactionAndInvoice
 	#create attributes, items, billing info, handle hmo cap, then redirect
 	handleInvoiceAttrs($self, $page, $command, $flags, $invoiceId);
 	handleProcedureItems($self, $page, $command, $flags, $invoiceId);
-	handleBillingInfo($self, $page, $command, $flags, $invoiceId);
+	handleBillingInfo($self, $page, $command, $flags, $invoiceId) if $submissionOrder == 0 || $command eq 'add';
 	handleHmoCapChanges($self, $page, $command, $invoiceId);
 	handleRedirect($self, $page, $command, $flags, $invoiceId);
 }
@@ -1893,6 +1885,8 @@ sub customValidate
 	my $payer = $page->field('payer');
 	if($payer eq 'Third-Party Payer')
 	{
+		$self->updateFieldFlags('other_payer_fields', FLDFLAG_INVISIBLE, 0);
+
 		my $otherPayer = $page->field('other_payer_id');
 		$otherPayer = uc($otherPayer);
 		$page->field('other_payer_id', $otherPayer);
@@ -1948,7 +1942,7 @@ sub checkIntellicodeErrors
 	for(my $line = 1; $line <= $lineCount; $line++)
 	{
 		my $cpt = $page->param("_f_proc_$line\_procedure");
-		next unless $cpt;
+		next unless $cpt && $cpt ne 'Procedure';
 		my $modifier = $page->param("_f_proc_$line\_modifier");
 		my $relDiags = $page->param("_f_proc_$line\_actual_diags");
 		push(@procs, [$cpt, $modifier || undef, split(/,/, $relDiags)]);
