@@ -39,6 +39,7 @@ sub new
 
 	my $physField = new App::Dialog::Field::Person::ID(name => 'r_ids',
 		caption => 'Resource(s)',
+		type => 'not_an_identifier', # to disable type identifier
 		types => ['Physician'],
 		hints => 'Template applies to these Resource(s) and/or Roving Physician(s)',
 		size => 70,
@@ -252,29 +253,6 @@ sub customValidate
 	}
 }
 
-sub cleanup
-{
-	my ($string) = @_;
-
-	my $cleanString = $string;
-
-	$cleanString =~ s/\s*//g;
-	$cleanString =~ s/,,+/,/g;
-	$cleanString =~ s/\-\-+/\-/g;
-
-	while ($cleanString =~ /^,+/ || $cleanString =~ /^\-+/
-		|| $cleanString =~ /,+$/  || $cleanString =~ /\-+$/)
-	{
-		$cleanString =~ s/^\-+//g;
-		$cleanString =~ s/\-+$//g;
-
-		$cleanString =~ s/^,+//g;
-		$cleanString =~ s/,+$//g;
-	}
-
-	return $cleanString;
-}
-
 ###############################
 # execute function
 ###############################
@@ -305,7 +283,7 @@ sub execute
 	start_time => $page->field ('duration_begin_time') || undef,
 	end_time => $page->field ('duration_end_time') || undef,
 	caption => $page->field ('caption'),
-	r_ids => $page->field ('r_ids'),
+	r_ids => cleanup($page->field ('r_ids')),
 	facility_id => $page->field ('facility_id'),
 	available => $page->field ('available'),
 	status => $page->field ('status'),

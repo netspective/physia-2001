@@ -389,7 +389,7 @@ sub buildHeader
 								<option value='/search/apptslot/$resource_id,$facility_id,$dashDate/1'>Find Slot</option>
 								<option value='/schedule/dlg-add-template/$resource_id/$facility_id'>Add Template</option>
 								<option value='/search/template//$resource_id/$org_id'>View Templates</option>
-								<option value='/search/appointment/$resource_id/$org_id/0/$dashDate/$dashDate'>Print Schedule</option>
+								<option value='/lookup/appointment/$resource_id/$org_id/0/$dashDate/$dashDate'>Print Schedule</option>
 								$customizeOption
 							</select>
 						</td>

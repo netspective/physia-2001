@@ -204,7 +204,7 @@ sub new
 
 	else
 	{
-		$params{type} = 'identifier';
+		$params{type} = 'identifier' unless $params{type};
 		$params{size} = 16 unless $params{size};
 		$params{maxLength} = 16 unless $params{maxLength};
 
@@ -235,6 +235,27 @@ sub new
 	return CGI::Dialog::Field::new($type, %params);
 }
 
+sub isPseudoResource
+{
+	my ($self, $page, $value) = @_;
+	
+	if ($value =~ /_\d$/ && $self->{types} && $self->{types}->[0] eq 'Physician')
+	{
+		my $rovingHash = $STMTMGR_SCHEDULING->getRowsAsHashList($page, STMTMGRFLAG_NONE,
+			'selRovingPhysicianTypes');
+
+		my @rovingPhysicians = ();
+		for (@$rovingHash)
+		{
+			push(@rovingPhysicians, $_->{caption});
+		}
+		my $stem = $value;
+		$stem =~ s/_\d$//;
+		
+		return 1 if grep(/^${stem}$/, @rovingPhysicians);
+	}
+}
+
 sub isValid
 {
 	my ($self, $page, $validator) = @_;
@@ -243,65 +264,57 @@ sub isValid
 	# If they entered a value
 	if (my $value = $page->field($self->{name}))
 	{
-		# Special handling for appointment person psuedo-categories
-		if ($value =~ /_\d$/ && $self->{types} && $self->{types}->[0] eq 'Physician')
-		{
-			my $rovingHash = $STMTMGR_SCHEDULING->getRowsAsHashList($page, STMTMGRFLAG_NONE,
-				'selRovingPhysicianTypes');
-
-			my @rovingPhysicians = ();
-			for (@$rovingHash)
-			{
-				push(@rovingPhysicians, $_->{caption});
-			}
-			my $stem = $value;
-			$stem =~ s/_\d$//;
-			return 1 if grep(/${stem}/, @rovingPhysicians);
-		}
-		return 1 if $value =~ /,/;
-
 		# Require one of ther person types specified or any valid person type
 		my $types = defined $self->{types} ? $self->{types} : \@PERSON_TYPES;
 
-		# Build an appropriate Invalidation Message for use if the requested ID doesn't exist
-		my $doesntExistMsg = qq{$self->{caption} '$value' does not exist. &nbsp; Add '$value' as a };
-		if ($self->{useShortForm})
-		{
-			my $createPersonHref = qq{javascript:doActionPopup('/org-p/#session.org_id#/dlg-add-shortformPerson/$value');};
-			$doesntExistMsg .= qq{<a href="$createPersonHref">Person</a> };
-		}
-		else
-		{
-			foreach $types (@$types)
-			{
-				my $createPersonHref;
-				$createPersonHref = "javascript:doActionPopup('/org-p/#session.org_id#/dlg-add-" . lc($types) . "/$value');";
-				$doesntExistMsg .= qq{<a href="$createPersonHref">$types</a>, };
-			}
-			$doesntExistMsg =~ s/, $//;
-			$doesntExistMsg =~ s/, ([^,]+)$/, or a $1/;
-		}
+		my @idList = split(/\s*,\s*/, $value);
 
-		# If the person record doesn't exist (in any org)...
-		unless($STMTMGR_PERSON->recordExists($page, STMTMGRFLAG_NONE,'selRegistry', $value))
+		for my $id (@idList)
 		{
-			$self->invalidate($page, $doesntExistMsg);
-		}
-		# Else (the person exists) unless the person isn't in their org...
-		elsif(! $STMTMGR_PERSON->recordExists($page, STMTMGRFLAG_NONE, 'selCategory', $value, $page->session('org_internal_id')))
-		{
-			$self->invalidate($page, "You do not have permission to select people outside of your organization.");
-		}
-		# Else (the person exists in our org)
-		else
-		{
-			my $categories = $STMTMGR_PERSON->getSingleValueList($page, STMTMGRFLAG_NONE, 'selCategory', $value, $page->session('org_internal_id'));
-			
-			# Unless one of the person types requested matches one of the categories that this person is...
-			unless (grep {my $type = $_; grep {$_ eq $type} @$categories} @$types)
+			next if $self->isPseudoResource($page, $id);
+			next unless $id;
+			my $capId = uc($id);
+						
+			# Build an appropriate Invalidation Message for use if the requested ID doesn't exist
+			my $doesntExistMsg = qq{$self->{caption} '$id' does not exist. &nbsp; Add '$id' as a };
+			if ($self->{useShortForm})
 			{
-				my $typesStr = join(', ', @$types);
-				$self->invalidate($page, qq{'$value' is not a $typesStr in this Org.});
+				my $createPersonHref = qq{javascript:doActionPopup('/org-p/#session.org_id#/dlg-add-shortformPerson/$id');};
+				$doesntExistMsg .= qq{<a href="$createPersonHref">Person</a> };
+			}
+			else
+			{
+				foreach $types (@$types)
+				{
+					my $createPersonHref;
+					$createPersonHref = "javascript:doActionPopup('/org-p/#session.org_id#/dlg-add-" . lc($types) . "/$id');";
+					$doesntExistMsg .= qq{<a href="$createPersonHref">$types</a>, };
+				}
+				$doesntExistMsg =~ s/, $//;
+				$doesntExistMsg =~ s/, ([^,]+)$/, or a $1/;
+			}
+
+			# If the person record doesn't exist (in any org)...
+			unless($STMTMGR_PERSON->recordExists($page, STMTMGRFLAG_NONE,'selRegistry', $capId))
+			{
+				$self->invalidate($page, $doesntExistMsg);
+			}
+			# Else (the person exists) unless the person isn't in their org...
+			elsif(! $STMTMGR_PERSON->recordExists($page, STMTMGRFLAG_NONE, 'selCategory', $capId, $page->session('org_internal_id')))
+			{
+				$self->invalidate($page, "You do not have permission to select people outside of your organization.");
+			}
+			# Else (the person exists in our org)
+			else
+			{
+				my $categories = $STMTMGR_PERSON->getSingleValueList($page, STMTMGRFLAG_NONE, 'selCategory', $capId, $page->session('org_internal_id'));
+
+				# Unless one of the person types requested matches one of the categories that this person is...
+				unless (grep {my $type = $_; grep {$_ eq $type} @$categories} @$types)
+				{
+					my $typesStr = join(', ', @$types);
+					$self->invalidate($page, qq{'$id' is not a $typesStr in this Org.});
+				}
 			}
 		}
 	}
@@ -309,8 +322,6 @@ sub isValid
 	# return TRUE if there were no errors, FALSE (0) if there were errors
 	return $page->haveValidationErrors() ? 0 : 1;
 }
-
-
 
 
 ##############################################################################

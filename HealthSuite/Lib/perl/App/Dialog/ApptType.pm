@@ -12,6 +12,7 @@ use App::Dialog::Field::RovingResource;
 use DBI::StatementManager;
 use App::Statements::Scheduling;
 use App::Statements::Transaction;
+use App::Schedule::Utilities;
 use Date::Manip;
 use constant NEXTACTION_COPYASNEW => "/org/%session.org_id%/dlg-add-appttype/%field.appt_type_id%";
 use vars qw(@ISA %RESOURCE_MAP);
@@ -35,6 +36,7 @@ sub new
 
 	my $r_ids_field = new App::Dialog::Field::Person::ID(caption => 'Resource ID(s)',
 		name => 'r_ids',
+		type => 'not_an_identifier', # to disable type identifier
 		types => ['Physician'],
 		hints => 'Appt Type applies to these Resource(s)',
 		size => 40,
@@ -47,6 +49,7 @@ sub new
 	my $rr_ids_field = new App::Dialog::Field::Person::ID(caption => 'Associated Resource(s)',
 		name => 'rr_ids',
 		hints => 'These Resources must also be available',
+		type => 'not_an_identifier', # to disable type identifier
 		types => ['Physician'],
 		size => 40,
 		maxLength => 255,
@@ -212,7 +215,7 @@ sub execute
 	my $newApptTypeId = $page->schemaAction(
 		'Appt_Type', $command,
 		appt_type_id => $command eq 'add' ? undef : $apptTypeId,
-		r_ids => $page->field ('r_ids'),
+		r_ids => cleanup($page->field ('r_ids')),
 		caption => $page->field ('caption'),
 		duration => $page->field('duration') || 10,
 		lead_time => $page->field ('lead_time') || undef,
@@ -223,7 +226,7 @@ sub execute
 		am_limit => $page->field ('am_limit') || undef,
 		pm_limit => $page->field ('pm_limit') || undef,
 		day_limit => $page->field ('day_limit') || undef,
-		rr_ids => $page->field ('rr_ids') || undef,
+		rr_ids => cleanup($page->field ('rr_ids')) || undef,
 		owner_org_id => $page->session('org_internal_id'),
 		_debug => 0
 	);

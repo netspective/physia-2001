@@ -24,11 +24,35 @@ use enum qw(BITMASK:TIME_ H24 H12 ONLY);
 	minutes2Time
 	time2hhmm
 	stamp2minutes
+	cleanup
 );
 
 use Date::Calc qw(:all);
 use Date::Manip;
 use App::Schedule::Slot;
+
+sub cleanup
+{
+	my ($string) = @_;
+
+	my $cleanString = $string;
+
+	$cleanString =~ s/\s*//g;
+	$cleanString =~ s/,,+/,/g;
+	$cleanString =~ s/\-\-+/\-/g;
+
+	while ($cleanString =~ /^,+/ || $cleanString =~ /^\-+/
+		|| $cleanString =~ /,+$/  || $cleanString =~ /\-+$/)
+	{
+		$cleanString =~ s/^\-+//g;
+		$cleanString =~ s/\-+$//g;
+
+		$cleanString =~ s/^,+//g;
+		$cleanString =~ s/,+$//g;
+	}
+
+	return $cleanString;
+}
 
 sub stamp2minutes
 {
