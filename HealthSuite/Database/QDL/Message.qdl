@@ -22,7 +22,7 @@
 		<field id="subject" caption="Subject" join="message_doc" column="doc_name"/>
 		<field id="message" caption="Message" join="message_doc" column="doc_content_small"/>
 		<field id="repatient_id" caption="Regarding Patient ID" join="attr_repatient" column="value_text"/>
-		<field id="repatient_name" caption="Regarding Patient Name" join="per_repatient" column="simple_name"/>
+		<field id="repatient_name" caption="Regarding Patient Name" join="per_repatient" column="simple_name" columndefn="initcap(simple_name)"/>
 		<field id="deliver_record" caption="Deliver with record" join="attr_repatient" column="value_int"/>
 		<field id="permed_id" caption="Person Medication ID" join="message_doc" column="doc_data_a"/>
 		<field id="priority" caption="Priority" join="message_doc" column="doc_data_b"/>

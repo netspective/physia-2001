@@ -13,7 +13,7 @@ use CGI::Carp qw(fatalsToBrowser);
 use vars qw(%RESOURCE_MAP);
 %RESOURCE_MAP = (
 	'phone_message' => {
-			_arl => ['message_id'],
+			_arl => ['message_id', 'doc_spec_subtype'],
 			_modes => ['send', 'trash', 'read', 'forward', 'reply_to', 'reply_to_all',],
 			_idSynonym => 'message_' . App::Universal::MSGSUBTYPE_PHONE_MESSAGE,
 		},
@@ -34,6 +34,8 @@ sub new
 sub addExtraFields
 {
 	my $self = shift;
+	
+	return;
 	
 	my @fields = (
 		new CGI::Dialog::Field(

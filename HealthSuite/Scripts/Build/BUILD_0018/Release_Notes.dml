@@ -219,9 +219,17 @@
 		<deliverable id="1764">
 			Add Unread Message Count component.
 		</deliverable>		
+		
+		<deliverable id="1765">
+			Add Messages Regarding Patient component.
+		</deliverable>		
 
 		<deliverable id="1766">
 			Report (Deposit Payment) : Added blank line after sub-total on the deposit summary
+		</deliverable>		
+
+		<deliverable id="1769">
+			Added popup for printing prescriptions.  No security/approval/signature tie-down yet. 
 		</deliverable>		
 
 		<deliverable id="1770">
@@ -364,6 +372,10 @@
 
 		<deliverable id="1903">
 			First dose and ongoing fields added to prescription dialog.
+		</deliverable>
+
+		<deliverable id="1905">
+			Corrected Mail Box / Messaging issues.
 		</deliverable>
 
 		<deliverable id="1908">

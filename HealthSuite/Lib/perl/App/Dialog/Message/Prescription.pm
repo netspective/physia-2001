@@ -13,12 +13,11 @@ use CGI::Carp qw(fatalsToBrowser);
 use vars qw(%RESOURCE_MAP);
 %RESOURCE_MAP = (
 	'message_prescription' => {
-			_arl => ['message_id'],
+			_arl => ['message_id', 'doc_spec_subtype'],
 			_modes => ['trash', 'read', 'forward', 'reply_to', 'reply_to_all',],
 			_idSynonym => 'message_' . App::Universal::MSGSUBTYPE_PRESCRIPTION,
 		},
 );
-
 
 sub new
 {
@@ -30,7 +29,6 @@ sub new
 	return $self;
 }
 
-
 sub addExtraFields
 {
 	my $self = shift;
@@ -40,14 +38,12 @@ sub addExtraFields
 			name => 'permed_id',
 			type => 'hidden',
 		),
-		new CGI::Dialog::Field(
-			caption => 'Prescription Request',
+		new CGI::Dialog::Field(caption => 'Prescription Request',
 			name => 'prescription',
 			options => FLDFLAG_READONLY,
 		),
 	);
 }
-
 
 sub makeStateChanges
 {
@@ -56,7 +52,6 @@ sub makeStateChanges
 	$self->SUPER::makeStateChanges($page, $command, $activeExecMode, $dlgFlags);
 	$self->setFieldFlags('patient_id', FLDFLAG_REQUIRED);
 }
-
 
 sub populateData
 {
@@ -69,7 +64,7 @@ sub populateData
 	my $existingMsg = $self->{existing_message};
 
 	my $permedId = $existingMsg->{'permed_id'};
-	my $personId = $page->field('patient_id');
+	my $personId = $page->field('saved_patient_id') || $page->field('patient_id');
 	$page->field('permed_id', $permedId);
 	my $preField = $self->getField('prescription');
 
@@ -92,7 +87,6 @@ sub execute
 	return $self->SUPER::execute($page, $command, $flags, $messageData);
 }
 
-
 sub saveMessage
 {
 	my $self = shift;
@@ -104,6 +98,5 @@ sub saveMessage
 	$schemaActionData{doc_data_a} = $messageData->{'permedId'};
 	return $self->SUPER::saveMessage($page, $messageData, %schemaActionData);
 }
-
 
 1;

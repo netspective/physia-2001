@@ -34,14 +34,18 @@ $QDL = File::Spec->catfile($CONFDATA_SERVER->path_Database(), 'QDL', 'Message.qd
 		{head => '', colIdx => '#{doc_spec_subtype}#', dataFmt => \&iconCallback,},
 		{head => 'To', dataFmt => '#{to_ids}#',},
 		{head => 'Subject', hAlign=> 'left', dataFmt => '#{subject}#',},
-		{head => 'Regarding Patient', hAlign=> 'left', dataFmt => '#{repatient_name}# (#{repatient_id}#)',},
+		{head => 'Regarding Patient', hAlign=> 'left',
+			#dataFmt => '#{repatient_name}# (#{repatient_id}#)',
+			dataFmt => "#{repatient_name}# (<a href=\"javascript:doActionPopup('/person/#{repatient_id}#/chart')\">#{repatient_id}#</a>)",
+		},
 		{head => 'Sent On', hAlign=> 'left', colIdx => '#{date_sent}#', dformat => 'stamp',},
 		{
 			head => 'Actions',
 			dataFmt => qq{
-				<a title="Reply To All" href="/person/#session.person_id#/dlg-reply_to_all-message_#{doc_spec_subtype}#/#{message_id}#?home=#homeArl#">$IMAGETAGS{'widgets/mail/reply_all'}</a>
-				<a title="Forward" href="/person/#session.person_id#/dlg-forward-message_#{doc_spec_subtype}#/#{message_id}#?home=#homeArl#">$IMAGETAGS{'widgets/mail/forward'}</a>
-				<a title="Trash" href="/person/#session.person_id#/dlg-trash-message_#{doc_spec_subtype}#/#{message_id}#?home=#homeArl#">$IMAGETAGS{'icons/action-edit-remove-x'}</a>
+				<a title="Reply" href="/person/#session.person_id#/dlg-reply_to-message_#{doc_spec_subtype}#/#{message_id}#/#{doc_spec_subtype}#?home=#homeArl#">$IMAGETAGS{'widgets/mail/reply'}</a>
+				<a title="Reply To All" href="/person/#session.person_id#/dlg-reply_to_all-message_#{doc_spec_subtype}#/#{message_id}#/#{doc_spec_subtype}#?home=#homeArl#">$IMAGETAGS{'widgets/mail/reply_all'}</a>
+				<a title="Forward" href="/person/#session.person_id#/dlg-forward-message_#{doc_spec_subtype}#/#{message_id}#/#{doc_spec_subtype}#?home=#homeArl#">$IMAGETAGS{'widgets/mail/forward'}</a>
+				<a title="Trash" href="/person/#session.person_id#/dlg-trash-message_#{doc_spec_subtype}#/#{message_id}#/#{doc_spec_subtype}#?home=#homeArl#">$IMAGETAGS{'icons/action-edit-remove-x'}</a>
 			},
 			options => PUBLCOLFLAG_DONTWRAP,
 		},
@@ -51,8 +55,7 @@ $QDL = File::Spec->catfile($CONFDATA_SERVER->path_Database(), 'QDL', 'Message.qd
 	},
 
 	dnQuery => \&dnQuery,
-	dnSelectRowAction => '/person/#session.person_id#/dlg-read-message_#{doc_spec_subtype}#/#{message_id}#?home=#homeArl#',
-#	dnAncestorFmt => 'All Lab Results',
+	dnSelectRowAction => '/person/#session.person_id#/dlg-read-message_#{doc_spec_subtype}#/#{message_id}#/#{doc_spec_subtype}#?home=#homeArl#',
 );
 
 sub iconCallback
@@ -100,7 +103,10 @@ sub dnQuery
 		'to_ids',
 		'recipient_status',
 	);
-	$finalCond->orderBy({id => 'date_sent', order => 'Descending'});
+	$finalCond->orderBy(
+		{id => 'recipient_status', order => 'Ascending'},
+		{id => 'date_sent', order => 'Descending'},
+	);
 	$finalCond->distinct(1);
 	return $finalCond;
 }

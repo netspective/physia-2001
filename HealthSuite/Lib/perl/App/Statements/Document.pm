@@ -15,29 +15,34 @@ $STMTMGR_DOCUMENT = new App::Statements::Document(
 	'selMessage' => qq{
 		SELECT
 			Document.doc_id as message_id,
-			Document.doc_orig_stamp AS send_on,
+			to_char(Document.doc_orig_stamp - :2, '$SQLSTMT_DEFAULTSTAMPFORMAT') AS send_on,
 			Document.doc_recv_stamp AS read_on,
 			Document.doc_source_id AS from_id,
 			Document.doc_name AS subject,
 			Document.doc_content_small AS message,
 			Document.doc_data_a AS permed_id,
 			Document.doc_data_b AS priority,
+			Document.doc_data_c AS common_message,
+			Document.doc_source_system,
 			attr_repatient.value_text AS repatient_id,
 			attr_repatient.value_int AS deliver_records,
 			attr_repatient.value_textB AS return_phone,
-			repatient.simple_name AS repatient_name
+			initcap(repatient.simple_name) AS repatient_name,
+			attr_phones.value_text AS return_phones
 		FROM
-			Document,
+			Person repatient,
+			Document_Attribute attr_phones,
 			Document_Attribute attr_repatient,
-			Person repatient
+			Document
 		WHERE
-			(
-				Document.doc_id = attr_repatient.parent_id (+) AND
-				attr_repatient.value_type (+) = @{[App::Universal::ATTRTYPE_PATIENT_ID]} AND
-				attr_repatient.item_name (+) = 'Regarding Patient' AND
-				attr_repatient.value_text = repatient.person_id (+)
-			) AND
 			Document.doc_id = :1
+			AND attr_repatient.parent_id (+) = Document.doc_id
+			AND attr_repatient.value_type (+) = @{[App::Universal::ATTRTYPE_PATIENT_ID]}
+			AND attr_repatient.item_name (+) = 'Regarding Patient'
+			AND attr_repatient.value_text = repatient.person_id (+)
+			AND attr_phones.value_type (+) = @{[App::Universal::ATTRTYPE_PHONE]}
+			AND attr_phones.item_name (+) = 'Return Phones'
+			AND attr_phones.parent_id (+) = Document.doc_id
 	},
 	'selMessageToList' => qq{
 		SELECT
