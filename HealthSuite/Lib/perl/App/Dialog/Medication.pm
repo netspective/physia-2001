@@ -3,7 +3,7 @@ package App::Dialog::Medication;
 ##############################################################################
 
 use strict;
-use SDE::CVS ('$Id: Medication.pm,v 1.9 2000-12-22 18:43:34 thai_nguyen Exp $', '$Name:  $');
+use SDE::CVS ('$Id: Medication.pm,v 1.10 2000-12-22 21:34:25 radha_kotagiri Exp $', '$Name:  $');
 use CGI::Validator::Field;
 use CGI::Dialog;
 use base qw(CGI::Dialog);
@@ -114,6 +114,13 @@ sub new
 					name => 'quantity',
 					size => 4,
 					options => FLDFLAG_REQUIRED,
+				),
+				new CGI::Dialog::Field(
+					name => 'sale_units',
+					caption => 'Units',
+					type => 'select',
+					selOptions => 'cl;ml;mg;ug;gm;kg;pills;caps;tabs;supp;cc;ggts;mm;oz;tsp;tbls;liter;gallon;applicator;inhalation;puff;spray;packets;patch',
+					options => FLDFLAG_PREPENDBLANK | FLDFLAG_REQUIRED,
 				),
 				new CGI::Dialog::Field(caption => '# of Refills',
 					name => 'num_refills',
@@ -396,7 +403,7 @@ sub execute_add
 
 	my $permedId = $page->schemaAction(
 		'Person_Medication', 'add',
-		parent_id => $page->field('parent_id'),
+		parent_id => $page->field('parent_id') || undef,
 		med_name => $page->field('med_name') || undef,
 		dose => $page->field('dose') || undef,
 		dose_units => $page->field('dose_units') || undef,
@@ -414,7 +421,8 @@ sub execute_add
 		notes => $page->field('notes') || undef,
 		approved_by => $page->field('approved_by') || undef,
 		pharmacy_id => $page->field('pharmacy_id') || undef,
-		status => $page->field('status'),
+		status => $page->field('status') || undef,
+		sale_units => $page->field('sale_units') || undef,
 		_debug => 0,
 	);
 	$page->param('permed_id', $permedId);
@@ -469,6 +477,7 @@ sub execute_update
 		notes => $page->field('notes') || undef,
 		approved_by => $page->field('approved_by') || undef,
 		pharmacy_id => $page->field('pharmacy_id') || undef,
+		sale_units  => $page->field('sale_units') || undef,
 		_debug => 0,
 	);
 
