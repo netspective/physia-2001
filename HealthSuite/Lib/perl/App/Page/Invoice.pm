@@ -200,7 +200,7 @@ sub getProceduresHtml
 	#my $created = App::Universal::INVOICESTATUS_CREATED;
 	#my $onHold = App::Universal::INVOICESTATUS_ONHOLD;
 	#my $pending = App::Universal::INVOICESTATUS_PENDING;
-	#my $submitted = App::Universal::INVOICESTATUS_SUBMITTED;
+	my $submitted = App::Universal::INVOICESTATUS_SUBMITTED;
 	my $selfPay = App::Universal::CLAIMTYPE_SELFPAY;
 
 	my $invoiceId = $self->param('invoice_id');
@@ -403,6 +403,17 @@ sub getProceduresHtml
 	$invoiceBalance = $formatter->format_price($invoiceBalance);
 	my $balColor = $invoiceBalance >= 0 ? 'Green' : 'Darkred';
 
+
+	my $diagLink = '';
+	if(@allDiags && $invStatus < $submitted)
+	{
+		$diagLink = "<A HREF='/invoice/$invoiceId/dialog/diagnoses/update'><FONT FACE='Arial,Helvetica' SIZE=2 COLOR=777777>Diagnoses</FONT></A>";
+	}
+	elsif($invStatus < $submitted)
+	{
+		$diagLink = "<A HREF='/invoice/$invoiceId/dialog/diagnoses/add'><FONT FACE='Arial,Helvetica' SIZE=2 COLOR=777777>Diagnoses</FONT></A>";
+	}
+
 	return qq{
 		<TABLE>
 			<TR VALIGN=TOP>
@@ -421,7 +432,7 @@ sub getProceduresHtml
 							<TD BGCOLOR=WHITE ALIGN=CENTER><FONT FACE="Arial,Helvetica" SIZE=2>$simDate</TD>
 						</TR>
 						<TR VALIGN=TOP>
-							<TD BGCOLOR=EEDDEE ALIGN=CENTER><FONT FACE="Arial,Helvetica" SIZE=2 COLOR=777777>Diagnoses</TD>
+							<TD BGCOLOR=EEDDEE ALIGN=CENTER>$diagLink</TD>
 						</TR>
 						<TR>
 							<TD BGCOLOR=WHITE ALIGN=CENTER TITLE='$icdCaption'><FONT FACE="Arial,Helvetica" SIZE=2>@allDiags</TD>
@@ -567,10 +578,14 @@ sub prepare_dialog_procedure
 {
 	my $self = shift;
 	my $invoiceId = $self->param('invoice_id');
+	my $claim = $self->property('activeClaim');
+
 	my $dialogCmd = $self->param('_pm_dialog_cmd') || 'add';
 	my ($action, $itemId, $itemSeq) = split(/,/, $dialogCmd);
 	$self->param('item_id', $itemId);
 	$self->param('item_seq', $itemSeq);
+
+	$self->addContent('<center><p>', $self->getProceduresHtml($claim), '</p></center>');
 
 	my $cancelUrl = "/invoice/$invoiceId/summary";
 	my $dialog = new App::Dialog::Procedure(schema => $self->getSchema(), cancelUrl => $cancelUrl);
