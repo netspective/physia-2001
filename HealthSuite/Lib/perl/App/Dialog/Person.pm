@@ -155,7 +155,7 @@ sub makeStateChanges
 		my $attrflag = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_NONE, 'selAttribute', $personId, $itemLastName);
 		$page->field('create_record', 1) if $attrflag->{value_int} ne '';
 
-		if ($nameFirst eq $checkfirst && $nameLast eq $checklast && $personId ne $perId && $attrflag->{value_int} eq '')
+		if ($nameFirst eq $checkfirst && $nameLast eq $checklast && $personId ne $perId && $attrflag->{value_int} eq '' && $command eq 'add')
 		{
 			$self->updateFieldFlags('create_record', FLDFLAG_INVISIBLE, 0);
 			unless ($page->field('create_record'))
@@ -323,7 +323,7 @@ sub handleContactInfo
 			_debug => 0
 		) if $page->field('addr_line1') ne '';
 
-	$self->handlePostExecute($page, $command, $flags);
+	#$self->handlePostExecute($page, $command, $flags);
 
 	return '';
 
