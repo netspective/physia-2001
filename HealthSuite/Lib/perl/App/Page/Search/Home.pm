@@ -8,8 +8,9 @@ use CGI::ImageManager;
 use vars qw(@ISA %RESOURCE_MAP);
 @ISA = qw(App::Page::Search);
 %RESOURCE_MAP = (
-	'search/_default' => {
+	'search/home' => {
 		_title => 'Main Menu',
+		_idSynonym => ['_default'],
 		_iconSmall => 'images/page-icons/search',
 		_iconMedium => 'images/page-icons/search',
 		_iconLarge => 'images/page-icons/search',

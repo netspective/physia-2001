@@ -143,8 +143,8 @@ sub handleARL
 	return 0 if $self->SUPER::handleARL($arl, $params, $rsrc, $pathItems) == 0;
 	$handleExec = 1 unless defined $handleExec;
 
-	$self->setFlag(PAGEFLAG_ISPOPUP) if $rsrc =~ /^lookup/;
-	$self->param('_islookup', 1) if $rsrc =~ /^lookup/;
+	$self->setFlag(PAGEFLAG_ISPOPUP) if $arl =~ /^lookup/;
+	$self->param('_islookup', 1) if $arl =~ /^lookup/;
 	$self->param('_pm_view', $pathItems->[0]);
 	$self->param('search_type', $pathItems->[1]) unless $self->param('search_type');
 	$self->param('search_expression', $pathItems->[2]) unless $self->param('search_expression');
