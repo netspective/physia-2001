@@ -12,11 +12,14 @@ use CGI::Validator::Field;
 use DBI::StatementManager;
 
 use App::Statements::Report::Accounting;
+use App::Statements::Person;
 
 use Data::TextPublish;
 use App::Configuration;
 use App::Device;
 use App::Statements::Device;
+use App::Dialog::Field::Person;
+use App::Dialog::Field::Organization;
 
 use vars qw(@ISA $INSTANCE);
 
@@ -27,28 +30,60 @@ sub new
 	my $self = App::Dialog::Report::new(@_, id => 'rpt-acct-aged-patient-data', heading => 'Aged Patient Receivables');
 
 	$self->addContent(
-			new App::Dialog::Field::Person::ID(caption =>'Patient ID', name => 'person_id', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE),
-			new CGI::Dialog::Field(
-				name => 'printReport',
-				type => 'bool',
-				style => 'check',
-				caption => 'Print report',
-				defaultValue => 0
+
+		new App::Dialog::Field::Person::ID(
+			caption =>'Patient ID',
+			name => 'person_id',
+			invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE),
+
+		new CGI::Dialog::Field(
+			caption => 'Provider',
+			name => 'provider_id',
+			fKeyStmtMgr => $STMTMGR_PERSON,
+			fKeyStmt => 'selPersonBySessionOrgAndCategory',
+			fKeyDisplayCol => 0,
+			fKeyValueCol => 0,
+			options => FLDFLAG_PREPENDBLANK),
+
+		new App::Dialog::Field::OrgType(
+			caption => 'Org ID',
+			name => 'org_id',
+			options => FLDFLAG_PREPENDBLANK,
+			types => "'PRACTICE', 'CLINIC', 'FACILITY/SITE'"
 			),
 
-			new CGI::Dialog::Field(
-				caption =>'Printer',
-				name => 'printerQueue',
-				options => FLDFLAG_PREPENDBLANK,
-				fKeyStmtMgr => $STMTMGR_DEVICE,
-				fKeyStmt => 'sel_org_devices',
-				fKeyDisplayCol => 0
-			),
-			);
+		new CGI::Dialog::Field(
+			name => 'printReport',
+			type => 'bool',
+			style => 'check',
+			caption => 'Print report',
+			defaultValue => 0
+		),
+
+		new CGI::Dialog::Field(
+			caption =>'Printer',
+			name => 'printerQueue',
+			options => FLDFLAG_PREPENDBLANK,
+			fKeyStmtMgr => $STMTMGR_DEVICE,
+			fKeyStmt => 'sel_org_devices',
+			fKeyDisplayCol => 0
+		),
+	);
 	$self->addFooter(new CGI::Dialog::Buttons);
 
 	$self;
 }
+
+
+sub makeStateChanges
+{
+	my ($self, $page, $command, $dlgFlags) = @_;
+	$self->SUPER::makeStateChanges($page, $command, $dlgFlags);
+
+	my $sessOrg = $page->session('org_internal_id');
+	$self->getField('provider_id')->{fKeyStmtBindPageParams} = [$sessOrg, 'Physician'];
+}
+
 
 
 sub execute
@@ -56,19 +91,48 @@ sub execute
 	my ($self, $page, $command, $flags) = @_;
 
 	my $personId = $page->field('person_id');
+	my $providerId = $page->field('provider_id');
+	my $facilityId = $page->field('org_id');
 	my $hardCopy = $page->field('printReport');
 	# Get a printer device handle...
 	my $printerAvailable = 1;
 	my $printerDevice;
 	$printerDevice = ($page->field('printerQueue') ne '') ? $page->field('printerQueue') : App::Device::getPrinter ($page, 0);
 	my $printHandle = App::Device::openPrintHandle ($printerDevice, "-o cpi=17 -o lpi=6");
-	
+
 	$printerAvailable = 0 if (ref $printHandle eq 'SCALAR');
 
 
-	my $data = $STMTMGR_REPORT_ACCOUNTING->getRowsAsArray($page, STMTMGRFLAG_NONE, 'sel_aged_patient', $personId, $page->session('org_internal_id'));
-	my $html = $STMTMGR_REPORT_ACCOUNTING->createHtml($page, STMTMGRFLAG_NONE, 'sel_aged_patient', [$personId,$page->session('org_internal_id')]);
-	
+	my $data;
+	my $html;
+
+	if(($providerId eq '') && ($facilityId eq ''))
+	{
+		$data = $STMTMGR_REPORT_ACCOUNTING->getRowsAsArray($page, STMTMGRFLAG_NONE, 'sel_aged_patient', $personId, $page->session('org_internal_id'));
+		$html = $STMTMGR_REPORT_ACCOUNTING->createHtml($page, STMTMGRFLAG_NONE, 'sel_aged_patient', [$personId,$page->session('org_internal_id')]);
+	}
+	else
+	{
+		if($providerId ne '')
+		{
+			if($facilityId ne '')
+			{
+				$data = $STMTMGR_REPORT_ACCOUNTING->getRowsAsArray($page, STMTMGRFLAG_NONE, 'sel_aged_patient_prov_org', $personId, $page->session('org_internal_id'), $providerId, $facilityId);
+				$html = $STMTMGR_REPORT_ACCOUNTING->createHtml($page, STMTMGRFLAG_NONE, 'sel_aged_patient_prov_org', [$personId, $page->session('org_internal_id'), $providerId, $facilityId]);
+			}
+			else
+			{
+				$data = $STMTMGR_REPORT_ACCOUNTING->getRowsAsArray($page, STMTMGRFLAG_NONE, 'sel_aged_patient_prov', $personId, $page->session('org_internal_id'), $providerId);
+				$html = $STMTMGR_REPORT_ACCOUNTING->createHtml($page, STMTMGRFLAG_NONE, 'sel_aged_patient_prov', [$personId, $page->session('org_internal_id'), $providerId]);
+			}
+		}
+		else
+		{
+			$data = $STMTMGR_REPORT_ACCOUNTING->getRowsAsArray($page, STMTMGRFLAG_NONE, 'sel_aged_patient_org', $personId, $page->session('org_internal_id'), $facilityId);
+			$html = $STMTMGR_REPORT_ACCOUNTING->createHtml($page, STMTMGRFLAG_NONE, 'sel_aged_patient_org', [$personId, $page->session('org_internal_id'), $facilityId]);
+		}
+	}
+
 	my $textOutputFilename = createTextRowsFromData($page, STMTMGRFLAG_NONE, $data, $STMTMGR_REPORT_ACCOUNTING->{"_dpd_sel_aged_patient"});
 
 	if ($hardCopy == 1 and $printerAvailable) {
