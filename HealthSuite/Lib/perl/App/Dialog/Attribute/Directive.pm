@@ -11,8 +11,11 @@ use App::Dialog::Field::Attribute;
 use App::Universal;
 use Date::Manip;
 use Devel::ChangeLog;
-use vars qw(@ISA @CHANGELOG);
+use vars qw(@ISA %RESOURCE_MAP);
+
 @ISA = qw(CGI::Dialog);
+
+%RESOURCE_MAP = ();
 
 sub initialize
 {
@@ -44,19 +47,5 @@ sub populateData_remove
 }
 
 use constant PANEDIALOG_DIRECTIVE => 'Dialog/Advance Directive';
-
-@CHANGELOG =
-(
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_NOTE, '01/30/2000', 'MAF',
-		PANEDIALOG_DIRECTIVE,
-		'Created new dialog for advance directives.'],
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_NOTE, '01/31/2000', 'MAF',
-		PANEDIALOG_DIRECTIVE,
-		'Added remaining dialog functions.'],
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_NOTE, '03/14/2000', 'RK',
-		PANEDIALOG_DIRECTIVE,
-		'Removed Item Path from Item Name'],
-
-);
 
 1;

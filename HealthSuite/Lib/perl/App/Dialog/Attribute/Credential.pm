@@ -11,9 +11,19 @@ use DBI::StatementManager;
 use App::Dialog::Field::Attribute;
 use App::Statements::Org;
 use Date::Manip;
-use Devel::ChangeLog;
-use vars qw(@ISA @CHANGELOG);
+use vars qw(@ISA %RESOURCE_MAP);
+
 @ISA = qw(CGI::Dialog);
+
+%RESOURCE_MAP = (
+	'credential' => {
+		valueType => App::Universal::ATTRTYPE_CREDENTIALS,
+		heading => '$Command Credentils',
+		_arl => ['org_id'] ,
+		_arl_modify => ['item_id'],
+		_idSynonym => 'attr-' .App::Universal::ATTRTYPE_CREDENTIALS()
+		},
+);
 
 sub new
 {
@@ -24,7 +34,7 @@ sub new
 	croak 'schema parameter required' unless $schema;
 
 	$self->addContent(
-		new App::Dialog::Field::Attribute::Name(name => 'value_textb', 
+		new App::Dialog::Field::Attribute::Name(name => 'value_textb',
 			caption => 'ID Caption', priKey => 1, type => 'select',
 			selOptions => ';Employer#;State#;Medicaid#;Workers Comp#;BCBS#;Medicare#;CLIA#',
 			options => FLDFLAG_REQUIRED,
@@ -33,7 +43,7 @@ sub new
 			valueType => $self->{valueType},
 			selAttrNameStmtName => 'selAttributeByItemNameAndValueTypeAndParent'
 		),
-		new CGI::Dialog::Field(name => 'value_text', 
+		new CGI::Dialog::Field(name => 'value_text',
 			caption => 'ID Number',
 			options => FLDFLAG_REQUIRED
 		),
@@ -46,7 +56,7 @@ sub new
 		key => "#param.org_id#",
 		data => "Credentials '#field.value_textb#' to <a href='/org/#param.org_id#/profile'>#param.org_id#</a>"
 	};
-		
+
 	$self->addFooter(new CGI::Dialog::Buttons);
 	return $self;
 }
@@ -79,18 +89,5 @@ sub execute
 	$self->handlePostExecute($page, $command, $flags | CGI::Dialog::DLGFLAG_IGNOREREDIRECT);
 	return "\u$command completed.";
 }
-
-
-use constant PANEDIALOG_CREDENTIALS => 'Dialog/Credentials';
-
-@CHANGELOG =
-(
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_NOTE, '02/01/2000', 'RK',
-		PANEDIALOG_CREDENTIALS,
-		'Added a new dialog for Credentials Pane.'],
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_NOTE, '03/14/2000', 'RK',
-		PANEDIALOG_CREDENTIALS,
-		'Removed Item Path from Item Name'],
-);
 
 1;

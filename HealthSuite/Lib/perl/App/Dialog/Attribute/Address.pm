@@ -12,9 +12,30 @@ use DBI::StatementManager;
 use App::Statements::Person;
 use App::Statements::Org;
 use Date::Manip;
-use Devel::ChangeLog;
-use vars qw(@ISA @CHANGELOG);
+use vars qw(@ISA %RESOURCE_MAP);
+
 @ISA = qw(CGI::Dialog);
+
+%RESOURCE_MAP = (
+	'address-person' => {
+		valueType => App::Universal::ATTRTYPE_FAKE_ADDRESS,
+		 tableId => 'Person_Contact_Addrs',
+		 heading => '$Command Address',
+		 table => 'Person_Address',
+		 _arl => ['person_id'],
+		 _arl_modify => ['item_id'],
+		_idSynonym => 'attr-person-' .App::Universal::ATTRTYPE_FAKE_ADDRESS()
+		},
+	'address-org' => {
+		valueType => App::Universal::ATTRTYPE_FAKE_ADDRESS,
+		tableId => 'Org_Contact_Addrs',
+		heading => '$Command Address',
+		table => 'Org_Address',
+		_arl => ['org_id'],
+		_arl_modify => ['item_id'],
+		_idSynonym => 'attr-org-' .App::Universal::ATTRTYPE_FAKE_ADDRESS()
+		},
+);
 
 sub new
 {
@@ -71,7 +92,7 @@ sub customValidate
 			$dialogItem->invalidate($page, "The '$addressName' address already exists for $parentId.") :
 			();
 	}
-	
+
 	elsif($table eq 'Org_Address')
 	{
 		my $parentId = $page->param('org_id');
@@ -121,21 +142,5 @@ sub execute
 
 	return "\u$command completed.";
 }
-
-use constant CONTACTMETHOD_DIALOG => 'Dialog/Pane/ContactMethod';
-
-@CHANGELOG =
-(
-
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_UPDATE, '01/28/2000', 'RK',
-		CONTACTMETHOD_DIALOG,
-		'Moved the dialog for Contact Methods  from property.pm to a seperate file in Property Directory.'],
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_ADD, '01/31/2000', 'RK',
-		CONTACTMETHOD_DIALOG,
-		'Added execute, customValidate, populateData_update and populateData_remove sub-routines.'],
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_ADD, '01/04/2000', 'RK',
-		CONTACTMETHOD_DIALOG,
-		'Added customValidate subroutine to do validation for Address Name.'],
-);
 
 1;

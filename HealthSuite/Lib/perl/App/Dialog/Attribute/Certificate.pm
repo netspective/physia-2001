@@ -10,16 +10,17 @@ use CGI::Dialog;
 use CGI::Validator::Field;
 use App::Universal;
 use Date::Manip;
-use Devel::ChangeLog;
 use App::Statements::Person;
-use vars qw(@ISA @CHANGELOG);
-@ISA = qw(CGI::Dialog);
 use constant SEQUENCE_SPECIALTY_PRIMARY => 1;
 use constant SEQUENCE_SPECIALTY_SECONDARY => 2;
 use constant SEQUENCE_SPECIALTY_TERTIARY => 3;
 use constant SEQUENCE_SPECIALTY_QUATERNARY => 4;
 use constant SEQUENCE_SPECIALTY_UNKNOWN => 5;
+use vars qw(@ISA %RESOURCE_MAP);
 
+@ISA = qw(CGI::Dialog);
+
+%RESOURCE_MAP = ();
 
 sub initialize
 {
@@ -109,23 +110,5 @@ sub execute
 
 	return "\u$command completed.";
 }
-
-use constant PANEDIALOG_CERTIFICATE => 'Dialog/Pane/Certificate';
-
-@CHANGELOG =
-(
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_NOTE, '01/30/2000', 'MAF',
-		PANEDIALOG_CERTIFICATE,
-		'Created new dialog for certificates.'],
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_NOTE, '02/04/2000', 'RK',
-		PANEDIALOG_CERTIFICATE,
-		'Added customValidate subroutine to Validate Affiliation, License, State and Accreditation Certificates.'],
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_UPDATE, '02/04/2000', 'RK',
-		PANEDIALOG_CERTIFICATE,
-		'Updated populateData subroutine to display data in affiliation pane while updating and deleting.'],
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_NOTE, '03/14/2000', 'RK',
-		PANEDIALOG_CERTIFICATE,
-		'Removed Item Path from Item Name'],
-);
 
 1;

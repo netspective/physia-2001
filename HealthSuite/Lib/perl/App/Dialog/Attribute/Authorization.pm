@@ -10,9 +10,11 @@ use CGI::Dialog;
 use CGI::Validator::Field;
 use App::Universal;
 use Date::Manip;
-use Devel::ChangeLog;
-use vars qw(@ISA @CHANGELOG);
+use vars qw(@ISA %RESOURCE_MAP);
+
 @ISA = qw(CGI::Dialog);
+
+%RESOURCE_MAP = ();
 
 sub initialize
 {
@@ -59,13 +61,13 @@ sub execute
 		$itemName = 'Signature Source';
 		$authCaption = $STMTMGR_PERSON->getSingleValue($page, STMTMGRFLAG_CACHE, 'selAuthSignatureCaption', $authorization);
 	}
-	
+
 	elsif($valueType == App::Universal::ATTRTYPE_AUTHPROVIDERASSIGN)
 	{
 		$itemName = 'Provider Assignment';
 		$authCaption = $STMTMGR_PERSON->getSingleValue($page, STMTMGRFLAG_CACHE, 'selAuthAssignCaption', $authorization);
 	}
-	
+
 	elsif($valueType == App::Universal::ATTRTYPE_AUTHINFORELEASE)
 	{
 		$itemName = 'Information Release';
@@ -90,17 +92,5 @@ sub execute
 	$self->handlePostExecute($page, $command, $flags | CGI::Dialog::DLGFLAG_IGNOREREDIRECT);
 	return "\u$command completed.";
 }
-
-use constant PANEDIALOG_AUTHORIZATION => 'Dialog/Authorization';
-
-@CHANGELOG =
-(
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_NOTE, '01/28/2000', 'MAF',
-		PANEDIALOG_AUTHORIZATION,
-		'Created new dialog for authorizations.'],
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_NOTE, '03/14/2000', 'RK',
-		PANEDIALOG_AUTHORIZATION,
-		'Removed Item Path from Item Name'],
-);
 
 1;

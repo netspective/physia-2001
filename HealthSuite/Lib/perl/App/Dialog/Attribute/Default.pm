@@ -11,9 +11,192 @@ use CGI::Validator::Field;
 use App::Dialog::Field::Attribute;
 use App::Universal;
 use Date::Manip;
-use Devel::ChangeLog;
-use vars qw(@ISA @CHANGELOG);
+use vars qw(@ISA %RESOURCE_MAP);
+
 @ISA = qw(CGI::Dialog);
+
+%RESOURCE_MAP = (
+	'employment-empinfo' => {
+		entityType => 'person',
+		valueType => App::Universal::ATTRTYPE_EMPLOYMENTRECORD,
+		propNameCaption => 'Property Name',
+		propValueCaption => 'Property Value',
+		heading => '$Command Employment Information',
+		_arl => ['person_id'],
+		_arl_modify => ['item_id'],
+		_idSynonym => 'attr-' .App::Universal::ATTRTYPE_EMPLOYMENTRECORD()
+		},
+	'employment-salinfo' => {
+		entityType => 'person',
+		valueType => App::Universal::ATTRTYPE_EMPLOYMENTRECORD,
+		propNameCaption => 'Property Name',
+		propValueCaption => 'Property Value',
+		heading => '$Command Salary Information',
+		_arl => ['person_id'],
+		_arl_modify => ['item_id'],
+		_idSynonym => 'attr-' .App::Universal::ATTRTYPE_TEXT()
+		},
+	'person-additional' => {
+		entityType => 'person',
+		propNameCaption => 'Property Name',
+		valueType => App::Universal::ATTRTYPE_PERSONALGENERAL,
+		attrNameFmt => 'General/Personal',
+		propValueCaption => 'Property Value',
+		heading => '$Command Additional Data',
+		_arl => ['person_id'],
+		_arl_modify => ['item_id'],
+		_idSynonym => 'attr-' . App::Universal::ATTRTYPE_PERSONALGENERAL()
+		},
+	'contact-personphone' => {
+		heading => '$Command Telephone',
+		propNameCaption => 'Name',
+		propNameLookup => 'Person_Contact_Phones',
+		propValueCaption => 'Telephone',
+		propValueType => 'phone',
+		propValueSize => 24,
+		prefFlgCaption => 'Preferred phone',
+		entityType => 'person',
+		#attrNameFmt => 'Contact Method/Telephone',
+		valueType => App::Universal::ATTRTYPE_PHONE,
+		_arl => ['person_id'],
+		_arl_modify => ['item_id'],
+		_idSynonym => 'attr-Person-' .App::Universal::ATTRTYPE_PHONE()
+		},
+	'contact-personfax' => {
+		heading => '$Command Fax',
+		propNameCaption => 'Name',
+		propNameLookup => 'Person_Contact_Phones',
+		propValueCaption => 'Fax',
+		propValueType => 'phone',
+		propValueSize => 24,
+		prefFlgCaption => 'Preferred fax',
+		entityType => 'person',
+		#attrNameFmt => 'Contact Method/Fax',
+		valueType => App::Universal::ATTRTYPE_FAX,
+		_arl => ['person_id'],
+		_arl_modify => ['item_id'],
+		_idSynonym => 'attr-Person-' .App::Universal::ATTRTYPE_FAX()
+		},
+	'contact-personpager' => {
+		heading => '$Command Pager',
+		propNameCaption => 'Name',
+		propNameLookup => 'Person_Contact_Order',
+		propValueCaption => 'Pager',
+		propValueType => 'pager',
+		propValueSize => 24,
+		prefFlgCaption => 'Preferred pager',
+		entityType => 'person',
+		#attrNameFmt => 'Contact Method/Pager',
+		valueType => App::Universal::ATTRTYPE_PAGER,
+		_arl => ['person_id'],
+		_arl_modify => ['item_id'],
+		_idSynonym => 'attr-Person-' .App::Universal::ATTRTYPE_PAGER()
+		},
+	'contact-personemail' => {
+		heading => '$Command E-mail',
+		propNameCaption => 'Name',
+		propNameLookup => 'Person_Contact_Order',
+		propValueCaption => 'E-mail',
+		propValueType => 'email',
+		propValueSize => 24,
+		prefFlgCaption => 'Preferred email',
+		entityType => 'person',
+		#attrNameFmt => 'Contact Method/EMail',
+		valueType => App::Universal::ATTRTYPE_EMAIL,
+		_arl => ['person_id'],
+		_arl_modify => ['item_id'],
+		_idSynonym => 'attr-Person-' .App::Universal::ATTRTYPE_EMAIL()
+		},
+	'contact-personinternet' => {
+		heading => '$Command URL',
+		propNameCaption => 'Name',
+		propNameLookup => 'Person_Contact_Order',
+		propValueCaption => 'URL',
+		propValueType => 'url',
+		propValueSize => 24,
+		prefFlgCaption => 'Preferred internet address',
+		entityType => 'person',
+		#attrNameFmt => 'Contact Method/Internet',
+		valueType => App::Universal::ATTRTYPE_URL,
+		_arl => ['person_id'],
+		_arl_modify => ['item_id'],
+		_idSynonym => 'attr-Person-' .App::Universal::ATTRTYPE_URL()
+		},
+	'contact-orgphone' => {
+		heading => '$Command Telephone',
+		propNameCaption => 'Name',
+		propNameLookup => 'Org_Contact_Name',
+		propValueCaption => 'Telephone',
+		propValueType => 'phone',
+		propValueSize => 24,
+		prefFlgCaption => 'Preferred phone',
+		entityType => 'org',
+		#attrNameFmt => 'Contact Method/Telephone',
+		valueType => App::Universal::ATTRTYPE_PHONE,
+		_arl => ['org_id'],
+		_arl_modify => ['item_id'],
+		_idSynonym => 'attr-Org-' .App::Universal::ATTRTYPE_PHONE()
+		},
+	'contact-orgfax' => {
+		heading => '$Command Fax',
+		propNameCaption => 'Name',
+		propNameLookup => 'Org_Contact_Name',
+		propValueCaption => 'Fax',
+		propValueType => 'phone',
+		propValueSize => 24,
+		prefFlgCaption => 'Preferred fax',
+		entityType => 'org',
+		#attrNameFmt => 'Contact Method/Fax',
+		valueType => App::Universal::ATTRTYPE_FAX,
+		_arl => ['org_id'],
+		_arl_modify => ['item_id'],
+		_idSynonym => 'attr-Org-' .App::Universal::ATTRTYPE_FAX()
+		},
+	'contact-orgemail' => {
+		heading => '$Command E-mail',
+		propNameCaption => 'Name',
+		propNameLookup => 'Org_Contact_Name',
+		propValueCaption => 'E-mail',
+		propValueType => 'email',
+		propValueSize => 24,
+		prefFlgCaption => 'Preferred email',
+		entityType => 'org',
+		#attrNameFmt => 'Contact Method/EMail',
+		valueType => App::Universal::ATTRTYPE_EMAIL,
+		_arl => ['org_id'],
+		_arl_modify => ['item_id'],
+		_idSynonym => 'attr-Org-' .App::Universal::ATTRTYPE_EMAIL()
+		},
+	'contact-orginternet' => {
+		heading => '$Command URL',
+		propNameCaption => 'Name',
+		propNameLookup => 'Org_Contact_Name',
+		propValueCaption => 'URL',
+		propValueType => 'url',
+		propValueSize => 24,
+		prefFlgCaption => 'Preferred internet address',
+		entityType => 'org',
+		#attrNameFmt => 'Contact Method/Internet',
+		valueType => App::Universal::ATTRTYPE_URL,
+		_arl => ['org_id'],
+		_arl_modify => ['item_id'],
+		_idSynonym => 'attr-Org-' .App::Universal::ATTRTYPE_URL()
+		},
+	'contact-orgbilling' => {
+		heading => '$Command Billing Contact Information',
+		propNameCaption => 'Name',
+		propValueCaption => 'Phone',
+		propValueType => 'phone',
+		propValueSize => 24,
+		entityType => 'org',
+		#attrNameFmt => 'Contact Method/Internet',
+		valueType => App::Universal::ATTRTYPE_BILLING_PHONE,
+		_arl => ['org_id'],
+		_arl_modify => ['item_id'],
+		_idSynonym => 'attr-Org-' .App::Universal::ATTRTYPE_BILLING_PHONE()
+		},
+);
+
 
 sub initialize
 {
@@ -220,17 +403,5 @@ sub execute_remove
 
 	return "\u$command completed.";
 }
-
-use constant PANEDIALOG_DEFAULT => 'Dialog/Default';
-
-@CHANGELOG =
-(
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_NOTE, '01/30/2000', 'MAF',
-		PANEDIALOG_DEFAULT,
-		'Created new dialog for default attributes.'],
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_NOTE, '03/14/2000', 'MAF',
-		PANEDIALOG_DEFAULT,
-		'Removed Item Path from Item Name'],
-);
 
 1;

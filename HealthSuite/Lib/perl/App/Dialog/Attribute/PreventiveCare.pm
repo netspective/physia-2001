@@ -13,9 +13,19 @@ use App::Dialog::Field::Attribute;
 use CGI::Validator::Field;
 use App::Universal;
 use Date::Manip;
-use Devel::ChangeLog;
-use vars qw(@ISA @CHANGELOG);
+use vars qw(@ISA %RESOURCE_MAP);
+
 @ISA = qw(CGI::Dialog);
+
+%RESOURCE_MAP = (
+	'preventivecare' => {
+		valueType => App::Universal::PREVENTIVE_CARE,
+		heading => '$Command Measure',
+		_arl => ['person_id'] ,
+		_arl_modify => ['item_id'],
+		_idSynonym => 'attr-' .App::Universal::PREVENTIVE_CARE()
+		},
+);
 
 sub new
 {
@@ -112,21 +122,5 @@ sub execute
 	$self->handlePostExecute($page, $command, $flags | CGI::Dialog::DLGFLAG_IGNOREREDIRECT);
 	return "\u$command completed.";
 }
-
-use constant PANEDIALOG_PREVENTIVECARE => 'Dialog/Preventive Care';
-
-@CHANGELOG =
-(
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_NOTE, '01/30/2000', 'MAF',
-		PANEDIALOG_PREVENTIVECARE,
-		'Created new dialog for preventive care.'],
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_ADD, '01/31/2000', 'RK',
-		PANEDIALOG_PREVENTIVECARE,
-		'Added execute and populate data subroutines.'],
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_UPDATE, '03/14/2000', 'MAF',
-		PANEDIALOG_PREVENTIVECARE,
-		'Removed item path from item name.'],
-
-);
 
 1;

@@ -10,9 +10,20 @@ use CGI::Dialog;
 use CGI::Validator::Field;
 use App::Universal;
 use Date::Manip;
-use Devel::ChangeLog;
-use vars qw(@ISA @CHANGELOG);
+use vars qw(@ISA %RESOURCE_MAP);
+
 @ISA = qw(CGI::Dialog);
+
+%RESOURCE_MAP = (
+	'allergy-medication' => {
+		valueType => App::Universal::MEDICATION_ALLERGY,
+		group => 'Medication Allergy',
+		heading => '$Command Medication Allergy',
+		_arl => ['person_id'] ,
+		_arl_modify => ['item_id'],
+		_idSynonym => 'attr-' .App::Universal::MEDICATION_ALLERGY()
+		},
+);
 
 sub new
 {
@@ -35,7 +46,7 @@ sub new
 		new CGI::Dialog::Field(caption => 'Comments', name => 'comments', type => 'memo'),
 
 	);
-	
+
 	$self->{activityLog} =
 	{
 		level => 1,
@@ -113,18 +124,5 @@ sub execute
 	$self->handlePostExecute($page, $command, $flags | CGI::Dialog::DLGFLAG_IGNOREREDIRECT);
 	return "\u$command completed.";
 }
-
-
-use constant PANEDIALOG_ALLERGY => 'Dialog/Allergy';
-
-@CHANGELOG =
-(
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_NOTE, '01/30/2000', 'MAF',
-		PANEDIALOG_ALLERGY,
-		'Created new dialog for allergies.'],
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_NOTE, '03/14/2000', 'RK',
-		PANEDIALOG_ALLERGY,
-		'Removed Item Path from Item Name'],
-);
 
 1;

@@ -12,10 +12,33 @@ use App::Dialog::Field::Attribute;
 use DBI::StatementManager;
 use App::Statements::Person;
 use Date::Manip;
-use Devel::ChangeLog;
-use vars qw(@ISA @CHANGELOG);
-use Devel::ChangeLog;
+use vars qw(@ISA %RESOURCE_MAP);
+
 @ISA = qw(CGI::Dialog);
+
+%RESOURCE_MAP = (
+	'benefit-insurance' => {
+		valueType => App::Universal::BENEFIT_INSURANCE,
+		heading => '$Command Insurance Benefit',
+		_arl => ['person_id'],
+		_arl_modify => ['item_id'],
+		_idSynonym => 'attr-' .App::Universal::BENEFIT_INSURANCE()
+		},
+	'benefit-retirement' => {
+		valueType => App::Universal::BENEFIT_RETIREMENT,
+		heading => '$Command Retirement Benefit',
+		_arl => ['person_id'],
+		_arl_modify => ['item_id'],
+		_idSynonym => 'attr-' .App::Universal::BENEFIT_RETIREMENT()
+		},
+	'benefit-other' => {
+		valueType => App::Universal::BENEFIT_OTHER,
+		heading => '$Command Other Benefit',
+		_arl => ['person_id'],
+		_arl_modify => ['item_id'],
+		_idSynonym => 'attr-' .App::Universal::BENEFIT_OTHER()
+		},
+);
 
 sub new
 {
@@ -81,16 +104,5 @@ sub execute
 	$self->handlePostExecute($page, $command, $flags | CGI::Dialog::DLGFLAG_IGNOREREDIRECT);
 	return "\u$command completed.";
 }
-use constant BENEFIT_DIALOG => 'Dialog/EmploymentBenefit';
 
-@CHANGELOG =
-(
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_UPDATE, '01/28/2000', 'RK',
-		BENEFIT_DIALOG,
-		'Moved the dialog for Employment Benifits Pane  from property.pm to a seperate file in Property Directory.'],
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_UPDATE, '03/14/2000', 'MAF',
-		BENEFIT_DIALOG,
-		'Removed item paths from item names.'],
-
-);
 1;

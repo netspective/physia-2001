@@ -13,8 +13,18 @@ use App::Universal;
 use App::Dialog::Field::Insurance;
 use Date::Manip;
 use Devel::ChangeLog;
-use vars qw(@ISA @CHANGELOG);
+use vars qw(@ISA %RESOURCE_MAP);
 @ISA = qw(CGI::Dialog);
+%RESOURCE_MAP = (
+	'org-attachinsurance' => {
+		_arl_add => ['ins_id'],
+		_arl_modify => ['item_id'],
+		id => 'attachinsplan',
+		heading => '$Command Insurance Plan',
+		valueType => App::Universal::ATTRTYPE_INSGRPINSPLAN,
+		_idSynonym => 'attr-' . App::Universal::ATTRTYPE_INSGRPINSPLAN
+		},
+	);
 
 sub new
 {
@@ -107,23 +117,5 @@ sub execute
 
 	return "\u$command completed.";
 }
-
-use constant PANEDIALOG_ATTACHINSURANCE => 'Dialog/Attach Insurance';
-
-@CHANGELOG =
-(
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_NOTE, '01/28/2000', 'MAF',
-		PANEDIALOG_ATTACHINSURANCE,
-		'Created new dialog for attaching insurance plans and workers comp.'],
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_NOTE, '02/08/2000', 'MAF',
-		PANEDIALOG_ATTACHINSURANCE,
-		'Added the execute subroutine.'],
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_NOTE, '02/15/2000', 'MAF',
-		PANEDIALOG_ATTACHINSURANCE,
-		'Finalized functionality of this dialog.'],
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_NOTE, '03/14/2000', 'RK',
-		PANEDIALOG_ATTACHINSURANCE,
-		'Removed Item Path from Item Name'],
-);
 
 1;

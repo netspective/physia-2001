@@ -12,9 +12,19 @@ use CGI::Validator::Field;
 use App::Dialog::Field::Attribute;
 use App::Universal;
 use Date::Manip;
-use Devel::ChangeLog;
-use vars qw(@ISA @CHANGELOG);
+use vars qw(@ISA %RESOURCE_MAP);
+
 @ISA = qw(CGI::Dialog);
+
+%RESOURCE_MAP = (
+	'attendance' => {
+		valueType => App::Universal::ATTRTYPE_EMPLOYEEATTENDANCE,
+		heading => '$Command Attendance',
+		_arl => ['person_id'],
+		_arl_modify => ['item_id'],
+		_idSynonym => 'attr-' .App::Universal::ATTRTYPE_EMPLOYEEATTENDANCE()
+		},
+);
 
 sub new
 {
@@ -68,17 +78,5 @@ sub execute
 
 	return "\u$command completed.";
 }
-
-use constant PANEDIALOG_ATTENDANCE => 'Dialog/Pane/Attendance';
-
-@CHANGELOG =
-(
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_NOTE, '02/08/2000', 'RK',
-		PANEDIALOG_ATTENDANCE,
-		'Created a new file for attendance.'],
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_NOTE, '03/14/2000', 'RK',
-		PANEDIALOG_ATTENDANCE,
-		'Removed Item Path from Item Name'],
-);
 
 1;

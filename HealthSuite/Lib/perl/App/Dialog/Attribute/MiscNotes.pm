@@ -12,9 +12,18 @@ use CGI::Validator::Field;
 use App::Dialog::Field::Attribute;
 use App::Universal;
 use Date::Manip;
-use Devel::ChangeLog;
-use vars qw(@ISA @CHANGELOG);
+use vars qw(@ISA %RESOURCE_MAP);
+
 @ISA = qw(CGI::Dialog);
+
+%RESOURCE_MAP = (
+	'misc-notes' => {
+		valueType => App::Universal::ATTRTYPE_TEXT,
+		heading => '$Command Misc Notes',
+		_arl => ['person_id'] ,
+		_arl_modify => ['item_id'],
+		},
+);
 
 sub new
 {
@@ -28,7 +37,7 @@ sub new
 		new CGI::Dialog::Field(name => 'value_text', caption => 'Misc Notes', type => 'memo', options => FLDFLAG_REQUIRED),
 		new CGI::Dialog::Field(name => 'value_date', caption => 'Date', type => 'date'),
 	);
-	
+
 	$self->{activityLog} =
 	{
 		level => 1,
@@ -55,31 +64,19 @@ sub populateData
 sub execute
 {
 	my ($self, $page, $command,$flags) = @_;
-	
-	
+
+
 	$page->schemaAction(
 		'Person_Attribute', $command,
 		parent_id => $page->param('person_id') || undef,
 		item_id => $page->param('item_id') || undef,
 		item_name =>'Misc Notes',
 		value_type => 0,
-		value_text => $page->field('value_text') || undef,	
+		value_text => $page->field('value_text') || undef,
 		value_date => $page->field('value_date') || undef,
 		_debug => 0
 	);
 	return "\u$command completed.";
 }
-
-use constant PANEDIALOG_ATTENDANCE => 'Dialog/Pane/Misc Notes';
-
-@CHANGELOG =
-(
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_NOTE, '02/08/2000', 'RK',
-		PANEDIALOG_ATTENDANCE,
-		'Created a new file for attendance.'],
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_NOTE, '03/14/2000', 'RK',
-		PANEDIALOG_ATTENDANCE,
-		'Removed Item Path from Item Name'],
-);
 
 1;
