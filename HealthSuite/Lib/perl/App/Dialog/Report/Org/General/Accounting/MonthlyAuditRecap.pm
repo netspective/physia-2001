@@ -185,7 +185,7 @@ sub execute
 		,$orgValue->{org_internal_id},$person_id,$batch_from,$batch_to,$page->session('org_internal_id'));
 		foreach (@$daily_audit)
 		{
-			$_->{tlt_rcpts}=$_->{person_pay} + $_->{insurance_pay} - $_->{refund};
+			$_->{tlt_rcpts}=$_->{person_pay} + $_->{insurance_pay} + $_->{refund};
 			$_->{tlt_chrgs}=$_->{total_charges}+$_->{misc_charges};		
 			$_->{collection_per} = $_->{tlt_chrgs} > 0 ? sprintf  "%3.2f", ($_->{tlt_rcpts} / $_->{tlt_chrgs} )*100 : '0.00' ;				
 			my @rowData = 
@@ -200,7 +200,7 @@ sub execute
 				$_->{insurance_pay},								
 				$_->{person_pay},
 				$_->{refund},
-				$_->{person_pay} + $_->{insurance_pay} - $_->{refund},
+				$_->{person_pay} + $_->{insurance_pay} + $_->{refund},
 				$_->{collection_per},
 				$_->{tlt_chrgs},	
 				$orgValue->{org_id},
