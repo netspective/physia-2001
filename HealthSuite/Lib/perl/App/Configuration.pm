@@ -12,10 +12,11 @@ use vars qw(@ISA @EXPORT %AVAIL_CONFIGS %ENV $CONFDATA_SERVER $DEBUG);
 @ISA    = qw(Exporter);
 @EXPORT = qw($CONFDATA_SERVER);
 
-struct(ServerConfigData => [
+struct(ServerConfigData => {
 	name_Config => '$',
 	name_Group => '$',
 	db_ConnectKey => '$',
+	db_AltConnectKeys => '%',
 	path_root => '$',
 	path_WebSite => '$',
 	path_temp => '$',
@@ -53,7 +54,30 @@ struct(ServerConfigData => [
 	file_NSFCounter => '$',
 	file_AccessControlDefn => '$',
 	file_AccessControlAutoPermissons => '$',
-]);
+});
+
+
+sub ServerConfigData::db_ConnectKey
+{
+	my $self = shift;
+	my $altConnectKey;
+	
+	if (@_)
+	{
+		$self->{'db_ConnectKey'} = shift;
+	}
+	
+	my ($name, $port) = split(':', lc($ENV{'HTTP_HOST'}));
+	$port = '' unless defined $port;
+	$name = 'default' unless defined $name;
+	if ($altConnectKey = $self->db_AltConnectKeys("$name:$port") or $altConnectKey = $self->db_AltConnectKeys($name))
+	{
+		return $altConnectKey;
+	}
+	
+	return $self->{'db_ConnectKey'};
+}
+
 
 use constant CONFIGGROUP_PRO => 'production';
 use constant CONFIGGROUP_SWDEV => 'development';
@@ -146,7 +170,20 @@ sub getDefaultConfig
 
 	$config->name_Config($name);
 	$config->name_Group($group);
-	$config->db_ConnectKey($dbConnectKey);
+	
+	if (ref($dbConnectKey) eq 'HASH')
+	{
+		foreach my $key (%$dbConnectKey)
+		{
+			$config->db_AltConnectKeys($key, $dbConnectKey->{$key});
+			$config->db_ConnectKey($dbConnectKey->{$key}) if $key eq 'default';
+		}
+	}
+	else
+	{
+		$config->db_ConnectKey($dbConnectKey);
+	}
+	
 	$config->path_root(PATH_APPROOT);
 	$config->path_WebSite(PATH_WEBSITE);
 	$config->path_temp(File::Spec->catfile(PATH_WEBSITE, PATH_TEMP));
@@ -220,6 +257,15 @@ sub getDefaultConfig
 	'account-alex_hillman' => getDefaultConfig('Alex Hillman Configuration', CONFIGGROUP_SWDEV, 'sde01/sde@dbi:Oracle:SDEDBS04'),
 
 	# configs specifically for use with $ENV{HS_CONFIG}
+	'db-multidemo' => getDefaultConfig('MultiDemo Configuration', CONFIGGROUP_DEMO, {
+		'default' => 'demo01/demo@dbi:Oracle:SDEDBS02',
+		'demo01.physia.com' => 'demo01/demo@dbi:Oracle:SDEDBS02',
+		'demo02.physia.com' => 'demo02/demo@dbi:Oracle:SDEDBS02',
+		'demo03.physia.com' => 'demo03/demo@dbi:Oracle:SDEDBS02',
+		'demo04.physia.com' => 'demo04/demo@dbi:Oracle:SDEDBS02',
+		'demo05.physia.com' => 'demo05/demo@dbi:Oracle:SDEDBS02',
+		'demo06.physia.com' => 'demo06/demo@dbi:Oracle:SDEDBS02',
+	}),
 	'db-demo01' => getDefaultConfig('Demo01 Configuration', CONFIGGROUP_DEMO, 'demo01/demo@dbi:Oracle:SDEDBS02'),
 	'db-demo02' => getDefaultConfig('Demo02 Configuration', CONFIGGROUP_DEMO, 'demo02/demo@dbi:Oracle:SDEDBS02'),
 	'db-demosnap' => getDefaultConfig('DemoSnap Configuration', CONFIGGROUP_DEMO, 'demosnap/demo@dbi:Oracle:SDEDBS02'),
