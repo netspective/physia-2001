@@ -1,3 +1,7 @@
+--1910 (Frank Major)
+start post/views-report-month-audit-recap
+
+
 --bug 1811
 
 alter table offering_catalog add(flags number(16));
