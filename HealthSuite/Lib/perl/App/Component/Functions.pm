@@ -184,9 +184,9 @@ use constant CONTENT_HTML => qq{
 	<nobr><input type="radio" name="search_scope" value="insplan" ondblclick="location.href='/search/'+this.value">Ins./Workers Comp Plan&nbsp;</nobr><br>
 	<nobr><input type="radio" name="search_scope" value="org" ondblclick="location.href='/search/'+this.value">Organization/Facility</nobr><br>
 	<nobr>
-		<input type="radio" name="search_scope" value="catalog/icd" ondblclick="location.href='/search/'+this.value">ICD-9
-		<input type="radio" name="search_scope" value="catalog/cpt" ondblclick="location.href='/search/'+this.value">CPT
-		<input type="radio" name="search_scope" value="catalog/hcpcs" ondblclick="location.href='/search/'+this.value">HCPCS
+		<input type="radio" name="search_scope" value="icd" ondblclick="location.href='/search/'+this.value">ICD-9
+		<input type="radio" name="search_scope" value="cpt" ondblclick="location.href='/search/'+this.value">CPT
+		<input type="radio" name="search_scope" value="hcpcs" ondblclick="location.href='/search/'+this.value">HCPCS
 	</nobr><br>
 	<nobr>
 		<input type="radio" name="search_scope" value="drug/name" ondblclick="location.href='/search/'+this.value">Drug Name
