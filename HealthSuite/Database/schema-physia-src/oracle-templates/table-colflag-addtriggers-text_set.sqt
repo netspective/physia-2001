@@ -37,7 +37,7 @@ prompt -----------------------------------------------------------------------;
 			time => 'after', action => 'update',
 			code =>
 			[
-				"if :new.$col->{name} != :old.$col->{name} then",
+				"if nvl(:new.$col->{name}, ' ') != nvl(:old.$col->{name}, ' ') then",
 				"	pkg_Set.AssignSetMembers('$tableName\_\u$col->{name}', :new.$firstPriKey->{name}, :new.$col->{name});",
 				"end if;",
 			]);
