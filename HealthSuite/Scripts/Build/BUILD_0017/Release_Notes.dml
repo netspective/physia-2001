@@ -15,6 +15,10 @@
 	</release-info>
 
 	<deliverables>
+		<deliverable id="110">
+			Added medicaid resubmission code field to claim dialog.
+		</deliverable>
+
 		<deliverable id="219">
 			Renamed "Related Diagnosis" to "ICD9" and added "CPT Description" column which will be
 			populated if the "Code" column is a CPT code.
