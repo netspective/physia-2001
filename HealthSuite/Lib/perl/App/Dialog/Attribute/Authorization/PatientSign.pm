@@ -44,6 +44,7 @@ sub initialize
 						attrNameFmt => 'Signature Source',
 						valueType => $self->{valueType},
 						selAttrNameStmtName => 'selAttributeByItemNameAndValueTypeAndParent'),
+				new CGI::Dialog::Field(name => 'value_date', caption => 'Date', type => 'date'),
 	);
 
 	$self->SUPER::initialize();

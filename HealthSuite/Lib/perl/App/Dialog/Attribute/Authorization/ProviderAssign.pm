@@ -47,6 +47,7 @@ sub initialize
 						attrNameFmt => 'Provider Assignment',
 						valueType => $self->{valueType},
 						selAttrNameStmtName => 'selAttributeByItemNameAndValueTypeAndParent'),
+				new CGI::Dialog::Field(name => 'value_date', caption => 'Date', type => 'date'),
 	);
 
 	$self->SUPER::initialize();
