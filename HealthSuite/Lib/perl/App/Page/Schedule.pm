@@ -208,6 +208,10 @@ sub prepare_view_template
 sub prepare_view_assign
 {
 	my $self = shift;
+	$self->addLocatorLinks(
+		['Assign', '/schedule/assign'],
+	);
+
 	$self->prepare_view_dialogs();
 }
 
@@ -291,6 +295,10 @@ sub getApptSheetTimes
 sub prepare_view_apptsheet
 {
 	my ($self) = @_;
+
+	$self->addLocatorLinks(
+		['Appointments', '/schedule'],
+	);
 
 	if (my $dialog = $self->param('dialog'))
 	{
@@ -709,7 +717,7 @@ sub initialize
 	}
 
 	$self->addLocatorLinks(
-			['Schedule Desk', ''],
+			['Schedule Desk', '/schedule'],
 		);
 
 
