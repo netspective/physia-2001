@@ -30,11 +30,17 @@ sub new
 			caption => 'Report Dates',
 			options => FLDFLAG_REQUIRED
 		),
-		new App::Dialog::Field::Organization::ID(name => 'facility_id',
-			caption => 'Facility ID',
-			#types => ['Facility'],
-			options => FLDFLAG_REQUIRED
-		),
+		#new App::Dialog::Field::Organization::ID(name => 'facility_id',
+		#	caption => 'Facility ID',
+		#	#types => ['Facility'],
+		#	options => FLDFLAG_REQUIRED
+		#),
+		new App::Dialog::Field::OrgType(
+			caption => 'Facility',
+			name => 'facility_id',
+			options => FLDFLAG_PREPENDBLANK,
+			types => qq{'CLINIC','HOSPITAL','FACILITY/SITE','PRACTICE'},
+		),		
 		new App::Dialog::Field::Person::ID(caption =>'Physican ID', 
 						   name => 'person_id',types => ['Physician'] ),
 		
@@ -65,9 +71,8 @@ sub execute
 	my $startDate   = $page->field('report_begin_date');
 	my $endDate     = $page->field('report_end_date');
 	my $person_id     = $page->field('person_id');
-	
-	my $internalFacilityId = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE,
-		'selOrgId', $page->session('org_internal_id'), $facility_id);
+	my $orgInternalId =$page->session('org_internal_id');
+	my $internalFacilityId =$page->field('facility_id');
 
 	my $html = qq{
 	<table cellpadding=10>
@@ -75,29 +80,34 @@ sub execute
 		<td>
 			<b style="font-size:8pt; font-family:Tahoma">Appointments</b>
 			@{[$STMTMGR_REPORT_SCHEDULING->createHtml($page, STMTMGRFLAG_NONE, 'sel_appointments_byStatus',
-				[$internalFacilityId, $startDate, $endDate]) ]}
+				[$internalFacilityId, $startDate, $endDate,$orgInternalId ]) ]}
 		</td>
 		<td>
 			<b style="font-size:8pt; font-family:Tahoma">Patients Seen By Physician</b>
 			@{[$STMTMGR_REPORT_SCHEDULING->createHtml($page, STMTMGRFLAG_NONE, 'sel_patientsSeen',
-				[$internalFacilityId, $startDate, $endDate]) ]}
+				[$internalFacilityId, $startDate, $endDate,$orgInternalId ]) ]}
 		</td>
 		<td>
 			<b style="font-size:8pt; font-family:Tahoma">Patients Seen By Patient Type</b>
 			@{[$STMTMGR_REPORT_SCHEDULING->createHtml($page, STMTMGRFLAG_NONE, 'sel_patientsSeen_byPatientType',
-				[$internalFacilityId, $startDate, $endDate]) ]}
+				[$internalFacilityId, $startDate, $endDate,$orgInternalId ]) ]}
 		</td>
 		<td>
 			<b style="font-size:8pt; font-family:Tahoma">Appointments By Procedure Code</b>
 			@{[$STMTMGR_REPORT_SCHEDULING->createHtml($page, STMTMGRFLAG_NONE, 'sel_patientsCPT',
-				[$internalFacilityId, $startDate, $endDate]) ]}
+				[$internalFacilityId, $startDate, $endDate,$orgInternalId ]) ]}
 		</td>
 		<td>
 			<b style="font-size:8pt; font-family:Tahoma">Appointments By Product Type</b>
 			@{[$STMTMGR_REPORT_SCHEDULING->createHtml($page, STMTMGRFLAG_NONE, 'sel_patientsProduct',
-				[$internalFacilityId, $startDate, $endDate]) ]}
+				[$internalFacilityId, $startDate, $endDate,$orgInternalId ]) ]}
 		</td>		
-		</tr>							
+		<td>
+			<b style="font-size:8pt; font-family:Tahoma">Missing Encounters</b>
+			@{[$STMTMGR_REPORT_SCHEDULING->createHtml($page, STMTMGRFLAG_NONE, 'sel_missingEncounter',
+				[$internalFacilityId, $startDate, $endDate,$orgInternalId ]) ]}
+		</td>				
+		</tr>									
 	</table>
 	};
 
@@ -117,12 +127,12 @@ sub prepare_detail_physician
 	my $endDate     = $page->param('_f_report_end_date');
 	my $physician   = $page->param('physician');
 	my $person_id     = $page->field('person_id');
-	my $internalFacilityId = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE,
-		'selOrgId', $page->session('org_internal_id'), $facility_id);
-
+	my $internalFacilityId = $page->param('_f_facility_id');
+	my $orgInternalId = $page->session('org_internal_id');
+	
 	$page->addContent("<b>Patients Seen by $physician</b><br><br>",
 		$STMTMGR_REPORT_SCHEDULING->createHtml($page, STMTMGRFLAG_NONE, 
-			'sel_detailPatientsSeenByPhysician', [$physician, $internalFacilityId, $startDate, $endDate])
+			'sel_detailPatientsSeenByPhysician', [$physician, $internalFacilityId, $startDate, $endDate,$orgInternalId])
 	);
 }
 
@@ -134,12 +144,12 @@ sub prepare_detail_CPT
 	my $endDate     = $page->param('_f_report_end_date');
 	my $cpt   = $page->param('CPT');
 	my $person_id     = $page->field('person_id');
-	my $internalFacilityId = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE,
-		'selOrgId', $page->session('org_internal_id'), $facility_id);
+	my $internalFacilityId = $page->param('_f_facility_id');
+	my $orgInternalId = $page->session('org_internal_id');
 
 	$page->addContent("<b>$cpt Procedures</b><br><br>",
 		$STMTMGR_REPORT_SCHEDULING->createHtml($page, STMTMGRFLAG_NONE, 
-			'sel_detailPatientsCPT', [$cpt, $internalFacilityId, $startDate, $endDate])
+			'sel_detailPatientsCPT', [$cpt, $internalFacilityId, $startDate, $endDate,$orgInternalId])
 	);
 
 }
@@ -152,14 +162,26 @@ sub prepare_detail_product
 	my $endDate     = $page->param('_f_report_end_date');
 	my $product   = $page->param('product');
 	my $person_id     = $page->field('person_id');
-	my $internalFacilityId = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE,
-		'selOrgId', $page->session('org_internal_id'), $facility_id);
-
+	my $internalFacilityId = $page->param('_f_facility_id');
+	my $orgInternalId = $page->session('org_internal_id');
+	
 	$page->addContent("<b>$product</b><br><br>",
 		$STMTMGR_REPORT_SCHEDULING->createHtml($page, STMTMGRFLAG_NONE, 
-			'sel_detailPatientsProduct', [$product, $internalFacilityId, $startDate, $endDate])
+			'sel_detailPatientsProduct', [$product, $internalFacilityId, $startDate, $endDate,$orgInternalId])
 	);
 
+}
+
+sub prepare_detail_missing_encounter
+{
+	my ($self, $page) = @_;
+	my $encounterDate = $page->param('encounter');
+	my $internalFacilityId = $page->param('_f_facility_id');
+	my $orgInternalId = $page->session('org_internal_id');
+	$page->addContent("<b>Missing Encounter ($encounterDate)</b><br><br>",
+		$STMTMGR_REPORT_SCHEDULING->createHtml($page, STMTMGRFLAG_NONE, 
+			'sel_detailMissingEncounter', [$internalFacilityId, $encounterDate,$orgInternalId])
+	);
 }
 
 sub prepare_detail_appointments
@@ -171,11 +193,11 @@ sub prepare_detail_appointments
 	my $event_status = $page->param('event_status');
 	my $caption      = $page->param('caption');
 	my $person_id     = $page->field('person_id');
-	my $internalFacilityId = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE,
-		'selOrgId', $page->session('org_internal_id'), $facility_id);
+	my $internalFacilityId = $page->param('_f_facility_id');
+	my $orgInternalId = $page->session('org_internal_id');
 	$page->addContent("<b>'$caption' Appointments</b><br><br>",
 		$STMTMGR_REPORT_SCHEDULING->createHtml($page, STMTMGRFLAG_NONE, 'sel_DetailAppointmentStatus',
-			[$event_status,$internalFacilityId, $startDate, $endDate],
+			[$event_status,$internalFacilityId, $startDate, $endDate,$orgInternalId],
 		),
 	);
 }
@@ -189,12 +211,11 @@ sub prepare_detail_patient_type
 	my $patient_type_id  = $page->param('patient_type_id');
 	my $patient_type_caption = $page->param('patient_type_caption');
 	my $person_id     = $page->field('person_id');
-	my $internalFacilityId = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE,
-		'selOrgId', $page->session('org_internal_id'), $facility_id);
-
+	my $internalFacilityId = $page->param('_f_facility_id');
+	my $orgInternalId = $page->session('org_internal_id');
 	$page->addContent("<b>'$patient_type_caption' Appointments</b><br><br>",
 		$STMTMGR_REPORT_SCHEDULING->createHtml($page, STMTMGRFLAG_NONE, 'sel_detailPatientsSeenByPatientType',
-			[$patient_type_id,$internalFacilityId, $startDate, $endDate])
+			[$patient_type_id,$internalFacilityId, $startDate, $endDate,$orgInternalId])
 	);
 }
 
