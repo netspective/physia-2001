@@ -6,7 +6,7 @@ alter table Org drop (time_zone_temp);
 
 alter table Org_Aud add (time_zone_temp varchar2(20));
 update Org_Aud set time_zone_temp=time_zone;
-update Org_Aud_Aud set time_zone=null;
+update Org_Aud set time_zone=null;
 alter table Org_Aud modify (time_zone varchar2(10));
 alter table Org_Aud drop (time_zone_temp);
 
