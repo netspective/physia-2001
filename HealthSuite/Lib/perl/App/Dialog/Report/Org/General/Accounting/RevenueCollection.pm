@@ -95,15 +95,16 @@ sub execute
 			{ colIdx => 8, head => 'Total Cap Prod', summarize => 'sum', , dformat => 'currency' },
 			{ colIdx => 9, head => 'Total Prof Prod', summarize => 'sum', dformat => 'currency' },			
 			{ colIdx => 10, head => 'Grand Total Prod', summarize => 'sum', dformat => 'currency' },			
-			{ colIdx => 11, head =>'Ancill Pmts', summarize => 'sum',  dformat => 'currency' },
-			{ colIdx => 12, head =>'Prof Pmts', summarize => 'sum',  dformat => 'currency' },
-			{ colIdx => 13, head =>'FFS Pmts', summarize => 'sum',  dformat => 'currency' },			
-			{ colIdx => 14, head =>'Cap Pmts', summarize => 'sum',  dformat => 'currency' },
-			{ colIdx => 15, head =>'Net Recpts', summarize => 'sum',  dformat => 'currency' },	
-			{ colIdx => 16, head =>'% To Gross', tDataFmt=> '&{sum_percent:15,10}'},	
-			{ colIdx => 17 ,head =>'Hospital Visits', summarize => 'sum',  },				
-			{ colIdx => 18, head =>'Office Visits', summarize => 'sum',  },			
-			{ colIdx => 19, head =>'Avg Chrg per Visit', summarize => 'sum',  dformat => 'currency' },	
+			{ colIdx => 11, head =>'Recpt Adj', summarize => 'sum',  dformat => 'currency' },			
+			{ colIdx => 12, head =>'Ancill Pmts', summarize => 'sum',  dformat => 'currency' },
+			{ colIdx => 13, head =>'Prof Pmts', summarize => 'sum',  dformat => 'currency' },
+			{ colIdx => 14, head =>'FFS Pmts', summarize => 'sum',  dformat => 'currency' },			
+			{ colIdx => 15, head =>'Cap Pmts', summarize => 'sum',  dformat => 'currency' },
+			{ colIdx => 16, head =>'Net Recpts', summarize => 'sum',  dformat => 'currency' },	
+			{ colIdx => 17, head =>'% To Gross', tAlign=>'RIGHT',tDataFmt=> '&{sum_percent:16,10}'},	
+			{ colIdx => 18 ,head =>'Hospital Visits', summarize => 'sum',  },				
+			{ colIdx => 19, head =>'Office Visits', summarize => 'sum',  },			
+			{ colIdx => 20, head =>'Avg Chrg per Visit', summarize => 'sum',  dformat => 'currency' },	
 		],
 	};		
 
@@ -129,15 +130,16 @@ sub execute
 			columnDefn =>
 				[	
 				{ colIdx => 0, head => 'Physican ID',  dAlign => 'LEFT' },	
-				{ colIdx => 1, head =>'Ancill Pmts', summarize => 'sum',  dformat => 'currency' },
-				{ colIdx => 2, head =>'Prof Pmts', summarize => 'sum',  dformat => 'currency' },
-				{ colIdx => 3, head =>'FFS Pmts', summarize => 'sum',  dformat => 'currency' },			
-				{ colIdx => 4, head =>'Cap Pmts', summarize => 'sum',  dformat => 'currency' },
-				{ colIdx => 5, head =>'Net Recpts', summarize => 'sum',  dformat => 'currency' },			
-				{ colIdx => 6, head =>'% To Gross', tDataFmt=> '&{sum_percent:5,10}', dAlign=>'Right' },
-				{ colIdx => 7 ,head =>'Hospital Visits', summarize => 'sum',  },			
-				{ colIdx => 8, head =>'Office Visits', summarize => 'sum',  },			
-				{ colIdx => 9, head =>'Avg Chrg per Visit',  dformat => 'currency' },			
+				{ colIdx => 1, head =>'Recpt Adj', summarize => 'sum',  dformat => 'currency' },							
+				{ colIdx => 2, head =>'Ancill Pmts', summarize => 'sum',  dformat => 'currency' },
+				{ colIdx => 3, head =>'Prof Pmts', summarize => 'sum',  dformat => 'currency' },
+				{ colIdx => 4, head =>'FFS Pmts', summarize => 'sum',  dformat => 'currency' },			
+				{ colIdx => 5, head =>'Cap Pmts', summarize => 'sum',  dformat => 'currency' },
+				{ colIdx => 6, head =>'Net Recpts', summarize => 'sum',  dformat => 'currency' },			
+				{ colIdx => 7, head =>'% To Gross',tAlign=>'RIGHT', tDataFmt=> '&{sum_percent:6,11}', dAlign=>'Right' },
+				{ colIdx => 8 ,head =>'Hospital Visits', summarize => 'sum',  },			
+				{ colIdx => 9, head =>'Office Visits', summarize => 'sum',  },			
+				{ colIdx => 10, head =>'Avg Chrg per Visit',  dformat => 'currency' },			
 			],
 	};		
 	my $rev_coll = $STMTMGR_REPORT_ACCOUNTING->getRowsAsHashList($page,STMTMGRFLAG_NONE,'sel_revenue_collection',$reportBeginDate,$reportEndDate,
@@ -147,16 +149,18 @@ sub execute
 	foreach (@$rev_coll)
 	{
 		
-		#$_->{cap_pmt}=0;			
+		next unless $_->{provider}; 				
+		my $visit = $STMTMGR_REPORT_ACCOUNTING->getRowAsHash($page,STMTMGRFLAG_NONE,'selGetVisit',$reportBeginDate,$reportEndDate,
+						,$orgIntId,$_->{provider},$batch_from,$batch_to,$page->session('org_internal_id'));
 		$_->{total_non_cap_prod} = $_->{ffs_prof} + $_->{x_ray} + $_->{lab};
 		$_->{total_cap_prod} = $_->{cap_ffs_prof} + $_->{cap_x_ray}+ $_->{cap_lab};
 		$_->{total_prof_prod} = $_->{ffs_prof} + $_->{cap_ffs_prof};
 		$_->{grand_total_prod} = $_->{total_non_cap_prod} +$_->{total_cap_prod};
-		$_->{net_recpts} = $_->{ffs_pmt} + $_->{cap_pmt} ;
+		$_->{net_recpts} = $_->{prof_pmt} + $_->{ancill_pmt} +$_->{refund};
 		$_->{gross_per} = sprintf  "%3.2f", ($_->{net_recpts} / $_->{grand_total_prod} )*100 if $_->{grand_total_prod} > 0;
-		$_->{chrg_per_visit} = $_->{visits} / $_->{grand_total_prod} if  $_->{grand_total_prod} >0;
-		$_->{prof_pmts} = $_->{net_recpts} - $_->{ancill_pmt} ;
-		$_->{avg_cost_vist} = $_->{grand_total_prod} / $_->{office_visit} if $_->{office_visit} > 0;
+		$_->{chrg_per_visit} = $visit->{visits} / $_->{grand_total_prod} if  $_->{grand_total_prod} >0;
+		$_->{prof_pmt} ;
+		$_->{avg_cost_vist} = $_->{grand_total_prod} / $visit->{office_visit} if $visit->{office_visit} > 0;
 		my @rowData = 
 		(	
 			$_->{provider},
@@ -174,14 +178,15 @@ sub execute
 		my @rowData2 =
 		(
 			$_->{provider},
+			$_->{refund},
 			$_->{ancill_pmt},
-			$_->{prof_pmts},
+			$_->{prof_pmt},
 			$_->{ffs_pmt},
 			$_->{cap_pmt},
 			$_->{net_recpts},
 			$_->{gross_per}||'0.00',
-			$_->{hospital_visit},			
-			$_->{office_visit},
+			$visit->{hospital_visit},			
+			$visit->{office_visit},
 			$_->{avg_cost_vist}||'0',
 			$_->{grand_total_prod},			
 		);
