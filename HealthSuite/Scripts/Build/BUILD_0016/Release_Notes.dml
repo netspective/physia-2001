@@ -245,10 +245,19 @@
 			Additional next actions for placing claim on hold and adding hospital claim added to claim dialog and patient choose action.
 		</deliverable>
 
-
 		<deliverable id="none">
 			Added information about the build number, database type to the bottom of the login window 
 			to aid in troubleshooting.
+		</deliverable>
+
+		<deliverable id="none">
+			Added a new worklist for Documents.  In this build this is specifically for Lab Results.  It will
+			show lab results for the particular doc logged in.  In a later build it will allow you to specify
+			a list of doctors who's lab results you wish to monitor and give you the ability to perform
+			actions on these lab results (sign, file, etc...)
+
+			This deliverable also includes the addition of a new Query for Lab Results which was necessary for the
+			worklist to operate.
 		</deliverable>
 
 	</deliverables>
