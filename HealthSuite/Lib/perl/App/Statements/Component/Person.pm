@@ -755,7 +755,7 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 	sqlStmtBindParamDescr => ['Person ID for Attribute Table'],
 	publishDefn => {
 		columnDefn => [
-			{ head => 'CareProvider', dataFmt => '<A HREF = "/person/#3#/profile">#3#</A> (&{fmt_stripLeadingPath:2}, <NOBR>#4#</NOBR>) <A HREF ="/person/#5#/dlg-add-appointment?_f_resource_id=#3#&_f_attendee_id=#5#"> Sched Appt</A>' },
+			{ head => 'CareProvider', dataFmt => '<A HREF = "/person/#3#/profile">#3#</A> (#2#) <A HREF ="/person/#5#/dlg-add-appointment?_f_resource_id=#3#&_f_attendee_id=#5#"> Sched Appointment</A>' },
 			#{ colIdx => 1, head => 'Provider', dataFmt => '&{fmt_stripLeadingPath:1}:' },
 			#{ colIdx => 2, head => 'Name', dataFmt => '#2#' },
 			#{ colIdx => 3, head => 'Phone', dataFmt => '#3#', options => PUBLCOLFLAG_DONTWRAP },
