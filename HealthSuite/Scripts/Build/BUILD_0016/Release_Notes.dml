@@ -202,6 +202,8 @@
 
 		<deliverable id="1440">
 			Added 2 more columns in the 'Monthly Audit Recap' report to showup the count of established and new patients
+			NOTE: Fixed the bug that is reopened to show the same number of new and established patients as that of 
+			     'Patient Activity Report'
 		</deliverable>
 
 		<deliverable id="1451">
