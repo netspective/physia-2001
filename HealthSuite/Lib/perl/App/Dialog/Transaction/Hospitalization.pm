@@ -41,11 +41,11 @@ sub new
 		new CGI::Dialog::Field(name => 'related_data', caption => 'Hospital Name',options => FLDFLAG_REQUIRED),
 		new CGI::Dialog::Field(name => 'caption', caption => 'Room Number'),
 		new CGI::Dialog::Field(name => 'trans_status_reason', caption => 'Reason For Admission', options => FLDFLAG_REQUIRED),
-		new App::Dialog::Field::Person::ID(caption => 'Physician', name => 'provider_id', types => ['Physician'], options => FLDFLAG_REQUIRED),
+		new App::Dialog::Field::Person::ID(caption => 'Physician', name => 'provider_id', types => ['Physician'], options => FLDFLAG_REQUIRED, incSimpleName=>1),
 		new CGI::Dialog::Field(name => 'data_text_a',type => 'select', selOptions => 'In;Out', caption => 'In/Out Patient', options => FLDFLAG_REQUIRED),
 		new CGI::Dialog::Field(type => 'memo', name => 'detail', caption => 'Orders', options => FLDFLAG_REQUIRED),
 		new CGI::Dialog::Field(name => 'data_text_c', caption => 'Procedures'),
-		new App::Dialog::Field::Person::ID(caption => 'Consulting Physician', name => 'consult_id', types => ['Physician']),
+		new App::Dialog::Field::Person::ID(caption => 'Consulting Physician', name => 'consult_id', types => ['Physician'], incSimpleName=>1),
 		new CGI::Dialog::Field(type => 'memo', name => 'trans_substatus_reason', caption => 'Findings'),
 		new CGI::Dialog::Field(caption => 'Duration of Stay', name => 'data_num_a', size => 4, options => FLDFLAG_REQUIRED, defaultValue => '1', type => 'integer', maxLength => 4),
 	);

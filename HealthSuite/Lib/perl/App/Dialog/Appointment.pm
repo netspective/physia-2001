@@ -78,6 +78,7 @@ sub new
 			size => 25,
 			useShortForm => 1,
 			hints => 'Leave blank to use ID autosuggestion feature for new patients',
+			incSimpleName=>1,
 			#options => FLDFLAG_REQUIRED
 		),
 		new CGI::Dialog::Field(caption => 'Patient Type',
@@ -205,6 +206,7 @@ sub new
 			size => 20,
 			useShortForm => 1,
 			options => FLDFLAG_REQUIRED,
+			incSimpleName=>1,
 		),
 
 		new App::Dialog::Field::Scheduling::Date(caption => 'Confirm Date',

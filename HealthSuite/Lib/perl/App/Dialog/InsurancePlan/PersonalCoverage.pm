@@ -95,6 +95,7 @@ sub new
 			caption => 'Insured Person ID',
 			name => 'insured_id',
 			types => ['Insured-Person'],
+			incSimpleName=>1,
 			),
 		new App::Dialog::Field::Organization::ID(
 			caption => "Insured Person's Employer",

@@ -161,7 +161,7 @@ sub initialize
 		),
 		new CGI::Dialog::MultiField(name => 'care_specialty',
 			fields => [
-				new App::Dialog::Field::Person::ID(caption =>'Care Provider ID', name => 'care_provider', types => ['Physician', 'Referring-Doctor']),
+				new App::Dialog::Field::Person::ID(caption =>'Care Provider ID', name => 'care_provider', types => ['Physician', 'Referring-Doctor'], incSimpleName=>1),
 				new CGI::Dialog::Field(caption => 'Specialty',
 									#type => 'foreignKey',
 									name => 'specialty',

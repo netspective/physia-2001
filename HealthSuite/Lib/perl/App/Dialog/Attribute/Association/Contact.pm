@@ -48,7 +48,7 @@ sub new
 
 	$self->addContent(
 		new CGI::Dialog::Subhead(heading => 'Link to Existing Person Record', name => 'exists_heading'),
-		new App::Dialog::Field::Person::ID(caption =>'Person ID', name => 'rel_id', addType => 'patient', hints => 'Please provide an existing Person ID. A link will be created between the patient and contact.'),
+		new App::Dialog::Field::Person::ID(caption =>'Person ID', name => 'rel_id', addType => 'patient', hints => 'Please provide an existing Person ID. A link will be created between the patient and contact.', incSimpleName=>1),
 		new CGI::Dialog::Subhead(heading => 'Or Provide A Contact Name', name => 'notexists_heading'),
 		new CGI::Dialog::Field(caption =>'Full Name', name => 'rel_name', hints => 'Please provide the full name of the contact if a record does not exist for him/her. A link will not be created between the patient and contact.'),
 		new CGI::Dialog::Subhead(heading => 'Contact Information', name => 'contact_heading'),
