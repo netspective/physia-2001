@@ -771,7 +771,7 @@ sub storeFacilityInfo
 	my $wrkCompNo = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selAttributeByItemNameAndValueTypeAndParent', $billFacilityId, 'Workers Comp#', $credentialsValueType);
 	my $bcbsNo = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selAttributeByItemNameAndValueTypeAndParent', $billFacilityId, 'BCBS#', $credentialsValueType);
 	my $medicareNo = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selAttributeByItemNameAndValueTypeAndParent', $billFacilityId, 'Medicare#', $credentialsValueType);
-	my $cliaNo = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selAttributeByItemNameAndValueTypeAndParent', $billFacilityId, 'CLIA#', $credentialsValueType);
+	my $billingCliaNo = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selAttributeByItemNameAndValueTypeAndParent', $billFacilityId, 'CLIA#', $credentialsValueType);
 	my $rrMedicareNo = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selAttributeByItemNameAndValueTypeAndParent', $billFacilityId, 'Railroad Medicare#', $credentialsValueType);
 
 	$page->schemaAction(
@@ -887,7 +887,7 @@ sub storeFacilityInfo
 			parent_id => $invoiceId,
 			item_name => 'Billing Facility/CLIA',
 			value_type => defined $textValueType ? $textValueType : undef,
-			value_text => $cliaNo->{value_text} || undef,
+			value_text => $billingCliaNo->{value_text} || undef,
 			value_textB => $billingFacilityInfo->{org_id} || undef,
 			value_int => $billFacilityId || undef,
 			value_intB => 1,
@@ -924,6 +924,7 @@ sub storeFacilityInfo
 	my $servFacilityId = $mainTransData->{service_facility_id};
 	my $serviceFacilityAddr = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selOrgAddressByAddrName', $servFacilityId, 'Mailing');
 	my $serviceFacilityInfo = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_NONE, 'selRegistry', $servFacilityId);
+	my $serviceCliaNo = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selAttributeByItemNameAndValueTypeAndParent', $servFacilityId, 'CLIA#', $credentialsValueType);
 
 	$page->schemaAction(
 			'Invoice_Attribute', $command,
@@ -931,6 +932,18 @@ sub storeFacilityInfo
 			item_name => 'Service Facility/Name',
 			value_type => defined $textValueType ? $textValueType : undef,
 			value_text => $serviceFacilityInfo->{name_primary} || undef,
+			value_textB => $serviceFacilityInfo->{org_id} || undef,
+			value_int => $servFacilityId || undef,
+			value_intB => 1,
+			_debug => 0
+		);
+
+	$page->schemaAction(
+			'Invoice_Attribute', $command,
+			parent_id => $invoiceId,
+			item_name => 'Service Facility/CLIA',
+			value_type => defined $textValueType ? $textValueType : undef,
+			value_text => $serviceCliaNo->{value_text} || undef,
 			value_textB => $serviceFacilityInfo->{org_id} || undef,
 			value_int => $servFacilityId || undef,
 			value_intB => 1,
