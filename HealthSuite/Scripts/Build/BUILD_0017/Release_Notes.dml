@@ -39,6 +39,7 @@
 			UI: Looking up a nurse's session set of physicians reveals his/her session set of physicians
 			not those of the current user of the app.
 		</deliverable>
+
 		<deliverable id="1512">
 			Deleted the validation check on the 'Nursing License' field in the 'Add Nurse' dialog
 		</deliverable>
@@ -67,6 +68,14 @@
 			Changed Envoy NSF to THINNet NSF.
 		</deliverable>
 
+		<deliverable id="1544">
+			Allow lookup of physicians/provider and referring physicians/providers.
+		</deliverable>
+
+		<deliverable id="1548">
+			Require patient Check-In before Check-Out.
+		</deliverable>
+
 		<deliverable id="1553">
 			UI: Administrators can now update main org profiles
 		</deliverable>
@@ -76,8 +85,8 @@
 			Patient/Person Lookup to show the 'Summary Page'.
 		</deliverable>
 		<deliverable id="1557">
-			UI: Added the 'Blood Type' component in the Chart page to update the bloodtype and the blood type cannot be 
-			    edited any more from the 'Edit Profile' 
+			UI: Added the 'Blood Type' component in the Chart page to update the bloodtype and the blood type cannot be
+			    edited any more from the 'Edit Profile'
 		</deliverable>
 		<deliverable id="1560">
 			Changed claim dialog next action post personal payment to send user to personal payment dialog for claims.
