@@ -62,8 +62,18 @@ detail report.
 		<deliverable id="1247">
 			Loaded thin net payer IDs.  Also changed the E-Remit Payer lookup to include payer source (PerSE,ThinNet,etc)
 		</deliverable>
-
-
+		<deliverable id="1089">
+			An action can now be specified in our definition files to allow clicking a query result to take you to the appropriate destination.  (This may not be defined in all query types [QDLs] yet)
+		</deliverable>
+		<deliverable id="1090">
+			Query results now show up with appropriate column headings.  However additional formatting is needed.
+		</deliverable>
+		<deliverable id="1091">
+			You can now use the comparison operators which take multiple criteria (like "is between" and "is one of").  When you specify the criteria you need to seperate multiple values with commas.  I.E.   "Balance" "is between" "10,50" would retrieve all items with a Balance between $10 and $50.
+		</deliverable>
+		<deliverable id="1088">
+			Invoice queries are now supported, however additional work will be necessary to add filters and additional columns
+		</deliverable>
 		<deliverable id="1152">
 			Option to submit to next payer after an insurance payment is made.
 		</deliverable>
@@ -85,7 +95,5 @@ detail report.
 		<deliverable id="1238">
 			Activity log for checkout hardcoded to 'Add'.
 		</deliverable>
-
-	
 	</deliverables>
 </release-notes>
