@@ -28,6 +28,10 @@
 			Check and update the Payer ID right before transmitting claims to Clearing Houses.
 		</deliverable>
 		
+		<deliverable id="1224">
+			Eliminate all tabs other than summary from ACS org page (affects ACS only)
+		</deliverable>
+		
 	
 	</deliverables>
 </release-notes>
