@@ -19,6 +19,8 @@ use constant TWCC_CHECK_BOX_WIDTH => 5;
 use constant TWCC_CHECK_BOX_HEIGHT => 5;
 use constant TWCC_PAGE_WIDTH => 612;
 use constant TWCC_PAGE_HEIGHT => 792;
+use constant TWCC_RADIUS => 3.5;
+use constant TWCC_INNER_RADIUS => 1;
 
 sub new
 {
@@ -54,7 +56,7 @@ sub drawBox
 	}
 	if ($right == TWCC_PDF_RIGHT)
 	{
-		
+
 		pdflib::PDF_moveto($pdf, $x1 + $width, $y1);
 		pdflib::PDF_lineto($pdf, $x1 + $width, $y1 - $height); # Top Line
 		pdflib::PDF_stroke($pdf);
@@ -94,7 +96,7 @@ sub drawText
 sub drawLine
 {
 	my ($self, $pdf, $properties) = @_;
-	
+
 	$self->setColor($pdf, $properties);
 	pdflib::PDF_setlinewidth($pdf, $properties->{'thickness'} eq "" ? TWCC_LINE_THICKNESS : $properties->{'thickness'});
 	pdflib::PDF_setdash($pdf, $properties->{'blackDash'} + 0, $properties->{'whiteDash'} + 0);
@@ -106,13 +108,36 @@ sub drawLine
 sub drawCheckBox
 {
 	my ($self, $pdf, $properties) = @_;
-#	$self->setColor($pdf, $properties);
+	$self->setColor($pdf, $properties);
 	my $width = $properties->{'width'} ne "" ? $properties->{'width'} : TWCC_CHECK_BOX_WIDTH;
 	my $height = $properties->{'height'} ne "" ? $properties->{'height'} : TWCC_CHECK_BOX_HEIGHT;
 
-	pdflib::PDF_setrgbcolor($pdf, 0.7, 0, 0);
+#	pdflib::PDF_setrgbcolor($pdf, 0.7, 0, 0);
 	pdflib::PDF_rect($pdf, $properties->{'x'}, $properties->{'y'}, $width , $height);
 	pdflib::PDF_stroke($pdf);
+}
+
+sub drawRadioButtonUnSelect
+{
+	my ($self, $pdf, $properties) = @_;
+	$self->setColor($pdf, $properties);
+	my $radius = $properties->{'raduis'} ne "" ? $properties->{'radius'} : TWCC_RADIUS;
+
+	pdflib::PDF_circle($pdf, $properties->{'x'} + $radius, $properties->{'y'} - $radius, $radius);
+	pdflib::PDF_stroke($pdf);
+}
+
+sub drawRadioButtonSelect
+{
+	my ($self, $pdf, $properties) = @_;
+	$self->setColor($pdf, $properties);
+	my $radius = $properties->{'raduis'} ne "" ? $properties->{'radius'} : TWCC_RADIUS;
+	my $innerRadius = TWCC_INNER_RADIUS;
+
+	pdflib::PDF_circle($pdf, $properties->{'x'} + $radius, $properties->{'y'} - $radius, $radius);
+	pdflib::PDF_stroke($pdf);
+	pdflib::PDF_circle($pdf, $properties->{'x'} + $radius, $properties->{'y'} - $radius, $innerRadius);
+	pdflib::PDF_fill_stroke($pdf);
 }
 
 sub drawArrow
@@ -173,8 +198,8 @@ sub textSplit
 
 	my @words = split(" ", $string);
 	my $sp = pdflib::PDF_stringwidth($p, " ", $fontName, $fontWidth);
-	
-	foreach my $word (@words) 
+
+	foreach my $word (@words)
 	{
 		$totalWidth = $totalWidth  + pdflib::PDF_stringwidth($p, $word, $fontName, $fontWidth) + $sp;
 		if ($totalWidth <= $clipWidth)
@@ -193,7 +218,7 @@ sub drawImageJPEG
 {
 	my($self, $p, $properties) = @_;
 	my $scale = $properties->{'scale'} eq "" ? 1 : $properties->{'scale'};
-	
+
 	my $tmp = pdflib::PDF_open_JPEG($p, $properties->{'imagePath'});
 	pdflib::PDF_place_image($p, $tmp, $properties->{'x'}, $properties->{'y'}, $scale);
 }

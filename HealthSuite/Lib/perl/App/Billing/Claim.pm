@@ -11,6 +11,7 @@ use App::Billing::Claim::Patient;
 use App::Billing::Claim::Physician;
 use App::Billing::Claim::Insured;
 use App::Billing::Claim::Treatment;
+use App::Billing::Claim::TWCC73;
 
 use App::Billing::Universal;
 use constant DATEFORMAT_USA => 1;
@@ -60,6 +61,8 @@ sub new
 	$params{deductibleItems} = [];
 	$params{voidItems} = [];
 	$params{suppressedItems} = [];
+
+	$params{twcc73} = undef;
 
 	$params{programName} = undef;
 	$params{acceptAssignment} = undef;
@@ -146,6 +149,18 @@ sub getInvoiceDate
 {
 	my $self = shift;
 	return $self->{invoiceDate};
+}
+
+sub setTWCC73
+{
+	my ($self, $value) = @_;
+	$self->{twcc73} = $value;
+}
+
+sub getTWCC73
+{
+	my $self = shift;
+	return $self->{twcc73};
 }
 
 sub setTransProviderId
