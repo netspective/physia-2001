@@ -443,6 +443,7 @@ Note : Lab Catalogs and Lab Order entered before this fix will not work correctl
 
 		<deliverable id="1966">
 			Removed sales units field and fixed pin# problem in medication dialog.
+			Reopened: Unrequired dose, start date, and quantity in add medication dialog.
 		</deliverable>
 
 	</deliverables>
