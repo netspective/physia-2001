@@ -256,6 +256,10 @@
 			Report (Financial Analy Report) : Fixed problem with Total A/R
 		</deliverable>
 
+		<deliverable id="1862">
+			Corrected Billing Statements Report
+		</deliverable>
+
 		<deliverable id="1869">
 			Validation for when adding a person category that already exists has been added.
 		</deliverable>
