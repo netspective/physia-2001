@@ -1089,7 +1089,7 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 			product_name,
 			DECODE(record_type, 3, 'coverage') AS record_type,
 			plan_name,
-			DECODE(bill_sequence,1,'Primary',2,'Secondary',3,'Tertiary',4,'Quaternary',5,'W. Comp', 98, 'Terminated', 99, 'InActive'),
+			DECODE(bill_sequence,1,'Primary',2,'Secondary',3,'Tertiary',4,'Quaternary',5,'W. Comp', 98, 'Terminated', 99, 'InActive', 'Active'),
 			owner_person_id,
 			ins_org_id,
 			indiv_deductible_amt,
@@ -1127,8 +1127,8 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 			{
 				colIdx => 15,
 				dataFmt => {
-					'0' => '<A HREF = "/person/#14#/profile">#12#</A> (Third Party)',
-					'1' => '<A HREF = "/org/#17#/profile">#12#</A> (Third Party)',
+					'0' => '<A HREF = "/person/#14#/profile">#12#</A> (Third Party, #5#): Begin Date: #18#, End Date: #19#',
+					'1' => '<A HREF = "/org/#17#/profile">#12#</A> (Third Party, #5#): Begin Date: #18#, End Date: #19#',
 					''  => '<A HREF = "/org/#16#/profile">#16#</A>(#5# #13#): #4#, #2#, Begin Date: #18#, End Date: #19#',
 				},
 			},
@@ -2201,7 +2201,7 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 					name_sort
 			from 	person_attribute b
 			where 	parent_id = ?
-			and 	value_type in (@{[ App::Universal::ATTRTYPE_LICENSE ]}, @{[ App::Universal::ATTRTYPE_STATE ]}, @{[ App::Universal::ATTRTYPE_ACCREDITATION ]}, @{[ App::Universal::ATTRTYPE_SPECIALTY ]}, @{[ App::Universal::ATTRTYPE_PROVIDER_NUMBER ]})
+			and 	value_type in (@{[ App::Universal::ATTRTYPE_LICENSE ]}, @{[ App::Universal::ATTRTYPE_STATE ]}, @{[ App::Universal::ATTRTYPE_ACCREDITATION ]}, @{[ App::Universal::ATTRTYPE_SPECIALTY ]}, @{[ App::Universal::ATTRTYPE_PROVIDER_NUMBER ]}, @{[App::Universal::ATTRTYPE_BOARD_CERTIFICATION]})
 			and     item_name not in('Nurse/Title', 'RN', 'Driver/License', 'Employee')
 			order by value_int
 		},
@@ -2215,6 +2215,7 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 							"@{[ App::Universal::ATTRTYPE_PROVIDER_NUMBER ]}" => '#2# (#4# #5#): #3#, #6#',
 							"@{[ App::Universal::ATTRTYPE_STATE ]}"  => '#2# (#4# #5#): #3#',
 							"@{[ App::Universal::ATTRTYPE_ACCREDITATION ]}"  => '#2# (#4# #5#)',
+							"@{[ App::Universal::ATTRTYPE_BOARD_CERTIFICATION ]}"  => '#2# (#4# #5#)',
 							"@{[ App::Universal::ATTRTYPE_SPECIALTY ]}" => '#2# (#4# #5#)'
 						},
 					},
@@ -2248,6 +2249,7 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 				{ caption => qq{ Add <A HREF= '/person/#param.person_id#/stpe-#my.stmtId#/dlg-add-certificate-license?home=#param.home#'>License</A> } },
 				{ caption => qq{ Add <A HREF= '/person/#param.person_id#/stpe-#my.stmtId#/dlg-add-certificate-state?home=#param.home#'>State</A> } },
 				{ caption => qq{ Add <A HREF= '/person/#param.person_id#/stpe-#my.stmtId#/dlg-add-certificate-accreditation?home=#param.home#'>Accreditation</A> } },
+				{ caption => qq{ Add <A HREF= '/person/#param.person_id#/stpe-#my.stmtId#/dlg-add-certificate-board?home=#param.home#'>Board Certification</A> } },
 				{ caption => qq{ Add <A HREF= '/person/#param.person_id#/stpe-#my.stmtId#/dlg-add-certificate-specialty?home=#param.home#'>Specialty</A> } },
 				{ caption => qq{ Add <A HREF= '/person/#param.person_id#/stpe-#my.stmtId#/dlg-add-certificate-provider-number?home=#param.home#'>Provider Number</A> } },
 		],
