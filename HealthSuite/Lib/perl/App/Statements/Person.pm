@@ -121,6 +121,10 @@ $STMTMGR_PERSON = new App::Statements::Person(
 			and value_type between 220 and 226
 			and value_type = id
 		},
+	'selBloodTypeCaption' => q{
+		select caption from Blood_Type
+		where id = ?
+		},
 	'selRelationship' => qq{
 		select caption from resp_party_relationship
 		},
