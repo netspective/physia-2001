@@ -571,7 +571,7 @@ $SEARCH_CLASSES = {
 	'postrefund' => 'App::Dialog::PostRefund',
 	'posttransfer' => 'App::Dialog::PostTransfer',
 	#'slot' => 'App::Dialog::Slot',
-	'template' => {_class => 'App::Dialog::Template', _arl_modify => ['template_id'],},
+	'template' => {_class => 'App::Dialog::Template', _arl_modify => ['template_id'], _arl_add => ['resource_id'],},
 	'userproblem' => 'App::Dialog::UserProblems',
 	'appttype' => {_class=>'App::Dialog::ApptType', _arl=>['appt_type_id'],},
 	'assign' => {_class=>'App::Dialog::Assign'},
