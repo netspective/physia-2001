@@ -586,10 +586,14 @@ sub addTransactionAndInvoice
 	#trans status
 	my $transStatus = App::Universal::TRANSSTATUS_ACTIVE;
 
+	# other
+	my $condRelToFakeNone = App::Universal::CONDRELTO_FAKE_NONE;
+
 	#-------------------------------------------------------------------------------------------------------------------------------
 
 	my $billingFacility = $page->field('billing_facility_id');
 	my $confirmedInfo = $page->field('confirmed_info') eq 'Yes' ? 1 : 0;
+	my $relTo = $page->field('accident') == $condRelToFakeNone ? '' : $page->field('accident');
 	my $transId = $page->schemaAction(
 			'Transaction', $command,
 			trans_id => $editTransId || undef,
@@ -610,6 +614,7 @@ sub addTransactionAndInvoice
 			init_onset_date => $page->field('illness_begin_date') || undef,
 			curr_onset_date => $page->field('illness_end_date') || undef,
 			bill_type => defined $claimType ? $claimType : undef,
+			related_to => $relTo || undef,
 			data_text_a => $page->field('ref_id') || undef,
 			data_text_b => $page->field('comments') || undef,
 			data_num_a => defined $confirmedInfo ? $confirmedInfo : undef,
@@ -695,21 +700,15 @@ sub handleInvoiceAttrs
 	#	 Accident Related To, Prior Auth Num, Deduct Balance, Accept Assignment, Ref Physician Name/Id,
 	#	 Illness/Disability/Hospitalization Dates
 
-	my $condRelToAuto = App::Universal::CONDRELTO_AUTO;
-	my $condRelToFakeNone = App::Universal::CONDRELTO_FAKE_NONE;
-	my @condRelToIds = $page->field('accident');
-	my @condRelToCaptions = ();
+
+
+	my $condRelToId = $page->field('accident');
+	my $condition = '';
 	my $state = '';
-
-	foreach my $relToId (@condRelToIds)
+	unless($condRelToId == App::Universal::CONDRELTO_FAKE_NONE)
 	{
-		next if $relToId == $condRelToFakeNone;
-
-		my $condition = $STMTMGR_TRANSACTION->getSingleValue($page, STMTMGRFLAG_NONE, 'selCondition', $relToId);
-
-		push(@condRelToCaptions, $condition);
-
-		$state = $page->field('accident_state') if $relToId == $condRelToAuto;
+		$condition = $STMTMGR_TRANSACTION->getSingleValue($page, STMTMGRFLAG_NONE, 'selCondition', $condRelToId);
+		$state = $page->field('accident_state') if $condRelToId == App::Universal::CONDRELTO_AUTO;
 	}
 
 	$page->schemaAction(
@@ -718,7 +717,7 @@ sub handleInvoiceAttrs
 			parent_id => $invoiceId || undef,
 			item_name => 'Condition/Related To',
 			value_type => defined $textValueType ? $textValueType : undef,
-			value_text => join(', ', @condRelToCaptions) || 'None',
+			value_text => $condition || undef,
 			value_textB => $state || undef,
 			_debug => 0
 	);
