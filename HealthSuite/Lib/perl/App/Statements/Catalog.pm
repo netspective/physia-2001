@@ -45,7 +45,7 @@ $STMTMGR_CATALOG = new App::Statements::Catalog(
 	},
 	'selFSLinkedProductPlan' =>qq
 	{
-		SELECT  distinct oc.internal_catalog_id as internal_catalog_id
+		SELECT  distinct oc.internal_catalog_id as internal_catalog_id, catalog_id
 		FROM	insurance_attribute ia, offering_catalog oc
 		WHERE 	oc.internal_catalog_id= ia.value_text
 		AND	ia.item_name = 'Fee Schedule'
