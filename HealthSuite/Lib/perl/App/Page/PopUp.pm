@@ -67,21 +67,21 @@ sub prepare_view_prescription_pdf
 		$permed_id
 	);
 
-	my $theFilename = $self->session ('org_id') . $self->session ('user_id') . time() . ".perscription.pdf";
+	my $pdfName = $self->session('org_internal_id') . '_' . $self->session('user_id') .
+		'_' . $permed_id . '.pdf';
+	my $pdfFile = File::Spec->catfile($CONFDATA_SERVER->path_PDFPrescriptionOutput, $pdfName);
+	my $pdfHref = File::Spec->catfile($CONFDATA_SERVER->path_PDFPrescriptionOutputHREF, $pdfName);
 
 	$output->printReport(
 		$prescription,
-		file => File::Spec->catfile($CONFDATA_SERVER->path_PDFPrescriptionOutput, $theFilename),
+		file => $pdfFile,
 #		columns => 4,
 #		rows => 51
 	);
 
-	my $fileLink = File::Spec->catfile($CONFDATA_SERVER->path_PDFPrescriptionOutputHREF, $theFilename);
-
-	$self->addContent(qq {<b>Prescription Generated: </b><a href="$fileLink">Click here to view</a>});
+	$self->redirect($pdfHref);
 
 	return 1;
-
 }
 
 
