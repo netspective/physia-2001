@@ -178,6 +178,17 @@ sub getTargetInvoices
 	return \@allRecords;
 }
 
+sub preStatusCheck
+{
+	my ($self, $claim, $attrDataFlag, $row) = @_;
+	my $go = 0;
+	
+	$go = 1 if (($claim->getStatus() <=  PRE_STATUS) || (($claim->getInvoiceSubtype == CLAIM_TYPE_SELF) && ($claim->getStatus() ==  INVOICESTATUS_CLOSED)) || (($claim->getStatus() == PRE_VOID) && not($attrDataFlag & $row)));
+	$go = 1 if (($claim->getStatus() >  INVOICESTATUS_SUBMITTED) && ($claim->getStatus() <  INVOICESTATUS_CLOSED));
+	return $go
+}
+	
+	
 sub populateClaims
 {
 	my ($self, $claimList, %params) = @_;
@@ -233,7 +244,8 @@ sub populateClaims
 
 		$sth->execute or $self->{valMgr}->addError($self->getId(),100,"Unable to execute $queryStatment");
 		@row = $sth->fetchrow_array();
-		if (($claims->[$i]->getStatus() <=  PRE_STATUS) || (($claims->[$i]->getInvoiceSubtype == CLAIM_TYPE_SELF) && ($claims->[$i]->getStatus() ==  INVOICESTATUS_CLOSED)) || (($claims->[$i]->getStatus() == PRE_VOID) && not($attrDataFlag & $row[0])))
+#		if (($claims->[$i]->getStatus() <=  PRE_STATUS) || (($claims->[$i]->getInvoiceSubtype == CLAIM_TYPE_SELF) && ($claims->[$i]->getStatus() ==  INVOICESTATUS_CLOSED)) || (($claims->[$i]->getStatus() == PRE_VOID) && not($attrDataFlag & $row[0])))
+		if ( $self->preStatusCheck($claims->[$i], $attrDataFlag, $row[0]) ==1)
 		{
 			$self->assignInvoicePreSubmit($claims->[$i], $targetInvoices->[$i]);
 		}
@@ -1419,7 +1431,7 @@ sub assignInvoiceProperties
 
 	};
 
-	my $queryStatment = " select ITEM_ID, ITEM_NAME, VALUE_TEXT, VALUE_TEXTB, VALUE_INT, VALUE_INTB, VALUE_FLOAT, VALUE_FLOATB, to_char(VALUE_DATE, \'dd-MON-yyyy\'), to_char(VALUE_DATEEND, \'dd-MON-yyyy\'), to_char(VALUE_DATEA, \'dd-MON-yyyy\'), to_char(VALUE_DATEB, \'dd-MON-yyyy\'), VALUE_BLOCK from invoice_attribute where parent_id = $invoiceId ";
+	my $queryStatment = " select ITEM_ID, ITEM_NAME, VALUE_TEXT, VALUE_TEXTB, VALUE_INT, VALUE_INTB, VALUE_FLOAT, VALUE_FLOATB, to_char(VALUE_DATE, \'dd-MON-yyyy\'), to_char(VALUE_DATEEND, \'dd-MON-yyyy\'), to_char(VALUE_DATEA, \'dd-MON-yyyy\'), to_char(VALUE_DATEB, \'dd-MON-yyyy\') from invoice_attribute where parent_id = $invoiceId ";
 	my $sth = $self->{dbiCon}->prepare(qq { $queryStatment});
 	# do the execute statement
 	$sth->execute()  or $self->{valMgr}->addError($self->getId(),100,"Unable to execute $queryStatment");
@@ -1809,7 +1821,8 @@ sub populateItems
 	my $outsideLabCharges;
 	my @itemMap;
 	my @claimCharge;
-
+	my $claimChargePaid=0;
+	
 	$itemMap[INVOICE_ITEM_OTHER] = \&App::Billing::Claim::addOtherItems;
 	$itemMap[INVOICE_ITEM_SERVICE] = \&App::Billing::Claim::addProcedure;
 	$itemMap[INVOICE_ITEM_LAB] = \&App::Billing::Claim::addProcedure;
@@ -1873,6 +1886,8 @@ sub populateItems
 		if (uc($tempRow[20]) ne "VOID")
 		{
 			$claimCharge[$tempRow[16]] = $claimCharge[$tempRow[16]] + $tempRow[13];
+			$claimChargePaid = $claimChargePaid + $tempRow[15] if (($tempRow[16] == INVOICE_ITEM_SERVICE) ||($tempRow[16] == INVOICE_ITEM_LAB));
+			
 		}
 		if ($functionRef ne "")
 		{
@@ -1882,6 +1897,7 @@ sub populateItems
 	$currentClaim->{treatment}->setOutsideLab(($outsideLabCharges eq "") ? 'N' : 'Y');
 	$currentClaim->{treatment}->setOutsideLabCharges($outsideLabCharges);
 	$currentClaim->setTotalCharge($claimCharge[INVOICE_ITEM_LAB] + $claimCharge[INVOICE_ITEM_SERVICE]);
+	$currentClaim->setTotalChargePaid($claimChargePaid);
 
 }
 

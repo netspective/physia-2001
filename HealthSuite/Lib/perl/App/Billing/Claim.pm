@@ -64,6 +64,7 @@ sub new
 	$params{programName} = undef;
 	$params{acceptAssignment} = undef;
 	$params{totalCharge} = undef;
+	$params{totalChargePaid} = undef;
 	$params{amountPaid} = undef;
 	$params{conditionRelatedToEmployment} = undef;
 	$params{conditionRelatedToAutoAccident} = undef;
@@ -711,12 +712,17 @@ sub setTotalCharge
 	$self->{totalCharge} = $treat;
 }
 
+sub setTotalChargePaid
+{
+	my ($self, $value) = @_;
+	$self->{totalChargePaid} = $value;
+}
+
 sub setTotalInvoiceCharges
 {
 	my ($self, $value) = @_;
 	$self->{totalInvoiceCharges} = $value;
 }
-
 
 sub setId
 {
@@ -744,6 +750,12 @@ sub getTotalCharge
 	return $self->{totalCharge};
 }
 
+sub getTotalChargePaid
+{
+	my ($self) = @_;
+	
+	return $self->{totalChargePaid};
+}
 
 sub getTotalInvoiceCharges
 {

@@ -2688,8 +2688,7 @@ sub box29ClaimData
 	my $font = pdflib::PDF_findfont($p, DATA_FONT_NAME, "default", 0);
 	die "Couldn't set font"  if ($font == -1);
 	pdflib::PDF_setfont($p, $font, DATA_FONT_SIZE);
-	my @amount  = split (/\./ , abs($claim->getAmountPaid));
-
+	my @amount  = split (/\./ , abs($claim->getTotalChargePaid));
 	pdflib::PDF_show_xy($p , $amount[0] + 0, $box29X + 45 - pdflib::PDF_stringwidth($p ,$amount[0], $font, DATA_FONT_SIZE) , $box29Y - 3 * FORM_FONT_SIZE);
 	pdflib::PDF_show_xy($p , substr($amount[1] . "00", 0, 2), $box29X + 55, $box29Y - 3 * FORM_FONT_SIZE);
 
@@ -2707,7 +2706,7 @@ sub box30ClaimData
 	my $font = pdflib::PDF_findfont($p, DATA_FONT_NAME, "default", 0);
 	die "Couldn't set font"  if ($font == -1);
 	pdflib::PDF_setfont($p, $font, DATA_FONT_SIZE);
-	my @amount  = split (/\./ ,$claim->getBalance);
+	my @amount  = split (/\./ , abs($claim->getTotalCharge - $claim->getTotalChargePaid));
 	pdflib::PDF_show_xy($p , $amount[0] + 0, $box30X + 40 - pdflib::PDF_stringwidth($p ,$amount[0], $font, DATA_FONT_SIZE) , $box30Y - 3 * FORM_FONT_SIZE);
 	pdflib::PDF_show_xy($p , substr($amount[1] . "00", 0, 2), $box30X + 50, $box30Y - 3 * FORM_FONT_SIZE);
 

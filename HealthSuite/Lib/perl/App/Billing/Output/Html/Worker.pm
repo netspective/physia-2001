@@ -59,7 +59,7 @@ sub populateInsured
 	my $insuredAddress = $insured->getAddress();
 	my $data = $self->{data};
 
-	$data->{insuredName} = $claim->{insured}->[0]->getEmployerOrSchoolName ;
+	$data->{insuredName} = $claim->{careReceiver}->getEmployerOrSchoolName;
 	my $dataA = $claim->{careReceiver}->getEmployerAddress;
 	$data->{insuredAddressCity} = $dataA->getCity;	
 	$data->{insuredAddressState} = $dataA->getState;
@@ -67,7 +67,8 @@ sub populateInsured
 	$data->{insuredAddressZipCode} = $dataA->getZipCode;
 	$data->{insuredAddress} = $dataA->getAddress1 . " " . $dataA->getAddress2;
 	$data->{insuredId} = $claim->{careReceiver}->getSsn();
-	$data->{insuredPolicyGroupName} = $insured->getPolicyGroupOrFECANo;
+#	$data->{insuredPolicyGroupName} = $insured->getPolicyGroupOrFECANo;
+	$data->{insuredPolicyGroupName} = "N/A";
 	$data->{signatureInsured} = uc($claim->{careReceiver}->getSignature()) =~ /M|B/ ? 'Signature on File' : "Signature on File";
 	$data->{insuredAnotherHealthBenefitPlanN} =  "Checked" ;
 	my $payer = $claim->{payer};
@@ -106,6 +107,9 @@ sub populateTreatment
 
 	$data->{treatmentDateOfIllnessInjuryPregnancy} = $treatment->getDateOfIllnessInjuryPregnancy(DATEFORMAT_USA);
 	$data->{treatmentDateOfSameOrSimilarIllness} = $treatment->getDateOfSameOrSimilarIllness(DATEFORMAT_USA);
+	$data->{treatmentOutsideLabY} = "";
+	$data->{treatmentOutsideLabN} = "";
+
 }
 
 sub populateClaim

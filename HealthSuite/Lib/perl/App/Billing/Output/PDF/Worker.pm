@@ -247,7 +247,8 @@ sub box11ClaimData
 	my $font = pdflib::PDF_findfont($p, DATA_FONT_NAME, "default", 0);
 	die "Couldn't set font"  if ($font == -1);
 	pdflib::PDF_setfont($p, $font, DATA_FONT_SIZE);
-	pdflib::PDF_show_xy($p , $claim->{insured}->[0]->getPolicyGroupOrFECANo, $box11X + CELL_PADDING_X + DATA_PADDING_X, $box11Y - 3 * FORM_FONT_SIZE - 1);
+#	pdflib::PDF_show_xy($p , $claim->{insured}->[0]->getPolicyGroupOrFECANo, $box11X + CELL_PADDING_X + DATA_PADDING_X, $box11Y - 3 * FORM_FONT_SIZE - 1);
+	pdflib::PDF_show_xy($p , "N/A", $box11X + CELL_PADDING_X + DATA_PADDING_X, $box11Y - 3 * FORM_FONT_SIZE - 1);
 	pdflib::PDF_stroke($p);
 
 }
