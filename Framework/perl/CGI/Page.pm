@@ -57,6 +57,8 @@ sub new
 	#Unit Of Work variables
 	$self->{sqlUnitWork} = undef;
 	$self->{valUnitWork} = undef;
+	$self->{sqlMsg} = undef;
+	$self->{sqlDump} = undef;
 	$self->{errUnitWork} = [];
 	$self->{cntUnitWork} = 0;
 
@@ -534,7 +536,9 @@ sub executeSql
 	};
 	if($@||!$rc)
 	{
+		$self->addError($self->{sqlMsg}) if $self->{sqlMsg} ;
 		$self->addError(join ("<br>",$@,$self->{db}->errstr));
+		$self->addError($self->{sqlDump});
 		$@ = undef;
 		return 0;
 	}
@@ -544,11 +548,14 @@ sub executeSql
 sub beginUnitWork
 {
 	my $self = shift;
+	my $msg = shift;
+	$self->{sqlMsg} = $msg  ? $msg : undef;
 	$self->{sqlUnitWork}='BEGIN ';
 	$self->{cntUnitWork}=0;
 	$self->{errUnitWork}=[];
 	$self->{valUnitWork}=undef;
-	$self->{schemaFlags}|= SCHEMAAPIFLAG_UNITSQL;
+	$self->{sqlDump}=undef;
+	$self->{schemaFlags}|= SCHEMAAPIFLAG_UNITSQL;	
 	$self->{schemaFlags}&=~SCHEMAAPIFLAG_EXECSQL;
 	return 1;
 }
@@ -558,10 +565,11 @@ sub endUnitWork
 	my $self = shift;
 	$self->{sqlUnitWork}.= "END;  ";
 	my $stmhdl = $self->prepareSql($self->{sqlUnitWork});
-	$self->{schemaFlags} = DEFAULT_SCHEMAAPIFLAGS;
-	$self->{sqlUnitWork}='';
+	$self->{schemaFlags}&= ~SCHEMAAPIFLAG_UNITSQL;		
+	$self->{sqlUnitWork}=undef;		
 	if (scalar(@{$self->{errUnitWork}}))
 	{
+		$self->addError($self->{sqlMsg}) if $self->{sqlMsg} ;
 		$self->addError(join ("<br>",@{$self->{errUnitWork}}));
 		return 0;
 	}
@@ -577,13 +585,16 @@ sub unitWork
 
 sub storeSql
 {
-	my ($self, $sql,$vals,$errors) = @_;
-	$self->{cntUnitWork}++;
+	my ($self, $sql,$vals,$errors) = @_;	
+	my $out_vals = join ",",@{$vals};
+	$self->{cntUnitWork}++;	
 	if(scalar(@{$errors}) > 0)
 	{
-		push(@{$self->{errUnitWork}},"<b> Unit Of Work Query $self->{cntUnitWork} error :</b> @{$errors}");
+		
+		push(@{$self->{errUnitWork}},"<b> Unit Of Work Query $self->{cntUnitWork} error :</b> @{$errors} <br> $sql $out_vals");
 	}
-	$self->{sqlUnitWork}.= $sql . ";  ";
+	$self->{sqlUnitWork}.= $sql . ";\n";
+	$self->{sqlDump}.= "<b> Line $self->{cntUnitWork} </b>" . $sql .  "<BR> <font color=red>$out_vals</font> <BR>" ;	
 	push(@{$self->{valUnitWork}},@{$vals});
 }
 
