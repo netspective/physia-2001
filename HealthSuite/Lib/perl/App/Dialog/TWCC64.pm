@@ -30,6 +30,8 @@ sub new
 	$self->addContent(		
 		new CGI::Dialog::Field(type => 'hidden', name => 'field17_item_id'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'field18_item_id'),
+		new CGI::Dialog::Field(type => 'hidden', name => 'field20_item_id'),
+		new CGI::Dialog::Field(type => 'hidden', name => 'field21_item_id'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'field23_item_id'),
 
 		#17
@@ -67,6 +69,12 @@ sub new
 		
 		#18
 		new CGI::Dialog::Field(type => 'memo', caption => "Changes in Injured Employee's Condition, Including Clinical Assessment and Test Results", name => 'change_in_condition'),
+
+		#20
+		new CGI::Dialog::Field(type => 'memo', caption => 'Referrals', name => 'referrals'),
+		
+		#21
+		new CGI::Dialog::Field(type => 'memo', caption => 'Medications or Durable Medical Equipment', name => 'equipment'),
 		
 		#23
 		new CGI::Dialog::Field(type => 'memo', caption => 'Compliance by Injured Employee with Recommended Treatment', name => 'compliance_by_employee'),
@@ -128,6 +136,18 @@ sub populateData
 	$page->field('change_in_condition', $field18->{value_text});
 
 
+	#populate field 20
+	my $field20 = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoiceAttr', $invoiceId, 'Invoice/TWCC64/20');
+	$page->field('field20_item_id', $field20->{item_id});
+	$page->field('referrals', $field20->{value_text});
+
+
+	#populate field 21
+	my $field21 = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoiceAttr', $invoiceId, 'Invoice/TWCC64/21');
+	$page->field('field21_item_id', $field21->{item_id});
+	$page->field('equipment', $field21->{value_text});
+
+
 	#populate field 23
 	my $field23 = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoiceAttr', $invoiceId, 'Invoice/TWCC64/23');
 	$page->field('field23_item_id', $field23->{item_id});
@@ -180,6 +200,26 @@ sub execute
 			item_name => 'Invoice/TWCC64/18',
 			value_type => defined $textValueType ? $textValueType : undef,			
 			value_text => $page->field('change_in_condition') || undef,
+			_debug => 0
+	);
+
+	$page->schemaAction(
+			'Invoice_Attribute', $command,
+			parent_id => $invoiceId,
+			item_id => $page->field('field20_item_id') || undef,
+			item_name => 'Invoice/TWCC64/20',
+			value_type => defined $textValueType ? $textValueType : undef,			
+			value_text => $page->field('referrals') || undef,
+			_debug => 0
+	);
+
+	$page->schemaAction(
+			'Invoice_Attribute', $command,
+			parent_id => $invoiceId,
+			item_id => $page->field('field21_item_id') || undef,
+			item_name => 'Invoice/TWCC64/21',
+			value_type => defined $textValueType ? $textValueType : undef,			
+			value_text => $page->field('equipment') || undef,
 			_debug => 0
 	);
 
