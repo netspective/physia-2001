@@ -51,6 +51,7 @@ sub new
 	$self->{schemaFile} = $params{schemaFile} || $CONFDATA_SERVER->file_SchemaDefn;
 	$self->{schema} = undef;
 	$self->{db} = undef;
+	$self->{schemaFlags} = DEFAULT_SCHEMAAPIFLAGS;
 	$self->loadSchema();
 
 	# setup default formats, can be overriden for each organization
@@ -407,7 +408,7 @@ sub send_http_header
 	my %HEADER = (-expires => '-1d');
 	$HEADER{-cookie} = $self->{page_cookies} if scalar(@{$self->{page_cookies}});
 
-	if(exists $self->{page_redirect} && ! $self->haveErrors())
+	if(exists $self->{page_redirect} && ! $self->haveErrors() && !($self->{schemaFlags} & SCHEMAAPIFLAG_LOGSQL))
 	{
 		print $self->header(%HEADER, -location => $self->replaceRedirectVars($self->{page_redirect}));
 		return 0;
@@ -454,6 +455,18 @@ sub dumpParams
 		{
 			$self->addDebugStmt("$_: <b>".$ENV{$_}."</b>");
 		}
+	}
+}
+
+sub dumpSession
+{
+	my ($self) = @_;
+
+	$self->addDebugStmt("<h3>Session variables</h3>");
+	foreach (sort keys %{$self->{session}})
+	{
+		my @vals = $self->session($_);
+		$self->addDebugStmt("$_: <b>" . join(', ', @vals) . "</b>");
 	}
 }
 
@@ -522,22 +535,6 @@ sub schemaAction
 	return $self->{schema}->schemaAction($self, @_);
 }
 
-# MOVED TO SCHEMA::API.pm
-#sub schemaAction
-#{
-#	my ($self, $table, $action, %data) = @_;
-#
-#	if(my $table = $self->{schema}->getTable($table))
-#	{
-#		return $table->dbCommand($self, $action, \%data);
-#	}
-#	else
-#	{
-#		$self->addError("table $table not found in schemaAction");
-#		return 0;
-#	}
-#}
-
 sub schemaGetSingleRec
 {
 	my ($self, $table, $destination, %data) = @_;
@@ -581,6 +578,18 @@ sub prepareSql
 {
 	my $self = shift;
 	return $self->{db}->prepare(@_);
+}
+
+sub getSqlLog
+{
+	return $_[0]->{sqlLog};
+}
+
+sub clearSqlLog
+{
+	my $self = shift;
+	$self->{sqlLog} = [];
+	return $self->{sqlLog};
 }
 
 #-----------------------------------------------------------------------------
@@ -688,6 +697,13 @@ sub establishSession
 				$self->{session}->{_LOGOUT} = 1;
 				return $self->sessionStatus(SESSIONTYPE_NOTSECURE);
 			}
+
+			# see if we want to modify some per-session attributes
+			if(defined $self->param('_debug_log_sa'))
+			{
+				$self->{session}->{'debug.logSchemaAction'} = $self->param('_debug_log_sa');
+			}
+			$self->{schemaFlags} |= SCHEMAAPIFLAG_LOGSQL if $self->{session}->{'debug.logSchemaAction'};
 
 			# if we get to here, we're fine and secure
 			return $self->sessionStatus(SESSIONTYPE_SECURE);

@@ -18,6 +18,7 @@ use DBI::StatementManager;
 use App::Statements::Page;
 use App::Statements::Person;
 use App::Statements::Component;
+use Schema::API;
 
 use vars qw(@ISA @EXPORT);
 @ISA = qw(Exporter CGI::Page);
@@ -759,7 +760,18 @@ sub prepare_page_content_body
 
 sub prepare_page_content_footer
 {
-	1;
+	my $self = shift;
+	if($self->{schemaFlags} & SCHEMAAPIFLAG_LOGSQL)
+	{
+		$self->addDebugStmt('SQL Logging is on');
+		$self->addContent('<HR SIZE=1 COLOR=DARKRED><FONT SIZE=3><CODE><OL>');
+		foreach(@{$self->{sqlLog}})
+		{
+			$self->addContent(scalar(@{$_->[1]} > 0) ? "<LI>@{[ $_->[0] ]}<BR><FONT COLOR=RED>@{[ join('<BR>', @{$_->[1]}) ]}</FONT></LI>" : "<LI>@{[ $_->[0] ]}</LI>");
+		}
+		$self->addContent('</OL></CODE></FONT>');
+	}
+	return 1;
 }
 
 sub component
@@ -970,10 +982,10 @@ sub printContents
 	return unless $self->send_page_header();
 
 	$self->dumpParams() if $self->param('_debug_params');
+	$self->dumpSession() if $self->param('_debug_session');
 	$self->dumpCookies() if $self->param('_debug_cookies');
 
 	$self->send_page_body();
-
 }
 
 sub handleARL
