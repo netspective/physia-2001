@@ -29,7 +29,7 @@ sub initialize
 				name => 'attr_name',
 				lookup => $attrNameLookup,
 				caption => $attrNameCaption,
-				priKey => 1,
+				#priKey => 1,
 				attrNameFmt => "#field.attr_name#",
 				fKeyStmtMgr => $entityType eq 'person' ? $STMTMGR_PERSON : $STMTMGR_ORG,
 				valueType => $self->{valueType},
@@ -37,7 +37,7 @@ sub initialize
 		new App::Dialog::Field::Attribute::Name(
 				name => 'attr_name',
 				caption => $attrNameCaption,
-				priKey => 1,
+				#priKey => 1,
 				attrNameFmt => "#field.attr_name#",
 				fKeyStmtMgr => $entityType eq 'person' ? $STMTMGR_PERSON : $STMTMGR_ORG,
 				valueType => $self->{valueType},
