@@ -38,8 +38,10 @@ sub new
 
 	$self->addContent(
 		new CGI::Dialog::Field(type => 'hidden', name => 'trans_id'),
+		new CGI::Dialog::Field(type => 'hidden', name => 'trans_begin_stamp'),		#to retain the original transaction date when updating an invoice
 		new CGI::Dialog::Field(type => 'hidden', name => 'claim_type'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'current_status'),
+		new CGI::Dialog::Field(type => 'hidden', name => 'invoice_date'),			#to retain the original invoice date when updating an invoice
 		new CGI::Dialog::Field(type => 'hidden', name => 'batch_item_id'),
 
 
@@ -104,6 +106,7 @@ sub populateData
 	$page->field('client_id', $invoiceInfo->{client_id});
 	$page->field('current_status', $invoiceInfo->{invoice_status});
 	$page->field('claim_type', $invoiceInfo->{invoice_subtype});
+	$page->field('invoice_date', $invoiceInfo->{fmt_invoice_date});
 	$page->field('owner_id', $invoiceInfo->{owner_id});
 	$STMTMGR_TRANSACTION->createFieldsFromSingleRow($page, STMTMGRFLAG_NONE, 'selTransCreateClaim', $invoiceInfo->{main_transaction});
 
@@ -324,8 +327,6 @@ sub addTransactionAndInvoice
 
 	handlePayer($self, $page, $command, $flags);
 
-	my $todaysDate = UnixDate('today', $page->defaultUnixDateFormat());
-	my $timeStamp = $page->getTimeStamp();
 	my $sessOrg = $page->session('org_internal_id');
 	my $sessUser = $page->session('user_id');
 
@@ -360,7 +361,7 @@ sub addTransactionAndInvoice
 		initiator_type => defined $personType ? $personType : undef,
 		initiator_id => $personId || undef,
 		bill_type => defined $claimType ? $claimType : undef,
-		trans_begin_stamp => $timeStamp || undef,
+		trans_begin_stamp => $command eq 'add' ? $page->getTimeStamp() : $page->field('trans_begin_stamp'),
 		_debug => 0
 	);
 
@@ -373,7 +374,7 @@ sub addTransactionAndInvoice
 		invoice_type => defined $invoiceType ? $invoiceType : undef,
 		invoice_subtype => defined $claimType ? $claimType : undef,
 		invoice_status => defined $invoiceStatus ? $invoiceStatus : undef,
-		invoice_date => $todaysDate || undef,
+		invoice_date => $command eq 'add' ? $page->getDate() : $page->field('invoice_date'),
 		main_transaction => $transId || undef,
 		submitter_id => $sessUser || undef,
 		owner_type => defined $orgType ? $orgType : undef,

@@ -61,12 +61,14 @@ sub initialize
 		new CGI::Dialog::Field(type => 'hidden', name => 'payer_selected_item_id'),
 		#---------------------------------------------------------------------------------------------
 		new CGI::Dialog::Field(type => 'hidden', name => 'trans_id'),
+		new CGI::Dialog::Field(type => 'hidden', name => 'trans_begin_stamp'),#to retain the original transaction date when updating an invoice
 		new CGI::Dialog::Field(type => 'hidden', name => 'parent_event_id'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'insuranceIsSet'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'eventFieldsAreSet'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'hospFieldsAreSet'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'invoiceFieldsAreSet'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'invoice_flags'),		#to check if this claim has been submitted already
+		new CGI::Dialog::Field(type => 'hidden', name => 'invoice_date'),		#to retain the original invoice date when updating an invoice
 		new CGI::Dialog::Field(type => 'hidden', name => 'old_invoice_id'),	#the invoice id of the claim that is being modified after submission
 		new CGI::Dialog::Field(type => 'hidden', name => 'old_person_id'),		#if user changes patient id while adding a claim, need to refresh payer list for the new patient id
 
@@ -378,6 +380,7 @@ sub populateData
 		$page->field('current_status', $invoiceInfo->{invoice_status});
 		$page->param('_f_proc_diags', $invoiceInfo->{claim_diags});
 		$page->field('invoice_flags', $invoiceInfo->{flags});
+		$page->field('invoice_date', $invoiceInfo->{fmt_invoice_date});
 
 		#this is needed if the current claim is being edited but has already been transferred (see Encounter/CreateClaim.pm for conditions).
 		#if this is the case, a new claim is being created that is an exact copy of the submitted claim.
@@ -791,7 +794,6 @@ sub addTransactionAndInvoice
 	my ($self, $page, $command, $flags) = @_;
 	$command ||= 'add';
 
-	my $timeStamp = $page->getTimeStamp();
 	my $sessOrgIntId = $page->session('org_internal_id');
 	my $sessUser = $page->session('user_id');
 	my $personId = $page->field('attendee_id');
@@ -851,7 +853,7 @@ sub addTransactionAndInvoice
 		related_to => $relTo || undef,
 		data_text_a => $page->field('ref_id') || undef,
 		data_num_a => defined $confirmedInfo ? $confirmedInfo : undef,
-		trans_begin_stamp => $timeStamp || undef,
+		trans_begin_stamp => $command eq 'add' ? $page->getTimeStamp() : $page->field('trans_begin_stamp'),
 		_debug => 0
 	);
 
@@ -867,7 +869,7 @@ sub addTransactionAndInvoice
 		invoice_type => defined $invoiceType ? $invoiceType : undef,
 		invoice_subtype => defined $claimType ? $claimType : undef,
 		invoice_status => defined $invoiceStatus ? $invoiceStatus : undef,
-		invoice_date => $page->getDate() || undef,
+		invoice_date => $command eq 'add' ? $page->getDate() : $page->field('invoice_date'),
 		main_transaction => $transId || undef,
 		submitter_id => $page->session('user_id') || undef,
 		claim_diags => join(', ', @claimDiags) || undef,
