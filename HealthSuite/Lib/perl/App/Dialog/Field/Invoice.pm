@@ -956,7 +956,7 @@ sub getHtml
 		$STMTMGR_INVOICE->getRowsAsHashList($page, STMTMGRFLAG_CACHE, 'selInvoiceProcedureItems', $invoiceId, App::Universal::INVOICEITEMTYPE_SERVICE, App::Universal::INVOICEITEMTYPE_LAB)
 		: $STMTMGR_INVOICE->getRowsAsHashList($page, STMTMGRFLAG_CACHE, 'selInvoiceItems', $invoiceId);
 
-
+	my $itemSuppressHtml = '';
 
 	my $totalItems = scalar(@{$outstandItems});
 	my $totalInvoiceBalance = 0;
@@ -999,6 +999,15 @@ sub getHtml
 			$writeoffTypesHtml .= "<OPTION VALUE='$woType->{id}' $selected>$woType->{caption}</OPTION>";
 		}
 
+		#display line item suppression checkboxes if paid by insurance
+		if($paidBy eq 'insurance')
+		{
+			my $isSuppressed = $page->param("_f_item_$line\_suppress") == 1 ? 'CHECKED' : '';
+			$itemSuppressHtml = $itemType != App::Universal::INVOICEITEMTYPE_ADJUST ? 
+				qq{<TD ALIGN=RIGHT><INPUT TYPE="CHECKBOX" NAME='_f_item_$line\_suppress' $isSuppressed></TD>}
+				: qq{<TD><FONT SIZE=1>&nbsp;</FONT></TD>};
+		}
+
 		$linesHtml .= qq{
 			<INPUT TYPE="HIDDEN" NAME="_f_item_$line\_item_id" VALUE="$itemId"/>
 			<INPUT TYPE="HIDDEN" NAME="_f_item_$line\_item_balance" VALUE="$itemBalance"/>
@@ -1007,6 +1016,7 @@ sub getHtml
 			<INPUT TYPE="HIDDEN" NAME="_f_item_$line\_item_cpt" VALUE="$itemCPT"/>
 			<TR VALIGN=TOP>
 				<TD ALIGN=RIGHT><FONT $textFontAttrs COLOR="#333333"/><B>$line</B></FONT></TD>
+				$itemSuppressHtml
 				<TD><FONT $textFontAttrs>$dateDisplay</TD>
 				<TD><FONT SIZE=1>&nbsp;</FONT></TD>
 				<TD ALIGN=RIGHT><FONT $textFontAttrs>$itemTypeCap</TD>
@@ -1054,6 +1064,7 @@ sub getHtml
 			<INPUT TYPE="HIDDEN" NAME="_f_item_$line\_item_cpt" VALUE="$itemCPT"/>
 			<TR VALIGN=TOP>
 				<TD ALIGN=RIGHT><FONT $textFontAttrs COLOR="#333333"/><B>$line</B></FONT></TD>
+				$itemSuppressHtml
 				<TD><FONT $textFontAttrs>$dateDisplay</TD>
 				<TD><FONT SIZE=1>&nbsp;</FONT></TD>
 				<TD ALIGN=RIGHT><FONT $textFontAttrs>$itemTypeCap</TD>
@@ -1070,6 +1081,10 @@ sub getHtml
 		} if $itemType == App::Universal::INVOICEITEMTYPE_ADJUST;
 	}
 
+	my $suppressHd = $paidBy eq 'insurance' ? 
+		qq{<TD ALIGN=CENTER TITLE="Suppress Items for Resubmission"><FONT $textFontAttrs><IMG SRC="/resources/icons/action-edit-remove-x.gif"></FONT></TD>} : '';
+	my $invBalColSpan = $suppressHd ? 'COLSPAN=12' : 'COLSPAN=11';
+
 	return qq{
 		<TR valign=top $bgColorAttr>
 			<TD width=$self->{_spacerWidth}>$spacerHtml</TD>
@@ -1078,6 +1093,7 @@ sub getHtml
 					<INPUT TYPE="HIDDEN" NAME="_f_line_count" VALUE="$totalItems"/>
 					<TR VALIGN=TOP BGCOLOR=#DDDDDD>
 						<TD ALIGN=CENTER><FONT $textFontAttrs>&nbsp;</FONT></TD>
+						$suppressHd
 						<TD ALIGN=CENTER><FONT $textFontAttrs>Svc Date(s)</FONT></TD>
 						<TD><FONT SIZE=1>&nbsp;</FONT></TD>
 						<TD ALIGN=CENTER><FONT $textFontAttrs>Type</FONT></TD>
@@ -1108,7 +1124,7 @@ sub getHtml
 					</TR>
 					$linesHtml
 					<TR VALIGN=TOP BGCOLOR=#DDDDDD>
-						<TD COLSPAN=11><FONT $textFontAttrsForTotalBalRow><b>Invoice Balance:</b></FONT></TD>
+						<TD $invBalColSpan><FONT $textFontAttrsForTotalBalRow><b>Invoice Balance:</b></FONT></TD>
 						<TD COLSPAN=1 ALIGN=RIGHT><FONT $textFontAttrsForTotalBalRow><b>\$$totalInvoiceBalance</b></FONT></TD>
 					</TR>
 				</TABLE>

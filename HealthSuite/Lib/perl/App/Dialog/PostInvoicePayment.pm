@@ -195,6 +195,15 @@ sub populateData
 		$page->field('batch_id', $batchId);
 		$page->field('batch_date', $batchDate);
 	}
+
+	my $procedures = $STMTMGR_INVOICE->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'selInvoiceProcedureItems', $invoiceId, App::Universal::INVOICEITEMTYPE_SERVICE, App::Universal::INVOICEITEMTYPE_LAB);
+	my $totalProcs = scalar(@{$procedures});
+	foreach my $idx (0..$totalProcs-1)
+	{
+		#NOTE: data_num_b indicates that the line item was suppressed
+		my $line = $idx + 1;			
+		$page->param("_f_item_$line\_suppress", $procedures->[$idx]->{data_num_b});
+	}
 }
 
 sub execute
@@ -219,12 +228,21 @@ sub execute
 	my $lineCount = $page->param('_f_line_count');
 	for(my $line = 1; $line <= $lineCount; $line++)
 	{
+		my $itemId = $page->param("_f_item_$line\_item_id");
+
+		#update item if it is being suppressed
+		my $isSuppressed = $page->param("_f_item_$line\_suppress") ? 1 : 0;
+		$page->schemaAction(
+			'Invoice_Item', 'update',
+			item_id => $itemId || undef,
+			data_num_b => defined $isSuppressed ? $isSuppressed : undef,
+			_debug => 0
+		);
+
 		my $planPaid = $page->param("_f_item_$line\_plan_paid");
 		my $amtApplied = $page->param("_f_item_$line\_amount_applied");
 		my $writeoffAmt = $page->param("_f_item_$line\_writeoff_amt");
 		next if $planPaid eq '' && $writeoffAmt eq '' && $amtApplied eq '';
-
-		my $itemId = $page->param("_f_item_$line\_item_id");
 
 		# Create adjustment for the item
 		my $planAllow = $page->param("_f_item_$line\_plan_allow");
