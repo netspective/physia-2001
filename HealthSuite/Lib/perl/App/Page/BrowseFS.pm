@@ -1,5 +1,5 @@
 ##############################################################################
-package App::Page::Directory;
+package App::Page::BrowseFS;
 ##############################################################################
 
 use strict;
@@ -8,18 +8,20 @@ use App::Universal;
 use App::Configuration;
 use App::Component::Navigate::FileSys;
 
-use vars qw(@ISA %RESOURCE_MAP);
+use vars qw(@EXPORT @ISA %RESOURCE_MAP);
 @ISA = qw(App::Page);
-%RESOURCE_MAP = (
-	'directory' => {},
-	);
 
-sub initialize
+sub setBrowseInfo
 {
 	my $self = shift;
-	$self->SUPER::initialize(@_);
-
-	my $rootFS = File::Spec->catfile($CONFDATA_SERVER->path_OrgDirectory(), 'General');
+	my %params = @_;
+	#
+	# required in %params: rootFS, rootURL, rootURLCaption
+	#
+	
+	$self->property('browseInfo', \%params);
+	my $rootFS = $params{rootFS} || die 'rootFS is required';
+	
 	my @activePath = $self->param('arl_pathItems');
 	if(my $module = App::Component::Navigate::FileSys::getModuleNameForFile($rootFS, \@activePath))
 	{
@@ -28,16 +30,19 @@ sub initialize
 		$self->property('activeInstance', ${"$module\::INSTANCE"});
 	}
 
-	my @activePathInfo = App::Component::Navigate::FileSys::getActivePathInfo(0, $rootFS, '/directory', \@activePath, 'locator');
+	my @activePathInfo = App::Component::Navigate::FileSys::getActivePathInfo(0, $rootFS, $params{rootURL}, \@activePath, 'locator');
 	$self->addLocatorLinks(
-			['Directory', '/directory'],
+			[$params{rootURLCaption}, $params{rootURL}],
 			@activePathInfo,
 		);
 }
 
 sub prepare_page_content_header
 {
-	my $self = shift;
+	my ($self, $insideActions) = @_;
+	
+	my $browseInfo = $self->property('browseInfo');
+	$insideActions ||= "<A HREF='.'>Menu</A>";
 
 	if($self->flagIsSet(App::Page::PAGEFLAG_ISPOPUP))
 	{
@@ -45,17 +50,29 @@ sub prepare_page_content_header
 		{
 			push(@{$self->{page_content_header}}, '<H1>', $instance->heading(), '</H1>');
 		}
+		elsif(my $caption = $self->param('ecaption'))
+		{
+			push(@{$self->{page_content_header}}, '<H1>', $caption, '</H1>');
+		}
 		return 1;
 	}
 
 	$self->SUPER::prepare_page_content_header(@_);
-	my $heading = "Directories";
-	my $insideDirectory = 0;
+	my $heading = $browseInfo->{rootHeading} || 'No rootHeading provided';
+	my $insideItem = 0;
+	
 	if(my $instance = $self->property('activeInstance'))
 	{
 		$heading = $instance->heading();
-		$insideDirectory = 1;
+		$insideActions = '<A HREF="#hrefSelfNoDlg#">Edit</A> | ' . $insideActions;
+		$insideItem = 1;
 	}
+	elsif(my $caption = $self->param('ecaption'))
+	{
+		$heading = $caption;
+		$insideItem = 1;
+	}
+	
 	push(@{$self->{page_content_header}}, qq{
 		<STYLE>
 			select { font-size:8pt; font-family: Tahoma, Arial, Helvetica }
@@ -70,16 +87,12 @@ sub prepare_page_content_header
 					<B>$heading</B>
 				</FONT>
 			</TD>
-			@{[
-			$insideDirectory ? qq{
 			<TD ALIGN=RIGHT>
 				<FONT FACE="Arial,Helvetica" SIZE=2>
-					<A HREF="#hrefSelfNoDlg#">Edit</A> | <A HREF=".">Directory Menu</A>
-				</FONT>
+				@{[	$insideItem ? $insideActions : '' ]}
+				</FONT?
 			</TD>
 			</TR>
-			} : ''
-			]}
 		</TABLE>
 		</TD></TR>
 		</TABLE>
@@ -93,7 +106,7 @@ sub handleDrillDown
 {
 	my ($self, $instance) = @_;
 
-	# if the directory page doesn't know how to handle drill downs, fail
+	# if the page doesn't know how to handle drill downs, fail
 	return 0 unless $instance->can('getDrillDownHandlers');
 
 	# now see if we find any drill down handlers
@@ -110,6 +123,20 @@ sub handleDrillDown
 
 	# if we find any handlers then TRUE will be returned
 	return $handlersCount;
+}
+
+sub getNavigatorHtml
+{
+	my ($self, $enteredFile) = @_;
+	my $navgParams = $self->property('browseInfo');
+	
+	new App::Component::Navigate::FileSys(
+		heading => $navgParams->{rootHeading},
+		rootFS => $navgParams->{rootFS},
+		rootURL => $navgParams->{rootURL},
+		rootCaption => $navgParams->{rootURLCaption},
+		style => $enteredFile ? '' : 'panel.transparent',
+		)->getHtml($self),
 }
 
 sub prepare
@@ -129,7 +156,7 @@ sub prepare
 					<TR VALIGN=TOP>
 					<TD>@{[ $html ]}</TD>
 					<TD WIDTH=10>&nbsp;</TD>
-					<TD ALIGN=RIGHT>#component.navigate-directory-panel#</TD>
+					<TD ALIGN=RIGHT>@{[ $self->getNavigatorHtml(1) ]}</TD>
 					</TR>
 				</TABLE>
 				});
@@ -143,12 +170,33 @@ sub prepare
 				}, '<BR>', $html);
 		}
 	}
+	elsif(my $enterFile = $self->param('enter'))
+	{
+		my $entryFlags = $self->param('eflags');
+		if(open(ENTRYFILE, $enterFile))
+		{	
+			my @fileData = <ENTRYFILE>;
+			if($entryFlags & NAVGFILEFLAG_RAWTEXT)
+			{
+				$self->addContent('<PRE>', @fileData, '</PRE>');
+			}
+			else
+			{
+				$self->addContent(@fileData);
+			}
+			close(ENTRYFILE);
+		}
+		else
+		{
+			$self->addContent("Unable to open file $enterFile: $!");
+		}
+	}
 	else
 	{
 		$self->addContent(qq{
 			<TABLE BORDER=0 CELLSPACING=0 CELLPADDING=0>
 				<TR VALIGN=TOP>
-				<TD>#component.navigate-directory-transparent#</TD>
+				<TD>@{[$self->getNavigatorHtml(0)]}</TD>
 				</TR>
 			</TABLE>
 			});
@@ -161,7 +209,6 @@ sub handleARL
 	return 0 if $self->SUPER::handleARL($arl, $params, $rsrc, $pathItems) == 0;
 	$handleExec = 1 unless defined $handleExec;
 
-	#$self->addContent('#anchorSelf.Test Self# | #anchorSelfPopup.Test Self Popup# ');
 	$self->printContents();
 
 	return 0;

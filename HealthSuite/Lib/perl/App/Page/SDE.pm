@@ -771,9 +771,16 @@ sub getConfigHtml
 		<TR><TD ALIGN=RIGHT>Billing template:</TD><TD><B>@{[ $CONFDATA_SERVER->path_BillingTemplate() ]}</TD></TR>
 		<TR><TD ALIGN=RIGHT>Reports:</TD><TD><B>@{[ $CONFDATA_SERVER->path_Reports() ]}</TD></TR>
 		<TR><TD ALIGN=RIGHT>Org Report:</TD><TD><B>@{[ $CONFDATA_SERVER->path_OrgReports() ]}</TD></TR>
+		<TR><TD ALIGN=RIGHT>Org Directory:</TD><TD><B>@{[ $CONFDATA_SERVER->path_OrgDirectory() ]}</TD></TR>
 		<TR><TD ALIGN=RIGHT>PDF Output:</TD><TD><B>@{[ $CONFDATA_SERVER->path_PDFOutput() ]}</TD></TR>
 		<TR><TD ALIGN=RIGHT>PDF Output HREF:</TD><TD><B>@{[ $CONFDATA_SERVER->path_PDFOutputHREF() ]}</TD></TR>
 		<TR><TD ALIGN=RIGHT>Application Config:</TD><TD><B>@{[ $CONFDATA_SERVER->path_AppConf() ]}</TD></TR>
+		<TR><TD ALIGN=RIGHT>EDI Data:</TD><TD><B>@{[ $CONFDATA_SERVER->path_EDIData() ]}</TD></TR>
+		<TR><TD ALIGN=RIGHT>Per-Se EDI Data:</TD><TD><B>@{[ $CONFDATA_SERVER->path_PerSeEDIData() ]}</TD></TR>
+		<TR><TD ALIGN=RIGHT>Per-Se EDI Data Icoming:</TD><TD><B>@{[ $CONFDATA_SERVER->path_PerSeEDIDataIncoming() ]}</TD></TR>
+		<TR><TD ALIGN=RIGHT>Per-Se EDI Data Outgoing:</TD><TD><B>@{[ $CONFDATA_SERVER->path_PerSeEDIDataOutgoing() ]}</TD></TR>
+		<TR><TD ALIGN=RIGHT>Per-Se EDI Errors:</TD><TD><B>@{[ $CONFDATA_SERVER->path_PerSeEDIErrors() ]}</TD></TR>
+		<TR><TD ALIGN=RIGHT>Per-Se EDI Errors (delimited):</TD><TD><B>@{[ $CONFDATA_SERVER->path_PerSeEDIErrorsDelim() ]}</TD></TR>
 		<TR BGCOLOR=#EEEEEE><TD COLSPAN=2><B>Files</TD></TR>
 		<TR><TD ALIGN=RIGHT>Schema defn:</TD><TD><B>@{[ $CONFDATA_SERVER->file_SchemaDefn() ]}</TD></TR>
 		<TR><TD ALIGN=RIGHT>Access control defn:</TD><TD><B>@{[ $CONFDATA_SERVER->file_AccessControlDefn() ]}</TD></TR>
