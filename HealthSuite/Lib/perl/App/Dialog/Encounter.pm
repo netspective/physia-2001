@@ -384,15 +384,17 @@ sub populateData
 		$page->field('old_invoice_id', $invoiceId);
 
 		#Get payer
-		#my $invoiceBilling = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoiceBillingCurrent', $invoiceInfo->{billing_id});
-		#my $billToId = $invoiceBilling->{bill_to_id};
-		#my $billPartyType = $invoiceBilling->{bill_party_type};
-		#if($billPartyType == App::Universal::INVOICEBILLTYPE_THIRDPARTYINS || $billPartyType == App::Universal::INVOICEBILLTYPE_THIRDPARTYORG)
-		#{
-		#	my $orgId = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_NONE, 'selRegistry', $billToId);
-		#	$billToId = $orgId->{org_id};
-		#}
-		#$page->field('payer', $billToId);
+		#NOTE: if the payer is insurance, the drop-down will default to it anyway, so there is no need to create a comma separated 
+		#list of the insurance's ins_internal_ids
+		if($invoiceInfo->{invoice_subtype} == App::Universal::CLAIMTYPE_SELFPAY)
+		{
+			$page->field('payer', FAKESELFPAY_INSINTID);
+		}
+		else
+		{
+			my $invoiceBilling = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoiceBillingCurrent', $invoiceInfo->{billing_id});
+			$page->field('payer', $invoiceBilling->{bill_ins_id});
+		}
 
 		#Get copay
 		my $invoiceCopayItem = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoiceItemsByType', $invoiceId, App::Universal::INVOICEITEMTYPE_COPAY);
