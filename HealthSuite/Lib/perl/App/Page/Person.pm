@@ -425,6 +425,7 @@ sub prepare_view_profile
 				<TD>
 					<font size=1 face=arial>
 					#component.stpt-person.contactMethodsAndAddresses#<BR>
+					#component.stpt-person.phoneMessage#<BR>
 					#component.stpt-person.insurance#<BR>
 					#component.stpt-person.careProviders#<BR>
 					#component.stpt-person.employmentAssociations#<BR>
@@ -444,6 +445,7 @@ sub prepare_view_profile
 							<TD>#component.stp-person.activeMedications#</TD>
 						</TR>
 					</TABLE><BR>
+					#component.stp-person.refillRequest#<BR>					
 					#component.stp-person.hospitalizationSurgeriesTherapies#<BR>
 					#component.stp-person.activeProblems#<BR>
 					#component.stp-person.authorization#<BR>
