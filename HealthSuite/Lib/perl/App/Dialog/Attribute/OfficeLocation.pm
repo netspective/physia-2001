@@ -35,8 +35,8 @@ sub new
 
 	$self->addContent(
 		new App::Dialog::Field::Organization::ID(name => 'value_text', caption => 'Location Org ID', options => FLDFLAG_REQUIRED),
-		new CGI::Dialog::Field(name => 'value_textB', caption => 'Office/Room/Suite#'),
-		new CGI::Dialog::Field(type => 'bool', name => 'value_int', caption => 'Default', style => 'check', defaultValue => 1),
+		new CGI::Dialog::Field(name => 'value_textb', caption => 'Office/Room/Suite#', size => 7),
+		new CGI::Dialog::Field(type => 'bool', name => 'value_int', caption => 'Default', style => 'check'),
 	);
 
 	$self->{activityLog} =
@@ -52,6 +52,25 @@ sub new
 	return $self;
 }
 
+sub makeStateChanges
+{
+	my ($self, $page, $command, $dlgFlags) = @_;
+
+	$self->SUPER::makeStateChanges($page, $command, $dlgFlags);
+
+	my $personId = $page->param('person_id');
+	$STMTMGR_PERSON->recordExists($page, STMTMGRFLAG_NONE, 'selOfficeLocationData', $personId) ? $self->updateFieldFlags('value_int', FLDFLAG_INVISIBLE, 0) : $self->updateFieldFlags('value_int', FLDFLAG_INVISIBLE, 1);
+	my $itemId = $page->param('item_id');
+	my $data = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_NONE, 'selAttributeById', $itemId);
+
+	if ($command eq 'update' && $data->{'value_int'} ne '')
+	{
+		$page->field('value_int',1);
+		$self->updateFieldFlags('value_int', FLDFLAG_INVISIBLE, 1);
+	}
+}
+
+
 sub populateData
 {
 	my ($self, $page, $command, $activeExecMode, $flags) = @_;
@@ -62,22 +81,56 @@ sub populateData
 	my $data = $STMTMGR_PERSON->createFieldsFromSingleRow($page, STMTMGRFLAG_NONE, 'selAttributeById', $itemId);
 }
 
+sub customValidate
+{
+	my ($self, $page) = @_;
+
+	my $oId = $self->getField('value_text');
+	my $personId = $page->param('person_id');
+	my $orgId = $page->field('value_text');
+	my $itemId = $page->param('item_id');
+	my $orgExists = $STMTMGR_PERSON->getRowAsHash($page,STMTMGRFLAG_NONE, 'selOfficeLocationOrg', $personId,$orgId);
+	if (($orgExists->{'value_text'} eq $orgId) && ($itemId ne $orgExists->{'item_id'}))
+	{
+		$oId->invalidate($page, "This $oId->{caption} already exists for the Person '$personId'");
+	}
+}
+
+
 sub execute
 {
 	my ($self, $page, $command,$flags) = @_;
 
+	my $personId = $page->param('person_id');
+	my $officeRecord = $STMTMGR_PERSON->recordExists($page, STMTMGRFLAG_NONE, 'selOfficeLocationData', $personId);
+	my $defaultField = $officeRecord eq 1 ? $page->field('value_int') : 1;
+
+	if ($page->field('value_int') ne '')
+	{
+
+		my $defaultOrgData = $STMTMGR_PERSON->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'selOfficeLocationData', $personId);
+		foreach my $defaultOrg(@{$defaultOrgData})
+		{
+			if ($defaultOrg->{'value_int'} ne '')
+			{
+				my $itemId = $defaultOrg->{'item_id'};
+				$STMTMGR_PERSON->createFieldsFromSingleRow($page, STMTMGRFLAG_NONE, 'selupdClearDefaultOrg', $itemId);
+			}
+		}
+	}
 
 	$page->schemaAction(
 		'Person_Attribute', $command,
-		parent_id => $page->param('person_id') || undef,
+		parent_id => $personId || undef,
 		item_id => $page->param('item_id') || undef,
 		item_name =>'Office Location',
 		value_type => 0,
 		value_text => $page->field('value_text') || undef,
-		value_textB => $page->field('value_textB') || undef,
-		value_int => $page->field('value_int') || undef,
+		value_textB => $page->field('value_textb') || undef,
+		value_int => $defaultField || undef,
 		_debug => 0
 	);
+
 	return "\u$command completed.";
 }
 
