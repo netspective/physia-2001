@@ -901,10 +901,19 @@ function chooseItem(arlFmt, itemValue, inNewWin)
 	}
 
 	var newArl = replaceString(arlFmt, '%itemValue%', itemValue);
-	if(inNewWin)
-		window.open(newArl, '');
-	else
+
+	if (inNewWin == null) {
+		inNewWin = false;
+		if (search_form.item_action_arl_dest_select.selectedIndex == 1)
+			inNewWin = true;
+	}
+	if(inNewWin) {
+		doActionPopup(newArl);
+		//window.open(newArl, '');
+	}
+	else {
 		window.location.href = newArl;
+	}
 }
 
 function chooseItem2(arlFmt, itemValue, inNewWin, features)
@@ -916,6 +925,13 @@ function chooseItem2(arlFmt, itemValue, inNewWin, features)
 	}
 
 	var newArl = replaceString(arlFmt, '%itemValue%', itemValue);
+	
+	if (inNewWin == null) {
+		inNewWin = false;
+		if (search_form.item_action_arl_dest_select.selectedIndex == 1)
+			inNewWin = true;
+	}
+	
 	if(inNewWin) {
 		var popUpWindow = open(newArl, WINDOWNAME_ACTIONPOPUP, features == null ? "width=620,height=440,scrollbars,resizable" : features);
 		popUpWindow.focus();
