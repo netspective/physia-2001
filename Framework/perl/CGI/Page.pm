@@ -53,6 +53,12 @@ sub new
 	$self->{db} = undef;
 	$self->{schemaFlags} = DEFAULT_SCHEMAAPIFLAGS;
 	$self->loadSchema();
+	
+	#Unit Of Work variables
+	$self->{sqlUnitWork}=undef;
+	$self->{errUnitWork}=[];
+	$self->{cntUnitWork}=0;
+	
 
 	# setup default formats, can be overriden for each organization
 	$self->{defaultUnixDateFormat} = '%m/%d/%Y';
@@ -516,6 +522,79 @@ sub defaultUnixStampFormat
 #-----------------------------------------------------------------------------
 
 sub getSchema {	$_[0]->{schema}; }
+
+sub executeSql
+{
+	my ($self, $stmhdl) = @_;
+	my $rc;
+	eval
+	{
+		$rc = $stmhdl->execute();	
+	};
+	if($@||!$rc)
+	{
+		$self->addError(join ("<br>",$@,$self->{db}->errstr));
+		return 0;
+	}	
+	return $rc;
+}
+
+sub beginUnitWork
+{
+	my $self = shift;
+	$self->{sqlUnitWork}='BEGIN ';
+	$self->{cntUnitWork}=0;
+	$self->{errUnitWork}=[];
+	$self->{schemaFlags}|= SCHEMAAPIFLAG_UNITSQL;		
+	$self->{schemaFlags}&=~SCHEMAAPIFLAG_EXECSQL;		
+	return 1;	
+}
+
+sub endUnitWork
+{
+	my $self = shift;			
+	$self->{sqlUnitWork}.= "END;  "; 	
+	my $stmhdl = $self->prepareSql($self->{sqlUnitWork});	
+	$self->{schemaFlags} = DEFAULT_SCHEMAAPIFLAGS;		
+	$self->{sqlUnitWork}='';
+	if (scalar(@{$self->{errUnitWork}}))
+	{
+		$self->addError(join ("<br>",@{$self->{errUnitWork}}));
+		return 0;
+	}
+	return $self->executeSql($stmhdl);	
+}
+
+#sub savePointUnitWork
+#{
+#	my $self = shift;		
+#	my $stmhdl = $self->prepareSql($self->{sqlUnitWork});	
+#	$self->{sqlUnitWork}.= "END;  "; 	
+#	if (scalar(@{$self->{errUnitWork}}))
+#	{
+#		$self->addError(join ("<br>",@{$self->{errUnitWork}}));
+#		return 0;
+#	}
+#	return $self->executeSql($stmhdl);
+#}
+
+
+sub unitWork
+{
+	my $self = shift;
+	return $self->{schemaFlags} & SCHEMAAPIFLAG_UNITSQL;
+}
+
+sub storeSql
+{
+	my ($self, $sql,$errors) = @_;
+	$self->{cntUnitWork}++;
+	if(scalar(@{$errors}) > 0)
+	{
+		push(@{$self->{errUnitWork}},"<b> Unit Of Work Query $self->{cntUnitWork} error :</b> @{$errors}");			
+	}
+	$self->{sqlUnitWork}.= $sql . ";  "; 
+}
 
 sub loadSchema
 {
