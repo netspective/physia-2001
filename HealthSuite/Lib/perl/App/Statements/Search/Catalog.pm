@@ -13,6 +13,7 @@ use vars qw(@ISA @EXPORT $STMTMGR_CATALOG_SEARCH $CATALOGENTRY_COLUMNS $CATALOGI
 @EXPORT = qw($STMTMGR_CATALOG_SEARCH);
 
 my $LIMIT = App::Universal::SEARCH_RESULTS_LIMIT;
+my $FS_TYPE = App::Universal::CATALOGTYPE_FEESCHEDULE;
 
 use vars qw($STMTFMT_SEL_CATALOG $STMTFMT_SEL_CATALOGENTRY $STMTFMT_SEL_CATENTRYBYID );
 
@@ -35,6 +36,7 @@ $STMTFMT_SEL_CATALOG = qq{
 		WHERE
 			oce.catalog_id (+) = oc.internal_catalog_id
 			AND oc_a.parent_id (+) = oc.internal_catalog_id 
+			AND oc.catalog_type = $FS_TYPE
 			AND (oc.org_internal_id IS NULL OR oc.org_internal_id = :1)
 			%whereCond%
 		GROUP BY
