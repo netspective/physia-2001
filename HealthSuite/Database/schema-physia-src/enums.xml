@@ -299,6 +299,7 @@
 
 	<table name="Offering_Catalog_Type" abbrev="OfCatTy" type="Enumeration">
 		<enum>Fee Schedule</enum>
+		<enum>Service Type</enum>
 	</table>
 
 	<table name="Catalog_Entry_Status" abbrev="CatItmSt" type="Enumeration">
