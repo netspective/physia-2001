@@ -86,6 +86,15 @@ alter table person_medication_aud drop (label_in_spanish);
 alter table person_medication_aud drop (label);
 alter table person_medication_aud add (label varchar2(32));
 
+alter table person_medication drop (label);
+alter table person_medication add (label number(1));
+alter table person_medication add (label_language varchar2(32));
+alter table person_medication_aud drop (label);
+alter table person_medication_aud add (label number(1));
+alter table person_medication_aud add (label_language varchar2(32));
+
+
+
 analyze table Person_Medication compute statistics for table for all indexes for all columns;
 
 start tables-code/Person_Medication
