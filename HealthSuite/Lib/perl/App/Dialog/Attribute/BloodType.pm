@@ -66,10 +66,13 @@ sub execute
 {
 	my ($self, $page, $command,$flags) = @_;
 
+	my $bloodTypecap = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_NONE, 'selAttribute', $page->param('person_id'), 'BloodType');
+	my $commandBlood =  $bloodTypecap->{'item_id'} ne '' && $command eq 'add' ? 'update' : $command;
+
 	$page->schemaAction(
-				'Person_Attribute', $command,
+				'Person_Attribute', $commandBlood,
 				parent_id => $page->param('person_id') || undef,
-				item_id => $page->param('item_id') || undef,
+				item_id => $bloodTypecap->{'item_id'} || undef,
 				item_name => 'BloodType' || undef,
 				value_type => App::Universal::ATTRTYPE_TEXT,
 				value_text => $page->field('value_text') || undef,
