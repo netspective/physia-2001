@@ -200,7 +200,6 @@ sub execute
 
 	my $pub ={ 
 		reportTitle => $self->heading(),
-		maxCols => 175,
 		columnDefn =>
 			[
 			{ colIdx =>13 , groupBy=>'#13#', head=>'Facility',hAlign=>'LEFT'},
