@@ -666,7 +666,7 @@ $STMTMGR_COMPONENT_INVOICE = new App::Statements::Component::Invoice(
 				p2.complete_name,
 				nvl(i.total_cost, 0)
 			from 	event e, transaction t, org o, transaction_type tt,
-				person p, person p1, person p2, invoice i
+				person p, person p1, person p2, invoice i, invoice_billing ib
 			where 	trunc(e.start_time) >= to_date(?, 'mm/dd/yyyy')
 			and 	trunc(e.start_time) <= to_date(?, 'mm/dd/yyyy')
 			and	e.event_id = t.parent_event_id
@@ -675,8 +675,9 @@ $STMTMGR_COMPONENT_INVOICE = new App::Statements::Component::Invoice(
 			and	p.person_id = t.provider_id
 			and	p1.person_id = e.scheduled_by_id
 			and	t.trans_id = i.main_transaction
-			and	i.bill_to_id = p2.person_id
-			and     i.bill_to_type = 0
+			and	ib.invoice_id = i.invoice_id
+			and	ib.bill_to_id = p2.person_id
+			and  	ib.bill_party_type in (0,1)
 			union all
 			select 	p1.complete_name, trunc(e.start_time),
 				to_char(e.start_time, 'HH12:MIAM'),
@@ -686,7 +687,7 @@ $STMTMGR_COMPONENT_INVOICE = new App::Statements::Component::Invoice(
 				o1.name_primary,
 				nvl(i.total_cost, 0)
 			from 	event e, transaction t, org o, org o1, transaction_type tt,
-				person p, person p1, invoice i
+				person p, person p1, invoice i, invoice_billing ib
 			where 	trunc(e.start_time) >= to_date(?, 'mm/dd/yyyy')
 			and 	trunc(e.start_time) <= to_date(?, 'mm/dd/yyyy')
 			and	e.event_id = t.parent_event_id
@@ -695,8 +696,9 @@ $STMTMGR_COMPONENT_INVOICE = new App::Statements::Component::Invoice(
 			and	p.person_id = t.provider_id
 			and	p1.person_id = e.scheduled_by_id
 			and	t.trans_id = i.main_transaction
-			and	i.bill_to_id = o1.org_internal_id
-			and     i.bill_to_type = 1
+			and	ib.invoice_id = i.invoice_id
+			and	ib.bill_to_id = o1.org_internal_id
+			and  	ib.bill_party_type in (2,3)
 			},
 	sqlStmtBindParamDescr => ['Provider ID for provider_by_location View'],
 	publishDefn => {
