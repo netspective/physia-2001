@@ -76,7 +76,7 @@ prompt -----------------------------------------------------------------------;
 				}
 			}
 
-			my ($sql, $errors) = $table->createInsertSql(\%colData);
+			my ($sql,$cols, $errors) = $table->createInsertSql(\%colData);
 			$OUT .= "$sql;\n";
 			$OUT .= "Error(s): \n" . join("\n", @{$errors}) . "\n" if @{$errors};
 			$rowIdx++;
