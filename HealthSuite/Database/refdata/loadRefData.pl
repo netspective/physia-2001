@@ -22,7 +22,7 @@ use File::Basename;
 use Date::Manip;
 
 $ENV{TZ} = 'EST' unless exists $ENV{TZ};
-my @allModules = ('icd', 'cpt', 'hcpcs', 'envoy', 'epayer', 'epsdt', 'rvu' . UnixDate('today', '%y'));
+my @allModules = ('icd', 'cpt', 'hcpcs', 'envoy', 'epayer', 'epsdt', 'rvu' . UnixDate('today', '%y'),'codeserv');
 
 sub printUsage
 {
