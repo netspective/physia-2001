@@ -92,7 +92,7 @@ $STMTMGR_GPCI_SEARCH = new App::Statements::Search::Gpci(
 		WHERE
 			parent_id = ?
 			AND address_name IN ('Street', 'Shipping', 'Mailing')
-			AND LTRIM(RTRIM(states.abbrev)) = LTRIM(RTRIM(org_address.state))
+			AND states.abbrev = LTRIM(RTRIM(upper(org_address.state)))
 			AND rownum <= $LIMIT
 	},
 );
