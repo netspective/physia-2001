@@ -965,7 +965,7 @@ sub getHtml
 					</TR>
 					$linesHtml
 					<TR VALIGN=TOP BGCOLOR=#DDDDDD>
-						<TD COLSPAN=5><FONT $textFontAttrsForTotalBalRow><b>Total Invoice Balance:</b></FONT></TD>
+						<TD COLSPAN=5><FONT $textFontAttrsForTotalBalRow><b>Invoice Balance:</b></FONT></TD>
 						<TD COLSPAN=1 ALIGN=RIGHT><FONT $textFontAttrsForTotalBalRow><b>\$$totalInvoiceBalance</b></FONT></TD>
 					</TR>
 				</TABLE>
