@@ -142,6 +142,14 @@ $STMTMGR_INVOICE = new App::Statements::Invoice(
 		from invoice
 		where invoice_id = ?
 		},
+	'selInvoiceDateDatabyID' =>qq
+		{
+			SELECT 	invoice_id,parent_invoice_id,invoice_status,
+				to_char(invoice_date, '$SQLSTMT_DEFAULTDATEFORMAT') as invoice_date,
+				balance
+			FROM	invoice
+			WHERE	invoice_id = :1
+		},
 	'selInvoiceOwner' => q{
 		select owner_id
 		from invoice
