@@ -230,6 +230,13 @@ sub populateData
 	my $bloodTypecap =  $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_NONE, 'selAttribute', $personId, $bloodType);
 	$page->field('blood_item_id', $bloodTypecap->{'item_id'});
 	$page->field('blood_type', $bloodTypecap->{'value_text'});
+
+	my $nurseLicense = 'RN';
+	my $nurseLicenseData =  $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_NONE, 'selAttribute', $personId, $nurseLicense);
+	$page->field('nurse_license_item_id', $nurseLicenseData->{'item_id'});
+	$page->field('rn_number', $nurseLicenseData->{'value_text'});
+	$page->field('rn_number_exp_date', $nurseLicenseData->{'value_date'});
+	$page->field('check_license', $nurseLicenseData->{'value_int'});
 }
 
 sub handleContactInfo
@@ -487,6 +494,18 @@ sub handleAttrs
 			item_name => 'BloodType' || undef,
 			value_type => 0,
 			value_text => $page->field('blood_type') || undef,
+			_debug => 0
+		);
+
+	$page->schemaAction(
+			'Person_Attribute', $command,
+			parent_id => $page->field('person_id'),
+			item_id => $page->field('nurse_license_item_id') || undef,
+			item_name => 'RN',
+			value_type => 500,
+			value_text => $page->field('rn_number')  || undef,
+			value_date => $page->field('rn_number_exp_date') || undef,
+			value_int => $page->field('check_license')  || undef,
 			_debug => 0
 		);
 
