@@ -141,18 +141,18 @@ sub customValidate
 {
 	my ($self, $page) = @_;
 
-	my $insType = $page->field('ins_type');
-	my $coPay = $page->field('copay_amt');
-	my $coPayCap = $self->getField('copay_amt');
+	#my $insType = $page->field('ins_type');
+	#my $coPay = $page->field('copay_amt');
+	#my $coPayCap = $self->getField('copay_amt');
 
-	if($insType == App::Universal::CLAIMTYPE_HMO && $coPay eq '')
-	{
-		$coPayCap->invalidate($page, "Co-pay is required because the 'Insurance Type' is 'HMO(cap)'");
-	}
-	elsif($insType != App::Universal::CLAIMTYPE_HMO && $coPay ne '')
-	{
-		$coPayCap->invalidate($page, "Co-pay field should be left blank because the 'Insurance Type' is not 'HMO(cap)'");
-	}
+	#if($insType == App::Universal::CLAIMTYPE_HMO && $coPay eq '')
+	#{
+	#	$coPayCap->invalidate($page, "Co-pay is required because the 'Insurance Type' is 'HMO(cap)'");
+	#}
+	#elsif($insType != App::Universal::CLAIMTYPE_HMO && $coPay ne '')
+	#{
+	#	$coPayCap->invalidate($page, "Co-pay field should be left blank because the 'Insurance Type' is not 'HMO(cap)'");
+	#}
 }
 
 
