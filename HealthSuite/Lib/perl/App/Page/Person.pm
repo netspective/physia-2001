@@ -402,30 +402,85 @@ sub prepare_view_worklist
 sub prepare_view_home
 {
 	my ($self) = @_;
-	$self->addContent(qq{
-		<TABLE BORDER=0 CELLSPACING=0 CELLPADDING=0>
-			<TR VALIGN=TOP>
-				<TD>
-					#component.lookup-records#<BR>
-					#component.navigate-reports-root#<BR>
-					TO-DO List will go here
-				</TD>
-				<TD WIDTH=10><FONT SIZE=1>&nbsp;</FONT></TD>
-				<TD>
-					#component.stp-person.associatedSessionPhysicians#<BR>
-					#component.stp-person.myAssociatedResourceAppointments#<BR>
-					#component.stp-person.myAssociatedResourceInPatients#<BR>
-					#component.stp-person.mySessionActivity#
-				</TD>
-				<TD WIDTH=10><FONT SIZE=1>&nbsp;</FONT></TD>
-				<TD>
-					#component.create-records#<BR>
-					#component.news-top#<BR>
-					#component.news-health#
-				</TD>
-			</TR>
-		</TABLE>
-	});
+	#######################################################
+	#DEMO CODE
+	my $categories = $self->session('categories');
+	my $selectedDate = 'today' ;
+	my $fmtDate = UnixDate($selectedDate, '%m/%d/%Y');	
+	$self->param('timeDate',$fmtDate);
+	#DEMO CODE
+	#######################################################	
+	my $pageHome;
+	#If user is a Physicina and the user id is TSAMO then show Physicianm home page
+	#Currently this is only for DEMO
+	if (($self->session('user_id') eq 'TSAMO') && grep {$_ eq 'Physician'} @$categories  )	
+	{
+                $pageHome =qq
+                {               
+        		<SCRIPT SRC='/lib/calendar.js'></SCRIPT>
+        		<SCRIPT>
+			function updatePage(selectedDate)
+			{
+				alert('TEST');
+				var dashDate = selectedDate.replace(/\\//g, "-");
+				location.href = './' + dashDate;
+			}
+			</SCRIPT>
+               	 	<TABLE BORDER=0 CELLSPACING=0 CELLPADDING=0>
+               	 	<TR VALIGN=TOP>
+               	 	 <TD>
+               	 	        #component.stp-person.scheduleAppts#</BR>
+               	 	        #component.stp-person.inPatient#<BR>                        
+               	 	        #component.lookup-records#<BR>   
+		
+                 	</TD>
+                 	<TD WIDTH=10><FONT SIZE=1>&nbsp;</FONT></TD>
+                 	<TD>
+                 	       #component.stpt-person.docSign#<BR>
+                 	       #component.stpt-person.docPhone#<BR>
+                 	       #component.stpt-person.docRefill#<BR>
+                 	       #component.stpt-person.docResults#<BR>
+                	</TD>
+                 	<TD WIDTH=10><FONT SIZE=1>&nbsp;</FONT></TD>
+                 	<TD>
+                 	       #component.stp-person.linkMedicalSite#<BR>
+                 	       #component.stp-person.linkNonMedicalSite#<BR>                                         	
+                 	       #component.news-top#<BR>
+                 	       #component.news-health#<BR>
+                	</TD>
+                	</TR>
+                	</TABLE>
+                }	
+        } 
+        else
+        {
+		$pageHome = qq
+		{
+			<TABLE BORDER=0 CELLSPACING=0 CELLPADDING=0>
+					<TR VALIGN=TOP>
+					<TD>
+						#component.lookup-records#<BR>
+						#component.navigate-reports-root#<BR>
+						TO-DO List will go here
+					</TD>
+					<TD WIDTH=10><FONT SIZE=1>&nbsp;</FONT></TD>
+					<TD>
+						#component.stp-person.associatedSessionPhysicians#<BR>
+						#component.stp-person.myAssociatedResourceAppointments#<BR>
+						#component.stp-person.myAssociatedResourceInPatients#<BR>
+						#component.stp-person.mySessionActivity#
+					</TD>
+					<TD WIDTH=10><FONT SIZE=1>&nbsp;</FONT></TD>
+					<TD>
+						#component.create-records#<BR>
+						#component.news-top#<BR>
+						#component.news-health#
+					</TD>
+				</TR>
+			</TABLE>
+		}
+	};
+	$self->addContent($pageHome);
 }
 
 sub prepare_view_session
