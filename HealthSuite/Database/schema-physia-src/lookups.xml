@@ -357,7 +357,7 @@
 
 	<table name="Org_Contact_Addrs" type="Lookup">
 		<enum id="0">Mailing</enum>
-		<enum id="1">Shipping</enum>
+		<enum id="1">Payment</enum>
 		<enum id="2">Street</enum>
 		<enum id="3">Billing</enum>
 	</table>
