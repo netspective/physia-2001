@@ -155,6 +155,8 @@ use App::Dialog::PostRefund;
 use App::Dialog::PostTransfer;
 use App::Dialog::Procedure;
 use App::Dialog::Invoice;
+use App::Dialog::LoginType;
+use App::Dialog::Transaction::Referral;
 #use App::Dialog::Slot;
 use App::Dialog::Template;
 use App::Dialog::Transaction::ActiveProblems;
@@ -533,17 +535,17 @@ $WORKLIST_CLASSES = {
 		_arl_noshow => ['event_id'],
 		_arl_reschedule => ['event_id'],
 	},
-	'catalog' => {_class => 'App::Dialog::Catalog', 
-		_arl_add => ['parent_catalog_id'], 
-		_arl_modify => ['internal_catalog_id'], 
-		_arl_remove => ['internal_catalog_id'], 
+	'catalog' => {_class => 'App::Dialog::Catalog',
+		_arl_add => ['parent_catalog_id'],
+		_arl_modify => ['internal_catalog_id'],
+		_arl_remove => ['internal_catalog_id'],
 	},
-	'catalog-item' => {_class => 'App::Dialog::CatalogItem', 
-		_arl_add => ['catalog_id', 'parent_entry_id'], 
-		_arl_modify => ['entry_id'] 
+	'catalog-item' => {_class => 'App::Dialog::CatalogItem',
+		_arl_add => ['catalog_id', 'parent_entry_id'],
+		_arl_modify => ['entry_id']
 	},
-	'catalog-copy' => {_class => 'App::Dialog::Catalog::Copy', 
-		_arl_add => ['parent_catalog_id'] 
+	'catalog-copy' => {_class => 'App::Dialog::Catalog::Copy',
+		_arl_add => ['parent_catalog_id']
 	},
 	'customize' => 'App::Dialog::Customize',
 	'diagnoses' => 'App::Dialog::Diagnoses',
@@ -628,6 +630,8 @@ $WORKLIST_CLASSES = {
 				_arl_modify => ['person_id', 'org_id'],
 				heading => '$Command Password'},
 	'personnel' => {_class => 'App::Dialog::Personnel', heading => '$Command Personnel', _arl => ['person_id']},
+	'loginType' => {_class => 'App::Dialog::LoginType', heading => 'Change Login Type', _arl => ['person_id']},
+	'referral' => {_class => 'App::Dialog::Transaction::Referral', heading => 'Add Referral', _arl => ['person_id']},
 
 );
 
