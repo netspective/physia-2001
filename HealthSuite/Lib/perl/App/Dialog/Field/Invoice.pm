@@ -420,10 +420,12 @@ sub getHtml
 	my $sessOrgIntId = $page->session('org_internal_id');
 	my $linesHtml = '';
 	my $personId = $page->param('person_id') || $page->field('payer_id');
-	my $creditInvoices = $STMTMGR_INVOICE->getRowsAsHashList($page, STMTMGRFLAG_CACHE, 'selCreditInvoicesByClient', $personId, $sessOrgIntId);
+	my $creditInvoices = $STMTMGR_INVOICE->getRowsAsHashList($page, STMTMGRFLAG_CACHE, 'selAllNonZeroBalanceInvoicesByClient', $personId, $sessOrgIntId);
 	my $totalPatientBalance = $STMTMGR_INVOICE->getSingleValue($page, STMTMGRFLAG_CACHE, 'selTotalPatientBalance', $personId, $sessOrgIntId);
 	my $totalPossibleRefund = $totalPatientBalance * (-1);
-	my $totalPossibleRefundMsg = $totalPatientBalance < 0 ? "(Amount refunded cannot exceed \$$totalPossibleRefund)" : "(There is no credit on this patient's balance)";
+	#Removed on 8/9/00 because we want to show all invoices with a non-zero balance, not just credit invoices - MAF
+	#my $totalPossibleRefundMsg = $totalPatientBalance < 0 ? "(Amount refunded cannot exceed \$$totalPossibleRefund)" : "(There is no credit on this patient's balance)";
+	my $totalPossibleRefundMsg = $totalPatientBalance < 0 ? '' : "(There is no credit on this patient's balance)";
 
 	my $totalInvoices = scalar(@{$creditInvoices});
 	for(my $line = 1; $line <= $totalInvoices; $line++)
@@ -455,6 +457,17 @@ sub getHtml
 				<TD><FONT SIZE=1>&nbsp;</FONT></TD>
 				<TD><INPUT NAME='_f_invoice_$line\_refund' TYPE='text' size=10 VALUE='@{[ $page->param("_f_invoice_$line\_refund") ]}'></TD>
 				<TD><FONT SIZE=1>&nbsp;</FONT></TD>
+				<TD><INPUT NAME='_f_invoice_$line\_refund_to_id' TYPE='text' size=15 VALUE='@{[ $page->param("_f_invoice_$line\_refund_to_id") ]}'>
+					<a href="javascript:doFindLookup(document.dialog, document.dialog._f_invoice_$line\_refund_to_id, '/lookup/itemValue', '', false, null, document.dialog._f_invoice_$line\_refund_to_type);"><img src='/resources/icons/magnifying-glass-sm.gif' border=0></a>
+				</TD>
+				<TD><FONT SIZE=1>&nbsp;</FONT></TD>
+				<TD>
+					<SELECT NAME='_f_invoice_$line\_refund_to_type'>
+						<OPTION>Person</OPTION>
+						<OPTION>Organization</OPTION>
+					</SELECT>
+				</TD>
+				<TD><FONT SIZE=1>&nbsp;</FONT></TD>
 				<TD><INPUT NAME='_f_invoice_$line\_comments' TYPE='text' size=30 VALUE='@{[ $page->param("_f_invoice_$line\_comments") ]}'></TD>
 			</TR>
 		};
@@ -476,6 +489,10 @@ sub getHtml
 						<TD ALIGN=CENTER><FONT $textFontAttrs>Balance</FONT></TD>
 						<TD><FONT SIZE=1>&nbsp;</FONT></TD>
 						<TD ALIGN=CENTER><FONT $textFontAttrs>Refund</FONT></TD>
+						<TD><FONT SIZE=1>&nbsp;</FONT></TD>
+						<TD ALIGN=CENTER><FONT $textFontAttrs>Refund To ID</FONT></TD>
+						<TD><FONT SIZE=1>&nbsp;</FONT></TD>
+						<TD ALIGN=CENTER><FONT $textFontAttrs>Refund To Type</FONT></TD>
 						<TD><FONT SIZE=1>&nbsp;</FONT></TD>
 						<TD ALIGN=CENTER><FONT $textFontAttrs>Comments</FONT></TD>
 					</TR>
