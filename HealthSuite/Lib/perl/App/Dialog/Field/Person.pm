@@ -34,9 +34,89 @@ sub new
 	return CGI::Dialog::Field::new($type, %params);
 }
 
+sub autoSuggest
+{
+	my ($self, $page, $validator) = @_;
+	my $name = $self->{name};
+	
+	# First, retrieve names, ssn & birthdate into local variables
+	my $firstname = $page->field('name_first');
+	my $MI = substr($page->field('name_middle'),0,1) || "X";
+	my $lastname = $page->field('name_last');
+	my $ssn = $page->field('ssn');
+ 	my $DOB = $page->field('date_of_birth');
+	
+	#Create some commonly used intermediaries
+	#First initial of first name
+	my $FIFN = substr($firstname,0,1);
+	#Last 4 digits of social security number
+	my $L4SSN = substr($ssn,5,4);
+	#Birthyear (last two digits of date_of_birth string)
+	my $ldob = length($DOB);
+	my $L2DOB = substr($DOB,$ldob-2,2);
+		
+	
+	#Generate array of possibles
+	my @possible = ();
+	#First initial of first name plus last name, total not greater than 16 characters
+	push(@possible,$FIFN . substr($lastname,0,15));
+	#First initial of first name plus middle initial plus last name, total not greater than 16 characters
+	push (@possible, $FIFN . $MI . substr($lastname,0,14));
+	#Lastname + firstname
+	push (@possible, substr($lastname . $firstname,0,16));
+	#First initial + lastname + year of birth
+	push (@possible, $FIFN . substr($lastname,0,13) . $L2DOB) unless(defined $DOB);
+	#First initial + lastname + last 4 digits of social security
+	push (@possible, $FIFN . substr($lastname,0,12) . $L4SSN) unless(defined $ssn);
+	#First initial + middle initial + lastname + year of birth
+	push (@possible, $FIFN . $MI . substr($lastname,0,13) . $L2DOB) unless(defined $DOB);
+	#First initial + lastname + last 4 digits of social security
+	push (@possible, $FIFN . $MI . substr($lastname,0,12) . $L4SSN) unless(defined $ssn);
+	#First initial + lastname + year of birth + last 4 digits of SSN
+	push (@possible, $FIFN . substr($lastname,0,10) . $L2DOB . $L4SSN) unless(defined $ssn);
+	#First initial + middle initial + lastname + 4 digit random number
+	push (@possible, $FIFN . $MI . substr($lastname,0,10) . int(10000*rand));
+	push (@possible, $FIFN . $MI . substr($lastname,0,10) . int(10000*rand));
+	push (@possible, $FIFN . $MI . substr($lastname,0,10) . int(10000*rand));
+	
+	
+	
+	#Check array of possibles for availability, stop after three are OK
+	
+	my $goodcount = 0;
+	my $count = 0;
+	my @goodones = ();
+	while ($goodcount < 3 && $count < scalar @possible) {
+		if (! $STMTMGR_PERSON->recordExists($page, STMTMGRFLAG_NONE,'selRegistry', $possible[$count]) ){
+			$goodones[$goodcount] = $possible[$count];
+			$goodcount = $goodcount + 1;
+			$count = $count + 1;
+			}
+		else {
+			$count = $count + 1;
+			}
+		}
+	
+return qq{	
+	<input type="radio" name="_f_radio$name" value="$goodones[0]" 
+				onClick="document.dialog._f_radioperson_id[0].checked=true; document.dialog._f_person_id.value=this.value"
+									> $goodones[0] &nbsp
+		<input type="radio" name="_f_radio$name" value="$goodones[1]"
+				onClick="document.dialog._f_person_id.value=this.value;	document.dialog._f_radioperson_id[1].checked=true"> $goodones[1] &nbsp
+		<input type="radio" name="_f_radio$name" value="$goodones[2]" 
+				onClick="document.dialog._f_person_id.value=this.value;	document.dialog._f_radioperson_id[2].checked=true"> $goodones[2] &nbsp
+		
+	};
+	
+
+}
+
+
+
 sub isValid
 {
 	my ($self, $page, $validator) = @_;
+	my $suggestion = " ";
 
 	my $command = $page->property(CGI::Dialog::PAGEPROPNAME_COMMAND . '_' . $validator->id());
 
@@ -44,9 +124,23 @@ sub isValid
 
 	if($self->SUPER::isValid($page, $validator))
 	{
+		
 		my $value = $page->field($self->{name});
-		$self->invalidate($page, "$self->{caption} '$value' already exists.")
-			if $STMTMGR_PERSON->recordExists($page, STMTMGRFLAG_NONE,'selRegistry', $value);
+		my $suggest = 0;
+		unless($value)
+		{
+			$suggest = 1;
+		}
+		elsif($STMTMGR_PERSON->recordExists($page, STMTMGRFLAG_NONE, 'selRegistry', $value))
+		{
+			$self->invalidate($page, "$self->{caption} '$value' already exists.");
+			$suggest = 1;
+		}
+		if($suggest)
+		{
+			my $suggestion = $self->autoSuggest($page,$validator);
+			$self->invalidate($page, "Please select an ID:<BR>$suggestion");
+		}		
 	}
 
 	# return TRUE if there were no errors, FALSE (0) if there were errors
@@ -178,7 +272,7 @@ sub isValid
 				else
 				{
 					$createPersonHref = "javascript:doActionPopup('/org-p/#session.org_id#/dlg-add-" . lc($types) . "/$value');";
-					#$types = "Responsible Party" if $types eq "Guarantor";
+					$types = "Responsible Party" if $types eq "Guarantor";
 				}
 				unless ($STMTMGR_PERSON->recordExists($page, STMTMGRFLAG_NONE,'selRegistry', $value))
 				{
