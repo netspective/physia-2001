@@ -69,12 +69,14 @@
 	<table name="PerSess_View_Count" abbrev="SesCnt">
 		<description>Count of all the activities undertaken by a user during a session</description>
 		<column name="session_id" parentref="Person_Session.session_id" indexed="yes" descr="The session ID for the activity"/>
-		<column name="view_init" type="stamp" required="yes" default="sysdate" descr="The date/time this record was first viewed"/>
+		<column name="person_id" parentref="Person.person_id" required="yes" indexed="yes" descr="The ID of the person that owns the session"/>
+		<column name="view_init" type="stamp" required="yes" indexed="yes" default="sysdate" descr="The date/time this record was first viewed"/>
 		<column name="view_latest" type="stamp" required="yes" default="sysdate" descr="The date/time this record was most recently viewed"/>
 		<column name="view_scope" type="text" size="48" descr="This can be person, org, invoice, etc"/>
 		<column name="view_key" type="text" size="48" descr="The key for the record/thing that was the focus of the activity"/>
 		<column name="view_count" type="integer" descr="The number of times this same view_scope and view_key was viewed in this session"/>
 		<column name="view_caption" type="text" size="255" descr="The caption to show to the user for this view-type"/>
+		<column name="view_arl" type="text" size="255" descr="The arl to use for the user for this view-type"/>
 	</table>
 
 	<table name="Org" type="Audit,Secure,Restrict_Rows">
