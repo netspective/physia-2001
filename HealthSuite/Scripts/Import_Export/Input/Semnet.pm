@@ -28,8 +28,8 @@ sub init
 	$self->dbiConnectKey('Semnet',"dbi:Proxy:hostname=medina;port=3333;dsn=dbi:ODBC:PROMED_SAMPLE");	
 	$self->statements('Semnet','org_data', 'select * from semnet_physician_orgs');
 	$self->statements('Semnet','hertg_person_data', 'select * from semnet_person_hertg');
-	$self->statements('Semnet','hmoblue_person_data_se_senior', 'select * from semnet_person_hmoblue_se_senior');
-	$self->statements('Semnet','hmoblue_person_data_se_comm', 'select * from semnet_person_hmoblue_se_comm');
+	$self->statements('Semnet','hmoblue_person_data_se_senior', 'select * from semnet_person_hmoblue_se_senior where First is not null and Last is not null');
+	$self->statements('Semnet','hmoblue_person_data_se_comm', 'select * from semnet_person_hmoblue_se_comm where First is not null and Last is not null');
 	
 	#Connect to Physia DB
 	$self->dbiConnectKey('Physia',"dbi:Oracle:SDEDBS04");
@@ -330,7 +330,7 @@ sub populateHMOBlueSeSeniorPatData
 		my $termDate = formatDate($sTermDate);
 
 
-		my $ssn = substr($memberID,1,9);
+		my $ssn = substr($memberID,0,9);
 		
 		my @pcpNames = split(' ', $pcpFullName);
 		
@@ -461,7 +461,11 @@ sub populateHMOBlueSeCommPatData
 		$count+=14;
 		my $sFromDate = defined $rowData->[$count] ?App::Data::Manipulate::trim($rowData->[$count]) : '' ; $count++;	
 		my $sTermDate = defined $rowData->[$count] ?App::Data::Manipulate::trim($rowData->[$count]) : '' ; $count++;
-		my $retro = defined $rowData->[$count] ?App::Data::Manipulate::trim($rowData->[$count]) : '' ; $count++;		
+		my $retro = defined $rowData->[$count] ?App::Data::Manipulate::trim($rowData->[$count]) : '' ; $count++;	
+		
+		if ($firstName eq '' or $lastName eq '')
+		{
+		}
 
     #print "count=$count recNum=$recNum\n";
 
@@ -470,7 +474,7 @@ sub populateHMOBlueSeCommPatData
 		my $fromDate = formatDate($sFromDate);
 		my $termDate = formatDate($sTermDate);
 		
-		my $ssn = substr($memberID,1,9);
+		my $ssn = substr($memberID,0,9);
 		
 		my @pcpNames = split(' ', $pcpFullName);
 		
@@ -552,6 +556,52 @@ sub populateHMOBlueSeCommPatData
 	}
 	
 }
+
+#sub locateDuplicates
+#{
+#	my ($self, $dataModel) = @_;
+
+	#
+	# STAGE 1: identify duplicates in source
+	#
+	my %index = ();
+#	foreach my $person (@{$dataModel->people()->all()})
+#	{
+			#
+			# WHAT's our key?
+			#
+			# FIX --> my $key = $person->lastName() . $person->firstName() . $person->dob();
+#			if(my $list = $index{$key})
+#			{
+#				if(ref $list eq 'ARRAY')
+#				{
+#					push(@$list, $person);
+#				}
+#				else
+#				{
+#					$index{$key} = [$list, $person];
+#				}
+#			}
+#			else
+#			{
+#					$index{$key} = $person;
+#			}
+#	}	
+	
+	#
+	# STAGE 2: reconcile differences 
+	#
+#	foreach my $potentialDupes (values %index)
+#	{
+#		next unless ref $potentialDupes eq 'ARRAY';
+#		foreach my $person (@$potentialDupes)
+#		{
+#				# decide on dup FIX FIX
+#				$person->loadIndicator('S');
+#				# also go into each item and skip the indicators FIX FIX
+#		}
+#	}
+#}
 
 
 sub populateDataModel
