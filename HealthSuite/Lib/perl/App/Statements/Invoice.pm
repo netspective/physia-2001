@@ -28,10 +28,16 @@ $STMTFMT_SEL_INVOICETYPE = qq{
 		ib.bill_party_type,
 		i.invoice_status as status_id,
 		i.parent_invoice_id,
-		to_char(i.invoice_date, '$SQLSTMT_DEFAULTDATEFORMAT') as invoice_date
-	FROM invoice i, invoice_status ist, invoice_billing ib, invoice_item iit, org o
+		to_char(i.invoice_date, '$SQLSTMT_DEFAULTDATEFORMAT') as invoice_date,
+		trans.care_provider_id,
+		trans.provider_id,
+		trans.service_facility_id,
+		sf.org_id
+	FROM invoice i, invoice_status ist, invoice_billing ib, invoice_item iit, org o, transaction trans, org sf
 	WHERE
 	%whereCond%
+	AND i.main_transaction = trans.trans_id
+	AND trans.service_facility_id = sf.org_internal_id
 	AND iit.parent_id (+) = i.invoice_id
 	AND ib.bill_id (+) = i.billing_id
 	AND ist.id = i.invoice_status
@@ -50,7 +56,11 @@ $STMTFMT_SEL_INVOICETYPE = qq{
 		ib.bill_party_type,
 		i.invoice_status,
 		i.parent_invoice_id,
-		i.invoice_date
+		i.invoice_date,
+		trans.care_provider_id,
+		trans.provider_id,
+		trans.service_facility_id,
+		sf.org_id
 	ORDER BY i.invoice_id desc
 };
 
@@ -118,6 +128,9 @@ $STMTRPTDEFN_DEFAULT_PERSON =
 										'16' => 'Void #13#'
 									},
 				},
+				{ head => 'Provider of Service', dataFmt => '#15#' },
+				{ head => 'Billing Provide', dataFmt => '#16#' },
+				{ head => 'Service Org', dataFmt => '#18#' },
 				{ head => 'Payer', colIdx => 11, dataFmt => {
 										'0'  => '#4#',
 										'1'  => '#4#',
