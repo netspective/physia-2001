@@ -554,6 +554,7 @@ sub assignInsuredInfo
 	my $sth;
 	my $no = $claim->getBillSeq();
 	my $no1 = $claim->getClaimType();
+	my $orgInternalId
 
 	foreach $insured (@$insureds)
 	{
@@ -608,7 +609,7 @@ sub assignInsuredInfo
 						$sth->execute() or $self->{valMgr}->addError($self->getId(),100,"Unable to execute $queryStatment");
 						@row = $sth->fetchrow_array();
 						$insured->setTypeCode($row[0]);
-						my $orgInternalId = $row[1];
+						$orgInternalId = $row[1];
 						$insured->setEmployerOrSchoolId($orgInternalId);
 
 					}
