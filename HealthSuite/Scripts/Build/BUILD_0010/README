@@ -88,6 +88,7 @@ summary daily audit report.  NOTE - this required minor change to framework shou
 
 B768, 857, 769,522 -  Minor Report fixes more information can be found in bugzillia
 
+B515 - Changed the 'Associated Physician' field in Nurse dialog to a checkbox instead of a drop down list
 
   
 
