@@ -28,6 +28,7 @@ runSQL('BUILD_0012_add_attribute_value_types.sql');
 runSQL('BUILD_0012_create_index_upper.sql');
 runSQL('BUILD_0012_Invoice.sql');
 runSQL('BUILD_0012_Invoice_Status.sql');
+runSQL('BUILD_0012_load_pre_post_code.sql');
 makeSymbolicLink();
 
 ######## END UPGRADE SCRIPT #########
