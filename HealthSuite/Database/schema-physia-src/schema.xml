@@ -170,7 +170,7 @@
 		<column name="trans_status" lookupref="Transaction_Status.id" required="yes" default="0" descr="The current status of this transaction (inactive, active, other, etc)"/>
 		<column name="trans_status_reason" type="text" size="128" descr="The reason the transaction is in its current status"/>
 		<column name="trans_substatus" type="longint" descr="The current status of this transaction (varies depending upon subtype)"/>
-		<column name="invoice_id" indexed="yes" lookupref="Invoice.invoice_id" descr="Invoice id for invoice related to this transaction"/>
+		<column name="trans_invoice_id" indexed="yes" lookupref="Invoice.invoice_id" descr="Invoice id for invoice related to this transaction"/>
 		<column name="trans_substatus_reason" type="text" size="128" descr="The reason the transaction is in its current status (varies depending upon subtype)"/>
 		<column name="caption" type="text" size="128" descr="Freeform text explanation of transaction (summary)"/>
 		<column name="detail" type="text" size="512" descr="Freeform text explanation of transaction (detail)"/>
