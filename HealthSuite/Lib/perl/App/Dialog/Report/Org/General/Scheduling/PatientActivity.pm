@@ -247,12 +247,23 @@ sub prepare_detail_appointments
 	my $internalFacilityId = $page->param('_f_facility_id');
 	my $orgInternalId = $page->session('org_internal_id');
 	my $gmtDayOffset = $page->session('GMT_DAYOFFSET');
+
+	$page->addContent("<b>'$caption' Appointments</b><br><br>");
 	
-	$page->addContent("<b>'$caption' Appointments</b><br><br>",
-		$STMTMGR_REPORT_SCHEDULING->createHtml($page, STMTMGRFLAG_NONE, 'sel_DetailAppointmentStatus',
-			[$event_status, $internalFacilityId, $startDate, $endDate, $orgInternalId, $gmtDayOffset, $resource_id],
-		),
-	);
+	if ($event_status == 3)
+	{
+		$page->addContent($STMTMGR_REPORT_SCHEDULING->createHtml($page, STMTMGRFLAG_NONE, 
+			'sel_DetailDiscardAppointment', [$event_status, $internalFacilityId, $startDate, 
+			$endDate, $orgInternalId, $gmtDayOffset, $resource_id],),
+		);
+	}
+	else
+	{
+		$page->addContent($STMTMGR_REPORT_SCHEDULING->createHtml($page, STMTMGRFLAG_NONE, 
+			'sel_DetailAppointmentStatus', [$event_status, $internalFacilityId, $startDate, 
+			$endDate, $orgInternalId, $gmtDayOffset, $resource_id],),
+		);
+	}
 }
 
 sub prepare_detail_patient_type
