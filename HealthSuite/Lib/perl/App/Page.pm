@@ -15,13 +15,14 @@ use App::Universal;
 use Date::Manip;
 
 use DBI::StatementManager;
+use App::Statements::Page;
 use App::Statements::Person;
 use App::Statements::Component;
 
 use vars qw(@ISA @EXPORT);
 @ISA = qw(Exporter CGI::Page);
 
-use enum qw(BITMASK:PAGEFLAG_ ISDISABLED ISPOPUP ISADVANCED ISFRAMESET ISFRAMEHEAD ISFRAMEBODY IGNORE_BODYHEAD IGNORE_BODYFOOT CONTENTINPANES INCLUDEDEFAULTSCRIPTS);
+use enum qw(BITMASK:PAGEFLAG_ ISDISABLED ISPOPUP ISADVANCED ISFRAMESET ISFRAMEHEAD ISFRAMEBODY IGNORE_BODYHEAD IGNORE_BODYFOOT CONTENTINPANES INCLUDEDEFAULTSCRIPTS RECORD_VIEWCOUNT);
 use constant DEFAULT_OPTIONS => PAGEFLAG_INCLUDEDEFAULTSCRIPTS;
 
 @EXPORT = qw(
@@ -33,6 +34,7 @@ use constant DEFAULT_OPTIONS => PAGEFLAG_INCLUDEDEFAULTSCRIPTS;
 	PAGEFLAG_ISFRAMEBODY
 	PAGEFLAG_IGNORE_BODYHEAD
 	PAGEFLAG_IGNORE_BODYFOOT
+	PAGEFLAG_RECORD_VIEWCOUNT
 	);
 
 use enum qw(:THEMECOLOR_
@@ -131,6 +133,38 @@ sub recordActivity
 
 	$STMTMGR_PERSON->execute($self, STMTMGRFLAG_REPLACEVARS, 'insSessionActivity',
 				$self->session('_session_id'), @_);
+}
+
+sub incrementViewCount
+{
+	my ($self, $caption, $arl) = @_;
+	
+	unless($caption)
+	{
+		return unless $self->flagIsSet(PAGEFLAG_RECORD_VIEWCOUNT);
+	}
+
+	my ($scope, $key) = ($1, $2) if $self->referer() =~ m!http://.*?/(.*?)/(.*?)/.*!;
+	my $sessionId = $self->session('_session_id');
+	my $userId    = $self->session('user_id');
+	
+	my @arlItems = split(/\//, $self->param('arl'));
+	my $rsrc = $arlItems[0];
+	
+	my $paramKey = $self->param($rsrc . '_id');
+	
+	unless ($scope eq $rsrc && $key eq $paramKey)
+	{
+		if ($STMTMGR_PAGE->recordExists($self, STMTMGRFLAG_NONE, 'sel_SessionInfo', $userId, $rsrc, $paramKey))
+		{
+			$STMTMGR_PAGE->execute($self, STMTMGRFLAG_NONE, 'upd_count', $userId, $rsrc, $paramKey);
+		}
+		else
+		{
+			$STMTMGR_PAGE->execute($self, STMTMGRFLAG_NONE, 'ins_newKey', $sessionId, $userId, $rsrc, $paramKey, 
+				qq{<a href='$arl'>$caption</a>}, $arl);
+		}
+	}
 }
 
 # --- url-management functions -----------------------------------------------
@@ -472,6 +506,8 @@ sub initialize
 	$self->addLocatorLinks(
 			['<IMG SRC="/resources/icons/home-sm.gif" BORDER=0> Home', '/home'],
 		);
+
+	$self->incrementViewCount();
 }
 
 sub disable
@@ -900,6 +936,7 @@ sub arlHasStdAction
 			$self->param('_compParamStartIndex', $startArlIndex+1);
 		}
 	}
+	
 
 	# if we get to here, it wasn't a standard action
 	return 0;
