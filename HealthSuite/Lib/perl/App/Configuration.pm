@@ -23,11 +23,15 @@ struct(ServerConfigData => [
 	path_BillingTemplate => '$',
 	path_Reports => '$',
 	path_OrgReports => '$',
+	path_Conf => '$',
+	path_AppConf => '$',
 	path_PDFOutput => '$',
 	path_PDFOutputHREF => '$',
 	file_SchemaDefn => '$',
 	file_AccessControlDefn => '$',
 	file_BuildLog => '$',
+	file_NSFHeader => '$',
+	file_NSFCounter => '$',
 ]);
 
 use constant CONFIGGROUP_PRO => 'production';
@@ -43,6 +47,8 @@ use constant PATH_REPORTS    => File::Spec->catfile(PATH_APPLIB, 'Dialog', 'Repo
 use constant PATH_WEBSITE    => File::Spec->catfile(PATH_APPROOT, 'WebSite');
 use constant PATH_TEMP       => File::Spec->catfile('temp');
 use constant PATH_OUTPUTPDF  => File::Spec->catfile(PATH_TEMP, 'invoices');
+use constant PATH_CONF       => File::Spec->catfile(PATH_APPROOT, 'Conf');
+use constant PATH_APPCONF    => File::Spec->catfile(PATH_CONF, 'app');
 
 sub requirePath
 {
@@ -80,10 +86,14 @@ sub getDefaultConfig
 	$config->path_SchemaSQL(File::Spec->catfile(PATH_DATABASE, 'schema-physia'));
 	$config->path_BillingTemplate(File::Spec->catfile(PATH_APPLIB, 'Billing'));
 	$config->path_OrgReports(File::Spec->catfile(PATH_REPORTS, 'Org'));
+	$config->path_Conf(PATH_CONF);
+	$config->path_AppConf(PATH_APPCONF);
 	$config->path_PDFOutput(File::Spec->catfile(PATH_WEBSITE, PATH_OUTPUTPDF));
 	$config->path_PDFOutputHREF(File::Spec->catfile('', PATH_OUTPUTPDF));
 	$config->file_SchemaDefn(File::Spec->catfile(PATH_DATABASE, 'schema-physia-src', 'schema.xml'));
 	$config->file_AccessControlDefn(File::Spec->catfile(PATH_APPLIB, 'Conf', 'AccessControl.xml'));
+	$config->file_NSFHeader(File::Spec->catfile(PATH_APPCONF, 'nsf-header-conf'));
+	$config->file_NSFCounter(File::Spec->catfile(PATH_APPCONF, 'nsf-submission-counter'));
 	return $config;
 }
 
