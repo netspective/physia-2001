@@ -35,9 +35,15 @@ sub initialize
 	$self->SUPER::initialize(@_);
 
 	my $personId = $self->param('person_id');
+
 	$STMTMGR_PERSON->createPropertiesFromSingleRow($self, STMTMGRFLAG_CACHE, ['selRegistry', 'person_'], $personId);
 	$self->property('person_complete_name', "Unknown ID: $personId") unless $self->property('person_complete_name');
 	$self->property('person_categories', $STMTMGR_PERSON->getSingleValueList($self, STMTMGRFLAG_CACHE, 'selCategory', $personId, $self->session('org_id')));
+
+	my $guarantor = 'Guarantor';
+	my $guarantorName =  $STMTMGR_PERSON->getRowAsHash($self, STMTMGRFLAG_NONE, 'selAttribute', $personId, $guarantor);
+	my $respPerson = $guarantorName->{'value_text'} eq $personId ? 'Self' :  $guarantorName->{'value_text'};
+	$self->property('person_responsible', $respPerson);
 
 	unless($self->property('person_categories'))
 	{
@@ -119,7 +125,7 @@ sub prepare_page_content_header
 					<A HREF="/person/$personId/dlg-add-claim/$personId">Create Claim</A> -
 					<A HREF="/person/$personId/dlg-add-medication-prescribe">Prescribe Meds</A>
 					-->
-					SSN #property.person_ssn#, #property.person_gender_caption#, Age #property.person_age# (#property.person_date_of_birth#), #property.person_ethnicity#, #property.person_marstat_caption#
+					Responsible Person : #property.person_responsible#, SSN #property.person_ssn#, #property.person_gender_caption#, Age #property.person_age# (#property.person_date_of_birth#), #property.person_ethnicity#, #property.person_marstat_caption#
 					</FONT>
 				</TD>
 				<TD ALIGN=RIGHT>
