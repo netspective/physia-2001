@@ -8,7 +8,6 @@ use Date::Calc qw(:all);
 
 use App::Page;
 use App::ImageManager;
-use Devel::ChangeLog;
 
 use DBI::StatementManager;
 use App::Statements::Scheduling;
@@ -17,8 +16,10 @@ use App::Statements::Search::Appointment;
 
 use App::Dialog::WorklistSetup;
 
-use vars qw(@ISA @CHANGELOG);
-@ISA = qw(App::Page);
+#use vars qw(@ISA);
+#@ISA = qw(App::Page);
+
+use base 'App::Page::WorkList';
 
 sub prepare_view_date
 {
@@ -28,7 +29,7 @@ sub prepare_view_date
 		<TABLE BORDER=0 CELLSPACING=1 CELLPADDING=0>
 			<TR VALIGN=TOP>
 				<TD colspan=5>
-					#component.worklist#
+					#component.worklist-patientflow#
 				</TD>
 			</TR>
 			<TR>
@@ -44,45 +45,6 @@ sub prepare_view_date
 				</TD>
 				<TD>&nbsp;</TD>
 				<TD>
-					#component.navigate-reports-root#
-				</TD>
-			</TR>
-		</TABLE>
-	});
-
-	return 1;
-}
-
-sub __prepare_view_date
-{
-	my ($self) = @_;
-
-	$self->addContent(qq{
-		<TABLE BORDER=0 CELLSPACING=1 CELLPADDING=0>
-			<TR VALIGN=TOP>
-				<TD colspan=5>
-					#component.worklist#
-				</TD>
-			</TR>
-			<TR>
-				<TD>
-					<A name=SETUP>
-					<A HREF='#TOP'><IMG SRC='/resources/icons/arrow-up-blue.gif' BORDER=0>Go to top</A>
-				</TD>
-			</TR>
-			<TR VALIGN=TOP>
-				<TD>
-					#component.resourceselector# <BR>
-					#component.facilityselector# <BR>
-				</TD>
-				<TD>&nbsp</TD>
-				<TD>
-					#component.on-select#<BR>
-					#component.create-records# <BR>
-				</TD>
-				<TD>&nbsp</TD>
-				<TD>
-					#component.lookup-records#<BR>
 					#component.navigate-reports-root#
 				</TD>
 			</TR>
@@ -187,13 +149,13 @@ sub prepare_page_content_header
 	my $heading = "Work List";
 	my $dateTitle = decodeDate($self->param('_seldate'));
 	
-	my $urlPrefix = "/worklist";
+	my $urlPrefix = "/worklist/patientflow";
 	my $functions = $self->getMenu_Simple(App::Page::MENUFLAG_SELECTEDISLARGER,
 		'_pm_view',
 		[
-			[$dateTitle, "/worklist/date", 'date'],
-			['Recent Activity', "/worklist/recentActivity", 'recentActivity'],
-			['Setup', "/worklist/setup", 'setup', ],
+			[$dateTitle, "$urlPrefix/date", 'date'],
+			['Recent Activity', "$urlPrefix/recentActivity", 'recentActivity'],
+			['Setup', "$urlPrefix/setup", 'setup', ],
 			#['Setup', "#SETUP", 'setup'],
 			
 		], ' | ');
@@ -273,9 +235,6 @@ sub getControlBarHtml
 			} else {
 				$time2 = $self->session('time2');
 			}
-			
-			#$time1 = $self->session('time1') || '12:00am';
-			#$time2 = $self->session('time2') || '11:59pm';
 		}
 		else
 		{
@@ -292,9 +251,6 @@ sub getControlBarHtml
 			} else {
 				$time2 = $self->session('time2');
 			}
-			
-			#$time1 = $self->session('time1') || 30;
-			#$time2 = $self->session('time2') || 120;
 		}
 
 		$timeFieldsHtml = qq{
@@ -363,8 +319,6 @@ sub getControlBarHtml
 		};
 		
 	}
-
-	#<FORM name='dateForm' method=POST onsubmit="updatePage(document.dateForm.selDate.value); return false;">
 
 	return qq{
 	<TABLE bgcolor='#EEEEEE' cellpadding=3 cellspacing=0 border=0 width=100%>
@@ -439,11 +393,11 @@ sub handleARL
 	my ($self, $arl, $params, $rsrc, $pathItems) = @_;
 	return 0 if $self->SUPER::handleARL($arl, $params, $rsrc, $pathItems) == 0;
 
-	$self->param('_pm_view', $pathItems->[0] || 'date');
+	$self->param('_pm_view', $pathItems->[1] || 'date');
 	$self->param('noControlBar', 1);
 
 	# see if the ARL points to showing a dialog, panel, or some other standard action
-	unless($self->arlHasStdAction($rsrc, $pathItems, 0))
+	unless($self->arlHasStdAction($rsrc, $pathItems, 1))
 	{
 		if (my $handleMethod = $self->can("handleARL_" . $self->param('_pm_view'))) {
 			&{$handleMethod}($self, $arl, $params, $rsrc, $pathItems);
@@ -458,19 +412,10 @@ sub handleARL_date
 {
 	my ($self, $arl, $params, $rsrc, $pathItems) = @_;
 
-	$pathItems->[1] =~ s/\-/\//g if defined $pathItems->[1];
-	$self->param('_seldate', $pathItems->[1]);
+	$pathItems->[2] =~ s/\-/\//g if defined $pathItems->[2];
+	$self->param('_seldate', $pathItems->[2]);
 	$self->param('noControlBar', 0);
 }
-
-#sub handleARL_setup
-#{
-#	my ($self, $arl, $params, $rsrc, $pathItems) = @_;
-#	if ($pathItems->[1] =~ /^resource$/i)
-#	{
-#		$self->param('resources', $pathItems->[2]);
-#	}
-#}
 
 sub getContentHandlers
 {
@@ -489,46 +434,10 @@ sub getJavascripts
 			function updatePage(selectedDate)
 			{
 				var dashDate = selectedDate.replace(/\\//g, "-");
-				location.href = '/worklist/date/' + dashDate;
-			}
-
-			function chooseEntry2(itemValue, actionObj, destObj)
-			{
-				if(isLookupWindow())
-				{
-					populateControl(itemValue, true);
-					return;
-				}
-
-				if(actionObj == null)
-					actionObj = search_form.item_action_arl_select;
-
-				if(actionObj != null) {
-					var arlFmt = actionObj.options[actionObj.selectedIndex].value;
-					var newArl = replaceString(arlFmt, '%itemValue%', itemValue);
-
-					if (destObj == null)
-					{
-						window.location.href = newArl;
-					}
-					else
-					{
-						if(destObj.selectedIndex == 0)
-							window.location.href = newArl;
-						else
-							doActionPopup(newArl);
-					}
-				}
+				location.href = '/worklist/patientflow/date/' + dashDate;
 			}
 		</SCRIPT>
 	};
 }
-
-@CHANGELOG =
-(
-	[	CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '04/01/2000', 'TVN',
-		'Page/WorkList',
-		'Convert Today to Work List.'],
-);
 
 1;

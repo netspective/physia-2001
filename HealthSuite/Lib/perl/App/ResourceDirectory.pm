@@ -83,7 +83,7 @@ use CGI::Component;
 use App::Component::Functions;
 use App::Component::News;
 use App::Component::Navigate::FileSys;
-use App::Component::WorkList;
+use App::Component::WorkList::PatientFlow;
 use App::Component::ResourceSelector;
 use App::Component::FacilitySelector;
 use App::Component::SDE;
@@ -242,8 +242,6 @@ $WORKLIST_CLASSES = {
 	'patientflow' => 'App::Page::Worklist::PatientFlow',
 	'collection' => 'App::Page::Worklist::Collection',
 };
-
-
 
 %PAGE_CLASSES = (
 	'logout' => 'App::Page::Redirect',
