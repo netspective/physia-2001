@@ -28,6 +28,7 @@ use base qw(App::Dialog::Encounter);
 
 use constant NEXTACTION_POSTPAYMENT => "/person/%field.attendee_id%/dlg-add-postpersonalpayment";
 use constant NEXTACTION_PATIENTWORKLIST => "/worklist/patientflow";
+use constant NEXTACTION_PRINTENCOUNTERFORM => "/person/%field.attendee_id%/dlg-add-printsuperbill/%field.parent_event_id%";
 
 sub initialize
 {
@@ -49,6 +50,7 @@ sub initialize
 							['Return to Previous Screen', '', 1],
 							['Go to Patient Flow Work List', NEXTACTION_PATIENTWORKLIST],
 							['Post Payment for this Patient', NEXTACTION_POSTPAYMENT],
+							['Print Encounter Form for this Patient', NEXTACTION_PRINTENCOUNTERFORM],
 						],
 						cancelUrl => $self->{cancelUrl} || undef));
 
