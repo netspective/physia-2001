@@ -42,6 +42,10 @@
 		<deliverable id="1153">
 			UI: Added the field called 'Language Spoken' in the 'Add Person' dialog.
 		</deliverable>		
+		<deliverable id="1192">
+			Report :  New bill cycle report.  The report is at the patient statement level.  It does not drill down to invoice level data, because we are currently not storing static invoice level data per  patient statement sent ,
+			Database : Needs new Statement tables 
+		</deliverable>		
 		<deliverable id="1262">
 			UI: The Electronic Billing Information component has now been moved form the Insurance tab
 			of an organization to the Clearing House tab.
