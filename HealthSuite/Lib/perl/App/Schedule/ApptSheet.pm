@@ -141,11 +141,12 @@ sub getHtml
 			for my $col (0..(@{$self->{inputSpec}}-1))
 			{
 				my $resource_id = $self->{inputSpec}[$col][1];
+				my $facility_id = $self->{inputSpec}[$col][2];
 				$html .= qq{
 					<td colspan=2 align=center>
 						<font face="Tahoma,Arial,Helvetica" size=2>
 							<img src='/resources/icons/arrow_right_red.gif'>
-							<a class=topnav href="javascript:location.href='/schedule/template/add/$resource_id';">Add Template</a>
+							<a class=topnav href="javascript:location.href='/schedule/dlg-add-template/$resource_id/$facility_id';">Add Template</a>
 						</font>
 					</TD>
 				};
@@ -291,7 +292,7 @@ sub getTemplateData
 			$templateTitle .= "Patient Types:  @{[ join(', ', @patientTypes) ]} \n";
 			$templateTitle .= "Visit Types:  @{[ join(', ', @visitTypes) ]} \n";
 
-			my $updateHref = qq{javascript:location.href = '/schedule/template/update/$templateID'};
+			my $updateHref = qq{javascript:location.href = '/schedule/dlg-update-template/$templateID'};
 
 			$html .= qq {
 				<tr><td align=center><font size=2 face='Lucida,Arial,Helvetica'>
@@ -380,12 +381,12 @@ sub buildHeader
 								<option value='/search/appointment/$resource_id,$facility_id,3,$dashDate,$dashDate,1/1'>Block Check Out</option>
 								<option value='/search/appointment/$resource_id,$facility_id,4,$dashDate,$dashDate/1'>Block Cancel</option>
 								<option value='/search/appointment/$resource_id,$facility_id,5,$dashDate,$dashDate/1'>Block Reschedule</option>
-								<option value='/schedule/appointment/add/$resource_id'>Add Appointment</option>
+								<option value='/schedule/dlg-add-appointment//$resource_id/$facility_id/'>Add Appointment</option>
 								<option value='#'>*Verify Insurance</option>
 								<option value='/search/apptslot/$resource_id,$facility_id,$dashDate/1'>Find Slot</option>
-								<option value='/schedule/template/add/$resource_id'>Create Template</option>
+								<option value='/schedule/dlg-add-template/$resource_id/$facility_id'>Create Template</option>
 								<option value='/search/template/$resource_id,$facility_id/1'>View Templates</option>
-								<option value='#'>*Print Schedule</option>
+								<option value='/search/appointment/$resource_id,$facility_id,0,$dashDate,$dashDate/1'>Print Schedule</option>
 								$customizeOption
 							</select>
 						</td>
@@ -450,12 +451,12 @@ sub buildRows
 			my $appointments = $self->getAppointments($page, $col, $hour, $maxAppts);
 
 			my $resource_id = $self->{inputSpec}[$col][1];
+			my $facility_id = $self->{inputSpec}[$col][2];
 			my @date = Decode_Date_US($self->{inputSpec}[$col][0]);
 			my $start_stamp = sprintf ("%02d-%02d-%04d_%02d:00", $date[1], $date[2], $date[0], $hour);
 			my $duration = 10;
 
-			#my $apptHref = "javascript:location.href='/schedule/appointment/add/$resource_id,$start_stamp,$duration';";
-			my $apptHref = "javascript:doActionPopup('/schedule/appointment/add/$resource_id,$start_stamp,$duration',null,'width=620,height=500,scrollbars,resizable');";
+			my $apptHref = "javascript:doActionPopup('/schedule/dlg-add-appointment//$resource_id/$facility_id/$start_stamp',null,'width=620,height=500,scrollbars,resizable');";
 
 			$apptSheetRef->[$hour][$col] = qq{
 				<td valign=center align=center rowspan=1 bgcolor=$hourbgColor width=$hourWidth >
