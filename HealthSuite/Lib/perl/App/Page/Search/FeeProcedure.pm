@@ -15,7 +15,7 @@ use base 'App::Page::Search';
 %RESOURCE_MAP = (
 	'search/feeprocedure' => {},
 	);
-
+my $FS_CATALOG_TYPE = 0;
 sub getForm
 {
 	my ($self, $flags) = @_;
@@ -24,7 +24,13 @@ sub getForm
 	
 	#Build heading for search screen
 	my $heading = 'Lookup Fee Schedule Procedure Code';
-	my @listFee = split "," , $self->param('fee_list');
+	my @listName = split "," , $self->param('fee_list');
+	my @listFee=();
+	foreach my $name (@listName)
+	{
+		my $catalog = $STMTMGR_CATALOG->getRowAsHash($self,STMTMGRFLAG_NONE,'selInternalCatalogIdByIdType',$self->session('org_internal_id'),$name,$FS_CATALOG_TYPE);
+		push @listFee,$catalog->{internal_catalog_id};
+	}
 	my $fee_schedules=q{<select name="fee_schedule" style="color: darkblue">};
 	
 	#Get Default Fee Schedule Id if one exists and append to list of searchable fee schedules
