@@ -14,7 +14,8 @@ use base 'CGI::Dialog';
 use vars qw(%RESOURCE_MAP);
 %RESOURCE_MAP = (
 	'medical' => { 
-			_arl => ['event_id', 'person_id'], 
+			_arl => ['event_id', 'person_id'],
+			_modes => ['verify'],
 		},
 );
 
