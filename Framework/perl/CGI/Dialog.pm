@@ -2099,7 +2099,8 @@ sub getHtml
 	my $execModeFieldName = $page->fieldPName(FIELDNAME_EXECMODE);
 	push(@dlgHouskeepingHiddens, qq{<input type="hidden" name="$execModeFieldName" value="$newExecMode">});
 
-	my $formAction = "/" . $page->param('arl');
+	my $formAction = "/";
+	$formAction .= $page->param('_isPopup') ? $page->param('arl_asPopup') : $page->param('arl');
 	$formAction =~ s/\?.*$//;
 
 	return qq{
