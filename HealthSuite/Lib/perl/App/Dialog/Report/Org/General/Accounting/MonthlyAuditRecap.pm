@@ -88,7 +88,7 @@ sub prepare_detail_payment
 	};
 	my $batch_date = $page->param('batch_date');	
 	my $daily_audit_detail = $STMTMGR_REPORT_ACCOUNTING->getRowsAsHashList($page,STMTMGRFLAG_NONE,'sel_monthly_audit_detail',
-		$batch_date,$orgIntId,$person_id,$batch_from,$batch_to);	
+		$batch_date,$orgIntId,$person_id,$batch_from,$batch_to,$page->session('org_internal_id'));	
 	my @data = ();	
 	foreach (@$daily_audit_detail)
 	{	
@@ -157,7 +157,7 @@ sub execute
 		],
 	};		
 	my $daily_audit = $STMTMGR_REPORT_ACCOUNTING->getRowsAsHashList($page,STMTMGRFLAG_NONE,'sel_monthly_audit',$reportBeginDate,$reportEndDate,
-	,$orgIntId,$person_id,$batch_from,$batch_to);
+	,$orgIntId,$person_id,$batch_from,$batch_to,$page->session('org_internal_id'));
 	my @data = ();	
 	foreach (@$daily_audit)
 	{

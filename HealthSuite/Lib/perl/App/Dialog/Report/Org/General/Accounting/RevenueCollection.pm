@@ -139,7 +139,7 @@ sub execute
 			],
 	};		
 	my $rev_coll = $STMTMGR_REPORT_ACCOUNTING->getRowsAsHashList($page,STMTMGRFLAG_NONE,'sel_revenue_collection',$reportBeginDate,$reportEndDate,
-	,$orgIntId,$person_id,$batch_from,$batch_to);
+	,$orgIntId,$person_id,$batch_from,$batch_to,$page->session('org_internal_id'));
 	my @data = ();	
 	my @data2 = ();
 	foreach (@$rev_coll)

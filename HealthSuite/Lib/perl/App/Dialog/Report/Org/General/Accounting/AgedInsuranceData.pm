@@ -38,7 +38,7 @@ sub execute
 
 	my $orgId = $page->field('ins_org_id');
 	my $orgIntId = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgId', $page->session('org_internal_id'), $orgId);
-	return $STMTMGR_REPORT_ACCOUNTING->createHtml($page, STMTMGRFLAG_NONE, 'sel_aged_insurance', [$orgIntId]);
+	return $STMTMGR_REPORT_ACCOUNTING->createHtml($page, STMTMGRFLAG_NONE, 'sel_aged_insurance', [$orgIntId,$page->session('org_internal_id')]);
 }
 
 

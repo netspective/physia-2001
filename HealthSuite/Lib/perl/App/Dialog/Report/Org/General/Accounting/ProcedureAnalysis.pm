@@ -54,7 +54,7 @@ sub execute
 	my $orgIntId='';
 	$orgIntId = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgId', $page->session('org_internal_id'), $orgId) if $orgId;
 	return $STMTMGR_COMPONENT_INVOICE->createHtml($page, STMTMGRFLAG_NONE, 'invoice.procAnalysis', [$personId,$batchDate,	
-		$orgIntId,$cptFrom,$cptTo]);
+		$orgIntId,$cptFrom,$cptTo,$page->session('org_internal_id')]);
 
 
 

@@ -34,7 +34,7 @@ sub execute
 	my ($self, $page, $command, $flags) = @_;
 
 	my $personId = $page->field('person_id');
-	return $STMTMGR_REPORT_ACCOUNTING->createHtml($page, STMTMGRFLAG_NONE, 'sel_aged_patient', [$personId]);
+	return $STMTMGR_REPORT_ACCOUNTING->createHtml($page, STMTMGRFLAG_NONE, 'sel_aged_patient', [$personId,$page->session('org_internal_id')]);
 
 
 }

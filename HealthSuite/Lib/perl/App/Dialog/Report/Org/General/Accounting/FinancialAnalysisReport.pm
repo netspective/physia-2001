@@ -59,7 +59,7 @@ sub execute
 	$orgIntId = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgId', $page->session('org_internal_id'), $orgId) if $orgId;
 
 	return $STMTMGR_REPORT_ACCOUNTING->createHtml($page, STMTMGRFLAG_NONE , 'sel_financial_monthly',[$reportBeginDate,
-	$reportEndDate,$orgIntId,$person_id]);
+	$reportEndDate,$orgIntId,$person_id,$page->session('org_internal_id')]);
 
 }
 
