@@ -2583,7 +2583,7 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 				},
 		],
 
-		bullets => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-update-invoice/#0#?home=#homeArl#',
+		bullets => '/invoice/#0#?home=#homeArl#',
 	},
 	publishDefn_panel =>
 	{
