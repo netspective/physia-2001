@@ -224,8 +224,16 @@
 			Fixed misspelled field name to allow adding of a Referring Doctor.
 		</deliverable>
 
+		<deliverable id="1840">
+			Fixed duplicate person id generation in add person dialog.
+		</deliverable>
+
 		<deliverable id="1841">
 			Fixed code to add the ShortFormPerson record correctly.
+		</deliverable>
+
+		<deliverable id="1842">
+			Print pt bill from pt flow worklist now showing correct info for Next Appt.
 		</deliverable>
 
 		<deliverable id="1844">
