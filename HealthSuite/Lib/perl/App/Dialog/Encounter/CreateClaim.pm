@@ -140,48 +140,8 @@ sub execute_remove
 		_debug => 0
 	);
 
-	$self->handlePostExecute($page, $command, $flags);
+	#$self->handlePostExecute($page, $command, $flags);
+	$page->redirect('/search/claim');
 }
-
-#
-# change log is an array whose contents are arrays of
-# 0: one or more CHANGELOGFLAG_* values
-# 1: the date the change/update was made
-# 2: the person making the changes (usually initials)
-# 3: the category in which change should be shown (user-defined) - can have '/' for hierarchies
-# 4: any text notes about the actual change/action
-#
-use constant CLAIM_DIALOG => 'Dialog/Claim';
-
-@CHANGELOG =
-(
-	[	CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_NOTE, '12/27/1999', 'MAF',
-		CLAIM_DIALOG,
-		'Added validation to prevent user from adding a procedure without first adding a diagnosis code.'],
-	[	CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_REMOVE, '12/27/1999', 'MAF',
-		CLAIM_DIALOG,
-		"Removed the 'None' option from the 'Accident' field."],
-	[	CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_REMOVE, '12/23/1999', 'MAF',
-		CLAIM_DIALOG,
-		'Removed the Subject field.'],
-	[	CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '12/23/1999', 'MAF',
-		CLAIM_DIALOG,
-		'Added a Pay To Org field.'],
-	[	CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '12/12/1999', 'MAF',
-		CLAIM_DIALOG,
-		'Added Next Action drop-down.'],
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_NOTE, '02/21/2000', 'MAF',
-		CLAIM_DIALOG,
-		'Fixed validation of explosion codes.'],
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_NOTE, '02/28/2000', 'RK',
-		CLAIM_DIALOG,
-		'Replaced fkeyxxx select in the dialog with Sql statement from Statement Manager'],
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_NOTE, '03/23/2000', 'MAF',
-		CLAIM_DIALOG,
-		'Created execute functions for each $command.'],
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_NOTE, '03/28/2000', 'MAF',
-		CLAIM_DIALOG,
-		'Changed sub new to sub initialize. Updated makeStateChanges accordingly.'],
-);
 
 1;
