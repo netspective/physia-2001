@@ -481,9 +481,11 @@ sub readChoicesStmt
 	#$page->addDebugStmt($self->{fKeyStmt});
 	#$page->addDebugStmt($self->{fKeyStmtBindPageParams});
 
+
 	my $choices = [];
 	my $fkeyValueCol = $self->{fKeyValueCol} || 0;
 	my $fKeyDisplayCol = exists $self->{fKeyDisplayCol} ? $self->{fKeyDisplayCol} : 1;
+	my $fKeyHint = exists $self->{fKeyHint} ? $self->{fKeyHint} : 2;
 	my $stmtExecFlags = $self->{fKeyStmtFlags} || 0;
 
 	eval
@@ -521,7 +523,7 @@ sub readChoicesStmt
 		my $cursor = $self->{fKeyStmtMgr}->execute($page, $stmtExecFlags, $self->{fKeyStmt}, @bindParams);
 		while(my $rowRef = $cursor->fetch())
 		{
-			my $choiceStruct = [0, $rowRef->[$fKeyDisplayCol], $rowRef->[$fkeyValueCol]];
+			my $choiceStruct = [0, $rowRef->[$fKeyDisplayCol], $rowRef->[$fkeyValueCol],defined $rowRef->[$fKeyHint]  ? $rowRef->[$fKeyHint] : undef];
 			$self->checkChoiceValueSelected($page, $choiceStruct);
 			push(@{$choices}, $choiceStruct);
 		}
@@ -536,8 +538,8 @@ sub readChoices
 
 	my $choices = [];
 	my $fkeyValueCol = $self->{fKeyValueCol} || 0;
-	my $fKeyDisplayCol = exists $self->{fKeyDisplayCol} ? $self->{fKeyDisplayCol} : $fkeyValueCol;
-
+	my $fKeyDisplayCol = exists $self->{fKeyDisplayCol} ? $self->{fKeyDisplayCol} : $fkeyValueCol;	
+	
 	my $whereCond = $self->{fKeyWhere} ? "where $self->{fKeyWhere}" : '';
 	my $orderBy =  $self->{fKeyOrderBy} ? "order by $self->{fKeyOrderBy}" : '';
 
@@ -631,7 +633,8 @@ sub select_as_html
 			foreach (@{$choices})
 			{
 				my $selected = $_->[0] ? 'checked' : '';
-				$inputs .= "<nobr><input type='checkbox' name='$fieldName' id='$fieldName$i' value='$_->[2]' $selected> <label for='$fieldName$i'>$_->[1]</label>&nbsp;&nbsp;</nobr> ";
+				my $hint = defined $_->[3] ? "title='$_->[3]'" : '';
+				$inputs .= "<nobr><input type='checkbox' name='$fieldName' $hint id='$fieldName$i' value='$_->[2]' $selected> <label for='$fieldName$i'>$_->[1]</label>&nbsp;&nbsp;</nobr> ";
 				$i++;
 			}
 			$html = $self->SUPER::getHtml($page, $dialog, $command, $dlgFlags, $inputs);
