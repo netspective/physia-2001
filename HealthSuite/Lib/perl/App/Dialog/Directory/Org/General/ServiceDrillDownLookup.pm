@@ -47,7 +47,7 @@ sub prepare_detail_service
 	my $code = $page->field('service');
 	my $sessionId = $page->session('org_internal_id');
 	my $html =undef;
-	my $actionURL = '/org/#9#/profile';
+	my $actionURL = q{javascript:doActionPopup('/org/#9#/profile')};
 
 	#$orgIntId = $page->param('org_internal_id');#$STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgId', $page->session('org_internal_id'), $orgId) if $orgId;
 	my @data = ();
