@@ -466,7 +466,7 @@ sub execute
 	my ($self, $page, $command, $flags) = @_;
 	
 	my $orgId = $page->session('org_internal_id');
-	
+	my $orgName = $page->session('org_id');
 	my $existingCatalog = $STMTMGR_CATALOG->getRowAsHash($page, STMTMGRFLAG_NONE,
 		'selCatalogById', $page->field('internal_catalog_id'));
 	
@@ -479,6 +479,7 @@ sub execute
 		description => $page->field('description') || $existingCatalog->{description} || undef,
 		rvrbs_multiplier =>  $existingCatalog->{rvrbs_multiplier} || undef,
 		parent_catalog_id => $existingCatalog->{parent_catalog_id} || undef,
+		org_internal_id => $orgId,
 		_debug => 0
 	);
 
@@ -525,7 +526,7 @@ sub execute
 	}
 
 	$STMTMGR_CATALOG->execute($page, STMTMGRFLAG_DYNAMICSQL, $insertStmt);
-	$page->param('_dialogreturnurl', "/org/$orgId/catalog");
+	$page->param('_dialogreturnurl', "/org/$orgName/catalog");
 	$self->handlePostExecute($page, $command, $flags);
 }
 

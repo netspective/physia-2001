@@ -178,7 +178,6 @@ sub execute
         {        	
 		my @cptRange = split(/-/, $check);   			
 		$cptRange[1] = length($cptRange[1]) ? $cptRange[1] : $cptRange[0];		
-		$page->addError("$cptRange[0] <-> $cptRange[1]");
 		#SQL COMMAND TO CREATE RANGE FEE SCHEDULE ENTRIES
 		my $insertStmt = qq{
 			INSERT INTO Offering_Catalog_Entry  (cr_session_id, cr_stamp, cr_user_id, cr_org_internal_id,
