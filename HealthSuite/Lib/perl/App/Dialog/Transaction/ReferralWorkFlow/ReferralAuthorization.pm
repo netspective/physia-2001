@@ -126,6 +126,8 @@ sub initialize
 				#new App::Dialog::Field::Organization::ID(caption =>'Client ', name => 'client'),
 				new CGI::Dialog::Field(caption => 'Case #', name => 'claim_num', size => '7'),
 			]),
+
+		new CGI::Dialog::Field(caption => 'Auth Num', name => 'auth_num'),
 		new CGI::Dialog::MultiField(
 		fields => [
 				new CGI::Dialog::Field(caption =>'Authorized By ', name => 'provider_id'),
@@ -342,7 +344,7 @@ sub populateData_update
 	$page->field('provider_id', $authData->{'data_text_c'});
 	$page->field('ref_result', $authData->{'related_data'});
 	$page->field('comments', $authData->{'display_summary'});
-
+	$page->field('auth_num', $authData->{'trans_subtype'});
 	#Get Code and Description from service Request
 
 	my $serviceRequest = $STMTMGR_TRANSACTION->getRowAsHash($page, STMTMGRFLAG_NONE,'selServiceProcedureDataByTransId',$authData->{parent_trans_id});
@@ -506,7 +508,7 @@ sub execute
 				data_date_a            => $page->field('ref_date') || undef,
 				care_provider_id       => $page->field('coordinator') || undef,
 				consult_id             => $page->field('person_id') || undef,
-				#trans_subtype          => $page->field('source') || undef,
+				trans_subtype          => $page->field('auth_num') || undef,
 				trans_substatus_reason => $page->field('contact_provider') || undef,
 				detail	            => $page->field('provider_name') || undef,
 				service_facility_id    => $providerInternalId || undef,
