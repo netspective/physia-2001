@@ -30,8 +30,10 @@ sub initialize
 				new CGI::Dialog::Field(caption => 'Authorization #',  name => 'auth_num', options => FLDFLAG_REQUIRED),
 				new CGI::Dialog::Field(caption => 'Authorization Date',  type => 'date', name => 'auth_date', options => FLDFLAG_REQUIRED),
 			]),
+
 		new CGI::Dialog::Field(caption => 'Coordinator',  name => 'coordinator'),
-		new CGI::Dialog::Field(caption => 'Units Authorized',  name => 'data_num_a', size => '4'),
+		new CGI::Dialog::Field(caption => 'Units Authorized',  name => 'quantity', size => '4'),
+
 		new CGI::Dialog::MultiField(caption =>'Service Begin/End Date',name => 'begin_end_date',
 			fields => [
 					new CGI::Dialog::Field(caption => 'Begin Date',  type => 'date', name => 'begin_date'),
@@ -39,7 +41,6 @@ sub initialize
 
 				]),
 
-		#new App::Dialog::Field::Person::ID(caption =>'Referral ID ', name => 'consult_id', options => FLDFLAG_REQUIRED),
 		new CGI::Dialog::Field(caption => 'Charge (POS Rate)', name => 'charge', size => '7'),
 
 		new CGI::Dialog::MultiField(caption => '%age Usual/Actual', name => 'percent_actual',
@@ -50,24 +51,15 @@ sub initialize
 
 		new CGI::Dialog::Field(name => 'service_comments', caption => 'Service Comments', type => 'memo'),
 		new CGI::Dialog::Field(name => 'units_comments', caption => 'Units Comments', type => 'memo'),
-		new CGI::Dialog::Field(name => 'followup_comments', caption => 'Follow Up Comments', type => 'memo')
+		new CGI::Dialog::Field(name => 'followup_comments', caption => 'Follow Up Comments', type => 'memo'),
+		new CGI::Dialog::Field(type => 'select',
+						style => 'radio',
+						selOptions => 'Pending;Authorized;Denied;Suspended;Started;Completed',
+						caption => 'Authorization Status',
+						postHtml => "</FONT></B>",
+						name => 'status',
+						defaultValue => 'Pending'),
 	)
-}
-
-sub __getSupplementaryHtml
-{
-	my ($self, $page, $command) = @_;
-	my $personId = $page->param('person_id');
-
-	$page->param('person_id', $personId);
-
-	return (CGI::Dialog::PAGE_SUPPLEMENTARYHTML_RIGHT, qq{
-				#component.stpd-person.contactMethodsAndAddresses#<BR>
-				#component.stpd-person.extendedHealthCoverage#<BR>
-				#component.stpd-person.careProviders#<BR>
-		});
-
-	return $self->SUPER::getSupplementaryHtml($page, $command);
 }
 
 sub makeStateChanges
@@ -84,12 +76,6 @@ sub populateData_add
 	return unless ($flags & CGI::Dialog::DLGFLAG_ADD_DATAENTRY_INITIAL);
 	my $transId = $page->param('parent_trans_id');
 	my $personId = $page->param('person_id');
-
-
-
-	$STMTMGR_PERSON->createFieldsFromSingleRow($page, STMTMGRFLAG_NONE, 'selPersonData', $personId);
-	#my $contactInfo = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_NONE, 'selPersonData', $personId);
-
 
 	my $physicianData = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_NONE, 'selPrimaryPhysicianOrProvider', $personId);
 	$page->field('provider_id', $physicianData->{'value_text'});
@@ -134,32 +120,33 @@ sub execute
 	my $transOwnerType = App::Universal::ENTITYTYPE_PERSON;
 	my $transType = App::Universal::TRANSTYPEPROC_REFERRAL_AUTHORIZATION;
 
-
-
-		 $page->schemaAction(
-				'Transaction',
-				$command,
-				parent_trans_id => $transId || undef,
-				trans_owner_type => defined $transOwnerType ? $transOwnerType : undef,
-				trans_owner_id => $page->param('person_id'),
-				trans_type => $transType || undef,
-				trans_begin_stamp => $page->field('begin_date') || undef,
-				trans_end_stamp => $page->field('end_date') || undef,
-				related_data => $page->field('service_comments') || undef,
-				data_num_a => $page->field('auth_num') || undef,
-				data_num_b => $page->field('percent_usual') || undef,
-				data_num_c => $page->field('percent_actual') || undef,
-				trans_status_reason => $page->field('payer') || undef,
-				provider_id => $page->field('provider_id') || undef,
-				care_provider_id => $page->field('referral_id') || undef,
-				#consult_id => $page->field('referral_id') || undef,
-				detail => $page->field('units_comments') || undef,
-				caption => $page->field('followup_comments') || undef,
-				_debug => 0
+	 $page->schemaAction(
+			'Transaction',
+			$command,
+			parent_trans_id => $transId || undef,
+			trans_owner_type => defined $transOwnerType ? $transOwnerType : undef,
+			trans_owner_id => $page->param('person_id'),
+			trans_type => $transType || undef,
+			provider_id => $page->field('provider_id') || undef,
+			auth_date => $page->field('auth_date') || undef,
+			data_num_a => $page->field('auth_num') || undef,
+			data_text_a =>$page->field('coordinator') || undef,
+			quantity => $page->field('quantity') || undef,
+			trans_begin_stamp => $page->field('begin_date') || undef,
+			trans_end_stamp => $page->field('end_date') || undef,
+			unit_cost => $page->field('charge') || undef,
+			related_data => $page->field('service_comments') || undef,
+			data_num_b => $page->field('percent_usual') || undef,
+			data_num_c => $page->field('percent_actual') || undef,
+			detail => $page->field('units_comments') || undef,
+			caption => $page->field('followup_comments') || undef,
+			display_summary => $page->field('service_comments') || undef,
+			trans_status_reason => $page->field('status') || undef,
+			_debug => 0
 		);
 
-
-	$self->handlePostExecute($page, $command, $flags | CGI::Dialog::DLGFLAG_IGNOREREDIRECT);
+	$page->param('_dialogreturnurl', "/worklist/referral");
+	$self->handlePostExecute($page, $command, $flags);
 	return "\u$command completed.";
 }
 
