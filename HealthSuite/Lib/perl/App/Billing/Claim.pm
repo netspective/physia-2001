@@ -54,6 +54,8 @@ sub new
 	$params{copayItems} = [];
 	$params{adjItems} = [];
 	$params{policy} = [];
+	$params{coInsuranceItems} = [];
+	$params{deductibleItems} = [];
 
 	$params{programName} = undef;
 	$params{acceptAssignment} = undef;
@@ -837,6 +839,31 @@ sub addCopayItems
 	}
 }
 
+sub addCoInsurance
+{
+	my $self = shift;
+
+	my $diagListRef = $self->{coInsuranceItems};
+	foreach (@_)
+	{
+		die 'only App::Billing::Claim::Procedure objects are allowed here'
+			unless $_->isa('App::Billing::Claim::Procedure');
+
+		push(@{$diagListRef}, $_);
+	}
+}
+sub addDeductible
+{
+	my $self = shift;
+	my $diagListRef = $self->{deductibleItems};
+	foreach (@_)
+	{
+		die 'only App::Billing::Claim::Procedure objects are allowed here'
+			unless $_->isa('App::Billing::Claim::Procedure');
+
+		push(@{$diagListRef}, $_);
+	}
+}
 
 sub addProcedure
 {
@@ -1074,7 +1101,6 @@ sub convertDateToCCYYMMDD
 					
 }
 
-
 sub convertDateToMMDDYYYYFromCCYYMMDD
 {
 	my ($self, $date) = @_;
@@ -1111,5 +1137,15 @@ sub convertDateToMMDDYYYYFromCCYYMMDD
 	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '04/17/2000', 'SSI', 'Billing Interface/Main Claim Object','1 is added to submission order to make it in proper bill sequence 1-4'],
 
 );
+
+sub printVal
+{
+	my ($self) = @_;
+	foreach my $key (keys(%$self))
+	{
+		print " patient $key = " . $self->{$key} . " \n";
+	}
+
+}
 
 1;

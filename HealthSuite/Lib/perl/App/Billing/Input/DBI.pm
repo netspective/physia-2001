@@ -17,6 +17,7 @@ use App::Billing::Claim::Insured;
 use App::Billing::Claim::Treatment;
 use App::Billing::Claim::Address;
 use App::Billing::Claim::Payer;
+use App::Billing::Claim::Adjustment;
 use App::Billing::Validator;
 use App::Billing::Input::Validate::DBI;
 use App::Billing::Validate::HCFA::Champus;
@@ -109,6 +110,14 @@ use constant CLAIM_TYPE_FECA_BLK_LUNG => 10;
 use constant CLAIM_TYPE_BCBS => 11;
 use constant CLAIM_TYPE_HMO_NONCAP => 12;
 
+# Invoice item type constants
+use constant INVOICE_ITEM_OTHER => 0;
+use constant INVOICE_ITEM_SERVICE => 1;
+use constant INVOICE_ITEM_LAB => 2;
+use constant INVOICE_ITEM_COPAY => 3;
+use constant INVOICE_ITEM_COINSURANCE => 4;
+use constant INVOICE_ITEM_ADJUST => 5;
+use constant INVOICE_ITEM_DEDUCTABLE => 6;
 
 sub new
 {
@@ -459,13 +468,14 @@ sub assignOtherInsuredInfo
 					@row = $sth->fetchrow_array();
 					$insured->setHMOIndicator($row[0]);
 
-					$queryStatment = "select value_text from person_attribute where parent_id = \'$insuredId\' and value_type between 220 and 225";
+					$queryStatment = "select value_text,value_type from person_attribute where parent_id = \'$insuredId\' and value_type between 220 and 225";
 					$sth = $self->{dbiCon}->prepare(qq {$queryStatment});
 						# do the execute statement
 					$sth->execute() or $self->{valMgr}->addError($self->getId(),100,"Unable to execute $queryStatment");
 					@row = $sth->fetchrow_array();
 					$insured->setEmployerOrSchoolName($row[0]);
-
+					$insured->setEmploymentStatus($row[1]);
+		
 					$queryStatment = "select extra
 							from insurance, invoice_billing
 							where invoice_billing.invoice_id = $invoiceId
@@ -660,7 +670,7 @@ sub assignReferralPhysician
 sub assignServiceFacility
 {
 	my ($self, $claim, $invoiceId) = @_;
-
+ 
 	my $renderingOrganization = $claim->getRenderingOrganization();
 	my $queryStatment = "select org.org_id, org.name_primary from org, transaction trans, invoice where invoice_id = $invoiceId and trans.trans_id = invoice.main_transaction and org.org_id = trans.service_facility_id ";
 	my $sth = $self->{dbiCon}->prepare(qq {$queryStatment});
@@ -669,7 +679,7 @@ sub assignServiceFacility
 	my @row = $sth->fetchrow_array();
 	$renderingOrganization->setId($row[0]);
 	$renderingOrganization->setName($row[1]);
-
+	
 	my $renderingOrganizationAdress = $renderingOrganization->getAddress();
 	$queryStatment = "select line1, line2, city, state, zip, country from org_address where parent_id = \'$row[0]\' and address_name = \'Mailing\'";
 	$sth = $self->{dbiCon}->prepare(qq {$queryStatment});
@@ -689,7 +699,7 @@ sub assignTransProvider
 {
 	my ($self, $claim, $invoiceId) = @_;
 
-	my $queryStatment = " select person_id, Complete_name from person where person_id =
+	my $queryStatment = " select person_id, Complete_name from person where person_id = 
 											(select trans.provider_id from transaction trans, invoice where invoice_id = $invoiceId and trans.trans_id = invoice.main_transaction)";
 	my $sth = $self->{dbiCon}->prepare(qq {$queryStatment});
 	# do the execute statement
@@ -713,7 +723,7 @@ sub assignServiceBilling
 	$payToOrganization->setId($row[0]);
 	$payToOrganization->setName($row[1]);
 	$payToOrganization->setFederalTaxId($row[2]);
-	$queryStatment = "select value_text from org_attribute, invoice where parent_id = \'$row[0]\' and value_type = " . FACILITY_GROUP_NUMBER;
+	$queryStatment = "select value_text from org_attribute where parent_id = \'$row[0]\' and value_type = " . FACILITY_GROUP_NUMBER;
 	$sth = $self->{dbiCon}->prepare(qq {$queryStatment});
 	$sth->execute() or $self->{valMgr}->addError($self->getId(),100,"Unable to execute $queryStatment");
 	@row = $sth->fetchrow_array();
@@ -770,7 +780,7 @@ sub assignPolicy
 	if($invoiceSubtype == CLAIM_TYPE_THIRD_PARTY)
 	{
 		$queryStatment = "select invoice_billing.BILL_TO_ID, invoice_billing.bill_sequence, invoice_billing.bill_amount,
-				invoice_billing.bill_party_type
+				invoice_billing.bill_party_type	
 				from invoice_billing
 				where invoice_billing.invoice_id = $invoiceId
 					and invoice_billing.invoice_item_id is NULL
@@ -781,7 +791,7 @@ sub assignPolicy
 	else
 	{
 		$queryStatment = "select invoice_billing.BILL_TO_ID, invoice_billing.bill_sequence, invoice_billing.bill_amount,
-				invoice_billing.bill_party_type
+				invoice_billing.bill_party_type	
 				from insurance, invoice_billing
 				where invoice_billing.invoice_id = $invoiceId
 					and invoice_billing.bill_ins_id = insurance.ins_internal_id
@@ -808,7 +818,7 @@ sub assignPolicy
 				$payerAddress = $payer->getAddress();
 				$payer->setAmountPaid($row1[2]);
 				$payer->setBillSequence($row1[1]);
-				if ($row1[3] == BILL_PARTY_TYPE_INSURANCE )
+				if ($row1[3] == BILL_PARTY_TYPE_INSURANCE ) 
 				{
 					$insOrgId = $row1[0];
 					$queryStatment = "select name_primary as payer_name, org_id as payer_id from org where org_id = \'$insOrgId\'";
@@ -818,7 +828,7 @@ sub assignPolicy
 					@row = $sth->fetchrow_array();
 					$payer->setName($row[0]);
 					$payer->setId($row[1]);
-
+	
 					my $inputMap =
 					{
 						'Champus Branch' => [$payer, \&App::Billing::Claim::Payer::setChampusSponsorBranch, $colValText],
@@ -866,7 +876,7 @@ sub assignPolicy
 												{
 													my $functionRef = $method->[$methodNum];
 													&$functionRef($objInst, ($row[$bindColumn->[$methodNum]]));
-												}
+												}	
 											}
 									}
 									else
@@ -901,7 +911,7 @@ sub assignPolicy
 				elsif ($row1[3] == BILL_PARTY_TYPE_PERSON)
 				{
 					my $pid = $row1[0];
-
+					
 					$queryStatment = "select complete_name from person where person_id = \'$pid\'";
 					$sth = $self->{dbiCon}->prepare(qq {$queryStatment});
 					# do the execute statement
@@ -937,7 +947,7 @@ sub assignPolicy
 					# do the execute statement
 					$sth->execute() or $self->{valMgr}->addError($self->getId(),100,"Unable to execute $queryStatment");
 					@row = $sth->fetchrow_array();
-
+			
 					$payer->setId($row[1]);
 					$payer->setName($row[0]);
 			 		$queryStatment = "select line1, line2, city, state, zip, country from org_address where parent_id = \'$oid\' and address_name = \'Mailing\'";
@@ -1086,8 +1096,9 @@ sub assignInvoiceProperties
 		'Rendering/Provider/Tax ID' => [$renderingProvider, \&App::Billing::Claim::Physician::setFederalTaxId, COLUMNINDEX_VALUE_TEXT],
       'Rendering/Provider/ID' => [$renderingProvider, \&App::Billing::Claim::Physician::setProviderId, COLUMNINDEX_VALUE_TEXT],
 		'Provider/Name Qualifier' => [$claim, \&App::Billing::Claim::setQualifier, COLUMNINDEX_VALUE_TEXT],
+		'Provider/Name' => [$renderingProvider, \&App::Billing::Claim::Person::setId, COLUMNINDEX_VALUE_TEXTB],
 		'Provider/Name/First' => [$renderingProvider, \&App::Billing::Claim::Person::setFirstName, COLUMNINDEX_VALUE_TEXT],
-		'Provider/Name/Last' => [$renderingProvider, [\&App::Billing::Claim::Person::setLastName,\&App::Billing::Claim::Person::setId], [COLUMNINDEX_VALUE_TEXT, COLUMNINDEX_VALUE_TEXTB]],
+		'Provider/Name/Last' => [$renderingProvider, \&App::Billing::Claim::Person::setLastName, COLUMNINDEX_VALUE_TEXT],
 		'Provider/Name/Middle' => [$renderingProvider, \&App::Billing::Claim::Person::setMiddleInitial, COLUMNINDEX_VALUE_TEXT],
 		'Pay To Provider/Name/First' => [$payToProvider,\&App::Billing::Claim::Person::setFirstName, COLUMNINDEX_VALUE_TEXT],
 		'Pay To Provider/Name/Last' => [$payToProvider, [\&App::Billing::Claim::Person::setLastName,\&App::Billing::Claim::Person::setId], [COLUMNINDEX_VALUE_TEXT,COLUMNINDEX_VALUE_TEXTB]],
@@ -1163,7 +1174,7 @@ sub assignInvoiceProperties
 			  }
 		 }
 	}
-
+	
 	my $billSeq = [];
 	$billSeq->[BILLSEQ_PRIMARY_PAYER] = [\$payer, \$insured];
 	$billSeq->[BILLSEQ_SECONDARY_PAYER] = [\$payer2, \$insured2];
@@ -1239,13 +1250,13 @@ sub setClaimProperties
 	my %atr;
 	my @tempRow;
 	my $diagcount;
-	my $queryStatment = "select  total_cost, INVOICE_STATUS, CLAIM_DIAGS, balance, Invoice.total_adjust, Invoice_subtype from invoice where invoice_id = $invoiceId";
+	my $queryStatment = "select  total_cost, INVOICE_STATUS, CLAIM_DIAGS, balance, Invoice.total_adjust, Invoice_subtype, client_id from invoice where invoice_id = $invoiceId";
 	my $sth = $self->{dbiCon}->prepare(qq{$queryStatment});
 	$sth->execute or $self->{valMgr}->addError($self->getId(),100,"Unable to execute $queryStatment");
 	@tempRow = $sth->fetchrow_array();
 	my $diagnosis;
 	$tempRow[2] =~ s/ //g;
-
+	
 	my @diagnosisCodes = split (/,/,$tempRow[2]) ;
 	my $diagCount;
 	my @ins;
@@ -1280,6 +1291,7 @@ sub setClaimProperties
 	$currentClaim->setPayToOrganization($payToOrganization);
 	$currentClaim->setLegalRepresentator($legalRepresentator);
 	$currentClaim->setProgramName($ins[$tempRow[5]]);
+	$patient->setId($tempRow[6]);
 	my $no = $currentClaim->getClaimType;
 	my $insureds = [$insured, $insured2, $insured3, $insured4];
 	$currentClaim->addInsured($insureds->[0]);
@@ -1288,10 +1300,10 @@ sub setClaimProperties
 	$currentClaim->addInsured($insureds->[3]);
 	$self->assignPatientInsurance($currentClaim, $invoiceId);
 	my $payers = [ $payer, $objects->[12], $objects->[13], $objects->[14]];
-	$currentClaim->addPolicy($payers->[0]);
-	$currentClaim->addPolicy($payers->[1]);
-	$currentClaim->addPolicy($payers->[2]);
-	$currentClaim->addPolicy($payers->[3]);
+	$currentClaim->addPolicy($payers->[0]); 
+	$currentClaim->addPolicy($payers->[1]); 
+	$currentClaim->addPolicy($payers->[2]); 
+	$currentClaim->addPolicy($payers->[3]); 
 	$self->assignPolicy($currentClaim,$invoiceId);
 	$currentClaim->setPayer($payer);
 	$currentClaim->getTotalCharge();
@@ -1386,7 +1398,7 @@ sub setProperPayer
 				{
 					$currentClaim->setPayerId($tempRow[0]);
 				}
-#				$payer->setName($payerName);  # incase of
+#				$payer->setName($payerName);  # incase of 
 			}
 		}
 		elsif($tempRow[0] == CLAIM_TYPE_SELF)
@@ -1423,23 +1435,22 @@ sub populateItems
 	my $functionRef;
 	my $outsideLabCharges;
 	my @itemMap;
-	$itemMap[0] = \&App::Billing::Claim::addOtherItems;
-	$itemMap[1] = \&App::Billing::Claim::addProcedure;
-	$itemMap[2] = \&App::Billing::Claim::addProcedure;
-	$itemMap[3] = \&App::Billing::Claim::addCopayItems;
-	$itemMap[4] = \&App::Billing::Claim::addAdjItems;
-	$itemMap[5] = \&App::Billing::Claim::addAdjItems;
-	$itemMap[6] = \&App::Billing::Claim::addAdjItems;
+
+	$itemMap[INVOICE_ITEM_OTHER] = \&App::Billing::Claim::addOtherItems;
+	$itemMap[INVOICE_ITEM_SERVICE] = \&App::Billing::Claim::addProcedure;
+	$itemMap[INVOICE_ITEM_LAB] = \&App::Billing::Claim::addProcedure;
+	$itemMap[INVOICE_ITEM_COPAY] = \&App::Billing::Claim::addCopayItems;
+	$itemMap[INVOICE_ITEM_ADJUST] = \&App::Billing::Claim::addAdjItems;
+	$itemMap[INVOICE_ITEM_COINSURANCE] = \&App::Billing::Claim::addCoInsurance;
+	$itemMap[INVOICE_ITEM_DEDUCTABLE] = \&App::Billing::Claim::addDeductible;
+
 
  	#$queryStatment = "select data_date_a, data_date_b, data_num_a, data_num_b, code, modifier, unit_cost, quantity, data_text_a, REL_DIAGS, data_text_c, DATA_TEXT_B , item_id, extended_cost, balance, total_adjust, item_type from invoice_item where parent_id = $invoiceId ";
 
- 	$queryStatment = "select nvl(to_char(service_begin_date, \'dd-MON-yyyy\'), to_char(cr_stamp, 'dd-MON-yyyy')), 
- 											to_char(service_end_date, \'dd-MON-yyyy\'), hcfa_service_place, hcfa_service_type, code, modifier, unit_cost, quantity, emergency,
- 											REL_DIAGS, reference, COMMENTS , item_id, extended_cost, balance, total_adjust, item_type,
- 											initcap(Ref_Cpt.name), caption
- 										from Ref_Cpt, invoice_item
- 										where parent_id = $invoiceId
- 											and Ref_Cpt.cpt (+) = Invoice_Item.code";
+ 	$queryStatment = "select to_char(service_begin_date, \'dd-MON-yyyy\'), to_char(service_end_date, \'dd-MON-yyyy\'), hcfa_service_place, hcfa_service_type, code, modifier, unit_cost, quantity, emergency,
+ 												REL_DIAGS, reference, COMMENTS , item_id, extended_cost, balance, total_adjust, item_type, flags, caption
+ 										from invoice_item
+ 										where parent_id = $invoiceId ";
 
 	$sth = $self->{dbiCon}->prepare(qq{$queryStatment});
 	$sth->execute or  $self->{valMgr}->addError($self->getId(),100,"Unable to execute $queryStatment");
@@ -1462,12 +1473,13 @@ sub populateItems
 		$procedureObject->setExtendedCost($tempRow[13]);
 		$procedureObject->setBalance($tempRow[14]);
 		$procedureObject->setTotalAdjustments($tempRow[15]);
-		$procedureObject->{itemType} = ($tempRow[16]);
-		$procedureObject->{cptName} = ($tempRow[17]);
-		$procedureObject->{caption} = ($tempRow[18]);
+		$procedureObject->setItemType($tempRow[16]);
+		$procedureObject->setFlags($tempRow[17]);
+		$procedureObject->setCaption($tempRow[18]);
+		$self->populateAdjustments($procedureObject, $tempRow[12]);
 
 		$functionRef = $itemMap[$tempRow[16]];
-		if ($tempRow[16] eq '2')
+		if ($tempRow[16] == INVOICE_ITEM_LAB)
 		{
 			$outsideLabCharges = $outsideLabCharges + $tempRow[13]
 			}
@@ -1476,11 +1488,54 @@ sub populateItems
 			&$functionRef($currentClaim, $procedureObject) ;
 		}
 	}
-	$currentClaim->{treatment}->setOutsideLab($outsideLabCharges eq "" ? 'N' : 'Y');
+	$currentClaim->{treatment}->setOutsideLab(($outsideLabCharges eq "") ? 'N' : 'Y');
 	$currentClaim->{treatment}->setOutsideLabCharges($outsideLabCharges);
-
 }
 
+sub populateAdjustments
+{
+	my ($self, $procedure, $ItemId) = @_;
+	my @tempRow;
+	my $adjustment;
+	my	$queryStatment = "select adjustment_id, adjustment_type, adjustment_amount, bill_id, flags,
+								payer_type, payer_id, parent_id, plan_allow, plan_paid, deductible, copay,
+								to_char(submit_date, \'dd-MON-yyyy\'), to_char(pay_date, \'dd-MON-yyyy\'), pay_method, pay_ref, writeoff_code, writeoff_amount, 
+								adjust_codes, net_adjust, comments, data_text_a, parent_id
+ 										from invoice_item_Adjust
+ 										where parent_id = $ItemId ";
+
+	my $sth = $self->{dbiCon}->prepare(qq{$queryStatment});
+	$sth->execute or  $self->{valMgr}->addError($self->getId(),100,"Unable to execute $queryStatment");
+	while(@tempRow = $sth->fetchrow_array())
+	{
+		$adjustment = new App::Billing::Claim::Adjustment;
+		$adjustment->setAdjsutId($tempRow[0]);
+		$adjustment->setAdjustType($tempRow[1]);
+		$adjustment->setAdjustAmt($tempRow[2]);
+		$adjustment->setBillId($tempRow[3]);
+		$adjustment->setFlags($tempRow[4]);
+		$adjustment->setPayerType($tempRow[5]);
+		$adjustment->setPayerId($tempRow[6]);
+		$adjustment->setPlanAllow($tempRow[7]);
+		$adjustment->setPlanPaid($tempRow[8]);
+		$adjustment->setDeductible($tempRow[9]);
+		$adjustment->setCopay($tempRow[10]);
+		$adjustment->setSubmitDate($tempRow[11]);
+		$adjustment->setPayDate($tempRow[12]);
+		$adjustment->setPayType($tempRow[13]);
+		$adjustment->setPayMethod($tempRow[14]);
+		$adjustment->setPayRef($tempRow[15]);
+		$adjustment->setWriteoffCode($tempRow[16]);
+		$adjustment->setWriteoffAmt($tempRow[17]);
+		$adjustment->setAdjustCodes($tempRow[18]);
+		$adjustment->setNetAdjust($tempRow[19]);
+		$adjustment->setComments($tempRow[20]);
+		$adjustment->setAuthRef($tempRow[21]);
+		$adjustment->setParentId($tempRow[22]);
+
+		$procedure->addAdjustments($adjustment);
+	}
+}
 
 sub populateTreatment
 {
@@ -1644,6 +1699,9 @@ sub getId
 	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '04/20/2000', 'SSI','Billing Interface/Input DBI','Workers compensation plan is also included'],
 	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '04/21/2000', 'SSI','Billing Interface/Input DBI','complete_name is used in payer when bill party type is person'],
 	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '04/21/2000', 'SSI','Billing Interface/Input DBI','insured SSN is now populated from insurance.member_number '],
+	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '04/21/2000', 'SSI','Billing Interface/Input DBI','Insured Employment Status is populated from person attribute.value type '],
+	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '04/28/2000', 'SSI','Billing Interface/Input DBI','rendering provider Id is set from value_textb of invoice_attribute with item_name provider/name'],
+	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '04/28/2000', 'SSI','Billing Interface/Input DBI','Patient ID is populated form invoice.client_id in both pre-submit and post-submit cases'],
 
 );
 
