@@ -265,13 +265,19 @@ sub box4f
 			};
 	$report->drawBox($p, $x, $y, BOX1_WIDTH, BOX_HEIGHT, LEFT_LINE, RIGHT_LINE, TOP_LINE, BOTTOM_LINE, $properties);
 
-	my $xpos = ($superBill->{patient}->getSex eq 'M') ? 0 : 12 ;
-	$self->boxData($p, $x, $y, $report, "X", $xpos, 12);
+	if($superBill->{patient}->getSex ne '')
+	{
+		my $xpos = ($superBill->{patient}->getSex eq 'M') ? 0 : 12 ;
+		$self->boxData($p, $x, $y, $report, "X", $xpos, 12);
+	}
 
-	$self->boxData($p, $x, $y, $report, $superBill->{patient}->{address}->getAddress1, 30, 10);
-	$self->boxData($p, $x, $y, $report, $superBill->{patient}->{address}->getCity, 150, 10);
-	$self->boxData($p, $x, $y, $report, $superBill->{patient}->{address}->getState, 180, 10);
-	$self->boxData($p, $x, $y, $report, $superBill->{patient}->{address}->getZipCode, 260, 10);
+	my $addressText = $superBill->{patient}->{address}->getAddress1 . ', ';
+	$addressText .= $superBill->{patient}->{address}->getCity . '/' . $superBill->{patient}->{address}->getState;
+
+	$self->boxData($p, $x, $y, $report, $addressText, 30, 10);
+#	$self->boxData($p, $x, $y, $report, $superBill->{patient}->{address}->getCity, 150, 10);
+#	$self->boxData($p, $x, $y, $report, $superBill->{patient}->{address}->getState, 180, 10);
+	$self->boxData($p, $x, $y, $report, $superBill->{patient}->{address}->getZipCode, 240, 10);
 
 }
 

@@ -81,95 +81,125 @@ sub populateSuperBillAndPatient
 #	$sthMain->execute($orgInternalID, $orgInternalID);
 
 	my $rows = $params{fetchedRows};
+	my $super_bill_id = $params{superBillID};
 
-	my $sthOrgTitle = $self->prepareStatement('orgInternalID');
-	my $sthPerson = $self->prepareStatement('personInfo');
-	my $sthAddress = $self->prepareStatement('addressInfo');
-	my $sthContact = $self->prepareStatement('contactInfo');
-	my $sthOrg = $self->prepareStatement('orgInfo');
-
-	foreach my $rowMain (@$rows)
+	if($rows)
 	{
+		my $sthOrgTitle = $self->prepareStatement('orgInternalID');
+		my $sthPerson = $self->prepareStatement('personInfo');
+		my $sthAddress = $self->prepareStatement('addressInfo');
+		my $sthContact = $self->prepareStatement('contactInfo');
+		my $sthOrg = $self->prepareStatement('orgInfo');
 
-		my $superBillID = $rowMain->{superbill_id};
-		my $patientID = $rowMain->{patient};
-		my $doctorID = $rowMain->{physician};
-		my $orgID = $rowMain->{facility_id};
+		foreach my $rowMain (@$rows)
+		{
+
+			my $superBillID = $rowMain->{superbill_id};
+			my $patientID = $rowMain->{patient};
+			my $doctorID = $rowMain->{physician};
+			my $orgID = $rowMain->{facility_id};
 
 
-		my $superBill = new App::Billing::SuperBill::SuperBill;
+			my $superBill = new App::Billing::SuperBill::SuperBill;
 
-		$sthOrgTitle->execute($orgInternalID);
+			$sthOrgTitle->execute($orgInternalID);
 
-		@row = $sthOrgTitle->fetchrow_array();
+			@row = $sthOrgTitle->fetchrow_array();
 
-		$superBill->setOrgName($row[0]);
-		$superBill->setTaxId($row[1]);
+			$superBill->setOrgName($row[0]);
+			$superBill->setTaxId($row[1]);
 
-		my $patient = new App::Billing::Claim::Person;
-		my $patientAddress = new App::Billing::Claim::Address;
+			my $patient = new App::Billing::Claim::Person;
+			my $patientAddress = new App::Billing::Claim::Address;
 
-		$sthPerson->execute($patientID);
-		@row = $sthPerson->fetchrow_array();
-		$patient->setLastName($row[0]);
-		$patient->setMiddleInitial($row[1]);
-		$patient->setFirstName($row[2]);
-		$patient->setId($row[3]);
-		$patient->setDateOfBirth($row[4]);
-		$patient->setSex($row[5]);
-		$patient->setStatus($row[6]);
-		$patient->setSsn($row[7]);
-		$patient->setName($row[8]);
+			$sthPerson->execute($patientID);
+			@row = $sthPerson->fetchrow_array();
+			$patient->setLastName($row[0]);
+			$patient->setMiddleInitial($row[1]);
+			$patient->setFirstName($row[2]);
+			$patient->setId($row[3]);
+			$patient->setDateOfBirth($row[4]);
+			$patient->setSex($row[5]);
+			$patient->setStatus($row[6]);
+			$patient->setSsn($row[7]);
+			$patient->setName($row[8]);
 
-		$sthAddress->execute($patientID);
-		@row = $sthAddress->fetchrow_array();
-		$patientAddress->setAddress1($row[0]);
-		$patientAddress->setAddress2($row[1]);
-		$patientAddress->setCity($row[2]);
-		$patientAddress->setState($row[3]);
-		$patientAddress->setZipCode($row[4]);
-		$patientAddress->setCountry($row[5]);
+			$sthAddress->execute($patientID);
+			@row = $sthAddress->fetchrow_array();
+			$patientAddress->setAddress1($row[0]);
+			$patientAddress->setAddress2($row[1]);
+			$patientAddress->setCity($row[2]);
+			$patientAddress->setState($row[3]);
+			$patientAddress->setZipCode($row[4]);
+			$patientAddress->setCountry($row[5]);
 
-		$sthContact->execute($patientID);
-		@row = $sthContact->fetchrow_array();
-		$patientAddress->setTelephoneNo($row[0]);
+			$sthContact->execute($patientID);
+			@row = $sthContact->fetchrow_array();
+			$patientAddress->setTelephoneNo($row[0]);
 
-		$patient->setAddress($patientAddress);
+			$patient->setAddress($patientAddress);
 
-		$superBill->setPatient($patient);
+			$superBill->setPatient($patient);
 
-		my $doctor = new App::Billing::Claim::Person;
+			my $doctor = new App::Billing::Claim::Person;
 
-		$sthPerson->execute($doctorID);
+			$sthPerson->execute($doctorID);
 
-		@row = $sthPerson->fetchrow_array();
+			@row = $sthPerson->fetchrow_array();
 
-		$doctor->setLastName($row[0]);
-		$doctor->setMiddleInitial($row[1]);
-		$doctor->setFirstName($row[2]);
-		$doctor->setId($row[3]);
-		$doctor->setDateOfBirth($row[4]);
-		$doctor->setSex($row[5]);
-		$doctor->setStatus($row[6]);
-		$doctor->setSsn($row[7]);
-		$doctor->setName($row[8]);
+			$doctor->setLastName($row[0]);
+			$doctor->setMiddleInitial($row[1]);
+			$doctor->setFirstName($row[2]);
+			$doctor->setId($row[3]);
+			$doctor->setDateOfBirth($row[4]);
+			$doctor->setSex($row[5]);
+			$doctor->setStatus($row[6]);
+			$doctor->setSsn($row[7]);
+			$doctor->setName($row[8]);
 
-		$superBill->setDoctor($doctor);
+			$superBill->setDoctor($doctor);
 
-		my $org = new App::Billing::Claim::Organization;
+			my $org = new App::Billing::Claim::Organization;
 
-		$sthOrg->execute($orgID);
+			$sthOrg->execute($orgID);
 
-		@row = $sthOrg->fetchrow_array();
+			@row = $sthOrg->fetchrow_array();
 
-		$org->setId($row[0]);
-		$org->setName($row[1]);
+			$org->setId($row[0]);
+			$org->setName($row[1]);
 
-		$superBill->setLocation($org);
+			$superBill->setLocation($org);
 
-		$self->populateSuperBillComponent($superBill, $superBillID);
+			$self->populateSuperBillComponent($superBill, $superBillID);
 
-		$superBills->addSuperBill($superBill);
+			$superBills->addSuperBill($superBill);
+		}
+	}
+	elsif($super_bill_id)
+	{
+			my $superBillID = $super_bill_id;
+
+			my $sthOrgTitle = $self->prepareStatement('orgInternalID');
+
+			my $superBill = new App::Billing::SuperBill::SuperBill;
+
+			$sthOrgTitle->execute($orgInternalID);
+
+			@row = $sthOrgTitle->fetchrow_array();
+
+			$superBill->setOrgName($row[0]);
+			$superBill->setTaxId($row[1]);
+
+			my $patient = new App::Billing::Claim::Person;
+			my $patientAddress = new App::Billing::Claim::Address;
+			$patient->setAddress($patientAddress);
+			$superBill->setPatient($patient);
+			my $doctor = new App::Billing::Claim::Person;
+			$superBill->setDoctor($doctor);
+			my $org = new App::Billing::Claim::Organization;
+			$superBill->setLocation($org);
+			$self->populateSuperBillComponent($superBill, $superBillID);
+			$superBills->addSuperBill($superBill);
 	}
 }
 
@@ -302,7 +332,7 @@ sub makeStatements
 			select line1, line2, city, state, zip, country
 			from person_address
 			where parent_id = ?
-			and address_name = 'Mailing'
+			and address_name = 'Home'
 		},
 
 		'contactInfo' => qq
