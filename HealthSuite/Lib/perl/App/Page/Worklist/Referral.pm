@@ -25,6 +25,8 @@ use vars qw(@ISA %RESOURCE_MAP);
 		_views => [
 			{caption => 'Today', name => 'date',},
 			],
+		_iconSmall =>'images/page-icons/worklist-referral',
+		_iconMedium =>'images/page-icons/worklist-referral',
 		},
 	);
 
@@ -148,8 +150,6 @@ sub prepare_page_content_header
 	return 1 if $self->flagIsSet(App::Page::PAGEFLAG_ISPOPUP);
 	unshift(@{$self->{page_content_header}}, '<A name=TOP>');
 
-	$self->SUPER::prepare_page_content_header(@_);
-	
 	my $userNameHash = $STMTMGR_COMPONENT_REFERRAL->getRowAsHash($self, 
 		STMTMGRFLAG_NONE, 'sel_personinfo', $self->session('user_id'));
 	my $userName = $userNameHash->{complete_name};
@@ -177,29 +177,9 @@ sub prepare_page_content_header
 			
 		], ' | ');
 
-	push(@{$self->{page_content_header}},
-	qq{
-		<TABLE WIDTH=100% BGCOLOR=LIGHTSTEELBLUE BORDER=0 CELLPADDING=0 CELLSPACING=1>
-		<TR><TD>
-		<TABLE WIDTH=100% BGCOLOR=LIGHTSTEELBLUE CELLSPACING=0 CELLPADDING=3 BORDER=0>
-			<TD>
-				<FONT FACE="Arial,Helvetica" SIZE=4 COLOR=DARKRED>
-					$IMAGETAGS{'icon-m/schedule'} <B>$heading</B>
-				</FONT>
-			</TD>
-			<TD ALIGN=RIGHT>
-				<FONT FACE="Arial,Helvetica" SIZE=2>
-				$functions
-				</FONT>
-			</TD>
-		</TABLE>
-		</TD></TR>
-		</TABLE>
-	}, @{[ $self->param('dialog') ? '<p>' : '' ]});
-
-	push(@{$self->{page_content_header}}, $self->getControlBarHtml()) 
-		unless ($self->param('noControlBar'));
-
+	$self->{page_heading} = $heading;
+	$self->SUPER::prepare_page_content_header(@_);
+	
 	return 1;
 }
 

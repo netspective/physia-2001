@@ -133,7 +133,7 @@ sub prepare
 				</table>
 				<p>
 				<table bgcolor=white border=0 cellspacing=1 cellpadding=2><tr valign=top bgcolor=white><td valign="middle">
-					$IMAGETAGS{'images/page-icons/accounting.gif'}
+					$IMAGETAGS{'images/page-icons/worklist-referral'}
 				</td><td valign="middle">
 					<font face="arial,helvetica" size=5 color=navy><b>Referrals</b></font>
 				</td></tr><tr><td colspan=2>
