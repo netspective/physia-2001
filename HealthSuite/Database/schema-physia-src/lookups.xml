@@ -56,12 +56,25 @@
 	</table>
 
 	<table name="Insured_Relationship" abbrev="InsRel" type="Lookup">
-		<enum id="0">Self</enum>
-		<enum id="10">Spouse</enum>
-		<enum id="11">Parent</enum>
-		<enum id="12">Child</enum>
-		<enum id="50">Employer</enum>
-		<enum id="99">Other</enum>
+		<enum id="01">Self</enum>
+		<enum id="02">Spouse</enum>
+		<enum id="03">Natural/Adopted Child (Insured has Financial Responsibility)</enum>
+		<enum id="04">Natural/Adopted Child (Insured does not have Financial Responsibility)</enum>
+		<enum id="05">Step Child</enum>
+		<enum id="06">Foster Child</enum>
+		<enum id="07">Ward of the Court</enum>
+		<enum id="08">Employee</enum>
+		<enum id="09">Unknown/Other</enum>
+		<enum id="10">Handicapped Dependent</enum>
+		<enum id="11">Organ Donor</enum>
+		<enum id="12">Cadaver Donor</enum>
+		<enum id="13">Grandchild</enum>
+		<enum id="14">Niece/Nephew</enum>
+		<enum id="15">Injured Plaintiff</enum>
+		<enum id="16">Sponsored Dependent</enum>
+		<enum id="17">Minor Dependent of a Minor Dependent</enum>
+		<enum id="18">Parent</enum>
+		<enum id="19">Grandparent</enum>
 	</table>
 
 	<table name="Resp_Party_Relationship" abbrev="RPRel" type="Lookup">
