@@ -61,5 +61,14 @@ insert into Offering_Catalog_Type (id, caption) values (5, 'Lab Test');
 insert into Org_Type (id, caption, group_name) values (12, 'Lab', 'Lab');
 
 
+--bug 1652
+
+insert into adjust_method (id, caption, abbrev) values (7, 'Payment Transfer', '');
+update adjust_method set caption = 'Transfer Balance to Next Payer' where id = 4;
+update adjust_method set caption = 'Reverse Transfer Balance to Next Payer' where id = 5;
+update adjust_method set caption = 'Reverse Payment Transfer' where id = 6;
+update invoice_item_adjust set adjustment_type = 7 where data_num_a = 1;
+
+
 
 commit;
