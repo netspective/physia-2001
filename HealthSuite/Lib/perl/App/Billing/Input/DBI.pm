@@ -1734,6 +1734,24 @@ sub payersRemainingProperties
 			}
 		}
 	}
+	$self->setPayerInsuranceType($invoiceId, $payers);
+}
+
+sub setPayerInsuranceType()
+{
+	my ($self, $invoiceId, $payers) = @_;
+	my $queryStatment = "select insurance.ins_type from invoice_billing, insurance
+											where invoice_id = $invoiceId and ins_internal_id = bill_ins_id
+											and bill_status is null
+											order by invoice_billing.bill_sequence";
+	my $sth1 = $self->{dbiCon}->prepare(qq {$queryStatment});
+	$sth1->execute() or $self->{valMgr}->addError($self->getId(),100,"Unable to execute $queryStatment");
+
+	my $payerCount = 0;
+	while (my @row = $sth1->fetchrow_array())
+	{
+		$payers->[$payerCount++]->setInsType($row[0]);
+	}
 }
 
 sub setproperRenderingProvider

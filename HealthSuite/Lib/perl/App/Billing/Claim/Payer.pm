@@ -10,14 +10,14 @@ use vars qw(@CHANGELOG);
 @ISA = qw(App::Billing::Claim::Entity);
 
 #
-#   -- here is the organization's data 
+#   -- here is the organization's data
 #   -- that is required in a HCFA 1500 or NSF output
 #
 sub new
 {
 	my ($type) = shift;
 	my $self = new App::Billing::Claim::Entity(@_);
-	
+
 	$self->{name} = undef;
 	$self->{id} = undef;
 	$self->{address} = undef;
@@ -35,6 +35,7 @@ sub new
 	$self->{billSequence} = undef;
 	$self->{payerId} = undef; # envoy id for payer
 	$self->{type} = undef;
+	$self->{insType} = undef;
 	$self->{insurancePlanOrProgramName}	= undef;
 
 	return bless $self, $type;
@@ -63,7 +64,7 @@ sub setInsurancePlanOrProgramName
 sub getType
 {
 	my ($self) = @_;
-	
+
 	return $self->{type};
 }
 
@@ -72,6 +73,20 @@ sub setType
 	my ($self,$value) = @_;
 
 	$self->{type} = $value;
+}
+
+sub getInsType
+{
+	my ($self) = @_;
+
+	return $self->{insType};
+}
+
+sub setInsType
+{
+	my ($self,$value) = @_;
+
+	$self->{insType} = $value;
 }
 
 sub getBillSequence
@@ -132,7 +147,7 @@ sub setAcceptAssignment
 			'1'  => 'Y',
 			'YES'  => 'Y',
 			'Y'  => 'Y',
-			
+
 		};
 	$self->{acceptAssignment} = $temp->{uc($treat)};
 }
@@ -140,7 +155,7 @@ sub setAcceptAssignment
 sub getAcceptAssignment
 {
 	my ($self) = @_;
-	
+
 	return $self->{acceptAssignment};
 }
 
@@ -153,7 +168,7 @@ sub setSourceOfPayment
 sub getSourceOfPayment
 {
 	my ($self) = @_;
-	
+
 	return $self->{sourceOfPayment};
 }
 
@@ -245,42 +260,42 @@ sub setPayerId
 sub setFirstName
 {
 	my ($self, $value) = @_;
-	
+
 	$self->{firstName} = $value;
 }
 
 sub setLastName
 {
 	my ($self, $value) = @_;
-	
+
 	$self->{lastName} = $value;
 }
 
 sub setMiddleInitial
 {
 	my ($self, $value) = @_;
-	
+
 	$self->{middleInitial} = $value;
 }
 
 sub getFirstName
 {
 	my ($self) = @_;
-	
+
 	return $self->{firstName};
 }
 
 sub getLastName
 {
 	my ($self) = @_;
-	
+
 	return $self->{lastName}
 }
 
 sub getMiddleInitial
 {
 	my ($self) = @_;
-	
+
 	return $self->{middleInitial};
 }
 
@@ -295,7 +310,7 @@ sub printVal
 }
 
 @CHANGELOG =
-( 
+(
     # [FLAGS, DATE, ENGINEER, CATEGORY, NOTE]
 	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '02/24/2000', 'SSI','Billing Interface/Claim Patient','A new attribute amountpaid is added which will reflect the amount paid by the payer in claim.'],
 	[CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '04/17/2000', 'SSI','Billing Interface/Claim Patient','A new attribute billSequence is added which will reflect the billing Sequence for the payer in claim.'],
