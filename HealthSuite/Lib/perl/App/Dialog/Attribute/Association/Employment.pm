@@ -16,8 +16,7 @@ use App::Statements::Org;
 use App::Statements::Person;
 use Date::Manip;
 use vars qw(@ISA);
-use Devel::ChangeLog;
-use vars qw(@ISA @CHANGELOG);
+use vars qw(@ISA );
 @ISA = qw(CGI::Dialog);
 
 sub new
@@ -37,10 +36,10 @@ sub new
 									fKeyDisplayCol => 1,
 									fKeyValueCol => 0),
 		new CGI::Dialog::Field(caption => 'Occupation', name => 'rel_type'),
-		new CGI::Dialog::Field(type => 'phone', caption => 'Phone Number', name => 'phone_number', options => FLDFLAG_REQUIRED),
+		new CGI::Dialog::Field(type => 'phone', caption => 'Phone Number', name => 'phone_number'),
 		new CGI::Dialog::Field(type => 'date', caption => 'Begin Date', name => 'begin_date', defaultValue => ''),
 	);
-	
+
 	$self->{activityLog} =
 	{
 		level => 1,
@@ -127,22 +126,5 @@ sub execute
 	return "\u$command completed.";
 }
 
-use constant PANEDIALOG_EMPLOYMENT => 'Dialog/Employment';
 
-@CHANGELOG =
-(
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_NOTE, '02/02/2000', 'RK',
-		PANEDIALOG_EMPLOYMENT,
-		'Added a new dialog for Employment Pane.'],
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_NOTE, '02/07/2000', 'RK',
-		PANEDIALOG_EMPLOYMENT,
-		'Renamed the Package name from App::Dialog::Association::Employment to App::Dialog::Attribute::Association::Employment.'],
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_NOTE, '02/28/2000', 'RK',
-		PANEDIALOG_EMPLOYMENT,
-		'Replaced fkeyxxx select in the dialogs with Sql statement from Statement Manager'],
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_NOTE, '03/14/2000', 'RK',
-		PANEDIALOG_EMPLOYMENT,
-		'Removed Item Path from Item Name'],
-
-);
 1;
