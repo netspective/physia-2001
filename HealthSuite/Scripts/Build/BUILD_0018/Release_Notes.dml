@@ -8,15 +8,41 @@
 
 <release-notes>
 	<release-info>
-		<build-id>17</build-id>
+		<build-id>18</build-id>
 		<build-manager>Lloyd Brodsky</build-manager>
 		<tested-date>12/15/2000 ***Tentative***</tested-date>
 		<release-date>TBD</release-date>
 	</release-info>
 
 	<deliverables>
-		<deliverable id="">
+		<deliverable id="110">
+			Medicaid resubmission code and original reference fields add to claim dialog and showing on HCFA.
 		</deliverable>
-		
+
+		<deliverable id="1501">
+			Fixed claim status changes.
+		</deliverable>
+
+		<deliverable id="1614">
+			Fixed validation for asking for third party payer id in checkin dialog.
+		</deliverable>
+
+		<deliverable id="1618">
+			If intellicode errors occur in checkout or claim, redirect forced to an error view on the claim summary.
+		</deliverable>
+
+		<deliverable id="1652">
+			Fixed handling of primary, secondary, tertiary claims (i.e. status changes, functions allowed based on status changes, 
+			reopening of claims and voiding of subsequent claims, etc.)
+		</deliverable>
+
+		<deliverable id="1697">
+			New transfer from legacy system writeoff type for personal payment dialog found on claim summary.
+		</deliverable>
+
+		<deliverable id="1732">
+			Added practices to pay to org drop down in Add Invoice dialog.
+		</deliverable>
+
 	</deliverables>
 </release-notes>
