@@ -6,6 +6,7 @@ use strict;
 use App::Page::Search;
 use App::Universal;
 use DBI::StatementManager;
+use App::Statements::Org;
 use App::Statements::Search::Insurance;
 
 use vars qw(@ISA %RESOURCE_MAP);
@@ -23,13 +24,14 @@ sub getForm
 	my ($createFns, $itemFns) = ('', '');
 	if($self->param('execute') && ! ($flags & (SEARCHFLAG_LOOKUPWINDOW | SEARCHFLAG_SEARCHBAR)))
 	{
+
 		$itemFns = qq{
 			<BR>
 			<FONT size=5 face='arial'>&nbsp;</FONT>
 			On Select:
 			<SELECT name="item_action_arl_select">
 				<option value="/org/%itemValue%/profile">View Summary</option>
-				<option value="/org/%itemValue%/update">Edit Registry</option>
+				<option value="/org/%itemValue%/dlg-update-org-insurance">Edit Profile</option>
 				<option value="/org/%itemValue%/dlg-add-ins-product">Add Insurance Product</option>
 				<option value="/org/%itemValue%/dlg-add-ins-plan">Add Insurance Plan</option>
 				<option value="/org/%itemValue%/remove">Delete Record</option>
@@ -97,7 +99,7 @@ sub execute
 	$self->addContent(
 		'<CENTER>',
 		$STMTMGR_INSURANCE_SEARCH->createHtml($self, STMTMGRFLAG_NONE, "sel_$type$appendStmtName$category",
-			[uc($expression), $self->session('org_internal_id')], 
+			[uc($expression), $self->session('org_internal_id')],
 			#[
 			#	['ID', '<A HREF=\'javascript:chooseEntry("%0")\' STYLE="text-decoration:none">%0</A>'],
 			#	['Group Name'],
