@@ -142,18 +142,21 @@ sub customValidate
 {
 	my ($self, $page) = @_;
 
-	#my $insType = $page->field('ins_type');
-	#my $coPay = $page->field('copay_amt');
-	#my $coPayCap = $self->getField('copay_amt');
+	my $command = $self->getActiveCommand($page);
 
-	#if($insType == App::Universal::CLAIMTYPE_HMO && $coPay eq '')
-	#{
-	#	$coPayCap->invalidate($page, "Co-pay is required because the 'Insurance Type' is 'HMO(cap)'");
-	#}
-	#elsif($insType != App::Universal::CLAIMTYPE_HMO && $coPay ne '')
-	#{
-	#	$coPayCap->invalidate($page, "Co-pay field should be left blank because the 'Insurance Type' is not 'HMO(cap)'");
-	#}
+	return () if $command eq 'remove';
+
+		my $planName = $page->field('plan_name');
+		my $pdtName = $page->field('product_name');
+		my $planId = $self->getField('plan_name');
+		my $productId = $self->getField('product_name');
+		my $orgId = $page->field('ins_org_id');
+		my $doesProductExist = $STMTMGR_INSURANCE->getSingleValue($page,STMTMGRFLAG_NONE,'selDoesProductExists',$pdtName, $orgId) if $pdtName ne '';
+
+		my $createInsProductHref = "javascript:doActionPopup('/org-p/$orgId/dlg-add-ins-product?_f_ins_org_id=$orgId&_f_product_name=$pdtName');";
+		$productId->invalidate($page,qq{ Product Name '$pdtName' does not exist in '$orgId'.<br><img src="/resources/icons/arrow_right_red.gif">
+				<a href="$createInsProductHref">Create Product '$pdtName' now</a>
+			}) if $doesProductExist eq '' && $pdtName ne '';
 }
 
 
@@ -258,7 +261,7 @@ sub execute
 	my $recordData = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selPlanByInsIdAndRecordType', $productName, $recordType);
 	my $parentInsId = $recordData->{'ins_internal_id'};
 	my $editInsIntId = $page->param('ins_internal_id');
-	my $insType = $page->field('ins_type');
+	my $insType = $recordData->{'ins_type'};
 
 	my $insIntId = $page->schemaAction(
 				'Insurance', $command,
@@ -269,7 +272,7 @@ sub execute
 				record_type => App::Universal::RECORDTYPE_INSURANCEPLAN || undef,
 				owner_org_id => $page->param('org_id') || undef,
 				ins_org_id => $page->field('ins_org_id') || undef,
-				ins_type => defined $insType ? $insType : undef,
+				ins_type => $insType || undef,
 				#fee_schedule => $page->field('fee_schedule') || undef,
 				coverage_begin_date => $page->field('coverage_begin_date') || undef,
 				coverage_end_date => $page->field('coverage_end_date') || undef,
