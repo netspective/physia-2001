@@ -108,6 +108,7 @@ $STMTMGR_INVOICE = new App::Statements::Invoice(
 			and balance > 0
 			and invoice_status < 4
 			and invoice_subtype = 0
+			and invoice_status != 16
 		},
 	'selAllNonZeroBalanceInvoicesByClient' => q{
 		select * from invoice
