@@ -1288,7 +1288,7 @@ sub handleInvoiceAttrs
 	);
 
 	$page->schemaAction(
-			'Invoice_Attribute', 'add',
+			'Invoice_Attribute', $command,
 			item_id => $page->field('batch_item_id') || undef,
 			parent_id => $invoiceId || undef,
 			item_name => 'Invoice/Creation/Batch ID',
