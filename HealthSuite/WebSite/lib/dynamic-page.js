@@ -222,7 +222,7 @@ function createFieldHtml(fieldNode, level, count, parent, parentPrefix)
 		}
 		
 		html =  '<div id="'+ sectionId +'" class="section" sectLevel="'+level+'">';
-		html += '<div id="'+ sectionId +'_head" class="section_head" sectLevel="'+level+'"><span id="'+sectionId+'_icons" class="'+sectionName+'_icons"><img src="/resources/images/icons/plus.gif"> </span><span style="width:250; cursor: hand;" onclick="chooseSection(\''+sectionId+'\')">'+ fieldNode.getAttribute('caption') + '</span>' + normalsHtml + '</div>';
+		html += '<div id="'+ sectionId +'_head" class="section_head" sectLevel="'+level+'"><span id="'+sectionId+'_icons" class="'+sectionName+'_icons"><img src="/resources/images/icons/plus.gif" onclick="chooseSection(\''+sectionId+'\')"> </span><span style="width:250; cursor: hand;" onclick="chooseSection(\''+sectionId+'\')">'+ fieldNode.getAttribute('caption') + '</span>' + normalsHtml + '</div>';
 		html += '<div id="'+ sectionId +'_body" class="section_body" sectLevel="'+level+'" style="display:none">';
 		html += contentsHtml + '</div></div>';
 	}
@@ -320,13 +320,15 @@ function prepareFieldHtml_grid(fieldNode, level, count, parent, namePrefix)
 	return '<table id="table_' + fieldNode.getAttribute ('id') + '" class="section_field_grid">'+headRow+dataRowPrototype+'</table>';
 }
 
-function prepareFieldHtml_group(fieldNode, level, count, parent, namePrefix)
+function prepareFieldHtml_composite(fieldNode, level, count, parent, namePrefix)
 {
 	var fieldName = fieldNode.getAttribute ('id');
 	var fieldCount = fieldNode.childNodes.length;
 	var insideFields = '';
 	var addLabelStyle = 'style="vertical-align: top"';
 	var icons = '<span style="font-family: wingdings; width: 15"></span>';
+	
+//	alert ('composite field: ' + fieldName + ' with ' + fieldCount + ' fields...');
 
 	for (var i = 0; i < fieldCount; i++)
 	{
@@ -423,7 +425,7 @@ function prepareFieldHtml_text(fieldNode, level, count, parent, namePrefix)
 	var html = '<div sectLevel="'+level+'" class="'+areaClassName+'" id="'+ fieldName +'_area">' + prepareFieldHtml_caption(fieldNode, level, count, namePrefix, addLabelStyle);
 	html += icons + controlHtml + '<div style="margin-left: 125; display:none;" id="'+ fieldName +'_options">Select</div></div>';
 	
-	return ((parentNodeType == 'group' || parentNodeType == 'grid') ? (fieldNode.getAttribute ('condition-field') ? '<span id="' + fieldName + '_area" class=section_field_area_conditional" sectLevel="' + level + '" style="display: none">' + controlHtml + '</span>' : controlHtml) : html);
+	return ((parentNodeType == 'composite' || parentNodeType == 'grid') ? (fieldNode.getAttribute ('condition-field') ? '<span id="' + fieldName + '_area" class=section_field_area_conditional" sectLevel="' + level + '" style="display: none">' + controlHtml + '</span>' : controlHtml) : html);
 }
 
 function prepareFieldHtml_choose(fieldNode, level, count, parent, namePrefix)
@@ -474,7 +476,7 @@ function prepareFieldHtml_choose(fieldNode, level, count, parent, namePrefix)
 	var html = '<div sectLevel="'+level+'" id="'+ fieldName +'_area" class="'+areaClassName+'">' + prepareFieldHtml_caption(fieldNode, level, count, namePrefix);
 	html += icons + controlHtml + '<div style="margin-left: 125; display:none;" id="'+ fieldName +'_options">Select</div></div>';
 	
-	return ((parentNodeType == 'group' || parentNodeType == 'grid') ? (fieldNode.getAttribute ('condition-field') ? '<span id="' + fieldName + '_area" class=section_field_area_conditional" sectLevel="' + level + '">' + controlHtml + '</span>' : controlHtml) : html);
+	return ((parentNodeType == 'composite' || parentNodeType == 'grid') ? (fieldNode.getAttribute ('condition-field') ? '<span id="' + fieldName + '_area" class=section_field_area_conditional" sectLevel="' + level + '">' + controlHtml + '</span>' : controlHtml) : html);
 }
 
 /* CSS expressions */

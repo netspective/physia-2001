@@ -97,13 +97,13 @@
 			<field-defn id="integer_test" type="integer" review="yes" caption="Integer"/>
 			<field-defn id="date_test" type="date" review="yes" caption="Date"/>
 			<field-defn id="time_test" type="time" review="yes" caption="Time"/>
-			<field-defn id="duration_test" type="group" review="yes" caption="Duration" condition-field="chemical_weapons_exposure.warVet" condition="control.value > 0">
+			<field-defn id="duration_test" type="composite" review="yes" caption="Duration" condition-field="chemical_weapons_exposure.warVet" condition="control.value > 0">
 				<field-defn id="from_label" type="static" review="yes" caption="From"/>
 				<field-defn id="start" type="date" review="yes" caption="Start"/>
 				<field-defn id="to_label" type="static" review="yes" caption="To"/>
 				<field-defn id="end" type="date" review="yes" caption="End"/>
 			</field-defn>
-			<field-defn id="ammo_test" type="group" review="yes" caption="Ammunition">
+			<field-defn id="ammo_test" type="composite" review="yes" caption="Ammunition">
 				<field-defn id="ammo_type" type="choose" caption="Ammo of Choice" style="list">
 					<options>
 					<option>tactical nukes</option>
