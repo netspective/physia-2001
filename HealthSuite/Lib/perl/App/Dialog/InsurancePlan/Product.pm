@@ -51,7 +51,7 @@ sub new
 			new CGI::Dialog::Field(type => 'hidden', name => 'medigap_number_id'),
 
 			new App::Dialog::Field::Organization::ID(caption => 'Insurance Company Id',
-				name => 'ins_org_id', 
+				name => 'ins_org_id',
 				addType => 'insurance',
 				options => FLDFLAG_REQUIRED
 			),
@@ -130,6 +130,7 @@ sub new
 					['Add Insurance Plan', "/org/%field.ins_org_id%/dlg-add-ins-plan?_f_product_name=%field.product_name%&_f_ins_org_id=%field.ins_org_id%", 1],
 					['Add Another Insurance Product', "/org/%field.ins_org_id%/dlg-add-ins-product?_f_ins_org_id=%field.ins_org_id%"],
 					['Go to Org Profile', "/org/%field.ins_org_id%/profile"],
+					['Go to Work List', "/worklist"],
 				],
 					cancelUrl => $self->{cancelUrl} || undef
 			)

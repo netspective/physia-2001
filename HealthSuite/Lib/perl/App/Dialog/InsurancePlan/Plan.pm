@@ -163,6 +163,7 @@ sub new
 				nextActions_add => [
 					['Add Another Insurance Plan', "/org/%field.ins_org_id%/dlg-add-ins-plan?_f_product_name=%field.product_name%", 1],
 					['Go to Org Profile', "/org/%field.ins_org_id%/profile"],
+					['Go to Work List', "/worklist"],
 				],
 					cancelUrl => $self->{cancelUrl} || undef
 			)
