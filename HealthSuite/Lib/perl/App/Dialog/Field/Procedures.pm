@@ -157,7 +157,19 @@ sub isValid
 	push(@insFeeSchedules, $list) if $list;	
 
 	#Set up default FS
-	push ( @defaultFeeSchedules, $page->param('_f_proc_default_catalog')) if $page->param('_f_proc_default_catalog');
+	my @fsIntIds = ();
+	my @fsText = split(/\s*,\s*/, $page->param('_f_proc_default_catalog'));
+	foreach (@fsText)
+	{
+		my $catalog = $STMTMGR_CATALOG->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInternalCatalogIdByIdType',
+					$page->session('org_internal_id'), $_, App::Universal::CATALOGTYPE_FEESCHEDULE);
+		
+		push(@fsIntIds, $catalog->{internal_catalog_id});
+		#$page->addError("FS Names: $_");
+		#$page->addError("FS Ids: $catalog->{internal_catalog_id}");
+	}
+
+	push ( @defaultFeeSchedules, @fsIntIds ) if $page->param('_f_proc_default_catalog');
 	
 	# ------------------------------------------------------------------------------------------------------------------------	
 	#munir's old icd validation for checking if the same icd code is entered in twice
