@@ -56,6 +56,12 @@ sub initialize
 		new CGI::Dialog::Field(type => 'hidden', name => 'eventFieldsAreSet'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'invoiceFieldsAreSet'),
 
+		new CGI::Dialog::Field(type => 'hidden', name => 'primary_payer'),
+		new CGI::Dialog::Field(type => 'hidden', name => 'secondary_payer'),
+		new CGI::Dialog::Field(type => 'hidden', name => 'tertiary_payer'),
+		new CGI::Dialog::Field(type => 'hidden', name => 'quaternary_payer'),
+		new CGI::Dialog::Field(type => 'hidden', name => 'third_party_payer_id'),
+
 
 		new App::Dialog::Field::Person::ID(caption => 'Patient ID', name => 'attendee_id', options => FLDFLAG_REQUIRED,
 			readOnlyWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
@@ -90,39 +96,48 @@ sub initialize
 
 		new CGI::Dialog::Field(caption => 'Place of Auto Accident (State)', name => 'accident_state', size => 2, maxLength => 2),
 
-		new CGI::Dialog::MultiField(caption => 'Payer Primary/Secondary/Tertiary', name => 'payer_fields',
-			fields => [
+		#new CGI::Dialog::MultiField(caption => 'Payer for Today', name => 'payer_fields',
+		#	fields => [
 				new CGI::Dialog::Field(
 						caption => 'Primary Payer',
-						style => 'select',
-						name => 'primary_payer',
-						fKeyStmtMgr => $STMTMGR_INSURANCE,
-						fKeyStmt => 'selPayerChoicesByOwnerPersonId',
-						fKeyDisplayCol => 0,
-						fKeyValueCol => 1,
+						type => 'select',
+						#selOptions => 'test;test2',
+						name => 'payer',
 						options => FLDFLAG_REQUIRED
 						),
-				new CGI::Dialog::Field(
-						caption => 'Secondary Payer',
-						style => 'select',
-						name => 'secondary_payer',
-						fKeyStmtMgr => $STMTMGR_INSURANCE,
-						fKeyStmt => 'selPayerChoicesByOwnerPersonId',
-						fKeyDisplayCol => 0,
-						fKeyValueCol => 1,
-						),
-				new CGI::Dialog::Field(
-						caption => 'Tertiary Payer',
-						style => 'select',
-						name => 'tertiary_payer',
-						fKeyStmtMgr => $STMTMGR_INSURANCE,
-						fKeyStmt => 'selPayerChoicesByOwnerPersonId',
-						fKeyDisplayCol => 0,
-						fKeyValueCol => 1,
-						),
-			]),
 
-		new CGI::Dialog::Field(caption => 'Payer for Today', name => 'other_payer'),
+				#new CGI::Dialog::Field(
+				#		caption => 'Primary Payer',
+				#		style => 'select',
+				#		name => 'primary_payer',
+				#		fKeyStmtMgr => $STMTMGR_INSURANCE,
+				#		fKeyStmt => 'selPayerChoicesByOwnerPersonId',
+				#		fKeyDisplayCol => 0,
+				#		fKeyValueCol => 1,
+				#		options => FLDFLAG_REQUIRED
+				#		),
+
+				#new CGI::Dialog::Field(
+				#		caption => 'Secondary Payer',
+				#		style => 'select',
+				#		name => 'secondary_payer',
+				#		fKeyStmtMgr => $STMTMGR_INSURANCE,
+				#		fKeyStmt => 'selPayerChoicesByOwnerPersonId',
+				#		fKeyDisplayCol => 0,
+				#		fKeyValueCol => 1,
+				#		),
+				#new CGI::Dialog::Field(
+				#		caption => 'Tertiary Payer',
+				#		style => 'select',
+				#		name => 'tertiary_payer',
+				#		fKeyStmtMgr => $STMTMGR_INSURANCE,
+				#		fKeyStmt => 'selPayerChoicesByOwnerPersonId',
+				#		fKeyDisplayCol => 0,
+				#		fKeyValueCol => 1,
+				#		),
+			#]),
+
+		new CGI::Dialog::Field(caption => 'Third-Party Payer for Today', name => 'other_payer'),
 
 		#new CGI::Dialog::MultiField(caption => 'Deductible Balance/Insurance Phone', name => 'deduct_fields',
 		#	fields => [
@@ -196,17 +211,6 @@ sub initialize
 
 		new CGI::Dialog::Field(caption => 'Prior Authorization Number', name => 'prior_auth'),
 
-		#new CGI::Dialog::Field(caption => 'Patient Control Number', name => 'control_number'),
-
-		#new App::Dialog::Field::Diagnoses(caption => 'ICD-9 Codes', name => 'claim_diags', options => FLDFLAG_TRIM, hints => 'Enter ICD-9 codes in a comma separated list'),
-
-		#new CGI::Dialog::Field(	caption => 'Reference',	name => 'reference'),
-
-		#new CGI::Dialog::Field(caption => 'Optimized Procedure Entry',
-		#		name => 'opprocentries',
-		#		type => 'memo',
-		#		cols => 70, rows => 5,
-		#		hints => 'Format: service begin date(mm/dd/yyyy)-service end date(mm/dd/yyyy),p.place(number),t.type(number),lab(l),<b>c.cptcode(number)</b>,m.modifier(number),<b>d1.diagnosis1,d2.diagnosis2,d3.diagnosis3,$unit cost(currency)</b>,u.units(number),emergency(e),r.reference(words),b.comments(words)'),
 		new CGI::Dialog::Field(type => 'memo',
 				caption => 'Comments',
 				name => 'comments'),
@@ -350,10 +354,9 @@ sub populateData
 		}
 
 
-		if(my $invoiceCopayItemAdjs = $STMTMGR_INVOICE->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'selItemAdjustments', $invoiceCopayItem->{item_id}))
-		{
-			#getAdjustmentHtml($self, $page, $command, $activeExecMode, $flags, $invoiceCopayItemAdjs);
-		}
+		#if(my $invoiceCopayItemAdjs = $STMTMGR_INVOICE->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'selItemAdjustments', $invoiceCopayItem->{item_id}))
+		#{
+		#}
 		#foreach my $adjNum (0..0)
 		#{
 		#	$page->field('check_number', $invoiceCopayItemAdjs->[$adjNum]->{pay_ref});
@@ -428,24 +431,6 @@ sub populateData
 	}
 }
 
-sub getAdjustmentHtml
-{
-	my ($self, $page, $command, $activeExecMode, $flags, $invoiceCopayItemAdjs) = @_;
-
-#	$self->addPostHtml(qq{
-#			<table cellspacing=0 border=0>
-#				<tr>
-#					<td align=right>$font Service:</td>
-#					<td>$font $fromDate $toDate ($servPlaceCaption, Type $indivItem->{data_num_b})</td>
-#				</tr>
-#				<tr>
-#					<td align=right>$font Diagnoses:</td>
-#					<td>$font $indivItem->{rel_diags}</td>
-#				</tr>
-#			</table>
-#	});
-}
-
 sub setInsuranceFields
 {
 	my ($self, $page, $command, $activeExecMode, $flags, $invoiceId, $personId) = @_;
@@ -462,147 +447,239 @@ sub setInsuranceFields
 	my $tertiary = App::Universal::INSURANCE_TERTIARY;
 
 	#fake product names
-	my $selfPayer = App::Universal::INSURANCE_FAKE_SELFPAY;
-	my $clientPayer = App::Universal::INSURANCE_FAKE_CLIENTBILL;
-	my $otherPayer = App::Universal::INSURANCE_FAKE_OTHERPAYER;
+	my $fakeInsIdClientBill = App::Universal::INSURANCE_FAKE_CLIENTBILL;
+	my $fakeInsIdSelfPay = App::Universal::INSURANCE_FAKE_SELFPAY;
 
-	if(! $page->field('insuranceIsSet') && $invoiceId eq '')
+	#if(! $page->field('insuranceIsSet') && $invoiceId ne '')
+	#{
+	#	my $billingParties = $STMTMGR_INVOICE->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'selInvPrimSecTertBillingParties', $invoiceId, $primary, $secondary, $tertiary);
+
+	#	foreach my $party (@{$billingParties})
+	#	{
+	#		my $insIntId = $party->{bill_ins_id};
+	#		if($party->{bill_sequence} == $primary)
+	#		{
+	#			if($party->{bill_party_type} == $billPartyTypeClient)
+	#			{
+	#				$page->field('primary_payer', $selfPayer);
+	#			}
+	#			elsif($party->{bill_party_type} == $billPartyTypeIns)
+	#			{
+	#				my $insurance = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selInsuranceData', $insIntId);
+	#				$page->field('primary_payer', $insurance->{product_name});
+	#			}
+				#elsif($party->{bill_party_type} == $billPartyTypeOrg)
+				#{
+				#	$page->field('primary_payer', );
+				#}
+				#else
+				#{
+				#	$page->field('primary_payer', );
+				#}
+	#		}
+	#		elsif($party->{bill_sequence} == $secondary)
+	#		{
+	#			if($party->{bill_party_type} == $billPartyTypeClient)
+	#			{
+	#				$page->field('secondary_payer', $selfPayer);
+	#			}
+	#			elsif($party->{bill_party_type} == $billPartyTypeIns)
+	#			{
+	#				my $insurance = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selInsuranceData', $insIntId);
+	#				$page->field('secondary_payer', $insurance->{product_name});
+	#			}
+				#elsif($party->{bill_party_type} == $billPartyTypeOrg)
+				#{
+				#	$page->field('secondary_payer', );
+				#}
+				#else
+				#{
+				#	$page->field('secondary_payer', );
+				#}
+	#		}
+	#		elsif($party->{bill_sequence} == $tertiary)
+	#		{
+	#			if($party->{bill_party_type} == $billPartyTypeClient)
+	#			{
+	#				$page->field('tertiary_payer', $selfPayer);
+	#			}
+	#			elsif($party->{bill_party_type} == $billPartyTypeIns)
+	#			{
+	#				my $insurance = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selInsuranceData', $insIntId);
+	#				$page->field('tertiary_payer', $insurance->{product_name});
+	#			}
+				#elsif($party->{bill_party_type} == $billPartyTypeOrg)
+				#{
+				#	$page->field('tertiary_payer', );
+				#}
+				#else
+				#{
+				#	$page->field('tertiary_payer', );
+				#}
+	#		}
+	#	}
+
+	#	$page->field('insuranceIsSet', 1);
+	#}
+
+
+	my $payers = $STMTMGR_INSURANCE->getRowsAsHashList($page, STMTMGRFLAG_CACHE, 'selPayerChoicesByOwnerPersonId', $personId, $personId, $personId);
+	my @insurPlans = ();
+	my @wkCompPlans = ();
+	my @thirdParties = ();
+	foreach my $ins (@{$payers})
 	{
-		if(my $primInsurance = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selInsuranceByBillSequence', $primary, $personId))
+		if($ins->{group_name} eq 'Insurance')
 		{
-			$page->field('primary_payer', $primInsurance->{product_name});
-			$page->field('copay_amt', $primInsurance->{copay_amt});
-			$primInsurance->{indiv_deduct_remain} ? $page->field('deduct_balance', $primInsurance->{indiv_deduct_remain}) : $page->field('deduct_balance', $primInsurance->{family_deduct_remain});
-
-			my $primInsPhone = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selInsuranceAttr', $primInsurance->{ins_internal_id}, 'Contact Method/Telephone/Primary');
-			$page->field('primary_ins_phone', $primInsPhone->{value_text});
-
-			my $primInsFeeSched = $STMTMGR_INSURANCE->getRowsAsHashList($page, STMTMGRFLAG_CACHE, 'selInsuranceAttr', $primInsurance->{ins_internal_id}, 'Fee Schedule');
-			my @schedules = ();
-			foreach (@{$primInsFeeSched})
-			{
-				push(@schedules, $_->{value_text});
-			}
-			@schedules = join(@schedules, ', ');
-			$page->param('_f_proc_default_catalog', $schedules[0]);
-			#$page->addDebugStmt("$schedules[0]");
+			push(@insurPlans, "$ins->{bill_seq}($ins->{plan_name})");
 		}
-		else
+		elsif($ins->{group_name} eq 'Workers Compensation')
 		{
-			$page->field('primary_payer', $selfPayer);
+			push(@wkCompPlans, "Work Comp($ins->{plan_name})");
 		}
-
-		if(my $secInsurance = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selInsuranceByBillSequence', $secondary, $personId))
+		elsif($ins->{group_name} eq 'Third-Party')
 		{
-			$page->field('secondary_payer', $secInsurance->{product_name});
+			push(@thirdParties, "$ins->{group_name} ($ins->{plan_name})");
 		}
-		elsif($page->field('primary_payer') != $selfPayer)
-		{
-			$page->field('secondary_payer', $selfPayer);
-		}
-
-		if(my $tertInsurance = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selInsuranceByBillSequence', $tertiary, $personId))
-		{
-			$page->field('tertiary_payer', $tertInsurance->{product_name});
-		}
-		elsif($page->field('primary_payer') != $selfPayer && $page->field('secondary_payer') != $selfPayer)
-		{
-			$page->field('tertiary_payer', $selfPayer);
-		}
-
-		$page->field('insuranceIsSet', 1);
 	}
-	elsif(! $page->field('insuranceIsSet') && $invoiceId ne '')
+
+	my $insurances = join(' / ', @insurPlans) if @insurPlans;
+	$insurances = "$insurances;" if $insurances;
+
+	my $workComp = join(';', @wkCompPlans) if @wkCompPlans;
+	$workComp = "$workComp;" if $workComp;
+
+	my $thirdParty = join(';', @thirdParties) if @thirdParties;
+	$thirdParty = "$thirdParty;" if $thirdParty;
+
+	my $thirdPartyOther = 'Third-Party Payer;';
+	my $selfPay = 'Self-Pay;';
+
+	#$self->getField('payer_fields')->{fields}->[0]->{selOptions} = "$insurances $workComp $thirdParty $thirdPartyOther $selfPay";
+	$self->getField('payer')->{selOptions} = "$insurances $workComp $thirdParty $thirdPartyOther $selfPay";
+
+
+	#Other third party payer if one is not given
+	#if($page->field('payer') ne 'Third-Party Payer')
+	#{
+	#	$self->updateFieldFlags('other_payer', FLDFLAG_INVISIBLE, 1);
+	#}
+	#if($page->field('payer') eq 'Third-Party Payer')
+	#{
+	#	$page->addError('error');
+	#	my $otherPayerField = $self->getField('other_payer');
+	#	$otherPayerField->invalidate($page, "Please provide an alternate payer");
+	#}
+
+
+
+	#Show all of patient's insurances (incl. work comp)
+
+	#$self->getField('payer_fields')->{fields}->[0]->{fKeyStmtBindPageParams} = [$personId, $personId, $personId];
+	#$self->getField('payer_fields')->{fields}->[1]->{fKeyStmtBindPageParams} = $personId;
+	#$self->getField('payer_fields')->{fields}->[2]->{fKeyStmtBindPageParams} = $personId;
+}
+
+sub handlePayers
+{
+	my ($self, $page, $command, $flags) = @_;
+
+	my $personId = $page->field('attendee_id');
+
+	#CONSTANTS -------------------------------------------
+
+	#bill sequences
+	my $primary = App::Universal::INSURANCE_PRIMARY;
+	my $secondary = App::Universal::INSURANCE_SECONDARY;
+	my $tertiary = App::Universal::INSURANCE_TERTIARY;
+	my $quaternary = App::Universal::INSURANCE_QUATERNARY;
+	my $workerscomp = App::Universal::INSURANCE_WORKERSCOMP;
+
+	#claim types
+	my $typeSelfPay = App::Universal::CLAIMTYPE_SELFPAY;
+	my $typeWorkComp = App::Universal::CLAIMTYPE_WORKERSCOMP;
+	my $typeClient = App::Universal::CLAIMTYPE_CLIENT;
+
+	#fake values for self-pay and third party payers
+	my $fakeInsIdClientBill = App::Universal::INSURANCE_FAKE_CLIENTBILL;
+	my $fakeInsIdSelfPay = App::Universal::INSURANCE_FAKE_SELFPAY;
+
+	# -----------------------------------------------------
+
+
+	my $claimType = '';
+	my $payer = $page->field('payer');
+	if($payer eq 'Self-Pay')
 	{
-		my $billingParties = $STMTMGR_INVOICE->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'selInvPrimSecTertBillingParties', $invoiceId, $primary, $secondary, $tertiary);
-
-		foreach my $party (@{$billingParties})
-		{
-			my $insIntId = $party->{bill_ins_id};
-			if($party->{bill_sequence} == $primary)
-			{
-				if($party->{bill_party_type} == $billPartyTypeClient)
-				{
-					$page->field('primary_payer', $selfPayer);
-				}
-				elsif($party->{bill_party_type} == $billPartyTypeIns)
-				{
-					my $insurance = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selInsuranceData', $insIntId);
-					$page->field('primary_payer', $insurance->{product_name});
-				}
-				#elsif($party->{bill_party_type} == $billPartyTypeOrg)
-				#{
-				#	$page->field('primary_payer', );
-				#}
-				#else
-				#{
-				#	$page->field('primary_payer', );
-				#}
-			}
-			elsif($party->{bill_sequence} == $secondary)
-			{
-				if($party->{bill_party_type} == $billPartyTypeClient)
-				{
-					$page->field('secondary_payer', $selfPayer);
-				}
-				elsif($party->{bill_party_type} == $billPartyTypeIns)
-				{
-					my $insurance = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selInsuranceData', $insIntId);
-					$page->field('secondary_payer', $insurance->{product_name});
-				}
-				#elsif($party->{bill_party_type} == $billPartyTypeOrg)
-				#{
-				#	$page->field('secondary_payer', );
-				#}
-				#else
-				#{
-				#	$page->field('secondary_payer', );
-				#}
-			}
-			elsif($party->{bill_sequence} == $tertiary)
-			{
-				if($party->{bill_party_type} == $billPartyTypeClient)
-				{
-					$page->field('tertiary_payer', $selfPayer);
-				}
-				elsif($party->{bill_party_type} == $billPartyTypeIns)
-				{
-					my $insurance = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selInsuranceData', $insIntId);
-					$page->field('tertiary_payer', $insurance->{product_name});
-				}
-				#elsif($party->{bill_party_type} == $billPartyTypeOrg)
-				#{
-				#	$page->field('tertiary_payer', );
-				#}
-				#else
-				#{
-				#	$page->field('tertiary_payer', );
-				#}
-			}
-		}
-
-		$page->field('insuranceIsSet', 1);
+		$page->field('primary_payer', $fakeInsIdSelfPay);
+		$claimType = $typeSelfPay;
+	}
+	elsif($payer eq 'Third-Party Payer')
+	{
+		$page->field('primary_payer', $fakeInsIdClientBill);
+		#$page->field('third_party_payer_id', id from inserted fields goes here);
+		$claimType = $typeClient;
 	}
 	else
 	{
-		my $primPayer = $page->field('primary_payer');
-		my $secondPayer = $page->field('secondary_payer');
-		my $tertPayer = $page->field('tertiary_payer');
-
-		$page->field('primary_payer', $primPayer);
-		$page->field('secondary_payer', $secondPayer);
-		$page->field('tertiary_payer', $tertPayer);
+		if($payer =~ '\/')
+		{
+			my @payerSeq = split(' \/ ', $payer);
+			foreach (@payerSeq)
+			{
+				my @singlePayer = split('\(', $_);
+				if($singlePayer[0] eq 'Primary')
+				{
+					my $primIns = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInsuranceByBillSequence', $primary, $personId);
+					$claimType = $primIns->{ins_type};
+					$page->field('primary_payer', $primIns->{product_name});
+				}
+				if($singlePayer[0] eq 'Secondary')
+				{
+					my $secIns = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInsuranceByBillSequence', $secondary, $personId);
+					$claimType = $secIns->{ins_type};
+					$page->field('secondary_payer', $secIns->{product_name});
+				}
+				if($singlePayer[0] eq 'Tertiary')
+				{
+					my $tertIns = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInsuranceByBillSequence', $tertiary, $personId);
+					$claimType = $tertIns->{ins_type};
+					$page->field('tertiary_payer', $tertIns->{product_name});
+				}
+				if($singlePayer[0] eq 'Quaternary')
+				{
+					my $quatIns = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInsuranceByBillSequence', $quaternary, $personId);
+					$claimType = $quatIns->{ins_type};
+					$page->field('quaternary_payer', $quatIns->{product_name});
+				}
+			}
+		}
+		else
+		{
+			my @nonInsPayer = split('\(', $payer);
+			if($nonInsPayer[0] eq 'Work Comp')
+			{
+				my $workCompPlan = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInsuranceByBillSequence', $workerscomp, $personId);
+				$claimType = $typeWorkComp;
+				$page->field('primary_payer', $workCompPlan->{product_name});
+			}
+			elsif($nonInsPayer[0] eq 'Third-Party')
+			{
+				my @thirdPartyOrgId = split('\)', $nonInsPayer[1]);
+				my $thirdPartyPlan = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInsuranceByPersonOwnerOrgOwnerAndInsType', $personId, $thirdPartyOrgId[0], App::Universal::CLAIMTYPE_CLIENT);
+				$claimType = $typeClient;
+				$page->field('primary_payer', $fakeInsIdClientBill);
+				$page->field('third_party_payer_id', $thirdPartyPlan->{owner_org_id});
+			}
+		}
 	}
 
-	#Show all of patient's insurances (incl. work comp)
-	$self->getField('payer_fields')->{fields}->[0]->{fKeyStmtBindPageParams} = $personId;
-	$self->getField('payer_fields')->{fields}->[1]->{fKeyStmtBindPageParams} = $personId;
-	$self->getField('payer_fields')->{fields}->[2]->{fKeyStmtBindPageParams} = $personId;
+	addTransactionAndInvoice($self, $page, $command, $flags, $claimType);
 }
 
 sub addTransactionAndInvoice
 {
-	my ($self, $page, $command, $flags) = @_;
+	my ($self, $page, $command, $flags, $claimType) = @_;
 	$command ||= 'add';
 
 	my $sessOrg = $page->session('org_id');
@@ -612,40 +689,18 @@ sub addTransactionAndInvoice
 	my $editTransId = $page->field('trans_id');
 	my $timeStamp = $page->getTimeStamp();
 
-	#CONSTANTS
+	#CONSTANTS -------------------------------------------
+
+	#invoice constants
 	my $invoiceType = App::Universal::INVOICETYPE_HCFACLAIM;
 	my $invoiceStatus = App::Universal::INVOICESTATUS_CREATED;
 
+	#entity types
 	my $entityTypePerson = App::Universal::ENTITYTYPE_PERSON;
 	my $entityTypeOrg = App::Universal::ENTITYTYPE_ORG;
+
+	#trans status
 	my $transStatus = App::Universal::TRANSSTATUS_ACTIVE;
-
-	my $typeSelfPay = App::Universal::CLAIMTYPE_SELFPAY;
-	my $typeClient = App::Universal::CLAIMTYPE_CLIENT;
-	my $fakeInsIdClientBill = App::Universal::INSURANCE_FAKE_CLIENTBILL;
-	my $fakeInsIdSelfPay = App::Universal::INSURANCE_FAKE_SELFPAY;
-	my $fakeInsIdOtherPayer = App::Universal::INSURANCE_FAKE_OTHERPAYER;
-
-	my $claimType = '';
-	my $primPayer = $page->field('primary_payer');
-	if($primPayer == $fakeInsIdSelfPay)
-	{
-		$claimType = $typeSelfPay;
-	}
-	elsif($primPayer == $fakeInsIdClientBill)
-	{
-		$claimType = $typeClient;
-	}
-	elsif($primPayer == $fakeInsIdOtherPayer)
-	{
-		$claimType = $typeClient;
-	}
-	else
-	{
-		my $insInfo = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInsuranceByOwnerAndProductName', $primPayer, $personId);
-		$claimType = $insInfo->{ins_type};
-	}
-
 
 	#-------------------------------------------------------------------------------------------------------------------------------
 
@@ -697,15 +752,19 @@ sub addTransactionAndInvoice
 			owner_id => $page->session('org_id') || undef,
 			client_type => App::Universal::ENTITYTYPE_PERSON,
 			client_id => $personId || undef,
-			#reference => $page->field('reference') || undef,
-			#ins_id => $insIntId || undef,
-			#secondary_ins_id => $insIntId || undef,
-			#bill_to_type => $billToType || undef,
-			#bill_to_id => $billToId || undef,
 			_debug => 0
 		);
 
 	$invoiceId = $command eq 'add' ? $invoiceId : $editInvoiceId;
+
+	$page->param('invoice_id', $invoiceId);
+
+#$page->addDebugStmt("Command: $command");
+#$page->addDebugStmt("Trans ID: $transId");
+#$page->addDebugStmt("Invoice ID: $invoiceId");
+#$page->addError("error");
+
+
 
 	handleInvoiceAttrs($self, $page, $command, $flags, $invoiceId);
 }
@@ -989,10 +1048,14 @@ sub handleBillingInfo
 	my ($self, $page, $command, $flags, $invoiceId) = @_;
 	my $personId = $page->field('attendee_id');
 
-	#CONSTANTS
+
+	#CONSTANTS ---------------------------------------------------------------
+
+	#fake values for self-pay and third party payers
 	my $fakeInsIdClientBill = App::Universal::INSURANCE_FAKE_CLIENTBILL;
 	my $fakeInsIdSelfPay = App::Universal::INSURANCE_FAKE_SELFPAY;
-	my $fakeInsIdOtherPayer = App::Universal::INSURANCE_FAKE_OTHERPAYER;
+
+	#bill party types
 	my $billPartyTypeClient = App::Universal::INVOICEBILLTYPE_CLIENT;
 	my $billPartyTypePerson = App::Universal::INVOICEBILLTYPE_THIRDPARTYPERSON;
 	my $billPartyTypeOrg = App::Universal::INVOICEBILLTYPE_THIRDPARTYORG;
@@ -1029,26 +1092,18 @@ sub handleBillingInfo
 			#$billStatus = '';
 			#$billResult = '';
 		}
-		#elsif($primPayer == $fakeInsIdClientBill)
-		#{
-		#	$billParty = $billPartyTypeOrg;
-		#	$billToId = $insInfo->{ins_org_id};
-		#	$billAmt = '';
-		#	$billPct = '';
-		#	$billDate = '';
-		#	$billStatus = '';
-		#	$billResult = '';
-		#}
-		#elsif($primPayer == $fakeInsIdOtherPayer)
-		#{
-		#	$billParty = $billPartyTypeIns;
-		#	$billToId = $insInfo->{ins_org_id};
-		#	$billAmt = '';
-		#	$billPct = '';
-		#	$billDate = '';
-		#	$billStatus = '';
-		#	$billResult = '';
-		#}
+		elsif($primPayer == $fakeInsIdClientBill)
+		{
+			#my $insInfo = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInsuranceByPersonOwnerOrgOwnerAndInsType', $personId, $thirdPartyId, App::Universal::CLAIMTYPE_CLIENT);
+
+			$billParty = $billPartyTypeOrg;
+			$billToId = $page->field('third_party_payer_id');
+			#$billAmt = '';
+			#$billPct = '';
+			#$billDate = '';
+			#$billStatus = '';
+			#$billResult = '';
+		}
 		else
 		{
 			my $insInfo = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInsuranceByOwnerAndProductName', $primPayer, $personId);
@@ -1094,48 +1149,16 @@ sub handleBillingInfo
 		my $billStatus = '';
 		my $billResult = '';
 
-		if($secondPayer == $fakeInsIdSelfPay)
-		{
-			$billParty = $billPartyTypeClient;
-			$billToId = $personId;
-			#$billAmt = '';
-			#$billPct = '';
-			#$billDate = '';
-			#$billStatus = '';
-			#$billResult = '';
-		}
-		#elsif($secondPayer == $fakeInsIdClientBill)
-		#{
-		#	$billParty = $billPartyTypeOrg;
-		#	$billToId = $insInfo->{ins_org_id};
-		#	$billAmt = '';
-		#	$billPct = '';
-		#	$billDate = '';
-		#	$billStatus = '';
-		#	$billResult = '';
-		#}
-		#elsif($secondPayer == $fakeInsIdOtherPayer)
-		#{
-		#	$billParty = $billPartyTypeIns;
-		#	$billToId = $insInfo->{ins_org_id};
-		#	$billAmt = '';
-		#	$billPct = '';
-		#	$billDate = '';
-		#	$billStatus = '';
-		#	$billResult = '';
-		#}
-		else
-		{
-			my $insInfo = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInsuranceByOwnerAndProductName', $secondPayer, $personId);
-			$billParty = $billPartyTypeIns;
-			$billToId = $insInfo->{ins_org_id};
-			$billInsId = $insInfo->{ins_internal_id};
-			#$billAmt = '';
-			$billPct = $insInfo->{percentage_pay};
-			#$billDate = '';
-			#$billStatus = '';
-			#$billResult = '';
-		}
+		my $insInfo = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInsuranceByOwnerAndProductName', $secondPayer, $personId);
+		$billParty = $billPartyTypeIns;
+		$billToId = $insInfo->{ins_org_id};
+		$billInsId = $insInfo->{ins_internal_id};
+		#$billAmt = '';
+		$billPct = $insInfo->{percentage_pay};
+		#$billDate = '';
+		#$billStatus = '';
+		#$billResult = '';
+
 
 		my $secBillSeq = App::Universal::PAYER_SECONDARY;
 		$page->schemaAction(
@@ -1170,48 +1193,16 @@ sub handleBillingInfo
 		my $billStatus = '';
 		my $billResult = '';
 
-		if($tertPayer == $fakeInsIdSelfPay)
-		{
-			$billParty = $billPartyTypeClient;
-			$billToId = $personId;
-			#$billAmt = '';
-			#$billPct = '';
-			#$billDate = '';
-			#$billStatus = '';
-			#$billResult = '';
-		}
-		#elsif($tertPayer == $fakeInsIdClientBill)
-		#{
-		#	$billParty = $billPartyTypeOrg;
-		#	$billToId = $insInfo->{ins_org_id};
-		#	$billAmt = '';
-		#	$billPct = '';
-		#	$billDate = '';
-		#	$billStatus = '';
-		#	$billResult = '';
-		#}
-		#elsif($tertPayer == $fakeInsIdOtherPayer)
-		#{
-		#	$billParty = $billPartyTypeIns;
-		#	$billToId = $insInfo->{ins_org_id};
-		#	$billAmt = '';
-		#	$billPct = '';
-		#	$billDate = '';
-		#	$billStatus = '';
-		#	$billResult = '';
-		#}
-		else
-		{
-			my $insInfo = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInsuranceByOwnerAndProductName', $tertPayer, $personId);
-			$billParty = $billPartyTypeIns;
-			$billToId = $insInfo->{ins_org_id};
-			$billInsId = $insInfo->{ins_internal_id};
-			#$billAmt = '';
-			$billPct = $insInfo->{percentage_pay};
-			#$billDate = '';
-			#$billStatus = '';
-			#$billResult = '';
-		}
+		my $insInfo = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInsuranceByOwnerAndProductName', $tertPayer, $personId);
+		$billParty = $billPartyTypeIns;
+		$billToId = $insInfo->{ins_org_id};
+		$billInsId = $insInfo->{ins_internal_id};
+		#$billAmt = '';
+		$billPct = $insInfo->{percentage_pay};
+		#$billDate = '';
+		#$billStatus = '';
+		#$billResult = '';
+
 
 		my $tertBillSeq = $secondPayer ne '' && $secondPayer ne $primPayer ? App::Universal::PAYER_TERTIARY : App::Universal::PAYER_SECONDARY;
 		$page->schemaAction(
@@ -1232,9 +1223,51 @@ sub handleBillingInfo
 
 
 
+	#------QUATERNARY PAYER
+
+	my $quatPayer = $page->field('quaternary_payer');
+	if($quatPayer ne '' && $quatPayer ne $tertPayer && $quatPayer ne $secondPayer && $quatPayer ne $primPayer)
+	{
+		my $billParty = '';
+		my $billToId = '';
+		my $billInsId = '';
+		my $billAmt = '';
+		my $billPct = '';
+		my $billDate = '';
+		my $billStatus = '';
+		my $billResult = '';
+
+		my $insInfo = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInsuranceByOwnerAndProductName', $quatPayer, $personId);
+		$billParty = $billPartyTypeIns;
+		$billToId = $insInfo->{ins_org_id};
+		$billInsId = $insInfo->{ins_internal_id};
+		#$billAmt = '';
+		$billPct = $insInfo->{percentage_pay};
+		#$billDate = '';
+		#$billStatus = '';
+		#$billResult = '';
+
+
+		my $quatBillSeq = App::Universal::PAYER_QUATERNARY;
+		$page->schemaAction(
+			'Invoice_Billing', 'add',
+			invoice_id => $invoiceId || undef,
+			bill_sequence => defined $quatBillSeq ? $quatBillSeq : undef,
+			bill_party_type => defined $billParty ? $billParty : undef,
+			bill_to_id => $billToId || undef,
+			bill_ins_id => $billInsId || undef,
+			bill_amount => $billAmt || undef,
+			bill_pct => $billPct || undef,
+			bill_date => $billDate || undef,
+			bill_status => $billStatus || undef,
+			bill_result => $billResult || undef,
+			_debug => 0
+		);
+	}
+
 	#------BY DEFAULT, ADD SELF-PAY AS THE LAST POSSIBLE PAYER IF IT HAS NOT ALREADY BEEN SELECTED
 
-	if($primPayer != $fakeInsIdSelfPay && $secondPayer != $fakeInsIdSelfPay && $tertPayer != $fakeInsIdSelfPay)
+	if($primPayer != $fakeInsIdSelfPay && $quatPayer eq '')
 	{
 		my $billParty = '';
 		my $billToId = '';
@@ -1273,6 +1306,10 @@ sub handleBillingInfo
 			_debug => 0
 		);
 	}
+
+
+
+	#redirect to next function according to copay
 
 	my $copay = $page->field('copay');
 	my $copayAmt = $page->field('copay_amt');
