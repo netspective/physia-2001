@@ -59,20 +59,39 @@ sub new
 	$self;
 }
 
+sub pingDB
+{
+	my $self = shift;
+	my $dbh = shift;
+	
+	eval {
+		$dbh->ping();
+	};
+	my $error = $@;
+	$@ = undef;
+	return $error ? 0 : 1;
+}
+
 sub connectDB
 {
 	my $self = shift;
 	my $connectKey = shift;
 
-	if(! exists $cachedDbHdls->{$connectKey})
+	unless(exists $cachedDbHdls->{$connectKey} && defined $cachedDbHdls->{$connectKey}->{dbiHdl} && $self->pingDB($cachedDbHdls->{$connectKey}->{dbiHdl}))
 	{
 		my ($un, $pw, $connectStr) = $connectKey =~ m/\s*(.*?)\/(.*?)\@(.*)\s*/;
+		if (exists $cachedDbHdls->{$connectKey})
+		{
+			delete $cachedDbHdls->{$connectKey};
+			warn "Database connection lost. Reconnecting\n";
+			# Need to send e-mail
+		}
 		if($un && $pw && $connectStr)
 		{
 			my ($dbi, $dbms, $server) = split(/:/, $connectStr);
 
 			$cachedDbHdls->{$connectKey}->{dbiHdl} = DBI->connect($connectStr, $un, $pw);
-			if(! $cachedDbHdls->{$connectKey})
+			if(! $cachedDbHdls->{$connectKey}->{dbiHdl})
 			{
 				delete $cachedDbHdls->{$connectKey};
 				$self->addError("Unable to connect to the database $self->{dbConnectParams}->{connectStr} as $self->{dbConnectParams}->{username}.");
@@ -81,9 +100,9 @@ sub connectDB
 			{
 				$cachedDbHdls->{$connectKey}->{dbms} = $dbms;
 				$cachedDbHdls->{$connectKey}->{dbserver} = $server;
-				$cachedDbHdls->{$connectKey}->{dbh}->{RaiseError} = 1;
-				$cachedDbHdls->{$connectKey}->{dbh}->{LongReadLen} = 8192;
-				$cachedDbHdls->{$connectKey}->{dbh}->{LongTruncOk} = 1;
+				$cachedDbHdls->{$connectKey}->{dbiHdl}->{RaiseError} = 1;
+				$cachedDbHdls->{$connectKey}->{dbiHdl}->{LongReadLen} = 8192;
+				$cachedDbHdls->{$connectKey}->{dbiHdl}->{LongTruncOk} = 1;
 			}
 		}
 		else
