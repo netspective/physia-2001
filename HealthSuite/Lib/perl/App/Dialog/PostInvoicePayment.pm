@@ -39,6 +39,7 @@ sub new
 		new CGI::Dialog::Field(type => 'hidden', name => 'credit_warning_flag'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'alert_off'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'client_id'),
+		new CGI::Dialog::Field(type => 'hidden', name => 'product_ins_id'),
 
 		new CGI::Dialog::Field(caption => 'Invoice ID', name => 'sel_invoice_id', options => FLDFLAG_REQUIRED, findPopup => '/lookup/claim'),
 
@@ -188,10 +189,11 @@ sub populateData
 	$page->field('batch_id', $page->session('batch_id')) if $page->field('batch_id') eq '';
 
 	my $invoiceId = $page->param('invoice_id') || $page->param('_sel_invoice_id') || $page->field('sel_invoice_id');
-	$page->field('sel_invoice_id', $invoiceId);
 	my $invoiceInfo = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoice', $invoiceId);
+	$page->field('sel_invoice_id', $invoiceId);
 	my $clientId = $invoiceInfo->{client_id};
 	$page->field('client_id', $clientId);
+
 	my $paidBy = $page->param('paidBy');
 	if($paidBy eq 'insurance' || $invoiceInfo->{invoice_type} == App::Universal::INVOICETYPE_SERVICE)
 	{
@@ -200,9 +202,23 @@ sub populateData
 		my $billPartyType = $currentPayer->{bill_party_type};
 		if($billPartyType == App::Universal::INVOICEBILLTYPE_THIRDPARTYINS || $billPartyType == App::Universal::INVOICEBILLTYPE_THIRDPARTYORG)
 		{
+			#populate payer info
 			my $orgId = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_NONE, 'selRegistry', $billToId);
 			$page->field('payer_id', $orgId->{org_id});
 			$page->field('orgpayer_internal_id', $billToId);
+
+			#populate product ins internal id for getting plan allow
+			my $coverage = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInsuranceData', $currentPayer->{bill_ins_id});
+			my $coverageParent = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInsuranceData', $coverage->{parent_ins_id});
+			if($coverageParent->{record_type} == App::Universal::RECORDTYPE_INSURANCEPRODUCT)
+			{
+				$page->field('product_ins_id', $coverageParent->{ins_internal_id});
+			}
+			else
+			{	
+				my $product = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInsuranceData', $coverageParent->{parent_ins_id});
+				$page->field('product_ins_id', $product->{ins_internal_id});
+			}
 		}
 		else
 		{

@@ -835,6 +835,7 @@ use CGI::Dialog;
 use DBI::StatementManager;
 use App::Statements::Person;
 use App::Statements::Invoice;
+use App::Statements::Catalog;
 use App::Universal;
 
 use Number::Format;
@@ -1015,7 +1016,6 @@ sub getHtml
 		my $dateDisplay = "$item->{service_begin_date} $endDateDisplay";
 
 		my $amtApplied = $page->param("_f_item_$line\_amount_applied");
-		my $planAllow = $page->param("_f_item_$line\_plan_allow");
 		my $planPaid = $page->param("_f_item_$line\_plan_paid");
 		my $writeoffCode = $page->param("_f_item_$line\_writeoff_code");
 
@@ -1030,12 +1030,22 @@ sub getHtml
 		}
 
 		#display line item suppression checkboxes if paid by insurance
+		my $planAllow = $page->param("_f_item_$line\_plan_allow");
 		if($paidBy eq 'insurance')
 		{
+			#create html for suppressing line items
 			my $isSuppressed = $page->param("_f_item_$line\_suppress") == 1 ? 'CHECKED' : '';
 			$itemSuppressHtml = $itemType != App::Universal::INVOICEITEMTYPE_ADJUST ? 
 				qq{<TD ALIGN=RIGHT><INPUT TYPE="CHECKBOX" NAME='_f_item_$line\_suppress' $isSuppressed></TD>}
 				: qq{<TD><FONT SIZE=1>&nbsp;</FONT></TD>};
+
+			#get plan allow
+			unless($page->param("_f_item_$line\_plan_allow_is_set"))
+			{
+				my $getPlanAllow = $STMTMGR_CATALOG->getSingleValue($page, STMTMGRFLAG_CACHE, 'selPlanAllowedByProdAndCode', $page->field('product_ins_id'), $page->session('org_internal_id'), $itemCPT);
+				$planAllow = $page->param("_f_item_$line\_plan_allow", $getPlanAllow);
+				$page->param("_f_item_$line\_plan_allow_is_set", 'test');
+			}
 		}
 
 		$linesHtml .= qq{
@@ -1044,6 +1054,7 @@ sub getHtml
 			<INPUT TYPE="HIDDEN" NAME="_f_item_$line\_item_charge" VALUE="$itemCharge"/>
 			<INPUT TYPE="HIDDEN" NAME="_f_item_$line\_item_existing_adjs" VALUE="$itemAdjs"/>
 			<INPUT TYPE="HIDDEN" NAME="_f_item_$line\_item_cpt" VALUE="$itemCPT"/>
+			<INPUT TYPE="HIDDEN" NAME="_f_item_$line\_plan_allow_is_set" VALUE='@{[ $page->param("_f_item_$line\_plan_allow_is_set") ]}'/>
 			<TR VALIGN=TOP>
 				<TD ALIGN=RIGHT><FONT $textFontAttrs COLOR="#333333"/><B>$line</B></FONT></TD>
 				$itemSuppressHtml
