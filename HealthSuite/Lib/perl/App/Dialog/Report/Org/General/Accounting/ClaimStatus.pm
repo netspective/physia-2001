@@ -70,7 +70,7 @@ sub buildSqlStmt
 	my $reportBeginDate = $page->field('report_begin_date');
 	my $reportEndDate = $page->field('report_end_date');
 	my $status = join(',',  $page->field('claim_status'));		
-	my $orgId = $page->session('org_id');
+	my $orgId = $page->session('org_internal_id');
 	my $statusClause='';	
 	$statusClause = qq{i_s.id in ($status)  and} if !($status=~m/-1/) ;		   
 	my $dateClause ;
@@ -91,12 +91,11 @@ sub buildSqlStmt
 					and     ib.invoice_item_id is NULL
 					$dateClause
 				   };			   
-	
 	my $columns = qq{i.invoice_id,
 			i.total_items, i.client_id,
 			to_char(i.invoice_date, 'MM/dd/YYYY') as invoice_date,
 			i_s.caption as invoice_status,
-			ib.bill_to_id,
+			decode(ib.bill_party_type,0,ib.bill_to_id,1,ib.bill_to_id,(select org_id FROM ORG WHERE org_internal_id = ib.bill_to_id)) as  bill_to_id,
 			i.total_cost,
 			i.total_adjust,
 			i.balance,
@@ -168,7 +167,7 @@ sub execute
 	my $pub = {
 		columnDefn => [
 			{ colIdx => 0, head => 'Invoice ID', hAlign => 'center',dAlign => 'center',dataFmt => '#0#', 
-			url => 'javascript:doActionPopup("#hrefSelfPopup#&detail=payment&payer=#0#",null,"width=800,height=600,scrollbars,resizable")',},
+			url => qq{javascript:doActionPopup('#hrefSelfPopup#&detail=payment&payer=#0#',null,'width=800,height=600,scrollbars,resizable')},},
 			{ colIdx => 1, head => 'Number Of Items',dAlign => 'center', dataFmt => '#1#' },
 			{ colIdx => 2, head => 'Client ID', dAlign => 'center',dataFmt => '#2#' },
 			{ colIdx => 3, head => 'Invoice Date', dAlign => 'center',dataFmt => '#3#' },
@@ -205,6 +204,7 @@ sub execute
 		$_->{cap});
 		push(@data, \@rowData);
 	};
+	
 	my $html = createHtmlFromData($page, 0, \@data,$pub);
 	return $html;
 	
