@@ -246,7 +246,6 @@ sub Table::insertRec
 	my $sqlCol = $sql || colDataAsStr("[DATA] Update ($self->{name}): ", $colDataRef);
 	$sqlCol .= "  " . join ',',@$colValue;
 	push(@{$page->{sqlLog}}, [$sqlCol, $errors]) if $flags & SCHEMAAPIFLAG_LOGSQL;			
-	$page->addDebugStmt($sql) if $colDataRef->{_debug} && $page;	
 	$page->storeSql($sql,$colValue,$errors) if $page && $page->can('unitWork') &&$page->unitWork();		
 	return 1 unless $flags & SCHEMAAPIFLAG_EXECSQL;
 
@@ -258,11 +257,30 @@ sub Table::insertRec
 			$rowsInserted = $schema->{dbh}->do($sql,undef,@{$colValue}) or die $DBI::errstr;
 			
 		};
-		if($rowsInserted == 0 || $@)
+		if($rowsInserted == 0 || $@ || $colDataRef->{_debug})
 		{
-			push(@{$errors}, "$self (insertRec DBI Error)", $@);
+			my $debugMsg = "<b>SQL:</b> <pre>$sql</pre>";
+			$debugMsg .= "<b>Bind Parameters:</b><BR>" if defined $_[0];
+			for my $i ( 0..$#{$colValue})
+			{
+				my $value = defined $$colValue[$i] ? "'$$colValue[$i]'" : '<i>undef</i>';
+				$debugMsg .= '&nbsp;&nbsp;:' . ($i+1) . " = $value<br>";
+			}
+			$debugMsg .= '<br>';
+			$debugMsg .= "<b>Rows Inserted:</b> $rowsInserted<br>";
+			$debugMsg .= "<b>DBI Error:</b> $@<br>" if $@;
+			if ($@ || $rowsInserted == 0)
+			{
+				$debugMsg = "<b>Schema Error in " . ref($self) . '::insertRec()</b><br>' . $debugMsg;
+				push(@{$errors}, $debugMsg);
+			}
+			else
+			{
+				$debugMsg = "<b>Schema Debug in " . ref($self) . '::insertRec()</b><br>' . $debugMsg;
+				$page->addDebugStmt($debugMsg) if $page;
+			}
 		}
-		else
+		if ($rowsInserted)
 		{
 			return $autoIncPriKeyValue if $autoIncPriKeyValue != -1;
 			return $rowsInserted; # success
@@ -291,25 +309,24 @@ sub Table::updateRec
 
 	my $flags = $page->{schemaFlags};
 	my $options = $flags & SCHEMAAPIFLAG_EMBEDVALUES ? { ignoreUndefs => 0, ignoreColsNotFound => 0 } : { ignoreUndefs => 0, ignoreColsNotFound => 0 , placeHolder =>1 }  ;
-	my ($sql, $colValue,$errors) = $self->createUpdateSql($colDataRef,$options);
+	my ($sql, $colValue, $errors) = $self->createUpdateSql($colDataRef, $options);
 	$sql = $page->replaceVars($sql) if $page && $page->can('replaceVars');
 	my $sqlCol = $sql || colDataAsStr("[DATA] Update ($self->{name}): ", $colDataRef);	
 	$sqlCol .= "  " . join ',',@$colValue;
 	push(@{$page->{sqlLog}}, [$sqlCol, $errors]) if $flags & SCHEMAAPIFLAG_LOGSQL;			
-	$page->addDebugStmt($sql) if $colDataRef->{_debug} && $page;
 	$page->storeSql($sql,$colValue,$errors) if $page && $page->can('unitWork') &&$page->unitWork();		
 	return 1 unless $flags & SCHEMAAPIFLAG_EXECSQL;
 
 	if(scalar(@{$errors}) == 0)
 	{
+		my $rowsUpdated = 0;
 		eval
 		{
-			 $schema->{dbh}->do($sql,undef,@{$colValue}) or die $DBI::errstr;
+			 $rowsUpdated = $schema->{dbh}->do($sql,undef,@{$colValue}) or die $DBI::errstr;
 		};
-		if($@)
-		{
-			my $debugMsg = "<b>Schema Error in " . ref($self) . '::updateRec()</b><br>';
-			$debugMsg .= "<b>SQL:</b> <pre>$sql</pre>";
+		if($rowsUpdated == 0 || $@ || $colDataRef->{_debug})
+		{			
+			my $debugMsg = "<b>SQL:</b> <pre>$sql</pre>";
 			$debugMsg .= "<b>Bind Parameters:</b><BR>" if defined $_[0];
 			for my $i ( 0..$#{$colValue})
 			{
@@ -317,10 +334,20 @@ sub Table::updateRec
 				$debugMsg .= '&nbsp;&nbsp;:' . ($i+1) . " = $value<br>";
 			}
 			$debugMsg .= '<br>';
-			$debugMsg .= "<b>DBI Error:</b> $@<br>";
-			push(@{$errors}, $debugMsg);
+			$debugMsg .= "<b>Rows Updated:</b> $rowsUpdated<br>";
+			$debugMsg .= "<b>DBI Error:</b> $@<br>" if $@;
+			if ($@)
+			{
+				$debugMsg = "<b>Schema Error in " . ref($self) . '::updateRec()</b><br>' . $debugMsg;
+				push(@{$errors}, $debugMsg);
+			}
+			else
+			{
+				$debugMsg = "<b>Schema Debug in " . ref($self) . '::updateRec()</b><br>' . $debugMsg;
+				$page->addDebugStmt($debugMsg) if $page;
+			}
 		}
-		else
+		if ($rowsUpdated)
 		{
 			return 1;
 		}
@@ -348,25 +375,44 @@ sub Table::deleteRec
 
 	my $flags = $page->{schemaFlags};
 	my $options = $flags & SCHEMAAPIFLAG_EMBEDVALUES ? { ignoreUndefs => 1, ignoreColsNotFound => 0  } : { ignoreUndefs => 1, ignoreColsNotFound => 0 , placeHolder =>1} ;
-	my ($sql, $colValue,$errors) = $self->createDeleteSql($colDataRef,$options);
+	my ($sql, $colValue, $errors) = $self->createDeleteSql($colDataRef, $options);
 	$sql = $page->replaceVars($sql) if $page && $page->can('replaceVars');
 	my $sqlCol = $sql || colDataAsStr("[DATA] Update ($self->{name}): ", $colDataRef);
 	$sqlCol .= "  " . join ',',@$colValue;
 	push(@{$page->{sqlLog}}, [$sqlCol, $errors]) if $flags & SCHEMAAPIFLAG_LOGSQL;			
-	$page->addDebugStmt($sql) if $colDataRef->{_debug} && $page;
 	$page->storeSql($sql,$colValue,$errors) if $page && $page->can('unitWork') &&$page->unitWork();	
 	return 1 unless $flags & SCHEMAAPIFLAG_EXECSQL;
 	if(scalar(@{$errors}) == 0)
 	{
+		my $rowsDeleted = 0;
 		eval
 		{
-			 $schema->{dbh}->do($sql,undef,@{$colValue}) or die $DBI::errstr;
+			 $rowsDeleted = $schema->{dbh}->do($sql,undef,@{$colValue}) or die $DBI::errstr;
 		};
-		if($@)
-		{
-			push(@{$errors}, "$self (updateRec DBI Error)", $@);
+		if($rowsDeleted == 0 || $@ || $colDataRef->{_debug})
+		{			
+			my $debugMsg = "<b>SQL:</b> <pre>$sql</pre>";
+			$debugMsg .= "<b>Bind Parameters:</b><BR>" if defined $_[0];
+			for my $i ( 0..$#{$colValue})
+			{
+				my $value = defined $$colValue[$i] ? "'$$colValue[$i]'" : '<i>undef</i>';
+				$debugMsg .= '&nbsp;&nbsp;:' . ($i+1) . " = $value<br>";
+			}
+			$debugMsg .= '<br>';
+			$debugMsg .= "<b>Rows Deleted:</b> $rowsDeleted<br>";
+			$debugMsg .= "<b>DBI Error:</b> $@<br>" if $@;
+			if ($@)
+			{
+				$debugMsg = "<b>Schema Error in " . ref($self) . '::deleteRec()</b><br>' . $debugMsg;
+				push(@{$errors}, $debugMsg);
+			}
+			else
+			{
+				$debugMsg = "<b>Schema Debug in " . ref($self) . '::deleteRec()</b><br>' . $debugMsg;
+				$page->addDebugStmt($debugMsg) if $page;
+			}
 		}
-		else
+		if ($rowsDeleted)
 		{
 			return 1;
 		}
@@ -403,30 +449,44 @@ sub Table::existsRec
 	{
 		#$page->addDebugStmt('here');
 		my $whereCond = $self->createEquality(\@colNames, \@colValues, " and ");
-		$sql = "select $colNames[0] from $self->{name} where $whereCond";
+		$sql = "SELECT $colNames[0]\nFROM $self->{name}\nWHERE $whereCond";
 		$sql = $page->replaceVars($sql) if $page && $page->can('replaceVars');
-		my $recFound = 0;
+		my $rowsFound = 0;
 		eval
 		{
 			my $cursor = $self->{schema}->{dbh}->prepare($sql);
 			$cursor->execute();
-			$recFound = 1 if $cursor->fetch();
+			$rowsFound = 1 if $cursor->fetch();
 		};
-		$page->addDebugStmt($sql) if $colData{_debug} && $page;
-		if($@)
-		{
-			if($page)
+		if($@ || $colData{_debug})
+		{			
+			my $debugMsg = "<b>SQL:</b> <pre>$sql</pre>";
+			$debugMsg .= "<b>Rows Found:</b> $rowsFound<br>";
+			$debugMsg .= "<b>DBI Error:</b> $@<br>" if $@;
+			if ($@ || $rowsFound == 0)
 			{
-				# running in a web environment, so give errors in HTML
-				$page->addError("$self (existsRec DBI Error) $@");
-				return 0;
+				$debugMsg = "<b>Schema Error in " . ref($self) . '::existsRec()</b><br>' . $debugMsg;
+				push(@{$errors}, $debugMsg);
 			}
 			else
 			{
-				return $@;
+				$debugMsg = "<b>Schema Debug in " . ref($self) . '::existsRec()</b><br>' . $debugMsg;
+				$page->addDebugStmt($debugMsg) if $page;
 			}
 		}
-		return $recFound;
+		return $rowsFound;
+	}
+	
+	# if we get to here, we have errors
+	if($page)
+	{
+		# running in a web environment, so give errors in HTML
+		$page->addError(join("<br>", @{$errors}));
+		return 0;
+	}
+	else
+	{
+		return $errors;
 	}
 }
 
