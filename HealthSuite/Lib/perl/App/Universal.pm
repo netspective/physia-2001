@@ -539,6 +539,7 @@ use vars qw(%DIALOG_COMMAND_ACTIVITY_MAP);
 	'view' => 0, 'add' => 1, 'update' => 2, 'remove' => 3,
 	'cancel' => 4, 'noshow' => 5, 'reschedule' => 6,
 	'confirm' => 7, 'verify' => 8, 'setup' => 9,
+	'prescribe' => 10, 'refill' => 11,
 );
 use constant ACTIVITY_TYPE_RECORD => 0;
 use constant ACTIVITY_TYPE_PAGE => 1;
