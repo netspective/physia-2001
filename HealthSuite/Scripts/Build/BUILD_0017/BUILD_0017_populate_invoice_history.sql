@@ -33,6 +33,4 @@ select
 	value_dateend,
 	value_datea,
 	value_dateb
-from Invoice_Attribute
-where item_name = 'Invoice/History/Item'
-;
+from Invoice_Attribute where item_name = 'Invoice/History/Item';
