@@ -22,6 +22,7 @@ sub initialize
 	#my $self = CGI::Dialog::new(@_, id => 'referral', heading => 'Add Referral');
 
 	$self->addContent(
+		new App::Dialog::Field::Person::ID(caption => 'Person/Patient ID',types => ['Patient'],	name => 'person_id'),
 		new CGI::Dialog::Subhead(heading => 'Insurance Information', name => 'insurance_heading', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE),
 		new CGI::Dialog::Field(caption => 'Primary Payer', type => 'select', name => 'payer'),
 		new CGI::Dialog::MultiField(caption => 'Payer for Today ID/Type', name => 'other_payer_fields',
@@ -133,6 +134,7 @@ sub makeStateChanges
 	#$self->setFieldFlags('phy_first_name', FLDFLAG_READONLY, 1);
 	#$self->setFieldFlags('phy_last_name', FLDFLAG_READONLY, 1);
 
+
 	my  $otherPayer = $self->getField('other_payer_fields');
 
 	$self->updateFieldFlags('other_payer_fields', FLDFLAG_INVISIBLE, 1);
@@ -144,8 +146,11 @@ sub makeStateChanges
 
 	}
 
-
-
+	my $personId = $page->param('person_id');
+	my $orgId = $page->session('org_id');
+	my $personCategories = $STMTMGR_PERSON->getSingleValueList($page, STMTMGRFLAG_CACHE, 'selCategory', $personId, $orgId);
+	my $category = $personCategories->[0];
+	$self->updateFieldFlags('person_id', FLDFLAG_INVISIBLE, 1)if $category eq 'Patient';
 }
 
 sub populateData_add
@@ -156,7 +161,7 @@ sub populateData_add
 
 	my $personId = $page->param('person_id');
 
-	$STMTMGR_PERSON->createFieldsFromSingleRow($page, STMTMGRFLAG_NONE, 'selPersonData', $personId);
+	#$STMTMGR_PERSON->createFieldsFromSingleRow($page, STMTMGRFLAG_NONE, 'selPersonData', $personId);
 	#my $contactInfo = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_NONE, 'selPersonData', $personId);
 
 
@@ -190,15 +195,17 @@ sub execute
 	push(@cpt, $cpt1);
 	push(@cpt, $cpt2);
 	my $dataTextC = join (', ', @cpt);
-	my $personId = $page->param('person_id');
+	my $personId = $page->param('person_id') ne '' ? $page->param('person_id') : $page->field('person_id');
 
 	my $transType = App::Universal::TRANSTYPEPROC_REFERRAL;
+
+
 
 	$page->schemaAction(
 			'Transaction',
 			$command,
 			trans_owner_type => defined $transOwnerType ? $transOwnerType : undef,
-			trans_owner_id => $page->param('person_id'),
+			trans_owner_id => $personId,
 			trans_id => $transId || undef,
 			trans_type => $transType || undef,
 			trans_begin_stamp => $page->field('trans_begin_stamp') || undef,
