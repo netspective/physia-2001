@@ -374,7 +374,7 @@
 		<column name="bill_status" type="text" size="128" descr="Status of the latest bill"/>
 		<column name="bill_result" type="text" size="128" descr="Result of the latest bill"/>
 	</table>
-	
+
 	<table name="Invoice_Budget" abbrev="InvBudget" parent="Invoice" type="Audit,Secure">
 		<column name="budget_id" type="autoinc" primarykey="yes" desc="Unique ID for specific budget record"/>
 		<column name="payment_cycle" type="integer" desc="Number of days between each required budget payment"/>
@@ -678,21 +678,23 @@
 	</table>
 
 	<table name="Invoice_Worklist" abbrev="InvWrk" type="Secure">
-		<column name="invoice_worklist_id" type="autoinc" primarykey="yes" descr="Uniq ID (in entire system) Invoice Worklist entry"/>		
+		<column name="invoice_worklist_id" type="autoinc" primarykey="yes" descr="Uniq ID (in entire system) Invoice Worklist entry"/>
+		<column name="cr_stamp" type="stamp" default="sysdate" descr="Date/time record was created"/>
+		<column name="cr_user_id" type="entity_id" descr="The user that created the record"/>
+		<column name="cr_org_internal_id" type="longint" descr="The org that created the record (the one the cr_user_id was logged-into)"/>
 		<column name="owner_id" lookupref="person.person_id" descr="Person whose worklist Invoice is attached)"/>
 		<column name="person_id" lookupref="person.person_id" descr="Person ID of patient on the invoice"/>
-		<column name="responsible_id" lookupref="person.person_id" descr="Responsible party ID for action on the invoice (collector,etc)"/>
+		<column name="responsible_id" indexed="yes" lookupref="person.person_id" descr="Responsible party ID for action on the invoice (collector,etc)"/>
 		<column name="org_internal_id" parentref="Org.org_internal_id" descr="The unique ID of the organization."/>
-		<column name="reck_date" type="date" descr="The date the worklist item should be re-checked"/>		
+		<column name="reck_date" type="date" descr="The date the worklist item should be re-checked"/>
 		<column name="invoice_id" indexed="yes" lookupref="Invoice.invoice_id" descr="Invoice id for invoice on the worklist"/>
 		<column name="data_date_a" type="date" descr="Extra data, dependent upon worklist type"/>
-		<column name="data_date_b" type="date" descr="Extra data, dependent upon worklist type"/>		
+		<column name="data_date_b" type="date" descr="Extra data, dependent upon worklist type"/>
 		<column name="parent_invoice_id" indexed="yes" lookupref="Invoice.invoice_id" descr="Parent Invoice id for invoice that is in"/>
-		<column name="worklist_status" type="text" size="30" descr="Status of Invoice on the worklist (transfered,closed,hold,etc)" />
-		<column name="worklist_type" type="text" size="30" descr="Type of Worklist Invoice will appear  on(collection,claims,etc)" />			
+		<column name="worklist_status" type="text" indexed="yes" size="30" descr="Status of Invoice on the worklist (transfered,closed,hold,etc)" />
+		<column name="worklist_type" type="text" size="30" descr="Type of Worklist Invoice will appear  on(collection,claims,etc)" />
 		<column name="comments" type="text" size="512" descr="Comment about invoice"/>
 	</table>
-
 
 	<table name="TEMP_FKM" abbrev="TempFM" >
 		<column name="person_id"  indexed="yes" type="text" size="16"/>
