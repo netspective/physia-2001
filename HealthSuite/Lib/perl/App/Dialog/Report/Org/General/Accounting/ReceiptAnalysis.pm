@@ -66,8 +66,8 @@ sub execute
 			{ colIdx => 3, head => 'Payer Name',groupBy => 'Sub-Total'  },
 			{ colIdx => 4, head => 'Batch Date' },			
 			{ colIdx => 5, head => 'Batch Date Rcpt', summarize => 'sum', dformat => 'currency' },
-			{ colIdx => 6, head => 'Month Rcpt', summarize => 'sum', , dformat => 'currency' },
-			{ colIdx => 7, head => 'Year Rcpt', summarize => 'sum', dformat => 'currency' },
+			{ colIdx => 6, head => 'Month Rcpt',  dformat => 'currency' },
+			{ colIdx => 7, head => 'Year Rcpt', dformat => 'currency' },
 		],
 	};	
 	my $orgInternalId = $page->session('org_internal_id');
