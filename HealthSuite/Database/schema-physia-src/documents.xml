@@ -78,7 +78,8 @@
 		<column name="doc_data_c" type="text" size="1024" descr="Any document-specific alias/information"/>		
 		<column name="doc_content_uri" type="text" size="512" descr="If the document is addressable by a URI, this is the URI"/>
 		<column name="doc_content_small" type="text" size="4000" descr="They actual content of the document (depends on spec as to whether this or _large is used)"/>		
-		<column name="doc_content_large" type="datablock" descr="They actual content of the document"/>		
+		<column name="doc_content_large" type="datablock" descr="They actual content of the document"/>
+		<column name="doc_dest_ids" type="text" size="1024" descr="The ids of the recipients (both To and CC)"/>
 	</table>
 
 	<table name="Document_Association" abbrev="DocAssn" type="Audit,Secure">

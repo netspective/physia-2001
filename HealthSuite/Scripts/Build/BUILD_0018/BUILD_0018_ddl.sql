@@ -56,3 +56,7 @@ start data/Lab_Order_Transmission
 analyze table Lab_Order_Transmission compute statistics for table for all indexes for all columns;
 alter table Lab_Order_Transmission monitoring;
 
+--bug 1762
+alter table Document Add (DOC_DEST_IDS VARCHAR2(1024));
+alter table Document_AUD Add (DOC_DEST_IDS VARCHAR2(1024));
+start tables-code/Document
