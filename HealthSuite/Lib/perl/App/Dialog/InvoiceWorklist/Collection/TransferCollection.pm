@@ -88,7 +88,7 @@ sub execute
 		trans_owner_type => 0,                        
 		caption =>'Account Notes',
 		trans_type => $ACCOUNT_NOTES,                        
-		trans_begin_stamp => $page->field('trans_begin_stamp')||undef,
+		trans_begin_stamp => $page->field('date_data_b')||undef,
 		detail => $page->field('detail') || undef,     
 		trans_status => $transStatus,             
 	);
