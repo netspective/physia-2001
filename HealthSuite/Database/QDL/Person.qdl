@@ -40,15 +40,15 @@
 		<field id="any_address_city" caption="Any Address - City" join="per_addr_any" column="city"/>
 		<field id="any_address_state" caption="Any Address - State" join="per_addr_any" column="state"/>
 		<field id="any_address_zip" caption="Any Address - Zip Code" join="per_addr_any" column="zip"/>
-		<field id="home_phone" caption="Home Phone Number" join="per_attr_phone_home" column="value_text"/>
-		<field id="work_phone" caption="Work Phone Number" join="per_attr_phone_work" column="value_text"/>
-		<field id="cell_phone" caption="Cellular Phone Number" join="per_attr_phone_cell" column="value_text"/>
-		<field id="alt_phone" caption="Alternate Phone Number" join="per_attr_phone_alt" column="value_text"/>
-		<field id="any_phone" caption="Any Phone Number" join="per_attr_phone_any" column="value_text"/>
-		<field id="home_fax" caption="Home Fax Number" join="per_attr_fax_home" column="value_text"/>
-		<field id="work_fax" caption="Work Fax Number" join="per_attr_fax_work" column="value_text"/>
-		<field id="alt_fax" caption="Alternate Fax Number" join="per_attr_fax_alt" column="value_text"/>
-		<field id="any_fax" caption="Any Fax Number" join="per_attr_fax_any" column="value_text"/>
+		<field id="home_phone" caption="Home Phone" join="per_attr_phone_home" column="value_text"/>
+		<field id="work_phone" caption="Work Phone" join="per_attr_phone_work" column="value_text"/>
+		<field id="cell_phone" caption="Cellular Phone" join="per_attr_phone_cell" column="value_text"/>
+		<field id="alt_phone" caption="Alternate Phone" join="per_attr_phone_alt" column="value_text"/>
+		<field id="any_phone" caption="Any Phone" join="per_attr_phone_any" column="value_text"/>
+		<field id="home_fax" caption="Home Fax" join="per_attr_fax_home" column="value_text"/>
+		<field id="work_fax" caption="Work Fax" join="per_attr_fax_work" column="value_text"/>
+		<field id="alt_fax" caption="Alternate Fax" join="per_attr_fax_alt" column="value_text"/>
+		<field id="any_fax" caption="Any Fax" join="per_attr_fax_any" column="value_text"/>
 		<field id="category" caption="Category" join="per_org_category" column="category"/>
 		<field id="category_org" join="per_org_category" column="org_internal_id"/>
 		<field id="account" caption="Account #" join="per_account" column="value_text"/>
@@ -81,7 +81,7 @@
 		<join id="per_chart" table="person_attribute" condition="per_chart.parent_id (+) = person.person_id AND per_chart.value_type (+) = 0 AND per_chart.item_name (+) = 'Patient/Chart Number'"/>
 		
 		<!-- Views -->
-		<view id="all" distinct="yes">
+		<view id="all" caption="None" distinct="yes" href="/person/{person_id}/profile">
 			<column id="person_id"/>
 			<column id="name_last"/>
 			<column id="name_first"/>
@@ -96,7 +96,7 @@
 			<order-by id="dob"/>
 			<condition field="category_org" comparison="is" criteria="#session.org_internal_id#"/>
 		</view>
-		<view id="nurse" distinct="yes">
+		<view id="nurse" caption="Nurses" distinct="yes" href="/person/{person_id}/profile">
 			<column id="person_id" caption="Nurse"/>
 			<column id="name_last"/>
 			<column id="name_first"/>
@@ -114,8 +114,8 @@
 				<condition field="category" comparison="is" criteria="Nurse"/>
 			</and-conditions>
 		</view>
-		<view id="physician" distinct="yes">
-			<column id="person_id" href="/person/{person_id}/{name_last}"/>
+		<view id="physician" caption="Physicians" distinct="yes" href="/person/{person_id}/profile">
+			<column id="person_id"/>
 			<column id="name_last"/>
 			<column id="name_first"/>
 			<column id="TO_CHAR({dob}, 'MM/DD/YYYY')"/>
@@ -132,8 +132,8 @@
 				<condition field="category" comparison="is" criteria="Physician"/>
 			</and-conditions>
 		</view>
-		<view id="staff" distinct="yes">
-			<column id="person_id" href="/person/{person_id}/{name_last}"/>
+		<view id="staff" caption="Staff Members" distinct="yes" href="/person/{person_id}/profile">
+			<column id="person_id"/>
 			<column id="name_last"/>
 			<column id="name_first"/>
 			<column id="TO_CHAR({dob}, 'MM/DD/YYYY')"/>
@@ -150,8 +150,8 @@
 				<condition field="category" comparison="is" criteria="Staff"/>
 			</and-conditions>
 		</view>
-		<view id="patient" distinct="yes">
-			<column id="person_id" href="/person/{person_id}/{name_last}"/>
+		<view id="patient" caption="Patients" distinct="yes" href="/person/{person_id}/profile">
+			<column id="person_id"/>
 			<column id="name_last"/>
 			<column id="name_first"/>
 			<column id="TO_CHAR({dob}, 'MM/DD/YYYY')"/>
@@ -168,8 +168,8 @@
 				<condition field="category" comparison="is" criteria="Patient"/>
 			</and-conditions>
 		</view>
-		<view id="administrator" distinct="yes">
-			<column id="person_id" href="/person/{person_id}/{name_last}"/>
+		<view id="administrator" caption="Administrators" distinct="yes" href="/person/{person_id}/profile">
+			<column id="person_id"/>
 			<column id="name_last"/>
 			<column id="name_first"/>
 			<column id="TO_CHAR({dob}, 'MM/DD/YYYY')"/>
@@ -186,8 +186,8 @@
 				<condition field="category" comparison="is" criteria="Administrator"/>
 			</and-conditions>
 		</view>
-		<view id="superuser" distinct="yes">
-			<column id="person_id" href="/person/{person_id}/{name_last}"/>
+		<view id="superuser" caption="SuperUsers" distinct="yes" href="/person/{person_id}/profile">
+			<column id="person_id"/>
 			<column id="name_last"/>
 			<column id="name_first"/>
 			<column id="TO_CHAR({dob}, 'MM/DD/YYYY')"/>
