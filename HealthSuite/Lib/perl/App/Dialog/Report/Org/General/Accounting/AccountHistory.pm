@@ -7,6 +7,7 @@ use Carp;
 use App::Dialog::Report;
 use App::Universal;
 
+use Number::Format;
 use CGI::Dialog;
 use CGI::Validator::Field;
 use DBI::StatementManager;
@@ -65,7 +66,7 @@ sub execute
 			{ colIdx => 5,	head => 'Charges',			hAlign => 'center',	dAlign => 'right',	dataFmt => '#5#',	dformat => 'currency' },
 			{ colIdx => 6,	head => 'Adjustment',		hAlign => 'center',	dAlign => 'right',	dataFmt => '#6#',	dformat => 'currency' },
 			{ colIdx => 7,	head => 'Description',		hAlign => 'center', dAlign => 'left',	dataFmt => '#7#' },
-			{ colIdx => 8,	head => 'Balance',			hAlign => 'center',	dAlign => 'right',	dataFmt => '#8#',	dformat => 'currency' },
+			{ colIdx => 8,	head => 'Balance',			hAlign => 'center',	dAlign => 'right',	dataFmt => '#8#',	dformat => 'currency', summarize => 'sum' },
 		],
 	};
 
@@ -271,6 +272,44 @@ sub execute
 		push(@data, \@rowData);
 	}
 
+	$sqlStmt = qq{ select * from agedpatientdata where patient = '$patientID'};
+	my $rowsF = $STMTMGR_RPT_CLAIM_STATUS->getRowsAsHashList($page,STMTMGRFLAG_DYNAMICSQL,$sqlStmt);
+	my ($total, $current, $period1, $period2, $period3, $period4, $period5, $period6, $copay, $insurance);
+
+	my $formatter = new Number::Format('INT_CURR_SYMBOL' => '$');
+
+	foreach my $rowF (@$rowsF)
+	{
+		$total += $rowF->{total};
+		$current = $formatter->format_price($rowF->{ageperiod1}) if ($rowF->{ageperiod1} != 0);
+		$period2 = $formatter->format_price($rowF->{ageperiod2}) if ($rowF->{ageperiod2} != 0);
+		$period3 = $formatter->format_price($rowF->{ageperiod3}) if ($rowF->{ageperiod3} != 0);
+		$period4 = $formatter->format_price($rowF->{ageperiod4}) if ($rowF->{ageperiod4} != 0);
+		$period5 = $formatter->format_price($rowF->{ageperiod5}) if ($rowF->{ageperiod5} != 0);
+		$period6 = $formatter->format_price($rowF->{ageperiod6}) if ($rowF->{ageperiod6} != 0);
+		$copay = $formatter->format_price($rowF->{copay}) if ($rowF->{copay} != 0);
+		$insurance = $rowF->{insurance} if ($rowF->{insurance} != 0);
+	}
+
+	my $patientBalance = $total - $insurance;
+	$insurance = $formatter->format_price($insurance);
+	$patientBalance = $formatter->format_price($patientBalance);
+	$total = $formatter->format_price($total);
+	my $footer = qq{<BR><table style='border: solid navy 1px' bgcolor='beige' border=0 cellspacing=0 cellpadding=1 width='30%'>};
+	$footer .= qq{<tr><td><font face='verdana,arial,helvetica' size='2' color='navy'>Current</td><td align=right><font face='verdana,arial,helvetica' size='2' color='navy'>$current</td></tr>} if ($current ne '');
+	$footer .= qq{<tr><td><font face='verdana,arial,helvetica' size='2' color='navy'>30-60 days</td><td align=right><font face='verdana,arial,helvetica' size='2' color='navy'>$period2</td></tr>} if ($period2 ne '');
+	$footer .= qq{<tr><td><font face='verdana,arial,helvetica' size='2' color='navy'>61-90 days</td><td align=right><font face='verdana,arial,helvetica' size='2' color='navy'>$period3</td></tr>} if ($period3 ne '');
+	$footer .= qq{<tr><td><font face='verdana,arial,helvetica' size='2' color='navy'>91-120 days</td><td align=right><font face='verdana,arial,helvetica' size='2' color='navy'>$period4</td></tr>} if ($period4 ne '');
+	$footer .= qq{<tr><td><font face='verdana,arial,helvetica' size='2' color='navy'>121-150 days</td><td align=right><font face='verdana,arial,helvetica' size='2' color='navy'>$period5</td></tr>} if ($period5 ne '');
+	$footer .= qq{<tr><td><font face='verdana,arial,helvetica' size='2' color='navy'>151-180 days</td><td align=right><font face='verdana,arial,helvetica' size='2' color='navy'>$period6</td></tr>} if ($period6 ne '');
+	$footer .= qq{<tr><td><font face='verdana,arial,helvetica' size='2' color='navy'>Copay</td><td align=right><font face='verdana,arial,helvetica' size='2' color='navy'>$copay</td></tr>} if ($copay ne '');
+	$footer .= qq{<tr><td><font face='verdana,arial,helvetica' size='2' color='navy'><B>Total Balance</B></td><td align=right><font face='verdana,arial,helvetica' size='2' color='navy'><B>$total</B></td></table>};
+
+	$footer .= qq{<table style='border: solid navy 1px' bgcolor='beige' border=0 cellspacing=0 cellpadding=1 width='30%'};
+	$footer .= qq{<tr><td><font face='verdana,arial,helvetica' size='2' color='navy'>Patient Balance</td><td align=right><font face='verdana,arial,helvetica' size='2' color='navy'>$patientBalance</td></tr>};
+	$footer .= qq{<tr><td><font face='verdana,arial,helvetica' size='2' color='navy'>Insurance Balance</td><td align=right><font face='verdana,arial,helvetica' size='2' color='navy'>$insurance</td></tr><BR>};
+	$footer .= qq{<tr><td><font face='verdana,arial,helvetica' size='2' color='navy'><B>Total Balance</B></td><td align=right><B><font face='verdana,arial,helvetica' size='2' color='navy'>$total</B></td></tr></table></font>};
+
 	my $orgId = $page->session('org_internal_id');
 
 	my $query = qq {select name_primary from org where org_internal_id = $orgId};
@@ -279,36 +318,37 @@ sub execute
 	my $orgAddress = $STMTMGR_RPT_CLAIM_STATUS->getSingleValue($page,STMTMGRFLAG_DYNAMICSQL,$query);
 	$query = qq {select value_text from org_attribute where parent_id = $orgId and value_type = 10};
 	my $orgPhone = $STMTMGR_RPT_CLAIM_STATUS->getSingleValue($page,STMTMGRFLAG_DYNAMICSQL,$query);
-	$query = qq {select value_text from org_attribute where parent_id = $orgId and value_type = 600 and item_name = 'State#'};
+	$query = qq {select tax_id from org where org_internal_id = $orgId};
 	my $orgTax = $STMTMGR_RPT_CLAIM_STATUS->getSingleValue($page,STMTMGRFLAG_DYNAMICSQL,$query);
 
-	$query = qq {select complete_name from person where person_id = \'$patientID\'};
+	$query = qq {select complete_name from person where person_id = '$patientID'};
 	my $patientName = $STMTMGR_RPT_CLAIM_STATUS->getSingleValue($page,STMTMGRFLAG_DYNAMICSQL,$query);
-	$query = qq {select complete_addr_html from person_address where parent_id = \'$patientID\'};
+	$query = qq {select complete_addr_html from person_address where parent_id = '$patientID'};
 	my $patientAddress = $STMTMGR_RPT_CLAIM_STATUS->getSingleValue($page,STMTMGRFLAG_DYNAMICSQL,$query);
 
 	my $html = qq
 	{
 		<center>
 			<table border=0 cellspacing=0 cellpadding=0>
-				<tr><td><font face=\'arial,helvetica\' size=\'2\' color=navy><b>$org</b></font></td></tr>
-				<tr><td><font face=\'arial,helvetica\' size=\'2\' color=navy>$orgAddress</font></td></tr>
-				<tr><td><font face=\'arial,helvetica\' size=\'2\' color=navy>$orgPhone</font></td></tr>
-				<tr><td><font face=\'arial,helvetica\' size=\'2\' color=navy>$orgTax</font></td></tr>
+				<tr><td><font face='arial,helvetica' size='2' color=navy><b>$org</b></font></td></tr>
+				<tr><td><font face='arial,helvetica' size='2' color=navy>$orgAddress</font></td></tr>
+				<tr><td><font face='arial,helvetica' size='2' color=navy>$orgPhone</font></td></tr>
+				<tr><td><font face='arial,helvetica' size='2' color=navy>$orgTax</font></td></tr>
 			</table>
 		</center>
 
-		<table border=0 cellspacing=0 cellpadding=0 width=\'100%\'>
-			<tr><td><font face=\'arial,helvetica\' size=\'2\' color=navy><b>$patientName ($patientID)</b></font></td></tr>
+		<table border=0 cellspacing=0 cellpadding=0 width='100%'>
+			<tr><td><font face='arial,helvetica' size='2' color=navy><b>$patientName ($patientID)</b></font></td></tr>
 			<tr>
-				<td><font face=\'arial,helvetica\' size=\'2\' color=navy>$patientAddress</font></td>
-				<td rowspan=\'2\' valign=\'bottom\'><font face=\'arial,helvetica\' size=\'2\' color=navy><b>@{[$page->getDate]}</b></font></td>
+				<td><font face='arial,helvetica' size='2' color=navy>$patientAddress</font></td>
+				<td rowspan='2' valign='bottom'><font face='arial,helvetica' size='2' color=navy><b>@{[$page->getDate]}</b></font></td>
 			</tr>
 		</table>
 		<p>
 	};
 
 	$html .= createHtmlFromData($page, 0, \@data, $pub);
+	$html .= $footer;
 	return $html;
 
 }
