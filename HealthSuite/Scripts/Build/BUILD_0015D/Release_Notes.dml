@@ -89,6 +89,10 @@
 		<deliverable id="1449">
 			Changed the 'Insured ID' field in the 'Personal Coverage' dialog to accept persons of type 'Patient' only.
 		</deliverable>		
+		<deliverable id="1453">
+			Added text payment method to daily and monthly audit detail report
+		</deliverable>		
+	
 	
 	</deliverables>
 </release-notes>
