@@ -226,7 +226,7 @@ sub execute
 			(To => $patientMail,
 			From => $strFrom,
 			Subject => "Your doctor's referral has been just processed",
-			Message => "http://tokyo.physia.com:8511/person/$personId/dlg-update-trans-6010/$newTransId"
+			Message => "http://tokyo.physia.com:8515/person/$personId/dlg-update-trans-6010/$newTransId"
 			);
 		sendmail(%mail) or die $Mail::Sendmail::error;
 	}
@@ -237,7 +237,7 @@ sub execute
 			(To => $referredByMail,
 			From => $strFrom,
 			Subject => "Your doctor's referral has been just processed",
-			Message => "http://tokyo.physia.com:8511/person/$personId/dlg-update-trans-6010/$newTransId"
+			Message => "http://tokyo.physia.com:8515/person/$personId/dlg-update-trans-6010/$newTransId"
 			);
 		sendmail(%mail) or die $Mail::Sendmail::error;
 	}
@@ -248,7 +248,7 @@ sub execute
 			(To => $referredToMail,
 			From => $strFrom,
 			Subject => "Your doctor's referral has been just processed",
-			Message => "http://tokyo.physia.com:8511/person/$personId/dlg-update-trans-6010/$newTransId"
+			Message => "http://tokyo.physia.com:8515/person/$personId/dlg-update-trans-6010/$newTransId"
 			);
 		sendmail(%mail) or die $Mail::Sendmail::error;
 	}
