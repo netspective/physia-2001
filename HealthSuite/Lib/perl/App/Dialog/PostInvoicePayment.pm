@@ -55,7 +55,11 @@ sub new
 
 		new CGI::Dialog::MultiField(caption => 'Check Amount/Number', name => 'check_fields',
 			fields => [
-					new CGI::Dialog::Field(caption => 'Check Amount', name => 'check_amount', options => FLDFLAG_REQUIRED),
+					new CGI::Dialog::Field(caption => 'Check Amount', 
+						name => 'check_amount',
+						type => 'currency',
+						options => FLDFLAG_REQUIRED,
+					),
 					new CGI::Dialog::Field::TableColumn(
 						caption => 'Check Number/Pay Reference',
 						schema => $schema,
@@ -67,7 +71,11 @@ sub new
 		
 		#fields for personal payment
 
-		new CGI::Dialog::Field(type => 'currency', caption => 'Total Amount', name => 'total_amount', options => FLDFLAG_REQUIRED),
+		new CGI::Dialog::Field(caption => 'Total Amount', 
+			name => 'total_amount',
+			type => 'currency',
+			options => FLDFLAG_REQUIRED,
+		),
 
 		new CGI::Dialog::Field(
 				name => 'pay_type',
