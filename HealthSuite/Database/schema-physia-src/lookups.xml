@@ -63,6 +63,16 @@
 		<enum id="99">Other</enum>
 	</table>
 
+	<table name="Resp_Party_Relationship" abbrev="RPRel" type="Lookup">
+		<enum id="0">Self</enum>
+		<enum id="10">Spouse</enum>
+		<enum id="11">Parent</enum>
+		<enum id="12">Child</enum>
+		<enum id="50">Employer</enum>
+		<enum id="99">Other</enum>
+	</table>
+
+
 	<table name="Ethnicity" type="Lookup">
 		<enum>Native-American</enum>
 		<enum>Caucasian</enum>
@@ -70,7 +80,7 @@
 		<enum>Asian-American</enum>
 	</table>
 
-	<table name="Relationship" type="Lookup">
+	<table name="Family_Relationship" type="Lookup">
 		<enum>Other</enum>
 		<enum>Mother</enum>
 		<enum>Father</enum>
