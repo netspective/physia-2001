@@ -154,6 +154,7 @@ sub incrementViewCount
 
 	my ($scope, $key) = ($1, $2) if $self->referer() =~ m!http://.*?/(.*?)/(.*?)/.*!;
 	my $sessionId = $self->session('_session_id');
+	return unless $sessionId;
 	my $userId    = $self->session('user_id');
 
 	my @arlItems = split(/\//, $self->param('arl'));
@@ -1017,6 +1018,14 @@ sub printContents
 	#$self->dumpCookies() if $self->param('_debug_cookies');
 
 	$self->send_page_body();
+}
+
+sub homeArl
+{
+	my ($self) = @_;
+	my $homeArl = $self->param('home') || $self->param('arl');
+	$homeArl = '/' . $homeArl unless $homeArl =~ /^\//;
+	return $homeArl;
 }
 
 sub handleARL
