@@ -175,7 +175,8 @@ sub processClaim
 			'EAat' => sub { return 0; },
 			'FA0' => sub { return 1; },
 			'FAat' => sub { return 0; },
-			'FB1' => sub { return 1; }
+			'FB1' => sub { return 1; },
+			'HA0' => sub { return 1; },
 		},
 		NSF_THIN . "" =>
 		{
@@ -275,6 +276,10 @@ sub processClaim
 	{
 		$self->{FB1Obj} = new App::Billing::Output::File::Batch::Claim::Record::NSF::FB1;
 	}
+	if(&{$recordCreationCondition->{$nsfType}->{HA0}} == 1)
+	{
+		$self->{HA0Obj} = new App::Billing::Output::File::Batch::Claim::Record::NSF::HA0;
+	}
 
 	my $proceduresCount = $tempClaim->{procedures};
 
@@ -297,7 +302,13 @@ sub processClaim
 				{
 					push(@$outArray,$self->{FB1Obj}->formatData($self, {RECORDFLAGS_NONE => 0} , $tempClaim, $nsfType));
 				}
-
+				if(&{$recordCreationCondition->{$nsfType}->{HA0}} == 1)
+				{
+					if($procedure->{comments} ne '')
+					{
+						push(@$outArray,$self->{HA0Obj}->formatData($self, {RECORDFLAGS_NONE => 0} , $tempClaim, $nsfType));
+					}
+				}
 				$self->{totalClaimCharges} +=  $tempClaim->{procedures}->[$self->getSequenceNo()-1]->getExtendedCost();
 				$self->{totalDisallowedCostContainmentCharges} += $tempClaim->{procedures}->[$self->getSequenceNo()-1]->getDisallowedCostContainment();
 				$self->{totalDisallowedOtherCharges} += $tempClaim->{procedures}->[$self->getSequenceNo()-1]->getDisallowedOther();
@@ -339,6 +350,22 @@ sub prepareClaimTrailer
 	push(@$outArray,$self->{nsfClaimTrailerObj}->formatData($self, {RECORDFLAGS_NONE => 0}, $tempClaim, $nsfType));
 }
 
+sub getComments
+{
+	my ($self, $claim) = @_;
+
+	my $procedures = $claim->{procedures};
+	my $procedure;
+	my $comments = '';
+
+	foreach my $i (0..$#$procedures)
+	{
+		$procedure = $procedures->[$i];
+		$comments = $procedure->{comments};
+		last if ($procedure->{comments} ne '')
+	}
+	return $comments;
+}
 
 sub getTime
 {
