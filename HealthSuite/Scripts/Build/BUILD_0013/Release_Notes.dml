@@ -50,6 +50,9 @@
 		<deliverable id="468">
 			UI:  Added a multifield in the update Patient dialog to add 'Patient deceased and date'. 
 			     This added information about deceased patient can be viewed in the 'Alert' component.
-		</deliverable>		
+		</deliverable>	
+		<deliverable id="1111">
+			UI: On the person page, editing person profile works.
+		</deliverable>
 	</deliverables>
 </release-notes>
