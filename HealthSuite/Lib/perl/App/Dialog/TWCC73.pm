@@ -272,7 +272,7 @@ sub new
 		new CGI::Dialog::Field(caption => 'Medications Restrictions (if any):', name => 'med_restrict_heading', options => FLDFLAG_READONLY),
 		new CGI::Dialog::Field(type => 'bool', style => 'check', caption => 'Must take prescription medication(s)', name => 'prescription_meds'),
 		new CGI::Dialog::Field(type => 'bool', style => 'check', caption => 'Advised to take over-the-counter meds', name => 'otc_meds'),
-		new CGI::Dialog::Field(type => 'bool', style => 'check', caption => 'Medication may take drowsy (possible safety/driving issues)', name => 'drowsy_meds'),
+		new CGI::Dialog::Field(type => 'bool', style => 'check', caption => 'Medication may make drowsy (possible safety/driving issues)', name => 'drowsy_meds'),
 
 		#21
 		new CGI::Dialog::Subhead(heading => 'Treatment/Follow-up Appointment Information', name => 'divider7'),
