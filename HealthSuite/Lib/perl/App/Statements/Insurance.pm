@@ -703,8 +703,8 @@ $STMTMGR_INSURANCE = new App::Statements::Insurance(
 		 	ins_org_id = ?,
 		 	product_name = ?,
 		 	plan_name = ?,
-		 	parent_ins_id = ?
-		 WHERE ins_internal_id = ?
+		 	owner_org_id = ?
+		 WHERE parent_ins_id = ?
 	},
 	#--------------------------------------------------------------------------------------------------------------------------------------
 	'sel_Person_Insurance' => {
