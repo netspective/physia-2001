@@ -223,19 +223,17 @@ $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
 		sqlStmt=>
 		qq
 		{
-
-                        SELECT	oa.value_int as cycle ,count (distinct(pog.person_id)) as tlt_patient
-                        FROM	person p, org_attribute oa , person_org_category pog
-                        WHERE   upper(substr(p.name_last,1,1)) between oa.value_text
-                        AND     oa.value_textb
-                        AND     oa.item_name = 'Billing Event'
-                        AND     oa.value_type = 650
-                        AND     (:1 IS NULL OR oa.value_int = :1)
-                        AND     p.person_id = pog.person_id
-                        AND     pog.category='Patient'
-                        AND     pog.org_internal_id = :2
-                        AND     oa.parent_id = :2
-                        GROUP BY oa.value_int
+			SELECT	oa.value_int as cycle ,count (distinct(pog.person_id)) as tlt_patient
+			FROM	person p, org_attribute oa , person_org_category pog
+			WHERE   upper(substr(p.name_last,1,1)) between oa.value_text AND oa.value_textb
+			AND     oa.item_name = 'Billing Event'
+			AND     oa.value_type = 650
+			AND     (:1 IS NULL OR oa.value_int = :1)
+			AND     p.person_id = pog.person_id
+			AND     pog.category='Patient'
+			AND     pog.org_internal_id = :2
+			AND     oa.parent_id = :2
+			GROUP BY oa.value_int
 		},
 	},
 	
@@ -244,7 +242,6 @@ $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
 		sqlStmt=>
 		qq
 		{
-
 			SELECT	s.amount_due,
 				p.simple_name,
 				s.patient_id,

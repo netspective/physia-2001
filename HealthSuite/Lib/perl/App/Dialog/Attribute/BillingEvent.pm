@@ -45,20 +45,26 @@ sub new
 	croak 'schema parameter required' unless $schema;
 
 	$self->addContent(
-		new CGI::Dialog::Field(name => 'value_int', size => 2, caption => 'Day of Month', options => FLDFLAG_REQUIRED),
-		new CGI::Dialog::MultiField(
-			caption => 'Name From',
+		new CGI::Dialog::Field(caption => 'Billing Cycle',
+			hints => 'Day of Month (1..28)',
+			name => 'value_int', size => 2, maxLength => 2, type => 'integer',
+			options => FLDFLAG_REQUIRED
+		),
+		new CGI::Dialog::MultiField(caption => 'Name From',
 			name => 'name_from',
 			fields => [
-				new CGI::Dialog::Field(name => 'value_text', size => 1, options => FLDFLAG_UPPERCASE),
-				new CGI::Dialog::Field(name => 'value_textb', size => 1, caption => 'to ', options => FLDFLAG_INLINECAPTION | FLDFLAG_UPPERCASE),
+				new CGI::Dialog::Field(name => 'value_text', size => 1, maxLength => 1, 
+					options => FLDFLAG_UPPERCASE),
+				new CGI::Dialog::Field(name => 'value_textb', size => 1, caption => 'to ', 
+					maxLength => 1,
+					options => FLDFLAG_INLINECAPTION | FLDFLAG_UPPERCASE),
 			],
 		),
-		new CGI::Dialog::MultiField(
-			caption => 'Balance is',
+		new CGI::Dialog::MultiField(caption => 'Balance is',
 			name => 'balance_criteria',
 			fields => [
-				new CGI::Dialog::Field(name => 'value_intb', type => 'select', selOptions => 'Greater Than:1;Less Than:-1'),
+				new CGI::Dialog::Field(name => 'value_intb', type => 'select', 
+					selOptions => 'Greater Than:1;Less Than:-1'),
 				new CGI::Dialog::Field(name => 'value_float', type => 'currency', defaultValue => 0),
 			],
 		),
@@ -74,9 +80,6 @@ sub customValidate
 {
 	my ($self, $page) = @_;
 
-	my $command = $self->getActiveCommand($page);
-	return () if $command ne 'add';
-
 	if ($page->field('value_text') gt $page->field('value_textb'))
 	{
 		my $nameField = $self->getField('name_from');
@@ -88,14 +91,13 @@ sub customValidate
 		my $dayField = $self->getField('value_int');
 		$dayField->invalidate($page, "Day of month cannot be greater than 28");
 	}
-
 }
 
 
 sub populateData
 {
 	my ($self, $page, $command, $activeExecMode, $flags) = @_;
-	return unless $flags & CGI::Dialog::DLGFLAG_UPDORREMOVE_DATAENTRY_INITIAL;
+	return unless $flags & CGI::Dialog::DLGFLAG_DATAENTRY_INITIAL;
 
 	my $table = $self->{table};
 	my $itemId = $page->param('item_id');
