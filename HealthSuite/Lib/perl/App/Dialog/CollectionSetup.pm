@@ -44,17 +44,17 @@ sub initialize
 
 	my $facilitiesField = new App::Dialog::Field::OrgType(
 		caption => '',
-		types => "'CLINIC', 'FACILITY/SITE','PRACTICE'",
+		types => qq{'CLINIC','HOSPITAL','FACILITY/SITE','PRACTICE'},
 		name => 'facility_list',
 		style => 'multidual',
 		multiDualCaptionLeft => 'Available Facilities',
-		multiDualCaptionRight => 'Selected Facilities',		
+		multiDualCaptionRight => 'Selected Facilities',
 		type => 'select',
 		size => '5',
 	);
 	$facilitiesField->clearFlag(FLDFLAG_REQUIRED);
 
-	$self->addContent(		
+	$self->addContent(
 
 		new CGI::Dialog::Subhead(heading => 'Physicians'),
 		$resourcesField,
@@ -64,9 +64,9 @@ sub initialize
 
 		new CGI::Dialog::Subhead(heading => 'Insurance Providers'),
 		new CGI::Dialog::Field(type => 'select',
-			defaultValue=>'0', 
-			selOptions=>"Selected:0;All:1", 
-			name => 'product_select', 
+			defaultValue=>'0',
+			selOptions=>"Selected:0;All:1",
+			name => 'product_select',
 			caption => 'Products',
 			onChangeJS => qq{showFieldsOnValues(event, [0], ['products']);}),
 		new CGI::Dialog::Field(
@@ -81,7 +81,7 @@ sub initialize
 			fKeyStmt => 'sel_worklist_available_products',
 			fKeyStmtBindSession => ['org_internal_id'],
 			hints => ''
-		),							
+		),
 
 		new CGI::Dialog::Subhead(heading => 'Patients Last Name'),
 		new CGI::Dialog::MultiField(caption =>'Enter range:',
@@ -107,7 +107,7 @@ sub initialize
 		new CGI::Dialog::Subhead(heading => 'Age of the Balance'),
 		new CGI::Dialog::MultiField(caption =>'Age range:',
 			name => 'BalanceAge',
-			hints => 'Enter minimum and maximum age of balance in days.',			
+			hints => 'Enter minimum and maximum age of balance in days.',
 			fields => [
 				new CGI::Dialog::Field(
 					name => 'BalanceAgeMin',
@@ -138,7 +138,7 @@ sub initialize
 					size => 5,
 					maxLength => 5,
 					type => 'integer',
-					minValue=>1,					
+					minValue=>1,
 				),
 				new CGI::Dialog::Field(
 					name => 'BalanceAmountMax',
@@ -146,7 +146,7 @@ sub initialize
 					size => 5,
 					maxLength => 5,
 					type => 'integer',
-					minValue=>1,					
+					minValue=>1,
 				),
 			]),
 	);
@@ -189,7 +189,7 @@ sub populateData
 	my $sessOrgId = $page->session('org_internal_id');
 
 	my $itemNamePrefix = $page->param('itemNamePrefix');
-	
+
 	# Populate the selected physicians
 	my $physicianList = $STMTMGR_WORKLIST_COLLECTION->getRowsAsHashList($page,
 		STMTMGRFLAG_NONE, 'sel_worklist_associated_physicians', $userId,  $itemNamePrefix . '-Physician');
@@ -212,7 +212,7 @@ sub populateData
 	else
 	{
 		my $productsList = $STMTMGR_WORKLIST_COLLECTION->getRowsAsHashList($page,
-			STMTMGRFLAG_NONE, 'sel_worklist_associated_products', $userId, $sessOrgId, 
+			STMTMGRFLAG_NONE, 'sel_worklist_associated_products', $userId, $sessOrgId,
 			$itemNamePrefix . '-Product');
 		my @products = ();
 		for (@$productsList)
@@ -221,7 +221,7 @@ sub populateData
 		}
 		$page->field('products', @products);
 	}
-	
+
 	# Populate the selected facilities
 	my $facilityList = $STMTMGR_WORKLIST_COLLECTION->getRowsAsHashList($page,
 		STMTMGRFLAG_NONE, 'sel_worklist_facilities', $userId, $sessOrgId, $itemNamePrefix . '-Org');
@@ -262,7 +262,7 @@ sub execute
 	my $userId = $page->session('user_id');
 	my $orgId =  $page->session('org_id') || undef;
 
-	my $orgIntId = $orgId ? $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgId', 
+	my $orgIntId = $orgId ? $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgId',
 		$page->session('org_internal_id'), $orgId) : undef;
 
 	my $itemNamePrefix = $page->param('itemNamePrefix');
@@ -423,22 +423,22 @@ sub customValidate
 	if ($strFrom gt $strTo  && length $strTo gt 0)
 	{
 		$nameRangeFields->invalidate($page, 'Invalid Last-Name range. The value on the left must be equal to or less than the value on the right.');
-	}	
+	}
 	my ($intBalanceAgeMin, $intBalanceAgeMax) = ($page->field('BalanceAgeMin'), $page->field('BalanceAgeMax'));
 	if (length $intBalanceAgeMin > 0 && length $intBalanceAgeMax > 0)
 	{
-		my $balanceAgeFields = $self->getField('BalanceAge')->{fields}->[0];	
+		my $balanceAgeFields = $self->getField('BalanceAge')->{fields}->[0];
 		if ($intBalanceAgeMin > $intBalanceAgeMax)
 		{
 
 			$balanceAgeFields->invalidate($page, "Invalid \"Balance Age\" range. The value on the left must be equal to or less than the value on the right.");
 		}
-		if ($intBalanceAgeMin == 0 || $intBalanceAgeMax == 0)		
+		if ($intBalanceAgeMin == 0 || $intBalanceAgeMax == 0)
 		{
-			$balanceAgeFields->invalidate($page, "Invalid \"Balance Age\" range. Min and Max value must be greater than 0.");		
+			$balanceAgeFields->invalidate($page, "Invalid \"Balance Age\" range. Min and Max value must be greater than 0.");
 		}
 	}
-	
+
 	my ($intBalanceAmountMin, $intBalanceAmountMax) = ($page->field('BalanceAmountMin'), $page->field('BalanceAmountMax'));
 	if (length $intBalanceAmountMin > 0 && length $intBalanceAmountMax > 0)
 	{
@@ -453,7 +453,7 @@ sub customValidate
 
 			$balanceAmountFields->invalidate($page, "Invalid \"Balance Amount\" range. Min and Max value must be greater than 0.");
 		}
-		
+
 	}
 }
 
