@@ -15,6 +15,7 @@ use Carp;
 use CGI::Validator::Field;
 use CGI::Dialog;
 use App::Dialog::Field::Person;
+use App::Dialog::Field::Organization;
 use App::Dialog::Field::Invoice;
 use App::Dialog::Field::Procedures;
 use App::Universal;
@@ -62,13 +63,18 @@ sub initialize
 		new CGI::Dialog::Field(type => 'hidden', name => 'tertiary_payer'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'quaternary_payer'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'third_party_payer_id'),
+		new CGI::Dialog::Field(type => 'hidden', name => 'third_party_payer_type'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'copay_amt'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'claim_type'),
 		new CGI::Dialog::Field(type => 'hidden', name => 'dupCheckin_returnUrl'),
 
+
+
 		new App::Dialog::Field::Person::ID(caption => 'Patient ID', name => 'attendee_id', options => FLDFLAG_REQUIRED,
 			readOnlyWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
 			types => ['Patient']),
+
+
 
 		new CGI::Dialog::Field(type => 'stamp', caption => 'Appointment Time',
 			name => 'start_time', options => FLDFLAG_READONLY),
@@ -76,8 +82,6 @@ sub initialize
 			name => 'checkin_stamp', options => FLDFLAG_READONLY),
 		new CGI::Dialog::Field(type => 'stamp', caption => 'Check-out Time',
 			name => 'checkout_stamp', options => FLDFLAG_READONLY),
-
-
 		new CGI::Dialog::Field::TableColumn(
 			caption => 'Type of Visit',
 			schema => $schema,
@@ -87,10 +91,10 @@ sub initialize
 			caption => 'Appointment Type',
 			schema => $schema,
 			column => 'Event.event_type', typeRange => '100..199'),
-
 		new CGI::Dialog::Field(caption => 'Reason for Visit', name => 'subject', options => FLDFLAG_REQUIRED),
-
 		new CGI::Dialog::Field(type => 'memo', caption => 'Symptoms', name => 'remarks'),
+
+
 
 		new CGI::Dialog::Field(name => 'accident',
 				caption => 'Accident?',
@@ -98,22 +102,28 @@ sub initialize
 				fKeyStmt => 'selAccidentDropDown',
 				fKeyDisplayCol => 0,
 				fKeyValueCol => 1),
-
 		new CGI::Dialog::Field(caption => 'Place of Auto Accident (State)', name => 'accident_state', size => 2, maxLength => 2),
 
 
 
 		new CGI::Dialog::Field(caption => 'Primary Payer', type => 'select', name => 'payer'),
+		
+		new CGI::Dialog::MultiField(caption => 'Third-Party ID/Type', name => 'other_payer_fields',
+			fields => [
+				new CGI::Dialog::Field(caption => 'Third-Party Payer for Today', name => 'other_payer_id'),
+				new CGI::Dialog::Field(type => 'select', selOptions => 'Person;Organization', caption => 'Third-Party Type', name => 'other_payer_type'),
+			]),
 
-		new CGI::Dialog::Field(caption => 'Third-Party Payer for Today', name => 'other_payer'),
+
 
 		#new CGI::Dialog::MultiField(caption => 'Deductible Balance/Insurance Phone', name => 'deduct_fields',
 		#	fields => [
 				new CGI::Dialog::Field(type => 'currency', caption => 'Deductible Balance', name => 'deduct_balance'),
 		#		new CGI::Dialog::Field(caption => 'Contact Phone for Primary Insurance', name => 'primary_ins_phone', options => FLDFLAG_READONLY),
 		#	]),
-
 		new CGI::Dialog::Field(caption => 'Contact Phone for Primary Insurance', name => 'primary_ins_phone', options => FLDFLAG_READONLY),
+
+
 
 		new CGI::Dialog::MultiField(caption => 'Provider Service/Billing', name => 'provider_fields',
 			fields => [
@@ -137,6 +147,8 @@ sub initialize
 						),
 			]),
 
+
+
 		new CGI::Dialog::MultiField(caption => 'Org Service/Billing/Pay To',
 			hints => 'Service Org is the org in which services were rendered.<br>
 						Billing org is the org in which the billing should be tracked.<br>
@@ -152,32 +164,36 @@ sub initialize
 							caption => 'Pay To Org',
 							name => 'pay_to_org_id'),
 			]),
-
-
 		new CGI::Dialog::Field(caption => 'Billing Contact', name => 'billing_contact'),
 		new CGI::Dialog::Field(type=>'phone', caption => 'Billing Phone', name => 'billing_phone'),
 
+
+
 		new App::Dialog::Field::Person::ID(caption => 'Referring Physician ID', name => 'ref_id', types => ['Physician']),
+
+
 
 		new CGI::Dialog::MultiField(caption =>'Similar/Current Illness Dates',
 			fields => [
 				new CGI::Dialog::Field(name => 'illness_begin_date', type => 'date', defaultValue => ''),
 				new CGI::Dialog::Field(name => 'illness_end_date', type => 'date', defaultValue => '')
 			]),
-
 		new CGI::Dialog::MultiField(caption =>'Begin/End Disability Dates',
 			fields => [
 				new CGI::Dialog::Field(name => 'disability_begin_date', type => 'date', defaultValue => ''),
 				new CGI::Dialog::Field(name => 'disability_end_date', type => 'date', defaultValue => '')
 			]),
-
 		new CGI::Dialog::MultiField(caption =>'Admission/Discharge Hospitalization Dates', name => 'hosp_dates',
 			fields => [
 				new CGI::Dialog::Field(name => 'hospitalization_begin_date', type => 'date', defaultValue => ''),
 				new CGI::Dialog::Field(name => 'hospitalization_end_date', type => 'date', defaultValue => '')
 			]),
 
+
+
 		new CGI::Dialog::Field(caption => 'Prior Authorization Number', name => 'prior_auth'),
+
+
 
 		new CGI::Dialog::Field(type => 'memo',
 				caption => 'Comments',
@@ -194,9 +210,7 @@ sub initialize
 
 
 		new CGI::Dialog::Subhead(heading => 'Procedure Entry', name => 'procedures_heading'),
-
 		new App::Dialog::Field::Procedures(name =>'procedures_list', lineCount => 3),
-
 	);
 
 	return $self;
@@ -208,8 +222,12 @@ sub makeStateChanges
 	$self->SUPER::makeStateChanges($page, $command, $dlgFlags);
 	$command ||= 'add';
 
-
-	$self->updateFieldFlags('other_payer', FLDFLAG_INVISIBLE, 1);
+	#keep third party other invisible unless it is chosen (see customValidate)
+	my $payer = $page->field('payer');
+	unless($payer eq 'Third-Party Payer')
+	{
+		$self->setFieldFlags('other_payer_fields', FLDFLAG_INVISIBLE, 1);
+	}
 
 
 
@@ -375,7 +393,7 @@ sub populateData
 	{
 		if($STMTMGR_PERSON->recordExists($page, STMTMGRFLAG_NONE, 'selPersonData', $personId))
 		{
-			setInsuranceFields($self, $page, $command, $activeExecMode, $flags, $invoiceId, $personId);
+			setPayerFields($self, $page, $command, $activeExecMode, $flags, $invoiceId, $personId);
 		}
 	}
 
@@ -390,30 +408,9 @@ sub populateData
 	}
 }
 
-sub setInsuranceFields
+sub setPayerFields
 {
 	my ($self, $page, $command, $activeExecMode, $flags, $invoiceId, $personId) = @_;
-
-	# CONSTANTS ---------------------------------------------------------------
-
-	#party types
-	my $billPartyTypeClient = App::Universal::INVOICEBILLTYPE_CLIENT;
-	my $billPartyTypePerson = App::Universal::INVOICEBILLTYPE_THIRDPARTYPERSON;
-	my $billPartyTypeOrg = App::Universal::INVOICEBILLTYPE_THIRDPARTYORG;
-	my $billPartyTypeIns = App::Universal::INVOICEBILLTYPE_THIRDPARTYINS;
-
-	#bill sequences
-	my $primary = App::Universal::INSURANCE_PRIMARY;
-	my $secondary = App::Universal::INSURANCE_SECONDARY;
-	my $tertiary = App::Universal::INSURANCE_TERTIARY;
-
-	#fake product names
-	my $fakeProdNameThirdParty = App::Universal::INSURANCE_FAKE_CLIENTBILL;
-	my $fakeProdNameSelfPay = App::Universal::INSURANCE_FAKE_SELFPAY;
-
-	# -------------------------------------------------------------------------
-
-
 
 	#Create drop-down of Payers
 
@@ -452,32 +449,18 @@ sub setInsuranceFields
 	push(@payerList, $thirdParty) if $thirdParty;
 
 	my $thirdPartyOther = 'Third-Party Payer';
+	#push(@payerList, $thirdPartyOther);
+
 	my $selfPay = 'Self-Pay';
 	push(@payerList, $selfPay);
 	
 	@payerList = join(';', @payerList);
 
-	#$self->getField('payer')->{selOptions} = "$insurances;$workComp;$thirdParty;$thirdPartyOther;$selfPay";
 	$self->getField('payer')->{selOptions} = "@payerList";
-	#$self->getField('payer')->{selOptions} = "$insurances;$workComp;$thirdParty;$selfPay";
 
 	my $payer = $page->field('payer');
 	$page->field('payer', $payer);
 	
-	#handlePayers($self, $page, $command, $flags);
-
-
-	#Other third party payer if one is not given
-	#if($page->field('payer') ne 'Third-Party Payer')
-	#{
-	#	$self->updateFieldFlags('other_payer', FLDFLAG_INVISIBLE, 1);
-	#}
-	#if($page->field('payer') eq 'Third-Party Payer')
-	#{
-	#	$page->addError('error');
-	#	my $otherPayerField = $self->getField('other_payer');
-	#	$otherPayerField->invalidate($page, "Please provide an alternate payer");
-	#}
 }
 
 sub handlePayers
@@ -487,7 +470,9 @@ sub handlePayers
 	my $personId = $page->field('attendee_id');
 
 	#CONSTANTS -------------------------------------------
-
+	
+	my $phoneAttrType = App::Universal::ATTRTYPE_PHONE;
+	
 	#bill sequences
 	my $primary = App::Universal::INSURANCE_PRIMARY;
 	my $secondary = App::Universal::INSURANCE_SECONDARY;
@@ -515,9 +500,63 @@ sub handlePayers
 	}
 	elsif($payer eq 'Third-Party Payer')
 	{
+		my $otherPayerId = $page->field('other_payer_id');
+		$otherPayerId = uc($otherPayerId);
+		my $otherPayerType = $page->field('other_payer_type');
+		my $addr = undef;
+		my $insPhone = undef;
+		my $guarantorType = undef;
+		if($otherPayerType eq 'Person')
+		{
+			$guarantorType = App::Universal::ENTITYTYPE_PERSON;
+			$addr = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_NONE, 'selHomeAddress', $otherPayerId);
+			$insPhone = $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_NONE, 'selAttributeByItemNameAndValueTypeAndParent', $otherPayerId, 'Home', $phoneAttrType);
+		}
+		else
+		{
+			$guarantorType = App::Universal::ENTITYTYPE_ORG;
+			$addr = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_NONE, 'selOrgAddressByAddrName', $otherPayerId, 'Mailing');
+			$insPhone = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_NONE, 'selAttributeByItemNameAndValueTypeAndParent', $otherPayerId, 'Primary', $phoneAttrType);
+		}
+		
+		my $recordType = App::Universal::RECORDTYPE_PERSONALCOVERAGE;
+		my $insIntId = $page->schemaAction(
+				'Insurance', 'add',
+				owner_person_id => $personId || undef,
+				record_type => defined $recordType ? $recordType : undef,
+				ins_type => defined $typeClient ? $typeClient : undef,
+				guarantor_id => $otherPayerId,
+				guarantor_type => defined $guarantorType ? $guarantorType : undef,
+				_debug => 0
+		);
+	
+		$page->schemaAction(
+				'Insurance_Address', 'add',
+				parent_id => $insIntId || undef,
+				address_name => 'Billing',
+				line1 => $addr->{line1} || undef,
+				line2 => $addr->{line2} || undef,
+				city => $addr->{city} || undef,
+				county => $addr->{county} || undef,
+				state => $addr->{state} || undef,
+				zip => $addr->{zip} || undef,
+				country => $addr->{country} || undef,
+				_debug => 0
+			);
+		
+		$page->schemaAction(
+				'Insurance_Attribute', 'add',
+				parent_id => $insIntId || undef,
+				item_name => 'Contact Method/Telephone/Primary',
+				value_type => defined $phoneAttrType ? $phoneAttrType : undef,
+				value_text => $insPhone->{value_text} || undef,
+				_debug => 0
+			);
+		
 		$page->field('primary_payer', $fakeProdNameThirdParty);
-		#$page->field('third_party_payer_id', id from inserted fields goes here);
-		$page->field('claim_type', $typeSelfPay);
+		$page->field('third_party_payer_id', $otherPayerId);
+		$page->field('third_party_payer_type', $otherPayerType);
+		$page->field('claim_type', $typeClient);
 	}
 	else
 	{
@@ -587,11 +626,13 @@ sub handlePayers
 			}
 			elsif($nonInsPayer[0] eq 'Third-Party')
 			{
-				my @thirdPartyOrgId = split('\)', $nonInsPayer[1]);
-				my $thirdPartyPlan = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInsuranceByPersonOwnerOrgOwnerAndInsType', $personId, $thirdPartyOrgId[0], $typeClient);
+				my @thirdPartyId = split('\)', $nonInsPayer[1]);
+				my $thirdPartyPlan = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInsuranceByPersonOwnerAndGuarantorAndInsType', $personId, $thirdPartyId[0], $typeClient);
 				$page->field('claim_type', $typeClient);
 				$page->field('primary_payer', $fakeProdNameThirdParty);
-				$page->field('third_party_payer_id', $thirdPartyPlan->{owner_org_id});
+				$page->field('third_party_payer_id', $thirdPartyPlan->{guarantor_id});
+				$thirdPartyPlan->{guarantor_type} == App::Universal::ENTITYTYPE_PERSON ? 
+					$page->field('third_party_payer_type', 'Person') : $page->field('third_party_payer_type', 'Org');
 			}
 		}
 	}
@@ -1032,9 +1073,9 @@ sub handleBillingInfo
 		elsif($primPayer == $fakeProdNameThirdParty)
 		{
 			my $thirdPartyId = $page->field('third_party_payer_id');
-			my $insInfo = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInsuranceByPersonOwnerOrgOwnerAndInsType', $personId, $thirdPartyId, App::Universal::CLAIMTYPE_CLIENT);
+			my $insInfo = $STMTMGR_INSURANCE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInsuranceByPersonOwnerAndGuarantorAndInsType', $personId, $thirdPartyId, App::Universal::CLAIMTYPE_CLIENT);
 
-			$billParty = $billPartyTypeOrg;
+			$billParty = $page->field('third_party_payer_type') eq 'Person' ? $billPartyTypePerson : $billPartyTypeOrg;
 			$billToId = $thirdPartyId;
 			$billInsId = $insInfo->{ins_internal_id};
 			#$billAmt = '';
@@ -1453,6 +1494,48 @@ sub customValidate
 	if($autoSet eq '' && $page->field('accident_state') ne '')
 	{
 		$accident->invalidate($page, "Must select 'Auto Accident' when indicating a '$state->{caption}'");
+	}
+	
+	
+	
+	#VALIDATION FOR THIRD PARTY PERSON OR ORG
+	my $payer = $page->field('payer');
+	if($payer eq 'Third-Party Payer')
+	{
+		my $otherPayer = $page->field('other_payer_id');
+		$otherPayer = uc($otherPayer);
+		$page->field('other_payer_id', $otherPayer);
+		my $otherPayerType = $page->field('other_payer_type');
+		my $otherPayerField = $self->getField('other_payer_fields')->{fields}->[0];
+
+		if($otherPayer eq '')
+		{
+			$otherPayerField->invalidate($page, "Please provide existing Id for 'Third-Party'");
+		}
+		elsif($otherPayerType eq 'Person')
+		{
+			my $createHref = "javascript:doActionPopup('/org-p/#session.org_id#/dlg-add-guarantor/$otherPayer');";
+			$otherPayerField->invalidate($page, qq{
+				Person Id '$otherPayer' does not exist.<br>
+				<img src="/resources/icons/arrow_right_red.gif">
+				<a href="$createHref">Create Third Party Person Id '$otherPayer' now</a>
+				})
+				unless $STMTMGR_PERSON->recordExists($page, STMTMGRFLAG_NONE,'selRegistry', $otherPayer);
+		}
+		elsif($otherPayerType eq 'Organization')
+		{
+			my $createOrgHrefPre = "javascript:doActionPopup('/org-p/#session.org_id#/dlg-add-org-";
+			my $createOrgHrefPost = "/$otherPayer');";
+
+			$otherPayerField->invalidate($page, qq{
+				Org Id '$otherPayer' does not exist.<br>
+				<img src="/resources/icons/arrow_right_red.gif">
+				Create '$otherPayer' Organization now as an
+				<a href="${createOrgHrefPre}insurance${createOrgHrefPost}">Insurance</a> or
+				<a href="${createOrgHrefPre}employer${createOrgHrefPost}">Employer</a>
+				})
+				unless $STMTMGR_ORG->recordExists($page, STMTMGRFLAG_NONE,'selRegistry', $otherPayer);
+		}
 	}
 }
 
