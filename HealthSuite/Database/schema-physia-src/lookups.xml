@@ -1433,6 +1433,1018 @@
 		</data>
 	</table>
 
+	<table name="Referral_Reason" abbrev="RefReas" type="Lookup">
+		<data>
+			<row>
+				<col name="id">0816</col>
+				<col name="caption">Allergy serum only</col>
+				<col name="group_name">Allergy</col>
+			</row>
+			<row>
+				<col name="id">0817</col>
+				<col name="caption">Allergy shots/injection</col>
+				<col name="group_name">Allergy</col>
+			</row>
+			<row>
+				<col name="id">2041</col>
+				<col name="caption">RAST</col>
+				<col name="group_name">Allergy</col>
+			</row>
+			<row>
+				<col name="id">2042</col>
+				<col name="caption">MAST</col>
+				<col name="group_name">Allergy</col>
+			</row>
+			<row>
+				<col name="id">2043</col>
+				<col name="caption">RIST</col>
+				<col name="group_name">Allergy</col>
+			</row>
+			<row>
+				<col name="id">2059</col>
+				<col name="caption">Other allergy</col>
+				<col name="group_name">Allergy</col>
+			</row>
+			<row>
+				<col name="id">2001</col>
+				<col name="caption">Angiograms</col>
+				<col name="group_name">Cardiology</col>
+			</row>
+			<row>
+				<col name="id">2002</col>
+				<col name="caption">EKG stress testing</col>
+				<col name="group_name">Cardiology</col>
+			</row>
+			<row>
+				<col name="id">2003</col>
+				<col name="caption">Cardiac rehab</col>
+				<col name="group_name">Cardiology</col>
+			</row>
+			<row>
+				<col name="id">2019</col>
+				<col name="caption">Other cardiology</col>
+				<col name="group_name">Cardiology</col>
+			</row>
+			<row>
+				<col name="id">2201</col>
+				<col name="caption">Motor vehicle accident</col>
+				<col name="group_name">Chiropractic</col>
+			</row>
+			<row>
+				<col name="id">2202</col>
+				<col name="caption">Worker's compensation</col>
+				<col name="group_name">Chiropractic</col>
+			</row>
+			<row>
+				<col name="id">2219</col>
+				<col name="caption">Other chiropractic</col>
+				<col name="group_name">Chiropractic</col>
+			</row>
+			<row>
+				<col name="id">2101</col>
+				<col name="caption">Lesion removal</col>
+				<col name="group_name">Dermatology</col>
+			</row>
+			<row>
+				<col name="id">2102</col>
+				<col name="caption">PUVA therapy</col>
+				<col name="group_name">Dermatology</col>
+			</row>
+			<row>
+				<col name="id">2103</col>
+				<col name="caption">Dermabrasion</col>
+				<col name="group_name">Dermatology</col>
+			</row>
+			<row>
+				<col name="id">2104</col>
+				<col name="caption">Chemical peel</col>
+				<col name="group_name">Dermatology</col>
+			</row>
+			<row>
+				<col name="id">2105</col>
+				<col name="caption">Reconstructive/Plastic</col>
+				<col name="group_name">Dermatology</col>
+			</row>
+			<row>
+				<col name="id">2106</col>
+				<col name="caption">Scar revision</col>
+				<col name="group_name">Dermatology</col>
+			</row>
+			<row>
+				<col name="id">2119</col>
+				<col name="caption">Other dermatology</col>
+				<col name="group_name">Dermatology</col>
+			</row>
+			<row>
+				<col name="id">2061</col>
+				<col name="caption">Growth hormones</col>
+				<col name="group_name">Endocrinology</col>
+			</row>
+			<row>
+				<col name="id">2062</col>
+				<col name="caption">Diabetic education</col>
+				<col name="group_name">Endocrinology</col>
+			</row>
+			<row>
+				<col name="id">2063</col>
+				<col name="caption">Nutritional counseling</col>
+				<col name="group_name">Endocrinology</col>
+			</row>
+			<row>
+				<col name="id">2079</col>
+				<col name="caption">Other endocrinology</col>
+				<col name="group_name">Endocrinology</col>
+			</row>
+			<row>
+				<col name="id">2021</col>
+				<col name="caption">Interferon therapy</col>
+				<col name="group_name">Gastroenterology</col>
+			</row>
+			<row>
+				<col name="id">2022</col>
+				<col name="caption">Sigmoidoscopy</col>
+				<col name="group_name">Gastroenterology</col>
+			</row>
+			<row>
+				<col name="id">2023</col>
+				<col name="caption">Endoscopy</col>
+				<col name="group_name">Gastroenterology</col>
+			</row>
+			<row>
+				<col name="id">2024</col>
+				<col name="caption">Colonoscopy</col>
+				<col name="group_name">Gastroenterology</col>
+			</row>
+			<row>
+				<col name="id">2039</col>
+				<col name="caption">Other gastroenterology</col>
+				<col name="group_name">Gastroenterology</col>
+			</row>
+			<row>
+				<col name="id">2161</col>
+				<col name="caption">Aerosol pentamidine</col>
+				<col name="group_name">Infectious disease</col>
+			</row>
+			<row>
+				<col name="id">2162</col>
+				<col name="caption">Interferon therapy</col>
+				<col name="group_name">Infectious disease</col>
+			</row>
+			<row>
+				<col name="id">2179</col>
+				<col name="caption">Other infectious disease</col>
+				<col name="group_name">Infectious disease</col>
+			</row>
+			<row>
+				<col name="id">0511</col>
+				<col name="caption">Mental Health Consultation</col>
+				<col name="group_name">Mental Health/CD</col>
+			</row>
+			<row>
+				<col name="id">0512</col>
+				<col name="caption">Chemical Dependency Consultation</col>
+				<col name="group_name">Mental Health/CD</col>
+			</row>
+			<row>
+				<col name="id">0513</col>
+				<col name="caption">Mental Health Outpatient</col>
+				<col name="group_name">Mental Health/CD</col>
+			</row>
+			<row>
+				<col name="id">0514</col>
+				<col name="caption">Chemical Dependency Outpatient</col>
+				<col name="group_name">Mental Health/CD</col>
+			</row>
+			<row>
+				<col name="id">0518</col>
+				<col name="caption">Mental Health, Residential</col>
+				<col name="group_name">Mental Health/CD</col>
+			</row>
+			<row>
+				<col name="id">0519</col>
+				<col name="caption">Dual Diagnosis, MH Primary/CD Secondary</col>
+				<col name="group_name">Mental Health/CD</col>
+			</row>
+			<row>
+				<col name="id">0520</col>
+				<col name="caption">Mental Health, Inpatient Adolescent</col>
+				<col name="group_name">Mental Health/CD</col>
+			</row>
+			<row>
+				<col name="id">0521</col>
+				<col name="caption">Mental Health, Transitional Adult</col>
+				<col name="group_name">Mental Health/CD</col>
+			</row>
+			<row>
+				<col name="id">0522</col>
+				<col name="caption">Mental Health, Transitional Adolescent</col>
+				<col name="group_name">Mental Health/CD</col>
+			</row>
+			<row>
+				<col name="id">0523</col>
+				<col name="caption">Chemical Dependency, Inpatient Adolescent</col>
+				<col name="group_name">Mental Health/CD</col>
+			</row>
+			<row>
+				<col name="id">0524</col>
+				<col name="caption">Chemical Dependency, Transitional Adult</col>
+				<col name="group_name">Mental Health/CD</col>
+			</row>
+			<row>
+				<col name="id">0525</col>
+				<col name="caption">Chemical Dependency, Transitional Adolescent</col>
+				<col name="group_name">Mental Health/CD</col>
+			</row>
+			<row>
+				<col name="id">2081</col>
+				<col name="caption">Dialysis</col>
+				<col name="group_name">Nephrology</col>
+			</row>
+			<row>
+				<col name="id">2099</col>
+				<col name="caption">Other nephrology</col>
+				<col name="group_name">Nephrology</col>
+			</row>
+			<row>
+				<col name="id">2121</col>
+				<col name="caption">Sleep studies</col>
+				<col name="group_name">Neurology</col>
+			</row>
+			<row>
+				<col name="id">2122</col>
+				<col name="caption">Motor vehicle accident</col>
+				<col name="group_name">Neurology</col>
+			</row>
+			<row>
+				<col name="id">2123</col>
+				<col name="caption">Worker's Compensation</col>
+				<col name="group_name">Neurology</col>
+			</row>
+			<row>
+				<col name="id">2139</col>
+				<col name="caption">Other neurology</col>
+				<col name="group_name">Neurology</col>
+			</row>
+			<row>
+				<col name="id">2601</col>
+				<col name="caption">Infertility</col>
+				<col name="group_name">OB/GYN</col>
+			</row>
+			<row>
+				<col name="id">2606</col>
+				<col name="caption">Prenatal care</col>
+				<col name="group_name">OB/GYN</col>
+			</row>
+			<row>
+				<col name="id">2619</col>
+				<col name="caption">Other OB/GYN</col>
+				<col name="group_name">OB/GYN</col>
+			</row>
+			<row>
+				<col name="id">2181</col>
+				<col name="caption">Radiation therapy</col>
+				<col name="group_name">Oncology</col>
+			</row>
+			<row>
+				<col name="id">2182</col>
+				<col name="caption">Chemotherapy</col>
+				<col name="group_name">Oncology</col>
+			</row>
+			<row>
+				<col name="id">2199</col>
+				<col name="caption">Other oncology</col>
+				<col name="group_name">Oncology</col>
+			</row>
+
+
+			<row>
+				<col name="id">0624</col>
+				<col name="caption">Eye exam, routine</col>
+				<col name="group_name">Ophthalmology</col>
+			</row>
+			<row>
+				<col name="id">0639</col>
+				<col name="caption">Other ophthalmology</col>
+				<col name="group_name">Ophthalmology</col>
+			</row>
+			<row>
+				<col name="id">2627</col>
+				<col name="caption">Motor vehicle accident</col>
+				<col name="group_name">Orthopedic</col>
+			</row>
+			<row>
+				<col name="id">2625</col>
+				<col name="caption">Sports injury</col>
+				<col name="group_name">Orthopedic</col>
+			</row>
+			<row>
+				<col name="id">2626</col>
+				<col name="caption">Work related injury</col>
+				<col name="group_name">Orthopedic</col>
+			</row>
+			<row>
+				<col name="id">2639</col>
+				<col name="caption">Other orthopedic</col>
+				<col name="group_name">Orthopedic</col>
+			</row>
+			<row>
+				<col name="id">2141</col>
+				<col name="caption">Bronchoscopies</col>
+				<col name="group_name">Pulmonology</col>
+			</row>
+			<row>
+				<col name="id">2142</col>
+				<col name="caption">Sleep studies</col>
+				<col name="group_name">Pulmonology</col>
+			</row>
+			<row>
+				<col name="id">2159</col>
+				<col name="caption">Other pulmonology</col>
+				<col name="group_name">Pulmonology</col>
+			</row>
+			<row>
+				<col name="id">3561</col>
+				<col name="caption">Bone density study</col>
+				<col name="group_name">Rheumatology</col>
+			</row>
+			<row>
+				<col name="id">1221</col>
+				<col name="caption">Other rheumatology</col>
+				<col name="group_name">Rheumatology</col>
+			</row>
+			<row>
+				<col name="id">3071</col>
+				<col name="caption">Hospice</col>
+				<col name="group_name">Home Care</col>
+			</row>
+			<row>
+				<col name="id">3011</col>
+				<col name="caption">IV therapy</col>
+				<col name="group_name">Home Care</col>
+			</row>
+			<row>
+				<col name="id">3031</col>
+				<col name="caption">Nursing care</col>
+				<col name="group_name">Home Care</col>
+			</row>
+			<row>
+				<col name="id">3051</col>
+				<col name="caption">Uterine monitoring</col>
+				<col name="group_name"></col>
+			</row>
+			<row>
+				<col name="id">3099</col>
+				<col name="caption">Other home care</col>
+				<col name="group_name">Home Care</col>
+			</row>
+			<row>
+				<col name="id">3181</col>
+				<col name="caption">Cardiac rehab</col>
+				<col name="group_name">Rehab/Therapies</col>
+			</row>
+			<row>
+				<col name="id">3191</col>
+				<col name="caption">Cognitive/Neuropsych therapy</col>
+				<col name="group_name">Rehab/Therapies</col>
+			</row>
+			<row>
+				<col name="id">3201</col>
+				<col name="caption">Pain clinics</col>
+				<col name="group_name">Rehab/Therapies</col>
+			</row>
+			<row>
+				<col name="id">3299</col>
+				<col name="caption">Other outpatient rehab</col>
+				<col name="group_name">Rehab/Therapies</col>
+			</row>
+			<row>
+				<col name="id">0627</col>
+				<col name="caption">Hearing evaluation</col>
+				<col name="group_name">Hearing Therapy</col>
+			</row>
+			<row>
+				<col name="id">0628</col>
+				<col name="caption">Hearing aid evaluation</col>
+				<col name="group_name">Hearing Therapy</col>
+			</row>
+			<row>
+				<col name="id">3341</col>
+				<col name="caption">Dispense hearing aid</col>
+				<col name="group_name">Hearing Therapy</col>
+			</row>
+			<row>
+				<col name="id">3121</col>
+				<col name="caption">Home</col>
+				<col name="group_name">Occupational Therapy</col>
+			</row>
+			<row>
+				<col name="id">3123</col>
+				<col name="caption">Outpatient</col>
+				<col name="group_name">Occupational Therapy</col>
+			</row>
+			<row>
+				<col name="id">3122</col>
+				<col name="caption">SNF</col>
+				<col name="group_name">Occupational Therapy</col>
+			</row>
+			<row>
+				<col name="id">3161</col>
+				<col name="caption">Home</col>
+				<col name="group_name">Physical Therapy</col>
+			</row>
+			<row>
+				<col name="id">3162</col>
+				<col name="caption">SNF</col>
+				<col name="group_name">Physical Therapy</col>
+			</row>
+			<row>
+				<col name="id">3163</col>
+				<col name="caption">Outpatient</col>
+				<col name="group_name">Physical Therapy</col>
+			</row>
+			<row>
+				<col name="id">3101</col>
+				<col name="caption">Home</col>
+				<col name="group_name">Respiratory Therapy</col>
+			</row>
+			<row>
+				<col name="id">3102</col>
+				<col name="caption">SNF</col>
+				<col name="group_name">Respiratory Therapy</col>
+			</row>
+			<row>
+				<col name="id">3103</col>
+				<col name="caption">Outpatient</col>
+				<col name="group_name">Respiratory Therapy</col>
+			</row>
+			<row>
+				<col name="id">3141</col>
+				<col name="caption">Home</col>
+				<col name="group_name">Speech Therapy</col>
+			</row>
+			<row>
+				<col name="id">3142</col>
+				<col name="caption">SNF</col>
+				<col name="group_name">Speech Therapy</col>
+			</row>
+			<row>
+				<col name="id">3143</col>
+				<col name="caption">Outpatient</col>
+				<col name="group_name">Speech Therapy</col>
+			</row>
+			<row>
+				<col name="id">3142</col>
+				<col name="caption">Cochlear implants</col>
+				<col name="group_name">Equipment/Supplies</col>
+			</row>
+			<row>
+				<col name="id">3321</col>
+				<col name="caption">Supplies</col>
+				<col name="group_name">Equipment/Supplies</col>
+			</row>
+			<row>
+				<col name="id">3341</col>
+				<col name="caption">Hearing aids</col>
+				<col name="group_name">Equipment/Supplies</col>
+			</row>
+			<row>
+				<col name="id">3361</col>
+				<col name="caption">Prosthetics</col>
+				<col name="group_name">Equipment/Supplies</col>
+			</row>
+			<row>
+				<col name="id">3381</col>
+				<col name="caption">Orthotics</col>
+				<col name="group_name">Equipment/Supplies</col>
+			</row>
+			<row>
+				<col name="id">3401</col>
+				<col name="caption">Oxygen</col>
+				<col name="group_name">Equipment/Supplies</col>
+			</row>
+			<row>
+				<col name="id">3459</col>
+				<col name="caption">Other equipment/supplies</col>
+				<col name="group_name">Equipment/Supplies</col>
+			</row>
+			<row>
+				<col name="id">8808</col>
+				<col name="caption">DME purchase</col>
+				<col name="group_name">Equipment/Supplies</col>
+			</row>
+			<row>
+				<col name="id">8809</col>
+				<col name="caption">DME rental</col>
+				<col name="group_name">Equipment/Supplies</col>
+			</row>
+			<row>
+				<col name="id">3501</col>
+				<col name="caption">MRI of joints</col>
+				<col name="group_name">Radiology</col>
+			</row>
+			<row>
+				<col name="id">3502</col>
+				<col name="caption">Other MRIs</col>
+				<col name="group_name">Radiology</col>
+			</row>
+			<row>
+				<col name="id">3521</col>
+				<col name="caption">CTs</col>
+				<col name="group_name">Radiology</col>
+			</row>
+			<row>
+				<col name="id">3541</col>
+				<col name="caption">PET scanners</col>
+				<col name="group_name">Radiology</col>
+			</row>
+			<row>
+				<col name="id">3561</col>
+				<col name="caption">Bone density study</col>
+				<col name="group_name">Radiology</col>
+			</row>
+			<row>
+				<col name="id">3599</col>
+				<col name="caption">Other diagnostic studies</col>
+				<col name="group_name">Radiology</col>
+			</row>
+			<row>
+				<col name="id">4322</col>
+				<col name="caption">Mammogram</col>
+				<col name="group_name">Radiology</col>
+			</row>
+			<row>
+				<col name="id">4335</col>
+				<col name="caption">Ultrasonic examination</col>
+				<col name="group_name">Radiology</col>
+			</row>
+			<row>
+				<col name="id">0914</col>
+				<col name="caption">TMJ surgery</col>
+				<col name="group_name">Dental</col>
+			</row>
+			<row>
+				<col name="id">0912</col>
+				<col name="caption">Cleft palate/lip consult or surgery</col>
+				<col name="group_name">Dental</col>
+			</row>
+			<row>
+				<col name="id">0920</col>
+				<col name="caption">TMJ and appliances</col>
+				<col name="group_name">Dental</col>
+			</row>
+			<row>
+				<col name="id">3601</col>
+				<col name="caption">TMJ disorder</col>
+				<col name="group_name">Dental</col>
+			</row>
+			<row>
+				<col name="id">3621</col>
+				<col name="caption">Accidental dental services</col>
+				<col name="group_name">Dental</col>
+			</row>
+			<row>
+				<col name="id">3699</col>
+				<col name="caption">Other services provided by a dentist</col>
+				<col name="group_name">Dental</col>
+			</row>
+			<row>
+				<col name="id">4302</col>
+				<col name="caption">Nonpar hospitals</col>
+				<col name="group_name">Nonpar Providers</col>
+			</row>
+			<row>
+				<col name="id">4301</col>
+				<col name="caption">Nonpar physicians</col>
+				<col name="group_name">Nonpar Providers</col>
+			</row>
+			<row>
+				<col name="id">4303</col>
+				<col name="caption">Other nonpar providers</col>
+				<col name="group_name">Nonpar Providers</col>
+			</row>
+			<row>
+				<col name="id">2999</col>
+				<col name="caption">Other surgery</col>
+				<col name="group_name">Surgery</col>
+			</row>
+			<row>
+				<col name="id">0712</col>
+				<col name="caption">Cardiovascular surgery</col>
+				<col name="group_name">Cardiovascular Surgery</col>
+			</row>
+			<row>
+				<col name="id">0713</col>
+				<col name="caption">Cardiac catherization</col>
+				<col name="group_name">Cardiovascular Surgery</col>
+			</row>
+			<row>
+				<col name="id">2501</col>
+				<col name="caption">TMJ disorder</col>
+				<col name="group_name">ENT</col>
+			</row>
+			<row>
+				<col name="id">2502</col>
+				<col name="caption">Tympanostomy</col>
+				<col name="group_name">ENT</col>
+			</row>
+			<row>
+				<col name="id">2503</col>
+				<col name="caption">Rhinoplasty</col>
+				<col name="group_name">ENT</col>
+			</row>
+			<row>
+				<col name="id">2505</col>
+				<col name="caption">Septo/Rinoplasty</col>
+				<col name="group_name">ENT</col>
+			</row>
+			<row>
+				<col name="id">2504</col>
+				<col name="caption">Septoplasty</col>
+				<col name="group_name">ENT</col>
+			</row>
+			<row>
+				<col name="id">2506</col>
+				<col name="caption">T &amp; A</col>
+				<col name="group_name">ENT</col>
+			</row>
+			<row>
+				<col name="id">2507</col>
+				<col name="caption">Myringotomy</col>
+				<col name="group_name">ENT</col>
+			</row>
+			<row>
+				<col name="id">2519</col>
+				<col name="caption">Other ENT surgery</col>
+				<col name="group_name">ENT</col>
+			</row>
+			<row>
+				<col name="id">2605</col>
+				<col name="caption">Laparoscopy</col>
+				<col name="group_name">General Surgery</col>
+			</row>
+			<row>
+				<col name="id">2661</col>
+				<col name="caption">Gastric bypass</col>
+				<col name="group_name">General Surgery</col>
+			</row>
+			<row>
+				<col name="id">2662</col>
+				<col name="caption">Skin lesion</col>
+				<col name="group_name">General Surgery</col>
+			</row>
+			<row>
+				<col name="id">2663</col>
+				<col name="caption">Panniculectomy</col>
+				<col name="group_name">General Surgery</col>
+			</row>
+			<row>
+				<col name="id">2664</col>
+				<col name="caption">Breast reduction</col>
+				<col name="group_name">General Surgery</col>
+			</row>
+			<row>
+				<col name="id">2665</col>
+				<col name="caption">Male gynecomastia</col>
+				<col name="group_name">General Surgery</col>
+			</row>
+			<row>
+				<col name="id">2666</col>
+				<col name="caption">Scar removal</col>
+				<col name="group_name">General Surgery</col>
+			</row>
+			<row>
+				<col name="id">2667</col>
+				<col name="caption">Hemangioma removal</col>
+				<col name="group_name">General Surgery</col>
+			</row>
+			<row>
+				<col name="id">2668</col>
+				<col name="caption">Reconstructive</col>
+				<col name="group_name">General Surgery</col>
+			</row>
+			<row>
+				<col name="id">2679</col>
+				<col name="caption">Other general surgery</col>
+				<col name="group_name">General Surgery</col>
+			</row>
+			<row>
+				<col name="id">1225</col>
+				<col name="caption">Laminectomy</col>
+				<col name="group_name">Neurosurgery</col>
+			</row>
+			<row>
+				<col name="id">2701</col>
+				<col name="caption">Other neurosurgery</col>
+				<col name="group_name">Neurosurgery</col>
+			</row>
+			<row>
+				<col name="id">2601</col>
+				<col name="caption">Infertility</col>
+				<col name="group_name">OB/GYN Surgery</col>
+			</row>
+			<row>
+				<col name="id">2602</col>
+				<col name="caption">Reversal of sterilization</col>
+				<col name="group_name">OB/GYN Surgery</col>
+			</row>
+			<row>
+				<col name="id">2603</col>
+				<col name="caption">Invitro fertilization</col>
+				<col name="group_name">OB/GYN Surgery</col>
+			</row>
+			<row>
+				<col name="id">2604</col>
+				<col name="caption">GIFT/ZIFT</col>
+				<col name="group_name">OB/GYN Surgery</col>
+			</row>
+			<row>
+				<col name="id">2605</col>
+				<col name="caption">Laparoscopy</col>
+				<col name="group_name">OB/GYN Surgery</col>
+			</row>
+			<row>
+				<col name="id">2606</col>
+				<col name="caption">Prenatal care</col>
+				<col name="group_name">OB/GYN Surgery</col>
+			</row>
+			<row>
+				<col name="id">2607</col>
+				<col name="caption">Norplant</col>
+				<col name="group_name">OB/GYN Surgery</col>
+			</row>
+			<row>
+				<col name="id">2608</col>
+				<col name="caption">Pregnancy termination</col>
+				<col name="group_name">OB/GYN Surgery</col>
+			</row>
+			<row>
+				<col name="id">2609</col>
+				<col name="caption">Sterilization</col>
+				<col name="group_name">OB/GYN Surgery</col>
+			</row>
+			<row>
+				<col name="id">2619</col>
+				<col name="caption">Other OB/GYN</col>
+				<col name="group_name">OB/GYN Surgery</col>
+			</row>
+			<row>
+				<col name="id">2521</col>
+				<col name="caption">Blepharoplasty</col>
+				<col name="group_name">Ophthalmology Surgery</col>
+			</row>
+			<row>
+				<col name="id">2522</col>
+				<col name="caption">Cataract surgery</col>
+				<col name="group_name">Ophthalmology Surgery</col>
+			</row>
+			<row>
+				<col name="id">2523</col>
+				<col name="caption">Strabismus surgery</col>
+				<col name="group_name">Ophthalmology Surgery</col>
+			</row>
+			<row>
+				<col name="id">2524</col>
+				<col name="caption">Refractive surgery</col>
+				<col name="group_name">Ophthalmology Surgery</col>
+			</row>
+			<row>
+				<col name="id">2539</col>
+				<col name="caption">Other ophthalmologic surgery</col>
+				<col name="group_name">Ophthalmology Surgery</col>
+			</row>
+			<row>
+				<col name="id">2621</col>
+				<col name="caption">Bunionectomy</col>
+				<col name="group_name">Orthopedic Surgery</col>
+			</row>
+			<row>
+				<col name="id">2622</col>
+				<col name="caption">Fracture care</col>
+				<col name="group_name">Orthopedic Surgery</col>
+			</row>
+			<row>
+				<col name="id">2623</col>
+				<col name="caption">Arthroscopy</col>
+				<col name="group_name">Orthopedic Surgery</col>
+			</row>
+			<row>
+				<col name="id">2624</col>
+				<col name="caption">Carpal tunnel repair</col>
+				<col name="group_name">Orthopedic Surgery</col>
+			</row>
+			<row>
+				<col name="id">2625</col>
+				<col name="caption">Sports injury</col>
+				<col name="group_name">Orthopedic Surgery</col>
+			</row>
+			<row>
+				<col name="id">2626</col>
+				<col name="caption">Work related injury</col>
+				<col name="group_name">Orthopedic Surgery</col>
+			</row>
+			<row>
+				<col name="id">2627</col>
+				<col name="caption">Motor vehicle accident</col>
+				<col name="group_name">Orthopedic Surgery</col>
+			</row>
+			<row>
+				<col name="id">2639</col>
+				<col name="caption">Other orthopedic</col>
+				<col name="group_name">Orthopedic Surgery</col>
+			</row>
+			<row>
+				<col name="id">0912</col>
+				<col name="caption">Cleft palate/lip consult or surgery</col>
+				<col name="group_name">Plastic/Reconstructive</col>
+			</row>
+			<row>
+				<col name="id">2541</col>
+				<col name="caption">Panniculectomy</col>
+				<col name="group_name">Plastic/Reconstructive</col>
+			</row>
+			<row>
+				<col name="id">2542</col>
+				<col name="caption">Rhinoplasty</col>
+				<col name="group_name">Plastic/Reconstructive</col>
+			</row>
+			<row>
+				<col name="id">2543</col>
+				<col name="caption">Reconstructive surgery</col>
+				<col name="group_name">Plastic/Reconstructive</col>
+			</row>
+			<row>
+				<col name="id">2544</col>
+				<col name="caption">General plastic surgery</col>
+				<col name="group_name">Plastic/Reconstructive</col>
+			</row>
+			<row>
+				<col name="id">2545</col>
+				<col name="caption">Scar revision</col>
+				<col name="group_name">Plastic/Reconstructive</col>
+			</row>
+			<row>
+				<col name="id">2546</col>
+				<col name="caption">Hemangioma removal</col>
+				<col name="group_name">Plastic/Reconstructive</col>
+			</row>
+			<row>
+				<col name="id">2547</col>
+				<col name="caption">Lesion removal</col>
+				<col name="group_name">Plastic/Reconstructive</col>
+			</row>
+			<row>
+				<col name="id">2548</col>
+				<col name="caption">MOH's procedure</col>
+				<col name="group_name">Plastic/Reconstructive</col>
+			</row>
+			<row>
+				<col name="id">2549</col>
+				<col name="caption">Breast reduction</col>
+				<col name="group_name">Plastic/Reconstructive</col>
+			</row>
+			<row>
+				<col name="id">2550</col>
+				<col name="caption">Male gynecomastia</col>
+				<col name="group_name">Plastic/Reconstructive</col>
+			</row>
+			<row>
+				<col name="id">2579</col>
+				<col name="caption">Other plastic/reconstructive</col>
+				<col name="group_name">Plastic/Reconstructive</col>
+			</row>
+			<row>
+				<col name="id">2641</col>
+				<col name="caption">Bunionectomy</col>
+				<col name="group_name">Podiatrist</col>
+			</row>
+			<row>
+				<col name="id">2642</col>
+				<col name="caption">Diabetic foot care</col>
+				<col name="group_name">Podiatrist</col>
+			</row>
+			<row>
+				<col name="id">2643</col>
+				<col name="caption">Surgery</col>
+				<col name="group_name">Podiatrist</col>
+			</row>
+			<row>
+				<col name="id">2659</col>
+				<col name="caption">Other podiatrist</col>
+				<col name="group_name">Podiatrist</col>
+			</row>
+			<row>
+				<col name="id">2681</col>
+				<col name="caption">Reversal of sterilization</col>
+				<col name="group_name">Urology</col>
+			</row>
+			<row>
+				<col name="id">2682</col>
+				<col name="caption">Infertility</col>
+				<col name="group_name">Urology</col>
+			</row>
+			<row>
+				<col name="id">2699</col>
+				<col name="caption">Other urology</col>
+				<col name="group_name">Urology</col>
+			</row>
+			<row>
+				<col name="id">2581</col>
+				<col name="caption">Hemangioma removal</col>
+				<col name="group_name">Vascular Surgery</col>
+			</row>
+			<row>
+				<col name="id">2582</col>
+				<col name="caption">Varicose veins</col>
+				<col name="group_name">Vascular Surgery</col>
+			</row>
+			<row>
+				<col name="id">2583</col>
+				<col name="caption">Spider veins</col>
+				<col name="group_name">Vascular Surgery</col>
+			</row>
+			<row>
+				<col name="id">2599</col>
+				<col name="caption">Other vascular surgery</col>
+				<col name="group_name">Vascular Surgery</col>
+			</row>
+			<row>
+				<col name="id">1511</col>
+				<col name="caption">Bone marrow</col>
+				<col name="group_name">Transplants</col>
+			</row>
+			<row>
+				<col name="id">1512</col>
+				<col name="caption">Heart</col>
+				<col name="group_name">Transplants</col>
+			</row>
+			<row>
+				<col name="id">1513</col>
+				<col name="caption">Liver</col>
+				<col name="group_name">Transplants</col>
+			</row>
+			<row>
+				<col name="id">1514</col>
+				<col name="caption">Kidney</col>
+				<col name="group_name">Transplants</col>
+			</row>
+			<row>
+				<col name="id">1515</col>
+				<col name="caption">Double lung</col>
+				<col name="group_name">Transplants</col>
+			</row>
+			<row>
+				<col name="id">1516</col>
+				<col name="caption">Single lung</col>
+				<col name="group_name">Transplants</col>
+			</row>
+			<row>
+				<col name="id">3701</col>
+				<col name="caption">Evaluation</col>
+				<col name="group_name">Transplants</col>
+			</row>
+			<row>
+				<col name="id">3704</col>
+				<col name="caption">Post-transplant care</col>
+				<col name="group_name">Transplants</col>
+			</row>
+			<row>
+				<col name="id">3702</col>
+				<col name="caption">Pre-transplant care</col>
+				<col name="group_name">Transplants</col>
+			</row>
+			<row>
+				<col name="id">1599</col>
+				<col name="caption">All other transplants</col>
+				<col name="group_name">Transplants</col>
+			</row>
+			<row>
+				<col name="id">3801</col>
+				<col name="caption">Ambulance</col>
+				<col name="group_name">Transport</col>
+			</row>
+			<row>
+				<col name="id">3802</col>
+				<col name="caption">Taxi</col>
+				<col name="group_name">Transport</col>
+			</row>
+			<row>
+				<col name="id">3803</col>
+				<col name="caption">Amulet/MediCab</col>
+				<col name="group_name">Transport</col>
+			</row>
+			<row>
+				<col name="id">3901</col>
+				<col name="caption">Room and board</col>
+				<col name="group_name">Skilled Nursing Facility</col>
+			</row>
+			<row>
+				<col name="id">2499</col>
+				<col name="caption">Other medical referral</col>
+				<col name="group_name">Skilled Nursing Facility</col>
+			</row>
+		</data>
+	</table>
+
 	<table name="States" type="Lookup">
 		<enum id="0">Alabama</enum>
 		<enum id="1">Alaska</enum>
