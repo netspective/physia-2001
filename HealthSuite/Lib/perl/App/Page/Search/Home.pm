@@ -177,7 +177,7 @@ sub prepare
 						<a href="/search/person">All Persons</a>,
 						<a href="/search/patient">Patients</a>,
 						<a href="/search/physician">Physician / Providers</a>,
-						<a href="/search/referring-Doctor">Referring Doctors</a>,
+						<a href="/search/Referring-Doctor">Referring Doctors</a>,
 						<a href="/search/nurse">Nurses</a>,
 						<a href="/search/staff">Staff Members</a>, or
 						<a href="/search/associate">Personnel</a>
