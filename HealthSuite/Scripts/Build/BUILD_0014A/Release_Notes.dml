@@ -45,6 +45,17 @@
 		</deliverable>
 		<deliverable id="1285">
 			Fixed code to get the correct url while selecting the 'Edit Profile' option in the search window
-		</deliverable>		
+		</deliverable>
+
+		<deliverable id="1287">
+			Fixed user session search statement.
+		</deliverable>
+		<deliverable id="1291">
+			Fixed service codes for voided items.
+		</deliverable>
+		<deliverable id="1292">
+			Void checkboxes showing in update claim dialog again.
+		</deliverable>
+
 	</deliverables>
 </release-notes>
