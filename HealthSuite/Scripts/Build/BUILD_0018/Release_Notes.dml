@@ -422,5 +422,9 @@ Note : Lab Catalogs and Lab Order entered before this fix will not work correctl
 			Fixed refill request component on pt flow worklist.
 		</deliverable>
 
+		<deliverable id="1960">
+			Fixed invalid physician id error on appointment dialog.
+		</deliverable>
+
 	</deliverables>
 </release-notes>
