@@ -836,7 +836,13 @@ sub prepare_stdAction_dialog
 		($self->param('_dlgId'), $self->param('_dlgCmd'), $self->param('_dlgParamStartIndex'));
 	my $dlgPrefix = &App::ResourceDirectory::DIALOG_RESOURCE_PREFIX;
 	$self->addContent('<BR>');
-	if(my $dlgInfo = $App::ResourceDirectory::RESOURCES{$dlgPrefix . $dlgId})
+	
+	my $permissionName = "dlg/$dlgId/$dlgCmd";
+	if (!$self->hasPermission($permissionName))		# Check permission to the dialog
+	{
+		$self->addContent("You do not have permissions to the dialog <B>$permissionName</B>.<P>Click <a href=\"javascript:history.back()\">here</a> to go back.");
+	}
+	elsif(my $dlgInfo = $App::ResourceDirectory::RESOURCES{$dlgPrefix . $dlgId})
 	{
 		my ($dlgClass, %dlgConstructParams, $dlgParams);
 		if(ref $dlgInfo eq 'HASH')
@@ -895,7 +901,14 @@ sub prepare_stdAction_component
 	my $compId = $self->param('_compId');
 	my $compPrefix = &App::ResourceDirectory::COMPONENT_RESOURCE_PREFIX;
 	my $resourceName = $compPrefix . $compId;
-	if(my $component = $App::ResourceDirectory::RESOURCES{$resourceName}{_class})
+
+
+	my $permissionName = "comp/$compId";
+	if (!$self->hasPermission($permissionName))		# Check permission to the dialog
+	{
+		$self->addContent("You do not have permissions to the dialog <B>$permissionName</B>.<P>Click <a href=\"javascript:history.back()\">here</a> to go back.");
+	}
+	elsif(my $component = $App::ResourceDirectory::RESOURCES{$resourceName}{_class})
 	{
 		my $m = ref $component eq 'CODE' ? $component : $component->can('getHtml');
 
@@ -903,6 +916,7 @@ sub prepare_stdAction_component
 		my @pathItems = $self->param('arl_pathItems');
 		if($pathItems[$arlIndex] =~ /^dlg\-(.*?)\-(.*)$/)
 		{
+			
 			$self->prepare_stdAction_dialog($2, $1, $arlIndex+1);
 			$self->addContent('<BR><CENTER>',
 				ref $component eq 'CODE' ? &$component($self, 0) : $component->getHtml($self, 0),
@@ -949,6 +963,7 @@ sub arlHasStdAction
 			$self->param('_stdAction', 'component');
 			$self->param('_compId', $action);
 			$self->param('_compParamStartIndex', $startArlIndex+1);
+			return 1;
 		}
 	}
 
