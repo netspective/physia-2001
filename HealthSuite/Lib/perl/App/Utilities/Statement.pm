@@ -18,6 +18,8 @@ use strict;
 
 use DBI::StatementManager;
 use App::Statements::BillingStatement;
+use App::Statements::Invoice;
+
 
 sub populateStatementsHash
 {
@@ -92,6 +94,8 @@ sub populateStatementsHash
 		);
 
 		push(@{$statements{$key}->{invoices}}, $invObject);
+		
+		changeInvoiceStatus($page, $_->{invoice_id}, App::Universal::INVOICESTATUS_AWAITCLIENTPAYMENT);
 	}
 
 	my @keys = sort keys %statements;
@@ -161,6 +165,22 @@ sub sendStatementToday
 	# Bummer dude, no billing event matches this statement
 	#warn "No billing event rule matched billing org '$stmt->{payToId}' last name '$stmt->{patientLastName}' balance '\$$stmt->{amountDue}'\n";
 	return 0;
+}
+
+sub changeInvoiceStatus
+{
+	my ($page, $invoiceId, $status) = @_;
+
+	my $invoiceInfo = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoice', 
+		$invoiceId);
+	
+	return if $invoiceInfo->{invoice_status} == App::Universal::INVOICESTATUS_VOID
+		|| $invoiceInfo->{invoice_status} == App::Universal::INVOICESTATUS_CLOSED;
+	
+	return $page->schemaAction(0, 'Invoice', 'update', 
+		invoice_id => $invoiceId,
+		invoice_status => $status,
+	);
 }
 
 1;
