@@ -52,9 +52,9 @@ sub initialize
 
 	$STMTMGR_PERSON->createPropertiesFromSingleRow($self, STMTMGRFLAG_CACHE, ['selRegistry', 'person_'], $personId);
 	$self->property('person_simple_name', "Unknown ID: $personId") unless $self->property('person_simple_name');
-	my $categories = $self->property('person_categories', $STMTMGR_PERSON->getSingleValueList($self, STMTMGRFLAG_CACHE, 'selCategory', $personId, $self->session('org_id')));
 
-	my $personCategory = join(', ', @$categories);
+	my $categories = $self->property('person_categories', $STMTMGR_PERSON->getSingleValueList($self, STMTMGRFLAG_CACHE, 'selCategory', $personId, $self->session('org_id')));
+	my $personCategory = defined $categories ? join(', ', @$categories) : '';
 	$self->property('person_org_category', $personCategory);
 
 	unless ($personId eq $userId)
