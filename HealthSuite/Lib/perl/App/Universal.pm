@@ -332,7 +332,10 @@ use constant CLAIMTYPE_CHAMPUS => 8;
 use constant CLAIMTYPE_CHAMPVA => 9;
 use constant CLAIMTYPE_FECABLKLUNG => 10;
 use constant CLAIMTYPE_BCBS => 11;
-use constant CLAIMTYPE_HMO_NON_CAP => 12;
+use constant CLAIMTYPE_HMO_NONCAP => 12;
+use constant CLAIMTYPE_MNGCARE => 13;
+use constant CLAIMTYPE_POS => 14;
+use constant CLAIMTYPE_RRMEDICARE => 15;
 
 #CLAIM DATE_REASON_TYPE
 use constant CLAIMDATE_VALUE => 160;
