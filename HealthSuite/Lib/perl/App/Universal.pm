@@ -269,6 +269,8 @@ use constant TRANSSTATUS_READ => 4;
 use constant TRANSSTATUS_NOTREAD => 5;
 use constant TRANSSTATUS_PENDING => 6;
 use constant TRANSSTATUS_FILLED => 7;
+use constant TRANSSTATUS_DENIED => 8;
+
 
 #EVENT STATUS
 use constant EVENTSTATUS_SCHEDULED => 0;
