@@ -38,7 +38,7 @@ sub obtain
 		
 		push(@$data, [
 			App::Data::Manipulate::trim($id),
-			($id2 =~ /N\/A/i) ? undef : App::Data::Manipulate::trim($id2),
+			#($id2 =~ /N\/A/i) ? undef : App::Data::Manipulate::trim($id2),
 			$name,
 			2, # pSource = Perse
 			($id2 =~ /N\/A/i) ? PAYERTYPE_NON_COMMERCIAL : PAYERTYPE_COMMERCIAL,
