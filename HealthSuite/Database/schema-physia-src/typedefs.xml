@@ -292,99 +292,99 @@
 				<col name="group_name">Visit</col>
 				<col name="icon_img_summ">visit.gif</col>
 				<col name="remarks">The Visit Type is stored in caption field</col>
-			</row>			
+			</row>
 			<row>
 				<col name="id">2060</col>
 				<col name="caption">Sports/School Physical</col>
 				<col name="group_name">Visit</col>
 				<col name="icon_img_summ">visit.gif</col>
 				<col name="remarks">The Visit Type is stored in caption field</col>
-			</row>			
+			</row>
 			<row>
 				<col name="id">2070</col>
 				<col name="caption">Regular Visit</col>
 				<col name="group_name">Visit</col>
 				<col name="icon_img_summ">visit.gif</col>
 				<col name="remarks">The Visit Type is stored in caption field</col>
-			</row>			
+			</row>
 			<row>
 				<col name="id">2080</col>
 				<col name="caption">Complicated Visit</col>
 				<col name="group_name">Visit</col>
 				<col name="icon_img_summ">visit.gif</col>
 				<col name="remarks">The Visit Type is stored in caption field</col>
-			</row>			
+			</row>
 			<row>
 				<col name="id">2090</col>
 				<col name="caption">Well Women Exam</col>
 				<col name="group_name">Visit</col>
 				<col name="icon_img_summ">visit.gif</col>
 				<col name="remarks">The Visit Type is stored in caption field</col>
-			</row>			
+			</row>
 			<row>
 				<col name="id">2100</col>
 				<col name="caption">Consultation</col>
 				<col name="group_name">Visit</col>
 				<col name="icon_img_summ">visit.gif</col>
 				<col name="remarks">The Visit Type is stored in caption field</col>
-			</row>			
+			</row>
 			<row>
 				<col name="id">2110</col>
 				<col name="caption">Injection Only</col>
 				<col name="group_name">Visit</col>
 				<col name="icon_img_summ">visit.gif</col>
 				<col name="remarks">The Visit Type is stored in caption field</col>
-			</row>			
+			</row>
 			<row>
 				<col name="id">2120</col>
 				<col name="caption">Procedure Visit</col>
 				<col name="group_name">Visit</col>
 				<col name="icon_img_summ">visit.gif</col>
 				<col name="remarks">The Visit Type is stored in caption field</col>
-			</row>			
+			</row>
 			<row>
 				<col name="id">2130</col>
 				<col name="caption">Workmans Comp Visit</col>
 				<col name="group_name">Visit</col>
 				<col name="icon_img_summ">visit.gif</col>
 				<col name="remarks">The Visit Type is stored in caption field</col>
-			</row>			
+			</row>
 			<row>
 				<col name="id">2140</col>
 				<col name="caption">Radiology Visit</col>
 				<col name="group_name">Visit</col>
 				<col name="icon_img_summ">visit.gif</col>
 				<col name="remarks">The Visit Type is stored in caption field</col>
-			</row>			
+			</row>
 			<row>
 				<col name="id">2150</col>
 				<col name="caption">Lab Visit</col>
 				<col name="group_name">Visit</col>
 				<col name="icon_img_summ">visit.gif</col>
 				<col name="remarks">The Visit Type is stored in caption field</col>
-			</row>			
+			</row>
 			<row>
 				<col name="id">2160</col>
 				<col name="caption">Counseling Visit</col>
 				<col name="group_name">Visit</col>
 				<col name="icon_img_summ">visit.gif</col>
 				<col name="remarks">The Visit Type is stored in caption field</col>
-			</row>			
+			</row>
 			<row>
 				<col name="id">2170</col>
 				<col name="caption">Physical Therapy</col>
 				<col name="group_name">Visit</col>
 				<col name="icon_img_summ">visit.gif</col>
 				<col name="remarks">The Visit Type is stored in caption field</col>
-			</row>			
+			</row>
 			<row>
 				<col name="id">2180</col>
 				<col name="caption">Special Visit</col>
 				<col name="group_name">Visit</col>
 				<col name="icon_img_summ">visit.gif</col>
 				<col name="remarks">The Visit Type is stored in caption field</col>
-			</row>			
-			
+			</row>
+
 			<row>
 				<col name="id">3000</col>
 				<col name="caption">Transient</col>
@@ -940,7 +940,7 @@
 			</row>
 			<row>
 				<col name="id">2</col>
-				<col name="caption">HMO</col>
+				<col name="caption">HMO(cap)</col>
 				<col name="group_name">insurance</col>
 			</row>
 			<row>
@@ -986,6 +986,11 @@
 			<row>
 				<col name="id">11</col>
 				<col name="caption">BCBS</col>
+				<col name="group_name">insurance</col>
+			</row>
+			<row>
+				<col name="id">12</col>
+				<col name="caption">HMO(non-cap)</col>
 				<col name="group_name">insurance</col>
 			</row>
 		</data>
