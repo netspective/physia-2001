@@ -106,13 +106,12 @@
 		</deliverable>	
 		<deliverable id="944">
 			UI : Added a check box under home-phone field of 'Add Patient' dailog to check if the home phone is added or not. 
-			The target build for this bug is 16, but was shipped in BUILD_15. This was reopened in BUILD_16. This bug was fixed 
-			after reopening but did not ship the changes to BUILD_15.
+			The target build for this bug is 16, but was shipped in BUILD_15. This was reopened in BUILD_16. This is fixed and will be shipped to BUILD_15.
 		</deliverable>		
 		<deliverable id="1225">
 			Fixed a problem in the Hospital Claim dialog which was causing some claims to be duplicated and others to be
 			lost.
-		</deliverable>
+		</deliverable>	
 	
 	</deliverables>
 </release-notes>
