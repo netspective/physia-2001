@@ -34,7 +34,8 @@ SELECT	i.invoice_id,
 	i.invoice_subtype,
 	nvl(ii.data_num_a,0) as ffs_cap,
 	0 as refund,
-	NULL as pay_type
+	NULL as pay_type,
+	t.trans_id
 FROM 	invoice i ,  transaction t , invoice_item ii,invoice_attribute ia 
 WHERE   t.trans_id = i.main_transaction 			
 	AND i.invoice_id = ia.parent_id 
@@ -54,14 +55,14 @@ SELECT	i.invoice_id,
 	0 as misc_charges ,
 	decode (iia.adjustment_type,2,0,nvl(iia.adjustment_amount,0)) as person_pay ,
 	nvl(iia.plan_paid,0) as insurance_pay,	
-	(  nvl(iia.adjustment_amount,0) + nvl(iia.plan_paid,0) +  nvl(iia.writeoff_amount,0) ) * -1 as charge_adjust ,	
-	decode(invoice_type,0,nvl(extended_cost, 0),0) + decode(invoice_type,0,nvl(extended_cost, 0),0) - ( nvl(iia.adjustment_amount,0) + nvl(iia.plan_paid,0) +  nvl(iia.writeoff_amount,0) )	 as net_charges,				
+	( nvl(iia.writeoff_amount,0) ) * -1 as charge_adjust ,	
+	decode(invoice_type,0,nvl(extended_cost, 0),0) + decode(invoice_type,1,nvl(extended_cost, 0),0) -   nvl(iia.writeoff_amount,0) 	 as net_charges,				
 	decode(iia.adjustment_type,2,nvl(iia.net_adjust,0),0) as balance_transfer,
 	decode(nvl(iia.payer_type,1),1,nvl(iia.writeoff_amount,0),0) as insurance_write_off ,
 	decode(iia.payer_type,0,nvl(iia.writeoff_amount,0),0) as person_write_off ,
 	0 as a_r,
-	decode(ii.item_type,7,-ii.quantity ,ii.quantity) as units ,
-	decode(ii.item_type,7,-ii.unit_cost,ii.unit_cost) as unit_cost,
+	0 as units ,
+	0 as unit_cost,
 	service_facility_id as facility,
 	nvl(t.care_provider_id,t.provider_id) as provider,
 	(nvl(
@@ -86,7 +87,8 @@ SELECT	i.invoice_id,
 	nvl(ii.data_num_a,0) as ffs_cap,
 	decode(iia.adjustment_type,1,nvl(iia.adjustment_amount,0),0) as refund,
 	(select pm.caption  FROM payment_method pm WHERE
-	 pm.id = iia.pay_method) pay_type
+	 pm.id = iia.pay_method) pay_type,
+	t.trans_id
 FROM 	invoice i ,  transaction t ,	
 	invoice_item_adjust iia , invoice_item ii
 WHERE   t.trans_id = i.main_transaction 			
@@ -106,7 +108,7 @@ select  provider,
         decode(ffs_cap,0,decode(ABBREV,'05',(total_charges),0),0) as cap_lab,
         decode(ffs_cap,0,decode(invoice_type,0,(person_pay+insurance_pay),0),0) as cap_pmt,
         decode(ffs_cap,1,decode(invoice_type,0,(person_pay+insurance_pay),0),0) as ffs_pmt,
-        decode(ffs_cap,1,decode(invoice_type,1,(person_pay+insurance_pay),0),0) as ancill_pmt,
+        decode(invoice_type,1,(person_pay+insurance_pay),0) as ancill_pmt,
         invoice_subtype,
         abbrev,
         hcfa_service_type,
