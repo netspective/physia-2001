@@ -666,8 +666,28 @@ $STMTMGR_INVOICE = new App::Statements::Invoice(
 		UNION
 		select 'Payment'
 		from dual
-
 	},
+	
+	'selPaperClaims' => qq{
+		SELECT invoice_id
+		FROM Invoice
+		WHERE owner_id = :1
+			and invoice_status = @{[ App::Universal::INVOICESTATUS_SUBMITTED ]}
+			and invoice_subtype in (@{[ App::Universal::CLAIMTYPE_SELFPAY ]}, 
+				@{[ App::Universal::CLAIMTYPE_CLIENT ]})
+	UNION
+		SELECT Invoice.invoice_id
+		FROM Insurance, Invoice_Billing, Invoice
+		WHERE owner_id = :1
+			and invoice_status = @{[ App::Universal::INVOICESTATUS_SUBMITTED ]}
+			and invoice_subtype != @{[ App::Universal::CLAIMTYPE_SELFPAY ]}
+			and invoice_subtype != @{[ App::Universal::CLAIMTYPE_CLIENT ]}
+			and Invoice_Billing.bill_id = Invoice.billing_id
+			and Insurance.ins_internal_id = Invoice_Billing.bill_ins_id
+			and Insurance.remit_type = 0
+		ORDER BY 1
+	},
+	
 );
 
 
