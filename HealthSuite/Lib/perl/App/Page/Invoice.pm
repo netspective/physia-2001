@@ -25,6 +25,7 @@ use App::Dialog::OnHold;
 use App::Dialog::Diagnoses;
 use App::Dialog::ClaimProblem;
 use App::Dialog::PostGeneralPayment;
+use App::Dialog::PostInsurancePayment;
 use App::Dialog::PostRefund;
 use App::Dialog::PostTransfer;
 #use App::Billing::Output::tPdfCLaim;
@@ -817,6 +818,24 @@ sub prepare_dialog_claim
 	return $self->prepare_view_summary();
 }
 
+sub prepare_dialog_postinspayment
+{
+	my $self = shift;
+	my $invoiceId = $self->param('invoice_id');
+
+	my $dialogCmd = $self->param('_pm_dialog_cmd') || 'add';
+	#my ($action, $invoiceId) = split(/,/, $dialogCmd);
+	#$self->param('invoice_id', $invoiceId);
+	#$self->param('posting_action', $action);
+	#$self->addDebugStmt($payType);
+
+	my $cancelUrl = "/invoice/$invoiceId/summary";
+	my $dialog = new App::Dialog::PostInsurancePayment(schema => $self->getSchema(), cancelUrl => $cancelUrl);
+	$dialog->handle_page($self, $dialogCmd);
+
+	$self->addContent('<p>');
+	return $self->prepare_view_summary();
+}
 
 #-----------------------------------------------------------------------------
 # VIEW-MANAGEMENT METHODS
@@ -1346,7 +1365,8 @@ sub prepare_page_content_header
 						@{[ $diags ne '' && $invStatus < $submitted ? "<option value='/invoice/$invoiceId/dialog/procedure/add'>Add Procedure</option>" : '' ]}
 						@{[ $diags eq '' && $invStatus < $submitted ? "<option value='/invoice/$invoiceId/dialog/diagnoses/add'>Add Diagnoses</option>" : '' ]}
 						@{[ $diags ne '' && $invStatus < $submitted ? "<option value='/invoice/$invoiceId/dialog/diagnoses/update'>Update Diagnoses</option>" : '' ]}
-						@{[ $claimType != $selfPay && $invStatus >= $submitted ? "<option value='/invoice/$invoiceId/dialog/adjustment/insurance'>Post Insurance Payment</option>" : '' ]}
+						@{[ $claimType != $selfPay && $invStatus >= $submitted ? "<option value='/invoice/$invoiceId/dialog/postinspayment'>Post Insurance Payment</option>" : '' ]}
+						<!-- @{[ $claimType != $selfPay && $invStatus >= $submitted ? "<option value='/invoice/$invoiceId/dialog/adjustment/insurance'>Post Insurance Payment</option>" : '' ]} -->
 						<option value="/person/$clientId/dialog/postpayment/payment,$invoiceId">Post Personal Payment</option>
 						<option value="/person/$clientId/dialog/postrefund/refund">Post Refund</option>
 						<option value="/person/$clientId/dialog/posttransfer/transfer">Post Transfer</option>
@@ -1405,57 +1425,5 @@ sub handleARL
 
 	return 0;
 }
-
-#use enum qw(BITMASK:CHANGELOGFLAG_ USER SDE ADD UPDATE REMOVE NOTE UI DB EI);
-#use constant CHANGELOGFLAG_ANYVIEWER => CHANGELOGFLAG_USER | CHANGELOGFLAG_SDE;
-#
-# USER   change is meant to be seen by end-user
-# SDE    change is meant for development environment (not for enduser)
-# ADD    feature/change was added (it's new)
-# UPDATE feature/change was updated (it existed already and is now different)
-# REMOVE feature/change was removed (it no longer exists)
-# NOTE   simple text note
-# UI     user interface change
-# DB     database change
-# EI     external interface change
-
-#
-# change log is an array whose contents are arrays of
-# 0: one or more CHANGELOGFLAG_* values
-# 1: the date the change/update was made
-# 2: the person making the changes (usually initials)
-# 3: the category in which change should be shown (user-defined) - can have '/' for hierarchies
-# 4: any text notes about the actual change/action
-#
-use constant PROC_PANE => 'Pane/Procedure';
-
-@CHANGELOG =
-(
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_NOTE, '12/15/1999', 'MAF',
-		PROC_PANE,
-		'Fixed calculation of invoice balance.'],
-	[	CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '01/05/2000', 'MAF',
-		PROC_PANE,
-		'Hyperlinked the adjustment dollar amounts to show a popup of all adjustments for that procedure.'],
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_NOTE, '01/05/2000', 'MAF',
-		'Summary/Invoice',
-		'Created a new function called getProcedureHtml that will return a specific procedure in html.'],
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_NOTE, '01/10/2000', 'MAF',
-		'Summary/Invoice',
-		"Removed 'prepare_view_hold' and created 'prepare_dialog_hold' function."],
-	[	CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '01/13/2000', 'MAF',
-		'Summary/Invoice',
-		"Added 'Quick Action' links to the summary."],
-	[	CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '01/14/2000', 'MAF',
-		'Summary/Invoice',
-		"Created 'Details' for Intellicode pane."],
-	[	CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '01/17/2000', 'MAF',
-		'Summary/Invoice',
-		"Added the 'Reference' column to the line items."],
-	[	CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_ADD, '03/13/2000', 'MAF',
-		'Summary/Invoice',
-		'Implemented ability to make personal payment on individual procedures.'],
-
-);
 
 1;
