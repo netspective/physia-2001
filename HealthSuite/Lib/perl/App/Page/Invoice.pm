@@ -223,7 +223,6 @@ sub getProceduresHtml
 
 		my $emg = $procedure->{emergency} eq 'Y' ? "<img src='/resources/icons/checkmark.gif' border=0>" : '';
 		my $itemId = $procedure->{itemId};
-		my $comments = $procedure->{comments};
 
 		my $editProcHref = "/invoice/$invoiceId/dialog/procedure/update,$itemId,$lineSeq";
 		my $voidProcHref = "/invoice/$invoiceId/dialog/procedure/remove,$itemId,$lineSeq";
@@ -371,14 +370,27 @@ sub getProceduresHtml
 		my $viewPaymentHref = "javascript:doActionPopup('/invoice-p/$invoiceId/dialog/adjustment/adjview,$itemId,$itemIdx,$itemType');";
 		my $viewPaymentHtml = "<a href=$viewPaymentHref>$itemAdjustmentTotal</a>";
 
+		my $cmtRow = '';
+		if(my $comments = $otherItem->{comments})
+		{
+			$cmtRow = qq{
+				<TR>
+					<TD><FONT FACE="Arial,Helvetica" SIZE=2>&nbsp;</FONT></TD>
+					<TD><FONT FACE="Arial,Helvetica" SIZE=2>&nbsp;</FONT></TD>
+					<TD COLSPAN=15><FONT FACE='Arial,Helvetica' SIZE=2 COLOR=NAVY>$comments</FONT></TD>
+				</TR>
+			}
+		}
+
 		push(@rows, qq{
 			<TR>
-				<TD COLSPAN=10><FONT FACE="Arial,Helvetica" SIZE=2>$itemNum: Misc Charge - $otherItem->{comments}</TD>
+				<TD COLSPAN=10><FONT FACE="Arial,Helvetica" SIZE=2>$itemNum: $otherItem->{caption}</TD>
 				<TD ALIGN="Right"><FONT FACE="Arial,Helvetica" SIZE=2>$itemExtCost</TD>
 				<TD><FONT FACE="Arial,Helvetica" SIZE=2 COLOR="Green">&nbsp;</FONT></TD>
 				<!-- <TD ALIGN="Right"><FONT FACE="Arial,Helvetica" SIZE=2 COLOR="Darkred">$itemAdjustmentTotal</TD> -->
 				<TD ALIGN="Right"><FONT FACE="Arial,Helvetica" SIZE=2 COLOR="Darkred">$viewPaymentHtml</TD>
 			</TR>
+			$cmtRow
 			<TR><TD COLSPAN=17><IMG SRC='/resources/design/bar.gif' HEIGHT=1 WIDTH=100%></TD></TR>
 		});
 	}
