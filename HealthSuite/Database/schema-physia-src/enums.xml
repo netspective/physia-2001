@@ -18,6 +18,11 @@
 		<enum>Inactive</enum>
 	</table>
 
+	<table name="Role_Activity" abbrev="RoleActivity" type="Enumeration">
+		<enum>Grant</enum>
+		<enum>Revoke</enum>
+	</table>
+
 	<table name="Session_Activity_Type" abbrev="SesActv" type="Enumeration">
 		<enum>Record</enum>
 		<enum>Page</enum>

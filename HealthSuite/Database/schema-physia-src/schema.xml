@@ -99,14 +99,6 @@
 		<column name="category" type="text" size="32" primarykey="yes" descr="The category to which person belongs"/>
 	</table>
 
-	<table name="Person_Org_Role" abbrev="PerORole" type="Audit,Secure">
-		<description>The role assigned to a person in a particular organization</description>
-		<column name="person_id" parentref="Person.person_id" primarykey="yes" descr="Unique ID for person"/>
-		<column name="org_id" parentref="Org.org_id" primarykey="yes" descr="Unique ID for company or organization"/>
-		<column name="org_role" type="text" size="64" primarykey="yes" descr="The assigned role"/>
-		<column name="role_status" lookupref="Org_Role_Status" descr="The assigned role's current status in given organization"/>
-	</table>
-
 	<table name="Insurance" abbrev="InsRec" type="Audit,Secure,Restrict_Rows">
 		<description>An insurance record that belongs to a person or organization</description>
 		<column name="ins_internal_id" type="autoinc" primarykey="yes" descr="Unique insurance record identification (in entire system) for internal use"/>
@@ -627,6 +619,27 @@
 		<column name="field_name" type="text" size="32" descr="The name of the variable to store the value"/>
 		<column name="field_type" type="text" size="32" descr="The type of value to store"/>
 		<column name="field_attrs" type="text" size="32" descr="Field attributes to pass to Dialog manager"/>
+	</table>
+
+	<table name="Role_Name" abbrev="RoleName">
+		<column name="role_name_id" type="autoinc" primarykey="yes" descr="The primary key."/>
+		<column name="role_name" type="text" size="120" descr="The role's name."/>
+		<column name="role_status_id" lookupref="Org_Role_Status" default="0" descr="The status of the role."/>
+	</table>
+
+	<table name="Person_Org_Role" abbrev="PerOrgRole" type="Audit">
+		<column name="person_id" parentref="Person.person_id" descr="The unique ID of the person."/>
+		<column name="org_id" parentref="Org.org_id" descr="The unique ID of the organization."/>
+		<column name="role_name_id" parentref="Role_Name.role_name_id" descr="The unique ID of the role."/>
+		<column name="role_status_id" lookupref="Org_Role_Status" default="0" descr="The status of the role."/>
+		<column name="priority" type="smallint" default="1" descr="Role priority."/>
+	</table>
+
+	<table name="Role_Permission" abbrev="RolePrm" type="Audit">
+		<column name="role_name_id" parentref="Role_Name.role_name_id" descr="The unique ID of the role."/>
+		<column name="org_id" parentref="Org.org_id" descr="The unique ID of the organization."/>
+		<column name="permission_name" type="text" size="120" descr="Permission name."/>
+		<column name="role_activity_id" lookupref="Role_Activity" default="0" descr="How the role is used (e.g., grant or revoke)."/>
 	</table>
 
 	<include file="reference.xml"/>
