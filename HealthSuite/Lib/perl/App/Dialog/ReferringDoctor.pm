@@ -197,6 +197,12 @@ sub new
 						cancelUrl => $self->{cancelUrl} || undef)
 	);
 
+	$self->{activityLog} = {
+		scope =>'person',
+		key => "#field.person_id#",
+		data => "Person '#field.person_id#' <a href='/person/#field.person_id#/profile'>#field.name_first# #field.name_last#</a> as a 'Referring Doctor'"
+	};
+
 	return $self;
 }
 
@@ -258,7 +264,7 @@ sub execute
 	$page->schemaAction(
 			'Person_Attribute', $command,
 			parent_id => $personId,
-			item_name => 'Home',
+			item_name => 'Work',
 			value_type => App::Universal::ATTRTYPE_PHONE || undef,
 			value_text => $page->field('phone') || undef,
 			_debug => 0
@@ -267,7 +273,7 @@ sub execute
 		$page->schemaAction(
 				'Person_Attribute', $command,
 				parent_id => $personId,
-				item_name => 'Home',
+				item_name => 'Work',
 				value_type => App::Universal::ATTRTYPE_FAX || undef,
 				value_text => $page->field('fax') || undef,
 				_debug => 0
