@@ -3,9 +3,9 @@ package SQL::GenerateQuery;
 ##############################################################################
 
 use strict;
-use SDE::CVS ('$Id: GenerateQuery.pm,v 1.2 2000-09-12 15:34:37 robert_jenks Exp $', '$Name:  $');
+use SDE::CVS ('$Id: GenerateQuery.pm,v 1.3 2000-09-13 23:40:36 robert_jenks Exp $', '$Name:  $');
 use XML::Parser;
-use fields qw(qdlFile id fields views styles);
+use fields qw(qdlFile id fields joins views);
 use vars qw(%CACHE $COMPARISONS);
 
 %CACHE = ();
@@ -120,7 +120,7 @@ sub id
 
 # Sets and/or returns the definition of a field
 # Without a param, it returns a list of fields
-sub field
+sub fields
 {
 	my SQL::GenerateQuery $self = shift;
 	my ($id, $value) = @_;
@@ -141,43 +141,44 @@ sub field
 	return exists $self->{fields}->{$id} ? $self->{fields}->{$id} : undef;
 }
 
-# Sets and/or returns the definition of a view
-# Without a param, it returns a list of views
-sub view
+# Sets and/or returns the definition of a join
+# Without a param, it returns a list of joins
+sub joins
 {
 	my SQL::GenerateQuery $self = shift;
 	my ($id, $value) = @_;
 	unless (defined $id)
 	{
-		return keys %{$self->{views}};
+		return keys %{$self->{joins}};
 	}
 	if (defined $value)
 	{
 		die "Field data must be a hash ref" unless ref($value) eq 'HASH';
 		my %newView = %{$value};
-		$self->{views}->{$id} = \%newView;
+		$self->{joins}->{$id} = \%newView;
 		return 1;
 	}
-	return $self->{views}->{$id};
+	return $self->{joins}->{$id};
 }
 
 
-# Returns a style definition
-sub style
+# Returns a view definition or a list of views
+# Without a param, it returns a list of views
+sub views
 {
 	my SQL::GenerateQuery $self = shift;
 	my $id = shift;
 	unless (defined $id)
 	{
-		return keys %{$self->{styles}};
+		return keys %{$self->{views}};
 	}
-	return $self->{styles}->{$id};
+	return $self->{views}->{$id};
 }
 
 
 # Returns the definition of a comparison
 # Without a param, it returns a list of comparisons
-sub comparison
+sub comparisons
 {
 	my SQL::GenerateQuery $self = shift;
 	my $id = shift;
@@ -197,8 +198,8 @@ sub initialize
 	my $qdlFile = $self->{qdlFile};
 	
 	$self->{fields} = [{},];  # Psuedo-Hash to maintain field order
+	$self->{joins} = {};
 	$self->{views} = {};
-	$self->{styles} = {};
 	
 	# Import the QDL data
 	my $parser = new XML::Parser(Style => 'Tree');
@@ -226,24 +227,24 @@ sub parseTags
 		{
 			if (exists $value->[0]->{id} && defined $value->[0]->{id})
 			{
-				$self->field($value->[0]->{id}, $value->[0]);
+				$self->fields($value->[0]->{id}, $value->[0]);
 			}
 		}
-		elsif ($tag eq 'view')
+		elsif ($tag eq 'join')
 		{
 			if (exists $value->[0]->{id} && defined $value->[0]->{id})
 			{
-				$self->view($value->[0]->{id}, $value->[0]);
+				$self->joins($value->[0]->{id}, $value->[0]);
 			}
 		}
-		elsif ($tag eq 'output-style')
+		elsif ($tag eq 'view')
 		{
 			# If the style contains no tags then ignore it
 			next unless $#{$value};
 			
 			# Pass control to parseStyle() to build the styles hash
-			my $condition = $self->parseStyle($value->[0]->{id}, [@$value[1..$#{$value}]], $value->[0]);
-			$self->{styles}->{$value->[0]->{id}}->{condition} = $condition->[0];
+			my $condition = $self->parseView($value->[0]->{id}, [@$value[1..$#{$value}]], $value->[0]);
+			$self->{views}->{$value->[0]->{id}}->{condition} = $condition->[0];
 			
 			# Since we already handled the contents of this tag, skip to the next
 			next;
@@ -258,14 +259,14 @@ sub parseTags
 }
 
 
-sub parseStyle
+sub parseView
 {
 	my SQL::GenerateQuery $self = shift;
 	my ($id, $tags, $attributes) = @_;
 	my @conditions = ();
 	
-	$self->{styles}->{$id} = {} unless exists $self->{styles}->{$id};
-	my $style = $self->{styles}->{$id};
+	$self->{views}->{$id} = {} unless exists $self->{views}->{$id};
+	my $style = $self->{views}->{$id};
 	
 	# Check for and add top level attributes
 	if (defined $attributes)
@@ -302,7 +303,7 @@ sub parseStyle
 		if ($#{$value})
 		{
 			# Passes a ref to a slice (which excludes the element 0 attributes)
-			my $childConditions = $self->parseStyle($id, [@$value[1..$#{$value}]]);
+			my $childConditions = $self->parseView($id, [@$value[1..$#{$value}]]);
 			if ($tag eq 'and-conditions')
 			{
 				push @conditions, $self->AND(@{$childConditions});
@@ -346,18 +347,18 @@ sub new
 	
 	$self->{sqlGen} = $sqlGen;
 	
-	# Validate the field & get the view name
-	unless($sqlGen->field($field))
+	# Validate the field & get the join name
+	unless($sqlGen->fields($field))
 	{
 		my @fields = $field =~ /\{(\w+)\}/g;
 		die "Only one field may be specified" if $#fields;
-		die "Field '$_' is invalid" unless $sqlGen->field($fields[0]);
+		die "Field '$_' is invalid" unless $sqlGen->fields($fields[0]);
 		$fieldDefn = $field;
 		$field = $fields[0];
 	}
 	
 	# Validate the comparison
-	my $compare = $sqlGen->comparison($comparison);
+	my $compare = $sqlGen->comparisons($comparison);
 	unless ($compare)
 	{
 		die "Comparison '$comparison' is invalid";
@@ -466,12 +467,12 @@ sub genSQL
 	my SQL::GenerateQuery $sqlGen = $self->{sqlGen};
 	
 	# Add any autoInclude tables to the query
-	foreach my $view ($sqlGen->view())
+	foreach my $join ($sqlGen->joins())
 	{
-		my $viewData = $sqlGen->view($view) or die "Can't get view '$view'";
-		if (defined $viewData->{autoInclude} && $viewData->{autoInclude})
+		my $joinData = $sqlGen->joins($join) or die "Can't get view '$join'";
+		if (defined $joinData->{autoInclude} && $joinData->{autoInclude})
 		{
-			$self->addTableToFROM($view, \@FROM, \@WHERE, \@bindParams) ;
+			$self->addTableToFROM($join, \@FROM, \@WHERE, \@bindParams) ;
 		}
 	}
 	
@@ -488,13 +489,13 @@ sub genSQL
 		
 		$join = " " . $join if $join;
 
-		my $fieldData = $sqlGen->field($field);
-		my $columnDefn = defined $fieldData->{view} ? $fieldData->{view} . "." : '';
+		my $fieldData = $sqlGen->fields($field);
+		my $columnDefn = defined $fieldData->{join} ? $fieldData->{join} . "." : '';
 		$columnDefn .= defined $fieldData->{'comp-column'} ? $fieldData->{'comp-column'} : $fieldData->{column};
-		my $compData = $sqlGen->comparison($comparison);
+		my $compData = $sqlGen->comparisons($comparison);
 		
 		# Add the appropriate FROM tables and join WHERE conditions		
-		$self->addTableToFROM($fieldData->{view}, \@FROM, \@WHERE, \@bindParams) if $fieldData->{view};
+		$self->addTableToFROM($fieldData->{join}, \@FROM, \@WHERE, \@bindParams) if $fieldData->{join};
 
 		# Add the bind parameter(s) and get the placeHolder
 		my $placeHolder = $self->addCriteria($criteria, $compData, \@bindParams);
@@ -525,18 +526,18 @@ sub genSQL
 	foreach my $field (@{$opts{outColumns}})
 	{
 		my $fieldDefn;
-		unless ($sqlGen->field($field))
+		unless ($sqlGen->fields($field))
 		{
 			my @fields = $field =~ /\{(\w+)\}/g;
 			die "Only one field may be specified" if $#fields;
-			die "Field '$_' is invalid" unless $sqlGen->field($fields[0]);
+			die "Field '$_' is invalid" unless $sqlGen->fields($fields[0]);
 			$fieldDefn = $field;
 			$field = $fields[0];
 		}
 		# Add the selected columns to the SELECT clause
-		my $fieldData = $sqlGen->field($field);
+		my $fieldData = $sqlGen->fields($field);
 		
-		my $selectCol = defined $fieldData->{view} ? $fieldData->{view} . '.' : '';
+		my $selectCol = defined $fieldData->{join} ? $fieldData->{join} . '.' : '';
 		$selectCol .= $fieldData->{column};
 		if (defined $fieldData->{columndefn})
 		{
@@ -552,18 +553,18 @@ sub genSQL
 		push @SELECT, $selectCol;
 		
 		# Add the appropriate FROM tables and join WHERE conditions
-		$self->addTableToFROM($fieldData->{view}, \@FROM, \@WHERE, \@bindParams) if $fieldData->{view};
+		$self->addTableToFROM($fieldData->{join}, \@FROM, \@WHERE, \@bindParams) if $fieldData->{join};
 	}
 	
 	# Process the Order By
 	foreach my $field (@{$opts{orderBy}})
 	{
 		my $fieldDefn;
-		unless ($sqlGen->field($field))
+		unless ($sqlGen->fields($field))
 		{
 			my @fields = $field =~ /\{(\w+)\}/g;
 			die "Only one field may be specified" if $#fields;
-			die "Field '$_' is invalid" unless $sqlGen->field($fields[0]);
+			die "Field '$_' is invalid" unless $sqlGen->fields($fields[0]);
 			$field = $fields[0];
 		}
 		
@@ -706,14 +707,14 @@ sub addCriteria
 sub addTableToFROM
 {
 	my SQL::GenerateQuery::Condition $self = shift;
-	my ($view, $FROM, $WHERE, $bindParams) = @_;
+	my ($join, $FROM, $WHERE, $bindParams) = @_;
 	my SQL::GenerateQuery $sqlGen = $self->{sqlGen};
-	my $viewData = $sqlGen->view($view);
+	my $joinData = $sqlGen->joins($join);
 	
 	# Construct a proper FROM clause member
-	my $table = $viewData->{table};
+	my $table = $joinData->{table};
 	my $from = $table;
-	$from .= " $view" unless $table eq $view;
+	$from .= " $join" unless $table eq $join;
 
 	# If we haven't already added this FROM clause
 	unless (grep {$_ eq $from} @$FROM)
@@ -721,29 +722,18 @@ sub addTableToFROM
 		# Add the table to the bottom of the FROM clause
 		push @$FROM, $from;
 
-		if (exists $viewData->{condition})
+		if (exists $joinData->{condition})
 		{
 			# Add the appropriate join to the top of the WHERE clause
-			unshift @$WHERE, '(' . $viewData->{condition} . ') AND';
+			unshift @$WHERE, '(' . $joinData->{condition} . ') AND';
 		}
-		if (exists $viewData->{bindParams})
+		if (exists $joinData->{bindParams})
 		{
 			# Add necessary bind params to top of list
-			unshift @$bindParams, @{$viewData->{bindParams}};
+			unshift @$bindParams, @{$joinData->{bindParams}};
 		}
 	}
 }
-
-
-# Generates XAP Dialog XML
-sub genXAP
-{
-	my SQL::GenerateQuery::Condition $self = shift;
-	my %opts = @_;
-	
-	# TODO: Something Useful :-)
-}
-
 
 1;
 
