@@ -24,7 +24,7 @@ $STMTMGR_CATALOG = new App::Statements::Catalog(
 		SELECT internal_catalog_id
 		FROM offering_catalog
 		WHERE catalog_id = ?
-	},
+	},	
 	'selInternalCatalogIdById' => qq
 	{
 		select * from Offering_catalog
@@ -75,6 +75,14 @@ $STMTMGR_CATALOG = new App::Statements::Catalog(
 		from offering_catalog_entry
 		where code = upper(?)
 			and entry_type = ?
+	},
+	'selCatalogItemByRange' => q{
+		SELECT entry_id
+		FROM OFFERING_CATALOG_ENTRY
+		WHERE code BETWEEN (:1) 
+		AND (:2) 
+		AND catalog_id = :3
+		AND modifier IS NULL
 	},
 
 	'selCatalogItemsByOrgIdAndCode' => q{
