@@ -111,8 +111,12 @@
 		<deliverable id="1225">
 			Fixed a problem in the Hospital Claim dialog which was causing some claims to be duplicated and others to be
 			lost.
-		</deliverable>	
-	
+		</deliverable>
+		
+		<deliverable id="1472">
+			Fixed offset for daylight-saving time.
+		</deliverable>
+
 	</deliverables>
 </release-notes>
 
