@@ -260,26 +260,40 @@ $STMTMGR_INSURANCE = new App::Statements::Insurance(
 			where product_name = ?
 		},
 	'selPersonPlanExists' => qq{
-		select product_name
+		select plan_name
 			from insurance
 			where product_name = ?
+			and plan_name = ?
 			and record_type = ?
 			and owner_person_id = ?
 		},
+
 	'selInsuredRelationship' => qq{
 		select caption
 		from insured_relationship
 		where id = ?
 		},
-	'selNewPlanExists' => qq{
+	'selNewProductExists' => qq{
 		select product_name
 			from insurance
 			where product_name = ?
+			and owner_org_id = ?
 		},
-	'selDoesPlanExists' => qq{
+	'selNewPlanExists' => qq{
+		select plan_name
+			from insurance
+			where product_name = ?
+			and plan_name = ?
+			and owner_org_id = ?
+			and record_type = 2
+		},
+
+	'selDoesProductExists' => qq{
 		select ins_internal_id
 			from insurance
 			where product_name = ?
+			and owner_org_id = ?
+			and record_type = 1
 		},
 	'selDoesPlanExistsForPerson' => qq{
 		select ins_internal_id
