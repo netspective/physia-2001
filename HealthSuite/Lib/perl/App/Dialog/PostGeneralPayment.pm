@@ -157,102 +157,79 @@ sub execute
 	my $payRef = $page->field('pay_ref');
 	my $authRef = $page->field('auth_ref');
 
-	if($page->field('total_amount') > 0)
+	my $totalAmtRecvd = $page->field('total_amount') || 0;
+	my $lineCount = $page->param('_f_line_count');
+	for(my $line = 1; $line <= $lineCount; $line++)
 	{
-		my $lineCount = $page->param('_f_line_count');
-		for(my $line = 1; $line <= $lineCount; $line++)
+		my $payAmt = $page->param("_f_invoice_$line\_payment");
+		next if $payAmt eq '';
+
+		my $invoiceId = $page->param("_f_invoice_$line\_invoice_id");
+
+		my $itemId = $page->schemaAction(
+			'Invoice_Item', 'add',
+			parent_id => $invoiceId,
+			item_type => defined $itemType ? $itemType : undef,
+			_debug => 0
+		);
+
+
+		# Create adjustment for the item
+		my $comments = $page->param("_f_invoice_$line\_comments");
+		my $adjItemId = $page->schemaAction(
+			'Invoice_Item_Adjust', 'add',
+			adjustment_type => defined $adjType ? $adjType : undef,
+			adjustment_amount => defined $payAmt ? $payAmt : undef,
+			parent_id => $itemId || undef,
+			pay_date => $todaysDate || undef,
+			pay_method => defined $payMethod ? $payMethod : undef,
+			pay_ref => $payRef || undef,
+			payer_type => $payerType || 0,
+			payer_id => $payerId || undef,
+			data_text_a => $authRef || undef,
+			pay_type => defined $payType ? $payType : undef,
+			comments => $comments || undef,
+			_debug => 0
+		);
+
+		#Update the invoice
+
+		my $invoice = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selInvoice', $invoiceId);
+		my $invoiceBalance = $invoice->{total_cost} + ($invoice->{total_adjust} + (0 - $payAmt));
+		$page->schemaAction(
+			'Invoice', 'update',
+			invoice_id => $invoiceId || undef,
+			invoice_status => $invoiceBalance == 0 ? App::Universal::INVOICESTATUS_CLOSED : App::Universal::INVOICESTATUS_PAYAPPLIED,
+			_debug => 0
+		);
+
+
+		#Create history attribute for this adjustment
+		$page->schemaAction(
+			'Invoice_Attribute', 'add',
+			parent_id => $invoiceId || undef,
+			item_name => 'Invoice/History/Item',
+			value_type => defined $historyValueType ? $historyValueType : undef,
+			value_text => "Personal payment of $totalAmtRecvd made by $payerId",
+			value_textB => $comments || undef,
+			value_date => $todaysDate,
+			_debug => 0
+		);
+
+		$page->schemaAction(
+			'Invoice_Attribute', 'add',
+			parent_id => $invoiceId || undef,
+			item_name => 'Invoice/Payment/Batch ID',
+			value_type => defined $textValueType ? $textValueType : undef,
+			value_text => $batchId || undef,
+			value_date => $batchDate || undef,
+			value_int => $adjItemId || undef,
+			_debug => 0
+		);
+
+		if($invoiceBalance == 0)
 		{
-			my $payAmt = $page->param("_f_invoice_$line\_payment");
-			next if $payAmt eq '';
-
-			my $totalAdjustForItemAndItemAdjust = 0 - $payAmt;
-
-			my $invoiceId = $page->param("_f_invoice_$line\_invoice_id");
-
-			#my $itemBalance = $totalAdjustForItemAndItemAdjust;	# because this is a "dummy" item that is made for the sole purpose of applying a general
-																# payment, there is no charge and the balance should be negative.
-			my $itemId = $page->schemaAction(
-				'Invoice_Item', 'add',
-				parent_id => $invoiceId,
-				item_type => defined $itemType ? $itemType : undef,
-				#total_adjust => defined $totalAdjustForItemAndItemAdjust ? $totalAdjustForItemAndItemAdjust : undef,
-				#balance => defined $itemBalance ? $itemBalance : undef,
-				_debug => 0
-			);
-
-
-
-
-			# Create adjustment for the item
-			my $comments = $page->param("_f_invoice_$line\_comments");
-			my $adjItemId = $page->schemaAction(
-				'Invoice_Item_Adjust', 'add',
-				adjustment_type => defined $adjType ? $adjType : undef,
-				adjustment_amount => defined $payAmt ? $payAmt : undef,
-				parent_id => $itemId || undef,
-				pay_date => $todaysDate || undef,
-				pay_method => defined $payMethod ? $payMethod : undef,
-				pay_ref => $payRef || undef,
-				payer_type => $payerType || 0,
-				payer_id => $payerId || undef,
-				#net_adjust => defined $totalAdjustForItemAndItemAdjust ? $totalAdjustForItemAndItemAdjust : undef,
-				data_text_a => $authRef || undef,
-				pay_type => defined $payType ? $payType : undef,
-				comments => $comments || undef,
-				_debug => 0
-			);
-
-			#Update the invoice
-
-			my $invoice = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selInvoice', $invoiceId);
-			my $invoiceBalance = $invoice->{total_cost} + ($invoice->{total_adjust} + (0 - $payAmt));
-			$page->schemaAction(
-				'Invoice', 'update',
-				invoice_id => $invoiceId || undef,
-				invoice_status => $invoiceBalance == 0 ? App::Universal::INVOICESTATUS_CLOSED : App::Universal::INVOICESTATUS_PAYAPPLIED,
-				#total_adjust => defined $totalAdjustForInvoice ? $totalAdjustForInvoice : undef,
-				#balance => defined $invoiceBalance ? $invoiceBalance : undef,
-				_debug => 0
-			);
-
-
-			#Create history attribute for this adjustment
-			$page->schemaAction(
-				'Invoice_Attribute', 'add',
-				parent_id => $invoiceId || undef,
-				item_name => 'Invoice/History/Item',
-				value_type => defined $historyValueType ? $historyValueType : undef,
-				value_text => "Personal payment made by $payerId",
-				value_textB => $comments || undef,
-				value_date => $todaysDate,
-				_debug => 0
-			);
-
-			$page->schemaAction(
-				'Invoice_Attribute', 'add',
-				parent_id => $invoiceId || undef,
-				item_name => 'Invoice/Payment/Batch ID',
-				value_type => defined $textValueType ? $textValueType : undef,
-				value_text => $batchId || undef,
-				value_date => $batchDate || undef,
-				value_int => $adjItemId || undef,
-				_debug => 0
-			);
-
-			if($invoiceBalance == 0 && $invoice->{invoice_subtype} == App::Universal::CLAIMTYPE_SELFPAY)
-			{
-				$page->schemaAction(
-					'Invoice_Attribute', 'add',
-					parent_id => $invoiceId || undef,
-					item_name => 'Invoice/History/Item',
-					value_type => defined $historyValueType ? $historyValueType : undef,
-					value_text => 'Closed',
-					value_date => $todaysDate,
-					_debug => 0
-				);
-				
-				App::Dialog::Procedure::execAction_submit($page, 'add', $invoiceId);
-			}
+			App::Dialog::Procedure::execAction_submit($page, 'add', $invoiceId);
 		}
 	}
 	

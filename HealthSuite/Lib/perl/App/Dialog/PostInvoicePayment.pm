@@ -109,8 +109,6 @@ sub new
 	return $self;
 }
 
-
-
 sub makeStateChanges
 {
 	my ($self, $page, $command, $dlgFlags) = @_;
@@ -124,7 +122,8 @@ sub makeStateChanges
 	my $isInsurance = $paidBy eq 'insurance';
 
 	$page->param('_p_batch_id') ? $self->heading('Add Batch Insurance Payments') : $self->heading("Add \u$paidBy Payment");
-
+	
+	$self->updateFieldFlags('payer_id', FLDFLAG_READONLY, 1);
 	if(! $invoiceId || ($isInsurance && $invoiceInfo->{invoice_subtype} == App::Universal::CLAIMTYPE_SELFPAY))
 	{
 		if($invoiceId)
@@ -166,22 +165,28 @@ sub populateData
 	my $invoiceId = $page->param('invoice_id') || $page->field('sel_invoice_id');
 	$page->field('sel_invoice_id', $invoiceId);
 	my $invoiceInfo = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoice', $invoiceId);
-	$page->field('client_id', $invoiceInfo->{client_id});
+	my $clientId = $invoiceInfo->{client_id};
+	$page->field('client_id', $clientId);
 	my $paidBy = $page->param('paidBy');
 	if($paidBy eq 'insurance')
 	{
-		my $primaryPayer = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoiceBillingPrimary', $invoiceId);
-		my $billToId = $primaryPayer->{bill_to_id};
-		if($primaryPayer->{bill_party_type} == App::Universal::INVOICEBILLTYPE_THIRDPARTYINS || $primaryPayer->{bill_party_type} == App::Universal::INVOICEBILLTYPE_THIRDPARTYORG)
+		my $currentPayer = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoiceBillingCurrent', $invoiceInfo->{billing_id});
+		my $billToId = $currentPayer->{bill_to_id};
+		my $billPartyType = $currentPayer->{bill_party_type};
+		if($billPartyType == App::Universal::INVOICEBILLTYPE_THIRDPARTYINS || $billPartyType == App::Universal::INVOICEBILLTYPE_THIRDPARTYORG)
 		{
 			my $orgId = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_NONE, 'selRegistry', $billToId);
 			$page->field('payer_id', $orgId->{org_id});
 			$page->field('orgpayer_internal_id', $billToId);
 		}
+		else
+		{
+			$page->field('payer_id', $billToId);
+		}
 	}
 	elsif($paidBy eq 'personal')
 	{	
-		$page->field('payer_id', $invoiceInfo->{client_id});
+		$page->field('payer_id', $clientId);
 	}
 
 	if(my $batchId = $page->param('_p_batch_id'))
@@ -209,6 +214,7 @@ sub execute
 	my $payRef = $page->field('pay_ref');
 	my $payType = $page->field('pay_type');
 
+	my $totalAmtRecvd = $page->field('total_amount') || $page->field('check_amount') || 0;
 
 	my $lineCount = $page->param('_f_line_count');
 	for(my $line = 1; $line <= $lineCount; $line++)
@@ -219,7 +225,7 @@ sub execute
 		next if $planPaid eq '' && $writeoffAmt eq '' && $amtApplied eq '';
 
 		my $itemId = $page->param("_f_item_$line\_item_id");
-	
+
 		# Create adjustment for the item
 		my $planAllow = $page->param("_f_item_$line\_plan_allow");
 		my $writeoffCode = $page->param("_f_item_$line\_writeoff_code");
@@ -254,7 +260,7 @@ sub execute
 			parent_id => $invoiceId || undef,
 			item_name => 'Invoice/History/Item',
 			value_type => defined $historyValueType ? $historyValueType : undef,
-			value_text => "\u$paidBy payment made by '$payerIdDisplay'",
+			value_text => "\u$paidBy payment of \$$totalAmtRecvd made by '$payerIdDisplay'",
 			value_textB => $comments || undef,
 			value_date => $todaysDate,
 			_debug => 0
@@ -304,20 +310,7 @@ sub execute
 
 	if($invoiceBalance == 0)
 	{
-		$page->schemaAction(
-			'Invoice_Attribute', 'add',
-			parent_id => $invoiceId || undef,
-			item_name => 'Invoice/History/Item',
-			value_type => defined $historyValueType ? $historyValueType : undef,
-			value_text => 'Closed',
-			value_date => $todaysDate,
-			_debug => 0
-		);
-		
-		if($invoice->{invoice_subtype} == App::Universal::CLAIMTYPE_SELFPAY)
-		{
-			App::Dialog::Procedure::execAction_submit($page, 'add', $invoiceId);
-		}
+		App::Dialog::Procedure::execAction_submit($page, 'add', $invoiceId);
 	}
 
 
