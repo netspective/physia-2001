@@ -589,6 +589,7 @@ sub calcRVRBS
 	
 	my $org = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_NONE, 'selAttribute',	$orgId, $gpciItemName);
 	my $gpciId = $org->{value_text};
+	$flags |= INTELLICODEFLAG_FACILITY_PRICING if $org->{value_int};
 	
 	my $gpci = $STMTMGR_INTELLICODE->getRowAsHash($page, STMTMGRFLAG_NONE, 'sel_gpci', $gpciId);
 	
