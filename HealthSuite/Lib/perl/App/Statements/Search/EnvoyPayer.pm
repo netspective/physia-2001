@@ -27,7 +27,7 @@ $STMTRPTDEFN_DEFAULT =
 {
 	columnDefn =>
 			[
-				{ head => 'ID',dAlign => 'CENTER', url => 'javascript:chooseEntry("#&{?}#")'},
+				{ head => 'ID',dAlign => 'CENTER', url => q{javascript:chooseEntry('#&{?}#')}, },
 				{ head => 'Name',dAlign => 'CENTER', tAlign=>'LEFT'},
 			],
 };

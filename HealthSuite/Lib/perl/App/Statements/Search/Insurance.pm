@@ -40,7 +40,7 @@ $STMTRPTDEFN_DEFAULT =
 {
 	columnDefn =>
 			[
-				{ head => 'Insurance Org', url => 'javascript:chooseEntry("#&{?}#")'},
+				{ head => 'Insurance Org', url => q{javascript:chooseEntry('#&{?}#')}, },
 				{ head => 'Product Name' },
 				{ head => 'Plan Name' },
 				{ head => 'Street' },
@@ -53,8 +53,8 @@ $STMTRPTDEFN_INSPRODUCT =
 {
 	columnDefn =>
 			[
-				{ head => 'Product Name', colIdx => 1, url => 'javascript:chooseItem("/org/#session.org_id#/dlg-update-ins-product/#6#","#&{?}#")' },
-				{ head => 'Insurance Org', colIdx => 0, url => 'javascript:chooseEntry("#&{?}#")'},
+				{ head => 'Product Name', colIdx => 1, url => q{javascript:chooseItem('/org/#session.org_id#/dlg-update-ins-product/#6#','#&{?}#')}, },
+				{ head => 'Insurance Org', colIdx => 0, url => q{javascript:chooseEntry('#&{?}#')}, },
 				{ head => 'Street', colIdx => 3 },
 				{ head => 'City', colIdx => 4 },
 				{ head => 'State', colIdx => 5 },
@@ -65,9 +65,9 @@ $STMTRPTDEFN_INSPLAN =
 {
 	columnDefn =>
 			[
-				{ head => 'Plan Name', colIdx => 2, url => 'javascript:chooseItem("/org/#session.org_id#/dlg-update-ins-plan/#6#","#&{?}#")' },
+				{ head => 'Plan Name', colIdx => 2, url => q{javascript:chooseItem('/org/#session.org_id#/dlg-update-ins-plan/#6#','#&{?}#')}, },
 				{ head => 'Product Name', colIdx => 1 },
-				{ head => 'Insurance Org', colIdx => 0, url => 'javascript:chooseEntry("#&{?}#")' },
+				{ head => 'Insurance Org', colIdx => 0, url => q{javascript:chooseEntry('#&{?}#')}, },
 				{ head => 'Street', colIdx => 3 },
 				{ head => 'City', colIdx => 4 },
 				{ head => 'State', colIdx => 5 },

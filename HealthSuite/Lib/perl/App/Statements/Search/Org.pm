@@ -48,7 +48,7 @@ $STMTRPTDEFN_DEFAULT =
 {
 	columnDefn =>
 			[
-				{ head => 'ID', url => 'javascript:chooseEntry("#&{?}#", null, null, "#3#")'},
+				{ head => 'ID', url => q{javascript:chooseEntry('#&{?}#', null, null, '#3#')}, },
 				{ head => 'Primary Name' },
 				{ head => 'Category'},
 			],

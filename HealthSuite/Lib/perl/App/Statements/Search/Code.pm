@@ -118,7 +118,7 @@ $STMTRPTDEFN_ICD =
 	#},
 	columnDefn =>
 	[
-		{ head => 'Code', url => 'javascript:chooseItem2("/lookup/icd/detail/#&{?}#", "#&{?}#", true)', hint => 'Lookup Detailed Data' },
+		{ head => 'Code', url => q{javascript:chooseItem2('/lookup/icd/detail/#&{?}#', '#&{?}#', true)}, hint => 'Lookup Detailed Data' },
 		{ head => 'Name' },
 		{ head => 'Description' },
 		{ head => 'Sex' },
@@ -136,7 +136,7 @@ $STMTRPTDEFN_CPT =
 	#},
 	columnDefn =>
 	[
-		{ head => 'Code', url => 'javascript:chooseItem2("/lookup/cpt/detail/#&{?}#", "#&{?}#", true)', hint => 'Lookup Detailed Data' },
+		{ head => 'Code', url => q{javascript:chooseItem2('/lookup/cpt/detail/#&{?}#', '#&{?}#', true)}, hint => 'Lookup Detailed Data' },
 		{ head => 'Name' },
 		{ head => 'Description' },
 	],
@@ -152,7 +152,7 @@ $STMTRPTDEFN_HCPCS =
 	#},
 	columnDefn =>
 	[
-		{ head => 'Code', url => 'javascript:chooseEntry("#&{?}#")' },
+		{ head => 'Code', url => q{javascript:chooseEntry('#&{?}#')}, },
 		{ head => 'Name' },
 		{ head => 'Description' },
 	],
@@ -168,7 +168,7 @@ $STMTRPTDEFN_SERVCODE =
 	#},
 	columnDefn =>
 	[
-		{ head => 'Code', url => 'javascript:chooseEntry("#&{?}#")' },
+		{ head => 'Code', url => q{javascript:chooseEntry('#&{?}#')}, },
 		{ head => 'Name' },
 	],
 	#rowSepStr => '',
@@ -178,7 +178,7 @@ $STMTRPTDEFN_EPSDT =
 {
 	columnDefn =>
 	[
-		{ head => 'Code', url => 'javascript:chooseEntry("#&{?}#")' },	
+		{ head => 'Code', url => q{javascript:chooseEntry('#&{?}#')}, },	
 		#{ head => 'Name' },
 		{ head => 'Description' },
 	],	
@@ -188,7 +188,7 @@ $STMTRPTDEFN_MISC_PROCEDURE =
 {
 	columnDefn =>
 	[
-		{ head => 'Code', url => 'javascript:chooseEntry("#&{?}#")' },	
+		{ head => 'Code', url => q{javascript:chooseEntry('#&{?}#')}, },	
 		{ head => 'Name' },
 		{ head => 'Description' },
 	],	
