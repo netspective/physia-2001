@@ -374,6 +374,188 @@ $STMTMGR_REPORT_ACCOUNTING = new App::Statements::Report::Accounting(
 		ORDER BY org_id
 	},
 
+	'sel_patient_superbill_info' => 
+	{
+		sqlStmt => qq
+		{
+			sELECT DISTINCT
+			TO_CHAR(thePatientAppt.start_time, 'MM/DD/YY') AS startDate,
+			TO_CHAR(thePatientAppt.start_time, 'HH24:MI') AS startTime,
+			thePatient.short_name AS patientname,
+			thePatientAppt.subject AS reason,
+			theDoctor.person_id AS doctorID,
+			theDoctor.short_name AS doctorName,
+			theDoctorAddr.line1 AS location,
+			TO_CHAR(thePatient.date_of_birth, 'MM/DD/YY') AS dob,
+			thePatient.person_id AS patientNo,
+			thePatient.person_id AS respParty,
+			thePatient.gender AS sex,
+			thePatientAddr.line1 AS patientAddress,
+			thePatientAddr.city,
+			thePatientAddr.state,
+			thePatientAddr.zip
+			FROM
+			Event thePatientAppt,
+			Event_Attribute theAppointmentAttr,
+			Person thePatient,
+			Person theDoctor,
+			Person_Address thePatientAddr,
+			Person_Address theDoctorAddr
+			WHERE
+			TRUNC(thePatientAppt.start_time) = TO_DATE(:1, 'MM/DD/YYYY')
+			AND theAppointmentAttr.parent_id = thePatientAppt.event_id
+			AND theAppointmentAttr.value_type = '333'
+			AND theAppointmentAttr.value_text = thePatient.person_id
+			AND theAppointmentAttr.value_textB = theDoctor.person_id
+			AND thePatient.person_id = thePatientAddr.parent_id
+			AND theDoctor.person_id = theDoctorAddr.parent_id
+		},
+		sqlStmtBindParamDescr => ['Date'],
+		publishDefn => 
+			{
+			columnDefn => 
+				[
+				{ colIdx =>  0, head => 'Start Time', dataFmt => '#0# #1#' },
+				{ colIdx =>  1, head => 'Patient', dataFmt => '#2#'},
+				{ colIdx =>  2, head => 'Reason', dataFmt => '#3#'},
+				{ colIdx =>  3, head => 'Dr #', dataFmt => '#4#'},
+				{ colIdx =>  4, head => 'Doctor', dataFmt => '#5#'},
+				{ colIdx =>  5, head => 'Location', dataFmt => '#6#'},
+				{ colIdx =>  6, head => 'DOB', dataFmt => '#7#'},
+				{ colIdx =>  7, head => 'Patient #', dataFmt => '#8#'},
+				{ colIdx =>  8, head => 'Resp. Party', dataFmt => '#9#'},
+				{ colIdx =>  9, head => 'Sex', dataFmt => '#10#'},
+				{ colIdx => 10, head => 'Address', dataFmt => '#11#' },
+				{ colIdx => 11, head => 'City/State', dataFmt => '#12#, #13#' },
+				{ colIdx => 12, head => 'Zip', dataFmt => '#14#' },
+				{ colIdx => 13, head => 'Over 90', dataFmt => '#15#'},
+				{ colIdx => 14, head => 'Over 60', dataFmt => '#16#'},
+				{ colIdx => 15, head => 'Over 30', dataFmt => '#17#'},
+				{ colIdx => 16, head => 'Current', dataFmt => '#18#'},
+				{ colIdx => 17, head => 'Total Due', dataFmt => '#19#'},
+				{ colIdx => 18, head => 'Insurance Co.', dataFmt => '#20#'},
+				{ colIdx => 19, head => 'Policy #', dataFmt => '#21#'},
+				{ colIdx => 20, head => 'Relationship to Insured', dataFmt => '#22#'},
+				],
+			maxCols => '80',
+			maxRows => '63',
+#			mtbDebug => 'none',
+			fieldDefn => 
+				[
+				# Date
+				{ colIdx =>  0, col =>  1, row => 48, width => 10, align => 'LEFT' },
+				# Time
+				{ colIdx =>  1, col =>  1, row => 49, width => 10, align => 'LEFT' },
+				# Patient
+				{ colIdx =>  2, col => 12, row => 48, width => 18, align => 'LEFT' },
+				{ colIdx =>  2, col => 12, row => 49, width => 18, align => 'LEFT' },
+				# Reason
+				{ colIdx =>  3, col => 31, row => 48, width => 11, align => 'LEFT' },
+				{ colIdx =>  3, col => 31, row => 49, width => 11, align => 'LEFT' },
+				# Ticket
+				# Dr. #
+				{ colIdx =>  4, col =>  7, row => 51, width =>  4, align => 'LEFT' },
+				# Doctor
+				{ colIdx =>  5, col => 12, row => 51, width => 10, align => 'LEFT' },
+				# Location
+				{ colIdx =>  6, col => 23, row => 51, width => 13, align => 'LEFT' },
+				# D.O.B
+				{ colIdx =>  7, col => 37, row => 51, width =>  8, align => 'LEFT' },
+				# Patient No
+				{ colIdx =>  8, col =>  1, row => 53, width =>  6, align => 'LEFT' },
+				# Responsible Party
+				{ colIdx =>  9, col =>  8, row => 53, width => 19, align => 'LEFT' },
+				# Phone #
+				# Referring Doctor
+				# Sex
+				{ colIdx => 10, col =>  3, row => 55, width =>  3, align => 'LEFT',
+				  type => 'conditional',
+				  data => { 
+				  	'1' => 'X  ',
+				  	'2' => '  X',
+				  	'3' => ' * ',
+				  },
+				},
+				# Address
+				{ colIdx => 11, col =>  7, row => 55, width => 13, align => 'LEFT' },
+				# City
+				{ colIdx => 12, col => 23, row => 55, width => 10, align => 'LEFT' },
+				# State
+				{ colIdx => 13, col => 34, row => 55, width =>  2, align => 'LEFT' },
+				# Zip
+				{ colIdx => 14, col => 37, row => 55, width =>  7, align => 'LEFT' },
+				# Balance over 90 days overdue
+				{ colIdx => 15, col =>  3, row => 57, width =>  5, align => 'LEFT' },
+				# Balance over 60 days overdue
+				{ colIdx => 16, col =>  9, row => 57, width =>  5, align => 'LEFT' },
+				# Balance over 30 days overdue
+				{ colIdx => 17, col => 15, row => 57, width =>  6, align => 'LEFT' },
+				# Current balance
+				{ colIdx => 18, col => 22, row => 57, width =>  4, align => 'LEFT' },
+				# Total pending
+				{ colIdx => 19, col => 27, row => 57, width =>  5, align => 'LEFT' },
+				# Insurance Company
+				{ colIdx => 20, col =>  1, row => 59, width =>  12, align => 'LEFT' },
+				{ colIdx => 20, col =>  1, row => 60, width =>  12, align => 'LEFT' },
+				{ colIdx => 20, col =>  1, row => 61, width =>  12, align => 'LEFT' },
+				{ colIdx => 20, col =>  1, row => 62, width =>  12, align => 'LEFT' },
+				# Policy ID
+				{ colIdx => 21, col => 18, row => 59, width =>  16, align => 'LEFT' },
+				{ colIdx => 21, col => 18, row => 60, width =>  16, align => 'LEFT' },
+				{ colIdx => 21, col => 18, row => 61, width =>  16, align => 'LEFT' },
+				{ colIdx => 21, col => 18, row => 62, width =>  16, align => 'LEFT' },
+				# Relationship to Insured
+				{ colIdx => 22, col => 35, row => 61, width =>   8, align => 'LEFT',
+				  type => 'conditional',
+				  data => {
+				  	 '1' => 'X      ',
+				  	 '2' => '  X    ',
+				  	 '3' => '    X  ',
+				  	 '4' => '    X  ',
+				  	 '5' => '    X  ',
+				  	 '6' => '    X  ',
+				  	 '9' => '      X',
+				  	'13' => '      X',
+				  	'14' => '      X',
+				  	'16' => '      X',
+				  	'17' => '      X',
+				  	'18' => '      X',
+				  	'19' => '      X',
+				  },
+				},
+				],
+			},
+	},
+		
+	
+	'sel_patient_superbill_ins_info' => 
+	{
+		sqlStmt => qq
+		{
+			SELECT	DISTINCT
+				thePatient.short_name,
+				theOrganization.name_primary,
+				theInsurance.member_number,
+				NVL(theInsurance.rel_to_guarantor, 9)
+			FROM	Org theOrganization,
+				Insurance theInsurance,
+				Person thePatient
+			WHERE	theInsurance.ins_org_id = theOrganization.org_internal_id
+			AND	theInsurance.owner_person_id = thePatient.person_id
+			AND	thePatient.person_id = :1
+		},
+		sqlStmtBindParamDescr => ['Date'],
+		publishDefn => 
+			{
+			columnDefn => 
+				[
+				{ colIdx => 0, head => 'Patient', dataFmt => '#0#'},
+				{ colIdx => 1, head => 'Insurance Company', dataFmt => '#1#' },
+				{ colIdx => 2, head => 'Policy ID', dataFmt => '#2#'},
+				{ colIdx => 3, head => 'Relationship to Insured', dataFmt => '#3#' },
+				],
+			},
+	},
 );
 
 
