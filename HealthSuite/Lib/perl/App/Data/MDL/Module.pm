@@ -372,6 +372,8 @@ sub importInsurance
 								record_type 	=> App::Universal::RECORDTYPE_PERSONALCOVERAGE || undef,
 								owner_person_id => $ownerId || undef,
 								owner_org_id =>   $ownerOrg || undef,
+								guarantor_id    => $item->{guarantor} || undef,
+								guarantor_type  => $item->{'guarantor-type'} || undef,
 								parent_ins_id 	=> $planData->{'ins_internal_id'} || undef,
 								product_name  	=> $item->{'ins-id'} || undef,
 								plan_name 		=> $item->{'policy-name'} || undef,
