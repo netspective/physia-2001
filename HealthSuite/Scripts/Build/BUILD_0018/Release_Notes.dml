@@ -36,6 +36,10 @@
 			edit the records and the CPT name is displayed in the component.
 		</deliverable>
 		
+		<deliverable id="1095">
+			Corrected Physician Home Page.
+		</deliverable>
+		
 		<deliverable id="1316">
 			UI :
 			 Added new Org type of Lab 
@@ -181,6 +185,10 @@
 		
 		<deliverable id="1762">
 			Show Recipients on Sent Items Mail Box.
+		</deliverable>		
+
+		<deliverable id="1764">
+			Add Unread Message Count component.
 		</deliverable>		
 
 		<deliverable id="1766">
