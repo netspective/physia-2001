@@ -162,7 +162,7 @@ sub execute_add
 		value_text => $page->field('value_text') || undef,
 		value_textB => $page->field('attr_name') || undef,
 		value_int => defined $prefFlag ? $prefFlag : undef,
-		_debug => 1
+		_debug => 0
 	);
 
 	return "\u$command completed.";
