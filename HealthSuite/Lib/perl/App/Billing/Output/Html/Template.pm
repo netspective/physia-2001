@@ -401,7 +401,6 @@ sub populateDiagnosis
 sub populateClaim
 {
 	my ($self, $claim) = @_;
-	my $physician = $claim->getRenderingProvider();
 	my $physicianAddress = $physician->getAddress();
 	my $data = $self->{data};
 	$data->{claimAcceptAssignmentN} = uc($claim->getAcceptAssignment) eq 'N' ? "Checked" : "";
@@ -423,6 +422,7 @@ sub populateClaim
 	$data->{claimProgramNameOther} = uc($claim->getProgramName) eq 'OTHER' ? "Checked" : "";
 	$data->{claimProgramNameFECA} = uc($claim->getProgramName) eq 'FECA' ? "Checked" : "";
 	$data->{claimTotalCharge} = $claim->getTotalCharge;
+	my $physician = $claim->getRenderingProvider();
 	$data->{transProviderName} = $physician->getName();
 	$data->{providerSignatureDate} = uc($claim->getInvoiceDate);
 
