@@ -67,22 +67,26 @@ sub prepare_detail_payment
 	my $html =undef;	
 	$orgIntId = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgId', $page->session('org_internal_id'), $orgId) if $orgId;	
 
-	my $pub = {
+	my $pub = {			
 		columnDefn =>
 		[
-			{head => 'Invoice', dAlign => 'left',url => q{javascript:chooseItemForParent('/invoice/#0#/summary') }, },					
-			{head => 'Physican', dAlign => 'left',},
-			{head => 'Patient',dAlign =>'left' , hAlign =>'left'},
-			{head => 'Proc Code', dAlign => 'center'},		
-			{head => 'Proc Name', dAlign => 'center'},		
-			{head => 'Service From', dAlign => 'center'},			
-			{head => 'Service To', dAlign => 'center'},						
-			{head => 'Diag Code',dAlign => 'center'},			
-			{head => 'Chrgs', dAlign => 'center',tDataFmt => '&{sum_currency:&{?}}',dformat => 'currency' },			
-			{head => 'Misc Chrgs', dAlign => 'center',tDataFmt => '&{sum_currency:&{?}}',dformat => 'currency'},
-			{head => 'Chrg Adj', dAlign => 'center',tDataFmt => '&{sum_currency:&{?}}',dformat => 'currency'},			
-			{head => 'Units', dAlign => 'center',tDataFmt => '&{sum:&{?}}'},
-			{head => 'Unit Cost', dAlign => 'center',tDataFmt => '&{sum_currency:&{?}}',dformat => 'currency'},			
+			{colIdx => 0, groupBy=>'#0#',head => 'Invoice', dAlign => 'left',url => q{javascript:chooseItemForParent('/invoice/#0#/summary') }, },					
+			{colIdx => 1,head => 'Physican', dAlign => 'left',},
+			{colIdx => 2,,head => 'Patient',dAlign =>'left' , hAlign =>'left'},
+			{colIdx => 3,head => 'Proc Code', dAlign => 'center'},		
+			{colIdx => 4,head => 'Proc Name', dAlign => 'center'},		
+			{colIdx => 5,head => 'Service From', dAlign => 'center'},			
+			{colIdx => 6,head => 'Service To', dAlign => 'center'},						
+			{colIdx => 7,head => 'Diag Code',dAlign => 'center'},								
+			{colIdx => 8,head => 'Chrgs', dAlign => 'center',summarize => 'sum',dformat => 'currency' },						
+			{colIdx => 9,head => 'Misc Chrgs', dAlign => 'center',summarize => 'sum',dformat => 'currency'},			
+			{colIdx => 10,head => 'Per W/O', summarize => 'sum',  dformat => 'currency' },			
+			{colIdx => 11,head => 'Ins W/O', summarize => 'sum',  dformat => 'currency' },
+			{colIdx => 12,head => 'Ins Rcpts', summarize => 'sum',  dformat => 'currency' },
+			{colIdx => 13,head => 'Per Rcpts', summarize => 'sum',  dformat => 'currency' },						
+			{colIdx => 14,head => 'Payment Type', dAlign => 'center',},
+			{colIdx => 15,head => 'Units', sAlign=>'center',dAlign => 'center',tAlign =>'center',summarize => 'sum'},			
+			{colIdx => 16,head => 'Unit Cost', sAlign=>'center',dAlign => 'center',tAlign =>'center',summarize => 'sum',dformat => 'currency'},			
 		],
 	};
 	my $batch_date = $page->param('batch_date');	
@@ -104,7 +108,11 @@ sub prepare_detail_payment
 			$_->{rel_diags},
 			$_->{total_charges},
 			$_->{misc_charges},						
-			$_->{charge_adjust},							
+			$_->{person_write_off},			
+			$_->{insurance_write_off},									
+			$_->{insurance_pay},								
+			$_->{person_pay},
+			$_->{pay_type},
 			$_->{units}||0,
 			$_->{unit_cost}||0,
 		);
@@ -136,23 +144,21 @@ sub execute
 	$orgIntId = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgId', $page->session('org_internal_id'), $orgId) if $orgId;
 	my @data=undef;	
 	my $html;
-	my $pub =
-	{
+	my $pub ={ 
 		columnDefn =>
 			[
-			{ colIdx => 0, head => 'Batch Date', dataFmt => '#0#', dAlign => 'RIGHT' ,
+			{ colIdx => 0 ,head => 'Batch Date', dataFmt => '#0#', dAlign => 'RIGHT' ,
 			url => qq{javascript:doActionPopup('#hrefSelfPopup#&detail=payment&batch_date=#0#',null,'width=900,height=600,scrollbars,resizable')}},
 			{ colIdx => 1, head => 'Chrgs', summarize => 'sum', dataFmt => '#2#', dformat => 'currency' },
 			{ colIdx => 2, head => 'Misc Chrgs', summarize => 'sum', dataFmt => '#3#', dformat => 'currency' },
-			{ colIdx => 3, head => 'Chrg Adj', summarize => 'sum', dataFmt => '#4#', dformat => 'currency' },
-			{ colIdx => 4, head => 'Net Chrgs', summarize => 'sum', dataFmt => '#6#', dformat => 'currency' },
-			{ colIdx => 5, head => 'Bal Trans', summarize => 'sum', dataFmt => '#7#', dformat => 'currency' },
-			{ colIdx => 6, head => 'Ins Rcpts', summarize => 'sum', dataFmt => '#9#', dformat => 'currency' },
-			{ colIdx => 7, head => 'Ins Wrt-Off', summarize => 'sum', dataFmt => '#5#', dformat => 'currency' },
-			{ colIdx => 8, head => 'Per Rcpts', summarize => 'sum', dataFmt => '#8#', dformat => 'currency' },
-			{ colIdx => 9, head => 'Per Wrt-Off', summarize => 'sum', dataFmt => '#5#', dformat => 'currency' },			
-			{ colIdx => 10, head =>'Ttl Rcpts', summarize => 'sum', dataFmt => '#10#', dformat => 'currency' },
-			#{ colIdx => 11, head => 'End A/R', summarize => 'sum', dataFmt => '#11#', dformat => 'currency' },
+			{ colIdx => 3, head => 'Per W/O', summarize => 'sum', dataFmt => '#5#', dformat => 'currency' },			
+			{ colIdx => 4, head => 'Ins W/O', summarize => 'sum', dataFmt => '#5#', dformat => 'currency' },
+			{ colIdx => 5, head => 'Net Chrgs', summarize => 'sum', dataFmt => '#6#', dformat => 'currency' },
+			{ colIdx => 6, head => 'Bal Trans', summarize => 'sum', dataFmt => '#7#', dformat => 'currency' },
+			{ colIdx => 7, head => 'Ins Rcpts', summarize => 'sum', dataFmt => '#9#', dformat => 'currency' },
+			{ colIdx => 8, head => 'Per Rcpts', summarize => 'sum', dataFmt => '#8#', dformat => 'currency' },			
+			{ colIdx => 9, head => 'Refunds', summarize => 'sum',  dformat => 'currency' },			
+			{ colIdx => 10, head =>'Ttl Rcpts', summarize => 'sum', dformat => 'currency' },
 		],
 	};		
 	my $daily_audit = $STMTMGR_REPORT_ACCOUNTING->getRowsAsHashList($page,STMTMGRFLAG_NONE,'sel_daily_audit',$reportBeginDate,$reportEndDate,
@@ -165,14 +171,14 @@ sub execute
 		(	
 			$_->{invoice_date},
 			$_->{total_charges},
-			$_->{misc_charges},
-			$_->{charge_adjust},
+			$_->{misc_charges},			
+			$_->{person_write_off},			
+			$_->{insurance_write_off},						
 			$_->{total_charges} + $_->{misc_charges} + $_->{charge_adjust}, #Net Charges						
 			$_->{balance_transfer},								
-			$_->{insurance_pay},					
-			$_->{insurance_write_off},						
+			$_->{insurance_pay},								
 			$_->{person_pay},
-			$_->{person_write_off},			
+			$_->{refund},
 			$_->{person_pay} + $_->{insurance_pay},
 		);
 		push(@data, \@rowData);
