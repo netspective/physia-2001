@@ -119,7 +119,7 @@ $STMTMGR_COMPONENT_ORG = new App::Statements::Component::Org(
 						<A HREF='/org/#param.org_id#/stpe-#my.stmtId#/dlg-add-contact-orginternet?home=#homeArl#'>Web Page (URL)</A>,
 						<A HREF='/org/#param.org_id#/stpe-#my.stmtId#/dlg-add-contact-orgbilling?home=#homeArl#'>Billing Contact</A> }
 					  },
-					{ caption => qq{ Add <A HREF='/org/#param.org_id#/stpe-#my.stmtId#/dlg-add-address-org?home=#homeArl#'>Physical Address</A> }, url => 'x', },
+					{ caption => qq{ Add <A HREF='/org/#param.org_id#/stpe-#my.stmtId#/dlg-add-address-org?home=#homeArl#'>Address</A> }, url => 'x', },
 
 				],
 			},
