@@ -30,7 +30,7 @@ use vars qw(@ISA $INSTANCE);
 
 sub new
 {
-	my $self = App::Dialog::Report::new(@_, id => 'rpt-acct-physician-license', heading => 'Professional License');
+	my $self = App::Dialog::Report::new(@_, id => 'rpt-acct-physician-license', heading => 'Professional License Expiration');
 
 	my $curYear = UnixDate('today', '%Y');
 	my $year;
@@ -52,7 +52,7 @@ sub new
 
 		new CGI::Dialog::MultiField(
 			fields => [
-				new CGI::Dialog::Field(caption => 'Expiry Month',
+				new CGI::Dialog::Field(caption => 'Expiration Month',
 					name => 'month',
 					type => 'select',
 					selOptions => 'January:01;February:02;March:03;April:04;May:05;June:06;July:07;August:08;September:09;October:10;November:11;December:12',
@@ -143,6 +143,7 @@ sub execute
 		my @rowData =
 		(
 			$_->{person_id},
+			$_->{category},
 			$_->{simple_name},
 			$_->{facility_id},
 			$_->{license_name},
