@@ -1,0 +1,4 @@
+. /etc/profile
+. $HOME/.bash_profile
+
+nsfClaims.pl db-pro_new create transmit archive 2 501.1 501.2 727 749 751 >> nsfClaims.log 2>&1

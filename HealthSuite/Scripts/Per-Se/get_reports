@@ -1,0 +1,4 @@
+. /etc/profile
+. $HOME/.bash_profile
+
+getPerseReports.pl >> getPerseReports.log 2>&1

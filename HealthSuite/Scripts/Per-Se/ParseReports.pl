@@ -30,6 +30,7 @@ use App::Universal;
 use App::Configuration;
 use DBI::StatementManager;
 use App::Statements::Invoice;
+use App::Statements::External;
 
 
 my @fields = (
@@ -178,8 +179,16 @@ foreach my $report (@reports)
 	$message = "$message$msgDetail";
 	print "Invoice $report->{PAT_ACTNO}: '$message' STATUS($status)\n";
 	
-	&addInvoiceHistory($page, $report->{DATE}, $report->{PAT_ACTNO}, $message, $report->{PAYER_PD});
-	&changeInvoiceStatus($page, $report->{PAT_ACTNO}, $status) if $status;
+	my $addedHistory = &addInvoiceHistory($page, $report->{DATE}, $report->{PAT_ACTNO}, 
+		$message, $report->{PAYER_PD});
+	if ($report->{PAT_ACTNO} && $status && $addedHistory)
+	{
+		&changeInvoiceStatus($page, $report->{PAT_ACTNO}, $status);
+	}
+	else
+	{
+		print "NO UPDATE STATUS ($report->{PAT_ACTNO}, $status)\n\n";
+	}
 }
 
 
@@ -208,11 +217,25 @@ sub parseFile
 	close INFILE;
 }
 
-
 sub addInvoiceHistory
 {
 	my ($page, $date, $invoice, $message, $amtPaid) = @_;
+	
+	return 0 unless $invoice;
+	
 	$date = UnixDate($date, '%m/%d/%Y');
+	my $invAttribute = $STMTMGR_EXTERNAL->getRowsAsHashList($page, STMTMGRFLAG_CACHE,
+		'sel_InvoiceAttribute', $invoice, 'Invoice/History/Item', $message, $date);
+		
+	if (@{$invAttribute})
+	{
+		for (@{$invAttribute})
+		{
+			print "EXISTING: $_->{item_id} - $_->{cr_stamp}: $_->{value_text} - $_->{value_date} \n";
+		}
+		return 0;
+	}
+
 	return $page->schemaAction(0, 'Invoice_Attribute', 'add',
 		parent_id => $invoice,
 		cr_user_id => 'EDI_PERSE',
