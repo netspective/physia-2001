@@ -13,11 +13,16 @@ SELECT 	i.client_id as person_ID , (i.invoice_id),
 	decode(ib.bill_party_type,0,ib.bill_to_id,1,ib.bill_to_id,(select org_id FROM ORG WHERE org_internal_id = ib.bill_to_id)) as  bill_to_id,
 	ib.bill_to_id as bill_plain,
 	i.balance
-FROM	invoice i, invoice_billing ib, invoice_attribute ia, invoice_item ii
+FROM	invoice i, invoice_billing ib, invoice_attribute ia, invoice_item ii,Transaction t
 WHERE	ib.invoice_id = i.invoice_id
 AND	ii.parent_id = i.invoice_id
 AND	ia.parent_id = i.invoice_id 
-AND	ia.item_name = 'Invoice/Creation/Batch ID'	
+AND	i.main_transaction = t.trans_id
+AND	(
+		(ia.item_name = 'Invoice/Creation/Batch ID') 
+	OR
+		(ia.item_name = 'Invoice/Payment/Batch ID' AND t.trans_type = 9030	)
+	)
 AND 	(invoice_status !=15 or parent_invoice_id is null)
 AND 	ib.bill_id = i.billing_id;
 
