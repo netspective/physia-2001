@@ -69,7 +69,7 @@ my %payerType = (THIN_MEDICARE . "" =>
 	$diagnosis[1] ne "" ? substr($diagnosis[1],0,1) : $spaces,  # if 1 then print else space
 	$diagnosis[2] ne "" ? substr($diagnosis[2],0,1) : $spaces,  # if 1 then print else space
 	$diagnosis[3] ne "" ? substr($diagnosis[3],0,1) : $spaces,  # if 1 then print else space
-	$self->numToStr(4,0,$currentProcedure->getDaysOrUnits()),   # units of service
+	$self->numToStr(3,1,$currentProcedure->getDaysOrUnits()),   # units of service
 	$self->numToStr(4,0,$inpClaim->getAnesthesiaOxygenMinutes()),   # Anesthesia/Oxygen minutes
 	substr($currentProcedure->getEmergency(),0,1),						  # Emergency Indicator
 	substr($currentProcedure->getCOB(),0,1),							  # COB Indicator
@@ -138,7 +138,7 @@ my %payerType = (THIN_MEDICARE . "" =>
 	$diagnosis[1] ne "" ? substr($diagnosis[1],0,1) : $spaces,  # if 1 then print else space
 	$diagnosis[2] ne "" ? substr($diagnosis[2],0,1) : $spaces,  # if 1 then print else space
 	$diagnosis[3] ne "" ? substr($diagnosis[3],0,1) : $spaces,  # if 1 then print else space
-	$self->numToStr(4,0,$currentProcedure->getDaysOrUnits()),   # units of service
+	$self->numToStr(3,1,$currentProcedure->getDaysOrUnits()),   # units of service
 	$self->numToStr(4,0,$inpClaim->getAnesthesiaOxygenMinutes()),   # Anesthesia/Oxygen minutes
 	substr($currentProcedure->getEmergency(),0,1),						  # Emergency Indicator
 	substr($currentProcedure->getCOB(),0,1),							  # COB Indicator
@@ -207,7 +207,7 @@ my %payerType = (THIN_MEDICARE . "" =>
 	$diagnosis[1] ne "" ? substr($diagnosis[1],0,1) : $spaces,  # if 1 then print else space
 	$diagnosis[2] ne "" ? substr($diagnosis[2],0,1) : $spaces,  # if 1 then print else space
 	$diagnosis[3] ne "" ? substr($diagnosis[3],0,1) : $spaces,  # if 1 then print else space
-	$self->numToStr(4,0,$currentProcedure->getDaysOrUnits()),   # units of service
+	$self->numToStr(3,1,$currentProcedure->getDaysOrUnits()),   # units of service
 	$self->numToStr(4,0,$inpClaim->getAnesthesiaOxygenMinutes()),   # Anesthesia/Oxygen minutes
 	substr($currentProcedure->getEmergency(),0,1),						  # Emergency Indicator
 	substr($currentProcedure->getCOB(),0,1),							  # COB Indicator
@@ -276,7 +276,7 @@ my %payerType = (THIN_MEDICARE . "" =>
 	$diagnosis[1] ne "" ? substr($diagnosis[1],0,1) : $spaces,  # if 1 then print else space
 	$diagnosis[2] ne "" ? substr($diagnosis[2],0,1) : $spaces,  # if 1 then print else space
 	$diagnosis[3] ne "" ? substr($diagnosis[3],0,1) : $spaces,  # if 1 then print else space
-	$self->numToStr(4,0,$currentProcedure->getDaysOrUnits()),   # units of service
+	$self->numToStr(3,1,$currentProcedure->getDaysOrUnits()),   # units of service
 	$self->numToStr(4,0,$inpClaim->getAnesthesiaOxygenMinutes()),   # Anesthesia/Oxygen minutes
 	substr($currentProcedure->getEmergency(),0,1),						  # Emergency Indicator
 	substr($currentProcedure->getCOB(),0,1),							  # COB Indicator
