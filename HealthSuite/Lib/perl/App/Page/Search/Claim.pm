@@ -59,12 +59,18 @@ sub getForm
 			<option value="all">All</option>
 			<option value="14">Appealed</option>
 			<option value="0">Created</option>
-			<!-- <option value="2">Pending</option> -->
 			<option value="3">On Hold</option>
 			<option value="17">Paper Claim Printed</option>
-			<option value="11">Rejected</option>
 			<option value="4">Submitted</option>
 			<option value="5">Transferred</option>
+			<option value="8">Electronically Transmitted</option>
+			<option value="9">Transmitted via Paper</option>
+			<option value="7">Rejected Internally</option>
+			<option value="11">Rejected Externally</option>
+			<option value="12">Awaiting Insurance Payment</option>
+			<option value="18">Awaiting Client Payment</option>
+			<option value="13">Payments Applied</option>
+			<option value="15">Closed</option>
 			<option value="16">Voided</option>
 		</select>
 		<script>
