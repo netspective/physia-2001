@@ -267,9 +267,11 @@ $STMTMGR_WORKLIST_COLLECTION = new App::Statements::Worklist::WorklistCollection
 	{
 		select min(to_char(e.start_time,'MM/DD/YYYY')) as appt
 		from event e, event_attribute ea
-		where ea.item_name = 'Appointment/Attendee/Patient' and value_text = :1 and
-		ea.parent_id = e.event_id and
-		e.start_time - to_date(:2,'MM/DD/YYYY') >=0
+		where ea.value_text = :1 
+			and ea.item_name = 'Appointment' 
+			and ea.value_type = 333
+			and e.event_id  = ea.parent_id
+			and e.start_time - to_date(:2,'MM/DD/YYYY') >=0
 	},
 	
 	'delAccountNotesById' =>qq
