@@ -22,7 +22,7 @@
 		<field id="referral_status" caption="Referral Status" join="person_referral" column="referral_status"/>
 		<field id="referral_status_date" caption="Referral Status Date" join="person_referral" column="referral_status_date"/>
 		<field id="product_name" caption="Product" join="insurance" column="product_name"/>
-		<field id="expiryDays" join="person_referral" columndefn="trunc(person_referral.referral_end_date) - trunc(sysdate)" caption="Days to Expire"/>
+		<field id="expiryDays" join="person_referral" columndefn="trunc(person_referral.referral_end_date - sysdate)" caption="Days to Expire"/>
 		<field id="recheck_date" join="person_referral" column="recheck_date"/>
 
 		<!-- Joins -->
