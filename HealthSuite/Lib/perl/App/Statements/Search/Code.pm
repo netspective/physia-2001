@@ -163,7 +163,7 @@ $STMTRPTDEFN_HCPCS =
 	#},
 	columnDefn =>
 	[
-		{ head => 'Code', url => q{javascript:chooseEntry('#&{?}#')}, },
+		{ head => 'Code', url => q{javascript:chooseItem('/lookup/hcpcs/detail/#&{?}#', '#&{?}#', true, '#2#')}, hint => 'Lookup Detailed Data' },
 		{ head => 'Name'},
 		{ head => 'Description', },
 	],
