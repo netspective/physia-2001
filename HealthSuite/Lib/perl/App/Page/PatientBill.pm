@@ -60,7 +60,7 @@ sub prepare
 	{
 		my $procedure = $claim->{otherItems}->[$i];
 		my @rowData = (
-			formatDate($procedure->{dateOfServiceFrom}),
+			formatDate($procedure->{paymentDate}),
 			$procedure->{caption} || decodeType($procedure->{itemType}),
 			$procedure->{extendedCost},
 			$procedure->{totalAdjustments} || 0,
@@ -74,7 +74,7 @@ sub prepare
 	{
 		my $procedure = $claim->{copayItems}->[$i];
 		my @rowData = (
-			formatDate($procedure->{dateOfServiceFrom}),
+			formatDate($procedure->{paymentDate}),
 			$procedure->{caption} || decodeType($procedure->{itemType}),
 			#$procedure->{extendedCost},
 			undef,
@@ -90,7 +90,7 @@ sub prepare
 	{
 		my $procedure = $claim->{adjItems}->[$i];
 		my @rowData = (
-			formatDate($procedure->{dateOfServiceFrom}),
+			formatDate($procedure->{paymentDate}),
 			$procedure->{caption} || decodeType($procedure->{itemType}),
 			$procedure->{extendedCost},
 			$procedure->{totalAdjustments} || 0,
