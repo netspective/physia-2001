@@ -16,7 +16,9 @@ use App::Statements::Org;
 use App::Universal;
 
 use Date::Manip;
-use vars qw(@ISA %RESOURCE_MAP);
+use vars qw(@ISA %RESOURCE_MAP $TIMEZONE_SELOPTIONS);
+
+$TIMEZONE_SELOPTIONS = 'GMT:GMT;US-Atlantic:AST4ADT;US-Eastern:EST5EDT;US-Central:CST6CDT;US-Mountain:MST7MDT;US-Pacific:PST8PDT';
 
 @ISA = qw(CGI::Dialog);
 
@@ -187,7 +189,7 @@ sub initialize
 				new CGI::Dialog::Field(caption => 'Time Zone',
 					name => 'time_zone',
 					type => 'select',
-					selOptions => 'GMT:GMT;US-Atlantic:AST4ADT;US-Eastern:EST5EDT;US-Central:CST6CDT;US-Mountain:MST7MDT;US-Pacific:PST8PDT',
+					selOptions => $TIMEZONE_SELOPTIONS,
 				),
 			],
 		),

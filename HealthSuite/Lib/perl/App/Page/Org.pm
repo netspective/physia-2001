@@ -43,6 +43,15 @@ use vars qw(@ISA %RESOURCE_MAP);
 
 #use constant FORMATTER => new Number::Format('INT_CURR_SYMBOL' => '$');
 my $intOrgId;
+
+my @timeZones = split(/\s*;\s*/, $App::Dialog::Organization::TIMEZONE_SELOPTIONS);
+my %timeZone;
+for (@timeZones)
+{
+	my ($value, $key) = split(/\s*:\s*/, $_);
+	$timeZone{$key} = $value;
+}
+
 sub initialize
 {
 	my $self = shift;
@@ -64,6 +73,8 @@ sub initialize
 	}
 
 	$STMTMGR_ORG->createPropertiesFromSingleRow($self, STMTMGRFLAG_CACHE, ['selOrgCategoryRegistry', 'org_'], $intOrgId);
+	$self->property('org_time_zone', $timeZone{$self->property('org_time_zone')}) if ($self->property('org_time_zone'));
+	
 	my $orgAttr = $STMTMGR_ORG->getRowAsHash($self, STMTMGRFLAG_CACHE, 'selAttribute', $intOrgId, 'Business Hours');
 	my $orgClearHouseAttr = $STMTMGR_ORG->getRowAsHash($self, STMTMGRFLAG_CACHE, 'selAttribute', $intOrgId, 'Organization Default Clearing House ID');
 	my @clearingHouseName = ('', 'Per-Se', 'THINet');
