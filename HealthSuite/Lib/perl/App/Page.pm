@@ -26,7 +26,7 @@ use App::Statements::Person;
 use App::Statements::Component;
 use Schema::API;
 
-use vars qw(@ISA @EXPORT $GLOBAL_PAGEREF);
+use vars qw(@ISA @EXPORT );
 @ISA = qw(Exporter CGI::Page);
 
 use enum qw(BITMASK:PAGEFLAG_ ISDISABLED ISPOPUP ISADVANCED ISFRAMESET ISFRAMEHEAD ISFRAMEBODY ISHANDHELD IGNORE_BODYHEAD IGNORE_BODYFOOT CONTENTINPANES INCLUDEDEFAULTSCRIPTS RECORD_VIEWCOUNT);
@@ -43,7 +43,6 @@ use constant DEFAULT_OPTIONS => PAGEFLAG_INCLUDEDEFAULTSCRIPTS;
 	PAGEFLAG_IGNORE_BODYHEAD
 	PAGEFLAG_IGNORE_BODYFOOT
 	PAGEFLAG_RECORD_VIEWCOUNT
-	$GLOBAL_PAGEREF
 	);
 
 use enum qw(:THEMECOLOR_
@@ -101,7 +100,6 @@ sub new
     
     my $self = $class->SUPER::new(@_, flags => DEFAULT_OPTIONS);
     my %params = @_;
-    $GLOBAL_PAGEREF = $self;
     
     $self->{startBenchmark} = $startBenchmark;
     $self->{benchmarks} = [];
