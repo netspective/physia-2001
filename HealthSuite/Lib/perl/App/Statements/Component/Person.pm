@@ -2347,23 +2347,25 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 #----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 'sel_referral'=> {
 	sqlStmt => qq{
-			select trans_id, trans_owner_id, trans_substatus_reason, trans_status_reason, caption, provider_id, care_provider_id,
-				 	trans_begin_stamp, trans_end_stamp, data_text_a, data_text_b, data_text_c, data_num_a,
-				 	related_data,detail
-				 from transaction
+			select trans_id, trans_owner_id, trans_substatus_reason, trans_status_reason, t.caption, t.provider_id, t.care_provider_id,
+				 	%simpleDate:trans_begin_stamp%, %simpleDate:trans_end_stamp%, t.data_text_a, t.data_text_b, t.data_text_c, t.data_num_a,
+				 	related_data,detail, p.complete_name, pp.complete_name
+				 from transaction t, person p, person pp
 				 where trans_type = 6000
 				 and trans_id = ?
+				 and t.provider_id = p.person_id
+				 and t.care_provider_id = pp.person_id
+
 		},
 		publishDefn => 	{
 					columnDefn =>
 					[
-						{head => 'Referred By', dataFmt => '<A HREF = "/person/#5#/profile">#5#</A>'},
-						{head => 'Referred To', dataFmt => '<A HREF = "/person/#6#/profile">#6#</A>'},
+						{head => 'Referred By', dataFmt => '<A HREF = "/person/#5#/profile">#15#</A>'},
+						{head => 'Referred To', dataFmt => '<A HREF = "/person/#6#/profile">#16#</A>'},
+						{head => 'Referral Type', dataFmt => '#9# (#4#)'},
 						{colIdx => 2, head => 'Requested Service'},
-						{colIdx => 4, head => 'Internal/External Flag', dAlign => 'CENTER'},
 						{colIdx => 7, head => 'Date Of Injury', options => PUBLCOLFLAG_DONTWRAP},
 						{colIdx => 8, head => 'Date Of Request', options => PUBLCOLFLAG_DONTWRAP},
-						{colIdx => 9, head => 'Referral Type'},
 						{colIdx => 10, head => 'ICD Codes'},
 						{colIdx => 11, head => 'CPT Codes'},
 					],
