@@ -628,7 +628,6 @@
 		<column name="invoice_type" lookupref="Invoice_Type" descr="The type of invoice"/>
 		<column name="invoice_subtype" type="integer" descr="The subtype of invoice (depending upon the type)"/>
 		<column name="trans_type" lookupref="Transaction_Type.id" required="yes" descr="Type of transaction"/>		
-		<column name="quantity" type="integer" descr="Quantity needed of transaction"/>		
 		<column name="item_type" lookupref="Inv_Item_Type" descr="The primary item type"/>		
 		<column name="units" type="integer" descr="The number of units to count for this item"/>
 		<column name="unit_cost" type="currency" descr="The cost per unit of this item (either a calculated value or a specific amount)"/>
@@ -663,6 +662,14 @@
 		<column name="org_internal_id" parentref="Org.org_internal_id" descr="The unique ID of the organization."/>
 		<column name="permission_name" type="text" size="120" descr="Permission name."/>
 		<column name="role_activity_id" lookupref="Role_Activity" default="0" descr="How the role is used (e.g., grant or revoke)."/>
+	</table>
+	<table name="Collector_Invoice" abbrev="CollInv" type="Audit,Secure">
+		<column name="collector_id" lookupref="person.person_id" descr="Person performing the collection process )"/>
+		<column name="patient_id" lookupref="person.person_id" descr="Patient ID  )"/>
+		<column name="responsible_id" lookupref="person.person_id" descr="Responsible party ID"/>
+		<column name="org_internal_id" parentref="Org.org_internal_id" descr="The unique ID of the organization."/>
+		<column name="reck_date" type="date" descr="The date the payment was made "/>
+		<column name="invoice_id" indexed="yes" lookupref="Invoice.invoice_id" descr="Invoice id for invoice that is in collection "/>
 	</table>
 
 	<include file="reference.xml"/>
