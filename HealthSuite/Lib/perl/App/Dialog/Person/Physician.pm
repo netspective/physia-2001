@@ -53,7 +53,7 @@ sub initialize
 						fKeyDisplayCol => 0,
 						fKeyValueCol => 1,
 						invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE),
-					new CGI::Dialog::Field(caption => 'Specialty Sequence', name => 'value_int1', type => 'select', selOptions => 'Unknown:5;Primary:1;Secondary:2;Tertiary:3;Quaternary:4', value => '5')
+					new CGI::Dialog::Field(caption => 'Specialty Sequence', name => 'value_int1', type => 'select', selOptions => 'Unknown:5;Primary:1;Secondary:2;Tertiary:3;Quaternary:4', value => '5', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE, name => 'specialty2')
 
 				]),
 
@@ -67,7 +67,7 @@ sub initialize
 						fKeyDisplayCol => 0,
 						fKeyValueCol => 1,
 						invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE),
-					new CGI::Dialog::Field(caption => 'Specialty Sequence', name => 'value_int2', type => 'select', selOptions => 'Unknown:5;Primary:1;Secondary:2;Tertiary:3;Quaternary:4', value => '5')
+					new CGI::Dialog::Field(caption => 'Specialty Sequence', name => 'value_int2', type => 'select', selOptions => 'Unknown:5;Primary:1;Secondary:2;Tertiary:3;Quaternary:4', value => '5', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE, name => 'specialty2')
 				]),
 
 		new CGI::Dialog::MultiField(caption => '3. Specialty/Sequence', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE, name => 'specialty3',
@@ -80,7 +80,7 @@ sub initialize
 						fKeyDisplayCol => 0,
 						fKeyValueCol => 1,
 						invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE),
-					new CGI::Dialog::Field(caption => 'Specialty Sequence', name => 'value_int3', type => 'select', selOptions => 'Unknown:5;Primary:1;Secondary:2;Tertiary:3;Quaternary:4', value => '5')
+					new CGI::Dialog::Field(caption => 'Specialty Sequence', name => 'value_int3', type => 'select', selOptions => 'Unknown:5;Primary:1;Secondary:2;Tertiary:3;Quaternary:4', value => '5', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE, name => 'specialty2')
 				]),
 
 		new CGI::Dialog::MultiField(caption => 'Affiliation/Exp Date', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
@@ -232,6 +232,10 @@ sub makeStateChanges
 sub customValidate
 {
 	my ($self, $page) = @_;
+
+	my $command = $self->getActiveCommand($page);
+
+	return () if ($command eq 'remove' || $command eq 'update');
 
 	my $specialty1 = $self->getField('specialty1')->{fields}->[0];
 	my $seq1 = $self->getField('specialty1')->{fields}->[1];
