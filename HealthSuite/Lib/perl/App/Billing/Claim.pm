@@ -699,8 +699,9 @@ sub setFilingIndicator
 
 sub getFilingIndicator
 {
-	my ($self) = @_;
-	return $self->{filingIndicator};
+	my ($self, $insSequence) = @_;
+	#return $self->{filingIndicator};
+	return $insSequence == 1 ? 'P' : 'I';
 }
 
 sub setAcceptAssignment

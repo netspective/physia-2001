@@ -50,12 +50,17 @@ sub formatData
 
     my $wasPayerMedicare = wasLastPayerMedicare($self, $flags, $inpClaim);
 
+	my $insSequence = $container->getSequenceNo();
+	
 my %nsfType = (NSF_HALLEY . "" =>
 	sprintf("%-3s%-2s%-17s%1s%1s%-2s%-5s%-4s%-17s%-16s%-20s%-17s%-16s%1s%-15s%-15s%1s%1s%2s%-17s%-8s%-20s%-10s%-2s%1s%-3s%1s%-8s%1s%1s%-7s%-25s%-15s%-1s%-28s%-7s%-9s",
 	$self->recordType(),
 	$self->numToStr(2,0,$container->getSequenceNo()),
 	substr($refClaimCareReceiver->getAccountNo(),0,17),
-	substr($inpClaim->getFilingIndicator(),0,1), 	# 'P',or 'M' or 'I'
+	
+	# Filing Indicator = 'P' if primary, 'I' otherwise
+	substr($inpClaim->getFilingIndicator($insSequence),0,1), 	# 'P',or 'M' or 'I'
+	
 	substr(($wasPayerMedicare == 1) ? 'Z' : $inpClaim->{policy}->[$flags->{RECORDFLAGS_NONE}]->getSourceOfPayment(),0,1),
 	substr(($wasPayerMedicare == 1) ? 'MG' : $refClaimInsured->getTypeCode(),0,2),   # insurance type code
 	substr($inpClaim->{policy}->[$flags->{RECORDFLAGS_NONE}]->getPayerId(),0,5),           # payer organization id

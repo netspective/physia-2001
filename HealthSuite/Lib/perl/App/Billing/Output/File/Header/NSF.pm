@@ -94,7 +94,8 @@ my %nsfType = ( NSF_HALLEY . "" =>
 	  substr($confData->{TELEPHONE_NUMBER},0,10), # substr($claimCareProviderAddress->getTelephoneNo(),0,10)
 	  substr($self->getDate(),0,8),
 	  substr($self->getTime(),0,6),
-	  substr($confData->{RECEIVER_ID},0,16), # receiver id
+	  #substr($confData->{RECEIVER_ID},0,16), # receiver id
+	  sprintf("%-16s", '540000'),
 	  substr($confData->{RECEIVER_TYPE_CODE},0,1),
 	  substr($confData->{VERSION_CODE_NATIONAL},0,5), # $self->numToStr(3,2,'200'), # version code national
 	  substr($confData->{VERSION_CODE_LOCAL},0,5), # $self->numToStr(3,2,'0'), # version code local
