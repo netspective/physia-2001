@@ -87,11 +87,17 @@ sub initialize
 							['View Staff Summary', "/person/%field.person_id%/profile", 1],
 							['Add Another Staff Member', '/org/#session.org_id#/dlg-add-staff'],
 							['Go to Search', "/search/person/id/%field.person_id%"],
-							['Return to Add Record', '/search'],
+							['Return to Home', "/person/#session.user_id#/home"],
 							['Go to Work List', "/worklist"],
 							],
 						cancelUrl => $self->{cancelUrl} || undef)
 	);
+
+	$self->{activityLog} = {
+		scope =>'person',
+		key => "#field.person_id#",
+		data => "Person '#field.person_id#' <a href='/person/#field.person_id#/profile'>#field.name_first# #field.name_last#</a> as a Staff"
+	};
 
 	return $self;
 }
