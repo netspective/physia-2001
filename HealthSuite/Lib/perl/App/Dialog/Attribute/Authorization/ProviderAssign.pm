@@ -20,7 +20,7 @@ use vars qw(@ISA %RESOURCE_MAP);
 %RESOURCE_MAP = (
 	'auth-providerassign' => {
 		valueType => App::Universal::ATTRTYPE_AUTHPROVIDERASSIGN,
-		heading => '$CommandProvider Assignment Indicator',
+		heading => '$Command Provider Assignment Indicator',
 		_arl => ['person_id'],
 		_arl_modify => ['item_id'],
 		_idSynonym => 'attr-' .App::Universal::ATTRTYPE_AUTHPROVIDERASSIGN()
@@ -49,6 +49,14 @@ sub initialize
 						selAttrNameStmtName => 'selAttributeByItemNameAndValueTypeAndParent'),
 				new CGI::Dialog::Field(name => 'value_date', caption => 'Date', type => 'date'),
 	);
+
+	$self->{activityLog} =
+		{
+			level => 1,
+			scope =>'person_attribute',
+			key => "#param.person_id#",
+			data => "'Provider Assignment Indicator Authorization' to <a href='/person/#param.person_id#/profile'>#param.person_id#</a>"
+		};
 
 	$self->SUPER::initialize();
 }
