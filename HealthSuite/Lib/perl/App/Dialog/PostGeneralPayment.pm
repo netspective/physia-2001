@@ -83,6 +83,13 @@ sub makeStateChanges
 	my ($self, $page, $command, $dlgFlags) = @_;
 	$self->SUPER::makeStateChanges($page, $command, $dlgFlags);
 
+	if($page->field('pay_type') == 0)
+	{
+		$self->setFieldFlags('outstanding_heading', FLDFLAG_INVISIBLE, 1);
+		$self->setFieldFlags('outstanding_invoices_list', FLDFLAG_INVISIBLE, 1);
+	}
+
+
 	#make payment fields and list of invoices invisible unless person id exists
 	$self->setFieldFlags('payer_id', FLDFLAG_READONLY, 1);
 	unless(my $personId = $page->param('person_id') || $page->param('_payer_id') || $page->field('payer_id'))
@@ -95,7 +102,6 @@ sub makeStateChanges
 		$self->setFieldFlags('auth_ref', FLDFLAG_INVISIBLE, 1);	
 		$self->setFieldFlags('outstanding_heading', FLDFLAG_INVISIBLE, 1);
 		$self->setFieldFlags('outstanding_invoices_list', FLDFLAG_INVISIBLE, 1);
-
 	}
 
 	my $batchId = $page->param('_p_batch_id') || $page->field('batch_id');
@@ -124,6 +130,9 @@ sub populateData
 sub customValidate
 {
 	my ($self, $page) = @_;
+	
+	my $payType = $page->field('pay_type');
+	my $payWasApplied;
 	my $lineCount = $page->param('_f_line_count');
 	my $list='';
 	for(my $line = 1; $line <= $lineCount; $line++)
@@ -131,12 +140,184 @@ sub customValidate
 		my $payAmt = $page->param("_f_invoice_$line\_payment");
 		my $invoiceId = $page->param("_f_invoice_$line\_invoice_id");
 		next if $payAmt eq '';		
-		$list .= $invoiceId.",";		
+		$list .= $invoiceId.",";
+		$payWasApplied = 1;
 	}
 	$page->field('list_invoices',$list);
+
+	if($payWasApplied == 1 && $payType < 1)
+	{
+		my $payTypeField = $self->getField('pay_type');
+		$payTypeField->invalidate($page, "Cannot choose 'Pre-payment' when applying payment to invoices.");
+	}
 }
 
 sub execute
+{
+	my ($self, $page, $command, $flags) = @_;
+	$command = 'add';
+
+	my $payType = $page->field('pay_type');
+	if($payType < 1)
+	{
+		#$page->addError("Pre: $payType < 1");
+		executePrePayment($self, $page, $command, $flags);
+	}
+	elsif($payType >= 1)
+	{
+		#$page->addError("Pre: $payType > 1");
+		executePostPayment($self, $page, $command, $flags);
+	}
+}
+
+sub executePrePayment
+{
+	my ($self, $page, $command, $flags) = @_;
+	$command = 'add';
+
+	my $todaysDate = $page->getDate();
+	my $timeStamp = $page->getTimeStamp();
+	my $sessOrgIntId = $page->session('org_internal_id');
+
+	my $itemType = App::Universal::INVOICEITEMTYPE_ADJUST;
+	my $historyValueType = App::Universal::ATTRTYPE_HISTORY;
+	my $payerType = App::Universal::ENTITYTYPE_PERSON;
+	my $adjType = App::Universal::ADJUSTMENTTYPE_PAYMENT;
+	my $textValueType = App::Universal::ATTRTYPE_TEXT;
+	my $entityTypePerson = App::Universal::ENTITYTYPE_PERSON;
+	my $entityTypeOrg = App::Universal::ENTITYTYPE_ORG;
+	my $transStatus = App::Universal::TRANSSTATUS_ACTIVE;
+
+	my $batchId = $page->field('batch_id');
+	my $batchDate = $page->field('batch_date');
+	my $payerId = $page->field('payer_id');
+	my $payMethod = $page->field('pay_method');
+	my $payType = $page->field('pay_type');
+	my $payRef = $page->field('pay_ref');
+	my $authRef = $page->field('auth_ref');
+	my $totalAmtRecvd = $page->field('total_amount') || 0;
+
+	my $transId = $page->schemaAction(
+		'Transaction', 'add',
+		trans_type => App::Universal::TRANSTYPEACTION_PAYMENT,
+		trans_status => defined $transStatus ? $transStatus : undef,
+	#	service_facility_id => $page->field('service_facility_id') || undef,
+	#	billing_facility_id => $billingFacility || undef,
+	#	provider_id => $billingProvider || undef,
+		trans_owner_type => defined $entityTypePerson ? $entityTypePerson : undef,
+		trans_owner_id => $payerId || undef,
+		initiator_type => defined $entityTypePerson ? $entityTypePerson : undef,
+		initiator_id => $payerId || undef,
+		receiver_type => defined $entityTypeOrg ? $entityTypeOrg : undef,
+		receiver_id => $sessOrgIntId || undef,
+		bill_type => 0,
+		trans_begin_stamp => $timeStamp || undef,
+		_debug => 0
+	);
+
+
+	#add invoice
+	my $invoiceType = App::Universal::INVOICETYPE_HCFACLAIM;
+	my $claimType = App::Universal::INVOICESTATUS_PAYAPPLIED;
+	my $invoiceId = $page->schemaAction(
+		'Invoice', 'add',
+		invoice_type => defined $invoiceType ? $invoiceType : undef,
+		invoice_subtype => App::Universal::CLAIMTYPE_SELFPAY,
+		invoice_status => defined $claimType ? $claimType : undef,
+		invoice_date => $page->getDate() || undef,
+		submitter_id => $page->session('user_id') || undef,
+		main_transaction => $transId || undef,
+		owner_type => defined $entityTypeOrg ? $entityTypeOrg : undef,
+		owner_id => $sessOrgIntId || undef,
+		client_type => defined $entityTypePerson ? $entityTypePerson : undef,
+		client_id => $payerId || undef,
+		_debug => 0
+	);
+
+
+	#add invoice billing and update invoice with new billing id
+	my $billPartyType = App::Universal::INVOICEBILLTYPE_CLIENT;
+	my $billId = $page->schemaAction(
+		'Invoice_Billing', 'add',
+		invoice_id => $invoiceId || undef,
+		bill_sequence => App::Universal::PAYER_PRIMARY,
+		bill_party_type => defined $billPartyType ? $billPartyType : undef,
+		bill_to_id => $payerId || undef,
+		_debug => 0
+	);
+
+	$page->schemaAction(
+		'Invoice', 'update',
+		invoice_id => $invoiceId || undef,
+		billing_id => $billId,
+	);
+
+
+	#add invoice item
+	my $itemId = $page->schemaAction(
+		'Invoice_Item', 'add',
+		parent_id => $invoiceId,
+		item_type => App::Universal::INVOICEITEMTYPE_ADJUST,
+		_debug => 0
+	);
+
+	#Add adjustment for the item
+	my $comments = $page->param('prepay_comments');
+	my $adjItemId = $page->schemaAction(
+		'Invoice_Item_Adjust', 'add',
+		adjustment_type => defined $adjType ? $adjType : undef,
+		adjustment_amount => defined $totalAmtRecvd ? $totalAmtRecvd : undef,
+		parent_id => $itemId || undef,
+		pay_date => $todaysDate || undef,
+		pay_method => defined $payMethod ? $payMethod : undef,
+		pay_ref => $payRef || undef,
+		payer_type => $payerType || 0,
+		payer_id => $payerId || undef,
+		pay_type => defined $payType ? $payType : undef,
+		data_text_a => $authRef || undef,
+		comments => $comments || undef,
+		_debug => 0
+	);
+
+	#Add history attributes
+	#$page->schemaAction(
+	#	'Invoice_Attribute', 'add',
+	#	parent_id => $invoiceId || undef,
+	#	item_name => 'Invoice/History/Item',
+	#	value_type => defined $historyValueType ? $historyValueType : undef,
+	#	value_text => "Invoice created specifically for prepayment.",
+	#	value_date => $todaysDate,
+	#	_debug => 0
+	#);
+
+	$page->schemaAction(
+		'Invoice_Attribute', 'add',
+		parent_id => $invoiceId || undef,
+		item_name => 'Invoice/History/Item',
+		value_type => defined $historyValueType ? $historyValueType : undef,
+		value_text => "Prepayment of $totalAmtRecvd made by $payerId",
+		value_textB => "$comments " . "Batch ID: $batchId" || undef,
+		value_date => $todaysDate,
+		_debug => 0
+	);
+
+
+	#Add batch id attribute
+	$page->schemaAction(
+		'Invoice_Attribute', 'add',
+		parent_id => $invoiceId || undef,
+		item_name => 'Invoice/Payment/Batch ID',
+		value_type => defined $textValueType ? $textValueType : undef,
+		value_text => $batchId || undef,
+		value_date => $batchDate || undef,
+		value_int => $adjItemId || undef,
+		_debug => 0
+	);
+	
+	$page->redirect("/person/$payerId/account");
+}
+
+sub executePostPayment
 {
 	my ($self, $page, $command, $flags) = @_;
 	$command = 'add';
