@@ -40,7 +40,30 @@ $STMTMGR_PERSON = new App::Statements::Person(
 		and person.gender = gen.id
 		and person.marital_status = mar.id
 		},
-
+	'selRegistryBySSN' => qq{
+		select person_id, ssn, name_first, name_middle, name_last, gen.caption as gender_caption, complete_name,
+			mar.caption  as marstat_caption,
+			pkg_entity.getPersonAge(date_of_birth) as Age,
+			to_char(date_of_birth, '$SQLSTMT_DEFAULTDATEFORMAT') as date_of_birth,
+			 short_sortable_name, ethnicity, person_ref, simple_name
+		from person, gender gen, marital_status mar
+		where ssn = ?
+		and person.gender = gen.id
+		and person.marital_status = mar.id
+		},
+	'selRegistryByLastAndFirstNameAndDOB' => qq{
+		select person_id, ssn, name_first, name_middle, name_last, gen.caption as gender_caption, complete_name,
+			mar.caption  as marstat_caption,
+			pkg_entity.getPersonAge(date_of_birth) as Age,
+			to_char(date_of_birth, '$SQLSTMT_DEFAULTDATEFORMAT') as date_of_birth,
+			 short_sortable_name, ethnicity, person_ref, simple_name
+		from person, gender gen, marital_status mar
+		where name_last = ?
+		and name_first = ?
+		and date_of_birth = to_date(?, '$SQLSTMT_DEFAULTDATEFORMAT')
+		and person.gender = gen.id
+		and person.marital_status = mar.id
+		},
 	'selFirstLastName' => qq{
 			select p.name_first, p.name_last, p.ssn as ssn, p.person_id as person_id
 			from person p, person_org_category pcat

@@ -58,6 +58,30 @@ $STMTMGR_INSURANCE = new App::Statements::Insurance(
 			record_type in (2, 3) and
 			NOT ins_type = 6
 		},
+	'selInsuranceByInsOrgAndMemberNumberForElig' => qq{
+		select ins_internal_id, parent_ins_id, ins_org_id, owner_person_id, plan_name, product_name,
+			to_char(coverage_begin_date, '$SQLSTMT_DEFAULTDATEFORMAT') as coverage_begin_date_html,
+			to_char(coverage_end_date, '$SQLSTMT_DEFAULTDATEFORMAT') as coverage_end_date_html,
+			to_char(coverage_begin_date, 'YYYY,MM,DD') as coverage_begin_date,
+			to_char(coverage_end_date, 'YYYY,MM,DD') as coverage_end_date,
+			ct.caption as ins_type
+		from insurance, claim_type ct
+		where ins_org_id = ?
+			and member_number = ?
+			and ins_type = ct.id
+		},
+	'selInsuranceByOwnerAndProductNameForElig' => qq{
+		select ins_internal_id, parent_ins_id, ins_org_id, owner_person_id, plan_name, product_name,
+			to_char(coverage_begin_date, '$SQLSTMT_DEFAULTDATEFORMAT') as coverage_begin_date_html,
+			to_char(coverage_end_date, '$SQLSTMT_DEFAULTDATEFORMAT') as coverage_end_date_html,
+			to_char(coverage_begin_date, 'YYYY,MM,DD') as coverage_begin_date,
+			to_char(coverage_end_date, 'YYYY,MM,DD') as coverage_end_date,
+			ct.caption as ins_type
+		from insurance, claim_type ct
+		where ins_org_id = ?
+			and owner_person_id = ?
+			and ins_type = ct.id
+		},
 	'selWorkersCompPlansForOrg' => qq{
 		select ins_internal_id, product_name, ins_org_id, remit_type, remit_payer_id, remit_payer_name, ins_type
 		from insurance
