@@ -32,7 +32,7 @@ sub getHtml
 	my $html = '';
 	if(my $sth = $STMTMGR_HANDHELD->execute($page, 0, $self->{sqlStmtId}, 
 			$page->session('GMT_DAYOFFSET'), 
-			$page->session('active_date'),
+			$page->session('handheld_select_date'),
 			$page->session('user_id'),
 			$page->session('org_internal_id')))
 	{

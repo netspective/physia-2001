@@ -72,8 +72,8 @@ sub prepare_page_content_header
 	if($insideItem || scalar(@$locLinks) > 2)
 	{
 		my $location = qq{
-			<a href="/mobile" border=0><img src="/resources/images/icons/home-sm.gif"></a> 
-			<a href="/logout" border=0><img src="/resources/widgets/action-close.gif"></a>
+			<a href="/mobile" border=0><img src="/resources/images/icons/home-sm.gif"></a>
+			<a href="/logout" border=0><img src="/resources/icons/logout.gif"></a>
 		};
 		
 		my $lastLoc = $#$locLinks;
@@ -90,15 +90,25 @@ sub prepare_page_content_header
 		unshift(@$contentHeader, '<img src="/resources/images/design/mobile-home-graphic.gif">');
 		$inHome = 1;
 	}
-	push(@$contentHeader, "<br>User: @{[ $self->session('user_id') ]}\@@{[ $self->session('org_id') ]}");
-	push(@$contentHeader, "<br>Date: @{[ $self->session('active_date') ]}");
+	
+	$self->session('handheld_select_date', UnixDate('today', '%m/%d/%Y')) unless $self->session('handheld_select_date');
+	$self->session('handheld_select_org', $self->session('org_id')) unless $self->session('handheld_select_org');
+	
+	my $dateHref = qq{
+		Date: <a href="/mobile/SelectDate">@{[ $self->session('handheld_select_date') ]}</a>
+	};
+	my $orgHref = qq{<a href="/mobile/SelectOrg">@{[ $self->session('handheld_select_org') ]}</a>};
+	
+	push(@$contentHeader, "<br>User: @{[ $self->session('user_id') ]}\@$orgHref");
+	push(@$contentHeader, "<br> $dateHref");
 	
 	push(@$contentHeader, "<br>Patient: @{[ $self->session('active_person_name') ]}" .
 		" (@{[ $self->session('active_person_id') ]})")
-		#if $instance && $instance->can('showActivePatient') && $instance->showActivePatient();
-		if ($self->session('active_person_id'));
+		if (($instance && $instance->can('showActivePatient') && $instance->showActivePatient())
+			|| $self->param('arl_pathItems') eq 'Manage_Patient') && $self->session('active_person_id');
+		#if ($self->session('active_person_id'));
 
-	push(@$contentHeader, '<hr size=1>');
+	push(@$contentHeader, '<hr size=0>');
 
 	unshift(@{$self->{page_head}}, "<title>$heading</title>");
 	$self->SUPER::prepare_page_content_header(@_);

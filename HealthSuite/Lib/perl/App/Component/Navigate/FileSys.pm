@@ -224,7 +224,8 @@ sub getActivePathContents
 					no strict 'refs';
 					my $icon = $highlight eq $fileName ? $fileTypeInfo->[FILEEXTNINFO_ICONHIGHL] : $fileTypeInfo->[FILEEXTNINFO_ICON];
 					if(my $instance = ${"$moduleName\::INSTANCE"}) {
-						push(@items, ["$urlPath/$fileName", $instance->heading(), $icon]);
+						push(@items, ["$urlPath/$fileName", $instance->heading(), $icon])
+							unless $instance->can('hideEntry');
 					} else {
 						push(@items, ["$urlPath/$fileName", $fileName, $icon]);
 					}

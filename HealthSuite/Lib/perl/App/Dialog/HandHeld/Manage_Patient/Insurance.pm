@@ -62,6 +62,11 @@ sub getRowHtml
 	};
 }
 
+sub showActivePatient
+{
+	return 1;
+}
+
 $INSTANCE = new __PACKAGE__;
 
 1;
