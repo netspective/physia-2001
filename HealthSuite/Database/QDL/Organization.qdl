@@ -56,7 +56,7 @@
 		<join id="org_attr_aphone" table="org_attribute" condition="org_attr_aphone.parent_id = org.org_internal_id AND org_attr_aphone.value_type IN (#constant.ATTRTYPE_PHONE#, #constant.ATTRTYPE_BILLING_PHONE#)"/>
 
 		<!-- Views -->
-		<view id="all" caption="None" href="/org/{org_id}/profile">
+		<view id="all" caption="None" href="/org/{id}/profile">
 			<column id="id"/>
 			<column id="name"/>
 			<column id="categories"/>
@@ -64,7 +64,7 @@
 			<order-by id="upper({id})"/>
 			<condition field="owner_org_id" comparison="is" criteria="#session.org_internal_id#"/>
 		</view>
-		<view id="department" distinct="yes" caption="Departments" href="/org/{org_id}/profile">
+		<view id="department" distinct="yes" caption="Departments" href="/org/{id}/profile">
 			<column id="id"/>
 			<column id="name"/>
 			<column id="categories"/>
@@ -75,7 +75,7 @@
 				<condition field="category" comparison="is" criteria="Department"/>
 			</and-conditions>
 		</view>
-		<view id="employer" distinct="yes" caption="Employers" href="/org/{org_id}/profile">
+		<view id="employer" distinct="yes" caption="Employers" href="/org/{id}/profile">
 			<column id="id"/>
 			<column id="name"/>
 			<column id="categories"/>
@@ -86,7 +86,7 @@
 				<condition field="category" comparison="is" criteria="Employer"/>
 			</and-conditions>
 		</view>
-		<view id="insurance" distinct="yes" caption="Insurers" href="/org/{org_id}/profile">
+		<view id="insurance" distinct="yes" caption="Insurers" href="/org/{id}/profile">
 			<column id="id"/>
 			<column id="name"/>
 			<column id="categories"/>
@@ -97,7 +97,7 @@
 				<condition field="category" comparison="is" criteria="Insurance"/>
 			</and-conditions>
 		</view>
-		<view id="provider" distinct="yes" caption="Providers" href="/org/{org_id}/profile">
+		<view id="provider" distinct="yes" caption="Providers" href="/org/{id}/profile">
 			<column id="id"/>
 			<column id="name"/>
 			<column id="categories"/>
