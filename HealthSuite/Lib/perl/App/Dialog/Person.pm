@@ -255,7 +255,7 @@ sub populateData
 	my $jobCode = 'Job Code';
 	my $jobCodeData =  $STMTMGR_PERSON->getRowAsHash($page, STMTMGRFLAG_NONE, 'selAttribute', $personId, $jobCode);
 	$page->field('job_item_id', $jobCodeData->{'item_id'});
-	$page->field('job_code', $jobCodeData->{'value_textB'});
+	$page->field('job_code', $jobCodeData->{'value_textb'});
 	$page->field('job_title', $jobCodeData->{'value_text'});
 }
 
