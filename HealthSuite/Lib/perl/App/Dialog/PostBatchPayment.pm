@@ -38,8 +38,8 @@ sub new
 		new CGI::Dialog::Field(caption => 'Batch ID', name => 'batch_id', size => 12, options => FLDFLAG_REQUIRED),
 		new CGI::Dialog::Field(type => 'date', caption => 'Batch Date', name => 'batch_date', options => FLDFLAG_REQUIRED),
 		#new CGI::Dialog::Field(type => 'select', selOptions => 'Insurance Payments:insurance;Personal Payments:personal', caption => 'Batch Type', name => 'batch_type'),
-		new CGI::Dialog::Field(type => 'select',  name => 'batch_type', 
-				selOptions => 'Insurance Payments:insurance;Personal Payments:personal', 
+		new CGI::Dialog::Field(type => 'select',  name => 'batch_type',
+				selOptions => 'Insurance Payments:insurance;Personal Payments:personal',
 				caption => 'Batch Type',
 				options => FLDFLAG_REQUIRED | FLDFLAG_PREPENDBLANK,
 				onChangeJS => qq{showFieldsOnValues(event, ['insurance'], ['sel_invoice_id']); showFieldsOnValues(event, ['personal'], ['payer_id']); },),
@@ -47,7 +47,7 @@ sub new
 		new App::Dialog::Field::Person::ID(caption => 'Patient/Person ID', name => 'payer_id', ),#options => FLDFLAG_REQUIRED),
 
 	);
-	
+
 	$self->addPostHtml(qq{
 		<script language="JavaScript1.2">
 		<!--
@@ -68,12 +68,12 @@ sub new
 	});
 
 
-	#$self->{activityLog} =
-	#{
-	#	scope =>'invoice',
-	#	key => "#param.invoice_id#",
-	#	data => "batch'#param.item_id#' claim <a href='/invoice/#param.invoice_id#/summary'>#param.invoice_id#</a>"
-	#};
+	$self->{activityLog} =
+	{
+		scope =>'invoice',
+		key => "#field.sel_invoice_id#",
+		data => "postbatchpayment to claim <a href='/invoice/#field.sel_invoice_id#/summary'>#field.sel_invoice_id#</a>"
+	};
 	$self->addFooter(new CGI::Dialog::Buttons(cancelUrl => $self->{cancelUrl} || undef));
 
 	return $self;
@@ -109,13 +109,13 @@ sub customValidate
 		{
 			$getInvoiceIdField->invalidate($page, 'Invoice ID is required. Cannot be blank.');
 		}
-		
+
 		if(my $invoiceInfo = $STMTMGR_INVOICE->getRowAsHash($page, STMTMGRFLAG_NONE, 'selInvoice', $invoiceId))
 		{
 			if($invoiceInfo->{invoice_subtype} == App::Universal::CLAIMTYPE_SELFPAY)
 			{
 				$getInvoiceIdField->invalidate($page, "Claim $invoiceId is 'Self-Pay'. Cannot apply insurance payment to this claim.");
-			}		
+			}
 		}
 		else
 		{
@@ -143,7 +143,7 @@ sub execute
 	my $invoiceId = $page->field('sel_invoice_id');
 	my $payerId = $page->field('payer_id');
 	my $sessOrg = $page->session('org_id');
-	
+
 	$page->session('batch_id', $batchId);
 
 	if($batchType eq 'personal')

@@ -48,7 +48,7 @@ sub new
 			findPopup => '/lookup/insplan/product/itemValue',
 			findPopupControlField => '_f_product_name',
 			),
-		new CGI::Dialog::Field(caption => 'Month', 
+		new CGI::Dialog::Field(caption => 'Month',
 			name => 'month',
 			type => 'enum',
 			enum => 'Month',
@@ -58,7 +58,7 @@ sub new
 
 		new CGI::Dialog::MultiField(caption => 'Check Amount/Number', name => 'check_fields',
 			fields => [
-					new CGI::Dialog::Field(caption => 'Check Amount', 
+					new CGI::Dialog::Field(caption => 'Check Amount',
 						name => 'check_amount',
 						type => 'currency',
 						options => FLDFLAG_REQUIRED,
@@ -69,9 +69,16 @@ sub new
 					]),
 		);
 
-	$self->addFooter(new CGI::Dialog::Buttons(cancelUrl => $self->{cancelUrl} || undef));
+		$self->{activityLog} =
+		{
+			scope =>'transaction',
+			key => "#field.provider_id#",
+			data => "postcappayment to <a href='/person/#field.provider_id#/summary'>#field.provider_id#</a> by Insproduct '#field.product_name#'"
+		};
 
-	return $self;
+		$self->addFooter(new CGI::Dialog::Buttons(cancelUrl => $self->{cancelUrl} || undef));
+
+		return $self;
 }
 
 sub populateData
