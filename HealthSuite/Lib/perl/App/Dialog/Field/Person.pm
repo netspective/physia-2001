@@ -30,6 +30,7 @@ sub new
 	$params{type} = 'identifier';
 	$params{size} = 16;
 	$params{maxLength} = 16;
+	$params{hints}="To use the ID autosuggestion feature, leave this field blank" unless exists $params{hints};
 
 	return CGI::Dialog::Field::new($type, %params);
 }
