@@ -32,24 +32,24 @@ sub initialize
 {
 	my $self = shift;
 
-	$self->heading('$Command Patient');
+	#$self->heading('$Command Patient');
 
 	$self->SUPER::initialize();
 	$self->addContent(
 		new CGI::Dialog::Field(name => 'ethnicity',
 				lookup => 'ethnicity',
-				style => 'multicheck',				
+				style => 'multicheck',
 				caption => 'Ethnicity',
 				hints => 'You may choose more than one ethnicity type.',
 				invisibleWhen => CGI::Dialog::DLGFLAG_REMOVE),
 
 				#new CGI::Dialog::Field(caption => 'Preferred Day For Appointment', name => 'prefer_day', type => 'memo', invisibleWhen => CGI::Dialog::DLGFLAG_REMOVE),
-				
+
 		#new CGI::Dialog::MultiField(caption =>'Responsible Party Name/Phone/Relationship', name => 'responsible', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
 			#	fields => [
-							new App::Dialog::Field::Person::ID(caption => 'Responsible Party', name => 'party_name',invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE),		
+							new App::Dialog::Field::Person::ID(caption => 'Responsible Party', name => 'party_name',invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE),
 							#new CGI::Dialog::Field(caption => 'Phone', type => 'phone', name => 'resp_phone', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE),
-							#new CGI::Dialog::Field(caption => 'Relationship', name => 'relation', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE)				
+							#new CGI::Dialog::Field(caption => 'Relationship', name => 'relation', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE)
 			#			]),
 		#OCCUPATION
 		new CGI::Dialog::Subhead(heading => 'Employment', name => 'occup_heading', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE),
@@ -77,14 +77,14 @@ sub initialize
 								caption => 'Add Personal Insurance Coverage?',
 								style => 'check',
 								invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE),
-	
+
 		new CGI::Dialog::MultiField(caption =>'Ins CompanyID/Product Name/Plan Name', name => 'insplan',invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
 				fields => [
-							new App::Dialog::Field::Organization::ID(caption => 'Ins Company ID', name => 'ins_org_id',invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE),		
+							new App::Dialog::Field::Organization::ID(caption => 'Ins Company ID', name => 'ins_org_id',invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE),
 							new CGI::Dialog::Field(caption => 'Product Name', name => 'product_name', findPopup => '/lookup/insurance/product_name', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE),
-							new CGI::Dialog::Field(caption => 'Plan Name', name => 'plan_name', findPopup => '/lookup/insurance/plan_name', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE)				
+							new CGI::Dialog::Field(caption => 'Plan Name', name => 'plan_name', findPopup => '/lookup/insurance/plan_name', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE)
 						]),
-				
+
 		new CGI::Dialog::Field(
 						type => 'bool',
 						name => 'delete_record',
@@ -112,18 +112,18 @@ sub initialize
 sub makeStateChanges
 {
 	my ($self, $page, $command, $dlgFlags) = @_;
-	
+
 	$self->updateFieldFlags('physician_type', FLDFLAG_INVISIBLE, 1);
-	$self->updateFieldFlags('nurse_title', FLDFLAG_INVISIBLE, 1);	
+	$self->updateFieldFlags('nurse_title', FLDFLAG_INVISIBLE, 1);
 	my $personId = $page->param('person_id');
-	
-	$self->updateFieldFlags('misc_notes', FLDFLAG_INVISIBLE, 1) if $command eq 'remove' || $command eq 'update';	
+
+	$self->updateFieldFlags('misc_notes', FLDFLAG_INVISIBLE, 1) if $command eq 'remove' || $command eq 'update';
 
 	if ($command eq 'remove')
 	{
 		my $deleteRecord = $self->getField('delete_record');
 		$deleteRecord->invalidate($page, "Are you sure you want to delete Patient '$personId'?");
-	}	
+	}
 
 	$self->SUPER::makeStateChanges($page, $command, $dlgFlags);
 }
@@ -131,16 +131,16 @@ sub makeStateChanges
 sub customValidate
 {
 	my ($self, $page) = @_;
-	
-	my $insOrg = $self->getField('insplan')->{fields}->[0];		
+
+	my $insOrg = $self->getField('insplan')->{fields}->[0];
 	my $productName = $self->getField('insplan')->{fields}->[1];
 	my $PlanName = $self->getField('insplan')->{fields}->[2];
-		
+
 	my $addIns = $page->field('add_insurance');
-	if($addIns ==1 &&  
+	if($addIns ==1 &&
 		($page->field('ins_org_id') eq '' || $page->field('product_name') eq '' || $page->field('plan_name') eq ''))
-	{	
-		$insOrg->invalidate($page, " 'Ins Org ID', 'ProductName' and 'PlanName' cannot be blank if the Insurance Coverage is checked.");			
+	{
+		$insOrg->invalidate($page, " 'Ins Org ID', 'ProductName' and 'PlanName' cannot be blank if the Insurance Coverage is checked.");
 	}
 }
 
@@ -169,7 +169,7 @@ sub execute_add
 				value_textB => $page->field('phone_number') || undef,
 				#value_date => $page->field('begin_date') || undef,
 				_debug => 0
-		);	
+		);
 
 		#third check if employer has any workers comp plans and if so attach to person
 		my $wrkCompValueType = App::Universal::ATTRTYPE_INSGRPWORKCOMP;
@@ -204,11 +204,11 @@ sub execute_add
 			}
 		}
 	}
-	
+
 	my $partyName =  $page->field('party_name');
 	if ($partyName ne '')
 	{
-			
+
 		$page->schemaAction(
 				'Person_Attribute', 'add',
 				parent_id => $personId || undef,
@@ -219,7 +219,7 @@ sub execute_add
 				_debug => 0
 		);
 	}
-	
+
 	$page->schemaAction(
 		'Person_Attribute', $command,
 		parent_id => $personId || undef,
@@ -230,7 +230,7 @@ sub execute_add
 		value_text => $page->field('acct_number') || undef,
 		_debug => 0
 		) if $page->field('acct_number') ne '';
-		
+
 	$page->schemaAction(
 		'Person_Attribute', $command,
 		parent_id => $personId || undef,
