@@ -15,7 +15,7 @@ my $LIMIT = App::Universal::SEARCH_RESULTS_LIMIT;
 
 $STMTFMT_SEL_INSURANCE = qq{
 	SELECT
-		ins.ins_org_id,
+		org.org_id,
 		ins.product_name,
 		ins.plan_name,
 		addr.line1,
@@ -24,11 +24,13 @@ $STMTFMT_SEL_INSURANCE = qq{
 		ins.ins_internal_id
 	FROM
 		insurance ins,
-		insurance_address addr
+		insurance_address addr,
+		org
 	WHERE
-		ins.ins_internal_id = addr.parent_id 
+		ins.ins_internal_id = addr.parent_id
+		AND org.org_internal_id = ins.ins_org_id
 		AND	%whereCond% 
-		AND owner_org_id = ?
+		AND ins.owner_org_id = ?
 		%catCond%
 		AND rownum <= $LIMIT
 	ORDER BY 1
@@ -77,73 +79,73 @@ my %insTemplates = (
 	'sel_product' =>
 		{
 			_stmtFmt => $STMTFMT_SEL_INSURANCE,
-			whereCond => qq{upper(ins.product_name) = replace(?, '%20', ' ')},
+			whereCond => qq{UPPER(ins.product_name) = REPLACE(?, '%20', ' ')},
 			publishDefn => $STMTRPTDEFN_DEFAULT,
 		},
 	'sel_product_like' =>
 		{
 			_stmtFmt => $STMTFMT_SEL_INSURANCE,
-			whereCond => 'upper(ins.product_name) like ?',
+			whereCond => 'UPPER(ins.product_name) LIKE ?',
 			publishDefn => $STMTRPTDEFN_DEFAULT,
 		},
 	'sel_plan' =>
 		{
 			_stmtFmt => $STMTFMT_SEL_INSURANCE,
-			whereCond => 'upper(ins.plan_name) = ?',
+			whereCond => 'UPPER(ins.plan_name) = ?',
 			publishDefn => $STMTRPTDEFN_DEFAULT,
 		},
 	'sel_plan_like' =>
 		{
 			_stmtFmt => $STMTFMT_SEL_INSURANCE,
-			whereCond => 'upper(ins.plan_name) like ?',
+			whereCond => 'UPPER(ins.plan_name) LIKE ?',
 			publishDefn => $STMTRPTDEFN_DEFAULT,
 		},
 	'sel_insorgid' =>
 		{
 			_stmtFmt => $STMTFMT_SEL_INSURANCE,
-			whereCond => 'upper(ins.ins_org_id) = ?',
+			whereCond => 'UPPER(org.org_id) = ?',
 			publishDefn => $STMTRPTDEFN_DEFAULT,
 		},
 	'sel_insorgid_like' =>
 		{
 			_stmtFmt => $STMTFMT_SEL_INSURANCE,
-			whereCond => 'upper(ins.ins_org_id) like ?',
+			whereCond => 'UPPER(org.org_id) LIKE ?',
 			publishDefn => $STMTRPTDEFN_DEFAULT,
 		},
 	'sel_street' =>
 		{
 			_stmtFmt => $STMTFMT_SEL_INSURANCE,
-			whereCond => 'upper(addr.line1) = ?',
+			whereCond => 'UPPER(addr.line1) = ?',
 			publishDefn => $STMTRPTDEFN_DEFAULT,
 		},
 	'sel_street_like' =>
 		{
 			_stmtFmt => $STMTFMT_SEL_INSURANCE,
-			whereCond => 'upper(addr.line1) like ?',
+			whereCond => 'UPPER(addr.line1) like ?',
 			publishDefn => $STMTRPTDEFN_DEFAULT,
 		},
 	'sel_city' =>
 		{
 			_stmtFmt => $STMTFMT_SEL_INSURANCE,
-			whereCond => 'upper(addr.city) = ?',
+			whereCond => 'UPPER(addr.city) = ?',
 			publishDefn => $STMTRPTDEFN_DEFAULT,
 		},
 	'sel_city_like' =>
 		{
 			_stmtFmt => $STMTFMT_SEL_INSURANCE,
-			whereCond => 'upper(addr.city) like ?',
+			whereCond => 'UPPER(addr.city) like ?',
 			publishDefn => $STMTRPTDEFN_DEFAULT,
 		},
 	'sel_state' =>
 		{
 			_stmtFmt => $STMTFMT_SEL_INSURANCE,
-			whereCond => 'upper(addr.state) = ?',
+			whereCond => 'UPPER(addr.state) = ?',
 			publishDefn => $STMTRPTDEFN_DEFAULT,
 		},
 	'sel_state_like' =>
 		{
 			_stmtFmt => $STMTFMT_SEL_INSURANCE,
-			whereCond => 'upper(addr.state) like ?',
+			whereCond => 'UPPER(addr.state) like ?',
 			publishDefn => $STMTRPTDEFN_DEFAULT,
 		},
 );
