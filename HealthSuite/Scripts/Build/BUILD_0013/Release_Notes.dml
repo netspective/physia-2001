@@ -54,5 +54,11 @@
 		<deliverable id="1111">
 			UI: On the person page, editing person profile works.
 		</deliverable>
+		<deliverable id="1049">
+			 Fixed the code to update a phone message.
+		</deliverable>
+		<deliverable id="360">
+			 UI: Now the 'Begin Date' and 'End Date' will showup in the 'Health Coverage' component
+		</deliverable>		
 	</deliverables>
 </release-notes>
