@@ -311,20 +311,24 @@ sub populateHMOBlueSeSeniorPatData
 		my $MI = defined $rowData->[$count] ?App::Data::Manipulate::trim($rowData->[$count]) : '' ; $count++;	
 		my $groupNumber = defined $rowData->[$count] ?App::Data::Manipulate::trim($rowData->[$count]) : '' ; $count++;
 		my $sex = defined $rowData->[$count] ?App::Data::Manipulate::trim($rowData->[$count]) : '' ; $count++;		
-		my $sourceDob = defined $rowData->[$count] ?App::Data::Manipulate::trim($rowData->[$count]) : '' ; $count++;
+		my $sDob = defined $rowData->[$count] ?App::Data::Manipulate::trim($rowData->[$count]) : '' ; $count++;
 		my $age = defined $rowData->[$count] ?App::Data::Manipulate::trim($rowData->[$count]) : '' ; $count++;		
 		my $line1 = defined $rowData->[$count] ?App::Data::Manipulate::trim($rowData->[$count]) : '' ; $count++;
 		my $city = defined $rowData->[$count] ?App::Data::Manipulate::trim($rowData->[$count]) : '' ; $count++;
 		my $state = defined $rowData->[$count] ?App::Data::Manipulate::trim($rowData->[$count]) : '' ; $count++;
 		my $zipCode = defined $rowData->[$count] ?App::Data::Manipulate::trim($rowData->[$count]) : '' ; $count++;
-		$count+=13;
-		my $fromDate = defined $rowData->[$count] ?App::Data::Manipulate::trim($rowData->[$count]) : '' ; $count++;	
-		my $termDate = defined $rowData->[$count] ?App::Data::Manipulate::trim($rowData->[$count]) : '' ; $count++;
+		$count+=14;
+		my $sFromDate = defined $rowData->[$count] ?App::Data::Manipulate::trim($rowData->[$count]) : '' ; $count++;	
+		my $sTermDate = defined $rowData->[$count] ?App::Data::Manipulate::trim($rowData->[$count]) : '' ; $count++;
 		my $retro = defined $rowData->[$count] ?App::Data::Manipulate::trim($rowData->[$count]) : '' ; $count++;		
 
     #print "count=$count recNum=$recNum\n";
 
-		my $dob = formatDate($sourceDob); 
+		my $dob = formatDate($sDob);
+		
+		my $fromDate = formatDate($sFromDate);
+		my $termDate = formatDate($sTermDate);
+
 
 		my $ssn = substr($memberID,1,9);
 		
@@ -383,7 +387,9 @@ sub populateHMOBlueSeSeniorPatData
 		{
        my $coverage = new App::DataModel::InsuranceCoverage(
 				     memberNumber=>$memberID,
-				     groupNumber=>$groupNumber);
+				     groupNumber=>$groupNumber,
+				     coverageDate=>new App::DataModel::Duration(beginDate=>$fromDate, endDate=>$termDate)
+				     );
 				     
        $person->link_insuranceCoverage($coverage,undef,$insProduct);
        
@@ -452,14 +458,17 @@ sub populateHMOBlueSeCommPatData
 		my $city = defined $rowData->[$count] ?App::Data::Manipulate::trim($rowData->[$count]) : '' ; $count++;
 		my $zipCode = defined $rowData->[$count] ?App::Data::Manipulate::trim($rowData->[$count]) : '' ; $count++;
 		my $state = defined $rowData->[$count] ?App::Data::Manipulate::trim($rowData->[$count]) : '' ; $count++;
-		$count+=13;
-		my $fromDate = defined $rowData->[$count] ?App::Data::Manipulate::trim($rowData->[$count]) : '' ; $count++;	
-		my $termDate = defined $rowData->[$count] ?App::Data::Manipulate::trim($rowData->[$count]) : '' ; $count++;
+		$count+=14;
+		my $sFromDate = defined $rowData->[$count] ?App::Data::Manipulate::trim($rowData->[$count]) : '' ; $count++;	
+		my $sTermDate = defined $rowData->[$count] ?App::Data::Manipulate::trim($rowData->[$count]) : '' ; $count++;
 		my $retro = defined $rowData->[$count] ?App::Data::Manipulate::trim($rowData->[$count]) : '' ; $count++;		
 
     #print "count=$count recNum=$recNum\n";
 
-		my $dob = formatDate($sourceDob); 
+		my $dob = formatDate($sourceDob);
+		
+		my $fromDate = formatDate($sFromDate);
+		my $termDate = formatDate($sTermDate);
 		
 		my $ssn = substr($memberID,1,9);
 		
@@ -518,7 +527,9 @@ sub populateHMOBlueSeCommPatData
 		{
        my $coverage = new App::DataModel::InsuranceCoverage(
 				     memberNumber=>$memberID,
-				     groupNumber=>$groupNumber);
+				     groupNumber=>$groupNumber,
+				     coverageDate=>new App::DataModel::Duration(beginDate=>$fromDate, endDate=>$termDate)
+				     );
 				     
        $person->link_insuranceCoverage($coverage,undef,$insProduct);
        
