@@ -192,12 +192,18 @@ sub isValid
 
 		next if $servicedatebegin eq 'From' && $servicedateend eq 'To';
 		next if $servicedatebegin eq '' && $servicedateend eq '';
+		
+		my $chkBegin = ParseDate($servicedatebegin);
+		my $chkEnd = ParseDate($servicedatebegin);
 
-		if($servicedatebegin !~ m/([\d][\d])\/([\d][\d])\/([\d][\d][\d][\d])/)
+
+		#if($servicedatebegin !~ m/([\d][\d])\/([\d][\d])\/([\d][\d][\d][\d])/)
+		if(!$chkBegin)
 		{
 			$self->invalidate($page, "[<B>P$line</B>] Invalid Service Begin Date: $servicedatebegin");
 		}
-		if($servicedateend !~ m/([\d][\d])\/([\d][\d])\/([\d][\d][\d][\d])/)
+#		if($servicedateend !~ m/([\d][\d])\/([\d][\d])\/([\d][\d][\d][\d])/)
+		if(!$chkEnd)
 		{
 			$self->invalidate($page, "[<B>P$line</B>] Invalid Service End Date: $servicedateend ");
 		}
@@ -277,9 +283,9 @@ sub isValid
 		#App::IntelliCode::incrementUsage($page, 'Hcpcs', \@cptCodes, $sessUser, $sessOrgIntId);
 		
 		my @listFeeSchedules = @defaultFeeSchedules ? @defaultFeeSchedules : @insFeeSchedules;
-		$page->param("_f_proc_active_catalogs", join(',', @listFeeSchedules));
-
-		my $fs_entry=App::IntelliCode::getFSEntry($page, $procedure, $modifier || undef,\@listFeeSchedules);
+		$page->param("_f_proc_active_catalogs", join(',', @listFeeSchedules));		
+		my $fsDate = $chkBegin ? $servicedatebegin :undef  ;
+		my $fs_entry=App::IntelliCode::getFSEntry($page, $procedure, $modifier || undef,$fsDate,\@listFeeSchedules);
 		my $count_type = scalar(@$fs_entry);
 		my $count=0;
 		if ($servicetype eq '' || $charges eq '')
