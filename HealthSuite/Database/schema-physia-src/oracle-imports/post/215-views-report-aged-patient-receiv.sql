@@ -1,3 +1,30 @@
+create or replace view agedpayments as
+SELECT 	i.client_id as person_ID , (i.invoice_id),
+	decode(round((sysdate-ia.value_date)*6/181),0,ii.balance,0) as balance_0,
+	decode(round((sysdate-ia.value_date)*6/181),1,ii.balance,0) as balance_31,
+	decode(round((sysdate-ia.value_date)*6/181),2,ii.balance,0) as balance_61,
+	decode(round((sysdate-ia.value_date)*6/181),3,ii.balance,0) as balance_91,
+	decode(round((sysdate-ia.value_date)*6/181),4,ii.balance,0) as balance_121,			
+	decode(round((sysdate-ia.value_date)*6/181),0,0,1,0,2,0,3,0,4,0,ii.balance) as balance_151,
+	decode(round((sysdate-ia.value_date)*6/181),0,ii.balance,0) +
+	decode(round((sysdate-ia.value_date)*6/181),1,ii.balance,0) +
+	decode(round((sysdate-ia.value_date)*6/181),2,ii.balance,0) +
+	decode(round((sysdate-ia.value_date)*6/181),3,ii.balance,0) +
+	decode(round((sysdate-ia.value_date)*6/181),4,ii.balance,0) +
+	decode(round((sysdate-ia.value_date)*6/181),0,0,1,0,2,0,3,0,4,0,ii.balance) as total_pending,
+	ib.bill_party_type,
+	ib.invoice_item_id,
+	ii.item_type,
+	decode(ib.bill_party_type,0,ib.bill_to_id,1,ib.bill_to_id,(select org_id FROM ORG WHERE org_internal_id = ib.bill_to_id)) as  bill_to_id,
+	ib.bill_to_id as bill_plain
+FROM	invoice i, invoice_billing ib, invoice_attribute ia, invoice_item ii
+WHERE	ib.invoice_id = i.invoice_id
+AND	ii.parent_id = i.invoice_id
+AND	ia.parent_id = i.invoice_id 
+AND	ia.item_name = 'Invoice/Creation/Batch ID'		
+AND	ib.bill_sequence=1;
+
+
 create or replace view agedpatientdataone as
 select i.client_id as patient, sum(i.balance) as balance
 from invoice i
