@@ -202,7 +202,7 @@ sub makeStateChanges
 	$page->field('coordinator') eq '' ? $page->field('coordinator', $sessionPersonId) : $page->field('coordinator');
 
 	#my $coordId = $self->getField('referral_date_intake')->{fields}->[0];
-	$self->setFieldFlags('coordinator', FLDFLAG_READONLY);
+	#$self->setFieldFlags('coordinator', FLDFLAG_READONLY);
 	$self->setFieldFlags('ref_id', FLDFLAG_READONLY);
 	#$self->setFieldFlags('name', FLDFLAG_READONLY);
 	$self->setFieldFlags('person_id', FLDFLAG_READONLY);
