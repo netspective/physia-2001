@@ -1042,7 +1042,7 @@ sub getHtml
 			#get plan allow
 			unless($page->param("_f_item_$line\_plan_allow_is_set"))
 			{
-				my $getPlanAllow = $STMTMGR_CATALOG->getSingleValue($page, STMTMGRFLAG_CACHE, 'selPlanAllowedByProdAndCode', $page->field('product_ins_id'), $page->session('org_internal_id'), $itemCPT);
+				my $getPlanAllow = $STMTMGR_CATALOG->getSingleValue($page, STMTMGRFLAG_CACHE, 'selPlanAllowedByProdAndCode', $page->field('product_ins_id') || undef, $page->session('org_internal_id'), $itemCPT);
 				$planAllow = $page->param("_f_item_$line\_plan_allow", $getPlanAllow);
 				$page->param("_f_item_$line\_plan_allow_is_set", 'test');
 			}
