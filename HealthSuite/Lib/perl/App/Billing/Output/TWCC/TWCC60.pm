@@ -1,6 +1,9 @@
 package App::Billing::Output::TWCC::TWCC60;
 
 use App::Billing::Output::PDF::Report;
+use App::Billing::Claim::TWCC60;
+use pdflib 2.01;
+use Number::Format;
 use strict;
 
 use constant LEFT_MARGIN => 36;
@@ -35,6 +38,7 @@ use constant DATA_FONT_SIZE => 8;
 use constant DATA_FONT_COLOR => '0,0,0';
 use constant FONT_NAME => 'Times-Roman';
 use constant BOLD_FONT_NAME =>  'Times-Bold';
+use constant DATA_FONT_NAME => 'Helvetica';
 use constant DATEFORMAT_USA => 1;
 use constant LEFT_PADDING => 2;
 use constant TOP_PADDING => 6;
@@ -69,7 +73,7 @@ sub printReport
 	my $properties = {'pageWidth' => PAGE2_WIDTH, 'pageHeight' => PAGE2_HEIGHT};
 	$report->newPage($p, $properties);
 	$self->drawForm_2($p, $claim, $report);
-#	$self->fillData_2($p, $claim, $report);
+	$self->fillData_2($p, $claim, $report);
 	$report->endPage($p);
 }
 
@@ -212,9 +216,72 @@ sub fillData_2
 {
 	my($self, $p, $claim, $report) = @_;
 
-	my $mainBoxX = LEFT_MARGIN_2;
-	my $mainBoxY = TOP_MARGIN_2 - MAIN_BOX_Y_2;
+	my $mainBoxX_2 = LEFT_MARGIN_2;
+	my $mainBoxY_2 = TOP_MARGIN_2 - MAIN_BOX_Y_2;
+	my ($x, $y) = ($mainBoxX_2, $mainBoxY_2 - BOX_HEAD_HEIGHT_2);
+	my (@itemMap, @itemMap2, $functionRef, $data, @total, $xpad);
 
+	$itemMap[0] = \&App::Billing::Claim::TWCC60::getDisputedDOS;
+	$itemMap[1] = \&App::Billing::Claim::TWCC60::getCPTCode;
+	$itemMap[2] = \&App::Billing::Claim::TWCC60::getAmountBilled;
+	$itemMap[3] = \&App::Billing::Claim::TWCC60::getMedicalFee;
+	$itemMap[4] = \&App::Billing::Claim::TWCC60::getTotalAmountPaid;
+	$itemMap[5] = \&App::Billing::Claim::TWCC60::getAmountInDispute;
+	$itemMap2[0] = \&App::Billing::Claim::TWCC60::getIncreasedReimburse;
+	$itemMap2[1] = \&App::Billing::Claim::TWCC60::getMaintainingReduction;
+
+	my $twcc60 = $claim->getTWCC60;
+	my $count = $#{$twcc60->{first4Fields}}; 
+	my $formatter = new Number::Format('INT_CURR_SYMBOL'=>'$');
+	
+	for my $h(0..$count)
+	{
+		for my $i(0..5)
+		{
+			$functionRef = $itemMap[$i];
+			$data = &$functionRef($twcc60, $h);
+			if ($i == 2 || $i == 3 || $i == 4 || $i == 5)
+			{
+				$total[$i] += $data;
+				$data = $formatter->format_price($data);
+				$xpad = pdflib::PDF_stringwidth($p, $data, DATA_FONT_NAME, DATA_FONT_SIZE);
+				$self->boxData($p, $claim, $x + $i * BOX_WIDTH_2, $y - $h * BOX_HEIGHT_2, $report, $data, 50 - $xpad, 7);
+			}
+			else
+			{
+				$self->boxData($p, $claim, $x + $i * BOX_WIDTH_2, $y - $h * BOX_HEIGHT_2, $report, $data, 10, 7);
+			}
+		}
+	}
+	
+	for my $h(0..$count)
+	{
+		for my $i(0..1)
+		{
+			$functionRef = $itemMap2[$i];
+			$data = &$functionRef($twcc60, $h);
+			$self->boxData($p, $claim, $x + 6 * BOX_WIDTH_2 + $i * WIDE_BOX_WIDTH_2, $y - $h * BOX_HEIGHT_2, $report, $data, 5, 7);
+		}
+	}
+	
+	my $arrX = [0,0,145,210,275,345];
+	
+	for my $i(2..5)
+	{
+		$data = $formatter->format_price($total[$i]);
+		$xpad = pdflib::PDF_stringwidth($p, $data, DATA_FONT_NAME, DATA_FONT_SIZE);
+		my $properties =
+		{
+			'text' => $data,
+			'fontWidth' => DATA_FONT_SIZE,
+			'color' => DATA_FONT_COLOR,
+			'x' => $x + $arrX->[$i] + 36 - $xpad,
+			'y' => $y - 16 * BOX_HEIGHT_2 - 15
+		};
+		$report->drawText($p,$properties);
+	}
+
+	
 }
 
 sub header
@@ -1108,7 +1175,7 @@ sub box6Data
 {
 	my($self, $p, $claim, $x, $y, $report) = @_;
 	$self->boxData($p, $claim, $x, $y, $report, 
-				substr($claim->{twcc60}->{requestorAddress}->getTelephoneNo, 0, 3) . "   " . substr($claim->{twcc60}->{requestorAddress}->getTelephoneNo, 3, 7),
+				substr($claim->{twcc60}->{requestorAddress}->getTelephoneNo, 0, 3) . "  " . substr($claim->{twcc60}->{requestorAddress}->getTelephoneNo, 3, 3) . "-" . substr($claim->{twcc60}->{requestorAddress}->getTelephoneNo, 6, 4),
 				DATA_LEFT_PADDING, DATA_TOP_PADDING);
 }
 
@@ -1124,7 +1191,7 @@ sub box8Data
 {
 	my($self, $p, $claim, $x, $y, $report) = @_;
 	$self->boxData($p, $claim, $x, $y, $report, 
-				substr($claim->{twcc60}->{requestorAddress}->getFaxNo, 0, 3) . "   " . substr($claim->{twcc60}->{requestorAddress}->getFaxNo, 3, 7),
+				substr($claim->{twcc60}->{requestorAddress}->getFaxNo, 0, 3) . "  " . substr($claim->{twcc60}->{requestorAddress}->getFaxNo, 3, 3) . "-" . substr($claim->{twcc60}->{requestorAddress}->getFaxNo, 6, 4),
 				DATA_LEFT_PADDING, DATA_TOP_PADDING);
 }
 
@@ -1179,7 +1246,7 @@ sub box16Data
 {
 	my($self, $p, $claim, $x, $y, $report) = @_;
 	$self->boxData($p, $claim, $x, $y, $report, 
-					substr($claim->{renderingProvider}->{address}->getTelephoneNo, 0, 3) . "   " . substr($claim->{renderingProvider}->{address}->getTelephoneNo, 3, 7),
+					substr($claim->{renderingProvider}->{address}->getTelephoneNo, 0, 3) . "   " . substr($claim->{renderingProvider}->{address}->getTelephoneNo, 3, 3) . "-" . substr($claim->{renderingProvider}->{address}->getTelephoneNo, 6, 4),
 					75, 6);
 }
 
@@ -1187,7 +1254,7 @@ sub box17Data
 {
 	my($self, $p, $claim, $x, $y, $report) = @_;
 	$self->boxData($p, $claim, $x, $y, $report, 
-					substr($claim->{payer}->{address}->getTelephoneNo, 0, 3) . "   " . substr($claim->{payer}->{address}->getTelephoneNo, 3, 7),
+					substr($claim->{payer}->{address}->getTelephoneNo, 0, 3) . "   " . substr($claim->{payer}->{address}->getTelephoneNo, 3, 3) . "-" . substr($claim->{payer}->{address}->getTelephoneNo, 6, 4),
 					73, 6);
 }
 
@@ -1195,7 +1262,7 @@ sub box18Data
 {
 	my($self, $p, $claim, $x, $y, $report) = @_;
 	$self->boxData($p, $claim, $x, $y, $report, 
-					substr($claim->{careReceiver}->{address}->getTelephoneNo, 0, 3) . "   " . substr($claim->{careReceiver}->{address}->getTelephoneNo, 3, 7),
+					substr($claim->{careReceiver}->{address}->getTelephoneNo, 0, 3) . "   " . substr($claim->{careReceiver}->{address}->getTelephoneNo, 3, 3) . "-" . substr($claim->{careReceiver}->{address}->getTelephoneNo, 6, 4),
 					73, 6);
 }
 
@@ -1203,16 +1270,16 @@ sub box19Data
 {
 	my($self, $p, $claim, $x, $y, $report) = @_;
 	$self->boxData($p, $claim, $x, $y, $report, 
-					substr($claim->{renderingProvider}->{address}->getFaxNo, 0, 3) . "   " . substr($claim->{renderingProvider}->{address}->getFaxNo, 3, 7),
-					73, 6);
+					substr($claim->{renderingProvider}->{address}->getFaxNo, 0, 3) . "   " . substr($claim->{renderingProvider}->{address}->getFaxNo, 3, 3) . "-" . substr($claim->{renderingProvider}->{address}->getFaxNo, 6, 4),
+					75, 6);
 }
 
 sub box20Data
 {
 	my($self, $p, $claim, $x, $y, $report) = @_;
 	$self->boxData($p, $claim, $x, $y, $report, 
-					substr($claim->{payer}->{address}->getFaxNo, 0, 3) . "   " . substr($claim->{payer}->{address}->getFaxNo, 3, 7),
-					73, 6);
+					substr($claim->{payer}->{address}->getFaxNo, 0, 3) . "   " . substr($claim->{payer}->{address}->getFaxNo, 3, 3) . "-" . substr($claim->{payer}->{address}->getFaxNo, 6, 4),
+					75, 6);
 }
 
 sub box21Data
@@ -1326,7 +1393,7 @@ sub box32Data
 {
 	my($self, $p, $claim, $x, $y, $report) = @_;
 	$self->boxData($p, $claim, $x, $y, $report, 
-				substr($claim->{twcc60}->{respondentAddress}->getTelephoneNo, 0, 3) . "   " . substr($claim->{twcc60}->{respondentAddress}->getTelephoneNo, 3, 7),
+				substr($claim->{twcc60}->{respondentAddress}->getTelephoneNo, 0, 3) . "  " . substr($claim->{twcc60}->{respondentAddress}->getTelephoneNo, 3, 3) . "-" . substr($claim->{twcc60}->{respondentAddress}->getTelephoneNo, 6, 4),
 				DATA_LEFT_PADDING, DATA_TOP_PADDING);
 }
 
@@ -1342,7 +1409,7 @@ sub box34Data
 {
 	my($self, $p, $claim, $x, $y, $report) = @_;
 	$self->boxData($p, $claim, $x, $y, $report, 
-				substr($claim->{twcc60}->{respondentAddress}->getFaxNo, 0, 3) . "   " . substr($claim->{twcc60}->{respondentAddress}->getFaxNo, 3, 7),
+				substr($claim->{twcc60}->{respondentAddress}->getFaxNo, 0, 3) . "  " . substr($claim->{twcc60}->{respondentAddress}->getFaxNo, 3, 3) . "-" . substr($claim->{twcc60}->{respondentAddress}->getFaxNo, 6, 4),
 				DATA_LEFT_PADDING, DATA_TOP_PADDING);
 }
 

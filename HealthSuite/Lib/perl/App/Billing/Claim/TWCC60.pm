@@ -30,6 +30,9 @@ sub new
 	$params{issueResolved} = undef;
 	$params{issueResolvedDesc} = undef;
 
+	$params{first4Fields} = [];
+	$params{second4Fields} = [];
+
 	return bless \%params, $type;
 }
 
@@ -237,5 +240,96 @@ sub getIssueResolvedDesc
 	return $self->{issueResolvedDesc};
 }
 
+sub addFirst4Fields
+{
+	my $self = shift;
+	my $listRef = $self->{first4Fields};
+	foreach (@_)
+	{
+		push(@{$listRef}, $_);
+	}
+}
+
+sub addSecond4Fields
+{
+	my $self = shift;
+	my $listRef = $self->{second4Fields};
+	foreach (@_)
+	{
+		push(@{$listRef}, $_);
+	}
+}
+
+sub getDisputedDOS
+{
+	my ($self, $no) = @_;
+	$no = 0 + $no;
+	return '' if ($no < 0 || $no > 15);
+	my @result = split('//', $self->{first4Fields}->[$no]);
+	return $result[0];
+}
+
+sub getCPTCode
+{
+	my ($self, $no) = @_;
+	$no = 0 + $no;
+	return '' if ($no < 0 || $no > 15);
+	my @result = split('//', $self->{first4Fields}->[$no]);
+	return $result[1];
+}
+
+sub getAmountBilled
+{
+	my ($self, $no) = @_;
+	$no = 0 + $no;
+	return '' if ($no < 0 || $no > 15);
+	my @result = split('//', $self->{first4Fields}->[$no]);
+	return $result[2];
+}
+
+sub getMedicalFee
+{
+	my ($self, $no) = @_;
+	$no = 0 + $no;
+	return '' if ($no < 0 || $no > 15);
+	my @result = split('//', $self->{first4Fields}->[$no]);
+	return $result[3];
+}
+
+sub getTotalAmountPaid
+{
+	my ($self, $no) = @_;
+	$no = 0 + $no;
+	return '' if ($no < 0 || $no > 15);
+	my @result = split('//', $self->{second4Fields}->[$no]);
+	return $result[0];
+}
+
+sub getAmountInDispute
+{
+	my ($self, $no) = @_;
+	$no = 0 + $no;
+	return '' if ($no < 0 || $no > 15);
+	my @result = split('//', $self->{second4Fields}->[$no]);
+	return $result[1];
+}
+
+sub getIncreasedReimburse
+{
+	my ($self, $no) = @_;
+	$no = 0 + $no;
+	return '' if ($no < 0 || $no > 15);
+	my @result = split('//', $self->{second4Fields}->[$no]);
+	return $result[2];
+}
+
+sub getMaintainingReduction
+{
+	my ($self, $no) = @_;
+	$no = 0 + $no;
+	return '' if ($no < 0 || $no > 15);
+	my @result = split('//', $self->{second4Fields}->[$no]);
+	return $result[3];
+}
 
 1;
