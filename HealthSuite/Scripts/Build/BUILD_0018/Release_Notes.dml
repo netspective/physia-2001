@@ -220,5 +220,9 @@
 			Fixed code to add the ShortFormPerson record correctly.
 		</deliverable>
 
+		<deliverable id="1844">
+			Fixed the multiple-Cancel-buttons error.
+		</deliverable>
+
 	</deliverables>
 </release-notes>
