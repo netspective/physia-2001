@@ -339,7 +339,7 @@ sub makeStateChanges_cancel
 
 
 	$self->updateFieldFlags('subject', FLDFLAG_READONLY, 1);
-	$self->updateFieldFlags('remarks', FLDFLAG_READONLY, 1);
+	#$self->updateFieldFlags('remarks', FLDFLAG_READONLY, 1);
 	$self->updateFieldFlags('start_stamp', FLDFLAG_READONLY, 1);
 	$self->updateFieldFlags('duration', FLDFLAG_READONLY, 1);
 	$self->updateFieldFlags('facility_id', FLDFLAG_READONLY, 1);
