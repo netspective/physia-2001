@@ -50,6 +50,7 @@ package Column;
 ##############################################################################
 
 use strict;
+use App::Data::Manipulate;
 
 sub new
 {
