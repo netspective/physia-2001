@@ -155,7 +155,7 @@ sub buildSqlStmt
 				AND (invoice_billing.bill_id = invoice.billing_id)
 				AND (insurance.ins_internal_id = invoice_billing.bill_ins_id)
 				AND (invoice_status.id = invoice.invoice_status)
-				AND (to_char(org.org_internal_id) = invoice_billing.bill_to_id)
+				AND (org.org_internal_id = invoice_billing.bill_to_id)
 				AND (org_attribute.parent_id (+) = org.org_internal_id and org_attribute.value_type (+) = 10
 					and org_attribute.item_name (+) = 'Primary')
 				AND (transaction.trans_id = invoice.main_transaction)
