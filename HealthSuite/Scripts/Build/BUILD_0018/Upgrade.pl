@@ -24,6 +24,7 @@ chomp $BUILDIR;
 
 system(qq{
 	cd @{[ $CONFDATA_SERVER->path_Database ]}
+	rm -rf schema-physia
 	./GenerateSchema.pl
 });
 
