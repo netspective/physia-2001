@@ -24,9 +24,9 @@ use Date::Manip;
 use vars qw(@ISA %RESOURCE_MAP);
 %RESOURCE_MAP = (
 	'patient' => {
-		heading => '$Command Patient/Person', 
-		_arl => ['person_id'], 
-		_arl_modify => ['person_id'], 
+		heading => '$Command Patient/Person',
+		_arl => ['person_id'],
+		_arl_modify => ['person_id'],
 		_idSynonym => 'Patient',
 		},
 	);
@@ -143,7 +143,7 @@ sub initialize
 #				['Add Insurance Coverage', "/person/%field.person_id%/dlg-add-ins-coverage?_f_product_name=%field.product_name%&_f_ins_org_id=%field.ins_org_id%&_f_plan_name=%field.plan_name%", 1],
 				['Add Insurance Coverage', "/person/%field.person_id%/dlg-add-ins-coverage", 1],
 				['View Patient Summary', "/person/%field.person_id%/profile"],
-				['Add Referral', '/person/%field.person_id%/dlg-add-referral'],
+				['Add Service Request', '/person/%field.person_id%/dlg-add-referral?_f_person_id=%field.person_id%'],
 				['Add Another Patient', '/org/#session.org_id#/dlg-add-patient'],
 				['Go to Search', "/search/person/id/%field.person_id%"],
 				['Return to Home', "/person/#session.user_id#/home"],
@@ -219,9 +219,9 @@ sub customValidate
 	elsif($page->field('party_name') eq ''  && $page->field('rel_type') ne 'Self')
 	{
 		#$relationship->invalidate($page, "'Responsible Party' is required when the 'Relationship' is other than 'Self'");
-		
-		#If user left Responsible party blank the field level validation will ignore so catch error here			
-		my $createPersonHref = qq{javascript:doActionPopup('/org-p/#session.org_id#/dlg-add-guarantor',null,null,['_f_person_id'],['_f_party_name']);};	
+
+		#If user left Responsible party blank the field level validation will ignore so catch error here
+		my $createPersonHref = qq{javascript:doActionPopup('/org-p/#session.org_id#/dlg-add-guarantor',null,null,['_f_person_id'],['_f_party_name']);};
 		my $invMsg = qq{<a href="$createPersonHref">Create Responsible Party</a> };
 		$relationship->invalidate($page, $invMsg);
 	}
@@ -233,14 +233,14 @@ sub execute_add
 
 	#first create registry
 	my $member = 'Patient';
-	
+
 	#Group all add transcations
 	$page->beginUnitWork("Unable to add Patient");
 	$self->SUPER::handleRegistry($page, $command, $flags, $member);
 
 	#second create employment attribute
 	my $personId = $page->field('person_id');
-	my $relTextId = $page->field('rel_id');	
+	my $relTextId = $page->field('rel_id');
 	my $relId = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgId', $page->session('org_internal_id'), $relTextId);
 	if($relId ne '')
 	{
@@ -315,6 +315,18 @@ sub execute_add
 		value_text => $page->field('chart_number') || undef,
 		_debug => 0
 		) if $page->field('chart_number') ne '';
+
+	$page->schemaAction(
+		'Person_Attribute', $command,
+		parent_id => $personId || undef,
+		parent_org_id => $page->session('org_internal_id') || undef,
+		item_name => 'Signature Source',
+		value_type => App::Universal::ATTRTYPE_AUTHPATIENTSIGN,
+		value_text => 'Authorization form for HCFA Blocks 12and 13 on file',
+		value_textB => 'B',
+		value_date => $page->getDate() || undef,
+		_debug => 0
+		);
 
 	$self->handleContactInfo($page, $command, $flags, 'Patient');
 	$page->endUnitWork();
