@@ -53,7 +53,7 @@ $STMTFMT_SEL_ORG_DIR = qq{
 			AND (
 				 owner_org_id = ?
 			)
-		ORDER BY o.org_id
+		ORDER BY o.name_primary, o.org_id
 	)
 	WHERE rownum <= $LIMIT
 };
@@ -104,26 +104,41 @@ $STMTFMT_SEL_ORG_SUB_DRILL_SERVICE_DIR = qq{
 
 		SELECT  unique o.org_id,
 					o.name_primary,a.state, a.city, a.line1, pa.value_text as value_text,
-					(
-						SELECT	 cc.internal_catalog_id
-						FROM		offering_catalog cc
-						WHERE 	upper(cc.catalog_id) = upper((o.org_id)||'_Fee_Schedule')
-						AND     cc.org_internal_id = o.parent_org_id
-					) AS internal_catalog_id,
-					(
-						SELECT	 cc.catalog_id
-						FROM		offering_catalog cc
-						WHERE 	upper(cc.catalog_id) = upper((o.org_id)||'_Fee_Schedule')
-						AND     cc.org_internal_id = o.parent_org_id
-					) AS catalog_id,
+					(NVL(
+							(
+								SELECT	 cc.internal_catalog_id
+								FROM		offering_catalog cc
+								WHERE 	upper(cc.catalog_id) = upper((o.org_id)||'_Fee_Schedule')
+								AND     cc.org_internal_id = o.parent_org_id
+							),
+							(SELECT 		ca.internal_catalog_id
+								FROM		offering_catalog ca, org gg
+								WHERE 	upper(ca.catalog_id) = upper((gg.org_id)||'_Fee_Schedule')
+								AND     gg.org_internal_id = o.parent_org_id
+							)
+						)
+					)AS internal_catalog_id,
+					(NVL(
+							(
+								SELECT catalog_id
+							  	FROM offering_catalog cc
+						  	 	WHERE 	upper(cc.catalog_id) = upper((o.org_id)||'_Fee_Schedule')
+						 	 	AND     cc.org_internal_id = o.parent_org_id
+							),
+							(SELECT (g.org_id)||'_Fee_Schedule' FROM
+									org g where g.org_internal_id = o.parent_org_id
+							)
+						)
+					)AS catalog_id,
 					(
 						SELECT   tt.value_text
 						FROM     org_attribute tt
 						WHERE    tt.parent_id = o.org_internal_id
 						AND      tt.item_name = 'Negotiated Contract Type'
 						AND      tt.value_type = 0
-					) AS type
-		FROM 	org o, org_category cat, org_address a, offering_catalog c, offering_catalog_entry oc,	org_attribute oa, org_attribute pa
+					)AS type,
+					po.org_id AS parent_org
+		FROM 	org o, org po, org_category cat, org_address a, offering_catalog c, offering_catalog_entry oc,	org_attribute oa, org_attribute pa
 		WHERE    oc.catalog_id = c.internal_catalog_id
 		AND     a.parent_id = o.org_internal_id
 		AND     cat.parent_id = o.org_internal_id
@@ -136,10 +151,11 @@ $STMTFMT_SEL_ORG_SUB_DRILL_SERVICE_DIR = qq{
 		AND     pa.parent_id = o.org_internal_id
 		AND     pa.item_name = 'Primary'
 		AND 	  pa.value_type = 10
+		AND 	  po.org_internal_id = o.parent_org_id
 		AND     o.owner_org_id = ?
 		AND     oc.code = ?
 		AND     a.city = ?
-		ORDER BY o.org_id
+		ORDER BY o.name_primary
 };
 
 $STMTRPTDEFN_DEFAULT =
