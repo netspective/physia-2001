@@ -190,6 +190,9 @@ sub isValid
 {
 	my ($self, $page, $validator, $valFlags) = @_;
 
+	my $payType = $page->field('pay_type');
+	return if $payType == App::Universal::ADJUSTMENTPAYTYPE_PREPAY;
+
 	my $totalPayRcvd = $page->field('total_amount');					#total amount paid
 	my $totalAmtEntered = 0;
 	my $totalBalance = $page->param('_f_total_balance');				#total patient balance
