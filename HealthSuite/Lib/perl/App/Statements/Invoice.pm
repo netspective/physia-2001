@@ -287,6 +287,19 @@ $STMTMGR_INVOICE = new App::Statements::Invoice(
 		from claim_type
 			where id = ?
 		},
+	'selItemTypeCaption' => q{
+		select caption
+		from inv_item_type
+			where id = ?
+		},
+	'selWriteoffTypes' => q{
+		select caption, id, 2 as myorder
+		from writeoff_type
+		UNION
+		(select '' as caption, -99999 as id, 1 as myorder 
+			from dual)
+		order by myorder
+		},
 	'selInvoiceAttrCondition' => q{
 		select item_id as condition_item_id, value_text, value_textB
 				from invoice_attribute
