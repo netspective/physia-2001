@@ -480,7 +480,7 @@
 	</table>
 
 	<table name="OfCatalog_Attribute" abbrev="OCtAttr" type="Attribute">
-		<param name="parentref">Offering_Catalog.catalog_id</param>
+		<param name="parentref">Offering_Catalog.internal_catalog_id</param>
 	</table>
 
 	<table name="OfCatEntry_Attribute" abbrev="OCtEnAttr" type="Attribute">
