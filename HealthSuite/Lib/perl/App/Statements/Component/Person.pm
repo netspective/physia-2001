@@ -9,6 +9,7 @@ use DBI::StatementManager;
 use App::Universal;
 use Data::Publish;
 use App::Statements::Component;
+use CGI::ImageManager;
 
 use vars qw(
 	@ISA @EXPORT $STMTMGR_COMPONENT_PERSON $PUBLDEFN_CONTACTMETHOD_DEFAULT
@@ -285,9 +286,9 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 #	AND	pa.item_name = 'Fee Schedules'
 #	AND	pa.item_type = 0
 #	AND	pa.value_type = @{[ App::Universal::ATTRTYPE_TEXT ]}
-#	AND	pa.value_int = oc.internal_catalog_id 
+#	AND	pa.value_int = oc.internal_catalog_id
 #	AND	oce.catalog_id (+) = oc.internal_catalog_id
-#	AND 	oc_a.parent_id (+) = oc.internal_catalog_id 
+#	AND 	oc_a.parent_id (+) = oc.internal_catalog_id
 #	GROUP BY
 #		oc.catalog_id,
 #		oc.internal_catalog_id,
@@ -297,7 +298,7 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 #		oc_a.value_int
 #	ORDER BY
 #		oc.catalog_id
-#	
+#
 #	},
 
 'person.feeschedules'=>
@@ -314,21 +315,21 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 	AND	pa.item_name = 'Fee Schedules'
 	AND	pa.item_type = 0
 	AND	pa.value_type = @{[ App::Universal::ATTRTYPE_TEXT ]}
-	AND	pa.value_int = oc.internal_catalog_id 
+	AND	pa.value_int = oc.internal_catalog_id
 	ORDER BY oc.catalog_id
 	},
 	sqlvar_entityName => 'Person',
 	sqlStmtBindParamDescr => ['Person ID for Fee Schedules'],
-	publishDefn => 
+	publishDefn =>
 	{
-		frame => 
+		frame =>
 		{
 			addUrl => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-add-feeschedule-person?home=#homeArl#',
 			editUrl => '/person/#param.person_id#/stpe-#my.stmtId#?home=#homeArl#',
-		},   
-		columnDefn => 
-			[								
-			{ head => 'Associated Fee Schedules', dataFmt => '<A HREF=/org/#session.org_id#/catalog/#3#/#0#>#0#</A>'  },			
+		},
+		columnDefn =>
+			[
+			{ head => 'Associated Fee Schedules', dataFmt => '<A HREF=/org/#session.org_id#/catalog/#3#/#0#>#0#</A>'  },
 			{colIdx => 1,  dAlign => 'left'},
 			],
 		bullets => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-update-feeschedule-person/#4#?home=#homeArl#',
@@ -353,14 +354,14 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 		# automatically inherits columnDefn and other items from publishDefn
 		style => 'panel.edit',
 		frame => { heading => 'Edit Associated Fee Schedule' },
-		banner => 
+		banner =>
 		{
 			actionRows =>
 			[
 			{ caption => qq{ Add <A HREF='/person/#param.person_id#/stpe-#my.stmtId#/dlg-add-feeschedule-person?home=#param.home#'>Associated Fee Schedules</A> }, url => 'x', },
 			],
 		},
-		stdIcons =>	
+		stdIcons =>
 		{
 			updUrlFmt => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-update-feeschedule-person/#4#?home=#param.home#', delUrlFmt => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-remove-feeschedule-person/#4#?home=#param.home#',
 		},
@@ -368,7 +369,7 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 	publishComp_st => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.feeschedules', [$personId]); },
 	publishComp_stp => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.feeschedules', [$personId], 'panel'); },
 	publishComp_stpt => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.feeschedules', [$personId], 'panelTransp'); },
-	publishComp_stpe => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.feeschedules', [$personId], 'panelEdit'); },			
+	publishComp_stpe => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.feeschedules', [$personId], 'panelEdit'); },
 },
 
 
@@ -546,14 +547,14 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 
 'person.refillRequest' => {
 	sqlStmt => qq{
-			select 	trans_id, trans_owner_id, trans_type, decode(trans_status,7,'Filled',6,'Pending'), caption, 
+			select 	trans_id, trans_owner_id, trans_type, decode(trans_status,7,'Filled',6,'Pending'), caption,
 					provider_id, %simpleDate:trans_begin_stamp%, data_text_a, data_text_b, cr_user_id, processor_id, receiver_id
 				from  Transaction
 			where  	trans_owner_id = ?
 			and caption = 'Refill Request'
                         and data_num_a is null
                         union
-                        select  	trans_id, trans_owner_id, trans_type, decode(trans_status,7,'Filled',6,'Pending'), caption, 
+                        select  	trans_id, trans_owner_id, trans_type, decode(trans_status,7,'Filled',6,'Pending'), caption,
                         		provider_id, %simpleDate:trans_begin_stamp%, data_text_a, data_text_b, cr_user_id, processor_id, receiver_id
                                 from  Transaction
                         where   trans_owner_id = ?
@@ -2775,30 +2776,117 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 #----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 'sel_referral'=> {
 	sqlStmt => qq{
-			select trans_id, trans_owner_id, trans_substatus_reason, trans_status_reason, t.caption, t.provider_id, t.care_provider_id,
-				 	%simpleDate:trans_begin_stamp%, %simpleDate:trans_end_stamp%, t.data_text_a, t.data_text_b, t.data_text_c, t.data_num_a,
-				 	related_data,detail, p.complete_name, pp.complete_name, related_data
-				 from transaction t, person p, person pp
+			SELECT
+				trans_id,
+				trans_owner_id,
+				a.value_text,
+				a.value_date,
+				t.data_text_a as referral_type,
+				aa.value_int as claim_number,
+				trans_substatus_reason,
+				trans_status_reason,
+				t.data_text_b,
+				t.data_text_c,
+				t.caption,
+				 %simpleDate:trans_begin_stamp%,
+				 %simpleDate:trans_end_stamp%,
+				 t.data_text_a,
+				 t.data_num_a,
+				 detail,
+				 related_data,
+				 initiator_id
+				 from transaction t, trans_attribute a, trans_attribute aa
 				 where trans_type = 6000
 				 and trans_id = ?
-				 and t.provider_id = p.person_id
-				 and t.care_provider_id = pp.person_id
+				 and a.parent_id = t.trans_id
+				 and aa.parent_id = t.trans_id
+				 and aa.item_name = 'Referral Insurance'
+				 and a.item_name = 'Referral SSN/DOB'
 		},
 		publishDefn => 	{
 			columnDefn =>
 			[
-				{head => 'Referred By', dataFmt => '<A HREF = "/person/#5#/profile">#15#</A>'},
-				{head => 'Referred To', dataFmt => '<A HREF = "/person/#6#/profile">#16#</A>'},
-				{head => 'Referral Type', dataFmt => '#9# (#4#)'},
-				{colIdx => 2, head => 'Requested Service'},
-				{colIdx => 7, head => 'Date Of Injury', options => PUBLCOLFLAG_DONTWRAP},
-				{colIdx => 8, head => 'Date Of Request', options => PUBLCOLFLAG_DONTWRAP},
-				{head => 'ICD Codes', dataFmt =>'<span title="Description: #18# ">#10#</span>'},
-				{head => 'CPT Codes', dataFmt =>'<span title="Description:#19#">#11#</span>'},
-				{colIdx => 17, head => 'Comments'},
+				{colIdx => 0, head => 'Trans ID', dataFmt => "<a href=\"javascript:doActionPopup('/org/#17#/dlg-update-trans-6000/#0#');\">#0#</a>"},
+				{colIdx => 1, head => 'Claim Number', dataFmt => '#5#'},
+				{colIdx => 2, head => 'ICD Codes', dataFmt =>'<span title="Description">#8#</span>'},
+				{colIdx => 3, head => 'CPT Codes', dataFmt =>'<span title="Description">#9#</span>'},
+				{colIdx => 4, head => 'Date Of Injury', options => PUBLCOLFLAG_DONTWRAP, dataFmt =>'#11#'},
+				{colIdx => 5, head => 'Date Of Request', options => PUBLCOLFLAG_DONTWRAP, dataFmt =>'#12#'},
+				{colIdx => 6, head => 'Referral Type', dataFmt =>'#13#'},
+				{colIdx => 7, head => 'SSN', dataFmt => '#2#'},
+				{colIdx => 8, head => 'Date of Birth', dataFmt => '#3#'},
+				{colIdx => 9, head => 'Comments', dataFmt =>'#16#'},
 			],
 		},
 },
+
+#----------------------------------------------------------------------------------------------------------------------------------------------------------
+
+'person.officeLocation' => {
+	sqlStmt => qq{
+			SELECT 	value_type, item_id, parent_id, item_name, value_text, value_textB, value_int, name_primary
+				from  Person_Attribute, Org
+			where  	parent_id = ?
+			AND     value_text = org_id
+			AND item_name = 'Office Location'
+
+		},
+		sqlStmtBindParamDescr => ['Person ID for Attribute Table'],
+
+	publishDefn =>
+	{
+		columnDefn => [
+				{
+					colIdx => 6,
+					dataFmt => {
+						'1' => $IMAGETAGS{'icons/checkmark'},
+						'' => "",
+					},
+				},
+
+				{colIdx => 2, dataFmt => "<A HREF = '/org/#4#/profile'>#7#</A> (#4#, #5#) "},
+
+		],
+		bullets => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-update-office-location/#1#?home=#homeArl#',
+		frame => {
+			addUrl => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-add-office-location?home=#homeArl#',
+			editUrl => '/person/#param.person_id#/stpe-#my.stmtId#?home=#homeArl#',
+		},
+	},
+	publishDefn_panel =>
+	{
+		# automatically inherits columnDefn and other items from publishDefn
+		style => 'panel',
+		frame => { heading => 'Office Location' },
+	},
+	publishDefn_panelTransp =>
+	{
+		# automatically inherits columnDefn and other items from publishDefn
+		style => 'panel.transparent',
+		inherit => 'panel',
+	},
+	publishDefn_panelEdit =>
+	{
+		# automatically inherits columnDefn and other items from publishDefn
+		style => 'panel.edit',
+		frame => { heading => 'Office Location' },
+		banner => {
+			actionRows =>
+			[
+				{ caption => qq{ Add <A HREF= '/person/#param.person_id#/stpe-#my.stmtId#/dlg-add-office-location?home=#param.home#'>Office Location</A> } },
+			],
+		},
+		stdIcons =>	{
+			updUrlFmt => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-update-office-location/#1#?home=#param.home#', delUrlFmt => '/person/#param.person_id#/stpe-#my.stmtId#/dlg-remove-office-location/#1#?home=#param.home#',
+		},
+	},
+
+	publishComp_st => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.officeLocation', [$personId]); },
+	publishComp_stp => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.officeLocation', [$personId], 'panel'); },
+	publishComp_stpe => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.officeLocation', [$personId], 'panelEdit'); },
+	publishComp_stpt => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.officeLocation', [$personId], 'panelTransp'); },
+},
+
 
 );
 
