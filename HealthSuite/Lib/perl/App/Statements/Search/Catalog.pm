@@ -89,7 +89,7 @@ $STMTFMT_SEL_CATENTRYBYID = qq{
 		'Add',
 		oce.parent_entry_id,
 		oce.name,
-		decode(flags, 0, null, 1, '(FFS)')
+		decode(oce.flags, 0, null, 1, '(FFS)')
 	FROM
 		catalog_entry_type,
 		offering_catalog_entry oce,
