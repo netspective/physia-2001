@@ -1,44 +1,44 @@
 spool create_db.log 
 
-startup nomount pfile = $ORACLE_HOME/dbs/initSDEDBS02.ora
-CREATE DATABASE "SDEDBS02"
+startup nomount pfile = $ORACLE_HOME/dbs/initSDEDBS03.ora
+CREATE DATABASE "SDEDBS03"
    maxdatafiles 254
    maxinstances 8
    maxlogfiles 32
    character set US7ASCII
    national character set US7ASCII
-DATAFILE '/u02/oradata/SDEDBS02/SDEDBS02_system01.dbf' SIZE 175M
-logfile group 1 ('/u03/oradata/SDEDBS02/SDEDBS02_redo01_a.log',
-                 '/home/u01/app/oradata/SDEDBS02/SDEDBS02_redo01_b.log') size 10M,
-group 2 ('/u03/oradata/SDEDBS02/SDEDBS02_redo02_a.log',
-                 '/home/u01/app/oradata/SDEDBS02/SDEDBS02_redo02_b.log') size 10M,
-group 3 ('/u03/oradata/SDEDBS02/SDEDBS02_redo03_a.log',
-                 '/home/u01/app/oradata/SDEDBS02/SDEDBS02_redo03_b.log') size 10M;
+DATAFILE '/u02/oradata/SDEDBS03/SDEDBS03_system01.dbf' SIZE 200M
+logfile group 1 ('/u03/oradata/SDEDBS03/SDEDBS03_redo01_a.log',
+                 '/home/u01/app/oradata/SDEDBS03/SDEDBS03_redo01_b.log') size 10M,
+group 2 ('/u03/oradata/SDEDBS03/SDEDBS03_redo02_a.log',
+                 '/home/u01/app/oradata/SDEDBS03/SDEDBS03_redo02_b.log') size 10M,
+group 3 ('/u03/oradata/SDEDBS03/SDEDBS03_redo03_a.log',
+                 '/home/u01/app/oradata/SDEDBS03/SDEDBS03_redo03_b.log') size 10M;
 
 CREATE ROLLBACK SEGMENT r0 TABLESPACE SYSTEM
 STORAGE (INITIAL 16K NEXT 16K MINEXTENTS 2 MAXEXTENTS 20);
 ALTER ROLLBACK SEGMENT r0 ONLINE;
 
 REM ************** TABLESPACE FOR ROLLBACK *****************
-CREATE TABLESPACE RBS DATAFILE '/u04/oradata/SDEDBS02/SDEDBS02_rbs01.dbf' SIZE 500M 
+CREATE TABLESPACE RBS DATAFILE '/u04/oradata/SDEDBS03/SDEDBS03_rbs01.dbf' SIZE 500M 
 DEFAULT STORAGE ( INITIAL 1M NEXT 1M  MINEXTENTS 20 MAXEXTENTS 1024 PCTINCREASE 0);
 
 REM ************** TABLESPACE FOR TEMPORARY *****************
-CREATE TABLESPACE TEMP DATAFILE '/u05/oradata/SDEDBS02/SDEDBS02_temp01.dbf' SIZE 300M 
+CREATE TABLESPACE TEMP DATAFILE '/u05/oradata/SDEDBS03/SDEDBS03_temp01.dbf' SIZE 300M 
 DEFAULT STORAGE ( INITIAL 2M NEXT 2M MINEXTENTS 1 MAXEXTENTS UNLIMITED PCTINCREASE 0) TEMPORARY;
 
-create tablespace USERS datafile '/u06/oradata/SDEDBS02/SDEDBS02_ts_users.dbf'
+create tablespace USERS datafile '/u06/oradata/SDEDBS03/SDEDBS03_ts_users.dbf'
 size 10M default storage (pctincrease 0);
 
-create tablespace TOOLS datafile '/u06/oradata/SDEDBS02/SDEDBS02_ts_tools.dbf'
+create tablespace TOOLS datafile '/u06/oradata/SDEDBS03/SDEDBS03_ts_tools.dbf'
 size 10M default storage (pctincrease 0);
 
-create tablespace TS_DATA datafile '/u06/oradata/SDEDBS02/SDEDBS02_ts_data_1.dbf'
+create tablespace TS_DATA datafile '/u06/oradata/SDEDBS03/SDEDBS03_ts_data_1.dbf'
 size 500M minimum extent 1M default storage (initial 1M next 1M maxextents 1024 pctincrease 0);
 
-alter tablespace TS_DATA add datafile '/u06/oradata/SDEDBS02/SDEDBS02_ts_data_2.dbf' size 500M;
+alter tablespace TS_DATA add datafile '/u06/oradata/SDEDBS03/SDEDBS03_ts_data_2.dbf' size 500M;
 
-create tablespace TS_INDEXES datafile '/u07/oradata/SDEDBS02/SDEDBS02_ts_indexes_1.dbf'
+create tablespace TS_INDEXES datafile '/u07/oradata/SDEDBS03/SDEDBS03_ts_indexes_1.dbf'
 size 1500M minimum extent 1M default storage (initial 1M next 1M maxextents 1024 pctincrease 0);
 
 
