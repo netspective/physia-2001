@@ -1627,30 +1627,49 @@ sub storeInsuranceInfo
 
 
 			#Insured's Employment Info
-			my $insuredEmployers = $STMTMGR_PERSON->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'selEmploymentAssociations', $personInsur->{insured_id});
-			foreach my $employer (@{$insuredEmployers})
-			{
-				my $valueType = $employer->{value_type};
-				next if $valueType == $retiredAttr;
+			#my $insuredEmployers = $STMTMGR_PERSON->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'selEmploymentAssociations', $personInsur->{insured_id});
+			#foreach my $employer (@{$insuredEmployers})
+			#{
+				#my $valueType = $employer->{value_type};
+				#next if $valueType == $retiredAttr;
 
-				my $occupType = 'Employer';
-				$occupType = 'School' if $valueType == $ftStudentAttr || $valueType == $ptStudentAttr;
+				#my $occupType = 'Employer';
+				#$occupType = 'School' if $valueType == $ftStudentAttr || $valueType == $ptStudentAttr;
 
-				my $empStatus = $STMTMGR_PERSON->getSingleValue($page, STMTMGRFLAG_NONE, 'selEmploymentStatus', $valueType);
+				#my $empStatus = $STMTMGR_PERSON->getSingleValue($page, STMTMGRFLAG_NONE, 'selEmploymentStatus', $valueType);
 
-				my $employerName = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgSimpleNameById', $employer->{value_int});
+				#my $employerName = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgSimpleNameById', $employer->{value_int});
+				my $employerName = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgSimpleNameById', $personInsur->{employer_org_id});
 
 				$page->schemaAction(
 						'Invoice_Attribute', $command,
 						parent_id => $invoiceId,
-						item_name => "Insurance/$order/Insured/$occupType/Name",
-						value_type => defined $valueType ? $valueType : undef,
+						#item_name => "Insurance/$order/Insured/$occupType/Name",
+						item_name => "Insurance/$order/Insured/Employer/Name",
+						#value_type => defined $valueType ? $valueType : undef,
+						value_type => defined $textValueType ? $textValueType : undef,
 						value_text => $employerName || undef,
-						value_textB => $empStatus || undef,
+						#value_textB => $empStatus || undef,
 						value_intB => 1,
 						_debug => 0
 					);
-			}
+			#}
+
+			my $insuredEmployerAddr = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_CACHE, 'selOrgAddressByAddrName', $personInsur->{employer_org_id}, 'Mailing');
+			$page->schemaAction(
+					'Invoice_Address', $command,
+					parent_id => $invoiceId,
+					address_name => "$order Insured Employer",
+					line1 => $insuredEmployerAddr->{line1} || undef,
+					line2 => $insuredEmployerAddr->{line2} || undef,
+					city => $insuredEmployerAddr->{city} || undef,
+					state => $insuredEmployerAddr->{state} || undef,
+					zip => $insuredEmployerAddr->{zip} || undef,
+					_debug => 0
+				);
+
+
+			##NEED TO CREATE ATTR FOR 'Medigap/Number' (THIS IS FOUND AT THE PRODUCT LEVEL)
 
 			##MEDICAID - RESUBMISSION CODE AND ORIGINAL REFERENCE
 
