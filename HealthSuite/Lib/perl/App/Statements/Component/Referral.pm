@@ -4,8 +4,13 @@ package App::Statements::Component::Referral;
 
 use strict;
 use Exporter;
+
+use Date::Manip;
 use DBI::StatementManager;
 use App::Universal;
+use App::Statements::Component;
+
+
 
 use vars qw(
 	@ISA @EXPORT $STMTMGR_COMPONENT_REFERRAL $STMTRPTDEFN_WORKLIST
@@ -34,7 +39,7 @@ $STMTRPTDEFN_WORKLIST =
 };
 
 $STMTMGR_COMPONENT_REFERRAL = new App::Statements::Component::Referral(
-	'sel_referrals_open' => qq{
+	'sel_referrals_open' => qq{		
 		select 
 			trans_id as referral_id,
 			(select p.complete_name || ' (' || p.person_id || ')' from person p where p.person_id = t.trans_owner_id) as patient,
@@ -44,12 +49,15 @@ $STMTMGR_COMPONENT_REFERRAL = new App::Statements::Component::Referral(
 			t.provider_id as referrer_id,
 			t.care_provider_id as service_provider_id,
 			t.data_text_a as service_provider_type, 
-			t.trans_substatus_reason as requested_service,
-			t.trans_end_stamp as request_date, 
-			t.trans_status as status
+			t.trans_substatus_reason as requested_service, 
+			--%simpleDate:trans_end_stamp%, 
+			decode(to_char(trans_end_stamp, 'YYYY'), to_char(sysdate, 'YYYY'), to_char(trans_end_stamp, 'Mon DD'), to_char(trans_end_stamp, 'MM/DD/YY')) as trans_end_stamp, 
+			(select tt.trans_status_reason from transaction tt where tt.trans_type = 6010 and tt.parent_trans_id = t.trans_id 
+				and rownum < 2 and trans_status = 2) as trans_status_reason
 		from transaction t
 		where 
-		t.trans_type = $REFERRAL_STATUS_OPEN
+		t.trans_type = $REFERRAL_STATUS_OPEN 
+		order by trans_id
 	},
 );
 
