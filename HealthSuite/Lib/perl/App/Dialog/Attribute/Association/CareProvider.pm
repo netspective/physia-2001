@@ -66,20 +66,6 @@ sub customValidate
 	my $pId = $self->getField('value_text');
 	#my $pName = $self->getField('rel_name');
 	my $itemId = $page->param('item_id');
-
-	#if($page->field('rel_id') && $page->field('rel_name'))
-	#{
-	#	$pId->invalidate($page, "Cannot provide both '$pId->{caption}' and '$pName->{caption}'");
-	#	$pName->invalidate($page, "Cannot provide both '$pId->{caption}' and '$pName->{caption}'");
-	#}
-	#else
-	#{
-	#	unless($page->field('rel_id') || $page->field('rel_name'))
-	#	{
-	#		$pId->invalidate($page, "Please provide either '$pId->{caption}' or '$pName->{caption}'");
-	#		$pName->invalidate($page, "Please provide either '$pId->{caption}' or '$pName->{caption}'");
-	#	}
-	#}
 }
 
 sub populateData
@@ -91,19 +77,6 @@ sub populateData
 	my $itemId = $page->param('item_id');
 
 	my $data = $STMTMGR_PERSON->createFieldsFromSingleRow($page, STMTMGRFLAG_NONE, 'selAttributeById', $itemId);
-	#$page->field('rel_type', $data->{item_name});
-	#$page->field('phone_number', $data->{value_textb});
-	#$page->field('begin_date', $data->{value_date});
-
-	#my $valueInt =  $data->{value_int};
-	#if($valueInt == 0)
-	#{
-	#	$page->field('rel_name', $data->{value_text});
-	#}
-	#else
-	#{
-		#$page->field('rel_id', $data->{value_text});
-	#}
 }
 
 sub execute
@@ -111,10 +84,6 @@ sub execute
 	my ($self, $page, $command, $flags) = @_;
 
 	my $relId = $page->field('value_text');
-	#my $relName = $page->field('rel_name');
-
-	#my $valueText = $relId eq '' ? $relName : $relId;
-	my $constrained = $relId eq '' ? 0 : 1;
 	my $medSpecCode = $page->field('value_textb');
 	my $medSpecCaption = $STMTMGR_PERSON->getSingleValue($page, STMTMGRFLAG_CACHE, 'selMedicalSpecialtyCaption', $medSpecCode);
 	$page->schemaAction(
@@ -123,15 +92,10 @@ sub execute
 		item_id => $page->param('item_id') || undef,
 		item_name => $medSpecCaption || undef,
 		value_type => App::Universal::ATTRTYPE_PROVIDER || undef,
-		#value_text => $valueText || undef,
 		value_text => $relId || undef,
 		value_textB => $page->field('value_textb') || undef,
-		#value_date => $page->field('begin_date') || undef,
-		value_int => defined $constrained ? $constrained : undef,
 		_debug => 0
 	);
-
-
 	$self->handlePostExecute($page, $command, $flags | CGI::Dialog::DLGFLAG_IGNOREREDIRECT);
 	return "\u$command completed.";
 }
