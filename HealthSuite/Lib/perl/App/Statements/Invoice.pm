@@ -158,6 +158,12 @@ $STMTMGR_INVOICE = new App::Statements::Invoice(
 		from invoice
 		where invoice_id = ?
 		},
+	'selInvoiceOrder' => qq{
+		select value_int
+		from invoice_attribute
+		where parent_id = ?
+			and item_name = 'Submission Order'
+		},
 	'selInvoiceStatus' => qq{
 		select invoice_status
 		from invoice
