@@ -50,7 +50,7 @@
 			Modified calc for net rcpts on financial analysis report.
 		</deliverable>
 		<deliverable id="1151">
-			On daily audit report detail section only show the physician and patient name once for an invoice
+			On daily/monthly audit report detail section only show the physician and patient name once for an invoice
 		</deliverable>
 		<deliverable id="1124">
 			Ordered the monthly detail audit report and added a batch date col to the 
@@ -58,6 +58,9 @@ detail report.
 		</deliverable>
 		<deliverable id="1145">
 			Added option to select all products in the collection worklist.  When user selects "all" the products list box will not appear on the dialog. If the user does not select "all" then the products list box will appear and the user can select which products to filter 
+		</deliverable>
+		<deliverable id="1247">
+			Loaded thin net payer IDs.  Also changed the E-Remit Payer lookup to include payer source (PerSE,ThinNet,etc)
 		</deliverable>
 	
 	</deliverables>
