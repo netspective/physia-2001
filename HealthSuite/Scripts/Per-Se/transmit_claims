@@ -1,0 +1,46 @@
+function abortOnError
+{
+	if [ $1 != 0 ]; then
+		echo
+		echo "ERROR:  $2.  Aborted."
+		exit
+	fi
+}
+
+#########
+# main
+#########
+
+echo
+echo "-----------------------------------"
+date
+echo "-----------------------------------"
+echo
+
+CONNECT_STRING=pro_new/pro@sdedbs03
+perl create_nsf_file.pl $CONNECT_STRING
+abortOnError $? "Unable to run 'perl create_nsf_file.pl'."
+
+NSF=`makeRecordFiles`
+PGP=$NSF.pgp
+
+echo NSF = $NSF
+echo PGP = $PGP
+
+pgp -es $NSF "Per-Se Technologies Chicago"
+abortOnError $? "Unable to run 'pgp -es'."
+
+perl update_transmitted.pl $CONNECT_STRING $NSF
+abortOnError $? "Unable to run 'perl update_transmitted.pl'."
+
+mv $PGP outgoing
+mv $NSF outgoing/archive
+
+cd outgoing
+ftp depot.medaphis.com <<ENDOFHEREDOC
+pwd
+put $PGP $NSF
+dir
+bye
+ENDOFHEREDOC
+cd -
