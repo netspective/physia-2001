@@ -243,8 +243,8 @@ sub prepare_view_expiring
 			<STYLE>
 				.referral_ {}
 				.referral_0 {background-color: TAN;}
-				.referral_1 {background-color: BEIGE;}
-				.referral_2 {background-color: LIGHTYELLOW;}
+				.referral_1 {background-color: #EEEEEE;}
+				.referral_2 {background-color: BEIGE;}
 			</STYLE>
 		},
 		$dlgHtml

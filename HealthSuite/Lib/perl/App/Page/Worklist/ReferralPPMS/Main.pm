@@ -245,7 +245,7 @@ sub prepare_view_main
 			<STYLE>
 				.referral_ {}
 				.referral_0 {background-color: TAN;}
-				.referral_1 {background-color: #B9AC91;}
+				.referral_1 {background-color: #EEEEEE;}
 				.referral_2 {background-color: BEIGE;}
 			</STYLE>
 		},
