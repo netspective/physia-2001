@@ -110,7 +110,7 @@ sub execute
 	my ($self, $page, $command, $flags) = @_;
 	my $pub = {
 		columnDefn => [
-			{ colIdx => 0, head => 'Zip Code', hAlign => 'center',dAlign => 'center',dataFmt => '#0#'},
+			{ colIdx => 0, head => 'Zip Code', hAlign => 'center',dAlign => 'left',dataFmt => '#0#'},
 		],
 	};
 
@@ -233,7 +233,7 @@ sub execute
 
 	if($fieldsExist ne '')
 	{
-		my @rowData = ("Total");
+		my @rowData = ("Selected Zips Subtotal");
 		push (@rowData, ' ') if exists $fieldsExist->{doctor};
 		push (@rowData, ' ') if exists $fieldsExist->{org};
 		push (@rowData, ' ') if exists $fieldsExist->{ins_org};
@@ -245,13 +245,25 @@ sub execute
 
 	if($fieldsExist ne '')
 	{
-		my @rowData = ("Others");
+		my @rowData = ("Unselected and Unknowns");
 		push (@rowData, ' ') if exists $fieldsExist->{doctor};
 		push (@rowData, ' ') if exists $fieldsExist->{org};
 		push (@rowData, ' ') if exists $fieldsExist->{ins_org};
 		push (@rowData, ' ') if exists $fieldsExist->{product};
 		push (@rowData, $totalPatients - $currentTotal);
 		push (@rowData, sprintf "%3.2f%", 100 - $currentPercent);
+		push (@data, \@rowData);
+	}
+
+	if($fieldsExist ne '')
+	{
+		my @rowData = ("Grand Total");
+		push (@rowData, ' ') if exists $fieldsExist->{doctor};
+		push (@rowData, ' ') if exists $fieldsExist->{org};
+		push (@rowData, ' ') if exists $fieldsExist->{ins_org};
+		push (@rowData, ' ') if exists $fieldsExist->{product};
+		push (@rowData, $totalPatients);
+		push (@rowData, sprintf "%3.2f%", 100);
 		push (@data, \@rowData);
 	}
 
