@@ -1112,6 +1112,11 @@
 				<col name="caption">POS(point of service)</col>
 				<col name="group_name">insurance</col>
 			</row>
+			<row>
+				<col name="id">15</col>
+				<col name="caption">Railroad Medicare</col>
+				<col name="group_name">insurance</col>
+			</row>
 		</data>
 	</table>
 
