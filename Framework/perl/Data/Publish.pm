@@ -484,26 +484,52 @@ sub prepare_HtmlBlockFmtTemplate
 	}
 	if(my $bullets = $publDefn->{bullets})
 	{
-		my $bulletIcons = { location => 'lead' };
-		push(@$allIcons, $bulletIcons);
-
 		if(ref $bullets eq 'HASH')
 		{
+			my $bulletIcons = { location => 'lead' };
+			push(@$allIcons, $bulletIcons);
+			
 			push(@{$bulletIcons->{data}}, {
 					imgSrc => exists $bullets->{imgSrc} ? $bullets->{imgSrc} : '/resources/icons/square-lgray-sm.gif',
 					urlFmt => exists $bullets->{urlFmt} ? $bullets->{urlFmt} : (exists $publDefn->{stdIcons} ? (exists $publDefn->{stdIcons}->{updUrlFmt} ? $publDefn->{stdIcons}->{updUrlFmt} : undef) : undef),
 					title => exists $bullets->{title} ? $bullets->{title} : 'Edit Record',
 					});
 		}
+		elsif(ref $bullets eq 'ARRAY')
+		{
+			for (@{$bullets})
+			{
+				my $bulletIcons = { location => 'lead' };
+				push(@$allIcons, $bulletIcons);
+
+				if (ref $_ eq 'HASH')
+				{
+					push(@{$bulletIcons->{data}}, {
+						imgSrc => exists $_->{imgSrc} ? $_->{imgSrc} : '/resources/icons/square-lgray-sm.gif',
+						urlFmt => exists $_->{urlFmt} ? $_->{urlFmt} : (exists $publDefn->{stdIcons} ? (exists $publDefn->{stdIcons}->{updUrlFmt} ? $publDefn->{stdIcons}->{updUrlFmt} : undef) : undef),
+						title => exists $_->{title} ? $_->{title} : 'Edit Record',
+					});
+				}
+				else
+				{
+					push(@{$bulletIcons->{data}}, {
+						urlFmt => $_, imgSrc => '/resources/icons/square-lgray-hat-sm.gif', title => 'Edit Record',
+					});
+				}
+			}
+		}
 		else
 		{
+			my $bulletIcons = { location => 'lead' };
+			push(@$allIcons, $bulletIcons);
+			
 			if($bullets =~ m/^1$/)
 			{
-				push(@{$bulletIcons->{data}}, { imgSrc => '/resources/icons/square-lgray-sm.gif' });
+				push(@{$bulletIcons->{data}}, { imgSrc => '/resources/icons/square-lgray-sm.gif', title => 'Edit Record' });
 			}
 			else
 			{
-				push(@{$bulletIcons->{data}}, { urlFmt => $bullets, imgSrc => '/resources/icons/square-lgray-hat-sm.gif' });
+				push(@{$bulletIcons->{data}}, { urlFmt => $bullets, imgSrc => '/resources/icons/square-lgray-hat-sm.gif', title => 'Edit Record' });
 			}
 		}
 	}
