@@ -1656,6 +1656,7 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 			from 	person_attribute
 			where 	parent_id = ?
 			and 	value_type = @{[ App::Universal::ATTRTYPE_RESOURCEPERSON ]}
+			and item_name = 'Physician'
 		},
 	sqlStmtBindParamDescr => ['Person ID for Certification'],
 	publishDefn => {
@@ -1663,7 +1664,7 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 			{ head => 'Record', dataFmt => '&{fmt_stripLeadingPath:2}:' },
 			{ dataFmt => '#3#'},
 		],
-		bullets => 'stpe-#my.stmtId#/dlg-update-attr-#0#/#1#?home=/#param.arl#',
+		bullets => 'stpe-#my.stmtId#/dlg-update-attr-assoc-nurse-#0#/#1#?home=/#param.arl#',
 		frame => { addUrl => 'stpe-#my.stmtId#/dlg-add-resource-nurse?home=/#param.arl#' },
 	},
 	publishDefn_panel =>
@@ -1690,7 +1691,7 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 			],
 		},
 		stdIcons =>	{
-			updUrlFmt => '#param.home#/../stpe-#my.stmtId#/dlg-update-attr-#0#/#1#?home=#param.home#', delUrlFmt => '#param.home#/../stpe-#my.stmtId#/dlg-remove-attr-#0#/#1#?home=#param.home#',
+			updUrlFmt => '#param.home#/../stpe-#my.stmtId#/dlg-update-attr-assoc-nurse-#0#/#1#?home=#param.home#', delUrlFmt => '#param.home#/../stpe-#my.stmtId#/dlg-remove-attr-assoc-nurse-#0#/#1#?home=#param.home#',
 		},
 	},
 	publishComp_st => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.associatedResources', [$personId]); },
