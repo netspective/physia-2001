@@ -245,6 +245,10 @@
 			Additional next actions for placing claim on hold and adding hospital claim added to claim dialog and patient choose action.
 		</deliverable>
 
+		<deliverable id="1515">
+			Fixed a bug which caused popup lookup windows to have the complete application title bar
+		</deliverable>
+
 		<deliverable id="none">
 			Added information about the build number, database type to the bottom of the login window 
 			to aid in troubleshooting.
