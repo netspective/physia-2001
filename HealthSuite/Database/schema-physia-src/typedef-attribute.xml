@@ -440,6 +440,13 @@
 				<col name="remarks">This is the id code assigned by an insurance company to a provider code which authorizes the provider to bill the insurance company for service rendered</col>
 			</row>
 			<row>
+				<col name="id">560</col>
+				<col name="caption">Board Certification</col>
+				<col name="group_name">Certificate</col>
+				<col name="dialog_params">type="text"</col>
+				<col name="remarks">This is the board name assigned to a provider code</col>
+			</row>
+			<row>
 				<col name="id">570</col>
 				<col name="caption">Tax Id</col>
 				<col name="group_name">Certificate</col>
