@@ -384,7 +384,7 @@ $STMTMGR_INVOICE = new App::Statements::Invoice(
 		where parent_id = ?
 			and adjustment_type = 3
 		},
-	'selItemAdjustments' => q{
+	'selItemAdjustments' => qq{
 		select 	iia.adjustment_id, iia.adjustment_amount,	iia.payer_id, iia.payer_type, iia.plan_allow, iia.plan_paid, iia.deductible, iia.copay,
 			iia.submit_date, iia.pay_date, comments, pay_ref, pay_method as pay_method_id, writeoff_amount,
 			adjust_codes, net_adjust, data_text_a,
@@ -397,8 +397,11 @@ $STMTMGR_INVOICE = new App::Statements::Invoice(
 		and iia.adjustment_type = adm.id (+)
 		and iia.pay_type = pat.id (+)
 		},
-	'selItemAdjustmentsByInvoiceId' => q{
-		select *
+	'selItemAdjustmentsByInvoiceId' => qq{
+		select iia.adjustment_id, iia.adjustment_amount, iia.payer_type, iia.payer_id, iia.refund_to_type, iia.refund_to_id, iia.parent_id,
+				iia.plan_allow, iia.plan_paid, iia.deductible, iia.copay, to_char(iia.pay_date, '$SQLSTMT_DEFAULTDATEFORMAT'),
+				iia.pay_type, iia.pay_method, iia.pay_ref, iia.writeoff_code, iia.writeoff_amount, iia.adjust_codes, iia.net_adjust,
+				iia.comments, iia.data_text_a, iia.data_text_b, iia.data_text_c, iia.data_num_a, iia.data_num_b, iia.data_num_c
 		from invoice_item_adjust iia, invoice_item ii, invoice i
 		where i.invoice_id = ?
 			and i.invoice_id = ii.parent_id
