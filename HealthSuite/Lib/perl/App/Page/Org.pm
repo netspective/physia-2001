@@ -39,8 +39,8 @@ my $intOrgId;
 sub initialize
 {
 	my $self = shift;
-	$self->SUPER::initialize(@_);	
-	my $orgId = $self->param('org_id');	
+	$self->SUPER::initialize(@_);
+	my $orgId = $self->param('org_id');
 	$intOrgId = $STMTMGR_ORG->getSingleValue($self,STMTMGRFLAG_CACHE,'selOrgId',$self->session('org_internal_id'),$orgId);
 	$STMTMGR_ORG->createPropertiesFromSingleRow($self, STMTMGRFLAG_CACHE, ['selOrgCategoryRegistry', 'org_'], $intOrgId);
 	$self->property('org_type', split(/,/, $self->property('org_category')));
@@ -54,25 +54,25 @@ sub initialize
 			);
 	#}
 	#$self->addDebugStmt(@{[$self->property('org_group_name')]});
-	
-		
+
+
 	# Check user's permission to page
 	my $activeView = $self->param('_pm_view');
-	if ($activeView) 
+	if ($activeView)
 	{
 		unless($self->hasPermission("page/org/$activeView"))
 		{
 			$self->disable(
 					qq{
 						<br>
-						You do not have permission to view this information. 
+						You do not have permission to view this information.
 						Permission page/org/$activeView is required.
 
 						Click <a href='javascript:history.back()'>here</a> to go back.
 					});
 		}
-	}	
-	
+	}
+
 }
 
 sub getContentHandlers
@@ -102,9 +102,9 @@ sub prepare_page_content_header
 	#push(@{$self->{page_content_header}}, new App::Pane::Org::Heading()->as_html($self), '<P>');
 
 	my $orgName = undef;
-	
+
 	if(my $orgId = $self->param('org_id'))
-	{		
+	{
 		$orgName = $STMTMGR_ORG->getSingleValue($self, STMTMGRFLAG_CACHE, 'selOrgSimpleNameById', $intOrgId);
 	}
 	else
@@ -140,13 +140,14 @@ sub prepare_page_content_header
 	$profileLine .=  '&nbsp;Category: #property.org_category# ' if $self->property('org_category');
 	$profileLine .=  '&nbsp;Trade Name: #property.org_name_trade# ' if $self->property('org_name_trade');
 	$profileLine .=  '&nbsp;Tax ID: #property.org_tax_id# ' if $self->property('org_tax_id');
-	
+
 	my $chooseAction = '';
 	$chooseAction = qq{
 				<TD ALIGN=RIGHT>
 					<FONT FACE="Arial,Helvetica" SIZE=2>
 					<SELECT style="font-family: tahoma,arial,helvetica; font-size: 8pt" onchange="if(this.selectedIndex > 0) window.location.href = this.options[this.selectedIndex].value">
 						<OPTION>Choose Action</OPTION>
+						<OPTION value="/org/#param.org_id#/dlg-add-referral">Add Referral</OPTION>
 						<OPTION value="/org/#session.org_id#/dlg-add-appointment">Schedule Appointment</OPTION>
 						<OPTION value="/org/#session.org_id#/dlg-add-claim">Add Claim</OPTION>
 						<OPTION value="/org/#param.org_id#/dlg-update-org-$category">Edit Profile</OPTION>
@@ -240,7 +241,7 @@ sub prepare_view_profile
 	my ($self) = @_;
 
 	$self->addLocatorLinks(['Profile', 'profile']);
-	
+
 
 	$self->addContent(qq{
 		<TABLE>
@@ -259,6 +260,7 @@ sub prepare_view_profile
 					#component.stp-org.insurancePlans#<BR>
 					#component.stpt-org.healthMaintenanceRule#<BR>
 					#component.stpt-org.associatedResourcesStats#<BR>
+					#component.st-org.feeSchedule#<BR>
 					</font>
 				</TD>
 			</TR>
@@ -365,13 +367,15 @@ sub prepare_view_account
 	$self->addLocatorLinks(['Account', 'account']);
 
 	my $orgId = $self->param('org_id');
+	my $ownerOrg = $self->session('org_internal_id');
+	my $orgIntId = $STMTMGR_ORG->getSingleValue($self, STMTMGRFLAG_NONE, 'selOrgId', $ownerOrg, $orgId);
 	my $todaysDate = $self->getDate();
 	my $formatter = new Number::Format('INT_CURR_SYMBOL' => '$');
 
 	$self->addContent(
 		'<CENTER>',
 		$STMTMGR_INVOICE->createHtml($self, STMTMGRFLAG_NONE, 'selInvoiceTypeForOrg',
-			[$orgId],
+			[$orgIntId],
 			#[
 				#['<SPAN TITLE="Claim Identifier">ID</SPAN>', '<A HREF=\'/invoice/%0\'>%0</A>', undef, 'RIGHT'],
 				#['<SPAN TITLE="Number of Items in Claim">IC</SPAN>', undef, undef, 'CENTER'],
