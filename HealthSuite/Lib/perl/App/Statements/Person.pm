@@ -903,7 +903,17 @@ $STMTMGR_PERSON = new App::Statements::Person(
 				updUrlFmt => 'dlg-update-person-address/#0#', delUrlFmt => 'dlg-remove-person-address/#0#',
 			},
 		},
+	},
 
+	'selPersonBillingInfo' => {
+		sqlStmt => qq{
+			select	value_type, item_id, value_text, value_textb, value_int, %simpleDate:value_date%
+			from	person_attribute
+			where	parent_id = ?
+			and	value_type = @{[ App::Universal::ATTRTYPE_BILLING_INFO ]}
+			order by value_int
+		},
+		sqlStmtBindParamDescr => ['Person ID'],
 	},
 
 );
