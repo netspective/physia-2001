@@ -56,6 +56,7 @@ sub new
 	
 	#Unit Of Work variables
 	$self->{sqlUnitWork}=undef;
+	$self->{valUnitWork}=undef;
 	$self->{errUnitWork}=[];
 	$self->{cntUnitWork}=0;
 	
@@ -526,10 +527,10 @@ sub getSchema {	$_[0]->{schema}; }
 sub executeSql
 {
 	my ($self, $stmhdl) = @_;
-	my $rc;
+	my $rc;	
 	eval
 	{
-		$rc = $stmhdl->execute();	
+		$rc = $stmhdl->execute(@{$self->{valUnitWork}});	
 	};
 	if($@||!$rc)
 	{
@@ -545,6 +546,7 @@ sub beginUnitWork
 	$self->{sqlUnitWork}='BEGIN ';
 	$self->{cntUnitWork}=0;
 	$self->{errUnitWork}=[];
+	$self->{valUnitWork}=undef;
 	$self->{schemaFlags}|= SCHEMAAPIFLAG_UNITSQL;		
 	$self->{schemaFlags}&=~SCHEMAAPIFLAG_EXECSQL;		
 	return 1;	
@@ -565,19 +567,6 @@ sub endUnitWork
 	return $self->executeSql($stmhdl);	
 }
 
-#sub savePointUnitWork
-#{
-#	my $self = shift;		
-#	my $stmhdl = $self->prepareSql($self->{sqlUnitWork});	
-#	$self->{sqlUnitWork}.= "END;  "; 	
-#	if (scalar(@{$self->{errUnitWork}}))
-#	{
-#		$self->addError(join ("<br>",@{$self->{errUnitWork}}));
-#		return 0;
-#	}
-#	return $self->executeSql($stmhdl);
-#}
-
 
 sub unitWork
 {
@@ -587,13 +576,14 @@ sub unitWork
 
 sub storeSql
 {
-	my ($self, $sql,$errors) = @_;
+	my ($self, $sql,$vals,$errors) = @_;
 	$self->{cntUnitWork}++;
 	if(scalar(@{$errors}) > 0)
 	{
 		push(@{$self->{errUnitWork}},"<b> Unit Of Work Query $self->{cntUnitWork} error :</b> @{$errors}");			
 	}
 	$self->{sqlUnitWork}.= $sql . ";  "; 
+	push(@{$self->{valUnitWork}},@{$vals});
 }
 
 sub loadSchema
@@ -613,6 +603,7 @@ sub schemaAction
 	my $self = shift;
 	return $self->{schema}->schemaAction($self, @_);
 }
+
 
 sub schemaGetSingleRec
 {
