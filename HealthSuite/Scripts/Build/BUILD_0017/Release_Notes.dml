@@ -417,6 +417,11 @@
 			For postsubmit, address for third party orgs and person now showing correctly.
 		</deliverable>
 
+		<deliverable id="1740">
+			Updated the ShortFormPerson dialog to make all the fields other than lastName and firstName to be not required.
+			NOTE: This is a patch not delivered until 12/8/00.
+		</deliverable>
+		
 		<deliverable id="1741">
 			In the Revenue/Collection report interchanged the headings 'Collection Information (Printable version)' 
 			and 'Production Information (Printable version)'.
