@@ -238,6 +238,7 @@ sub execute_add
 			value_textB => $medSpecCaption || undef,
 			_debug => 0
 		);
+
 	$page->schemaAction(
 			'Person_Attribute', $command,
 			parent_id => $personId,
@@ -247,6 +248,7 @@ sub execute_add
 			value_textB => $medSpecCaption2 || undef,
 			_debug => 0
 		);
+
 	$page->schemaAction(
 			'Person_Attribute', $command,
 			parent_id => $personId,
