@@ -40,7 +40,7 @@ sub new
 			new CGI::Dialog::Field(caption => 'Batch ID To', name => 'batch_id_to', size => 12),											
 			]),				
 			new App::Dialog::Field::Organization::ID(caption =>'Site Organization ID', name => 'org_id', invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE),
-			new App::Dialog::Field::Person::ID(caption =>'Physician ID', name => 'person_id',types => ['Physician'] ),			
+			new App::Dialog::Field::Person::ID(incSimpleName=>1,caption =>'Physician ID', name => 'person_id',types => ['Physician'] ),			
 			new CGI::Dialog::Field(type => 'select',
 							style => 'radio',
 							selOptions => 'Segmented:0;Whole:1',
