@@ -299,6 +299,7 @@
 		<enum id="0">Mailing</enum>
 		<enum id="1">Shipping</enum>
 		<enum id="2">Street</enum>
+		<enum id="3">Billing</enum>
 	</table>
 
 	<table name="Person_Contact_Class" abbrev="PerCnCl" type="Lookup">
