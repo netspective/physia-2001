@@ -39,7 +39,7 @@ sub getForm
 				<option value="/person/%itemValue%/dlg-add-appointment">Schedule Appointment</option>
 				<option value="/person/%itemValue%/dlg-add-claim">Add Claim</option>
 				<option value="/person/%itemValue%/dlg-update-%itemCategory%">Edit Profile</option>
-				<option value="/person/%itemValue%/dlg-add-medication-prescribe">Prescribe Medication</option>
+				<option value="/person/%itemValue%/dlg-prescribe-medication">Prescribe Medication</option>
 				<!-- <option value="/person/%itemValue%/dlg-add-">Add Note</OPTION> -->
 				<option value="/person/%itemValue%/account">Apply Payment</option>
 				<option value="/person/%itemValue%/account">View Account</option>
