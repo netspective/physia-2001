@@ -91,6 +91,9 @@
 			is out of sequence.
 		</deliverable>
 
+		<deliverable id="1050">
+			UI: Adjustment detail popup window showing correctly for generic invoices.
+		</deliverable>
 
 
 	</deliverables>
