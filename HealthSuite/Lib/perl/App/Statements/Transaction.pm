@@ -33,7 +33,7 @@ $STMTMGR_TRANSACTION = new App::Statements::Transaction(
 			to_char(trans_end_stamp, '$SQLSTMT_DEFAULTSTAMPFORMAT') AS trans_end_stamp,
 			to_char(init_onset_date, '$SQLSTMT_DEFAULTDATEFORMAT') AS init_onset_date,
 			to_char(curr_onset_date, '$SQLSTMT_DEFAULTDATEFORMAT') AS curr_onset_date,
-			trans_status_reason, related_data, caption, trans_substatus_reason
+			trans_status_reason, related_data, caption, trans_substatus_reason, auth_ref
 		from Transaction
 		where trans_id = ?
 	},
