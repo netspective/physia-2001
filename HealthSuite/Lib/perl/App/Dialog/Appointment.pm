@@ -16,12 +16,12 @@ use App::Statements::Person;
 use vars qw(@ISA);
 use Date::Manip;
 use Date::Calc qw(:all);
-use Devel::ChangeLog;
+
 use App::Dialog::Field::RovingResource;
 use App::Dialog::Field::Organization;
 use App::Schedule::Utilities;
 
-use vars qw(@ISA @CHANGELOG);
+use vars qw(@ISA %RESOURCE_MAP);
 
 @ISA = qw(CGI::Dialog);
 
@@ -213,11 +213,22 @@ sub populateData_add
 	return unless $flags & CGI::Dialog::DLGFLAG_DATAENTRY_INITIAL;
 
 	my $personId = $page->param('person_id');
-	my $startStamp = $page->getTimeStamp($page->param('start_stamp'));
-
+	my $startStamp;
+	if ($startStamp = $page->param('start_stamp'))
+	{
+		$startStamp =~ s/\-/\//g;
+		$startStamp =~ s/_/ /g;
+	}
+	else
+	{
+		$startStamp = $page->getTimeStamp();
+	}
+	
 	$page->field('attendee_id', $personId);
 	$page->field('start_stamp', $startStamp);
 	$page->field('resource_id', $page->param('resource_id'));
+	$page->field('facility_id', $page->param('facility_id'));
+	
 	$page->field('duration', $page->param('duration'));
 	App::Dialog::Appointment::setPhysicianFields($self, $page, $command, $flags);
 }
@@ -508,39 +519,15 @@ sub execute
 	$self->handlePostExecute($page, $command, $flags);
 }
 
-use constant APPOINTMENT_DIALOG => 'Dialog/Appointment';
-@CHANGELOG =
-(
-	[	CHANGELOGFLAG_ANYVIEWER | CHANGELOGFLAG_UPDATE, '12/30/1999', 'RK',
-		APPOINTMENT_DIALOG,
-		'Added the setPhysicianFields subroutine to pop-up the primary physician in the Appointment dialog for a patient. '],
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_ADD, '01/12/2000', 'RK',
-		APPOINTMENT_DIALOG,
-		'Deleted session-activity in execute_add subroutine and added activityLog in the sub new subroutine.'],
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_ADD, '01/12/2000', 'RK',
-		APPOINTMENT_DIALOG,
-		'Added handlePostExecute in sub execute subroutine'],
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_ADD, '01/30/2000', 'TVN',
-		APPOINTMENT_DIALOG,
-		'Added Roving Physician and updated makeStateChanges function.'],
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_NOTE, '01/30/2000', 'TVN',
-		APPOINTMENT_DIALOG,
-		'Completed implementation for Roving Resource and corrected makeStateChanges function.'],
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_NOTE, '02/08/2000', 'TVN',
-		APPOINTMENT_DIALOG,
-		'Completed Appointment Conflict Check.'],
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_NOTE, '02/18/2000', 'TVN',
-		APPOINTMENT_DIALOG,
-		'Completed Appointment Waiting List.'],
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_NOTE, '02/21/2000', 'MAF',
-		APPOINTMENT_DIALOG,
-		'Fixed attendee_id so it is set to param(person_id) when adding (see populateData_add).'],
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_NOTE, '02/24/2000', 'TVN',
-		APPOINTMENT_DIALOG,
-		'Fine-Tune Appointment Waiting List.'],
-	[	CHANGELOGFLAG_SDE | CHANGELOGFLAG_NOTE, '03/17/2000', 'RK',
-		APPOINTMENT_DIALOG,
-		'Replaced fkeyxxx select in the dialog with Sql statement from Statement Manager.'],
+%RESOURCE_MAP = (
+	'appointment' => {
+		_class => 'App::Dialog::Appointment',
+		_arl_add => ['person_id', 'resource_id', 'facility_id', 'start_stamp'],
+		_arl_modify => ['event_id'],
+		_arl_cancel => ['event_id'],
+		_arl_noshow => ['event_id'],
+		_arl_reschedule => ['event_id'],
+	},
 );
 
 1;

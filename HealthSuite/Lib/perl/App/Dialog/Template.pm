@@ -15,7 +15,7 @@ use App::Statements::Transaction;
 use Date::Manip;
 
 use constant NEXTACTION_COPYASNEW => "/schedule/template/add/,%field.template_id%";
-use vars qw(@ISA);
+use vars qw(@ISA %RESOURCE_MAP);
 
 @ISA = qw(CGI::Dialog);
 
@@ -167,7 +167,6 @@ sub new
 sub makeStateChanges
 {
 	my ($self, $page, $command, $activeExecMode, $dlgFlags) = @_;
-
 	$self->SUPER::makeStateChanges($page, $command, $activeExecMode, $dlgFlags);
 }
 
@@ -188,6 +187,7 @@ sub populateData_add
 		my $startDate = $page->getDate();
 		$page->field('effective_begin_date', $startDate);
 		$page->field('r_ids', $page->param('resource_id'));
+		$page->field('facility_id', $page->param('facility_id'));
 		$page->field('duration_begin_time', '08:00 am');
 		$page->field('duration_end_time', '08:00 pm');
 	}
@@ -242,5 +242,13 @@ sub execute
 
 	$self->handlePostExecute($page, $command, $flags);
 }
+
+%RESOURCE_MAP = (
+	'template' => {
+		_class => 'App::Dialog::Template', 
+		_arl_modify => ['template_id'], 
+		_arl_add => ['resource_id', 'facility_id'],
+	},
+);
 
 1;
