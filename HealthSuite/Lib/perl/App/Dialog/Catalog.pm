@@ -153,8 +153,9 @@ sub new
 		nextActions_add => [
 			['Add Another Fee Schedule', '/org/#session.org_id#/dlg-add-catalog', 1],
 			['Add RVRBS Fee Schedule Entries', '/org/#session.org_id#/dlg-add-feescheduledataentry/%field.catalog_id%'],
-			['Show Current Fee Schedule', '/org/#session.org_id#/catalog/%field.internal_catalog_id%/%field.catalog_id%'],
-			['Show List of Fee Schedules', '/org/#session.org_id#/catalog']
+			#['Show Current Fee Schedule', '/org/#session.org_id#/catalog/%field.internal_catalog_id%/%field.catalog_id%'],
+			['Show Current Fee Schedule', '/org/#session.org_id#/catalog?catalog=fee_schedule_detail&fee_schedule_detail=%field.internal_catalog_id%'],			
+			['Show List of Fee Schedules', '/org/#session.org_id#/catalog?catalog=fee_schedule']
 			],
 		cancelUrl => $self->{cancelUrl} || undef));
 
@@ -284,7 +285,7 @@ sub execute
 
 	savePerOrgAttr ($page,$phy_Id,$org_Id,$command);
 
-	$page->param('_dialogreturnurl', "/org/$orgId/catalog") if $command ne 'add';
+	$page->param('_dialogreturnurl', "/org/$orgId/catalog?catalog=fee_schedule") if $command ne 'add';
 	$self->handlePostExecute($page, $command, $flags);
 }
 
@@ -526,7 +527,7 @@ sub execute
 	}
 
 	$STMTMGR_CATALOG->execute($page, STMTMGRFLAG_DYNAMICSQL, $insertStmt);
-	$page->param('_dialogreturnurl', "/org/$orgName/catalog");
+	$page->param('_dialogreturnurl', "/org/$orgName/catalog?catalog=fee_schedule") ;
 	$self->handlePostExecute($page, $command, $flags);
 }
 

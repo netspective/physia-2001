@@ -149,8 +149,8 @@ sub new
 
 	$self->addFooter(new CGI::Dialog::Buttons(
 		nextActions_add => [
-			['Add Another Fee Schedule Item', "/org/#session.org_id#/dlg-add-catalog-item/%param.internal_catalog_id%", 1],
-			['Show Current Fee Schedule Item', '/search/catalog/detail/%param.internal_catalog_id%'],
+			['Add Another Fee Schedule Item', "/org/#session.org_id#/dlg-add-catalog-item/#param.internal_catalog_id#", 1],
+			['Show Current Fee Schedule Item', '/org/#session.org_id#/catalog?catalog=fee_schedule_detail&fee_schedule_detail=#param.internal_catalog_id#'],
 			],
 		cancelUrl => $self->{cancelUrl} || undef));
 
@@ -181,12 +181,12 @@ sub populateData_add
 	}
 	$self->makeStateChanges_special($page);
 	return unless $flags & CGI::Dialog::DLGFLAG_DATAENTRY_INITIAL;
-	if($page->param('parent_entry_id'))
-	{
-		my $parentEntry = $STMTMGR_CATALOG->getRowAsHash($page,STMTMGRFLAG_NONE,'selCatalogItemById',$page->param('parent_entry_id')) ;
-		$page->field('parent_entry_id', $parentEntry->{name});
-	}
-
+	#if($page->param('parent_entry_id'))
+	#{
+	#	my $parentEntry = $STMTMGR_CATALOG->getRowAsHash($page,STMTMGRFLAG_NONE,'selCatalogItemById',$page->param('parent_entry_id')) ;
+	#	$page->field('parent_entry_id', $parentEntry->{name});
+	#}
+	$page->field('parent_entry_id',$page->param('parent_entry_id'));
 	$page->field('entry_type', 100);
 	$page->field('status', 1);
 	$page->field('cost_type', 1);
@@ -402,7 +402,7 @@ sub execute
 		_debug => 0
 		);
 
-	$page->param('_dialogreturnurl', '/search/catalog/detail/%param.internal_catalog_id%') if $command ne 'add';
+	$page->param('_dialogreturnurl', '/org/%session.org_id%/catalog?catalog=fee_schedule_detail&fee_schedule_detail=%param.internal_catalog_id%') if $command ne 'add';
 	$self->handlePostExecute($page, $command, $flags);
 }
 
