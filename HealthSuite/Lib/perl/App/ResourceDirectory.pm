@@ -626,7 +626,7 @@ $WORKLIST_CLASSES = {
         'feescheduledataentry' => {_class => 'App::Dialog::FeeScheduleDataEntry',heading => '$Command Fee Schedule Entry', _arl => ['feeschedules'], _arl_modify => ['feeschedules'], _idSynonym => 'FeeScheduleDataEntry'},
 	'adjustment' => 'App::Dialog::Adjustment',
 	'postpayment' => {_class => 'App::Dialog::PostGeneralPayment', heading => 'Add Personal Payment'},
-	'postbatchpayment' => {_class => 'App::Dialog::PostGeneralPayment', heading => 'Add Batch Payments', isBatch => 1},
+	'postbatchpayment' => {_class => 'App::Dialog::PostGeneralPayment', heading => 'Add Batch Payments'},
 	'postinvoicepayment' => 'App::Dialog::PostInvoicePayment',
 	'postrefund' => 'App::Dialog::PostRefund',
 	'posttransfer' => 'App::Dialog::PostTransfer',
