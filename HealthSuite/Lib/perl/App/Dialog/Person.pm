@@ -187,7 +187,7 @@ sub makeStateChanges
 		my $nameLast = $page->field('name_last');
 		my $perId = $nameFirstLast->{person_id};
 
-		if ($nameFirst eq $checkfirst && $nameLast eq $checklast && $personId ne $perId && $attrflag->{value_int} eq '')
+		if ($nameFirst eq $checkfirst && $nameLast eq $checklast && $personId ne $perId && $attrflag->{value_int} eq '' && $command eq 'add')
 		{
 			$self->updateFieldFlags('create_record', FLDFLAG_INVISIBLE, 0);
 			unless ($page->field('create_record'))
@@ -613,16 +613,29 @@ sub handleAttrs
 				_debug => 0
 	) if ($page->field('emp_id') ne '' && $member eq 'Nurse');
 
-	#my $assocCommand = $page->field('assoc_phy_item_id') eq '' ? 'add' : 'update';
-	#$page->schemaAction(
-	#		'Person_Attribute', $assocCommand,
-	#		parent_id => $page->field('person_id'),
-	#		item_name => 'Physician',
-	#		item_id   => $page->field('assoc_phy_item_id') || undef,
-	#		value_type => App::Universal::ATTRTYPE_RESOURCEPERSON,
-	#		value_text => $page->field('value_text') || undef,
-	#		_debug => 0
-	#) if $page->field('value_text') ne '';
+	my $commandAcct = $command eq 'update' &&  $page->field('acct_item_id') eq '' ? 'add' : $command;
+	$page->schemaAction(
+			'Person_Attribute', $commandAcct,
+			parent_id => $personId || undef,
+			item_id => $page->field('acct_item_id') || undef,
+			parent_org_id => $page->session('org_internal_id') ||undef,
+			item_name => 'Patient/Account Number',
+			value_type => 0,
+			value_text => $page->field('acct_number') || undef,
+			_debug => 0
+	) if $page->field('acct_number') ne '';
+
+	my $commandChart = $command eq 'update' &&  $page->field('chart_item_id') eq '' ? 'add' : $command;
+	$page->schemaAction(
+		'Person_Attribute', $commandChart,
+		parent_id => $personId || undef,
+		item_id => $page->field('chart_item_id') || undef,
+		parent_org_id => $page->session('org_internal_id') ||undef,
+		item_name => 'Patient/Chart Number',
+		value_type => 0,
+		value_text => $page->field('chart_number') || undef,
+		_debug => 0
+	) if $page->field('chart_number') ne '';
 }
 
 sub customValidate
