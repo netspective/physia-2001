@@ -57,13 +57,18 @@ sub initialize
 						style => 'multicheck',
 						hints => "You may choose more than one 'Person Type'."
 				),
-
+				
+		new CGI::Dialog::MultiField(caption =>'Job Title/Code', name => 'job_code',
+			fields => [
+					new CGI::Dialog::Field(caption => 'Job Title', name => 'job_title'),
+					new CGI::Dialog::Field(caption => 'Code', name => 'job_code'),
+				]),
 							
 		new CGI::Dialog::MultiField(caption =>'Account/Chart Number', name => 'acct_chart_num',
 			fields => [
-						new CGI::Dialog::Field(caption => 'Account Number', name => 'acct_number', readOnlyWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE),
-						new CGI::Dialog::Field(caption => 'Chart Number', name => 'chart_number', readOnlyWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE),
-					]),
+					new CGI::Dialog::Field(caption => 'Account Number', name => 'acct_number', readOnlyWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE),
+					new CGI::Dialog::Field(caption => 'Chart Number', name => 'chart_number', readOnlyWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE),
+				]),
 
 		new CGI::Dialog::Subhead(heading => 'General Information', name => 'gen_info_heading'),
 
@@ -79,8 +84,8 @@ sub initialize
 
 		new CGI::Dialog::MultiField(caption =>'Gender / Marital Status',
 			fields => [
-				new CGI::Dialog::Field(type=> 'enum', enum => 'Gender', caption => 'Gender', name => 'gender', options => FLDFLAG_REQUIRED),
-				new CGI::Dialog::Field(type=> 'enum', enum => 'Marital_Status', caption => 'Marital Status', name => 'marital_status'),
+					new CGI::Dialog::Field(type=> 'enum', enum => 'Gender', caption => 'Gender', name => 'gender', options => FLDFLAG_REQUIRED),
+					new CGI::Dialog::Field(type=> 'enum', enum => 'Marital_Status', caption => 'Marital Status', name => 'marital_status'),
 				]),
 
 		new CGI::Dialog::Field(type=> 'enum', enum => 'Blood_Type', caption => 'Blood Type', name => 'blood_type', invisibleWhen => CGI::Dialog::DLGFLAG_REMOVE),
@@ -174,6 +179,8 @@ sub makeStateChanges
 		$page->field('person_id', $personId);
 		#$self->setFieldFlags('person_id', FLDFLAG_READONLY);
 	}
+	
+	$self->updateFieldFlags('job_code', FLDFLAG_INVISIBLE, 1) if $command eq 'remove' || $command eq 'update';	
 }
 
 sub populateData
@@ -392,7 +399,9 @@ sub handleRegistry
 				_debug => 0
 			) if $member ne 'patient';
 	}
-
+	
+	handleAttrs($self, $page, $command, $flags, $member, $personId);
+	
 	$member = lc($member);
 	if($page->field('delete_record'))
 	{
@@ -401,19 +410,27 @@ sub handleRegistry
 	else
 	{
 		$self->handlePostExecute($page, $command, $flags);
-	}
+	}	
+}
+
+
+}
+
+sub handleAttrs
+{
+	my ($self, $page, $command, $flags, $member, $personId) = @_;
 	
 	$page->schemaAction(
-		'Person_Attribute', $command,
-		parent_id => $personId || undef,
-		item_id => $page->field('phy_type_item_id') || undef,
-		parent_org_id => $page->session('org_id') ||undef,
-		item_name => 'Physician/Type',
-		value_type => 0,
-		value_text => $page->field('physician_type') || undef,
-		_debug => 0
-	) if $page->field('physician_type') ne '';
-	
+			'Person_Attribute', $command,
+			parent_id => $personId || undef,
+			item_id => $page->field('phy_type_item_id') || undef,
+			parent_org_id => $page->session('org_id') ||undef,
+			item_name => 'Physician/Type',
+			value_type => 0,
+			value_text => $page->field('physician_type') || undef,
+			_debug => 0
+			) if $page->field('physician_type') ne '';
+		
 	$page->schemaAction(
 			'Person_Attribute', $command,
 			parent_id => $personId || undef,			
@@ -421,7 +438,18 @@ sub handleRegistry
 			item_name => 'Misc Notes' ,
 			value_text => $page->field('misc_notes') || undef,
 			_debug => 0
-	) if $page->field('misc_notes') ne '';
+			) if $page->field('misc_notes') ne '';
+			
+	$page->schemaAction(
+			'Person_Attribute', $command,
+			parent_id => $personId || undef,			
+			parent_org_id => $page->session('org_id') ||undef,
+			item_name => 'Job Code' ,
+			value_text => $page->field('job_code') || undef,
+			value_textB => $page->field('job_title') || undef,
+			_debug => 0
+			) if ($page->field('job_code') ne '' || $page->field('job_title') ne '');
+	
 }
 
 sub customValidate
