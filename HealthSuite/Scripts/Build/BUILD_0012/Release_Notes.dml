@@ -46,6 +46,13 @@
 		<deliverable id="694">
 			Fixed code to show up the alerts in the priority order
 		</deliverable>
-
+		
+		<deliverable id="874">
+			UI : In the 'Add Physician' dialog, all the license number fields have been deleted and 2 new sections called 
+			     'License ID Numbers' and 'Provider Numbers' have been added. These 2 sections have multifields with 
+			     the 'Facility ID' and 'License' field as drop-down list. If the License is entered, a new multifield will be automatically displayed below it.
+			     And a new dialog called 'Provider Numbers' is created under 'Certificate' component to add and update the 'Provider Numbers'. 
+		</deliverable>
+		
 	</deliverables>
 </release-notes>
