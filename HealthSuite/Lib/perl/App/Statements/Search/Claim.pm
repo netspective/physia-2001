@@ -57,17 +57,17 @@ $STMTRPTDEFN_DEFAULT =
 	[
 		{ head => 'ID', url => 'javascript:chooseEntry("#&{?}#")', hint => 'Created on: #10#' },
 		{ head => 'IC' },
-		{ head => 'Patient', url => '/person/#&{?}#/account' },
+		{ head => 'Patient', url => qq{javascript:chooseItem("/person/#&{?}#/account")}},
 		#{ head => 'Inv Date' },
 		{ head => 'Svc Date' },
 		{ head => 'Status' },
 		{ head => 'Payer', colIdx => 9,
 			dataFmt =>
 			{
-				0 => '<A HREF=\'/person/#5#/account\' STYLE="text-decoration:none">#5#</A>',
-				1 => '<A HREF=\'/person/#5#/account\' STYLE="text-decoration:none">#5#</A>',
-				2 => '<A HREF=\'/org/#5#/account\' STYLE="text-decoration:none">#5#</A>',
-				3 => '<A HREF=\'/org/#5#/account\' STYLE="text-decoration:none">#5#</A>',
+				0 => qq{<A HREF="javascript:chooseItem('/person/#5#/account')" STYLE="text-decoration:none">#5#</A>},
+				1 => qq{<A HREF="javascript:chooseItem('/person/#5#/account')" STYLE="text-decoration:none">#5#</A>},
+				2 => qq{<A HREF="javascript:chooseItem('/org/#5#/account')" STYLE="text-decoration:none">#5#</A>},
+				3 => qq{<A HREF="javascript:chooseItem('/org/#5#/account')" STYLE="text-decoration:none">#5#</A>},
 				'_DEFAULT' => '#5#',
 			},
 		},
