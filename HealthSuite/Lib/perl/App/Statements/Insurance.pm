@@ -546,15 +546,13 @@ $STMTMGR_INSURANCE = new App::Statements::Insurance(
 		FROM insurance
 		WHERE
 			product_name = ?
-			AND ins_org_id = ?
+			AND record_type = 1
 		},
 	'selNewPlanExists' => qq{
 		SELECT plan_name
 		FROM insurance
 		WHERE
-			product_name = ?
-			AND plan_name = ?
-			AND ins_org_id = ?
+			plan_name = ?
 			AND record_type = 2
 		},
 
