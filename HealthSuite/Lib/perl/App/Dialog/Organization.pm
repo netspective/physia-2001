@@ -69,6 +69,7 @@ sub initialize
 	my $orgIdCaption = 'Organization ID';
 
 	$self->addContent(
+		new CGI::Dialog::Field(type => 'hidden', name => 'business_hrs_id'),
 		new CGI::Dialog::Subhead(
 			heading => 'Profile Information',
 			name => 'gen_info_heading'
@@ -106,7 +107,7 @@ sub initialize
 		new CGI::Dialog::Field::TableColumn(
 			caption => 'Organization Name',
 			name => 'name_primary',
-			schema => $schema, 
+			schema => $schema,
 			column => 'Org.name_primary'
 		),
 		new CGI::Dialog::Field::TableColumn(
@@ -127,7 +128,6 @@ sub initialize
 		),
 		new CGI::Dialog::MultiField(
 			name => 'hours_and_tzone',
-			invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
 			fields => [
 				new CGI::Dialog::Field(
 					caption => 'Hours of Operation',
@@ -141,31 +141,69 @@ sub initialize
 					name => 'time_zone'),
 			],
 		),
-		new CGI::Dialog::MultiField(
-			name => 'phone_fax',
-			invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
-			fields => [
-				new CGI::Dialog::Field(
-					caption => 'Phone',
-					type=>'phone',
-					name => 'phone',
-					options => FLDFLAG_REQUIRED,
-					invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
-				),
-				new CGI::Dialog::Field(
-					caption => 'Fax',
-					type=>'phone',
-					name => 'fax',
-					invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
-				),
-			],
-		),
-		new App::Dialog::Field::Address(
-			caption=>'Mailing Address',
-			name => 'address',
-			options => FLDFLAG_REQUIRED,
-			invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
-		),
+	);
+
+	if ($self->{orgtype} eq 'insurance')
+	{
+		$self->addContent(
+			new CGI::Dialog::MultiField(
+				name => 'phone_fax',
+				invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
+				fields => [
+					new CGI::Dialog::Field(
+						caption => 'Phone',
+						type=>'phone',
+						name => 'phone',
+						invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
+					),
+					new CGI::Dialog::Field(
+						caption => 'Fax',
+						type=>'phone',
+						name => 'fax',
+						invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
+					),
+				],
+			),
+			new App::Dialog::Field::Address(
+				caption=>'Mailing Address',
+				name => 'address',
+				invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
+			),
+		);
+	}
+
+	elsif ($self->{orgtype} ne 'insurance')
+	{
+		$self->addContent(
+			new CGI::Dialog::MultiField(
+				name => 'phone_fax',
+				invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
+				fields => [
+					new CGI::Dialog::Field(
+						caption => 'Phone',
+						type=>'phone',
+						name => 'phone',
+						options => FLDFLAG_REQUIRED,
+						invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
+					),
+					new CGI::Dialog::Field(
+						caption => 'Fax',
+						type=>'phone',
+						name => 'fax',
+						invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
+					),
+				],
+			),
+			new App::Dialog::Field::Address(
+				caption=>'Mailing Address',
+				name => 'address',
+				options => FLDFLAG_REQUIRED,
+				invisibleWhen => CGI::Dialog::DLGFLAG_UPDORREMOVE,
+			),
+		);
+	}
+
+	$self->addContent(
 		new CGI::Dialog::Field(
 			caption => 'Email',
 			type=>'email',
@@ -374,7 +412,7 @@ sub populateData
 	}
 
 	return unless $flags & CGI::Dialog::DLGFLAG_UPDORREMOVE_DATAENTRY_INITIAL;
- 
+
 	my $orgId = $page->param('org_id') ? $page->param('org_id') : $page->session('org_id');
 	my $ownerOrg = $page->session('org_internal_id');
 	my $orgIntId = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgId', $ownerOrg, $orgId);
@@ -384,7 +422,7 @@ sub populateData
 	{
 		$page->field(lc($_), $orgData->{$_});
 	}
-	
+
 	my $parentId = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selId', $orgData->{parent_org_id});
 	$page->field('parent_org_id', $parentId);
 
@@ -409,6 +447,13 @@ sub populateData
 	);
 	$page->field('medicare_gpci', $attribute->{value_text});
 	$page->field('medicare_facility_type', $attribute->{value_int});
+
+	my $businessAttribute = $STMTMGR_ORG->getRowAsHash($page, STMTMGRFLAG_NONE,
+		'selAttributeByItemNameAndValueTypeAndParent', $orgIntId, 'Business Hours',
+		App::Universal::ATTRTYPE_ORGGENERAL
+	);
+	$page->field('business_hours', $businessAttribute->{value_text});
+	$page->field('business_hrs_id', $businessAttribute->{item_id});
 }
 
 
@@ -423,31 +468,26 @@ sub execute_add
 	{
 		$parentId = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgId', $ownerOrg, $parentId);
 	}
-	my $taxId = $page->field('tax_id');
-	if ($parentId && !$taxId)
-	{
-		$taxId = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selTaxId', $parentId);
-	}
-	
+
 	#Group all add transactions together
 	$page->beginUnitWork("Unable to add Organization");
 	## First create new Org record
 	my $orgIntId = $page->schemaAction(
 			'Org', $command,
-			org_id => $orgId,
-			parent_org_id => $parentId,
-			owner_org_id => $ownerOrg,
-			tax_id => $taxId,
+			org_id => $orgId || undef,
+			parent_org_id => $parentId || undef,
+			owner_org_id => $ownerOrg || undef,
+			tax_id => $page->field('tax_id') || undef,
 			name_primary => $page->field('name_primary') || undef,
 			name_trade => $page->field('name_trade') || undef,
 			time_zone => $page->field('time_zone') || undef,
 			category => join(',', @members) || undef,
 			_debug => 0
 		);
-		
+
 	# Retrieve the new Org's internal ID
 	#my $orgIntId = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgId', $ownerOrg, $orgId);
-	
+
 	# Special handling of "Main" orgs
 	if ($self->{orgtype} eq 'main')
 	{
@@ -632,9 +672,9 @@ sub execute_add
 	);
 
 	$page->param('_dialogreturnurl', "/org/$orgId/profile");
-	
+
 	$page->endUnitWork();
-	
+
 	$self->handlePostExecute($page, $command, $flags);
 	return '';
 }
@@ -652,12 +692,7 @@ sub execute_update
 	{
 		$parentId = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selOrgId', $ownerOrg, $parentId);
 	}
-	my $taxId = $page->field('tax_id');
-	if ($parentId && !$taxId)
-	{
-		$taxId = $STMTMGR_ORG->getSingleValue($page, STMTMGRFLAG_NONE, 'selTaxId', $parentId);
-	}
-	
+
 	#Group all update transactions together
 	$page->beginUnitWork("Unable to update Organization");
 	## First update new Org record
@@ -665,13 +700,24 @@ sub execute_update
 			'Org', $command,
 			org_internal_id => $orgIntId,
 			parent_org_id => $parentId || undef,
-			tax_id => $taxId || undef,
+			tax_id => $page->field('tax_id') || undef,
 			name_primary => $page->field('name_primary') || undef,
 			name_trade => $page->field('name_trade') || undef,
 			time_zone => $page->field('time_zone') || undef,
 			category => join(',', @members) || undef,
 			_debug => 0
 		);
+
+	my $busHrsCommand = $page->field('business_hrs_id') eq '' ? 'add' : $command;
+	$page->schemaAction(
+			'Org_Attribute', $busHrsCommand,
+			parent_id => $orgIntId,
+			item_id => $page->field('business_hrs_id') || undef,
+			item_name => 'Business Hours',
+			value_type => App::Universal::ATTRTYPE_ORGGENERAL,
+			value_text => $page->field('business_hours') || undef,
+			_debug => 0
+		) if $page->field('business_hours') ne '';
 
 	saveAttribute($page, 'Org_Attribute', $orgIntId, 'HCFA Service Place', App::Universal::ATTRTYPE_INTEGER,
 		value_text => $page->field('hcfa_service_place'),
