@@ -1049,7 +1049,7 @@ sub getHtml
 		if($paidBy eq 'insurance')
 		{
 			#create html for suppressing line items
-			my $isSuppressed = $page->param("_f_item_$line\_suppress") == 1 ? 'CHECKED' : '';
+			my $isSuppressed = $page->param("_f_item_$line\_suppress") eq 'on' ? 'CHECKED' : '';
 			$itemSuppressHtml = $itemType != App::Universal::INVOICEITEMTYPE_ADJUST ? 
 				qq{<TD ALIGN=RIGHT><INPUT TYPE="CHECKBOX" NAME='_f_item_$line\_suppress' $isSuppressed></TD>}
 				: qq{<TD><FONT SIZE=1>&nbsp;</FONT></TD>};

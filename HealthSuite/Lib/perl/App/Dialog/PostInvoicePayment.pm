@@ -229,13 +229,18 @@ sub populateData
 
 	$page->field('batch_date', $page->param('_p_batch_date'));
 
+	return unless $flags & CGI::Dialog::DLGFLAG_DATAENTRY_INITIAL;
+
 	my $procedures = $STMTMGR_INVOICE->getRowsAsHashList($page, STMTMGRFLAG_NONE, 'selInvoiceProcedureItems', $invoiceId, App::Universal::INVOICEITEMTYPE_SERVICE, App::Universal::INVOICEITEMTYPE_LAB);
 	my $totalProcs = scalar(@{$procedures});
 	foreach my $idx (0..$totalProcs-1)
 	{
 		#NOTE: data_num_b indicates that the line item was suppressed
 		my $line = $idx + 1;
-		$page->param("_f_item_$line\_suppress", $procedures->[$idx]->{data_num_b});
+		if($procedures->[$idx]->{data_num_b} == 1)
+		{
+			$page->param("_f_item_$line\_suppress", 'on');
+		}
 	}
 }
 
@@ -269,7 +274,7 @@ sub execute
 		#update item if it is being suppressed
 		if($itemId)
 		{
-			my $isSuppressed = $page->param("_f_item_$line\_suppress") ? 1 : 0;
+			my $isSuppressed = $page->param("_f_item_$line\_suppress") eq 'on' ? 1 : 0;
 			$page->schemaAction(
 				'Invoice_Item', 'update',
 				item_id => $itemId || undef,
