@@ -303,8 +303,8 @@ sub customValidate
 		}
 		else
 		{
-			my $createPersonHref = qq{javascript:doActionPopup('/org-p/#session.org_id#/dlg-add-patient ',null,null,['_f_person_id'],['_f_insured_id']);};
-			my $invMsg = qq{$insuredIdField->{caption} is required when Relationship is not 'Self'.  <a href="$createPersonHref">Create A New Person ID?</a> };
+			my $createPersonHref = qq{javascript:doActionPopup('/org-p/#session.org_id#/dlg-add-insured-Person ',null,null,['_f_person_id'],['_f_insured_id']);};
+			my $invMsg = qq{$insuredIdField->{caption} is required when Relationship is not 'Self'.  <a href="$createPersonHref">Create A New Insured Person ID?</a> };
 			$insuredIdField->invalidate($page, $invMsg)
 		}
 	}
