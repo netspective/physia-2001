@@ -303,6 +303,7 @@
 		<enum>Fee Schedule</enum>
 		<enum>Service Type</enum>
 		<enum>Misc Procedure</enum>
+		<enum>Contract Schedule</enum>
 	</table>
 
 	<table name="Catalog_Entry_Status" abbrev="CatItmSt" type="Enumeration">
