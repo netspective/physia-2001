@@ -2,12 +2,13 @@
 package App::Billing::Claim::Treatment;
 ##############################################################################
 
-use strict;
-
-use constant DATEFORMAT_USA => 1;
 #
 # this object encapsulates a single "treatment" item in the HCFA 1500
 #
+
+use strict;
+
+use constant DATEFORMAT_USA => 1;
 
 sub new
 {
@@ -17,23 +18,25 @@ sub new
 	$params{dateOfSameOrSimilarIllness} = undef;
 	$params{datePatientUnableToWorkFrom} = undef;
 	$params{datePatientUnableToWorkTo} = undef;
-	$params{nameOfReferingPhysicianOrOther} = undef;
-	$params{idOfReferingPhysician} = undef;
 	$params{hospitilizationDateFrom} = undef;
 	$params{hospitilizationDateTo} = undef;
-	$params{reservedForLocalUse} = undef;
 	$params{outsideLab} = undef;
 	$params{outsideLabCharges} = undef;
 	$params{medicaidResubmission} = undef;
 	$params{resubmissionReference} = undef;
 	$params{priorAuthorizationNo} = undef;
 
+	# This has to be moved in Claim as Referring Physician
+
+	$params{idOfReferingPhysician} = undef;
 	$params{refProviderLastName} = undef;
 	$params{refProviderFirstName} = undef;
 	$params{refProviderMiName} = undef;
-	$params{referingPhysicianIDIndicator} = undef;
+	$params{referingPhysicianIDIndicator} = undef; # Only for Envoy
 	$params{referingPhysicianState} = undef;
 	$params{id} = undef;
+
+	# TWCC Values
 
 	$params{returnToLimitedWorkAnticipatedDate} = undef;
 	$params{maximumImpovementAnticipatedDate} = undef;
@@ -69,8 +72,6 @@ sub new
 	return bless \%params, $type;
 }
 
-
-
 sub setId
 {
 	my ($self,$value) = @_;
@@ -83,7 +84,6 @@ sub getId
 	return $self->{id};
 }
 
-
 sub setReferringProvider
 {
 	my ($self, $value) = @_;
@@ -93,10 +93,8 @@ sub setReferringProvider
 sub getReferringProvider
 {
 	my ($self) = @_;
-
 	return $self->{referringProvider};
 }
-
 
 sub setReferringOrganization
 {
@@ -107,12 +105,8 @@ sub setReferringOrganization
 sub getReferringOrganization
 {
 	my ($self) = @_;
-
 	return $self->{referringOrganization};
 }
-
-
-
 
 sub setReferingPhysicianState
 {
@@ -132,20 +126,17 @@ sub setRefProviderMiName
 	$self->{refProviderMiName} = $value;
 }
 
-
 sub setRefProviderFirstName
 {
 	my ($self, $value) = @_;
 	$self->{refProviderFirstName} = $value;
 }
 
-
 sub setRefProviderLastName
 {
 	my ($self, $value) = @_;
 	$self->{refProviderLastName} = $value;
 }
-
 
 sub getReferingPhysicianState
 {
@@ -167,13 +158,11 @@ sub getRefProviderMiName
 	return $self->{refProviderMiName};
 }
 
-
 sub getRefProviderFirstName
 {
 	my $self = shift;
 	return $self->{refProviderFirstName};
 }
-
 
 sub getRefProviderLastName
 {
@@ -188,13 +177,11 @@ sub property
 	return $self->{$name};
 }
 
-
 sub getResubmissionReference
 {
 	my $self = shift;
 	return $self->{resubmissionReference};
 }
-
 
 sub setResubmissionReference
 {
@@ -202,40 +189,28 @@ sub setResubmissionReference
 	$self->{resubmissionReference} =  $value;
 }
 
-
 sub getDateOfIllnessInjuryPregnancy
 {
 	my ($self, $formatIndicator) = @_;
-
 	return (DATEFORMAT_USA == $formatIndicator) ? $self->convertDateToMMDDYYYYFromCCYYMMDD($self->{dateOfIllnessInjuryPregnancy}) : $self->{dateOfIllnessInjuryPregnancy};
 }
 
 sub getDateOfSameOrSimilarIllness
 {
 	my ($self, $formatIndicator) = @_;
-
 	return (DATEFORMAT_USA == $formatIndicator) ? $self->convertDateToMMDDYYYYFromCCYYMMDD($self->{dateOfSameOrSimilarIllness}) : $self->{dateOfSameOrSimilarIllness};
 }
 
 sub getDatePatientUnableToWorkFrom
 {
 	my ($self, $formatIndicator) = @_;
-
 	return (DATEFORMAT_USA == $formatIndicator) ? $self->convertDateToMMDDYYYYFromCCYYMMDD($self->{datePatientUnableToWorkFrom}) : $self->{datePatientUnableToWorkFrom};
 }
 
 sub getDatePatientUnableToWorkTo
 {
 	my ($self, $formatIndicator) = @_;
-
 	return (DATEFORMAT_USA == $formatIndicator) ? $self->convertDateToMMDDYYYYFromCCYYMMDD($self->{datePatientUnableToWorkTo}) : $self->{datePatientUnableToWorkTo};
-}
-
-sub getNameOfReferingPhysicianOrOther
-{
-	my $self = shift;
-
-	return $self->getRefProviderLastName . $self->getRefProviderFirstName . $self->getRefProviderMiName;
 }
 
 sub getIDOfReferingPhysician
@@ -247,21 +222,13 @@ sub getIDOfReferingPhysician
 sub getHospitilizationDateFrom
 {
 	my ($self, $formatIndicator) = @_;
-
 	return (DATEFORMAT_USA == $formatIndicator) ? $self->convertDateToMMDDYYYYFromCCYYMMDD($self->{hospitilizationDateFrom}) : $self->{hospitilizationDateFrom};
 }
 
 sub getHospitilizationDateTo
 {
 	my ($self, $formatIndicator) = @_;
-
 	return (DATEFORMAT_USA == $formatIndicator) ? $self->convertDateToMMDDYYYYFromCCYYMMDD($self->{hospitilizationDateTo}) : $self->{hospitilizationDateTo};
-}
-
-sub getReservedForLocalUse
-{
-	my $self = shift;
-	return $self->{reservedForLocalUse};
 }
 
 sub getOutsideLab
@@ -293,7 +260,6 @@ sub setDateOfIllnessInjuryPregnancy
 	my ($self,$value) = @_;
 	$value =~ s/  00:00:00//;
 	$value = $self->convertDateToCCYYMMDD($value);
-
 	$self->{dateOfIllnessInjuryPregnancy} = $value;
 }
 
@@ -302,7 +268,6 @@ sub setDateOfSameOrSimilarIllness
 	my ($self,$value) = @_;
 	$value =~ s/  00:00:00//;
 	$value = $self->convertDateToCCYYMMDD($value);
-
 	$self->{dateOfSameOrSimilarIllness} = $value;
 }
 
@@ -311,7 +276,6 @@ sub setDatePatientUnableToWorkFrom
 	my ($self,$value) = @_;
 	$value =~ s/  00:00:00//;
 	$value = $self->convertDateToCCYYMMDD($value);
-
 	$self->{datePatientUnableToWorkFrom} = $value;
 }
 
@@ -321,15 +285,7 @@ sub setDatePatientUnableToWorkTo
 	my ($self,$value) = @_;
 	$value =~ s/  00:00:00//;
 	$value = $self->convertDateToCCYYMMDD($value);
-
 	$self->{datePatientUnableToWorkTo} = $value;
-}
-
-sub setNameOfReferingPhysicianOrOther
-{
-	my ($self,$value) = @_;
-
-	$self->{nameOfReferingPhysicianOrOther} = $value;
 }
 
 sub setIDOfReferingPhysician
@@ -343,7 +299,6 @@ sub setHospitilizationDateFrom
 	my ($self,$value) = @_;
 	$value =~ s/  00:00:00//;
 	$value = $self->convertDateToCCYYMMDD($value);
-
 	$self->{hospitilizationDateFrom} = $value;
 }
 
@@ -352,14 +307,7 @@ sub setHospitilizationDateTo
 	my ($self,$value) = @_;
 	$value =~ s/  00:00:00//;
 	$value = $self->convertDateToCCYYMMDD($value);
-
 	$self->{hospitilizationDateTo} = $value;
-}
-
-sub setReservedForLocalUse
-{
-	my ($self,$value) = @_;
-	$self->{reservedForLocalUse} = $value;
 }
 
 sub setOutsideLab
@@ -389,12 +337,12 @@ sub setPriorAuthorizationNo
 sub convertDateToCCYYMMDD
 {
 	my ($self, $date) = @_;
-	my $monthSequence = {JAN => '01', FEB => '02', MAR => '03', APR => '04',
-				   		 MAY => '05', JUN => '06', JUL => '07', AUG => '08',
-				 		 SEP => '09', OCT => '10', NOV => '11',	DEC => '12'
-						};
-
-
+	my $monthSequence =
+	{
+		JAN => '01', FEB => '02', MAR => '03', APR => '04',
+		MAY => '05', JUN => '06', JUL => '07', AUG => '08',
+		SEP => '09', OCT => '10', NOV => '11',	DEC => '12'
+	};
 	$date =~ s/-//g;
 	if(length($date) == 7)
 	{
@@ -404,13 +352,11 @@ sub convertDateToCCYYMMDD
 	{
 		return substr($date,5,4) . $monthSequence->{uc(substr($date,2,3))} . substr($date,0,2);
 	}
-
 }
 
 sub convertDateToMMDDYYYYFromCCYYMMDD
 {
 	my ($self, $date) = @_;
-
 	if ($date ne "")
 	{
 		return substr($date,4,2) . '/' . substr($date,6,2) . '/' . substr($date,0,4) ;
@@ -420,7 +366,6 @@ sub convertDateToMMDDYYYYFromCCYYMMDD
 		return "";
 	}
 }
-
 
 sub getReturnToLimitedWorkAnticipatedDate
 {
@@ -451,7 +396,6 @@ sub getPastMedicalHistory
 	my $self = shift;
 	return $self->{pastMedicalHistory};
 }
-
 
 sub getClinicalFindings
 {
@@ -572,7 +516,6 @@ sub getDoctorType
 	my $self = shift;
 	return $self->{doctorType};
 }
-
 
 sub getExaminingDoctorType
 {
@@ -706,7 +649,6 @@ sub setReasonForReport
 	$self->{reasonForReport} = $value;
 }
 
-
 sub setChangeInCondition
 {
 	my ($self,$value) = @_;
@@ -761,6 +703,4 @@ sub setImpairmentRatingAgreement
 	$self->{impairmentRatingAgreement} = $value;
 }
 
-
 1;
-

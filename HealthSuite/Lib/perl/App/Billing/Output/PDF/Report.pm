@@ -187,5 +187,22 @@ sub textSplit
 	return ($first, $rest);
 }
 
+sub drawImageJPEG
+{
+	my($self, $p, $properties) = @_;
+	my $scale = $properties->{'scale'} eq "" ? 1 : $properties->{'scale'};
+	
+	my $tmp = pdflib::PDF_open_JPEG($p, $properties->{'imagePath'});
+	pdflib::PDF_place_image($p, $tmp, $properties->{'x'}, $properties->{'y'}, $scale);
+}
+
+sub drawFilledRectangle
+{
+	my($self, $p, $properties) = @_;
+
+	$self->setColor($p, $properties);
+	pdflib::PDF_rect($p, $properties->{'x'}, $properties->{'y'}, $properties->{'width'}, -1 * $properties->{'height'});
+	pdflib::PDF_closepath_fill_stroke($p);
+}
 
 1;
