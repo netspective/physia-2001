@@ -6,6 +6,7 @@ use strict;
 use App::Page;
 use App::Universal;
 use Exporter;
+use DBI::StatementManager;
 
 use vars qw(@ISA @EXPORT);
 @ISA = qw(Exporter App::Page);
@@ -517,13 +518,165 @@ sub prepare_view_table
 	return prepare_view_tables(@_);
 }
 
+#---------------------------------------------------------------------------------
+
+sub getStmtMgrsList
+{
+	my ($self, $type, $size) = @_;
+
+	my $rows = "";
+	foreach my $stMgrObjId (sort keys %{$ALL_STMT_MANAGERS})
+	{
+		my $stMgrObjName = $stMgrObjId;
+		$stMgrObjName =~ s/^App::Statements:://;
+		$rows .= $type eq 'select' ?
+			"<option value='/sde/stmgr/$stMgrObjId'>$stMgrObjName</option>" :
+			"<a href='/sde/stmgr/$stMgrObjId'>$stMgrObjName</a><BR>";
+			;
+	}
+
+	return $type eq 'select' ? qq{
+		<SELECT @{[ $size ? "SIZE='$size'" : '']} ONCLICK='if(this.selectedIndex > 0) window.location.href = this.options[this.selectedIndex].value'>
+		<OPTION SELECTED>Choose Statement Manager</OPTION>
+		$rows
+		</SELECT>
+	} : $rows;
+}
+
+sub getStmtsList
+{
+	my ($self, $stMgrId, $stMgr, $type, $size) = @_;
+
+	my $rows = "";
+	foreach my $stmtId (sort keys %{$stMgr})
+	{
+		# ignore "private" variables
+		next if $stmtId =~ m/^_/;
+		next if $stmtId =~ m/^publishDefn/;
+
+		$rows .= $type eq 'select' ?
+			"<option value='/sde/stmgr/$stMgrId/$stmtId'>$stmtId</option>" :
+			"<a href='/sde/stmgr/$stMgrId/$stmtId'>$stmtId</a><font color=#555555><pre>@{[ $stMgr->{$stmtId} ]}</pre></font><P>";
+			;
+	}
+
+	return $type eq 'select' ? qq{
+		<SELECT @{[ $size ? "SIZE='$size'" : '']} ONCLICK='if(this.selectedIndex > 0) window.location.href = this.options[this.selectedIndex].value'>
+		<OPTION SELECTED>Choose Statement</OPTION>
+		$rows
+		</SELECT>
+	} : $rows;
+}
+
+sub prepare_view_stmgrs
+{
+	my $self = shift;
+	my @pathItems = $self->param('arl_pathItems');
+
+	$self->addLocatorLinks(['Statement Managers', '/sde/stmgrs']);
+	my $allMgrs = $self->getStmtMgrsList('select');
+
+	if(scalar @pathItems == 1)
+	{
+		$self->addContent(qq{
+				<TABLE WIDTH=100% BGCOLOR=LIGHTSTEELBLUE BORDER=0 CELLPADDING=3 CELLSPACING=0>
+				<TR><TD><font size=4 color=darkred face="arial,helvetica">Statement Managers</font></TD><TD ALIGN=RIGHT>$allMgrs</TD></TR>
+				</TABLE>
+			<P>
+			@{[ $self->getStmtMgrsList() ]}
+			});
+	}
+	elsif(scalar @pathItems == 2)
+	{
+		my $stMgrObjId = $pathItems[1];
+		my $stMgrObj = $ALL_STMT_MANAGERS->{$stMgrObjId};
+		$self->addLocatorLinks([$stMgrObjId, '/sde/stmgr/' . $stMgrObjId]);
+		$self->addContent(qq{
+				<TABLE WIDTH=100% BGCOLOR=LIGHTSTEELBLUE BORDER=0 CELLPADDING=3 CELLSPACING=0>
+				<TR><TD><font size=4 color=darkred face="arial,helvetica">$stMgrObjId</font></TD><TD ALIGN=RIGHT>$allMgrs</TD></TR>
+				</TABLE>
+			<P>
+			@{[ $self->getStmtsList($stMgrObjId, $stMgrObj) ]}
+			});
+	}
+	elsif(scalar @pathItems == 3)
+	{
+		my $stMgrObjId = $pathItems[1];
+		my $stMgrObj = $ALL_STMT_MANAGERS->{$stMgrObjId};
+		my $stmtId = $pathItems[2];
+		my $stmtObj = $stMgrObj->{$stmtId};
+		my $sql = $self->param('query') || $stmtObj;
+
+		my @curBindValues = $self->param('bind_param');
+		my $run = $self->param('_run');
+
+		my $stmtHdl = undef;
+		my $bindParamsCount = 0;
+		my $bindInputsHtml = '';
+
+		eval
+		{
+			$stmtHdl = $self->{db}->prepare($sql);
+			for(my $i = 0; $i < $stmtHdl->{NUM_OF_PARAMS}; $i++)
+			{
+				$bindInputsHtml .= "Param @{[ $i + 1]}: <INPUT NAME='bind_param' VALUE='@{[ $curBindValues[$i] ]}' SIZE=45><BR>";
+			}
+		};
+		if($@ || ! $stmtHdl)
+		{
+			$self->addContent('<P><FONT COLOR=RED>', $@, '</FONT></P>');
+		}
+
+		my $output = '';
+		if($run)
+		{
+			$output = $stMgrObj->createHtml($self, 0, $stmtId, \@curBindValues);
+		}
+
+		$sql =~ s/^\s+//gm;
+		my @sqlLines = split(/\n/, $sql);
+		my $stmtLines = scalar(@sqlLines) + 3;
+
+		$self->addLocatorLinks([$stMgrObjId, "/sde/stmgr/$stMgrObjId"]);
+		$self->addLocatorLinks([$stmtId, "/sde/stmgr/$stMgrObjId/$stmtId"]);
+		$self->addContent(qq{
+				<TABLE WIDTH=100% BGCOLOR=LIGHTSTEELBLUE BORDER=0 CELLPADDING=3 CELLSPACING=0>
+				<TR><TD><font size=4 color=darkred face="arial,helvetica">Statement <b>$stmtId</b></font></TD><TD ALIGN=RIGHT>@{[ $self->getStmtsList($stMgrObjId, $stMgrObj, 'select') ]}</TD></TR>
+				</TABLE>
+				<P>
+				<form method="post" href="/">
+					<input type="hidden" name="_run" value="1">
+					$bindInputsHtml
+					<textarea name="query" cols=80 rows=$stmtLines>
+$sql
+					</textarea>
+					<br>
+					<input type="submit">
+				</form>
+				<P>
+				$output
+			});
+
+	}
+}
+
+sub prepare_view_stmgr
+{
+	prepare_view_stmgrs(@_);
+}
+
+#---------------------------------------------------------------------------------
+
 sub prepare
 {
 	my ($self) = @_;
 
 	$self->addContent(qq{
 		<P>
-		<A HREF='/sde/tables'>Database Design:</A> @{[ $self->getTableListAsSelect() ]}
+		<A HREF='/sde/tables'>Database Design</A><BR> @{[ $self->getTableListAsSelect() ]}<p>
+		<A HREF='/sde/stmgrs'>Statement Managers</A><BR> @{[ $self->getStmtMgrsList('select') ]}
+		<P>
+		<A HREF='/perl-status'>View active modules</A>
 		});
 }
 
