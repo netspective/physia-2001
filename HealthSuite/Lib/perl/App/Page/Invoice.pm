@@ -59,6 +59,7 @@ use vars qw(@ISA %RESOURCE_MAP);
 					{caption => 'Submit', name => 'submit',},
 					{caption => 'Review', name => 'review',},
 					{caption => 'Intellicode', name => 'intellicode',},
+					{caption => 'Adjustment', name => 'adjustment',},
 			],
 		},
 	);
