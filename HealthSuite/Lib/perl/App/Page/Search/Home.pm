@@ -151,7 +151,7 @@ sub prepare
 				</td><td>
 					<font face="arial,helvetica" size=2>
 						<b>Add</b> a new
-						<a href="/org/#session.org_id#/dlg-add-referral">Service Request</a>
+						<a href="/org/#session.org_id#/dlg-add-referral-person">Service Request</a>
 					</font>
 				</td></tr></table>
 			</center>
