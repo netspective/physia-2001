@@ -1,12 +1,13 @@
-create or replace function get_sqlprompt_f
+CREATE OR REPLACE
+Function     get_sqlprompt_f
 return varchar2
 is
 
 v_host_name varchar2(12);
-v_dbname varchar2(10);
+v_dbname varchar2(20);
 v_session_id varchar2(6);
 v_serial_nm varchar2(6);
-v_user_name varchar2(10);
+v_user_name varchar2(20);
 
 begin
 
@@ -25,3 +26,4 @@ return v_host_name||':'||v_dbname||':'||v_user_name||':'||v_session_id||':'||v_s
 end get_sqlprompt_f;
 /
 show errors;
+
