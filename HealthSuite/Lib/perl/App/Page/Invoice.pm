@@ -2045,6 +2045,9 @@ sub prepare_page_content_header
 	my $paperPrinted = App::Universal::INVOICESTATUS_PAPERCLAIMPRINTED;
 	my $awaitClientPayment = App::Universal::INVOICESTATUS_AWAITCLIENTPAYMENT;
 
+	#invoice flags
+	my $attrDataFlag = App::Universal::INVOICEFLAG_DATASTOREATTR;
+
 	#claim types
 	my $selfPay = App::Universal::CLAIMTYPE_SELFPAY;
 	my $workComp = App::Universal::CLAIMTYPE_WORKERSCOMP;
@@ -2062,6 +2065,7 @@ sub prepare_page_content_header
 	my $totalItems = $claim->getTotalItems();
 	my $invoiceBalance = $claim->{balance};
 	my $invoiceTotalAdj = $claim->{amountPaid};
+	my $invoiceFlags = $claim->{flags};
 
 	#check submission order of claim
 	my $submissionOrder;
@@ -2161,12 +2165,12 @@ sub prepare_page_content_header
 						@{[ $invType == $hcfaInvoiceType && ($submissionOrder->{value_int} == 0 || $invStatus > $submitted) && $invStatus != $submitted && $invStatus != $appealed && $invStatus != $void && $invStatus != $closed ? "<option value='/invoice/$invoiceId/dialog/claim/update'>Edit Claim</option>" : '' ]}
 						@{[ $invType == $genericInvoiceType && $invStatus != $void && $invStatus != $closed ? "<option value='/invoice/$invoiceId/dlg-update-invoice'>Edit Invoice</option>" : '' ]}
 
-						@{[ $invStatus < $submitted && ($claimType == $selfPay || $claimType == $thirdParty) && $totalItems > 0 ? "<option value='/invoice/$invoiceId/submit'>Submit for Billing</option>" : '' ]}
-						@{[ $invStatus < $submitted && $claimType != $selfPay && $totalItems > 0 && $invType == $hcfaInvoiceType ? "<option value='/invoice/$invoiceId/submit'>Submit Claim for Transfer</option>" : '' ]}
+						@{[ ($invStatus < $submitted || $invStatus == $paymentApplied) && ($claimType == $selfPay || $claimType == $thirdParty) && $totalItems > 0 ? "<option value='/invoice/$invoiceId/submit'>Submit for Billing</option>" : '' ]}
+						@{[ ! ($invoiceFlags & $attrDataFlag) && ($invStatus < $submitted || $invStatus == $paymentApplied) && $claimType != $selfPay && $totalItems > 0 && $invType == $hcfaInvoiceType ? "<option value='/invoice/$invoiceId/submit'>Submit Claim for Transfer</option>" : '' ]}
 
-						@{[ ( ($invStatus >= $rejectInternal && $invStatus <= $paper) || $invStatus == $rejectExternal || $invStatus == $paymentApplied || $invStatus == $paperPrinted ) && $claimType != $selfPay && $totalItems > 0 && $invType == $hcfaInvoiceType ? "<option value='/invoice/$invoiceId/submit?resubmit=1'>Resubmit Claim for Transfer to Current Payer</option>" : '' ]}
-						@{[ ( ($invStatus >= $rejectInternal && $invStatus <= $paper) || $invStatus == $rejectExternal || $invStatus == $awaitInsPayment || $invStatus == $paymentApplied || $invStatus == $paperPrinted ) && $claimType != $selfPay && $totalItems > 0 && $invType == $hcfaInvoiceType ? "<option value='/invoice/$invoiceId/submit?resubmit=2'>Submit Claim for Transfer to Next Payer</option>" : '' ]}
-						@{[ $invStatus == $appealed || ($invStatus != $onHold && $invStatus < $transferred) ? "<option value='/invoice/$invoiceId/dialog/hold'>Place Claim On Hold</option>" : '' ]}
+						@{[ ( ($invStatus >= $rejectInternal && $invStatus <= $paper) || $invStatus == $rejectExternal || $invStatus == $paymentApplied || $invStatus == $paperPrinted ) && $invoiceFlags & $attrDataFlag && $claimType != $selfPay && $totalItems > 0 && $invType == $hcfaInvoiceType ? "<option value='/invoice/$invoiceId/submit?resubmit=1'>Resubmit Claim for Transfer to Current Payer</option>" : '' ]}
+						@{[ ( ($invStatus >= $rejectInternal && $invStatus <= $paper) || $invStatus == $rejectExternal || $invStatus == $paymentApplied || $invStatus == $paperPrinted || $invStatus == $awaitInsPayment  ) && $invoiceFlags & $attrDataFlag && $claimType != $selfPay && $totalItems > 0 && $invType == $hcfaInvoiceType ? "<option value='/invoice/$invoiceId/submit?resubmit=2'>Submit Claim for Transfer to Next Payer</option>" : '' ]}
+						@{[ $invStatus == $rejectInternal || $invStatus == $rejectExternal || $invStatus == $paymentApplied || $invStatus == $appealed || ($invStatus != $onHold && $invStatus < $transferred) ? "<option value='/invoice/$invoiceId/dialog/hold'>Place Claim On Hold</option>" : '' ]}
 
 						@{[ $invStatus < $submitted && $invType == $hcfaInvoiceType && ($noAdjsExist == 1 || $invoiceTotalAdj == 0) ? "<option value='/invoice/$invoiceId/dialog/claim/remove'>Void Claim</option>" : '' ]}
 						@{[ $invStatus < $submitted && $invType == $genericInvoiceType && ($noAdjsExist == 1 || $invoiceTotalAdj == 0) ? "<option value='/invoice/$invoiceId/dlg-remove-invoice'>Void Invoice</option>" : '' ]}
