@@ -184,7 +184,7 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 
 'person.miscNotes' => {
 	sqlStmt => qq{
-			select 	value_type, item_id, parent_id, item_name, value_text, value_date
+			select 	value_type, item_id, parent_id, item_name, value_text, %simpleDate:value_date%
 				from  Person_Attribute
 			where  	parent_id = ?
 			and item_name = 'Misc Notes'
@@ -232,6 +232,61 @@ $STMTMGR_COMPONENT_PERSON = new App::Statements::Component::Person(
 	publishComp_stp => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.miscNotes', [$personId], 'panel'); },
 	publishComp_stpe => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.miscNotes', [$personId], 'panelEdit'); },
 	publishComp_stpt => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.miscNotes', [$personId], 'panelTransp'); },
+},
+
+
+#----------------------------------------------------------------------------------------------------------------------------------------------------------
+
+'person.phoneMessage' => {
+	sqlStmt => qq{
+			select 	value_type, item_id, parent_id, item_name, value_text, %simpleDate:value_date%, value_textb
+				from  Person_Attribute
+			where  	parent_id = ?
+			and item_name = 'Phone Message'
+
+		},
+		sqlStmtBindParamDescr => ['Person ID for Attribute Table'],
+
+	publishDefn =>
+	{
+		columnDefn => [
+			{ dataFmt => 'Phone Message for #6# (#5#): #4#' },
+		],
+		bullets => 'stpe-#my.stmtId#/dlg-update-attr-#0#/#1#?home=/#param.arl#',
+		frame => { addUrl => 'stpe-#my.stmtId#/dlg-add-phone-message?home=/#param.arl#' },
+	},
+	publishDefn_panel =>
+	{
+		# automatically inherits columnDefn and other items from publishDefn
+		style => 'panel',
+		frame => { heading => 'Phone Message' },
+	},
+	publishDefn_panelTransp =>
+	{
+		# automatically inherits columnDefn and other items from publishDefn
+		style => 'panel.transparent',
+		inherit => 'panel',
+	},
+	publishDefn_panelEdit =>
+	{
+		# automatically inherits columnDefn and other items from publishDefn
+		style => 'panel.edit',
+		frame => { heading => 'Phone Message' },
+		banner => {
+			actionRows =>
+			[
+				{ caption => qq{ Add <A HREF= '#param.home#/../stpe-#my.stmtId#/dlg-add-phone-message?home=#param.home#'>Phone Message</A> } },
+			],
+		},
+		stdIcons =>	{
+			updUrlFmt => '#param.home#/../stpe-#my.stmtId#/dlg-update-attr-#0#/#1#?home=#param.home#', delUrlFmt => '#param.home#/../stpe-#my.stmtId#/dlg-remove-attr-#0#/#1#?home=#param.home#',
+		},
+	},
+
+	publishComp_st => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.phoneMessage', [$personId]); },
+	publishComp_stp => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.phoneMessage', [$personId], 'panel'); },
+	publishComp_stpe => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.phoneMessage', [$personId], 'panelEdit'); },
+	publishComp_stpt => sub { my ($page, $flags, $personId) = @_; $personId ||= $page->param('person_id'); $STMTMGR_COMPONENT_PERSON->createHtml($page, $flags, 'person.phoneMessage', [$personId], 'panelTransp'); },
 },
 
 
