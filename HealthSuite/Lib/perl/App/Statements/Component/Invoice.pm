@@ -227,32 +227,41 @@ $STMTMGR_COMPONENT_INVOICE = new App::Statements::Component::Invoice(
 
 'invoice.procAnalysis' => {
 	sqlStmt => qq{
-			select 	y.NAME,
-				y.DEPARTMENTNAME,
-				y.CPTCODE,
-				y.CPTNAME,
-				m.MONTHUNITS,
-				m.MONTHAMOUNT,
-				y.YEARUNITS,
-				y.YEARAMOUNT
-			from 	monthToDateReceiptProcAnalysis m, yearToDateReceiptProcAnalysis y
-			where	m.PROVIDERID(+) = y.PROVIDERID
-			and	m.CPTCODE(+) = y.CPTCODE
-			and	m.CPTNAME(+) = y.CPTNAME
-			and	m.DEPARTMENTNAME(+) = y.DEPARTMENTNAME
-			and 	y.PROVIDERID = ?
+			select p.short_sortable_name,
+			tt.caption as visit_type,
+			nvl(i.code,'UNK') as code,
+			nvl(r.name,'N/A') as proc,	
+			sum(decode(trunc(invoice_date,'MM'),trunc(to_date(:2,'MM/DD/YYYY'),'MM'),i.units,0)) as month_to_date_units,
+			sum(decode(trunc(invoice_date,'MM'),trunc(to_date(:2,'MM/DD/YYYY'),'MM'),i.unit_cost,0)) as month_to_date_unit_cost,
+			sum(i.units) as year_to_date_units,
+			sum(i.unit_cost) as year_to_date_unit_cost
+			from invoice_charges i
+			, ref_cpt r,person p, transaction t,
+			Transaction_type tt
+			where  r.CPT (+) = i.code
+			AND p.person_id= provider
+			AND (p.person_id = :1 OR :1 IS NULL)
+			AND trunc(i.invoice_date,'YYYY') =trunc(to_date(:2,'MM/DD/YYYY'),'YYYY')
+			AND (:3 IS NULL OR :3 = i.facility)
+			AND (:4 IS NULL OR :4 <=i.code) 
+			AND (:5 is NULL OR :5 >=i.code)
+			AND t.trans_id (+)= i.trans_id
+			AND tt.id (+)= t.trans_type
+			group by r.name,p.short_sortable_name,
+			i.code,tt.caption
+			order by p.short_sortable_name,tt.caption
 			},
 	sqlStmtBindParamDescr => ['Provider ID for yearToDateReceiptProcAnalysis View'],
 	publishDefn => {
 		columnDefn => [
-			{ colIdx => 0, head => 'Name', dataFmt => '#0#' },
-			{ colIdx => 1, head => 'Department Name', dataFmt => '#1#' },
-			{ colIdx => 2, head => 'CPT Code', dataFmt => '#2#' },
-			{ colIdx => 3, head => 'CPT Name', dataFmt => '#3#' },
-			{ colIdx => 4, head => 'Monthly Units', dataFmt => '#4#' },
-			{ colIdx => 5, head => 'Month To Date', dataFmt => '#5#' },
-			{ colIdx => 6, head => 'Yearly Units', dataFmt => '#6#' },
-			{ colIdx => 7, head => 'Year To Date', dataFmt => '#7#' },
+			{ colIdx => 0, head => 'Name', dataFmt => '#0#',groupBy=>"#0#",},
+			{ colIdx => 1, head => 'Visit Type', dataFmt => '#1#',groupBy=>"#1#" },
+			{ colIdx => 2, head => 'CPT Code', dataFmt => '#2#' ,},
+			{ colIdx => 3, head => 'CPT Name', dataFmt => '#3#' ,},
+			{ colIdx => 4, head => 'Monthly Units', summarize => 'sum',dataFmt => '#4#', },
+			{ colIdx => 5, head => 'Month To Date Cost', summarize => 'sum',dataFmt => '#5#',dformat => 'currency' },
+			{ colIdx => 6, head => 'Yearly Units', summarize => 'sum',dataFmt => '#6#' ,},
+			{ colIdx => 7, head => 'Year To Date Cost',summarize => 'sum', dataFmt => '#7#' ,dformat => 'currency'},
 		],
 	},
 	publishDefn_panel =>
@@ -663,8 +672,9 @@ $STMTMGR_COMPONENT_INVOICE = new App::Statements::Component::Invoice(
 				t.caption,
 				tt.caption,
 				p.complete_name,
-				p2.complete_name,
-				nvl(i.total_cost, 0)
+				p2.complete_name,				
+				nvl(i.total_cost, 0),
+				i.client_id
 			from 	event e, transaction t, org o, transaction_type tt,
 				person p, person p1, person p2, invoice i, invoice_billing ib
 			where 	trunc(e.start_time) >= to_date(?, 'mm/dd/yyyy')
@@ -678,6 +688,8 @@ $STMTMGR_COMPONENT_INVOICE = new App::Statements::Component::Invoice(
 			and	ib.invoice_id = i.invoice_id
 			and	ib.bill_to_id = p2.person_id
 			and  	ib.bill_party_type in (0,1)
+			and	ib.bill_sequence = 1
+			and	ib.invoice_item_id is NULL
 			union all
 			select 	p1.complete_name, trunc(e.start_time),
 				to_char(e.start_time, 'HH12:MIAM'),
@@ -685,7 +697,8 @@ $STMTMGR_COMPONENT_INVOICE = new App::Statements::Component::Invoice(
 				o.name_primary, e.subject,
 				t.caption, tt.caption, p.complete_name,
 				o1.name_primary,
-				nvl(i.total_cost, 0)
+				nvl(i.total_cost, 0),
+				i.client_id
 			from 	event e, transaction t, org o, org o1, transaction_type tt,
 				person p, person p1, invoice i, invoice_billing ib
 			where 	trunc(e.start_time) >= to_date(?, 'mm/dd/yyyy')
@@ -699,18 +712,22 @@ $STMTMGR_COMPONENT_INVOICE = new App::Statements::Component::Invoice(
 			and	ib.invoice_id = i.invoice_id
 			and	ib.bill_to_id = o1.org_internal_id
 			and  	ib.bill_party_type in (2,3)
+			and	ib.bill_sequence = 1
+			and	ib.invoice_item_id is NULL
+			ORDER BY  2,12
 			},
 	sqlStmtBindParamDescr => ['Provider ID for provider_by_location View'],
 	publishDefn => {
 		columnDefn => [
+			{ colIdx => 11, head => 'Patient ID', dataFmt => '#11#',},
 			{ colIdx => 0, head => 'Receptionist', dataFmt => '#0#' },
 			{ colIdx => 1, head => 'Date', dataFmt => '#1#' },
 			{ colIdx => 2, head => 'Start Time', dataFmt => '#2#' },
 			{ colIdx => 3, head => 'End Time', dataFmt => '#3#' },
 			{ colIdx => 4, head => 'Org', dataFmt => '#4#' },
 			{ colIdx => 5, head => 'Reason', dataFmt => '#5#' },
-			{ colIdx => 6, head => 'Transaction Caption', dataFmt => '#6#' },
-			{ colIdx => 7, head => 'Transaction Type Caption', dataFmt => '#7#' },
+			#{ colIdx => 6, head => 'Visit Type', dataFmt => '#6#' },
+			{ colIdx => 7, head => 'Visit Type', dataFmt => '#7#' },
 			{ colIdx => 8, head => 'Provider Name', dataFmt => '#8#' },
 			{ colIdx => 9, head => 'Billed To', dataFmt => '#9#' },
 			{ colIdx => 10, head => 'Charges', dataFmt => '#10#', dformat => 'currency'},
