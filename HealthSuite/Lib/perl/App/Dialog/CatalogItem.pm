@@ -274,7 +274,7 @@ sub customValidate
 
 	#If FS is not capitated just set flags to FFS to be safe
 	my $recExist = $STMTMGR_CATALOG->getRowAsHash($page, STMTMGRFLAG_NONE, 'sel_Catalog_Attribute',
-			$page->param('internal_catalog_id'), App::Universal::ATTRTYPE_BOOLEAN, 'Capitated Contract');
+			$page->param('internal_catalog_id')||undef, App::Universal::ATTRTYPE_BOOLEAN, 'Capitated Contract');
 
 	#$page->addError($recExist->{value_int});
 	$page->field('flags',1) unless ($recExist->{value_int});
