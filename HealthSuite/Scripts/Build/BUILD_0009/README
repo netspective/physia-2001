@@ -1,0 +1,10 @@
+
+
+BUILD_0009 includes the following enhancements:
+
+
+B863 - "Proxy errors after db server restart"
+Found Oracle bug which caused httpd core dump upon attempting to DESTROY
+a dead database connection.  Worked around problem by caching the
+dead connection and esatblishing a new connection.
+
