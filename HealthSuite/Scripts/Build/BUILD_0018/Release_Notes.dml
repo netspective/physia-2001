@@ -324,11 +324,11 @@
 			Reopened: If fee schedule id not provided, the lookup for the parent entry returns a user friendly error.
 		</deliverable>
 
-		</deliverable id="1901">
+		<deliverable id="1901">
 			Report (DAR MAR)   Fixed the Net Chrgs column in the DAR and MAR
 		</deliverable>
 
-		</deliverable id="1910">
+		<deliverable id="1910">
 			Report (FAR)  Modified query so pre-payment invoices were included	
 			Note  Also test that service date filter is working as expected.
 		</deliverable>
