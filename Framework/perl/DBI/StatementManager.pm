@@ -114,6 +114,8 @@ sub fixupStatements
 					else { $value->{$2} || "" }
 					!ge;
 			}
+			# Add a SQL comment to aid in tracing statement executions back to the code
+			$stmt = "/* $className $key */\n" . $stmt if defined $stmt;
 			$self->{$key} = defined $stmt ? $stmt : undef;
 
 			# see if any Data::Publish definitions (DPD) exist
@@ -134,6 +136,11 @@ sub fixupStatements
 			}
 			$appendKeyValues{"_dpd_$key"} = $basePublDefn if $basePublDefn;
 		}
+		elsif (! ref $value) # Else if it's a scalar (just a SQL statement)
+		{
+			# Add a SQL comment to aid in tracing statement executions back to the code
+			$self->{$key} = "/* $className $key */\n" . $value if $value;
+		}
 	}
 
 	# we couldn't modify the $self hash in the "each" loop above so we do it now
@@ -148,6 +155,16 @@ sub getStatementHdl
 	my ($self, $dbpage, $flags, $name) = @_;
 	if($flags & STMTMGRFLAG_DYNAMICSQL)
 	{
+		# Find out what package it's coming from
+		my $i = 0;
+		my $caller = '';
+		while ($caller = caller($i++))
+		{
+			last if $caller !~ /^DBI/;
+		}
+
+		# Add a SQL comment to aid in tracing statement executions back to the code
+		$name = "/* $caller - Dynamic SQL */\n" . $name;
 		my $stmtHdl = $dbpage->{db}->prepare($name) or die $dbpage->{db}->errstr();
 		return $stmtHdl;
 	}
@@ -225,9 +242,11 @@ sub execute
 		}
 		$debugMsg .= "<br>";
 	}
-	
+
+
+
 	my $stmtHdl = $self->getStatementHdl($dbpage, $flags, $name);
-	
+
 	# Check for #something# replacements
 	my @params = @_;
 	if($flags & STMTMGRFLAG_REPLACEVARS)
@@ -236,7 +255,7 @@ sub execute
 		# the substitution here (regexp) should be the same as the one in CGI::Page
 		# basically, it replaces session.xxx with $page->session('xxx'), param.yyy with
 		# $page->param('yyy'), and field.abc with $page->field('abc')
-		#	
+		#
 		grep
 		{
 			s/\#(\w+)\.?([\w\-\.]*)\#/
@@ -251,14 +270,18 @@ sub execute
 				/ge;
 		} @params;
 	}
-	
+
 	# Execute the SQL & handle errors
 	eval {
 		$execRV = $stmtHdl->execute(@params) or die $stmtHdl->errstr();
 	};
-	
-	# Add the debug message if we're in debug mode or an error 
-	if($@ || ($flags & STMTMGRFLAG_DEBUG) || $dbpage->param('_debug_stmt') eq $name || $dbpage->param('_debug_stmt_all'))
+
+	# Add the debug message if we're in debug mode or an error
+	if(	$@ ||
+		($flags & STMTMGRFLAG_DEBUG) ||
+		($dbpage->param('_debug_stmt') && $dbpage->param('_debug_stmt') eq $name) ||
+		$dbpage->param('_debug_stmt_all')
+		)
 	{
 		$debugMsg .= "<b>Execute Result Code:</b> " . (defined $execRV ? $execRV : '<i>undef</i>') . '<br>';
 		$debugMsg .= $stack if $dbpage->param('_debug_stack') || $@;
@@ -266,7 +289,7 @@ sub execute
 		die "$debugMsg\n" if $@;
 		$dbpage->addDebugStmt($debugMsg);
 	}
-	
+
 	wantarray ? ($stmtHdl, $execRV) : $stmtHdl;
 }
 
@@ -318,11 +341,11 @@ sub getRowsAsArray
 {
 	my $stmtHdl = execute(@_);
 	my @tableRows;
-	
+
 	while (my $currentRowRef = $stmtHdl->fetch()) {
 		push @tableRows, [ @{$currentRowRef} ];
 	}
-	
+
 	return \@tableRows;
 }
 
@@ -703,7 +726,7 @@ sub createPropertiesFromSingleRow
 sub createHtml
 {
 	my ($self, $dbpage, $flags, $name, $bindColsRef, $defnAltName, $publParams, $pubD) = @_;
-	
+
 	my $stmtHdl = $self->execute($dbpage, $flags, $name, @$bindColsRef);
 	my $defnName = $defnAltName ? "$name\_$defnAltName" : $name;
 	my $publDefn = $self->{"_dpd_$defnName"} || {};
@@ -807,7 +830,7 @@ sub removeCachedData
 sub createText
 {
 	my ($self, $dbpage, $flags, $name, $bindColsRef, $defnAltName, $publParams, $pubD) = @_;
-	
+
 	my $stmtHdl = $self->execute($dbpage, $flags, $name, @$bindColsRef);
 	my $defnName = $defnAltName ? "$name\_$defnAltName" : $name;
 	my $publDefn = $self->{"_dpd_$defnName"} || {};
@@ -817,7 +840,7 @@ sub createText
 	$publParams->{stmtId} = $name unless exists $publParams->{stmtId};
 
 	prepareStatementColumns($dbpage, $flags, $stmtHdl, $publDefn) unless exists $publDefn->{columnDefn};
-	
+
 	return
 		createHtmlFromStatement($dbpage, $flags, $stmtHdl, $publDefn, $publParams);
 }
