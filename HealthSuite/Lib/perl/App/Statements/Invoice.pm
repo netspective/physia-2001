@@ -163,6 +163,10 @@ $STMTMGR_INVOICE = new App::Statements::Invoice(
 		from invoice
 		where invoice_id = ?
 		},
+	'selStatusList' => qq{
+		select id, caption
+		from invoice_status
+		},
 	'selParentInvoices' => qq{
 		select p1.parent_invoice_id as parent1, p2.parent_invoice_id as parent2, p3.parent_invoice_id as parent3
 		from invoice p1, invoice p2, invoice p3
