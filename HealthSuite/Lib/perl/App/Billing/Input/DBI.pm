@@ -2,6 +2,7 @@
 package App::Billing::Input::DBI;
 ################################################################
 # At present rendringProvider and pay to provider are same.
+# by shams
 use strict;
 use Carp;
 use DBI;
@@ -251,10 +252,8 @@ sub assignInvoicePreSubmit
 {
 	my ($self, $claim, $invoiceId) = @_;
 
-	print "b  pat \n";
 	$self->assignPatientInfo($claim, $invoiceId);
 	$self->assignPatientAddressInfo($claim, $invoiceId);
-	print "b  ins \n";
 	$self->assignPatientInsurance($claim, $invoiceId);
 	$self->assignPatientEmployment($claim, $invoiceId);
 	$self->assignProviderInfo($claim, $invoiceId);
@@ -889,18 +888,21 @@ sub assignServiceBilling
 	@row = $sth->fetchrow_array();
 #	$payToOrganization->setGRP($row[0]);
 	my $payToOrganizationAddress = new App::Billing::Claim::Address;
-	$queryStatment = "select line1, line2, city, state, zip, country from org_address where parent_id = $orgInternalId and address_name = \'Mailing\'";
-	$sth = $self->{dbiCon}->prepare(qq {$queryStatment});
-	# do the execute statement
-	$sth->execute() or $self->{valMgr}->addError($self->getId(),100,"Unable to execute $queryStatment");
-	@row = $sth->fetchrow_array();
-	$payToOrganizationAddress->setAddress1($row[0]);
-	$payToOrganizationAddress->setAddress2($row[1]);
-	$payToOrganizationAddress->setCity($row[2]);
-	$payToOrganizationAddress->setState($row[3]);
-	$payToOrganizationAddress->setZipCode($row[4]);
-	$payToOrganizationAddress->setCountry($row[5]);
-	$payToOrganization->setAddress($payToOrganizationAddress);
+	if($orgInternalId)
+	{
+		$queryStatment = "select line1, line2, city, state, zip, country from org_address where parent_id = $orgInternalId and address_name = \'Mailing\'";
+		$sth = $self->{dbiCon}->prepare(qq {$queryStatment});
+		# do the execute statement
+		$sth->execute() or $self->{valMgr}->addError($self->getId(),100,"Unable to execute $queryStatment");
+		@row = $sth->fetchrow_array();
+		$payToOrganizationAddress->setAddress1($row[0]);
+		$payToOrganizationAddress->setAddress2($row[1]);
+		$payToOrganizationAddress->setCity($row[2]);
+		$payToOrganizationAddress->setState($row[3]);
+		$payToOrganizationAddress->setZipCode($row[4]);
+		$payToOrganizationAddress->setCountry($row[5]);
+		$payToOrganization->setAddress($payToOrganizationAddress);
+	}
 
 	$claim->setPayToOrganization($payToOrganization);
 }
@@ -1104,31 +1106,34 @@ sub assignPolicy
 				elsif ($row1[3] == BILL_PARTY_TYPE_ORGANIZATION)
 				{
 					my $oid = $self->getOrgId($row1[0]);
-					$queryStatment = "select name_primary , org_id  from org where org_internal_id = $oid";
-					$sth = $self->{dbiCon}->prepare(qq {$queryStatment});
-					# do the execute statement
-					$sth->execute() or $self->{valMgr}->addError($self->getId(),100,"Unable to execute $queryStatment");
-					@row = $sth->fetchrow_array();
+					if ($row1[0])
+					{
+						$queryStatment = "select name_primary , org_id  from org where org_internal_id = $row1[0]";
+						$sth = $self->{dbiCon}->prepare(qq {$queryStatment});
+						# do the execute statement
+						$sth->execute() or $self->{valMgr}->addError($self->getId(),100,"Unable to execute $queryStatment");
+						@row = $sth->fetchrow_array();
 
-					$payer->setId($row[1]);
-					$payer->setName($row[0]);
-			 		$queryStatment = "select line1, line2, city, state, zip, country from org_address where parent_id = $row1[0] and address_name = \'Mailing\'";
-					$sth = $self->{dbiCon}->prepare(qq {$queryStatment});
-					# do the execute statement
-					$sth->execute() or $self->{valMgr}->addError($self->getId(),100,"Unable to execute $queryStatment");
-					@row = $sth->fetchrow_array();
-					$payerAddress->setAddress1($row[0]);
-					$payerAddress->setAddress2($row[1]);
-					$payerAddress->setCity($row[2]);
-					$payerAddress->setState($row[3]);
-					$payerAddress->setZipCode($row[4]);
-					$payerAddress->setCountry($row[5]);
-					$queryStatment = "select value_text from org_attribute where parent_id = $row1[0] and Item_name = \'Contact Method/Telepone/Primary\'";
-					$sth = $self->{dbiCon}->prepare(qq {$queryStatment});
-					# do the execute statement
-					$sth->execute() or $self->{valMgr}->addError($self->getId(),100,"Unable to execute $queryStatment");
-					@row = $sth->fetchrow_array();
-					$payerAddress->setTelephoneNo($row[0]);
+						$payer->setId($row[1]);
+						$payer->setName($row[0]);
+				 		$queryStatment = "select line1, line2, city, state, zip, country from org_address where parent_id = $row1[0] and address_name = \'Mailing\'";
+						$sth = $self->{dbiCon}->prepare(qq {$queryStatment});
+						# do the execute statement
+						$sth->execute() or $self->{valMgr}->addError($self->getId(),100,"Unable to execute $queryStatment");
+						@row = $sth->fetchrow_array();
+						$payerAddress->setAddress1($row[0]);
+						$payerAddress->setAddress2($row[1]);
+						$payerAddress->setCity($row[2]);
+						$payerAddress->setState($row[3]);
+						$payerAddress->setZipCode($row[4]);
+						$payerAddress->setCountry($row[5]);
+						$queryStatment = "select value_text from org_attribute where parent_id = $row1[0] and Item_name = \'Contact Method/Telepone/Primary\'";
+						$sth = $self->{dbiCon}->prepare(qq {$queryStatment});
+						# do the execute statement
+						$sth->execute() or $self->{valMgr}->addError($self->getId(),100,"Unable to execute $queryStatment");
+						@row = $sth->fetchrow_array();
+						$payerAddress->setTelephoneNo($row[0]);
+					}
 				}
 			}
 		}
@@ -1390,11 +1395,9 @@ sub assignInvoiceProperties
 
 	my $queryStatment = " select ITEM_ID, ITEM_NAME, VALUE_TEXT, VALUE_TEXTB, VALUE_INT, VALUE_INTB, VALUE_FLOAT, VALUE_FLOATB, to_char(VALUE_DATE, \'dd-MON-yyyy\'), to_char(VALUE_DATEEND, \'dd-MON-yyyy\'), to_char(VALUE_DATEA, \'dd-MON-yyyy\'), to_char(VALUE_DATEB, \'dd-MON-yyyy\'), VALUE_BLOCK from invoice_attribute where parent_id = $invoiceId ";
 	my $sth = $self->{dbiCon}->prepare(qq { $queryStatment});
-	print $queryStatment . "\n";
 	# do the execute statement
 	$sth->execute()  or $self->{valMgr}->addError($self->getId(),100,"Unable to execute $queryStatment");
-	print " done \n";
-
+	
 	while(@row = $sth->fetchrow_array())
 	{
 		if(my $attrInfo = $inputMap->{$row[COLUMNINDEX_ATTRNAME]})

@@ -42,23 +42,33 @@ sub diagnosisPtr
 	if ($currentClaim->{'diagnosis'}->[1] ne "")
 	{	
 		$diagnosisMap->{$currentClaim->{'diagnosis'}->[1]->getDiagnosis()} = 2;
+
 	}  
 	if ($currentClaim->{'diagnosis'}->[2] ne "")
 	{	
 		$diagnosisMap->{$currentClaim->{'diagnosis'}->[2]->getDiagnosis()} = 3;
+
 	}
 	if ($currentClaim->{'diagnosis'}->[3] ne "")
 	{	
 		$diagnosisMap->{$currentClaim->{'diagnosis'}->[3]->getDiagnosis()} = 4;
+
 	} 
 
 		my @diagCodes = split(/,/,$codes);
-
+		
 		for (my $diagnosisCount = 0; $diagnosisCount <= $#diagCodes; $diagnosisCount++)
 		{
-			$ptr = $diagnosisMap->{$diagCodes[$diagnosisCount]} . $ptr;
+			my $tempVal = $diagCodes[$diagnosisCount];
+			
+			$tempVal =~ s/ //;
+			$tempVal = $tempVal . "";
+			
+		    $ptr = $ptr . "," . $diagnosisMap->{$tempVal};
 		}
-		
+	
+	$ptr =~ s/,//;
+
 	return $ptr;
 
 }

@@ -45,7 +45,10 @@ sub formatData
 	my $zero = "0";
 	my $pointer = $container->getSequenceNo();
 	my @modifier = split (/ /,$currentProcedure->getModifier());
-	my @diagnosis = split (/ /,$self->diagnosisPtr($inpClaim,$currentProcedure->getDiagnosis()));
+	my @diagnosis = split (/\,/,$self->diagnosisPtr($inpClaim,$currentProcedure->getDiagnosis()));
+	
+	
+	
 	
 	# modifier are separated by to spaces '  '
 	
