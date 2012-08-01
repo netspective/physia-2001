@@ -95,7 +95,9 @@ sub connectDB
 		if($un && $pw && $connectStr)
 		{
 			my ($dbi, $dbms, $server) = split(/:/, $connectStr);
-
+		
+			#To enable database connection tracing uncomment this.	
+			#DBI->trace(15, "/tmp/dbi.log");
 			$cachedDbHdls->{$connectKey}->{dbiHdl} = DBI->connect($connectStr, $un, $pw);
 			if(! $cachedDbHdls->{$connectKey}->{dbiHdl})
 			{
