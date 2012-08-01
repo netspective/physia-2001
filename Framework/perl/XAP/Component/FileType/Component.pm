@@ -3,6 +3,7 @@ package XAP::Component::FileType::Component;
 ##############################################################################
 
 use strict;
+
 use Exporter;
 use XAP::Component;
 use XAP::Component::Path;
