@@ -379,8 +379,7 @@ sub getSlotsHtml
 		for (@slots)
 		{
 			my $resource_id = $_->{resource_id};
-			my $facility_id = $STMTMGR_ORG->getSingleValue($self, STMTMGRFLAG_NONE, 'selId',
-				$_->{facility_id});
+			my $facility_id = $STMTMGR_ORG->getSingleValue($self, STMTMGRFLAG_NONE, 'selId', $_->{facility_id});
 			my @minute_ranges = split(/,/, $_->{minute_set}->run_list);
 
 			my $facilityInternalId = $_->{facility_id};
