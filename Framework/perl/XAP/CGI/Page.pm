@@ -362,7 +362,7 @@ sub getHttpHeader
 
 	if(($pageFlags & CGIPAGEFLAG_ISREDIRECT) && ! ($pageFlags & CGIPAGEFLAG_HAVEERRORS))
 	{
-		return $self->header(%HEADER, -location => $self->{page_redirect});
+		return CGI::redirect (%HEADER, -location => $self->{page_redirect});
 	}
 
 	my XAP::Component $component = $self->{mainComponent};
