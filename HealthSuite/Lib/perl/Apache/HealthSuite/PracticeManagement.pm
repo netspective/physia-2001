@@ -3,8 +3,8 @@ package Apache::HealthSuite::PracticeManagement::PerlHandler;
 ##############################################################################
 
 use strict;
-use Apache;
-use Apache::Constants qw(:common);
+#use Apache2::compat;
+use Apache2::Const qw(:common);
 use CGI qw(:standard);
 use App::ResourceDirectory;
 use CGI::Carp qw(fatalsToBrowser);
@@ -16,6 +16,7 @@ sub handler
 	$DEBUG = (! $DEBUG) || (lc($DEBUG) eq 'off') ? 0 : 1;
 
 	return DECLINED if ($ENV{REQUEST_URI} =~ /\.pdf$/);
+	#return Apache2::DECLINED if ($ENV{REQUEST_URI} =~ /\.pdf$/);
 	
 	eval {
 		my $arl;
@@ -25,13 +26,16 @@ sub handler
 		return OK;
 	};
 
+	#TODO: Need to find better way of enabling debug
+	#$DEBUG=1;
+
 	if ($@)
 	{
-		my $msg = "<h1>Perl Runtime Errors:</h1><font color=red>$@</font>";
+		my $msg = "<h1>Perl Runtime Errors at PractMgmt:</h1><font color=red>$@</font>";
 		$msg .= "<h1>Environment:</h1>" . join '<br>', map {"$_ = $ENV{$_}"} sort keys %ENV;
 		my $user = getpwuid($>) || '';
 		$r->content_type('text/html');
-		$r->send_http_header();
+
 		if ($DEBUG)
 		{	
 			$r->print($msg);
@@ -89,6 +93,4 @@ sub handler
 	warn ("$$ END Pre-Connecting to the database\n");
 }
 
-
 1;
-
