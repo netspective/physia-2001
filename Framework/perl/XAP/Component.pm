@@ -76,7 +76,7 @@ sub new
 	return $SINGLETONS{$class} if $isSingleton && exists $SINGLETONS{$class};
 	
 	no strict 'refs';
-	my $self = bless [\%{"$class\::FIELDS"}], $class;
+        my XAP::Component $self = fields::new($class);
 	use strict 'refs';
 	$self->init(@_);
 	$SINGLETONS{$class} = $self if $isSingleton;
@@ -88,7 +88,7 @@ sub init
 {
 	my XAP::Component $self = shift;
 	my %params = @_;
-
+	
 	$self->{parent} = exists $params{parent} ? $params{parent} : undef;
 	$self->{id} = exists $params{id} ? $params{id} : ref $self;
 	$self->{name} = exists $params{name} ? $params{name} : undef;
