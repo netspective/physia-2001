@@ -5,6 +5,7 @@ package App::Statements::Report::CloseDate;
 use strict;
 use DBI::StatementManager;
 use Data::Publish;
+use App::Universal;
 
 use base qw(Exporter DBI::StatementManager);
 
@@ -155,6 +156,7 @@ $STMTMGR_REPORT_CLOSEDATE = new App::Statements::Report::CloseDate(
 	},
 
 	# -----------------------------------------------
+
 	'sel_lastCloseDate' => qq{
 		select to_char(value_date, '$SQLSTMT_DEFAULTDATEFORMAT') as last_close_date 
 		from Org_Attribute

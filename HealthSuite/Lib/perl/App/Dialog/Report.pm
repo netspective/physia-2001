@@ -5,6 +5,9 @@ package App::Dialog::Report;
 use strict;
 use Carp;
 use CGI::Dialog;
+use App::Dialog::Field::Organization;
+use App::Dialog::Field::Person;
+
 use App::Universal;
 use vars qw(@ISA %DIRECTORY %RESOURCE_MAP);
 %RESOURCE_MAP = ();
