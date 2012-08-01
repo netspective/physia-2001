@@ -7,40 +7,8 @@
 	<include file="lookups.xml"/>
 	<include file="typedefs.xml"/>
 	<include file="typedef-attribute.xml"/>
+	<include file="org_person.xml"/>
 	<include file="devices.xml"/>
-
-	<table name="Person" abbrev="Per" type="Audit,Secure,Restrict_Rows">
-		<description>A person, such as a doctor, a nurse, a receptionist, or a patient</description>
-		<!-- column name="person_internal_id" type="autoinc" primarykey="yes" descr="Unique person record identification (in entire system) for internal use"/ -->
-		<column name="person_id" primarykey="yes" type="entity_id" descr="Unique ID for a person within an organization."/>
-		<column name="person_ref" type="text" size="32" descr="A reference account number/id (in the user's system)"/>
-		<column name="ssn" type="socsec" descr="Social Security number"/>
-		<column name="name_prefix" type="text" size="16"/>
-		<column name="name_first" type="text" required="yes" size="32"/>
-		<column name="name_middle" type="text" size="32"/>
-		<column name="name_last" type="text" required="yes" size="32"/>
-		<column name="name_suffix" type="text" size="16"/>
-		<column name="short_name" type="text" calc="trigger" size="42" descr="[first letter of name_first] [name_last]"/>
-		<column name="simple_name" type="text" calc="trigger" size="96" descr="[name_first] [name_last]"/>
-		<column name="complete_name" type="text" calc="trigger" size="128" descr="[name_prefix] [name_first] [name_middle] [name_last] [name_suffix]"/>
-		<column name="short_sortable_name" type="text" calc="trigger" size="42" descr="[name_last], [first letter of name_first]"/>
-		<column name="complete_sortable_name" type="text" calc="trigger" size="128" descr="[name_last], [name_first] [name_middle]"/>
-		<column name="gender" lookupref="Gender" default="0" descr="Gender"/>
-		<column name="marital_status" lookupref="Marital_Status" default="0" descr="Marital status"/>
-		<column name="date_of_birth" type="date" descr="Date of Birth"/>
-		<column name="age" type="integer" descr="Actual age (only required if date_of_birth is NULL or not known)"/>
-		<column name="ethnicity" type="text_set" descr="The primary/secondary ethnicity or race [comma-separated if more than one]"/>
-		<column name="language" type="text_set" descr="Language(s) a person speaks [comma-separated if more than one]"/>
-		<column name="language2" type="lookup_set" lookupsetref="Gender" descr="Language(s) a person speaks [comma-separated if more than one]"/>
-		<column name="login_type" lookupref="Login_Type" descr="The login information for this person">
-			<table name="$parenttbl_name$_Login" abbrev="$parenttbl_abbrev$Lgi" type="Audit,Secure">
-				<column name="person_id" parentref="$parenttbl_name$.$parenttbl_prikey$" uniquegrp="orgperson" indexed="yes" descr="The person for whom login information is specified"/>
-				<column name="org_internal_id" lookupref="Org.org_internal_id" indexed="yes" uniquegrp="orgperson" descr="The organization for which login information is supplied"/>
-				<column name="password" type="text" size="16" descr="The login password"/>
-				<column name="quantity" type="integer" default="1" descr="The number of times login is allowed from different sessions"/>
-			</table>
-		</column>
-	</table>
 
 	<table name="Person_Session" abbrev="PerSess">
 		<description>An active session of a user connected to the application</description>
@@ -113,19 +81,6 @@
 		<column name="label" type="boolean" descr="True if label should include drug name and strength"/>
 		<column name="label_language" type="text" size="32" descr="The language label should be printed in for this prescription"/>
 		<column name="signed" type="boolean" descr="True if a provider signature is on file"/>
-	</table>
-
-	<table name="Org" type="Audit,Secure,Restrict_Rows">
-		<description>An organization, such as a physician's private practice, a hospital, or an insurance company</description>
-		<column name="org_internal_id" type="autoinc" primarykey="yes" descr="Unique organization record identification (in entire system) for internal use"/>
-		<column name="owner_org_id" selfref="org.org_internal_id" uniquegrp="orgid" descr="ID for owner(creator) of organization"/>
-		<column name="org_id" required="yes" type="entity_id" uniquegrp="orgid" descr="Unique org identification within owner organization."/>
-		<column name="parent_org_id" selfref="org.org_internal_id" indexed="yes" descr="ID for parent organization"/>
-		<column name="category" type="text_set" descr="Type(s) of organization [comma-separated if more than one]"/>
-		<column name="tax_id" type="text" descr="Tax ID"/>
-		<column name="name_primary" type="text" size="128" descr="Name of organization" required="yes"/>
-		<column name="name_trade" type="text" size="128" descr="Trade name of organization"/>
-		<column name="time_zone" type="text" size="10" descr="Time zone that the organization operates in"/>
 	</table>
 
 	<table name="Person_Org_Category" abbrev="PerOCatg" type="Audit,Secure">
