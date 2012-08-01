@@ -5,7 +5,8 @@ package CGI::Page;
 use strict;
 use CGI;
 use CGI::Carp qw(fatalsToBrowser);
-use CGI::Session::DBI;
+use CGI::Session::Oracle;
+
 use File::Spec;
 use Date::Manip;
 use Schema::API;
@@ -428,7 +429,7 @@ sub send_http_header
 
 	if(exists $self->{page_redirect} && ! $self->haveErrors() && !($self->{schemaFlags} & SCHEMAAPIFLAG_LOGSQL))
 	{
-		print $self->header(%HEADER, -location => $self->replaceRedirectVars($self->{page_redirect}));
+		print  CGI::redirect(%HEADER, -location => $self->replaceRedirectVars($self->{page_redirect}));
 		return 0;
 	}
 
@@ -714,7 +715,7 @@ sub createSession
 {
 	my ($self, $userId, $orgIntId, $sessionVars) = @_;
 	my %session;
-	tie %session, 'CGI::Session::DBI', undef,
+	tie %session, 'CGI::Session::Oracle', undef,
 		{
 			dbh => $self->{db},
 			status => 0,
@@ -737,6 +738,7 @@ sub createSession
 	}
 
 	$self->addCookie(-name => SESSIONID_COOKIENAME, -value => $self->{session}->{_session_id});
+	#print "Create Session ID: $self->{session}->{_session_id}; <br>\n";
 	return $self->{session}->{_session_id};
 }
 
@@ -814,7 +816,8 @@ sub establishSession
 		eval
 		{
 			my %session;
-			tie %session, 'CGI::Session::DBI', $sessionKey,
+			#tie %session, 'CGI::Session::DBI', $sessionKey,
+			tie %session, 'CGI::Session::Oracle', $sessionKey,
 				{
 					dbh => $self->{db},
 					remote_addr => $self->remote_addr(),
@@ -826,11 +829,13 @@ sub establishSession
 			$self->setupACL() unless exists $session{aclPermissions};
 			$self->{permissions} = $session{aclPermissions};
 		};
+
 		if($@)
 		{
 			# using errorCode_ref and errorMsg_ref, CGI::Session::DBI will fill the messages appropriately
 			#$self->{sessError} = $@;
 			#$self->addError('Session Error: ' . $@);
+
 			$@ = undef;
 			return $self->sessionStatus(SESSIONTYPE_SESSIONERROR);
 		}
