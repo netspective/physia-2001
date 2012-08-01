@@ -1,5 +1,6 @@
 ##############################################################################
 package App::Dialog::HandHeld::Appointments::Checked_In;
+#package App::Dialog::HandHeld::Appointments::Checked-In;
 ##############################################################################
 
 use strict;
