@@ -54,7 +54,7 @@ directory to compile and install this module.
 
 Oracle 11g is NOT officially supported for Ubuntu-12.04, but since it is a variant of Linux distribution, the Oracle installer can be easily fooled to resemble the system as RedHat Linux and install it. Hence, the Ubuntu system need to be slightly altered to make Oracle install and work correctly.
 
-Note: Unless explicitly mentioned all these operations need to performed as privileged user (or using sudo).
+_Note:_ Unless explicitly mentioned all these operations need to performed as privileged user (or using sudo).
 
 Prerequisite:
 
@@ -68,7 +68,7 @@ These parameters can be verified using the following commands
     grep SwapTotal /proc/meminfo
     df -kh /dev/shm/
 
-Edit the /etc/fstab and add/modify the following line:
+Edit the `/etc/fstab` and add/modify the following line:
 
     tmpfs    /dev/shm     tmpfs   defaults,size=512M    0       0
 
@@ -94,7 +94,7 @@ Create oracle user and required system group as follows
 
 Configure kernel parameters:
 
-Then edit your /etc/sysctl.conf and add the following lines
+Then edit your `/etc/sysctl.conf` and add the following lines
 
     fs.aio-max-nr = 1048576
     fs.file-max = 6815744
@@ -176,6 +176,8 @@ Download oracle 11g from the following URL. It requires at least a free oracle w
     https://edelivery.oracle.com/EPD/Download/process_download/V17530-01_1of2.zip
     https://edelivery.oracle.com/EPD/Download/process_download/V17530-01_2of2.zip
 
+Extract the files and change permission
+
     unzip -q V17530-01_1of2.zip
     unzip -q V17530-01_2of2.zip
     chown -R oracle:oinstall /var/lib/oracle/
@@ -190,7 +192,9 @@ login with user account "oracle" and setup the below  parameters
 run X-Server on your PC/Mac/Linux:
 
 Give access for the oracle (host) installer client to connect to your X-Server.
-In linux and Mac it will be: xhost + <your X-server IP>
+In linux and Mac it will be: 
+
+    xhost + _your X-server IP_
 
 On the server start the installer:
 
@@ -229,15 +233,16 @@ Start DB Listener service:
 
 ###4. HealthSuite installation:
 
-Copy the Healthsuite source to a directory say /var/physia. (which is PHYSIA_ROOT)
+Copy the Healthsuite source to a directory say `/var/physia`. (which is PHYSIA_ROOT)
 
-Configure the database credentials on the file: PHYSIA_ROOT/HealthSuite/Lib/perl/App/Configuration.pm
+Configure the database credentials on the file: `PHYSIA_ROOT/HealthSuite/Lib/perl/App/Configuration.pm`
 
 Create schema and initialize the database:
+
     cd PHYSIA_ROOT/
     perl ./HealthSuite/Database/GenerateSchema.pl
 
-This will create a directory PHYSIA_ROOT/HealthSuite/Database/schema-physia with all SQL script required to populate the schema and some sample data. Now run these commands to setup the database.
+This will create a directory `PHYSIA_ROOT/HealthSuite/Database/schema-physia` with all SQL script required to populate the schema and some sample data. Now run these commands to setup the database.
 
     cd PHYSIA_ROOT/HealthSuite/Database/schema-physia
     ./setupdb.sh
@@ -249,10 +254,11 @@ On Ubuntu system modify/copy the http configuration file from `PHYSIA_ROOT/Healt
 Configure these two files to match the current environment.
 
 Start Apache:
+
     sudo service apache2 start
 
 ###6. Access the user interface
-Point the browser to the URL: http://ServerIP|Hostname/
+Point the browser to the URL: `http://ServerIP|Hostname/`
 
 The interface credentials are stored on the database table "person_login". Add related entries on the tables "Person", "Org" and "Person_Org_Category". And then add the creditials to "person_login". A sample SQL statement would be
 
