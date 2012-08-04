@@ -6,6 +6,9 @@ use strict;
 use Carp;
 use Date::Calc qw(Delta_Days);
 use App::Dialog::Report;
+
+use App::Dialog::Field::Person;
+use App::Dialog::Field::Organization;
 use App::Universal;
 
 use CGI::Dialog;

@@ -263,6 +263,9 @@ sub getDefaultConfig
 	'account-vusr_demo01' => getDefaultConfig('Demo01 Configuration', CONFIGGROUP_DEMO, 'demo01/demo@dbi:Oracle:SDEDBS02'),
 	'account-vusr_test01' => getDefaultConfig('Testing Configuration', CONFIGGROUP_TEST, 'pro_test/pro@dbi:Oracle:SDEDBS04'),
 	'account-alex_hillman' => getDefaultConfig('Alex Hillman Configuration', CONFIGGROUP_SWDEV, 'sde01/sde@dbi:Oracle:SDEDBS04'),
+	'account-logu' => getDefaultConfig('logu Configuration', CONFIGGROUP_SWDEV, 'logu/l0gu@dbi:Oracle:orcl'),
+	'account-www-data' => getDefaultConfig('For apache user Conf', CONFIGGROUP_SWDEV, 'logu/l0gu@dbi:Oracle:orcl'),
+	'account-root' => getDefaultConfig('root Configuration', CONFIGGROUP_SWDEV, 'logu/l0gu@dbi:Oracle:orcl'),
 
 	# configs specifically for use with $ENV{HS_CONFIG}
 	'db-multidemo' => getDefaultConfig('MultiDemo Configuration', CONFIGGROUP_DEMO, {

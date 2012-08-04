@@ -13,6 +13,7 @@ use App::Billing::Claim::Physician;
 use App::Billing::Claim::Organization;
 use App::Billing::Claim::Person;
 use App::Billing::Claim::Address;
+use App::Billing::Claim::Patient;
 
 use DBI::StatementManager;
 use App::Statements::Report::Prescription;

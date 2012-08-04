@@ -5,6 +5,7 @@ package App::Dialog::Report::Org::General::Billing::ClaimStatus;
 use strict;
 use Carp;
 use App::Dialog::Report;
+use App::Dialog::Field::Insurance;
 use App::Universal;
 
 use CGI::Dialog;

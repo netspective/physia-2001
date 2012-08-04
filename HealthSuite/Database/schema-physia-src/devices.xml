@@ -13,7 +13,7 @@
 	<table name="Device_Type" abbrev="DevTy" type="Enumeration">
 		<enum>Printer</enum>
 	</table>
-	
+
 	<table name="Device_Specification" abbrev="DevSpec">
 		<description>List of Devices</description>
 		<column name="device_id" type="autoinc" primarykey="yes" descr="Unique Device ID"/>
@@ -100,5 +100,5 @@
 			</row>
 		</data>
 	</table>
-	
 </schema>
+

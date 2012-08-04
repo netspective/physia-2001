@@ -3,7 +3,8 @@ package App::Dialog::Field::Scheduling::Date;
 ##############################################################################
 
 use strict;
-use base qw{CGI::Dialog::Field};
+#use base qw{CGI::Dialog::Field};
+use base qw{CGI::Dialog::MultiField};
 
 sub new
 {

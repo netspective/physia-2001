@@ -24,6 +24,7 @@ use App::Dialog::Field::Scheduling;
 use App::Component::WorkList::PatientFlow;
 
 use App::Schedule::Utilities;
+use App::Schedule::Analyze;
 use App::Utilities::Invoice;
 
 use vars qw(%RESOURCE_MAP);
@@ -530,7 +531,6 @@ sub validateAvailTemplate
 		patient_type      => defined $page->field('patient_type') ? $page->field('patient_type') : -1,
 		appt_type         => $page->field('appt_type') || -1
 	);
-
 	my $flag = defined $rrIds ? App::Schedule::Analyze::MULTIRESOURCESEARCH_PARALLEL
 		: App::Schedule::Analyze::MULTIRESOURCESEARCH_SERIAL;
 

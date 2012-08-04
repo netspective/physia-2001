@@ -6,6 +6,7 @@ use strict;
 use SDE::CVS ('$Id: GenerateQuery.pm,v 1.11 2000-11-22 20:31:21 robert_jenks Exp $', '$Name:  $');
 use XML::Parser;
 use fields qw(qdlFile id fields joins views params);
+use Class::PseudoHash;
 use vars qw(%CACHE $COMPARISONS);
 
 %CACHE = ();
@@ -48,8 +49,6 @@ $COMPARISONS = [
 	unshift @$COMPARISONS, \%compIndex;
 }
 
-
-
 sub new
 {
 	my $class = shift;
@@ -67,8 +66,8 @@ sub new
 	# Create a new object
 	$class = ref($class) || $class;
 	no strict 'refs';
-	my SQL::GenerateQuery $self = [\%{"${class}::FIELDS"}];
-	bless $self, $class;
+	my SQL::GenerateQuery $self = fields::new($class);
+	use strict 'refs';
 
 	$self->{qdlFile} = $opts{file};
 
@@ -185,20 +184,21 @@ sub views
 	return exists $self->{views}->{$id} ? $self->{views}->{$id} : undef;
 }
 
-
 # Returns the definition of a comparison
 # Without a param, it returns a list of comparisons
 sub comparisons
 {
 	my SQL::GenerateQuery $self = shift;
 	my $id = shift;
+	
 	unless (defined $id)
 	{
 		return map {$_->{id}} @$COMPARISONS[1..$#{$COMPARISONS}];
 	}
-	return $COMPARISONS->{$id};
+	#Pseudohash doesn't work, so use this expanded notation
+	my $compword = $COMPARISONS->[$COMPARISONS->[0]{$id}];
+	return $compword;
 }
-
 
 # Reads/Parses the QDL file
 #   Can be called multiple times to re-load after a data-file change
@@ -207,9 +207,9 @@ sub initialize
 	my SQL::GenerateQuery $self = shift;
 	my $qdlFile = $self->{qdlFile};
 
-	$self->{fields} = [{},];  # Psuedo-Hash to maintain field order
+	$self->{fields} = Class::PseudoHash->new;  # Psuedo-Hash to maintain field order
 	$self->{joins} = {};
-	$self->{views} = [{},]; # Psuedo-Hash to maintain view order
+	$self->{views} = Class::PseudoHash->new; # Psuedo-Hash to maintain view order
 
 	# Import the QDL data
 	my $parser = new XML::Parser(Style => 'Tree');
@@ -338,7 +338,6 @@ sub parseView
 }
 
 
-
 ##############################################################################
 package SQL::GenerateQuery::Condition;
 ##############################################################################
@@ -360,7 +359,8 @@ sub new
 
 	$class = ref($class) || $class;
 	no strict 'refs';
-	my SQL::GenerateQuery::Condition $self = [\%{"${class}::FIELDS"}];
+	#my SQL::GenerateQuery::Condition $self = [\%{"${class}::FIELDS"}];
+	my SQL::GenerateQuery::Condition $self = fields::new($class);
 
 	$self->{sqlGen} = $sqlGen;
 
@@ -376,6 +376,7 @@ sub new
 
 	# Validate the comparison
 	my $compare = $sqlGen->comparisons($comparison);
+
 	unless ($compare)
 	{
 		die "Comparison '$comparison' is invalid";
@@ -399,7 +400,6 @@ sub new
 	$self->{orderBy} = [];
 	$self->{distinct} = 0;
 
-	bless $self, $class;
 	return $self;
 }
 
@@ -425,7 +425,8 @@ sub joinConditions
 	# Create an object
 	$class = ref($_[0]) || $_[0];
 	no strict 'refs';
-	my SQL::GenerateQuery::Condition $self = [\%{"${class}::FIELDS"}];
+	#my SQL::GenerateQuery::Condition $self = [\%{"${class}::FIELDS"}];
+	my SQL::GenerateQuery::Condition $self = fields::new($class);
 	use strict;
 
 	$self->{sqlGen} = $sqlGen;
@@ -471,7 +472,6 @@ sub joinConditions
 		}
 	}
 
-	bless $self, $class;
 	return $self;
 }
 
@@ -590,7 +590,7 @@ sub genSQL
 
 		# Get a copy of the default comparison operator data
 		my $compData = { %{$sqlGen->comparisons($comparison)} };
-
+		
 		# Add overridden parameters to the comparison operator data
 		foreach my $opt (keys %{$compare->{options}})
 		{

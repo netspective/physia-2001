@@ -453,7 +453,6 @@ sub handleARL
 		unless($pathItems->[1])
 		{
 			$self->redirect("/$arl/profile");
-			$self->send_http_header();
 			return 0;
 		}
 
@@ -476,4 +475,4 @@ sub handleARL
 	return 0;
 }
 
-1;
+1;

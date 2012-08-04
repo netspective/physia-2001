@@ -5,6 +5,7 @@ package App::Dialog::Report::Org::General::Accounting::ProcAnalysis;
 use strict;
 use Carp;
 use App::Dialog::Report;
+use App::Dialog::Field::Insurance;
 use App::Universal;
 use Date::Calc qw(:all);
 use Date::Manip;
@@ -19,6 +20,7 @@ use App::Configuration;
 use App::Device;
 use App::Statements::Device;
 
+#use App::Dialog::Field::OrgType;
 use App::Statements::Component::Invoice;
 use App::Statements::Report::Accounting;
 use vars qw(@ISA $INSTANCE);

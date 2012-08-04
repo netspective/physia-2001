@@ -3,7 +3,6 @@ package XAP::Apache::PerlHandler;
 ##############################################################################
 
 use strict;
-use Apache;
 use Apache::Constants qw(:common);
 use CGI qw(:standard);
 use CGI::Carp qw(fatalsToBrowser);
@@ -41,7 +40,7 @@ sub handler
 	
 	if ($@)
 	{
-		my $msg = "<h1>Perl Runtime Errors:</h1><font color=red>$@</font>";
+		my $msg = "<h1>Perl Runtime Errors at XAP:</h1><font color=red>$@</font>";
 		my $user = getpwuid($>) || '';
 		$r->content_type('text/html');
 		$r->send_http_header();

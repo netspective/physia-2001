@@ -3,6 +3,7 @@ package App::Statements::BillingStatement;
 ##############################################################################
 
 use strict;
+use App::Universal;
 use Exporter;
 use DBI::StatementManager;
 

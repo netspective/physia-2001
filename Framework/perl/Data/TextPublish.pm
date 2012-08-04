@@ -8,7 +8,7 @@ use Number::Format;
 use CGI::Layout;
 use Data::Reporter;
 use Data::Reporter::RepFormat;
-use Data::Reporter::Arraysource;
+#use Data::Reporter::Arraysource; #TODO: Find out this missing module
 use App::Configuration;
 use Storable qw(dclone);
 

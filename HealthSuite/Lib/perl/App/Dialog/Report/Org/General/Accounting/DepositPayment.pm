@@ -6,6 +6,8 @@ use strict;
 use Carp;
 use Date::Calc qw(Delta_Days);
 use App::Dialog::Report;
+use App::Dialog::Field::Organization;
+use App::Dialog::Field::Person;
 use App::Universal;
 
 use CGI::Dialog;
@@ -198,8 +200,8 @@ $batch_from, $batch_to) ;
 			{groupBy=>'#1#',colIdx => 1, head => 'Batch ID', hAlign=>'left', tAlign=>'left',dAlign => 'left'},
 			{groupBy=>'#2#', colIdx => 2, head => 'Payer', hAlign=>'left', tAlign=>'left',dAlign => 'left',},
 			{groupBy=>'#3#', colIdx => 3, head => 'Check', hAlign=>'left', tAlign=>'left',dAlign => 'left',},
-			{ colIdx => 4, head => 'Invoice ID' , hAlign=>'left', tAlign=>'left',dAlign => 'left',},
-			{ colIdx => 5, head => 'Check Amount',  dformat => 'currency',sAlign=>'right',summarize=>'sum' ,,tAlign=>'right'},
+			{colIdx => 4, head => 'Invoice ID' , hAlign=>'left', tAlign=>'left',dAlign => 'left',},
+			{colIdx => 5, head => 'Check Amount',  dformat => 'currency',sAlign=>'right', summarize=>'sum', tAlign=>'right',},
 		],
 	};
 
@@ -242,7 +244,7 @@ $batch_from, $batch_to) ;
 	{ Name=> "Print Report ", Value => ($hardCopy) ? 'Yes' : 'No' },
 	{ Name=> "Printer ", Value => $printerDevice},
 	];
-	my $FormFeedDepositSummary = appendFormFeed($tempDir.$textDepositSummary);
+	my $FormFeedDepositSummary = appendFormFeed($tempDir.$textDepositSummary);
 	my $FormFeedCheckPayment = appendFormFeed($tempDir.$textCheckPayment);
 	my $fileConstraintDepositSummary = appendConstraints($page, $tempDir.$textDepositSummary, $Constraints);
 	my $fileConstraintCheckPayment = appendConstraints($page, $tempDir.$textCheckPayment, $Constraints);

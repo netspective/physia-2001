@@ -1,6 +1,7 @@
 package CGI::Theme;
 
 use strict;
+use warnings;
 use Class::Struct;
 
 struct
@@ -10,10 +11,10 @@ struct
 	menuFontHoverColor => '$',
 	logoAreaAttrs => '$',
 	headerAreaAttrs => '$',
-	workAreaAttrs => '$',
+	workAreaAttrs => '$'
 );
 
-getAll
+sub getAll
 {
 	my $self = shift;
 	return (
@@ -26,11 +27,12 @@ getAll
 		);
 }
 
-getPhysiaDefault
+sub getPhysiaDefault
 {
 	return $physia::defaultTheme if defined $physia::defaultTheme;
 	
 	$physia::defaultTheme = new CGI::Theme;
+	my $theme = $physia::defaultTheme;
 	$theme->menuAreaAttrs('BGCOLOR="#DCDCDC" HEIGHT="25"');
 	$theme->menuFontAttrs('FACE="Arial,Helvetica" SIZE="2" COLOR="#0B3170"');
 	$theme->menuFontHoverColor('red');

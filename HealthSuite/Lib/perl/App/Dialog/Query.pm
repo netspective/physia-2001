@@ -37,6 +37,7 @@ sub new
 
 	my $page = $self->{page};
 	my $sqlGen = new SQL::GenerateQuery(file => $page->property('QDL'));
+	
 	$self->{sqlGen} = $sqlGen;
 	my $viewName = $page->param('_query_view') || 'all';
 	my $view = $sqlGen->views($page->param('_query_view'));
@@ -59,6 +60,7 @@ sub new
 		$self->{topHtml} = [qq{<br><table align="center" border="0" cellspacing="0" cellpadding="0" bgcolor="white"><tr><td>&nbsp;<font face="tahoma,helvetica" size="2" color="Navy"><b>Filters:</b></font>&nbsp;</td>$viewMenuHtml</tr></table>}];
 	}
 
+
 	my $fieldSelections =
 		join ';',
 			map {$sqlGen->fields($_)->{caption} . ":" . $sqlGen->fields($_)->{id}}
@@ -69,6 +71,7 @@ sub new
 			map {$sqlGen->comparisons($_)->{caption} . ":" . $sqlGen->comparisons($_)->{id}}
 				grep {$sqlGen->comparisons($_)->{placeholder} !~ /\@/}
 					$sqlGen->comparisons();
+
 	my $joinOps = 'AND;OR';
 
 	my $gridName = 'params';

@@ -8,6 +8,7 @@ use CGI::Validator::Field;
 use CGI::Dialog;
 use DBI::StatementManager;
 use App::Statements::Component::Scheduling;
+use App::Component::WorkList::PatientFlow;
 
 use base 'CGI::Dialog';
 

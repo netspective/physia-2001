@@ -12,7 +12,9 @@ sub import
 	my $class = shift;
 	@_ or return;  # Import list of CVS keywords is required
 	no strict 'refs';
-	my SDE::CVS $self = bless [\%{"$class\::FIELDS"}], $class;
+        my SDE::CVS $self = { "Revision" => "fields::Revision", "Date" => "fields::Date", "Name" => "fields::Name", "Author" => "fields::Author", "Locker" => "fields::Locker", "Source" => "fields::Source", "State" => "fields::State", "RCSfile" => "fields::RCSfile", "Version" => "fields::Version" };
+        bless $self, $class;
+
 	use strict;
 	foreach (@_)
 	{

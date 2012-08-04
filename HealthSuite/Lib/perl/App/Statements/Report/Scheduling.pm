@@ -6,6 +6,8 @@ use strict;
 
 use DBI::StatementManager;
 use Data::Publish;
+use App::Universal;
+
 use vars qw(@EXPORT $STMTMGR_REPORT_SCHEDULING $STMTFMT_DETAIL_APPT_SCHEDULE $STMTRPTDEFN_DETAIL_APPT_SCHEDULE
 );
 use base qw(Exporter DBI::StatementManager);

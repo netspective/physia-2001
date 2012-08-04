@@ -58,14 +58,15 @@ sub initialize
 	$self->SUPER::initialize(@_);
 
 	my $orgId = $self->param('org_id');
-	$intOrgId = $STMTMGR_ORG->getSingleValue($self, STMTMGRFLAG_CACHE, 'selOrgId',
-		$self->session('org_internal_id'), $orgId);
+	$intOrgId = $STMTMGR_ORG->getSingleValue($self, STMTMGRFLAG_CACHE, 'selOrgId', $self->session('org_internal_id'), $orgId);
+	my $session_org_int_id=$self->session('org_internal_id');
 
 	unless($intOrgId)
 	{
 		$self->disable(
 			qq{
 				<br>
+				session_org_internal_id: '$session_org_int_id' <br>
 				Org '$orgId' does NOT exist in your Organization.
 				Click <a href='javascript:history.back()'>here</a> to go back.
 			}

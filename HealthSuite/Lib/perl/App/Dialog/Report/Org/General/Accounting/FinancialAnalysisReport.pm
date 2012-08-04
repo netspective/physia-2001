@@ -5,6 +5,9 @@ package App::Dialog::Report::Org::General::Accounting::FinancialAnalysisReport;
 use strict;
 use Carp;
 use App::Dialog::Report;
+use App::Dialog::Field::Organization;
+use App::Dialog::Field::Person;
+
 use App::Universal;
 
 use CGI::Dialog;
