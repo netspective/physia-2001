@@ -58,9 +58,9 @@ Note: Unless explicitly mentioned all these operations need to performed as priv
 
 Prerequisite:
 
-Memory: > 1GB
-swap : > 2GB
-Shared Memory: > 512MB
+ - Memory: > 1GB
+ - swap: > 2GB
+ - Shared Memory: > 512MB
 
 These parameters can be verified using the following commands
 
@@ -69,9 +69,11 @@ These parameters can be verified using the following commands
     df -kh /dev/shm/
 
 Edit the /etc/fstab and add/modify the following line:
+
     tmpfs    /dev/shm     tmpfs   defaults,size=512M    0       0
 
 Then remount and verify the size:
+
     mount -o remount /dev/shm
     df -kh /dev/shm/
 
@@ -112,12 +114,15 @@ Run the following command to reload these kernel parameters
 
 Shell limits for oracle user
 Add the following to `/etc/security/limits.conf` as below:
+
     oracle              soft    nproc   2047
     oracle              hard    nproc   16384
     oracle              soft    nofile  1024
     oracle              hard    nofile  65536
     oracle              soft    stack   10240
-Check if the following line exits within /etc/pam.d/login and /etc/pam.d/su or add it on both the files if doesn't exists
+
+Check if the following line exits within `/etc/pam.d/login` and `/etc/pam.d/su` or add it on both the files if doesn't exists
+
     session required pam_limits.so
     Create required directories
     Create required directory and change permission:
@@ -128,7 +133,7 @@ Check if the following line exits within /etc/pam.d/login and /etc/pam.d/su or a
 
 Configuring the oracle user's environment:
 
-Add following line to /var/lib/oracle/.profile.
+Add following line to `/var/lib/oracle/.profile`.
 
     ulimit -u 16384 -n 65536
     umask 022
@@ -143,7 +148,7 @@ Add following line to /var/lib/oracle/.profile.
         PATH="$ORACLE_HOME/bin:$PATH"
     fi
 
-Fake Oracle installer:
+Fake the Oracle installer:
 
 As mentioned before , Ubuntu is not listed as Oracle officially support platform and so we need to "fake" it. Create symbolic links as follows:
 
@@ -167,6 +172,7 @@ Last step before installation start
     cd /var/lib/oracle
 
 Download oracle 11g from the following URL. It requires at least a free oracle web login account.
+
     https://edelivery.oracle.com/EPD/Download/process_download/V17530-01_1of2.zip
     https://edelivery.oracle.com/EPD/Download/process_download/V17530-01_2of2.zip
 
@@ -195,7 +201,7 @@ On X-server host the installer interface will start. Follow the standard screen 
 
 - Save the response file for future reference or installation.
 - During "Perform Prerequisite checks", go through the package requirement list and make sure all the packages are installed. These warning can be ignored as this is not officially supported OS and the package version might be slightly different.
-- During installation, oracle tries to build certain packages and some compile/Linker error might occur in the makefiles ins_emagent.mk and inst_srvm.mk. In that case, just execute these commands to rectify it.
+- During installation, oracle tries to build certain packages and some compile/Linker error might occur in the makefiles `ins_emagent.mk` and `inst_srvm.mk`. In that case, just execute these commands to rectify it.
 
 The commands are
 
@@ -238,7 +244,7 @@ This will create a directory PHYSIA_ROOT/HealthSuite/Database/schema-physia with
 
 ###5. Apache and Mod_Perl configuration
 
-On Ubuntu system modify/copy the http configuration file from PHYSIA_ROOT/HealthSuite/Conf/apache2/default to /var/apache2/sites-available/default and modperl startup file PHYSIA_ROOT/HealthSuite/Conf/apache2/startup.pl to  /var/apache2/startconf/startup.pl
+On Ubuntu system modify/copy the http configuration file from `PHYSIA_ROOT/HealthSuite/Conf/apache2/default` to `/var/apache2/sites-available/default` and modperl startup file `PHYSIA_ROOT/HealthSuite/Conf/apache2/startup.pl` to  `/var/apache2/startconf/startup.pl`
 
 Configure these two files to match the current environment.
 
