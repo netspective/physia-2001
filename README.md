@@ -1,13 +1,15 @@
 **General instructions to Load HealthSuite on Ubuntu-12.04LTS with Apache-2.2.22, Perl-5.14.2, ModPerl-2.0.5 and Oracle-11g**
 
 ###1. Application Environment
-Use Apache,Perl and ModPerl that come with the distribution or install them using apt-get.
+Use Apache, Perl and ModPerl that come with the distribution or install them using apt-get.
 
 ###2. Perl Environment 
 Install the following perl modules, either using apt-get or cpan. To install a module perl named "AAA::Bbb".
 
-Using apt-get: apt-get install  libaaa-bbb-perl
-Using cpan: cpan -i AAA::Bbb
+- Using apt-get: `apt-get install libaaa-bbb-perl`
+- Using cpan: `cpan -i AAA::Bbb`
+
+Required Perl Module List
 
     DBD::Oracle 
     Apache::Session
@@ -46,13 +48,11 @@ Using cpan: cpan -i AAA::Bbb
     Text::Autoformat
     Text::CSV
 
-The source for old version of pdflib which was used for this project can be obtained from 
-URL http://download.devparadise.com/pdflib-2.01.zip. Follow the instruction in the source 
-directory to compile and install this module.
+An old version of pdflib was used for this project. The source for this can be obtained from the URL `http://download.devparadise.com/pdflib-2.01.zip`. Follow the instruction in the source directory to compile and install this module.
 
 ###3. Oracle installation on Ubuntu-12.04 LTS.
 
-Oracle 11g is NOT officially supported for Ubuntu-12.04, but since it is a variant of Linux distribution, the Oracle installer can be easily fooled to resemble the system as RedHat Linux and install it. Hence, the Ubuntu system need to be slightly altered to make Oracle install and work correctly.
+Oracle-11g is NOT officially supported for Ubuntu-12.04, but since it is a variant of Linux distribution, the Oracle installer can be easily fooled to resemble it as RedHat Linux system and install Oracle. Hence, the Ubuntu system need to be slightly altered to make Oracle install and work correctly.
 
 _Note:_ Unless explicitly mentioned all these operations need to performed as privileged user (or using sudo).
 
@@ -150,7 +150,7 @@ Add following line to `/var/lib/oracle/.profile`.
 
 Fake the Oracle installer:
 
-As mentioned before , Ubuntu is not listed as Oracle officially support platform and so we need to "fake" it. Create symbolic links as follows:
+As mentioned before, Ubuntu is not listed as officially supported Oracle platform and so we need to fake it. Create symbolic links as follows:
 
     mkdir /usr/lib64
     ln -s /etc /etc/rc.d
@@ -204,7 +204,7 @@ On the server start the installer:
 On X-server host the installer interface will start. Follow the standard screen instructions.
 
 - Save the response file for future reference or installation.
-- During "Perform Prerequisite checks", go through the package requirement list and make sure all the packages are installed. These warning can be ignored as this is not officially supported OS and the package version might be slightly different.
+- During "Perform Prerequisite checks", go through the package requirement list and make sure all the packages are installed. Most of the warnings can be ignored as this is not officially supported OS and the package version might be slightly different than what was specified.
 - During installation, oracle tries to build certain packages and some compile/Linker error might occur in the makefiles `ins_emagent.mk` and `inst_srvm.mk`. In that case, just execute these commands to rectify it.
 
 The commands are
@@ -215,8 +215,9 @@ The commands are
     sed -i 's/^\(\s*\)\(\$(OCRLIBS_DEFAULT)\)/\1 -Wl,--no-as-needed \2/g' $ORACLE_HOME/srvm/lib/ins_srvm.mk
     sed -i 's/^\(TNSLSNR_LINKLINE.*\$(TNSLSNR_OFILES)\) \(\$(LINKTTLIBS)\)/\1 -Wl,--no-as-needed \2/g' $ORACLE_HOME/network/lib/env_network.mk
     sed -i 's/^\(ORACLE_LINKLINE.*\$(ORACLE_LINKER)\) \(\$(PL_FLAGS)\)/\1 -Wl,--no-as-needed \2/g' $ORACLE_HOME/rdbms/lib/env_rdbms.mk
+
+_______ End of Oracle installation _______
 ___
------------------ End of Oracle installation ------------
 
 Starting Oracle database service:
 
@@ -225,10 +226,12 @@ Login as oracle user on the system, set all appropriate environment variable and
     sqlplus sys as sysdba
 
 On SQL Prompt
+
     startup;
     exit;
 
 Start DB Listener service:
+
     lsnrctl start 
 
 ###4. HealthSuite installation:
@@ -268,5 +271,3 @@ The interface credentials are stored on the database table "person_login". Add r
     insert into person_org_category (person_id, org_internal_id, category, cr_stamp, version_id) values ('LOGU', 15, 'Superuser', '07-DEC-11', 0);
     update org set owner_org_id=15 where org_id='VISOLVE';
 ___
-
-___End__
