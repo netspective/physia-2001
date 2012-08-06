@@ -5,6 +5,7 @@ package App::Dialog::HandHeld::Manage_Patient::Medication;
 use strict;
 use SDE::CVS ('$Id: Medication.pm,v 1.3 2001-01-31 19:03:23 thai_nguyen Exp $', '$Name:  $');
 use App::Dialog::Medication;
+use App::Dialog::Field::Organization;
 
 use vars qw($INSTANCE);
 

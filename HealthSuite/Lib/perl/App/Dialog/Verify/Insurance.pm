@@ -8,10 +8,12 @@ use CGI::Validator::Field;
 use CGI::Dialog;
 use DBI::StatementManager;
 use App::Statements::Component::Scheduling;
+use App::Component::WorkList::PatientFlow;
 
 use base 'CGI::Dialog';
 
 use vars qw(%RESOURCE_MAP);
+
 %RESOURCE_MAP = (
 	'insurance-records' => { 
 			_arl => ['event_id', 'person_id'],
@@ -324,7 +326,7 @@ sub execute
 		ins_verify_date => $page->field('ins_verify_date'),
 		owner_org_id => $page->session('org_internal_id'),
 	);
-	
+
 	my $eventAttribute = $STMTMGR_COMPONENT_SCHEDULING->getRowAsHash($page, STMTMGRFLAG_NONE,
 		'sel_EventAttribute', $eventId, App::Universal::EVENTATTRTYPE_APPOINTMENT);
 

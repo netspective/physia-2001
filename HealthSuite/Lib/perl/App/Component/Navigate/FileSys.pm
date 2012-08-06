@@ -8,6 +8,7 @@ use CGI::Component;
 use File::Spec;
 use File::Basename;
 use App::Configuration;
+use App::Page;
 use Data::Publish;
 use Exporter;
 use Date::Manip;

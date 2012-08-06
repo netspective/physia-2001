@@ -2777,12 +2777,12 @@
 				<col name="group_name">Neurology</col>
 			</row>
 			<row>
-				<col name="id">2601</col>
+				<col name="id">2611</col>
 				<col name="caption">Infertility</col>
 				<col name="group_name">OB/GYN</col>
 			</row>
 			<row>
-				<col name="id">2606</col>
+				<col name="id">2612</col>
 				<col name="caption">Prenatal care</col>
 				<col name="group_name">OB/GYN</col>
 			</row>
@@ -2819,17 +2819,17 @@
 				<col name="group_name">Ophthalmology</col>
 			</row>
 			<row>
-				<col name="id">2627</col>
+				<col name="id">2637</col>
 				<col name="caption">Motor vehicle accident</col>
 				<col name="group_name">Orthopedic</col>
 			</row>
 			<row>
-				<col name="id">2625</col>
+				<col name="id">2635</col>
 				<col name="caption">Sports injury</col>
 				<col name="group_name">Orthopedic</col>
 			</row>
 			<row>
-				<col name="id">2626</col>
+				<col name="id">2636</col>
 				<col name="caption">Work related injury</col>
 				<col name="group_name">Orthopedic</col>
 			</row>
@@ -2984,7 +2984,7 @@
 				<col name="group_name">Speech Therapy</col>
 			</row>
 			<row>
-				<col name="id">3142</col>
+				<col name="id">3144</col>
 				<col name="caption">Cochlear implants</col>
 				<col name="group_name">Equipment/Supplies</col>
 			</row>
@@ -2994,7 +2994,7 @@
 				<col name="group_name">Equipment/Supplies</col>
 			</row>
 			<row>
-				<col name="id">3341</col>
+				<col name="id">3344</col>
 				<col name="caption">Hearing aids</col>
 				<col name="group_name">Equipment/Supplies</col>
 			</row>
@@ -3049,7 +3049,7 @@
 				<col name="group_name">Radiology</col>
 			</row>
 			<row>
-				<col name="id">3561</col>
+				<col name="id">3562</col>
 				<col name="caption">Bone density study</col>
 				<col name="group_name">Radiology</col>
 			</row>
@@ -3169,7 +3169,7 @@
 				<col name="group_name">ENT</col>
 			</row>
 			<row>
-				<col name="id">2605</col>
+				<col name="id">2613</col>
 				<col name="caption">Laparoscopy</col>
 				<col name="group_name">General Surgery</col>
 			</row>
@@ -3274,7 +3274,7 @@
 				<col name="group_name">OB/GYN Surgery</col>
 			</row>
 			<row>
-				<col name="id">2619</col>
+				<col name="id">2620</col>
 				<col name="caption">Other OB/GYN</col>
 				<col name="group_name">OB/GYN Surgery</col>
 			</row>
@@ -3339,12 +3339,12 @@
 				<col name="group_name">Orthopedic Surgery</col>
 			</row>
 			<row>
-				<col name="id">2639</col>
+				<col name="id">2628</col>
 				<col name="caption">Other orthopedic</col>
 				<col name="group_name">Orthopedic Surgery</col>
 			</row>
 			<row>
-				<col name="id">0912</col>
+				<col name="id">0902</col>
 				<col name="caption">Cleft palate/lip consult or surgery</col>
 				<col name="group_name">Plastic/Reconstructive</col>
 			</row>

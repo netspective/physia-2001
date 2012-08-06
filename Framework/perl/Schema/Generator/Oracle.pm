@@ -736,7 +736,6 @@ sub createLoadFiles
 	my $self = shift;
 	my $allsql = "spool load_all_sql\n\n";
 
-	#foreach my $subdir ('pre', 'tables', 'tables-code', 'data', 'api', 'post')
 	foreach my $subdir ('pre', 'tables', 'tables-code', 'data', 'post')
 	{
 		my $sqlFiles = "";
@@ -759,7 +758,7 @@ sub createLoadFiles
 				$sqlFiles .= "start $subdir/$destNameOnly\n";
 			}
 		}
-
+		
 		if(exists $self->{createPaths}->{$subdir})
 		{
 			foreach (@{$self->{createPaths}->{$subdir}->{files}})
@@ -806,10 +805,10 @@ sub createLoadFiles
 		$self->saveFile(path => 'base', fileName => "load_all_ctl.bat", dataRef => \$ctlFiles);
 	}
 
-	my $setupFile = "$self->{cmdProcessor} -s $self->{connectStr} \@load_all_sql.sql\n";
+	my $setupFile = "$self->{cmdProcessor} $self->{connectStr} \@load_all_sql.sql\n";
 	$setupFile .= "load_all_ctl.bat\n" if $haveCtls;
 
-	$self->saveFile(path => 'base', fileName => "setupdb.bat", dataRef => \$setupFile);
+	$self->saveFile(path => 'base', fileName => "setupdb.sh", dataRef => \$setupFile);
 }
 
 1;

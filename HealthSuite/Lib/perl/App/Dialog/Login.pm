@@ -32,6 +32,12 @@ sub new
 			onValidate => \&validateUser, onValidateData => $self,
 			options => FLDFLAG_REQUIRED | FLDFLAG_NOBRCAPTION | FLDFLAG_UPPERCASE | FLDFLAG_PERSIST | FLDFLAG_HOME,
 		),
+##TODO: To add Organization field in login screen
+#		new CGI::Dialog::Field(
+#			name => 'org_id', caption => 'Oraganization ID',
+			#onValidate => \&validateOrg, onValidateData => $self,
+#			options => FLDFLAG_REQUIRED | FLDFLAG_NOBRCAPTION | FLDFLAG_UPPERCASE | FLDFLAG_PERSIST | FLDFLAG_HOME,
+#		),
 		new CGI::Dialog::Field(
 			name => 'password', caption => 'Password', type => 'password',
 			onValidate => \&validatePassword, onValidateData => $self,
@@ -70,26 +76,36 @@ sub validateUser
 		() : ("$dialogItem->{caption} '$value' cannot login.");
 }
 
+#sub validateOrg
+#{
+#	my ($dialogItem, $page, $dialog, $value, $extraData) = @_;
+#
+#	return $STMTMGR_ORG->recordExists($page, STMTMGRFLAG_NONE,'selPersonCategoryExists', $value) ?
+#		() : ("$dialogItem->{caption} '$value' cannot login.");
+#}
+
 sub validatePassword
 {
 	my ($dialogItem, $page, $dialog, $value, $extraData) = @_;
 	my $personId = uc($page->field('person_id'));
 	my $orgId = uc($page->field('org_id'));
-	my $orgIntId = uc($dialog->{org_internal_id});
+
 	#my $info = $orgIntId ?
 	#	$STMTMGR_PERSON->getRowAsArray($page, STMTMGRFLAG_NONE, 'selLoginOrg', $personId, $orgIntId) :
 	#	$STMTMGR_PERSON->getRowAsArray($page, STMTMGRFLAG_NONE, 'selLogin', $personId);
 	my $info = $STMTMGR_PERSON->getRowAsArray($page, STMTMGRFLAG_NONE, 'selLoginAnyOrg', $personId);
+	my $orgIntId = uc($info->[1]);
+	#print "info: ",join " #", @$info, "<br> \n";
 
 	if($info)
 	{
-		return ("Invalid password specified for User ID $info->[0]\@$info->[1]") if $info->[2] ne $value;
+		return ("Invalid password specified for User ID $info->[0]\@$orgId") if $info->[2] ne $value;
 
 		if(my $loginCount = $info->[3])
 		{
 			if($page->field('clear_sessions'))
 			{
-				$orgId ?
+				$orgIntId ?
 					$STMTMGR_PERSON->execute($page, STMTMGRFLAG_NONE, 'updSessionsTimeoutOrg', $personId, $orgIntId) :
 					$STMTMGR_PERSON->execute($page, STMTMGRFLAG_NONE, 'updSessionsTimeout', $personId);
 			}

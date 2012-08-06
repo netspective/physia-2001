@@ -41,6 +41,7 @@ use App::Statements::Scheduling;
 use App::Statements::Transaction;
 use App::Statements::Report::Accounting;
 use App::Statements::Device;
+#use App::Dialog::Field::Organization;
 
 #
 # the following hash is create to keep track of "how" components
@@ -252,7 +253,6 @@ sub handlePage
 sub handleARL
 {
 	my ($arl) = @_;
-
 	my $errorCode = 'ARL-000100'; # invalid ARL
 	my $flags = 0;
 

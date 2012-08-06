@@ -4,6 +4,7 @@ package App::Data::MDL::Invoice;
 
 use strict;
 use DBI::StatementManager;
+use App::Statements::Transaction;
 use App::Statements::Insurance;
 use App::Statements::Invoice;
 use App::Statements::Person;
@@ -311,6 +312,7 @@ sub importClaimSubmission
 
 	unless($invoiceFlags & $attrDataFlag)
 	{
+		my $page;
 		my $mainTransId = $invoice->{main_transaction};
 		my $mainTransData = $STMTMGR_TRANSACTION->getRowAsHash($self, STMTMGRFLAG_CACHE, 'selTransaction', $mainTransId);
 
