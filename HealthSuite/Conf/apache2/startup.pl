@@ -10,6 +10,7 @@ BEGIN {
     $ENV{LD_LIBRARY_PATH} =$ENV{ORACLE_HOME}."/lib";
     $ENV{HS_DEBUG} = 1;
     $ENV{PHYSIA_ROOT} = "/var/netphysia";
+    $ENV{HS_HOME} = "/var/netphysia/HealthSuite";
 
 }
 
