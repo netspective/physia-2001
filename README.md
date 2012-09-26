@@ -3,6 +3,19 @@
 ###1. Application Environment
 Use Apache, Perl and ModPerl that come with the distribution or install them using apt-get.
 
+Install using the following commands:
+
+    sudo apt-get update
+    sudo apt-get install apache2
+    sudo apt-get install perl
+    sudo apt-get install libapache2-mod-perl2
+
+Install the software dependancies using the following command:
+
+    sudo aptitude -y install alien binutils build-essential cpp-4.4 tree debhelper g++ gawk gcc gettext html2text ia32-libs intltool-debian ksh lesstif2 make pax po-debconf rpm rpm-common sysstat unzip libexpat1-dev
+
+Note: Use 'sudo' where ever you perform a system operation.
+
 ###2. Perl Environment 
 Install the following perl modules, either using apt-get or cpan. To install a module perl named "AAA::Bbb".
 
@@ -11,6 +24,7 @@ Install the following perl modules, either using apt-get or cpan. To install a m
 
 Required Perl Module List
 
+    DBI
     DBD::Oracle 
     Apache::Session
     Apache::Session::NullLocker
@@ -29,7 +43,6 @@ Required Perl Module List
     CGI
     CGI::Carp
     Class::Struct
-    DBI
     Date::Calc
     Date::Manip
     Devel::Symdump
@@ -38,18 +51,25 @@ Required Perl Module List
     Set::IntSpan
     Set::Scalar
     Text::Template
+    XML::Parser
     XML::DOM
     XML::Generator
-    XML::Parser
     Class::Generate
     Class::PseudoHash
     Data::Reporter
     File::PathConvert
     Text::Autoformat
     Text::CSV
+    Image::Info
 
-An old version of pdflib was used for this project. The source for this can be obtained from the URL `http://download.devparadise.com/pdflib-2.01.zip`. Follow the instruction in the source directory to compile and install this module.
-
+Install pdflib module. 
+    
+    git clone https://github.com/netspective/pdflib-2.0.1-patched-ubuntu
+    cd pdflib-2.0.1-patched-ubuntu
+    ./configure
+    sudo make
+    sudo make install
+    
 ###3. Oracle installation on Ubuntu-12.04 LTS.
 
 Oracle-11g is NOT officially supported for Ubuntu-12.04, but since it is a variant of Linux distribution, the Oracle installer can be easily fooled to resemble it as RedHat Linux system and install Oracle. Hence, the Ubuntu system need to be slightly altered to make Oracle install and work correctly.
@@ -81,8 +101,8 @@ Software dependencies:
 
 Use the following command to install the software dependencies for Oracle 11g.
 
-    aptitude -y install alien binutils build-essential cpp-4.4 debhelper g++-4.4 gawk gcc-4.4 gcc-4.4-base gettext html2text ia32-libs intltool-debian ksh lesstif2 lib32bz2-dev lib32z1-dev libaio-dev libaio1 libbeecrypt7 libc6 libc6-dev libc6-dev-i386 libdb4.8 libelf-dev libelf1 libltdl-dev libltdl7 libmotif4 libodbcinstq4-1 libodbcinstq4-1:i386 libqt4-core libqt4-gui libsqlite3-0 libstdc++5 libstdc++6 libstdc++6-4.4-dev lsb lsb-core lsb-cxx lsb-desktop lsb-graphics lsb-qt4 make odbcinst pax po-debconf rpm rpm-common sysstat unixodbc unixodbc-dev unzip
-
+    sudo aptitude -y lib32bz2-dev lib32z1-dev libaio-dev libaio1 libbeecrypt7 libc6 libc6-dev libc6-dev-i386 libdb4.8 libelf-dev libelf1 libltdl-dev libltdl7 libmotif4 libodbcinstq4-1 libodbcinstq4-1:i386 libqt4-core libqt4-gui libsqlite3-0 libstdc++5 libstdc++6 libstdc++6-4.4-dev lsb lsb-core lsb-cxx lsb-desktop lsb-graphics lsb-qt4 odbcinst unixodbc unixodbc-dev
+    
 System groups and users:
 
 Create oracle user and required system group as follows
@@ -91,6 +111,8 @@ Create oracle user and required system group as follows
     addgroup --system dba
     useradd -r -g oinstall -G dba -m -s /bin/bash -d /var/lib/oracle oracle
     passwd oracle
+    useradd -m vusr_edi
+    mkdir /home/vusr_edi/per-se
 
 Configure kernel parameters:
 
@@ -124,8 +146,9 @@ Add the following to `/etc/security/limits.conf` as below:
 Check if the following line exits within `/etc/pam.d/login` and `/etc/pam.d/su` or add it on both the files if doesn't exists
 
     session required pam_limits.so
-    Create required directories
-    Create required directory and change permission:
+
+Create required directories and change permission:
+
     mkdir -p /u01/app/oracle
     mkdir -p /u02/oradata
     chown -R oracle:oinstall /u01 /u02
@@ -228,31 +251,56 @@ Login as oracle user on the system, set all appropriate environment variable and
 On SQL Prompt
 
     startup;
-    exit;
+    
+In the SQL, create a user and database index for Healthsuite.
+
+    create user USERNAME identified by PASSWORD;
+    grant connect,resource,dba to USERNAME;
+    create tablespace TS_INDEXES datafile '/u01/app/oracle/oradata/orcl/ts_index.dbf' size 100M;
+    alter user USERNAME default tablespace TS_INDEXES;
+    commit;
 
 Start DB Listener service:
 
     lsnrctl start 
 
+Copy the oracle tnsnames.ora file to oracle home and /etc/ directory.
+
+    cp /u01/app/oracle/product/11.2.0/dbhome_1/network/admin/tnsnames.ora /var/lib/oracle/.tnsnames.ora
+    cp /u01/app/oracle/product/11.2.0/dbhome_1/network/admin/tnsnames.ora /etc/tnsnames.ora
+
+
 ###4. HealthSuite installation:
 
-Copy the Healthsuite source to a directory say `/var/physia`. (which is PHYSIA_ROOT)
+Download the Healthsuite source and Copy the files in Healthsuite source to a directory say `/var/netphysia`. (which is PHYSIA_ROOT)
+    
+    git clone https://github.com/netspective/physia-2001.git
+    cd physia-2001.git
+    cp -r * /var/netphysia
+    
+Configure the database credentials (USERNAME and PASSWORD) created in the SQL above on the file: `PHYSIA_ROOT/HealthSuite/Lib/perl/App/Configuration.pm`
 
-Configure the database credentials on the file: `PHYSIA_ROOT/HealthSuite/Lib/perl/App/Configuration.pm`
-
+    'account-root' => getDefaultConfig('root Configuration', CONFIGGROUP_SWDEV, 'USERNAME/PASSWORD@dbi:Oracle:orcl')
+    
+    Note: If you have problem connecting to database then change the above line as below:
+    
+    'account-root' => getDefaultConfig('root Configuration', CONFIGGROUP_SWDEV, 'USERNAME/PASSWORD@dbi:Oracle:host=localhost;sid=orcl')
+    
 Create schema and initialize the database:
 
     cd PHYSIA_ROOT/
-    perl ./HealthSuite/Database/GenerateSchema.pl
-
+    perl -I /var/netphysia/HealthSuite/Lib/perl -I /var/netphysia/Framework/perl ./HealthSuite/Database/GenerateSchema.pl
+    
 This will create a directory `PHYSIA_ROOT/HealthSuite/Database/schema-physia` with all SQL script required to populate the schema and some sample data. Now run these commands to setup the database.
 
     cd PHYSIA_ROOT/HealthSuite/Database/schema-physia
-    ./setupdb.sh
+    chmod 755 setup.sh
+    sh setupdb.sh  
+    (This should create the required schemas. This should not prompt for any username/password. If it prompts then there ia an issue with the tnsnames and resolve it before proceeding.) 
 
 ###5. Apache and Mod_Perl configuration
 
-On Ubuntu system modify/copy the http configuration file from `PHYSIA_ROOT/HealthSuite/Conf/apache2/default` to `/var/apache2/sites-available/default` and modperl startup file `PHYSIA_ROOT/HealthSuite/Conf/apache2/startup.pl` to  `/var/apache2/startconf/startup.pl`
+On Ubuntu system modify/copy the http configuration file from `PHYSIA_ROOT/HealthSuite/Conf/apache2/default` to `/etc/apache2/sites-available/default` and modperl startup file `PHYSIA_ROOT/HealthSuite/Conf/apache2/startup.pl` to  `/etc/apache2/startconf/startup.pl`
 
 Configure these two files to match the current environment.
 
@@ -270,4 +318,5 @@ The interface credentials are stored on the database table "person_login". Add r
     insert into person_login(cr_stamp, cr_user_id, org_internal_id, version_id, person_id, password) values ('07-DEC-11','logu', 15, 10, 'LOGU','l123');
     insert into person_org_category (person_id, org_internal_id, category, cr_stamp, version_id) values ('LOGU', 15, 'Superuser', '07-DEC-11', 0);
     update org set owner_org_id=15 where org_id='VISOLVE';
+    commit;
 ___
